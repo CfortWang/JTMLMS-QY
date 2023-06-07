@@ -1057,7 +1057,7 @@ export default {
 }
 
 .dynamic-form-table .el-table th {
-    background-color: #a7d6f8 !important;
+    background-color: #84d5cf !important;
     font-size: 12px;
     font-weight: bold;
     border: 0px;
@@ -1069,7 +1069,7 @@ export default {
 }
 
 .dynamic-form-table .el-table .warning-row {
-    background: #d3ebfc;
+    background: #e0f0ee;
     color: #000000;
 }
 

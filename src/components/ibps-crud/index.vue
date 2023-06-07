@@ -484,7 +484,7 @@
   </script>
   <style>
     .el-table th{
-      background-color: #A7D6F8 !important;
+      background-color: #84d5cf !important;
       font-size: 12px  !important;
       color: #000000;
       border: 0px;
@@ -506,7 +506,7 @@
        font-size: 12px  !important;
      }
     .el-table .warning-row {
-        background: #D9EEFD;
+        background: #e0f0ee;
         color: #000000;
       }
 

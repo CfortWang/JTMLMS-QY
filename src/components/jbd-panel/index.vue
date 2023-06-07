@@ -9,7 +9,8 @@
 <template>
   <div class="jbd-sys-title">
       <!--<span  class="jbd-sys-title-cont-center" style="margin-left: 40px;float: left;">金通实验室认证认可LIMS系统V2.0</span>-->
-      <span  class="jbd-sys-title-cont-center" style="margin-left: 40px;float: left;">深圳市罗湖医院集团细胞质量检测实验室LIMS系统</span>
+      <!-- <span  class="jbd-sys-title-cont-center" style="margin-left: 40px;float: left;">深圳市罗湖医院集团细胞质量检测实验室LIMS系统</span> -->
+      <span  class="jbd-sys-title-cont-center" style="margin-left: 40px;float: left;">金通医学实验室管理系统</span>
        <span style="float: right; " class="jbd-sys-title-contact">
          </br>
        深圳市金源信通科技有限公司开发 <i style="margin-left: 10px;" class="el-icon-phone"/> 0755-2642-4403

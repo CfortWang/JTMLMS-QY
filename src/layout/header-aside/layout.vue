@@ -331,7 +331,7 @@
     // 注册主题
     @import '~@/assets/styles/theme/register.scss';
     .jbd-sys-title {
-        background: linear-gradient(to top, rgb(51, 150, 209), #7dbfdf);
+        background: linear-gradient(to top, rgb(48, 194, 189), rgb(145, 216, 210));
         // background: rgb(51, 150, 209);
         height: 40px;
         line-height: 40px;

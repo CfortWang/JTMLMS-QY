@@ -881,8 +881,8 @@
                 .btn {
                     height: 30px;
                     margin-left: 10px;
-                    background-color: #409eff;
-                    border-color: #409eff;
+                    background-color: #01a394;
+                    border-color: #01a394;
                     font-size: 12px;
                     border-radius: 3px;
                     padding: 7px 15px;
@@ -900,7 +900,7 @@
         overflow: scroll;
     }
     .app-container .el-table th {
-        background-color: #a7d6f8 !important;
+        background-color: #84d5cf !important;
         font-size: 14px;
         font-weight: bold;
         color: #000000;
@@ -910,7 +910,7 @@
         padding: 4px;
     }
     .app-container .el-table .warning-row {
-        background: #d3ebfc;
+        background: #e0f0ee ;
         color: #000000;
     }
     .app-container .el-table .success-row {

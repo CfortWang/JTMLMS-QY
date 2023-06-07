@@ -1,14 +1,15 @@
 <template>
     <div class="jbd-login-page-bg">
         <el-container class="login-container" @keyup.enter="handleLogin">
-            <el-main style="width: 100%; height: 100%; overflow: hidden;border: 0;">
+            <el-main style="width: 100%; height: 100%; overflow: hidden;border: 0;display: flex;
+            justify-content: right;">
                 <div class="">
                     <div class="logoTitle">
                         <h1 class="login-title">
                             <img src="../../../assets/images/login/logo.jpg" class="logoImg" />
-                            深圳市罗湖医院集团
+                            金标达集团
                         </h1>
-                        <h1 class="login-title" style="font-size: 52px">细胞质量检测实验室LIMS系统</h1>
+                        <h1 class="login-title" style="font-size: 52px">金通医学实验室管理系统</h1>
                     </div>
 
                     <div class="jbd-login-page-main">
@@ -63,7 +64,7 @@ export default {
 </script>
 <style>
 .jbd-login-page-bg {
-    background-image: url('../../../assets/images/login/bgImg.png');
+    background-image: url('../../../assets/images/login/bgImg.jpg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     position: absolute;
@@ -89,6 +90,7 @@ export default {
 .login-title {
     font-size: 26px;
     color: #01a39e;
+
 }
 .logoImg {
     width: 30px;
