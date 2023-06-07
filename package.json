@@ -146,5 +146,14 @@
     "no-console": "off",
     "no-irregular-whitespace": "off",
     "no-debugger": "off"
-  }
+  },
+  "main": ".eslintrc.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://119.23.210.103:3000/wy/zdqy_firm_former.git"
+  },
+  "license": "ISC"
 }
