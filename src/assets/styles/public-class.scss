@@ -1,0 +1,222 @@
+@import 'public';
+
+// 补丁 base
+@import '~@/assets/styles/fixed/base.scss';
+// 补丁 element
+@import '~@/assets/styles/fixed/element.scss';
+// 补丁 markdown
+@import '~@/assets/styles/fixed/markdown.scss';
+// 补丁 n-progress
+@import '~@/assets/styles/fixed/n-progress.scss';
+// 补丁 vue-splitpane
+@import '~@/assets/styles/fixed/vue-splitpane.scss';
+// 补丁 vue-grid-layout
+@import '~@/assets/styles/fixed/vue-grid-layout.scss';
+// 补丁 tree-view
+@import '~@/assets/styles/fixed/tree-view.scss';
+// 补丁 print
+@import '~@/assets/styles/fixed/print.scss';
+// 补丁 vue-codemirror
+@import '~@/assets/styles/fixed/vue-codemirror.scss';
+// 动画
+@import '~@/assets/styles/animate/vue-transition.scss';
+// 文字省略
+@import '~@/assets/styles/fixed/ellipsis.scss';
+
+
+
+//图标
+@import '~@/assets/styles/iconfont/icon.scss';
+
+//组件
+@import '~@/assets/styles/components/search-form.scss';
+@import '~@/assets/styles/components/crud.scss';
+@import '~@/assets/styles/components/card-list.scss';
+@import '~@/assets/styles/components/selector.scss';
+@import '~@/assets/styles/components/selector-dialog.scss';
+@import '~@/assets/styles/components/list.scss';
+@import '~@/assets/styles/components/toolbar.scss';
+@import '~@/assets/styles/components/panel.scss';
+@import '~@/assets/styles/components/table.scss';
+@import '~@/assets/styles/components/attachment-selector.scss';
+@import '~@/assets/styles/components/watermark.scss';
+
+
+
+// 在这里写公用的class
+// 注意 这个文件里只写class
+// mixin等内容请在 public.scss 里书写
+
+// 文字相关
+.#{$prefix}-tc {
+  text-align: center !important;
+}
+.#{$prefix}-tr {
+  text-align: right !important;
+}
+.#{$prefix}-tl {
+  text-align: left;
+}
+//文字省略
+.#{$prefix}-ellipsis{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.#{$prefix}-help-block{
+  display: block;
+  color: #909399;
+}
+.#{$prefix}-help-icon{
+  color: #cacad3;
+  font-size: 13px;
+}
+
+
+.#{$prefix}-dashed{
+  border-top-style: dashed!important;
+}
+.#{$prefix}-solid{
+  border-top-style: solid !important;
+}
+
+.#{$prefix}-desc{
+  margin: 10px;
+  .title{
+    margin-left: 10px;
+    color: #000000d9;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .divider{
+    position: relative;
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    border-top-color: #aab2bd;
+    border-top-style: dashed;
+    border-top-width: 1px;
+  }
+  .desc{
+    display: block;
+    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color: #545454;
+  }
+}
+
+.#{$prefix}-page-header-title{
+  height: 20px;
+  line-height: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-indent: 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  padding-bottom: 5px;
+  border-left: 5px solid $color-primary;
+  border-bottom: 1px solid $color-border-3;
+}
+
+// 浮动相关
+.#{$prefix}-fl {
+  float: left;
+}
+.#{$prefix}-fr {
+  float: right;
+}
+.#{$prefix}-fl-important {
+  float: left!important;
+}
+.#{$prefix}-fr-important {
+  float: right!important;
+}
+.#{$prefix}-clearfix:before,
+.#{$prefix}-clearfix:after {
+  display: table;
+  content: "";
+}
+.#{$prefix}-clearfix:after {
+  clear: both
+}
+
+.#{$prefix}-field-text{
+  margin: 5px 5px 0 0;
+  line-height: 24px;
+}
+
+// -webkit-box-sizing: border-box;
+// box-sizing: border-box;
+// overflow: hidden;
+// text-overflow: ellipsis;
+// white-space: pre;
+// word-break: break-all;
+
+.#{$prefix}-field-textarea{
+  .el-textarea__inner, 
+  .el-textarea__inner:hover,
+  .el-textarea__inner:focus{
+    padding: 5px;
+    border-color:#ffffff;
+  }
+}
+
+
+// 对话框相关
+$dialogSizes: (90, 80,70,60,50,40,30,20);
+
+@for $index from 1 to 9 {
+  .#{$prefix}-dialog-#{nth($dialogSizes, $index)} {
+    .el-dialog__body {
+      height:  calc(#{nth($dialogSizes, $index)}vh - 120px) !important;
+    }
+  }
+}
+
+// 快速使用
+
+.#{$prefix}-m { margin: 20px !important; }
+.#{$prefix}-mt { margin-top: 20px !important; }
+.#{$prefix}-mr { margin-right: 20px !important; }
+.#{$prefix}-mb { margin-bottom: 20px !important; }
+.#{$prefix}-ml { margin-left: 20px !important; }
+
+.#{$prefix}-p { padding: 20px !important; }
+.#{$prefix}-pt { padding-top: 20px !important; }
+.#{$prefix}-pr { padding-right: 20px !important; }
+.#{$prefix}-pb { padding-bottom: 20px !important; }
+.#{$prefix}-pl { padding-left: 20px !important; }
+
+// 边距相关
+$sizes: (0, 5, 10, 15, 20);
+
+@for $index from 1 to 6 {
+  .#{$prefix}-m-#{nth($sizes, $index)} { margin: #{nth($sizes, $index)}px !important; }
+  .#{$prefix}-mt-#{nth($sizes, $index)} { margin-top: #{nth($sizes, $index)}px !important; }
+  .#{$prefix}-mr-#{nth($sizes, $index)} { margin-right: #{nth($sizes, $index)}px !important; }
+  .#{$prefix}-mb-#{nth($sizes, $index)} { margin-bottom: #{nth($sizes, $index)}px !important; }
+  .#{$prefix}-ml-#{nth($sizes, $index)} { margin-left: #{nth($sizes, $index)}px !important; }
+
+  .#{$prefix}-p-#{nth($sizes, $index)} { padding: #{nth($sizes, $index)}px !important; }
+  .#{$prefix}-pt-#{nth($sizes, $index)} { padding-top: #{nth($sizes, $index)}px !important; }
+  .#{$prefix}-pr-#{nth($sizes, $index)} { padding-right: #{nth($sizes, $index)}px !important; }
+  .#{$prefix}-pb-#{nth($sizes, $index)} { padding-bottom: #{nth($sizes, $index)}px !important; }
+  .#{$prefix}-pl-#{nth($sizes, $index)} { padding-left: #{nth($sizes, $index)}px !important; }
+}
+
+
+
+.required,.has-errors{
+  color: #dd5a43 !important;
+}
+
+.red {
+  color: #dd5a43 !important;
+}
+.green {
+  color: #69aa46 !important;
+}

@@ -1,0 +1,90 @@
+.ibps-attachment-selector{
+  min-width: 200px;
+  .selector-list {
+    display: block;
+    margin:0;
+    padding: 0;
+    background: #fff;
+    // max-height: 40px;
+    border: dashed 1px #CCC;
+    overflow: auto;
+    &.disabled{
+      background-color: #f5f7fa;
+      border-color: #e4e7ed;
+      color: #c0c4cc;
+    }
+    &.disabled label{
+      cursor: not-allowed;
+    }
+    label {
+      margin: 0;
+      display: table;
+      width: 100%;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    label .plus {
+      font-size: 20px;
+      width: 20px;
+      display: table-cell;
+      vertical-align: middle;
+      padding-left: 10px;
+      padding-top: 0;
+      cursor: pointer;
+      color: #c0c4cc;
+    }
+
+   .selector-empty {
+      padding: 0 10px 0 0;
+      text-align: left;
+      line-height: 2;
+      display: table-cell;
+      vertical-align: middle;
+      color: #c0c4cc;
+    }
+  }
+    
+  .is-disabled{
+    .el-upload-list__item:first-child{
+      margin-top: 5px;
+    }
+  }
+  .el-upload-list__item{
+    .el-upload-list__item{
+        margin-top:0 ;
+    }
+    .tools{
+        position: absolute;
+        right: 5px;
+        top: 0;
+        line-height: inherit;
+        display: none;
+    }
+  }
+  
+  .el-upload-list__item:hover{
+    cursor: pointer;
+    .tools{
+      display: block;
+    }
+  }
+
+   .ibps-default-upload{
+      width:100%;
+      line-height:0;
+      .el-upload-list{
+        display:none;
+      }
+      .el-upload{
+        width:100%;
+        .el-upload-dragger{
+          width:100%;
+          height: 32px;
+          border:none;
+          border-radius:4px;
+        }
+      }
+    }
+    
+  }
+ 
