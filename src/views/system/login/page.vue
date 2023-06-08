@@ -7,7 +7,7 @@
                     <div class="logoTitle">
                         <h1 class="login-title">
                             <img src="../../../assets/images/login/logo.jpg" class="logoImg" />
-                            金标达集团
+                            金源信通
                         </h1>
                         <h1 class="login-title" style="font-size: 52px">金通医学实验室管理系统</h1>
                     </div>
