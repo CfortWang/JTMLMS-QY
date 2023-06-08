@@ -10,6 +10,7 @@
                             :height="height"
                             title=""
                             category-key="FLOW_TYPE"
+                            :hasPermission="true"
                             @node-click="handleNodeClick"
                             @expand-collapse="handleExpandCollapse"
                         />
