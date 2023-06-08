@@ -4,7 +4,7 @@
 
     <div slot="west">
       <ibps-type-tree :width="width" :height="height" title="记录分类" category-key="FLOW_TYPE"
-        @node-click="handleNodeClick" @expand-collapse="handleExpandCollapse" />
+        :hasPermission="true" @node-click="handleNodeClick" @expand-collapse="handleExpandCollapse" />
     </div>
     <ibps-crud ref="crud" :style="{ marginLeft: width + 'px' }" :height="height" :data="listData"
       :toolbars="listConfig.toolbars" :search-form="listConfig.searchForm" :pk-key="pkKey" :displayField="tableTitle"
