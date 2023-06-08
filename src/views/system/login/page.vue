@@ -1,13 +1,12 @@
 <template>
     <div class="jbd-login-page-bg">
         <el-container class="login-container" @keyup.enter="handleLogin">
-            <el-main style="width: 100%; height: 100%; overflow: hidden;border: 0;display: flex;
-            justify-content: right;">
+            <el-main style="width: 100%; height: 100%; overflow: hidden; border: 0; display: flex; justify-content: right">
                 <div class="">
                     <div class="logoTitle">
                         <h1 class="login-title">
                             <img src="../../../assets/images/login/logo.jpg" class="logoImg" />
-                            金源信通
+                            <span style="font-size: 24px; margin-left: 5px">金源信通</span>
                         </h1>
                         <h1 class="login-title" style="font-size: 52px">金通医学实验室管理系统</h1>
                     </div>
@@ -28,10 +27,17 @@
                     </div>
                 </div>
             </el-main>
-            <el-footer style="width: 80%">
-                <div style="font-size: 12px; text-align: right">
-                    <hr />
-                    <div><i class="el-icon-s-platform" /> 深圳市金源信通科技有限公司开发</div>
+            <el-footer style="width: 100%">
+                <hr style="color: #aaaaaa" />
+                <div class="centerCox">
+                    <div style="width: 260px"></div>
+                    <div>
+                        建议使用的浏览器360、火狐
+                    </div>
+                    <div style="font-size: 12px; text-align: right">
+
+                        <div style="font-size: 16px"><i class="el-icon-s-platform" /> 深圳市金源信通科技有限公司开发</div>
+                    </div>
                 </div>
             </el-footer>
         </el-container>
@@ -76,7 +82,8 @@ export default {
 
 .jbd-login-page-main {
     margin-top: 80px;
-    margin-left: 3%;
+    /* margin-left: 3%; */
+    margin: 0 auto;
     margin-bottom: 20px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     padding: 30px;
@@ -85,12 +92,12 @@ export default {
     background-repeat: no-repeat;
     border-radius: 5%;
     box-sizing: border-box;
+    background: #fff;
 }
 
 .login-title {
     font-size: 26px;
     color: #01a39e;
-
 }
 .logoImg {
     width: 30px;
@@ -103,5 +110,11 @@ export default {
 <style scoped>
 .logoTitle {
     margin: 30px;
+}
+
+.centerCox{
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
 }
 </style>

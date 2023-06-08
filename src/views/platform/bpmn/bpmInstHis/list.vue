@@ -4,7 +4,7 @@
             <ibps-type-tree
                 :width="width"
                 :height="height"
-                title="事务分类"
+
                 :location="location"
                 category-key="FLOW_TYPE"
                 :hasPermission="hasPermission"
@@ -167,7 +167,7 @@
     import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
     import IbpsAttachment from '@/business/platform/file/attachment/selector'
     import { specialType, specialBtn, specialParams, specialTable, specialField } from './corresponding/index'
-    
+
     export default {
         components: {
             IbpsTypeTree,

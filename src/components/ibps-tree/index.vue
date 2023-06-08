@@ -212,7 +212,7 @@ export default {
       if (!this.data || this.data.length === 0) return []
       this.data.map(item => {
         if (item.name === '任务分类') {
-            item.name = '事务分类'
+            item.name = '记录分类'
         }
       })
       if (this.dataType === 'list') {
