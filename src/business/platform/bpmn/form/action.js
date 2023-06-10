@@ -17,7 +17,6 @@ export default {
         // 设置是否过审的状态
         setData(title) {
             let data = title
-            console.log(this.getFormEL())
             if (!title) {
                 //获取当前流程步骤名
                 data = "已" + this.getFormEL().formDefData.flowName
@@ -108,11 +107,12 @@ export default {
                 case 'rejectToStart':// 驳回发起人
                 case 'reject':// 驳回
                     this.setData("已退回")
-                    if (this.isBpmOpinionHide && actionName === 'rejectToPrevious') {
-                        this.handleDirectActionEvent(actionName)
-                    } else {
-                        this.rejectDialogVisible = true
-                    }
+                    // if (this.isBpmOpinionHide && actionName === 'rejectToPrevious') {
+                    //     this.handleDirectActionEvent(actionName)
+                    // } else {
+                    //     this.rejectDialogVisible = true
+                    // }
+                    this.rejectDialogVisible = true
                     break
                 case 'delegate':// 转办
                     this.delegateReadonly = false
@@ -425,7 +425,6 @@ export default {
                 })
             }).catch((err) => {
                 loading.close()
-                console.error(err)
             })
         },
         /**
@@ -459,7 +458,6 @@ export default {
                 })
             }).catch((err) => {
                 loading.close()
-                console.error(err)
             })
         },
         /**

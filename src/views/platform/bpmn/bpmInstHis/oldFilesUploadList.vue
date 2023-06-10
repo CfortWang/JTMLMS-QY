@@ -1,6 +1,5 @@
 <template>
   <div class="main-container">
-
     <div slot="west">
       <ibps-type-tree :width="width"
                       :height="height"
@@ -40,9 +39,8 @@
                      :def-id="defId"
                      :pk-value="pkValue"
                      :form-key="formKey"
-                     @callback=""
                      :addDataCont="addDataCont"
-                     @close="visible => dialogFormVisible = visible" />``
+                     @close="visible => dialogFormVisible = visible" />
 
     <el-dialog :close-on-click-modal="false"
                :close-on-press-escape="false"
@@ -71,6 +69,7 @@ import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js' //增删改查规则
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import GetReport from './corresponding/getReport.js'
+import { number } from 'echarts/lib/export.js'
 export default {
   components: {
     IbpsTypeTree,
@@ -109,7 +108,19 @@ export default {
       height: document.clientHeight,
       reportAll: [],
       listData: [],
-      pagination: { limit: 0, page: 0, totalCount: 0, totalPages: 0 },
+      bianlistData: {
+        dataResult: [],
+        pageResult: {
+          limit: 0,
+          page: 0,
+          totalCount: 0,
+          totalPages: 0
+        }
+      },
+      selectListData: [],
+      pagination: {
+        limit: 20, page: 1
+      },
       paginations: 20,
       page: 1,
       sorts: {},
@@ -138,11 +149,13 @@ export default {
         // 表格字段配置
         columns: [
           { prop: 'fen_lei_', label: '记录表单分类', width: 120 },
-          { prop: 'biao_dan_ming_che', label: '表单名称', width: 300 },
-          { prop: 'nian_du_', label: '年度', width: 120 },
-          { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 150 },
-          { prop: 'bm_name', label: '上传部门', width: 120 },
-          { prop: 'ry_name', label: '上传人', width: 120 },
+          { prop: 'biao_dan_ming_che', label: '表单名称', width: 350 },
+          { prop: 'shi_wu_shuo_ming_', label: '事务说明', width: 350 },
+
+          { prop: 'nian_du_', label: '年度', width: 80 },
+          { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 100 },
+        //   { prop: 'bm_name', label: '上传部门', width: 120 },
+          { prop: 'ry_name', label: '上传人', width: 100 },
           { prop: 'fu_jian_', label: '附件', slotName: "wenjinachayue", width: 300 }
         ],
       }
@@ -179,7 +192,7 @@ export default {
     openTask(id) {
       this.dialogFormVisible = true
       this.defId = id
-      this.addDataCont = { fenLei: this.tableTitle, fenLeiId: this.typeId, biaoDanMingCheng: '1111' }
+      this.addDataCont = { fenLei: this.tableTitle, fenLeiId: this.typeId }
     },
     // 加载数据
     loadData() {
@@ -202,8 +215,28 @@ export default {
         )
         let sql = 'select * FROM t_ywyxjlb jl  LEFT JOIN lh_bm_ry ry ON ry.ry_id  = jl.bian_zhi_ren_' + nianduWhere + ' order by bian_zhi_shi_jian desc'
         curdPost('sql', sql).then(response => {
-          this.listData = this.handlePage(response.variables.data, this.paginations, this.page)
-
+          let tableDatas = response.variables.data
+          if (tableDatas.length !== 0) {
+            this.selectListData = JSON.parse(JSON.stringify(tableDatas))
+            let filterDatas = []
+            this.bianlistData.pageResult.totalCount = tableDatas.length
+            this.bianlistData.pageResult.totalPages = Math.ceil(tableDatas.length / this.pagination.limit)
+            this.bianlistData.pageResult.limit = this.pagination.limit
+            this.bianlistData.pageResult.page = this.pagination.page
+            if (this.pagination.limit > tableDatas.length) {
+              filterDatas = JSON.parse(JSON.stringify(tableDatas))
+            } else {
+              for (let index = 0; index < 20; index++) {
+                filterDatas.push(tableDatas[index])
+              }
+            }
+            this.bianlistData.dataResult = filterDatas
+            ActionUtils.handleListData(this, this.bianlistData)
+          } else {
+            ActionUtils.handleListData(this, [])
+            this.pagination.limit = 20
+            this.pagination.page = 1
+          }
           this.loading = false
         }).catch(() => {
           this.loading = false
@@ -235,11 +268,29 @@ export default {
         let sql = `select * FROM t_ywyxjlb jl  LEFT JOIN lh_bm_ry ry ON ry.ry_id  = jl.bian_zhi_ren_   ` + idwhere + ` order by bian_zhi_shi_jian desc`
 
         curdPost('sql', sql).then(response => {
-          this.listData = this.handlePage(response.variables.data, this.paginations, this.page)
-          this.pagination['limit'] = this.paginations
-          this.pagination['page'] = this.page
-          this.pagination['totalCount'] = this.handlePage(response.variables.data, this.paginations, this.page).length
-          this.pagination['totalPages'] = Math.ceil(this.handlePage(response.variables.data, this.paginations, this.page).length / this.paginations);
+          let tableDatas = response.variables.data
+          if (tableDatas.length !== 0) {
+            this.selectListData = JSON.parse(JSON.stringify(tableDatas))
+            let filterDatas = []
+            this.bianlistData.pageResult.totalCount = tableDatas.length
+            this.bianlistData.pageResult.totalPages = Math.ceil(tableDatas.length / this.pagination.limit)
+            this.bianlistData.pageResult.limit = this.pagination.limit
+            this.bianlistData.pageResult.page = this.pagination.page
+            if (this.pagination.limit > tableDatas.length) {
+              filterDatas = JSON.parse(JSON.stringify(tableDatas))
+            } else {
+              for (let index = 0; index < 20; index++) {
+                filterDatas.push(tableDatas[index])
+              }
+            }
+            this.bianlistData.dataResult = filterDatas
+            ActionUtils.handleListData(this, this.bianlistData)
+          } else {
+            ActionUtils.handleListData(this, [])
+            this.pagination.limit = 20
+            this.pagination.page = 1
+          }
+
           this.loading = false
         }).catch(() => {
           this.loading = false
@@ -270,43 +321,47 @@ export default {
      */
     getSearcFormData() {
       const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-      this.niandu = params.nianDu ? params.nianDu : '' // 年度
-      this.startTime = params.b ? params.b : '' // 开始时间
-      this.endTime = params.i ? params.i : '' // 结束时间
+      if (JSON.stringify(params) == "{}") {
+        this.niandu = '' // 年度
+        this.startTime = '' // 开始时间
+        this.endTime = '' // 结束时间
+      } else {
+        this.niandu = params.nianDu ? params.nianDu : '' // 年度
+        this.startTime = params.b ? params.b : '' // 开始时间
+        this.endTime = params.i ? params.i : '' // 结束时间
+      }
     },
     /**
      * 处理分页事件
      */
     handlePaginationChange(page) {
-      this.paginations = page.limit
-      this.page = page.page
-      this.loadData()
+      ActionUtils.setPagination(this.pagination, page)
+      this.bianlistData.pageResult.limit = page.limit
+      this.bianlistData.pageResult.page = page.page
+      let filterDatas = []
+      if (this.selectListData.length >= (page.limit * page.page)) {
+        for (let index = (page.limit * page.page) - page.limit; index < (page.limit * page.page); index++) {
+          filterDatas.push(this.selectListData[index])
+        }
+        this.bianlistData.dataResult = JSON.parse(JSON.stringify(filterDatas))
+      } else {
+        for (let index = (page.limit * page.page) - page.limit; index < this.selectListData.length; index++) {
+          filterDatas.push(this.selectListData[index])
+        }
+        this.bianlistData.dataResult = JSON.parse(JSON.stringify(filterDatas))
+      }
+      ActionUtils.handleListData(this, this.bianlistData)
     },
 
-    /* 分页数据处理 */
-    handlePage(data, pagination, page) {
-      let handleDatas = []
-      if (data.length !== 0) {
-        for (let i = pagination * page - pagination; i < pagination * page - 1; i++) {
-          if (data[i]) {
-            handleDatas.push(data[i])
-            continue;
-          } else {
-            break;
-          }
-        }
-        return handleDatas
-      } else {
-        return []
-      }
-    },
+
     /**
      * 查询
      */
     search() {
+      this.pagination.limit = 20
+      this.pagination.page = 1
       this.getSearcFormData()
       this.loadData()
-
     },
     /* 防止多次快速查询*/
     numbersClick() {

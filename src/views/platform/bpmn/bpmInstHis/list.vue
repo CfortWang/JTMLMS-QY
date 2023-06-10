@@ -239,7 +239,7 @@
                         // { prop: 'subject', label: '任务标题', link: 'dialog', width: 250 },
                         { prop: 'tYear', label: '年份', width: 60 },
                         { prop: 'tDept', label: '部门', width: 90 },
-                        { prop: 'procDefName', label: '表单名称', sortable: 'custom', width: 250 },
+                        { prop: 'procDefName', label: '表单名称', sortable: 'custom', formatter: this.replaceFormName, width: 250 },
                         { prop: 'subject', label: '事务说明', formatter: this.getDesc, 'min-width': 300 },
                         { prop: 'tUser', label: '编制人', width: 80 },
                         { prop: 'endTime', label: '完成时间', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 90}
@@ -270,6 +270,13 @@
             }
         },
         methods: {
+            replaceFormName (row, column, cellValue, index) {
+                let t = cellValue === '管理评审计划'
+                if (t) {
+                    return '管理评审'
+                }
+                return cellValue
+            },
             // 截取事务说明字段内容
             getDesc(row, column, cellValue, index) {
                 let hasDesc = cellValue.includes('#')

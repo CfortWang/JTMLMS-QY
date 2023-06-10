@@ -69,7 +69,8 @@
                         data: [],
                         rowNum: 7,
                         // columnWidth: ['300','100','150','150','100']
-                        columnWidth: ['400','150','150','100']
+                        columnWidth: ['400','150','150','100'],
+                        waitTime: 1500
                     },
                     acceptData:[],
                     taskData: [],

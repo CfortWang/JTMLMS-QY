@@ -147,7 +147,7 @@ export default {
       this.getLook(idStr)
     },
     getLook(id) {
-      let sql = `select * from t_cgysjlb where wai_jian_ in (${id})`
+      let sql = `select * from t_cgysjlb where wai_jian_ in (${id}) UNION ALL SELECT * FROM t_wlzpysjlb WHERE wai_jian_ IN (${id})`
       repostCurd("sql", sql).then(res => {
         if (res.state === 200) {
           for (var i of res.variables.data) {

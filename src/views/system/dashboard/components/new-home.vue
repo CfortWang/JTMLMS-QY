@@ -596,14 +596,24 @@
                     parameters: [],
                     sorts: []
                 }
-                let sql = `select id_, shi_wu_id_ as taskId from t_gqswb where position('${userId}' in chu_li_ren_id_)`
-                Promise.all([pending(params), curdPost('sql', sql)]).then(([res1, res2]) => {
+                let sql = `select id_, shi_wu_id_ as taskId from t_gqswb where position('${userId}' in chu_li_ren_id_) FOR UPDATE`
+                // Promise.all([pending(params), curdPost('sql', sql)]).then(([res1, res2]) => {
+                //     let workData = res1.data && res1.data.dataResult
+                //     let noticeData = res2.variables && res2.variables.data
+                //     if (!workData || !workData.length) {
+                //         return
+                //     }
+                //     this.dealData(workData, noticeData)
+                // })
+                pending(params).then(res1 => {
                     let workData = res1.data && res1.data.dataResult
-                    let noticeData = res2.variables && res2.variables.data
-                    if (!workData || !workData.length) {
-                        return
-                    }
-                    this.dealData(workData, noticeData)
+                    curdPost('sql', sql).then(res2 => {
+                        let noticeData = res2.variables && res2.variables.data
+                        if (!workData || !workData.length) {
+                            return
+                        }
+                        this.dealData(workData, noticeData)
+                    })
                 })
             },
             // 处理数据
@@ -627,6 +637,7 @@
                     }
                     result.all.push(item)
                 })
+                // console.log('处理后数据：', result)
                 // 有过期数据才执行过期数据处理
                 if (result.expire.length) {
                     this.dealExpile(result.expire, noticeList)
@@ -662,6 +673,8 @@
             },
             // 处理已过期数据
             dealExpile(data, noticeList) {
+                // console.log('已过期流程数据：', data)
+                // console.log('过期事务表数据：', noticeList)
                 const { userId } = this.$store.getters
                 let addList = []
                 let sendList = []
@@ -712,7 +725,8 @@
                             subject: msgTitle[item.workType],
                             content: `<p>事务【${item.workName}】${msgContent[item.workType]}<p>`,
                             receiverId: userId,
-                            canreply: '0'
+                            canreply: '0',
+                            taskId: item.taskId
                         }
                         sendList.push(msg)
                     }
@@ -721,7 +735,7 @@
                     tableName: 't_gqswb',
                     paramWhere: addList
                 }
-                console.log(addList, sendList)
+                // console.log('新增过期事务表数据：', addList, '发送消息数据', sendList)
                 if (addList.length) {
                     curdPost('add', JSON.stringify(addParams))
                 }
@@ -739,6 +753,7 @@
                         deleteList.push(item.id_)
                     }
                 })
+                // console.log('过期事务表中需删除的数据：', deleteList)
                 if (!deleteList.length) {
                     return
                 }
@@ -882,8 +897,8 @@
                 .btn {
                     height: 30px;
                     margin-left: 10px;
-                    background-color: #01a394;
-                    border-color: #01a394;
+                    background-color: #409eff;
+                    border-color: #409eff;
                     font-size: 12px;
                     border-radius: 3px;
                     padding: 7px 15px;
@@ -901,7 +916,7 @@
         overflow: scroll;
     }
     .app-container .el-table th {
-        background-color: #84d5cf !important;
+        background-color: #a7d6f8 !important;
         font-size: 14px;
         font-weight: bold;
         color: #000000;
@@ -911,7 +926,7 @@
         padding: 4px;
     }
     .app-container .el-table .warning-row {
-        background: #e0f0ee ;
+        background: #d3ebfc;
         color: #000000;
     }
     .app-container .el-table .success-row {
