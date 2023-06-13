@@ -601,7 +601,7 @@ import * as forEach from 'lodash/forEach'
      }
   }
   #dv-full-screen-container {
-    background-image: url('../../assets/images/screen/bg.png');
+    background-image: url('~@/assets/images/screen/bg.png');
     background-size: 100% 100%;
     box-shadow: 0 0 3px blue;
     display: flex;
