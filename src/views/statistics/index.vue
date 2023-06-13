@@ -5,7 +5,7 @@
       <div class="statistics">
         <div class="editDate">
            <!-- 标题装饰组件 -->
-          <header-decoration /> 
+          <header-decoration />
           <!-- <div class="stitle">实验室管理看板</div> -->
           <div class="block" style="display:none">
             <span class="demonstration">开始:</span>
@@ -27,7 +27,7 @@
                 </el-date-picker> -->
             <!-- </el-date-picker> -->
           <!-- </div> -->
-          <div 
+          <div
             style="width: 12%;
             height:2.825rem;
             line-height: 2.825rem;
@@ -50,43 +50,43 @@
               v-model="NowTime1"
               type="month"
               @change="changeTime1"
-              format="yyyy-MM" 
+              format="yyyy-MM"
               value-format="yyyy-MM"
               placeholder="请选择时间">
             </el-date-picker> -->
           </div>
 
           <!-- <div class="block">
-            
+
           </div> -->
 
           <!-- <div class="goBackButton" @click.prevent="goBack()" >
             返回
           </div> -->
-          <div 
-            @click.prevent="rollstop()" 
+          <div
+            @click.prevent="rollstop()"
             style="width: 8%;
             height:2.825rem;
             line-height: 2.825rem;
             text-align:center;
             float: right;
-            margin: -3% 12% 0 0;" 
+            margin: -3% 12% 0 0;"
             v-if="rollup">
             <dv-border-box-8>暂停</dv-border-box-8>
           </div>
-          <div 
-            @click.prevent="rollcontinue()" 
+          <div
+            @click.prevent="rollcontinue()"
             style="width: 8%;
             height:2.825rem;
             line-height: 2.825rem;
             text-align:center;
             float: right;
-            margin: -3% 12% 0 0;" 
+            margin: -3% 12% 0 0;"
             v-else>
             <dv-border-box-8>继续</dv-border-box-8>
           </div>
-          <div 
-            @click.prevent="goBack()" 
+          <div
+            @click.prevent="goBack()"
             style="width: 8%;
             height:2.825rem;
             line-height: 2.825rem;
@@ -95,7 +95,7 @@
             margin: -3% 3% 0 0;" >
             <dv-border-box-8>返回</dv-border-box-8>
           </div>
-          
+
         </div>
         <dv-border-box-7  backgroundColor="rgba(6, 30, 93, 0.5)" ><div class="ttitle">质量方针：公正、科学、准确、高效</div></dv-border-box-7>
         <div class="congxiebox7" style="display: flex;justify-content: space-between;padding: 1.5% 0.2%;">
@@ -224,7 +224,7 @@
 
           </div>
         </div>
-       
+
 
 
 
@@ -243,7 +243,7 @@
   import s1zhiLiang1 from './item/s1zhiLiang1.vue'
   import s1zhiLiang2 from './item/s1zhiLiang2.vue'
   import s1zhiLiang3 from './item/s1zhiLiang3.vue'
-  
+
   import s1jianCe from './item/s1jianCe.vue'
   import s2manYiDu from './item/s2manYiDu.vue'
   import s3tousu from './item/s3tousu.vue'
@@ -497,14 +497,14 @@ import * as forEach from 'lodash/forEach'
             this.relOf = false
             clearTimeout(this.timer)
           }, 0)
-          
+
           // this.timer = setInterval(() => {
           //   if (!this.relOf) {
           //     this.relOf = true
           //     clearInterval(this.timer)
           //   }
           // }, 100);
-        } 
+        }
         // else if (this.endDate == this.BeginDate) {
         //   this.$message({
         //     showClose: true,
@@ -541,7 +541,7 @@ import * as forEach from 'lodash/forEach'
             message: '年份不得大于当前年份',
             type: 'warning'
           });
-          
+
         }
         this.selectAll()
         // else(
@@ -580,7 +580,7 @@ import * as forEach from 'lodash/forEach'
       // this.currentTime()
       if(screenfull.isEnabled && !screenfull.isFullscreen){
       this.allView()
-        
+
       }
     }
   }
@@ -601,7 +601,7 @@ import * as forEach from 'lodash/forEach'
      }
   }
   #dv-full-screen-container {
-    background-image: url('./img/stars.png');
+    background-image: url('../../assets/images/screen/bg.png');
     background-size: 100% 100%;
     box-shadow: 0 0 3px blue;
     display: flex;
@@ -610,12 +610,12 @@ import * as forEach from 'lodash/forEach'
     display: flex;
     flex-direction:column;
     align-items: stretch;
-    
+
   //  .headerContent{
   //   flex: 1;
-    
+
   //   // background-color: rgb(99, 12, 41);
-    
+
 
   //  }
   }
@@ -644,7 +644,7 @@ import * as forEach from 'lodash/forEach'
   }
   .screen{
     height: 100%;
-    
+
     margin: 0 0.5%;
   }
   .clear{ clear: both; }
@@ -681,5 +681,5 @@ import * as forEach from 'lodash/forEach'
   color: #606266 !important;
   font-weight: 100 !important;
 }
- 
+
 </style>

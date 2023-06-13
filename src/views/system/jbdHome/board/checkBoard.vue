@@ -146,7 +146,7 @@
                 curdPost('sql', sql).then(res => {
                     const data = res.variables.data
                     // console.log(data)
-                    
+
                     if ( data && data.length ) {
                         const { month, accepted, approval, jcFinish, jcTotal, process, report, rwFinish, task, today, week, quarter, bgFinish } = data[0]
                         this.middleCardData.taskData = [month, jcTotal, task, report]
@@ -232,7 +232,7 @@
                                 ]
                             }
                         ]
-                        
+
                         this.topBarData = result
                     }
                 }).catch(error => {
@@ -253,7 +253,7 @@
                 const sql2 = `select ${sqlStr} from t_lhjczb tj, t_mjjcnlfw tm where tj.jian_ce_xiang_mu_ = tm.id_ and tj.create_time_ like '${this.month}%'`
                 // console.log(sqlStr, sql2)
 
-                Promise.all([ 
+                Promise.all([
                     curdPost('sql', sql1),
                     curdPost('sql', sql2)
                 ]).then(([res1, res2]) => {
@@ -401,7 +401,7 @@
         z-index: 999;
         :global {
             #dv-full-screen-container {
-                background-image: url('./img/bg.png');
+                background-image: url('../../../../assets/images/screen/bg.png');
                 background-size: 100% 100%;
                 box-shadow: 0 0 3px blue;
                 display: flex;
