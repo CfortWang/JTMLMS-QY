@@ -21,8 +21,8 @@
                 placeholder="选择月">
               </el-date-picker>
             </div>
-            <div 
-              @click.prevent="goBack()" 
+            <div
+              @click.prevent="goBack()"
               style="width: 12%;
               height:2.825rem;
               line-height: 2.825rem;
@@ -57,7 +57,7 @@
               <div class="nullDate" v-else>暂无数据</div>
             </div>
           </dv-border-box-7> -->
-          
+
         </div>
         <!-- <div class="customerD" v-if="authority"> -->
           <!-- <dv-border-box-7 style="width:49.5%;" backgroundColor="rgba(6, 30, 93, 0.5)">
@@ -77,7 +77,7 @@
               <div class="nullDate" v-else>暂无数据</div>
             </div>
           </dv-border-box-7> -->
-<!--           
+<!--
           <dv-border-box-7  backgroundColor="rgba(6, 30, 93, 0.5)" >
             <div class="ttitle">
               <div v-if="teArr.length>0" class="middleFont">年度团队绩效</div>
@@ -108,7 +108,7 @@
               <div class="nullDate" v-else>暂无数据</div>
             </div>
           </dv-border-box-7> -->
-          
+
         </div>
       </div>
     <!-- </el-scrollbar> -->
@@ -215,7 +215,7 @@
           date: nowDate.getDate(),
         };
         const newmonth = date.month > 10 ? date.month : "0" + date.month;
-        this.allDate = date.year + "-" + newmonth 
+        this.allDate = date.year + "-" + newmonth
 
 
         let dateNum = new Date(date.year, date.month, 0).getDate();
@@ -387,7 +387,7 @@
             var dotIndex = String(num).indexOf('.')
             if (dotIndex === -1) { // 整数
               res = String(num).replace(/(\d)(?=(?:\d{3})+$)/g, `$1${split}`) + '.' + '0'.repeat(decimal)
-            } else { 
+            } else {
               const numStr = String((Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal)).toFixed(decimal)) // 四舍五入，然后固定保留2位小数
               const decimals = numStr.slice(dotIndex, dotIndex + decimal + 1) // 截取小数位
               res = String(numStr.slice(0, dotIndex)).replace(/(\d)(?=(?:\d{3})+$)/g, `$1${split}`) + decimals
@@ -403,7 +403,7 @@
 </script>
 <style lang="scss" scoped>
   #dv-full-screen-container {
-    background-image: url('./img/stars.png');
+    background-image: url('~@/assets/images/screen/bg.png');
     background-size: 100% 100%;
     box-shadow: 0 0 3px blue;
     display: flex;
@@ -416,7 +416,7 @@
   .bgAll{
     height: 100%;
   }
-  
+
   .pickDate{
     height:2.825rem;
     line-height: 2.825rem;
