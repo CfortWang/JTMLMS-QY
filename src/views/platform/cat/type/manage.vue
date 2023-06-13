@@ -2,68 +2,56 @@
   <ibps-layout ref="layout">
     <!--  -->
     <div slot="west">
-      <ibps-tree
-        :width="width"
-        :height="height"
-        :data="treeData"
-        :options="treeOptions"
-        :contextmenus="treeContextmenus"
-        title="分类管理"
-        @action-event="handleTreeAction"
-        @node-click="handleNodeClick"
-        @expand-collapse="handleExpandCollapse"
-      >
-        <el-select slot="searchForm" v-model="categoryKey" @change="loadTreeData(false)">
-          <el-option
-            v-for="item in categoryOptions"
-            :key="item.id"
-            :label="item.name"
-            :value="item.categoryKey"
-          />
+      <ibps-tree :width="width"
+                 :height="height"
+                 :data="treeData"
+                 :options="treeOptions"
+                 :contextmenus="treeContextmenus"
+                 title="分类管理"
+                 @action-event="handleTreeAction"
+                 @node-click="handleNodeClick"
+                 @expand-collapse="handleExpandCollapse">
+        <el-select slot="searchForm"
+                   v-model="categoryKey"
+                   @change="loadTreeData(false)">
+          <el-option v-for="item in categoryOptions"
+                     :key="item.id"
+                     :label="item.name"
+                     :value="item.categoryKey" />
         </el-select>
       </ibps-tree>
     </div>
 
-    <ibps-container
-      :margin-left="width+'px'"
-      class="page"
-    >
-      <edit
-        v-show="show"
-        :id="editId"
-        ref="editForm"
-        :readonly="readonly"
-        :category-key="categoryKey"
-        :parent-data="nodeData"
-        :is-private="isPrivate"
-        :random-num="randomNum"
-        display-type="edit"
-        @callback="loadTreeData"
-      />
-      <el-alert
-        v-show="!show"
-        :closable="false"
-        title="请选择左边菜单右键进行操作！"
-        type="warning"
-        show-icon
-        style="height:50px;"
-      />
+    <ibps-container :margin-left="width+'px'"
+                    class="page">
+      <edit v-show="show"
+            :id="editId"
+            ref="editForm"
+            :readonly="readonly"
+            :category-key="categoryKey"
+            :parent-data="nodeData"
+            :is-private="isPrivate"
+            :random-num="randomNum"
+            display-type="edit"
+            @callback="loadTreeData" />
+      <el-alert v-show="!show"
+                :closable="false"
+                title="请选择左边菜单右键进行操作！"
+                type="warning"
+                show-icon
+                style="height:50px;" />
     </ibps-container>
 
     <!-- 数据字典 -->
-    <import-xml
-      :id="editId"
-      :visible="importFormVisible"
-      @callback="callback"
-      @close="visible => importFormVisible = visible"
-    />
-    <sort
-      :id="editId"
-      :visible="sortFormVisible"
-      title="分类排序"
-      @callback="callback"
-      @close="visible => sortFormVisible = visible"
-    />
+    <import-xml :id="editId"
+                :visible="importFormVisible"
+                @callback="callback"
+                @close="visible => importFormVisible = visible" />
+    <sort :id="editId"
+          :visible="sortFormVisible"
+          title="分类排序"
+          @callback="callback"
+          @close="visible => sortFormVisible = visible" />
   </ibps-layout>
 </template>
 <script>
@@ -82,6 +70,12 @@ export default {
     Edit
   },
   mixins: [FixHeight],
+  props: {
+    categoryKey: {
+      type: String,
+      default: 'FLOW_TYPE'
+    }
+  },
   data() {
     return {
       width: 200,
@@ -95,49 +89,57 @@ export default {
       // 树配置
       treeOptions: { 'rootPId': '-1' },
       treeContextmenus: [
-        { icon: 'add',
+        {
+          icon: 'add',
           label: '添加分类',
           value: 'add',
-          rights: function(menu, data, isRoot) {
+          rights: function (menu, data, isRoot) {
             if (isRoot) return true
             if (data.struType === '0') return false // 平铺结构类型不允许添加子分类
             if (!(data.ownerId === '0' || this.$utils.isEmpty(data.ownerId))) {
               return false
             }
             return true
-          } },
-        { icon: 'add',
+          }
+        },
+        {
+          icon: 'add',
           label: '添加私有分类',
           value: 'addPrivate',
-          rights: function(menu, data, isRoot) {
+          rights: function (menu, data, isRoot) {
             if (data.struType === '0') return false // 平铺结构类型不允许添加子分类
             return true
-          } },
+          }
+        },
         { icon: 'edit', label: '编辑分类', value: 'edit', rights: ['node'] },
         { icon: 'delete', label: '删除分类', value: 'remove', rights: ['node'] },
         { type: 'divided' },
         { icon: 'export', label: '导出', value: 'export' },
         { icon: 'import', label: '导入', value: 'import' },
-        { type: 'divided',
-          rights: function(menu, data, isRoot) {
+        {
+          type: 'divided',
+          rights: function (menu, data, isRoot) {
             if (isRoot) return true
             if (data.isLeaf === 'Y') return false
             return true
-          } },
-        { icon: 'sort',
+          }
+        },
+        {
+          icon: 'sort',
           label: '子节点排序',
           value: 'sort',
-          rights: function(menu, data, isRoot) {
+          rights: function (menu, data, isRoot) {
             if (isRoot) return true
             if (data.isLeaf === 'Y') return false
             return true
-          } }
+          }
+        }
       ],
       treeData: [],
       nodeData: {},
       isPrivate: false,
       type: {},
-      categoryKey: 'FLOW_TYPE',
+    //   categoryKey: 'FLOW_TYPE',
       categoryOptions: [],
       show: false
     }
