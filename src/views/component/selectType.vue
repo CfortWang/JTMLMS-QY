@@ -15,9 +15,10 @@ export default {
           const { level, value } = node;
           let sqlString1 = "";
           if (level == 0) {
-            sqlString1 = "select *FROM `ibps_cat_type` WHERE parent_id_='286814138233389357' ORDER BY sn_ ASC";
+            // 286814138233389367 是文件分类标识的id，在ibps_cat_category
+            sqlString1 = "select *FROM `ibps_cat_type` WHERE parent_id_='286814138233389367' ORDER BY sn_ ASC";
           } else {
-            sqlString1 = `select *FROM ibps_cat_type WHERE parent_id_ in (select id_ from ibps_cat_type where NAME_= '${value}'  AND category_key_ ='FLOW_TYPE') ORDER BY sn_ ASC`;
+            sqlString1 = `select *FROM ibps_cat_type WHERE parent_id_ in (select id_ from ibps_cat_type where NAME_= '${value}'  AND category_key_ ='FILE_TYPE') ORDER BY sn_ ASC`;
           }
           curdPost("sql", sqlString1).then((res1) => {
             let datas1 = res1.variables.data;
