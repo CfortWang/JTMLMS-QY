@@ -5,9 +5,9 @@
         <!-- 头部内容部分 -->
         <div class="headerContent">
            <!-- 标题装饰组件 -->
-          <header-decoration :titleName="outputData.headerName"/> 
-          <div 
-            class="goBackButton" 
+          <header-decoration :titleName="outputData.headerName"/>
+          <div
+            class="goBackButton"
             style="width: 12%;
             height:2.825rem;
             line-height: 2.825rem;
@@ -20,16 +20,16 @@
               v-model="NowTime1"
               type="month"
               @change="changeTime1"
-              format="yyyy-MM" 
+              format="yyyy-MM"
               value-format="yyyy-MM"
               placeholder="请选择时间">
             </el-date-picker>
           </div>
           <!-- 返回按钮 -->
 
-          <div 
-            class="goBackButton" 
-            @click.prevent="goBack()" 
+          <div
+            class="goBackButton"
+            @click.prevent="goBack()"
             style="width: 12%;
             height:2.825rem;
             line-height: 2.825rem;
@@ -57,10 +57,10 @@
           <div class="overView">
             <headerContent  @getUpdateTime="getTime" :NowTime1="NowTime1+'-01'"></headerContent>
             <dv-decoration-10 style="width:100%;height:5px;" />
-          </div> 
+          </div>
 
         </div>
-       
+
 
         <!-- 主体内容(图表部分) -->
         <div class="mainContent">
@@ -76,7 +76,7 @@
             <!-- <div class="monthlyN" ref="MonthlyNumber_refs"><monthlyNumber  :NowTime1="NowTime1"/></div> -->
           </div>
         </div>
-        
+
       </dv-full-screen-container>
    </div>
 </template>
@@ -91,7 +91,7 @@ import headerContent from './headerContent'
 //委托样品条目情况组件
 import entrustNumber from './EntrustNumber'
 //委托样品类型组件
-import entrustType from './EntrustType'  
+import entrustType from './EntrustType'
 // 月度检测完成情况(环形图)
 import monthlyStatus from './MonthlyStatus'
 //年度检测完成情况(环形图)
@@ -125,7 +125,7 @@ export default {
       NowTime1:'',
       value1:[]
     }
-    
+
   },
   mounted() {
     this.getNowTime()
@@ -133,7 +133,7 @@ export default {
   created() {
     if(screenfull.isEnabled && !screenfull.isFullscreen){
      this.allView()
-      
+
     }
   },
   beforeDestroy() {
@@ -167,13 +167,13 @@ export default {
       let year = e.slice(0,4)
       let month = e.slice(5,7)
       this.NowTime1 = year + '-' + month
-  
+
       this.days=[]
 
     },
     // getDaysInMonth(year,month){
     //   let temp = new Date(year,month,0);
-    //   this.day = temp.getDate(); 
+    //   this.day = temp.getDate();
     //   // console.log('处理好的年 月 月份天数',year,month,this.day);   //2022 11 30
     //   //把月份对应天数转化为数组
     //   for( let i=1;i <= this.day ;i++){
@@ -199,7 +199,7 @@ export default {
   color: #fff;
   z-index: 9999;
   #dv-full-screen-container {
-    background-image: url('./img/stars.png');
+    background-image: url('~@/assets/images/screen/bg.png');
     background-size: 100% 100%;
     display: flex;
     flex-direction:column;
@@ -213,7 +213,7 @@ export default {
         height: 80px;
       }
     }
-    
+
     .mainContent{
       width: 100%;
       height:80%;
@@ -239,7 +239,7 @@ export default {
             height: 100%;
             margin-left: 10px;
             // background-color: rgb(12, 103, 131);
-          
+
           }
         }
 
@@ -268,10 +268,10 @@ export default {
             margin-left: 10px;
             // background-color: rgb(12, 103, 131);
           }
-        
+
         }
-    } 
-  } 
+    }
+  }
 }
 
 </style>

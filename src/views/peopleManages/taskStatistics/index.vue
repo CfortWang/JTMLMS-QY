@@ -16,7 +16,7 @@
         <!-- <div class="personNum">员工数量:{{ employeeNum }}</div> -->
         <dv-decoration-11  class="personNum" style="margin-left:10%"><i class="el-icon-user" style="color:#4ea5d6;margin-right: 3px;"></i> 员工数量:{{ employeeNum   }}人</dv-decoration-11>
         <dv-border-box-8 class="date" style="margin-right:10%; display: flex; align-items: center;">
-          <div style="width:25%;display: inline-block;margin-right: 3px;">统计时间:</div>          
+          <div style="width:25%;display: inline-block;margin-right: 3px;">统计时间:</div>
           <el-date-picker style="width:75%;" v-model="monthValues" type="monthrange" align="right" unlink-panels range-separator="至" start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions" @change="changeDate">
           </el-date-picker>
         </dv-border-box-8>
@@ -74,7 +74,7 @@
     </dv-border-box-1>
   </div>
 </template>
-  
+
 <script>
 import * as echarts from "echarts";
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
@@ -487,7 +487,7 @@ export default {
         this_.optionPerson.series[0].data.push(item.num);
       }
       //超时
-      let cssql = `select  executor_ ,count(executor_) as num ,c.name_,a.create_time_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b  on a.task_id_ = b.task_id_ join ibps_party_employee as c on b.executor_ = c.id_  
+      let cssql = `select  executor_ ,count(executor_) as num ,c.name_,a.create_time_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b  on a.task_id_ = b.task_id_ join ibps_party_employee as c on b.executor_ = c.id_
                   where now()> SUBDATE(a.create_time_,interval - 3 day) and  c.STATUS_= 'actived' and c.ID_ != '1' and c.ID_ != '-1' and c.ID_ != '702117247933480960' and c.GROUP_ID_ not like '%1041786072788369408%'  GROUP BY  executor_  order by  c.CREATE_TIME_ asc `;
       await curdPost("sql", cssql).then((res) => {
         csData = res.variables.data;
@@ -577,24 +577,24 @@ export default {
     async chartLoading() {
       // 获取所有检测人员任务统计
       let this_ = this;
-      const sql = `select  *FROM (SELECT ie.ID_ AS jcId,ie.NAME_ AS jcName,COUNT(tj.zhuang_tai_ = '待数据输入' OR NULL) AS jianCeWeiWanCheng,COUNT(tj.zhuang_tai_ = '待数据校验' OR tj.zhuang_tai_ = '已完成' OR NULL) AS jianCeYiWanCheng FROM 
-                          t_lhjczb tj,ibps_party_employee ie 
-                          WHERE ie.positions_ like '%1040709034740547584%' and tj.jian_ce_yuan_ = ie.ID_ AND tj.update_time_ BETWEEN '${this.startDate}' AND '${this.endDate}' GROUP BY jian_ce_yuan_ 
-                          ) jc  LEFT JOIN 
+      const sql = `select  *FROM (SELECT ie.ID_ AS jcId,ie.NAME_ AS jcName,COUNT(tj.zhuang_tai_ = '待数据输入' OR NULL) AS jianCeWeiWanCheng,COUNT(tj.zhuang_tai_ = '待数据校验' OR tj.zhuang_tai_ = '已完成' OR NULL) AS jianCeYiWanCheng FROM
+                          t_lhjczb tj,ibps_party_employee ie
+                          WHERE ie.positions_ like '%1040709034740547584%' and tj.jian_ce_yuan_ = ie.ID_ AND tj.update_time_ BETWEEN '${this.startDate}' AND '${this.endDate}' GROUP BY jian_ce_yuan_
+                          ) jc  LEFT JOIN
                           (
-                          SELECT ie.ID_ AS fhId,ie.NAME_ AS fhName,COUNT(tj.zhuang_tai_ = '待数据校验' OR NULL) AS fuHeWeiWanCheng,COUNT(tj.zhuang_tai_ = '已完成' OR NULL) AS fuHeYiWanCheng FROM 
-                          t_lhjczb tj,ibps_party_employee ie 
-                          WHERE ie.positions_ like '%1040709034740547584%' and tj.fu_he_yuan_ = ie.ID_ AND tj.update_time_ BETWEEN  '${this.startDate}' AND '${this.endDate}' GROUP BY fu_he_yuan_ 
+                          SELECT ie.ID_ AS fhId,ie.NAME_ AS fhName,COUNT(tj.zhuang_tai_ = '待数据校验' OR NULL) AS fuHeWeiWanCheng,COUNT(tj.zhuang_tai_ = '已完成' OR NULL) AS fuHeYiWanCheng FROM
+                          t_lhjczb tj,ibps_party_employee ie
+                          WHERE ie.positions_ like '%1040709034740547584%' and tj.fu_he_yuan_ = ie.ID_ AND tj.update_time_ BETWEEN  '${this.startDate}' AND '${this.endDate}' GROUP BY fu_he_yuan_
                           ) fh ON jc.jcName = fh.fhName
                           UNION (
-                          SELECT  *FROM (SELECT ie.ID_ AS jcId, ie.NAME_ AS jcName,COUNT(tj.zhuang_tai_ = '待数据输入' OR NULL) AS jianCeWeiWanCheng,COUNT(tj.zhuang_tai_ = '待数据校验' OR tj.zhuang_tai_ = '已完成' OR NULL) AS jianCeYiWanCheng FROM 
-                          t_lhjczb tj,ibps_party_employee ie 
-                          WHERE tj.jian_ce_yuan_ = ie.ID_ AND tj.update_time_ BETWEEN  '${this.startDate}' AND '${this.endDate}' GROUP BY jian_ce_yuan_ 
-                          ) jc  RIGHT JOIN 
+                          SELECT  *FROM (SELECT ie.ID_ AS jcId, ie.NAME_ AS jcName,COUNT(tj.zhuang_tai_ = '待数据输入' OR NULL) AS jianCeWeiWanCheng,COUNT(tj.zhuang_tai_ = '待数据校验' OR tj.zhuang_tai_ = '已完成' OR NULL) AS jianCeYiWanCheng FROM
+                          t_lhjczb tj,ibps_party_employee ie
+                          WHERE tj.jian_ce_yuan_ = ie.ID_ AND tj.update_time_ BETWEEN  '${this.startDate}' AND '${this.endDate}' GROUP BY jian_ce_yuan_
+                          ) jc  RIGHT JOIN
                           (
-                          SELECT ie.ID_ AS fhId,ie.NAME_ AS fhName,COUNT(tj.zhuang_tai_ = '待数据校验' OR NULL) AS fuHeWeiWanCheng,COUNT(tj.zhuang_tai_ = '已完成' OR NULL) AS fuHeYiWanCheng FROM 
-                          t_lhjczb tj,ibps_party_employee ie 
-                          WHERE ie.positions_ like '%1040709034740547584%' and tj.fu_he_yuan_ = ie.ID_ AND tj.update_time_ BETWEEN  '${this.startDate}' AND '${this.endDate}' GROUP BY fu_he_yuan_ 
+                          SELECT ie.ID_ AS fhId,ie.NAME_ AS fhName,COUNT(tj.zhuang_tai_ = '待数据校验' OR NULL) AS fuHeWeiWanCheng,COUNT(tj.zhuang_tai_ = '已完成' OR NULL) AS fuHeYiWanCheng FROM
+                          t_lhjczb tj,ibps_party_employee ie
+                          WHERE ie.positions_ like '%1040709034740547584%' and tj.fu_he_yuan_ = ie.ID_ AND tj.update_time_ BETWEEN  '${this.startDate}' AND '${this.endDate}' GROUP BY fu_he_yuan_
                           ) fh ON jc.jcName = fh.fhName
                           )`;
       // console.log(sql,"sql")
@@ -793,7 +793,7 @@ export default {
     //饼图 环形图数据
     async degreeGradeInfoData() {
       let data = [];
-      let sql = `select 
+      let sql = `select
                 sum(a.zui_gao_xue_li_x_ = '博士') as doctor,
                 sum(a.zui_gao_xue_li_x_ = '硕士') as Master,
                 sum(a.zui_gao_xue_li_x_ = '本科') as undergraduate,
@@ -877,7 +877,7 @@ export default {
 .personView {
   width: 100%;
   height: calc(100vh - 100px);
-  background-image: url("~@/views/system/jbdHome/board/img/bg.png");
+  background-image: url("~@/assets/images/screen/bg.png");
 }
 .topView {
   overflow: hidden;

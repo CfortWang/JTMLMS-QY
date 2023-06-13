@@ -51,7 +51,7 @@
             </div>
             <!-- <dv-decoration-2 :reverse="true" style="width:3%;height:100%;;margin: 0 10px;" /> -->
             <!-- <div style="width:37%">
-              <zhuzhuangtu v-if="sheBeiweiHuData.data.length" :info="sheBeiweiHuData"  ref="sheBeiWeiHuDataref"/>          
+              <zhuzhuangtu v-if="sheBeiweiHuData.data.length" :info="sheBeiweiHuData"  ref="sheBeiWeiHuDataref"/>
             </div> -->
           </div>
           <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
@@ -177,7 +177,7 @@ export default {
       };
       let sql = `select a.Equipments,a1.mony,b.addEquipments,c.testEquipments,c1.testNoEquipments,d.checkEquipments,
       d1.checkNoEquipments,e.goodEquipments,f.scrapEquipments,g.limitedEquipments,h.weiHuNoEquipments,h1.weiHuEquipments
-      from  
+      from
       (select count(*) as Equipments from t_sbdj) as a,
       (select zi_chan_yuan_zhi_ as mony FROM t_sbdj) as a1,
       (select count(*) as addEquipments  from t_sbdj where gou_jin_ri_qi_ LIKE '${this_.month}') as b,
@@ -348,7 +348,7 @@ export default {
             "受限数",
             "报废停用数",
           ];
-          
+
           this_.sheBeiData.data.push(data[0].Equipments);
           this_.sheBeiData.data.push(data[0].addEquipments);
           this_.sheBeiData.data.push(data[0].goodEquipments);
@@ -587,7 +587,7 @@ export default {
   color: #fff;
   z-index: 999;
   #dv-full-screen-container {
-    background-image: url("./img/bg.png");
+    background-image: url("~@/assets/images/screen/bg.png");
     background-size: 100% 100%;
     box-shadow: 0 0 3px blue;
     display: flex;
