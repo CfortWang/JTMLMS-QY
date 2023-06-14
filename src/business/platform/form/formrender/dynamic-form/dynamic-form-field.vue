@@ -102,7 +102,7 @@
         <!-- 单项选择 -->
         <template v-else-if="fieldType === 'radio'">
             <template v-if="readonlyText">
-                <div v-if="$utils.isNotEmpty(dataModel)" :class="isTable ? '' : dataModel ? 'ibps-field-text' : 'ibps-field-text-no'">
+                <div v-if="$utils.isNotEmpty(dataModel)" :class="isTable ? 'ibps-overflow' : dataModel ? 'ibps-field-text' : 'ibps-field-text-no'">
                     {{ dataModel | optionsFilter(dataOptions, 'label', 'val') }}
                 </div>
                 <div v-else :class="isTable ? '' : 'ibps-field-text-no'">/</div>
@@ -132,7 +132,7 @@
         <template v-else-if="fieldType === 'checkbox'">
             <template v-if="readonlyText">
                 <template v-if="checkboxDataModel && checkboxDataModel.length > 0">
-                    <div :class="isTable ? '' : readonlyText ? 'ibps-field-text' : ''">
+                    <div :class="isTable ? 'ibps-overflow' : readonlyText ? 'ibps-field-text' : ''">
                         <span v-for="(v, i) in checkboxDataModel" :key="i" class="ibps-mr-5">
                             {{ v | optionsFilter(dataOptions, 'label', 'val') }}
                         </span>
