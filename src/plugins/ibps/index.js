@@ -58,7 +58,7 @@ export default {
             // 目前可用type    6:生成报表的pdf文件【默认】   7:生成报表的word文件   3:生成报表的excel文件
             return `https://www.szjyxt.com/demo/reportServlet?action=${type}&file=${encodeURIComponent(src)}.rpx&columns=0&srcType=file&paramString=${encodeURIComponent(where)}`
         }
-        const reportPath = '中汇瑞德检测中心'
+        const reportPath = '金通医学实验室管理系统'
         let timer = setInterval(() => { //定时循环添加参数
             if (getToken()) {
                 //报表路径
