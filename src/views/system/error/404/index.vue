@@ -10,7 +10,7 @@
         </div>
         <div class="bullshit">
           <div class="bullshit__oops">OOPS!</div>
-          <div class="bullshit__info"><a class="link-type" href="http://www.bpmhome.cn" target="_blank">{{ $t('common.company') }}</a>©{{ $t('common.copyright') }}</div>
+          <div class="bullshit__info"><a class="link-type" href="https://www.szjyxt.com/" target="_blank">{{ $t('common.company') }}</a>©{{ $t('common.copyright') }}</div>
           <div class="bullshit__headline">{{ message }}</div>
           <div class="bullshit__info">{{ $t('error.page404.info') }}</div>
           <a href="javascript:void(0)" class="bullshit__return-home" @click="backHome">{{ $t('error.backHome') }}</a>
