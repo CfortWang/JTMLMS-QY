@@ -8,7 +8,7 @@
 
                 <div class="tagBox">
                  <!-- <p class="title"> -->
-                    <img src="../../../../assets/images/login/orderOpen.png" class="logoImg" />
+                    <img src="@/assets/images/login/bgImg.jpg" class="logoImg" />
 
                <!--   </p> -->
                 </div>

@@ -105,15 +105,13 @@
                 </el-col>
             </el-row>
         </el-form-item>
-        <br/>
-        <el-form-item>
-            <el-button
+
+        <el-button
                 :loading="loading"
                 type="primary"
                 class="login-submit"
                 @click.native.prevent="handleLogin"
             >{{ $t('login.logIn') }}</el-button>
-        </el-form-item>
     </el-form>
 </template>
 
@@ -429,5 +427,9 @@
 <style scoped>
     .el-form-item {
         margin-bottom: 18px !important;
+    }
+
+    /deep/ .el-form-item--small .el-form-item__error{
+        padding-top: 10px;
     }
 </style>

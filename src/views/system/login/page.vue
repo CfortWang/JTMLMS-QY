@@ -5,15 +5,15 @@
                 <div class="">
                     <div class="logoTitle">
                         <h1 class="login-title">
-                            <img src="../../../assets/images/login/logo.jpg" class="logoImg" />
+                            <img src="@/assets/images/login/logo.jpg" class="logoImg" />
                             <span style="font-size: 24px; margin-left: 5px">金源信通</span>
                         </h1>
-                        <h1 class="login-title" style="font-size: 52px">金通医学实验室管理系统</h1>
+                        <h1 class="login-title">金通医学实验室管理系统</h1>
                     </div>
 
                     <div class="jbd-login-page-main">
-                        <h3>
-                            <span>{{ $t('login.userLogin') }}</span>
+                        <h3 class="Loginh3">
+                            <span class="loginTong">{{ $t('login.userLogin') }}</span>
                             <ibps-api-base-url-controller v-if="$nodeEnv === 'development'">
                                 <el-tooltip effect="dark" :content="$t('navbar.switchEnvironment')" placement="bottom">
                                     <el-button type="text" class="ibps-fr ibps-mr-5 btn-text can-hover">
@@ -30,13 +30,10 @@
             <el-footer style="width: 100%">
                 <hr style="color: #aaaaaa" />
                 <div class="centerCox">
-                    <div style="width: 260px"></div>
-                    <div>
-                        建议使用的浏览器360、火狐
-                    </div>
-                    <div style="font-size: 12px; text-align: right">
-
-                        <div style="font-size: 16px"><i class="el-icon-s-platform" /> 深圳市金源信通科技有限公司开发</div>
+                    <div class="footerLeft"></div>
+                    <div class="footerCenter">推荐使用IE 11、Chrome 69、Firefox 65及以上版本的浏览器，推荐显示分辨率：1920 * 1080</div>
+                    <div class="footerRight">
+                        <div><i class="el-icon-s-platform" /> 深圳市金源信通科技有限公司开发</div>
                     </div>
                 </div>
             </el-footer>
@@ -70,7 +67,7 @@ export default {
 </script>
 <style>
 .jbd-login-page-bg {
-    background-image: url('../../../assets/images/login/bgImg.jpg');
+    background-image: url('~@/assets/images/login/bgImg.jpg');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     position: absolute;
@@ -81,13 +78,11 @@ export default {
 }
 
 .jbd-login-page-main {
-    margin-top: 80px;
-    /* margin-left: 3%; */
-    margin: 0 auto;
+    margin: 80px auto 0;
     margin-bottom: 20px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    height: 340px;
+    padding: 20px;
+    /* height: 340px; */
     width: 300px;
     background-repeat: no-repeat;
     border-radius: 5%;
@@ -96,7 +91,7 @@ export default {
 }
 
 .login-title {
-    font-size: 26px;
+    font-size: 52px;
     color: #01a39e;
 }
 .logoImg {
@@ -107,14 +102,55 @@ export default {
 }
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .logoTitle {
     margin: 30px;
 }
 
-.centerCox{
+.centerCox {
+    color: #4f4f4f;
     display: flex;
     justify-content: space-between;
     align-content: center;
+    .footerLeft {
+        width: 280px;
+    }
+
+    .footerCenter {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .footerRight {
+        width: 280px;
+        font-size: 14px;
+    }
+}
+hr {
+    border: 1px solid white;
+}
+
+.el-footer {
+    padding: 0;
+}
+
+@media (min-width: 1350px) and (max-width: 1900px) {
+    .jbd-login-page-main {
+        margin: 0 auto;
+        width: 260px;
+    }
+    .Loginh3{
+        margin: 0 !important;
+    }
+    .login-form{
+        margin: 0 !important;
+    }
+
+    .loginTong{
+        font-size: 14px !important;
+    }
+    .login-title {
+        font-size: 32px;
+    }
 }
 </style>
