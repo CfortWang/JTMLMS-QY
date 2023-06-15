@@ -152,6 +152,7 @@ import Scan from '@/views/system/jbdScan/scan.vue'
 import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
+import pintText from '../../../form/utils/custom/pintText.js' //打印规则
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
 
 export default {
@@ -221,8 +222,8 @@ export default {
             scanVisible: false,
             scanName: '',
             obj: '',
-            defid:'',
-            runQianPah:'',
+            runQianPathPDF:'',
+            runQianPathOther:'',
             initialization: false,
             tableHeight: document.body.clientHeight,
             listIdentity: '',
@@ -726,6 +727,7 @@ export default {
 
             // 前置事件
             this.beforeScript(command, position, selection, data, () => {
+                let srcUrl =''
                 this.readonly = false
                 switch (buttonType) {
                     case 'search': // 查询
@@ -782,6 +784,28 @@ export default {
                     case 'bianZhi': // 编制
                         this.npmDialogFormVisible =true
                         this.defId = this.defId
+                    break
+                    case 'runQianPDF': // 查阅
+                        if(!selection){
+                            this.$message({
+                                message: '请选择一条数据',
+                                type: 'warning'
+                            })
+                            return 
+                        }
+                         srcUrl =this.$reportPash.replace("show","pdf")+this.runQianPathPDF+'.rpx&id_='+selection
+                        pintText(this,srcUrl)
+                    break
+                    case 'runQianOther': // 下载记录
+                        if(!selection){
+                            this.$message({
+                                message: '请选择一条数据',
+                                type: 'warning'
+                            })
+                            return 
+                        }
+                        srcUrl =this.$reportPash+this.runQianPathOther+'.rpx&id_='+selection
+                        pintText(this,srcUrl)
                     break
                     case 'print': // 打印
                         ActionUtils.selectedRecord(selection)
@@ -993,6 +1017,12 @@ export default {
             for(var i of functionButtons){
                 if(i.button_type=='bianZhi'){
                     this.defId=i.defId
+                }
+                if(i.button_type=='runQianPDF'){
+                    this.runQianPathPDF=i.runQianPah
+                }
+                if(i.button_type=='runQianOther'){
+                    this.runQianPathOther=i.runQianPah
                 }
             }
             // 工具栏

@@ -89,7 +89,7 @@ export const fucntionButtonDefaultValue = {
   position: 'all'
 }
 
-export const functionListButtonTypes = ['search', 'resetSearch', 'add', 'remove', 'edit', 'detail', 'print', 'import', 'export', 'sefStartFlow', 'custom', 'exportMuBan','bianZhi']
+export const functionListButtonTypes = ['search', 'resetSearch', 'add', 'remove', 'edit', 'detail', 'print', 'import', 'export', 'sefStartFlow', 'custom', 'exportMuBan','bianZhi','runQianPDF','runQianOther']
 // export const functionListButtonTypes = ['search', 'resetSearch', 'add', 'remove', 'edit', 'detail', 'sefStartFlow', 'custom']
 
 // export const functionTreeButtonTypes = ['refresh', 'expand', 'compress', 'custom']

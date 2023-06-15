@@ -67,6 +67,13 @@
       <p>流程key：{{formData.defKey}}</p>
       <p>流程名称：{{formData.defName}}</p>
     </el-form-item>
+    <el-form-item v-if="formData && (formData.button_type === 'runQianPDF'|| formData.button_type === 'runQianOther')" 
+                  label="润乾路径"
+                  required
+                  prop="label">
+      <el-input v-model="formData.runQianPah"
+                placeholder="润乾路径" />
+    </el-form-item>
     <el-form-item v-if="formData && formData.button_type === 'sefStartFlow'"
                   prop="deflow">
       <label slot="label">

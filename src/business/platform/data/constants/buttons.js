@@ -90,6 +90,18 @@ const buttons = {
     icon: 'ibps-icon-export',
     scope: ['toolbar'],
   },
+  'runQianPDF': {
+    label: '查阅',
+    type: 'primary',
+    icon: 'ibps-icon-export',
+    scope: ['toolbar', 'manage'],
+  },
+  'runQianOther': {
+    label: '下载记录',
+    type: 'primary',
+    icon: 'ibps-icon-export',
+    scope: ['toolbar', 'manage'],
+  },
   'close': {
     label: '关闭',
     type: 'default',
