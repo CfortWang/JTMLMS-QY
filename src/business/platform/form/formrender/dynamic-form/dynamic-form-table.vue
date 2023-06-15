@@ -6,10 +6,7 @@
                 <div class="panel-heading ibps-clearfix">
                     <div v-if="!formDialogVisible" class="ibps-fl dynamic-form-table__label table-tetle-style">{{ field.label }}</div>
                     <!--弹窗模式对话框-->
-                    <formrender-dialog ref="jyxtEdit" v-if="formDialogVisible" :title="field.label" :form-def="dialogFormDef" :data="dialogFormData" :mode="mode" :editFromType="editFromType" @close="deleteEdit()" @action-event="handleFormDialogActionEvent" />
                     <div v-if="toolbarButtons && toolbarButtons.length > 0" class="ibps-fr hidden-print">
-                        <!-- :visible="formDialogVisible"-->
-
                         <el-button-group>
                             <el-button v-for="(button, index) in toolbarButtons" :key="index" :type="button.type" :icon="button.icon" @click="handleActionEvent(button, index)">
                                 {{ button.label }}
@@ -23,7 +20,6 @@
                         <el-table-column v-if="field.field_options.index" type="index" :label="field.field_options.index_name ? field.field_options.index_name : '序号'" :width="field.field_options.index_width ? field.field_options.index_width : 50" />
                         <template v-for="(column, j) in displayColumns">
                             <el-table-column show-overflow-tooltip v-if="!columnHidden(column) && column.field_type != 'desc' && column.label != ''" :key="j" :prop="column.name" :width="column.field_options.custom_class || null">
-                                <!--  :width="column.field_options.is_label_width ?column.field_options.label_width + (column.field_options.label_width_unit || 'px') :null"-->
                                 <template slot="header">
                                     {{ $utils.isNotEmpty(column.field_options.units) ? column.label + '(' + column.field_options.units + ')' : column.label }}
                                     <ibps-help v-if="column && column.desc && descPosition === 'lableIcon'" type="tooltip" :content="$utils.formatText(column.desc)" />
@@ -98,6 +94,7 @@
 
         <import-table :visible="importTableDialogVisible" :title="field.label" @close="(visible) => (importTableDialogVisible = visible)" @action-event="handleImportTableActionEvent" />
         <component :is="dialogTemplate" v-if="dialogTemplate" ref="dialogTemplate" v-bind="dialogTemplateAtts" />
+        <formrender-dialog ref="jyxtEdit" :visible="formDialogVisible" :title="field.label" :form-def="dialogFormDef" :data="dialogFormData" :mode="mode" :editFromType="editFromType" custom-class="ibps-dialog-80" @close="(visible) => (formDialogVisible = visible)" @action-event="handleFormDialogActionEvent" />
     </div>
 </template>
 <script>
@@ -112,7 +109,7 @@ import FormFieldUtil from '../../utils/formFieldUtil'
 import { hasPermission } from '@/business/platform/form/constants/tableButtonTypes'
 
 import CustomDialog from '@/business/platform/data/templaterender/custom-dialog/dialog'
-import FormrenderDialog from '@/business/platform/form/formrender/editForm'
+import FormrenderDialog from '@/business/platform/form/formrender/dialog'
 import ImportTable from './components/import-table'
 import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
@@ -309,19 +306,6 @@ export default {
         }
     },
     beforeDestroy() {
-        /* this.dataModel = null
-    this.copDataModel =null
-    this.fieldRights = null
-    this.tableRights = null
-    this.columnsRights = null
-    this.buttonsRights = null
-    this.customDialogDynamicParams = null
-    this.customDialogCustom = null
-    this.dialogFormDef = null
-    this.dialogFormData = null
-    this.dialogTemplate = null
-    this.dialogTemplateAtts = null
-    this.handleCout = null */
         this.dynamicShow = false
         // 注销当前表格保存在window[this.mainCode+'TableRefs']的this
         this.destoryTable()
@@ -565,9 +549,9 @@ export default {
             this.initRunCalFormula(this.dataModel.length - 1)
             // 后置事件
             this.afterScript(this.actionCode, this.actionPosition)
-            /*  if (this.$refs.elTable) {
-          this.$refs.elTable.doLayout()
-        } */
+            if (this.$refs.elTable) {
+                this.$refs.elTable.doLayout()
+            }
         },
         /**
          * 获取选择的记录
@@ -897,6 +881,7 @@ export default {
             } else {
                 this.addData(data)
             }
+            this.formDialogVisible = false
         },
         // =====================自定义对话框=====================
 
