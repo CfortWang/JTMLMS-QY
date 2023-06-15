@@ -18,6 +18,16 @@
     <% for (var i in htmlWebpackPlugin.options.cdn&&htmlWebpackPlugin.options.cdn.js) { %>
     <link href="<%= htmlWebpackPlugin.options.cdn.js[i] %>" rel="preload" as="script">
     <% } %>
+
+    <!-- 使用luckysheet文件 -->
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/css/pluginsCss.css' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/plugins.css' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/css/luckysheet.css' />
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/assets/iconfont/iconfont.css' />
+    <script src="https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/js/plugin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luckysheet/dist/luckysheet.umd.js"></script>
+
+
     <title><%= VUE_APP_TITLE %></title>
 <!-- 	<script type="text/javascript" src="http://192.168.48.129:9999/web-apps/apps/api/documents/api.js"></script> -->
 	<script type="text/javascript" src="https://www.szjyxt.com/word/web-apps/apps/api/documents/api.js"></script>
