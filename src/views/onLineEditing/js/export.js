@@ -1272,7 +1272,7 @@ var setStyleAndValue = function (cellArr, worksheet) {
             if(rowid==0){
                 const dobCol = worksheet.getColumn(columnid+1);
                 //设置单元格列宽除以8
-                dobCol.width=luckysheet.getColumnWidth([columnid])[columnid]
+                dobCol.width=luckysheet.getColumnWidth([columnid])[columnid]/8
             }
             let fill = fillConvert(cell.bg);
             let font = fontConvert(cell.ff, cell.fc, cell.bl, cell.it, cell.fs, cell.cl, cell.ul);

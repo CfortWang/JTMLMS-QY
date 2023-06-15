@@ -108,6 +108,8 @@
         <labelPrint :show="showPrintYi" :list="printList" :type="printType" />
 
         <import-table :visible="importTableDialogVisible" title="导入" @close="(visible) => (importTableDialogVisible = visible)" @action-event="handleImportTableActionEvent" />
+
+        <xlsxFile :visible="xlsxFileVisible" @xlsxFileClose="xlsxFileClose" v-if="xlsxFileVisible"></xlsxFile>
     </div>
 </template>
 <script>
@@ -154,6 +156,7 @@ import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
 import pintText from '../../../form/utils/custom/pintText.js' //打印规则
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
+import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
 
 export default {
     name: 'list',
@@ -174,7 +177,8 @@ export default {
         Scan,
         importTable,
         Print: () => import('../components/print'),
-        LabelPrint: () => import('../components/labelPrint')
+        LabelPrint: () => import('../components/labelPrint'),
+        xlsxFile
 
         // BpmnFormrender
         // DataTemplateFormat
@@ -200,7 +204,8 @@ export default {
         preview: {
             type: Boolean,
             default: false
-        }
+        },
+        xlsxFileVisible: false
     },
     destroyed() {
         if (this.dataTemplate.type !== 'dialog') {
@@ -791,7 +796,7 @@ export default {
                                 message: '请选择一条数据',
                                 type: 'warning'
                             })
-                            return 
+                            return
                         }
                          srcUrl =this.$reportPash.replace("show","pdf")+this.runQianPathPDF+'.rpx&id_='+selection
                         pintText(this,srcUrl)
@@ -802,7 +807,7 @@ export default {
                                 message: '请选择一条数据',
                                 type: 'warning'
                             })
-                            return 
+                            return
                         }
                         srcUrl =this.$reportPash+this.runQianPathOther+'.rpx&id_='+selection
                         pintText(this,srcUrl)
@@ -1529,6 +1534,12 @@ export default {
             }else{
                 return obj
             }
+        },
+        xlsxFileClick(){
+            this.xlsxFileVisible = true
+        },
+        xlsxFileClose(){
+            this.xlsxFileVisible = false
         },
 
         // =================================处理脚本================================

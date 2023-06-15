@@ -116,13 +116,12 @@ export default {
         }
     },
     mounted() {
-        if(this.id){
+        if (this.id) {
             this.getInitData(this.id)
             // this.init()
-        }else{
+        } else {
             this.init()
         }
-
     },
     methods: {
         init() {
@@ -149,9 +148,9 @@ export default {
             luckysheet.create(options)
         },
         //获取数据表的数据
-        getInitData(id){
+        getInitData(id) {
             let sql = `select * from t_pbgl where id_ = '${id}'`
-            curdPost('sql', sql).then(res => {
+            curdPost('sql', sql).then((res) => {
                 if (res.state == '200') {
                     let dataItem = res.variables.data[0]
                     this.title = dataItem.shu_ju_ming_cheng
@@ -162,7 +161,12 @@ export default {
         },
         save() {
             let data = luckysheet.toJson()
-            this.getSumbit(data)
+            if(this.id){
+                this.updateSumbit(data)
+            }else{
+                this.getSumbit(data)
+            }
+
         },
         //下载文档
         exportExcelBtn() {
@@ -211,7 +215,17 @@ export default {
                 showstatisticBarConfig: this.showstatisticBarConfig
             })
         },
-        errorCb(error) {
+        errorCb(error) {},
+        printFn() {
+            // 1. 实现全选
+            $('#luckysheet-left-top').click();
+            // 2. 生成选区的截图
+            let src = luckysheet.getScreenshot();
+            let $img = `<img src=${src} style="max-width: 90%;" />`
+            this.$nextTick(() => {
+                document.querySelector('#print_html').innerHTML = $img;
+            })
+            // 3. 调用系统打印：已经用v-print指令绑定在打印按钮上
         },
 
         getSumbit(option) {
@@ -243,11 +257,45 @@ export default {
                     })
                 }
             })
+        },
+        updateSumbit(option) {
+            if (this.title == '') {
+                this.$message({
+                    showClose: true,
+                    message: '请填写表格名称',
+                    type: 'warning'
+                })
+                return
+            }
+            let data = {
+                where:{
+                    id_ : this.id
+                },
+                param:{
+                shu_ju_cun_chu_: JSON.stringify(option),
+                shu_ju_lei_xing_: '在线编辑',
+                shu_ju_ming_cheng: this.title
+                }
+            }
+            let allSampleParams = {
+                tableName: 't_pbgl',
+                updList: [data]
+            }
+            repostCurd('updatesByWhere', JSON.stringify(allSampleParams)).then((res) => {
+                if (res.state == '200') {
+                    this.$emit('addClick', this.id, option)
+                    this.$message({
+                        showClose: true,
+                        message: this.title + '的文档' + '修改成功',
+                        type: 'success'
+                    })
+                }
+            })
         }
     }
 }
 </script>
-  <style scoped lang="less">
+<style scoped lang="less">
 .mb-md {
     padding: 10px;
     display: flex;
@@ -263,11 +311,5 @@ export default {
     .excel {
         flex: 1;
     }
-}
-
-.drag-button {
-    position: fixed;
-    cursor: move;
-    z-index: 9999;
 }
 </style>
