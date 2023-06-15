@@ -108,6 +108,8 @@
         <labelPrint :show="showPrintYi" :list="printList" :type="printType" />
 
         <import-table :visible="importTableDialogVisible" title="导入" @close="(visible) => (importTableDialogVisible = visible)" @action-event="handleImportTableActionEvent" />
+
+        <xlsxFile :visible="xlsxFileVisible" @xlsxFileClose="xlsxFileClose" v-if="xlsxFileVisible"></xlsxFile>
     </div>
 </template>
 <script>
@@ -152,7 +154,9 @@ import Scan from '@/views/system/jbdScan/scan.vue'
 import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
+import pintText from '../../../form/utils/custom/pintText.js' //打印规则
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
+import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
 
 export default {
     name: 'list',
@@ -173,7 +177,8 @@ export default {
         Scan,
         importTable,
         Print: () => import('../components/print'),
-        LabelPrint: () => import('../components/labelPrint')
+        LabelPrint: () => import('../components/labelPrint'),
+        xlsxFile
 
         // BpmnFormrender
         // DataTemplateFormat
@@ -199,7 +204,8 @@ export default {
         preview: {
             type: Boolean,
             default: false
-        }
+        },
+        xlsxFileVisible: false
     },
     destroyed() {
         if (this.dataTemplate.type !== 'dialog') {
@@ -221,7 +227,8 @@ export default {
             scanVisible: false,
             scanName: '',
             obj: '',
-
+            runQianPathPDF:'',
+            runQianPathOther:'',
             initialization: false,
             tableHeight: document.body.clientHeight,
             listIdentity: '',
@@ -725,6 +732,7 @@ export default {
 
             // 前置事件
             this.beforeScript(command, position, selection, data, () => {
+                let srcUrl =''
                 this.readonly = false
                 switch (buttonType) {
                     case 'search': // 查询
@@ -778,6 +786,32 @@ export default {
                         break
                     case 'custom': // 自定义按钮
                         break
+                    case 'bianZhi': // 编制
+                        this.npmDialogFormVisible =true
+                        this.defId = this.defId
+                    break
+                    case 'runQianPDF': // 查阅
+                        if(!selection){
+                            this.$message({
+                                message: '请选择一条数据',
+                                type: 'warning'
+                            })
+                            return
+                        }
+                         srcUrl =this.$reportPash.replace("show","pdf")+this.runQianPathPDF+'.rpx&id_='+selection
+                        pintText(this,srcUrl)
+                    break
+                    case 'runQianOther': // 下载记录
+                        if(!selection){
+                            this.$message({
+                                message: '请选择一条数据',
+                                type: 'warning'
+                            })
+                            return
+                        }
+                        srcUrl =this.$reportPash+this.runQianPathOther+'.rpx&id_='+selection
+                        pintText(this,srcUrl)
+                    break
                     case 'print': // 打印
                         ActionUtils.selectedRecord(selection)
                             .then((id) => {
@@ -985,6 +1019,17 @@ export default {
             // this.template.attrs ? this.$utils.toBoolean(this.template.attrs.manage_effect) : false
 
             const functionButtons = this.template.buttons ? this.template.buttons.function_buttons || [] : []
+            for(var i of functionButtons){
+                if(i.button_type=='bianZhi'){
+                    this.defId=i.defId
+                }
+                if(i.button_type=='runQianPDF'){
+                    this.runQianPathPDF=i.runQianPah
+                }
+                if(i.button_type=='runQianOther'){
+                    this.runQianPathOther=i.runQianPah
+                }
+            }
             // 工具栏
             const toolbarButtons = []
             // 管理列
@@ -1489,6 +1534,12 @@ export default {
             }else{
                 return obj
             }
+        },
+        xlsxFileClick(){
+            this.xlsxFileVisible = true
+        },
+        xlsxFileClose(){
+            this.xlsxFileVisible = false
         },
 
         // =================================处理脚本================================
