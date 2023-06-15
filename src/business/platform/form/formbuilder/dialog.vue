@@ -52,14 +52,15 @@ export default {
           labelPosition: 'right', // 标签对齐方式
           labelWidth: '100', // 标签宽度
           labelWidthUnit: 'px', // 标签宽度单位
-          size: 'small', // 尺寸
+          size: 'mini', // 尺寸
           statusIcon: false, // 显示验证图标
           descPosition: 'inline',
           verifys: [], // 表单提交校验
           script: '', // 表单脚本
           read_style: 'text',
           colon: false,
-          labelSuffix: ':'
+          labelSuffix: ':',
+          title_position: 'center'
         },
         fields: [] // 字段列表
       },
