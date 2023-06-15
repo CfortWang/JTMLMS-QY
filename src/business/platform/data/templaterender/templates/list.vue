@@ -221,7 +221,8 @@ export default {
             scanVisible: false,
             scanName: '',
             obj: '',
-
+            defid:'',
+            runQianPah:'',
             initialization: false,
             tableHeight: document.body.clientHeight,
             listIdentity: '',
@@ -778,6 +779,10 @@ export default {
                         break
                     case 'custom': // 自定义按钮
                         break
+                    case 'bianZhi': // 编制
+                        this.npmDialogFormVisible =true
+                        this.defId = this.defId
+                    break
                     case 'print': // 打印
                         ActionUtils.selectedRecord(selection)
                             .then((id) => {
@@ -985,6 +990,11 @@ export default {
             // this.template.attrs ? this.$utils.toBoolean(this.template.attrs.manage_effect) : false
 
             const functionButtons = this.template.buttons ? this.template.buttons.function_buttons || [] : []
+            for(var i of functionButtons){
+                if(i.button_type=='bianZhi'){
+                    this.defId=i.defId
+                }
+            }
             // 工具栏
             const toolbarButtons = []
             // 管理列

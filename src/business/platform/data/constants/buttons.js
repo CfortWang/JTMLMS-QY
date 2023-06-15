@@ -84,6 +84,12 @@ const buttons = {
     icon: 'ibps-icon-export',
     scope: ['toolbar'],
   },
+  'bianZhi': {
+    label: '编制',
+    type: 'primary',
+    icon: 'ibps-icon-export',
+    scope: ['toolbar'],
+  },
   'close': {
     label: '关闭',
     type: 'default',
