@@ -227,8 +227,8 @@ export default {
             scanVisible: false,
             scanName: '',
             obj: '',
-            runQianPathPDF:'',
-            runQianPathOther:'',
+            previewPath:'',
+            downloadPath:'',
             initialization: false,
             tableHeight: document.body.clientHeight,
             listIdentity: '',
@@ -732,7 +732,7 @@ export default {
 
             // 前置事件
             this.beforeScript(command, position, selection, data, () => {
-                let srcUrl =''
+                let src =''
                 this.readonly = false
                 switch (buttonType) {
                     case 'search': // 查询
@@ -786,11 +786,11 @@ export default {
                         break
                     case 'custom': // 自定义按钮
                         break
-                    case 'bianZhi': // 编制
+                    case 'openTask': // 编制，开启对应流程
                         this.npmDialogFormVisible =true
                         this.defId = this.defId
                     break
-                    case 'runQianPDF': // 查阅
+                    case 'consult': // 查阅
                         if(!selection){
                             this.$message({
                                 message: '请选择一条数据',
@@ -798,10 +798,10 @@ export default {
                             })
                             return
                         }
-                         srcUrl =this.$reportPash.replace("show","pdf")+this.runQianPathPDF+'.rpx&id_='+selection
-                        pintText(this,srcUrl)
+                        src = `${this.$reportPash.replace('show', 'pdf')}${this.previewPath}&id_=${selection}`
+                        pintText(this, src)
                     break
-                    case 'runQianOther': // 下载记录
+                    case 'download': // 下载记录
                         if(!selection){
                             this.$message({
                                 message: '请选择一条数据',
@@ -809,8 +809,8 @@ export default {
                             })
                             return
                         }
-                        srcUrl =this.$reportPash+this.runQianPathOther+'.rpx&id_='+selection
-                        pintText(this,srcUrl)
+                        src = `${this.$reportPash}${this.downloadPath}&id_=${selection}`
+                        pintText(this, src)
                     break
                     case 'print': // 打印
                         ActionUtils.selectedRecord(selection)
@@ -1020,14 +1020,14 @@ export default {
 
             const functionButtons = this.template.buttons ? this.template.buttons.function_buttons || [] : []
             for(var i of functionButtons){
-                if(i.button_type=='bianZhi'){
-                    this.defId=i.defId
+                if(i.button_type=='openTask'){
+                    this.defId = i.defId
                 }
-                if(i.button_type=='runQianPDF'){
-                    this.runQianPathPDF=i.runQianPah
+                if(i.button_type === 'consult'){
+                    this.previewPath = i.reportPath
                 }
-                if(i.button_type=='runQianOther'){
-                    this.runQianPathOther=i.runQianPah
+                if(i.button_type === 'download'){
+                    this.downloadPath = i.reportPath
                 }
             }
             // 工具栏

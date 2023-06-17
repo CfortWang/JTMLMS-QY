@@ -1,66 +1,68 @@
 <template>
     <div v-if="formPage">
         <ibps-watermark :disabled="!enableWatermark" :text="watermarkText">
-            <!--顶部按钮-->
-            <template v-if="hasActions">
-                <div v-sticky="{ stickyTop: marginTop }" class="form-toolbar hidden-print">
-                    <div :class="['ibps-toolbar--' + $ELEMENT.size]" class="ibps-toolbar">
-                        <panle />
-                        <div class="header" style="height: 30px">
-                            <div class="buttons" style="float: right; margin-right: 8%">
-                                <ibps-toolbar
-                                    ref="toolbar"
-                                    :actions="actions.reverse()"
-                                    @action-event="handleButtonEvent"
-                                />
-                            </div>
-                            <!--步骤条按钮-->
-                            <div v-if="hasStepButton" class="buttons ibps-pr-10 ibps-fr-important">
-                                <el-button
-                                    v-for="button in stepButtons"
-                                    :key="button.key"
-                                    :size="button.size || $ELEMENT.size"
-                                    :icon="'ibps-icon-' + button.icon"
-                                    :autofocus="false"
-                                    :disabled="disabledStepButton(button.key)"
-                                    :loading="stepLoading"
-                                    @click="() => { handleStepButtonEvent(button) }"
-                                >
-                                    {{ button.label }}
-                                </el-button>
+            <div class="table-content">
+                <!--顶部按钮-->
+                <template v-if="hasActions">
+                    <div v-sticky="{ stickyTop: marginTop }" class="form-toolbar hidden-print">
+                        <div :class="['ibps-toolbar--' + $ELEMENT.size]" class="ibps-toolbar">
+                            <panle />
+                            <div class="header" style="height: 30px">
+                                <div class="buttons" style="float: right; margin-right: 8%">
+                                    <ibps-toolbar
+                                        ref="toolbar"
+                                        :actions="actions.reverse()"
+                                        @action-event="handleButtonEvent"
+                                    />
+                                </div>
+                                <!--步骤条按钮-->
+                                <div v-if="hasStepButton" class="buttons ibps-pr-10 ibps-fr-important">
+                                    <el-button
+                                        v-for="button in stepButtons"
+                                        :key="button.key"
+                                        :size="button.size || $ELEMENT.size"
+                                        :icon="'ibps-icon-' + button.icon"
+                                        :autofocus="false"
+                                        :disabled="disabledStepButton(button.key)"
+                                        :loading="stepLoading"
+                                        @click="() => { handleStepButtonEvent(button) }"
+                                    >
+                                        {{ button.label }}
+                                    </el-button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </template>
-            <!--表单-->
-            <dynamic-form
-                ref="dynamicForm"
-                v-model="formData"
-                :form-def="formDefData"
-                :form="this"
-                :permissions="permissions"
-                :readonly="readonly"
-                :params="params"
-                :dynamicParams="dynamicParams"
-                :initialization="initialization"
-                :cur-active-step.sync="curActiveStep"
-                :isDialog="isDialog"
-                class="form-container"
-                :style="{ marginTop: hasActions ? marginTop + 'px' : '0' }"
-            />
-            <component
-                :is="dialogTemplate"
-                v-if="dialogTemplate"
-                ref="dialogTemplate"
-                v-bind="dialogTemplateAtts"
-            />
-            <component
-                :is="customComponent"
-                v-if="customComponent"
-                ref="customComponent"
-                v-bind="customComponentAtts"
-            />
+                </template>
+                <!--表单-->
+                <dynamic-form
+                    ref="dynamicForm"
+                    v-model="formData"
+                    :form-def="formDefData"
+                    :form="this"
+                    :permissions="permissions"
+                    :readonly="readonly"
+                    :params="params"
+                    :dynamicParams="dynamicParams"
+                    :initialization="initialization"
+                    :cur-active-step.sync="curActiveStep"
+                    :isDialog="isDialog"
+                    class="form-container"
+                    :style="{ marginTop: hasActions ? marginTop + 'px' : '0' }"
+                />
+                <component
+                    :is="dialogTemplate"
+                    v-if="dialogTemplate"
+                    ref="dialogTemplate"
+                    v-bind="dialogTemplateAtts"
+                />
+                <component
+                    :is="customComponent"
+                    v-if="customComponent"
+                    ref="customComponent"
+                    v-bind="customComponentAtts"
+                />
+            </div>
         </ibps-watermark>
     </div>
 </template>
@@ -560,26 +562,39 @@
     }
 </script>
 <style lang="scss" scoped>
-    .form-toolbar {
-        position: fixed;
-        width: 100%;
-        margin-top: -50px;
-    }
-    .form-container {
-        margin: 0 10px 10px 10px;
-    }
-    @media print {
-        .dynamic-form {
-            margin-top: 0 !important;
+    .table-content {
+        .form-toolbar {
+            position: fixed;
+            width: 100%;
+            margin-top: -50px;
         }
-        .el-dialog__headerbtn {
-            display: none !important;
-            padding: 0;
-            margin: 0;
+        .form-container {
+            margin: 0 10px 10px 10px;
+            ::v-deep .el-form--label-left {
+                font-size: 18px;
+                .el-form-item__label {
+                    padding-left: 30px;
+                    position: relative;
+                    &:before {
+                        position: absolute;
+                        left: 24px;
+                    }
+                }
+            }
         }
-        .hidden-print {
-            padding: 0;
-            margin: 0;
+        @media print {
+            .dynamic-form {
+                margin-top: 0 !important;
+            }
+            .el-dialog__headerbtn {
+                display: none !important;
+                padding: 0;
+                margin: 0;
+            }
+            .hidden-print {
+                padding: 0;
+                margin: 0;
+            }
         }
     }
 </style>

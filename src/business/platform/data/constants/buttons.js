@@ -22,14 +22,14 @@ const buttons = {
   },
   'add': {
     label: '添加',
-    type: 'primary',
+    type: 'success',
     icon: 'ibps-icon-add',
     scope: ['toolbar', 'contextmenu'],
     contextmenu: 'all'
   },
   'remove': {
     label: '删除',
-    type: 'primary',
+    type: 'danger',
     icon: 'ibps-icon-remove',
     scope: ['toolbar', 'manage'],
     contextmenu: 'sub'
@@ -84,22 +84,22 @@ const buttons = {
     icon: 'ibps-icon-export',
     scope: ['toolbar'],
   },
-  'bianZhi': {
+  'openTask': {
     label: '编制',
-    type: 'primary',
-    icon: 'ibps-icon-export',
+    type: 'success',
+    icon: 'ibps-icon-add',
     scope: ['toolbar'],
   },
-  'runQianPDF': {
+  'consult': {
     label: '查阅',
     type: 'primary',
-    icon: 'ibps-icon-export',
+    icon: 'ibps-icon-eye',
     scope: ['toolbar', 'manage'],
   },
-  'runQianOther': {
+  'download': {
     label: '下载记录',
     type: 'primary',
-    icon: 'ibps-icon-export',
+    icon: 'ibps-icon-download',
     scope: ['toolbar', 'manage'],
   },
   'close': {
