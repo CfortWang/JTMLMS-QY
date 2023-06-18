@@ -732,7 +732,7 @@ export default {
 
             // 前置事件
             this.beforeScript(command, position, selection, data, () => {
-                let src =''
+                let src = ''
                 this.readonly = false
                 switch (buttonType) {
                     case 'search': // 查询
@@ -787,7 +787,8 @@ export default {
                     case 'custom': // 自定义按钮
                         break
                     case 'openTask': // 编制，开启对应流程
-                        this.npmDialogFormVisible =true
+                        console.log(button)
+                        // this.npmDialogFormVisible =true
                         this.defId = this.defId
                     break
                     case 'consult': // 查阅
@@ -1021,6 +1022,7 @@ export default {
             const functionButtons = this.template.buttons ? this.template.buttons.function_buttons || [] : []
             for(var i of functionButtons){
                 if(i.button_type=='openTask'){
+                    console.log(i)
                     this.defId = i.defId
                 }
                 if(i.button_type === 'consult'){

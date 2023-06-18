@@ -38,14 +38,14 @@ const buttons = {
     label: '编辑',
     type: 'primary',
     icon: 'ibps-icon-edit',
-    scope: ['toolbar', 'manage'],
+    scope: ['manage'],
     contextmenu: 'sub'
   },
   'detail': {
     label: '明细',
     type: 'primary',
     icon: 'ibps-icon-detail',
-    scope: ['toolbar', 'manage'],
+    scope: ['manage'],
     contextmenu: 'sub'
   },
   'batchModify': {
@@ -89,18 +89,21 @@ const buttons = {
     type: 'success',
     icon: 'ibps-icon-add',
     scope: ['toolbar'],
+    contextmenu: 'all'
   },
   'consult': {
     label: '查阅',
     type: 'primary',
     icon: 'ibps-icon-eye',
-    scope: ['toolbar', 'manage'],
+    scope: ['manage'],
+    contextmenu: 'sub'
   },
   'download': {
     label: '下载记录',
     type: 'primary',
     icon: 'ibps-icon-download',
-    scope: ['toolbar', 'manage'],
+    scope: ['manage'],
+    contextmenu: 'sub'
   },
   'close': {
     label: '关闭',

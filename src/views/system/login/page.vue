@@ -67,7 +67,7 @@ export default {
 </script>
 <style>
 .jbd-login-page-bg {
-    background-image: url('~@/assets/images/login/bgImg.jpg');
+    background-image: url('~@/assets/images/login/bgImg.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     position: absolute;

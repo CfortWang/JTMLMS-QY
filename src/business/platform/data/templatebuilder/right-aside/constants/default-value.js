@@ -89,7 +89,7 @@ export const fucntionButtonDefaultValue = {
   position: 'all'
 }
 
-export const functionListButtonTypes = ['search', 'resetSearch', 'add', 'remove', 'edit', 'detail', 'print', 'import', 'export', 'exportMuBan','openTask','consult','download', 'sefStartFlow', 'custom']
+export const functionListButtonTypes = ['search', 'resetSearch', 'add', 'remove', 'edit', 'detail', 'print', 'import', 'export', 'exportMuBan','openTask', 'consult', 'download', 'sefStartFlow', 'custom']
 // export const functionListButtonTypes = ['search', 'resetSearch', 'add', 'remove', 'edit', 'detail', 'sefStartFlow', 'custom']
 
 // export const functionTreeButtonTypes = ['refresh', 'expand', 'compress', 'custom']
@@ -97,5 +97,5 @@ export const functionTreeButtonTypes = ['refresh', 'expand', 'compress']
 
 export const contextmenuButtonTypes = ['add', 'remove', 'edit', 'detail']
 
-export const editButtonTypes = ['close', 'save', 'print', 'sefStartFlow', 'custom']
+export const editButtonTypes = ['close', 'save', 'print', 'sefStartFlow', 'custom', 'openTask', 'consult', 'download',]
 // ['close', 'save', 'print', 'sefStartFlow']

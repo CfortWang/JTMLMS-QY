@@ -50,7 +50,7 @@
                     attrs: {
                         inline: false, // 是否使用inline排版
                         labelPosition: 'left', // 标签对齐方式
-                        labelWidth: '100', // 标签宽度
+                        labelWidth: '110', // 标签宽度
                         labelWidthUnit: 'px', // 标签宽度单位
                         size: 'mini', // 尺寸
                         statusIcon: false, // 显示验证图标
@@ -58,7 +58,7 @@
                         verifys: [], // 表单提交校验
                         script: '', // 表单脚本
                         read_style: 'text',
-                        colon: true,
+                        colon: false,
                         labelSuffix: ':',
                         title_position: 'center'
                     },

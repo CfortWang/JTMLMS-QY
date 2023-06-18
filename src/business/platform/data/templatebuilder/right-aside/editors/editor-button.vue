@@ -63,16 +63,32 @@
             <el-button size="small" type="primary" @click="handleExportFields">设置导出字段</el-button>
         </el-form-item>
         <el-form-item
-            v-if="formData && (formData.button_type === 'consult' || formData.button_type === 'download')"
-            label="润乾路径"
+            v-if="formData && ['consult', 'download'].includes(formData.button_type)"
+            label="报表路径"
             required
             prop="label"
         >
-            <el-input v-model="formData.reportPath" placeholder="润乾路径" />
+            <el-input v-model="formData.reportPath" placeholder="请填写润乾报表完整路径" />
         </el-form-item>
         <el-form-item
-            v-if="formData && formData.button_type === 'sefStartFlow' && formData.button_type === 'openTask'"
+            v-if="formData && ['openTask'].includes(formData.button_type)"
+            prop="defId"
+            label="绑定流程"
+            required
+        >
+            <bpm-def-dialog
+                :form-key="formKey"
+                :visible="selectorVisible"
+                :value="formData.defId"
+                :is-data-template-use="false"
+                @close="visible => dialogVisible = visible"
+                @action-event="handleDialogActionEvent"
+            />
+        </el-form-item>
+        <el-form-item
+            v-if="formData && ['sefStartFlow'].includes(formData.button_type)"
             prop="deflow"
+            required
         >
             <label slot="label">
                 绑定流程
@@ -94,19 +110,21 @@
             :visible="exportFieldDialogVisible"
             :data="template"
             @callback="handleExportColumn"
-            @close="(visible) => (exportFieldDialogVisible = visible)"
+            @close="visible => exportFieldDialogVisible = visible"
         />
     </el-form>
 </template>
 <script>
     import { hasPermission } from '@/business/platform/data/constants/buttons'
     import BpmDefSelector from '@/business/platform/bpmn/definition/selector'
+    import BpmDefDialog from '@/business/platform/bpmn/definition/dialog'
     import RightsSelector from '@/business/platform/rights/config/selector'
     import ExportColumn from '../components/export-column'
 
     export default {
         components: {
             RightsSelector,
+            BpmDefDialog,
             BpmDefSelector,
             ExportColumn
         },
@@ -145,7 +163,8 @@
                             message: this.$t('validate.required')
                         }
                     ]
-                }
+                },
+                dialogVisible: false
             }
         },
         computed: {
@@ -156,20 +175,13 @@
                     label: '所有'
                 })
                 const buttonType = this.formData.button_type || ''
-                if (
-                    hasPermission(buttonType, 'toolbar') &&
-                    this.type === 'function'
-                ) {
+                if (hasPermission(buttonType, 'toolbar') && this.type === 'function') {
                     positionType.push({
                         value: 'toolbar',
                         label: '仅顶部'
                     })
                 }
-
-                if (
-                    hasPermission(buttonType, 'manage') &&
-                    this.type === 'function'
-                ) {
+                if (hasPermission(buttonType, 'manage') && this.type === 'function') {
                     positionType.push({
                         value: 'manage',
                         label: '仅管理列'
@@ -181,14 +193,12 @@
                 //     label: '仅查询列'
                 //   })
                 // }
-
                 if (hasPermission(buttonType, 'edit') && this.type === 'edit') {
                     positionType.push({
                         value: 'edit',
                         label: '仅编辑'
                     })
                 }
-
                 return positionType
             }
         },
@@ -197,10 +207,8 @@
                 handler(val) {
                     if (val) {
                         this.formData = val
-                        if (
-                            this.formData.button_type === 'custom' ||
-                            this.formData.button_type === 'sefStartFlow'
-                        ) {
+                        const spicialType = ['custom', 'sefStartFlow', 'openTask']
+                        if (spicialType.includes(this.formData.button_type)) {
                             this.rules['code'] = [
                                 {
                                     required: true,
@@ -234,6 +242,9 @@
             },
             handleData(key, value) {
                 this.$emit('callback', key, value)
+            },
+            handleDialogActionEvent (key, data) {
+                console.log(key, data)
             }
         }
     }
