@@ -67,27 +67,18 @@ module.exports = {
             'after': true
         }],
         'handle-callback-err': [2, '^(err|error)$'],
-        // 'indent': ["off", 2, {
-        //     'SwitchCase': 1
-        // }],
-        "vue/script-indent": [
-            2,
-            4,
-            {
-                "baseIndent": 1,
-                "switchCase": 1,
-                "MemberExpression": 1
-            }
-        ],
-        "vue/html-indent": [
-            2,
-            4,
-            {
-                "attribute": 1,
-                "closeBracket": 0,
-                "alignAttributesVertically": true
-            }
-        ],
+        'indent': [off, 4, {
+            'SwitchCase': 1
+        }],
+        "vue/script-indent": [2, 4, {
+            "baseIndent": 1,
+            "switchCase": 1
+        }],
+        "vue/html-indent": [2, 4, {
+            "attribute": 1,
+            "closeBracket": 0,
+            "alignAttributesVertically": true
+        }],
         'jsx-quotes': [2, 'prefer-single'],
         'key-spacing': [2, {
             'beforeColon': false,
@@ -174,13 +165,7 @@ module.exports = {
         }],
         'no-unreachable': 2,
         'no-unsafe-finally': 2,
-        // 'no-unused-vars': [2, {
-        //     'vars': 'all',
-        //     'args': 'none'
-        // }],
-        // 当存在定义而未使用的组件时，关闭报错
         'vue/no-unused-components': 'off',
-        // 当存在定义而未使用的变量时，关闭报错
         'no-unused-vars': 'off',
         'no-useless-call': 2,
         'no-useless-computed-key': 2,
@@ -208,7 +193,7 @@ module.exports = {
             'after': true
         }],
         'space-before-blocks': [2, 'always'],
-        'space-before-function-paren': [2, 'never'],
+        'space-before-function-paren': [2, 'always'],
         'space-in-parens': [2, 'never'],
         'space-infix-ops': 2,
         'space-unary-ops': [2, {
