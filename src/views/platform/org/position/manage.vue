@@ -9,7 +9,7 @@
         :contextmenus="orgTreeContextmenus"
         :load="loadNode"
         lazy
-        title="岗位管理"
+        title="部门管理"
         @action-event="handleTreeAction"
         @node-click="handleNodeClick"
         @expand-collapse="handleExpandCollapse"
@@ -39,7 +39,7 @@
         <el-alert
           v-else
           :closable="false"
-          title="尚未指定一个岗位"
+          title="尚未指定一个部门"
           type="warning"
           show-icon
           style="height:50px;"
@@ -126,6 +126,11 @@ export default {
         type: 1,
         posId: node.level === 0 ? null : node.data.id
       }).then(res => {
+        let data = res.data
+        //岗位树改成部门树
+        if(node.level === 0 && data.length > 0 && data[0].name == '岗位树'){
+            data[0].name = '部门树'
+        }
         this.loading = false
         resolve(this.toTree(res.data))
       }).catch(res => {

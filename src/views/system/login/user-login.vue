@@ -424,12 +424,21 @@
     }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
     .el-form-item {
-        margin-bottom: 18px !important;
+        margin-bottom: 22px !important;
     }
 
+
+
     /deep/ .el-form-item--small .el-form-item__error{
-        padding-top: 10px;
+        padding-top: 0px;
+        line-height: 14px;
     }
+
+    // @media (min-width: 1620px) and (max-width: 1910px) {
+    //     /deep/ .el-form-item--small .el-form-item__error{
+    //     padding-top: 10px;
+    // }
+    // }
 </style>

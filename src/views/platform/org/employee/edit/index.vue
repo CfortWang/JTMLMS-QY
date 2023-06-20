@@ -34,7 +34,7 @@
                     @input="data => employee.attrItemList = data"
                 />
             </el-tab-pane>
-            <el-tab-pane
+            <!-- <el-tab-pane
                 v-if="!infoIncludes('org-info')"
                 label="组织信息"
                 name="org-info"
@@ -47,9 +47,10 @@
                     :groupID="employee.groupID"
                     @input="data => employee.orgItem = data"
                 />
-            </el-tab-pane>
+            </el-tab-pane> -->
 
-            <!-- <el-tab-pane label="岗位信息" name="position-info">
+            <!-- 原岗位 -->
+            <el-tab-pane label="部门信息" name="position-info">
                 <position-info
                     ref="positionInfo"
                     :span="span"
@@ -58,7 +59,7 @@
                     :data="employee.posItemList"
                     @input="data => employee.posItemList = data"
                 />
-            </el-tab-pane> -->
+            </el-tab-pane>
             <el-tab-pane v-if="!infoIncludes('role-info')"  label="角色信息" name="role-info">
                 <!-- <span slot="label">角色信息
                     <el-tooltip
@@ -307,9 +308,9 @@
                 this.activeName = 'basic-info'
                 this.employee = this.$utils.newData(this.defaultEmployee)
                 this.$nextTick(() => {
-                    if (this.$refs.orgInfo) {
-                        this.$refs.orgInfo.init()
-                    }
+                    // if (this.$refs.orgInfo) {
+                    //     this.$refs.orgInfo.init()
+                    // }
                     // this.$refs.positionInfo.init()
                     if (this.$refs.roleInfo) {
                         this.$refs.roleInfo.init()

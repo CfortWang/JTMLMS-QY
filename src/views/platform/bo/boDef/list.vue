@@ -168,13 +168,14 @@ export default {
         },
         // 表格字段配置
         columns: [
-          { prop: 'name', label: '名称', width: 150 },
-          { prop: 'code', label: '编码', width: 150 },
-          { prop: 'versionCount', label: '版本信息', fieldType: 'slot', slotName: 'versionCount' },
-          {prop:'typeId',label:'归分类型', width: 120 },
-          { prop: 'status', label: '状态', width: 100, tags: statusOptions },
-          { prop: 'boType', label: '对象类型', width: 100, tags: boTypeOptions },
-          { prop: 'isCreateTable', label: '生成表', tags: createTabelOptions, width: 80 }
+          { prop: 'name', label: '名称', sortable: true, minWidth: 250 },
+          { prop: 'code', label: '编码', sortable: true, width: 100 },
+          { prop: 'versionCount', label: '版本信息', fieldType: 'slot', slotName: 'versionCount', width: 180 },
+          {prop:'typeId',label:'归分类型', sortable: true, width: 120 },
+          { prop: 'status', label: '状态', sortable: true, width: 100, tags: statusOptions },
+          { prop: 'boType', label: '对象类型', sortable: true, width: 100, tags: boTypeOptions },
+          { prop: 'isCreateTable', label: '生成表', sortable: true, tags: createTabelOptions, width: 80 },
+          {prop:'createTime',label:'创建时间', sortable: true, width: 150 }
         ],
         // 管理列
         rowHandle: {
@@ -191,9 +192,9 @@ export default {
               key: 'synBoTable',
               label: '同步表结构',
               icon: 'ibps-icon-exchange',
-              hidden: (row, index) => {
-                return row.boType !== 'out'
-              }
+            //   hidden: (row, index) => {
+            //     return row.boType === 'out'
+            //   }
             },
             {
               key: 'copy',
@@ -224,18 +225,14 @@ export default {
     loadData(id = '') {
       this.loading = true
       queryPageList(this.getFormatParams(id)).then(response => {
-            response.data.dataResult.forEach((item)=>{
-              if(item.typeId && this.typeFiler.length>0){
-                  this.typeFiler.forEach((val)=>{
-                         if(item.typeId == val.id){
-                              item.typeId = val.name
-                               return
-                           }
-                      })
-                  }else{
-                   item.typeId = item.typeId ? '已分类': '未分类'
-                  }
-                })
+        response.data.dataResult.forEach((item)=>{
+            if(item.typeId && this.typeFiler.length){
+                let temp = this.typeFiler.find(i => i.id === item.typeId)
+                item.typeId = temp ? temp.name : '未分类'
+            } else {
+                item.typeId = item.typeId ? 'a0分类被删除': 'z9未分类'
+            }
+        })
         ActionUtils.handleListData(this, response.data)
         this.loading = false
       }).catch(() => {

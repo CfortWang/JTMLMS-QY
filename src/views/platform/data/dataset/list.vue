@@ -8,6 +8,7 @@ y
         :has-contextmenu="true"
         title="数据集分类"
         category-key="DATASET_TYPE"
+        @treeData="treeData"
         @node-click="handleNodeClick"
         @expand-collapse="handleExpandCollapse"
       />
@@ -78,6 +79,7 @@ export default {
       typeId: '',
       loading: false,
       listData: [],
+      typeFiler:[],
       listConfig: {
         // 工具栏
         toolbars: [
@@ -108,10 +110,13 @@ export default {
         },
         // 表格字段配置
         columns: [
-          { prop: 'name', label: '名称' },
-          { prop: 'key', label: '业务主键' },
-          { prop: 'type', label: '类型', tags: datasetTypeOptions },
-          { prop: 'from', label: '来源' }
+          { prop: 'name', label: '名称', sortable: true },
+          { prop: 'key', label: '业务主键', sortable: true, width: 120 },
+          { prop: 'type', label: '类型', tags: datasetTypeOptions, sortable: true, width: 100 },
+          {prop:'typeId', label:'归分类型', sortable: true, width: 120 },
+          { prop: 'from', label: '来源', sortable: true, width: 120 },
+          { prop: 'createTime', label: '创建时间', sortable: true, width: 150 },
+          { prop: 'updateTime', label: '更新时间', sortable: true, width: 150 }
         ],
         // 管理列
         rowHandle: {
@@ -143,6 +148,14 @@ export default {
     loadData() {
       this.loading = true
       queryPageList(this.getFormatParams()).then(response => {
+        response.data.dataResult.forEach((item)=>{
+            if(item.typeId && this.typeFiler.length){
+                let temp = this.typeFiler.find(i => i.id === item.typeId)
+                item.typeId = temp ? temp.name : '未分类'
+            } else {
+                item.typeId = item.typeId ? '分类被删除': '未分类'
+            }
+        })
         ActionUtils.handleListData(this, response.data)
         this.loading = false
       }).catch(() => {
@@ -269,6 +282,9 @@ export default {
     },
     handleExpandCollapse(isExpand) {
       this.width = isExpand ? 230 : 30
+    },
+    treeData(data){
+      this.typeFiler = data
     }
   }
 }

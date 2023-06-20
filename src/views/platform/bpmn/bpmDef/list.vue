@@ -170,7 +170,7 @@ export default {
           forms: [
             { prop: 'Q^name_^SL', label: '名称', width: 150 },
             { prop: 'Q^def_key_^SL', label: '业务主键', width: 150 },
-            /* {
+            {
               prop: 'Q^status_^S',
               label: '流程状态',
               fieldType: 'select',
@@ -186,17 +186,18 @@ export default {
               prop: ['Q^CREATE_TIME_^DL', 'Q^CREATE_TIME_^DG'],
               label: '创建时间',
               fieldType: 'daterange'
-            } */
+            }
           ]
         },
         // 表格字段配置
         columns: [
-          { prop: 'name', label: '流程名称', slotName: 'defName' },
-          { prop: 'defKey', label: '流程业务主键', width: 150 },
+          { prop: 'name', label: '流程名称', slotName: 'defName', sortable: true },
+          { prop: 'defKey', label: '流程业务主键', width: 150, sortable: true },
           { prop: 'status', label: '流程状态', tags: statusOptions, width: 90 },
           { prop: 'testStatus', label: '测试状态', tags: testStatusOptions, width: 90 },
-          { prop: 'updateTime', label: '更新时间', width: 150 },
-          { prop: 'version', label: '版本号', width: 90 }
+          { prop: 'createTime', label: '创建时间', width: 150, sortable: true },
+          { prop: 'updateTime', label: '更新时间', width: 150, sortable: true },
+          { prop: 'version', label: '版本号', width: 90, sortable: true }
         ],
         rowHandle: {
           actions: [
@@ -456,7 +457,6 @@ export default {
         console.error(err)
       })
     }
-
   }
 }
 </script>

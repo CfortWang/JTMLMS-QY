@@ -4,13 +4,13 @@
       v-model="activeName"
       @tab-click="handleTabClick"
     >
-      <el-tab-pane label="岗位明细" name="detail">
+      <el-tab-pane label="部门明细" name="detail">
         <detail :id="id" :readonly="readonly" />
       </el-tab-pane>
       <el-tab-pane label="归属组织" name="positionOrg">
         <position-org :id="id" :height="height" :visible="activeName==='positionOrg'" />
       </el-tab-pane>
-      <el-tab-pane label="岗位人员" name="positionEmployee">
+      <el-tab-pane label="部门人员" name="positionEmployee">
         <position-employee :id="id" seeting-search-party-type="position" :height="height" :visible="activeName==='positionEmployee'" />
       </el-tab-pane>
       <el-tab-pane label="扩展属性" name="extraAttr">

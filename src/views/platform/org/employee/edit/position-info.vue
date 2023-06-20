@@ -34,14 +34,14 @@
         border
       >
         <el-table-column
-          label="岗位名称"
+          label="部门名称"
         >
           <template slot-scope="scope">
             <span style="margin-left: 10px">{{ scope.row.name }}</span>
           </template>
         </el-table-column>
         <el-table-column
-          label="是否主岗位"
+          label="是否主部门"
           width="100"
         >
           <template slot-scope="scope">
@@ -111,7 +111,8 @@ export default {
       treeData: [],
       posItemList: [],
       height: document.clientHeight,
-      checkStrictly: true
+      checkStrictly: true,
+      defaultTreeData: []
     }
   },
   computed: {
@@ -169,7 +170,10 @@ export default {
         this.loading = false
         const arr = JSON.parse(JSON.stringify(res.data))
         const treeData = this.toTree(arr)
-        if (treeData[0].id === '0') { treeData[0].disabled = true } // 根节点不能选择
+        if (treeData[0].id === '0') {
+          treeData[0].name = '部门树'
+          treeData[0].disabled = true
+        } // 根节点不能选择
         resolve(treeData)
       }).catch(res => {
         this.loading = false

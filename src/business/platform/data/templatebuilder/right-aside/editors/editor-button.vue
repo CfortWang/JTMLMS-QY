@@ -63,7 +63,7 @@
             <el-button size="small" type="primary" @click="handleExportFields">设置导出字段</el-button>
         </el-form-item>
         <el-form-item
-            v-if="formData && ['consult', 'download'].includes(formData.button_type)"
+            v-if="formData && (formData.button_type === 'consult' || formData.button_type === 'download')"
             label="报表路径"
             required
             prop="label"
@@ -71,28 +71,12 @@
             <el-input v-model="formData.reportPath" placeholder="请填写润乾报表完整路径" />
         </el-form-item>
         <el-form-item
-            v-if="formData && ['openTask'].includes(formData.button_type)"
-            prop="defId"
-            label="绑定流程"
-            required
-        >
-            <bpm-def-dialog
-                :form-key="formKey"
-                :visible="selectorVisible"
-                :value="formData.defId"
-                :is-data-template-use="false"
-                @close="visible => dialogVisible = visible"
-                @action-event="handleDialogActionEvent"
-            />
-        </el-form-item>
-        <el-form-item
-            v-if="formData && ['sefStartFlow'].includes(formData.button_type)"
+            v-if="formData && ['sefStartFlow', 'openTask'].includes(formData.button_type)"
             prop="deflow"
-            required
         >
             <label slot="label">
                 绑定流程
-                <el-tooltip class="item" effect="light" placement="bottom">
+                <el-tooltip v-if="formData.button_type === 'sefStartFlow'" class="item" effect="light" placement="bottom">
                     <div slot="content" style="line-height: 1.5;">
                         先在模板属性绑定表单，此流程定义数据才有！
                     </div>
@@ -101,9 +85,9 @@
             </label>
             <bpm-def-selector
                 v-model="formData.deflow"
-                value-key="defKey"
+                :value-key="formData.button_type === 'sefStartFlow' ? 'defKey' : 'defId'"
                 :form-key="formKey"
-                :is-data-template-use="true"
+                :is-data-template-use="formData.button_type === 'sefStartFlow'"
             />
         </el-form-item>
         <export-column
@@ -117,14 +101,12 @@
 <script>
     import { hasPermission } from '@/business/platform/data/constants/buttons'
     import BpmDefSelector from '@/business/platform/bpmn/definition/selector'
-    import BpmDefDialog from '@/business/platform/bpmn/definition/dialog'
     import RightsSelector from '@/business/platform/rights/config/selector'
     import ExportColumn from '../components/export-column'
 
     export default {
         components: {
             RightsSelector,
-            BpmDefDialog,
             BpmDefSelector,
             ExportColumn
         },
@@ -163,8 +145,7 @@
                             message: this.$t('validate.required')
                         }
                     ]
-                },
-                dialogVisible: false
+                }
             }
         },
         computed: {
@@ -242,9 +223,6 @@
             },
             handleData(key, value) {
                 this.$emit('callback', key, value)
-            },
-            handleDialogActionEvent (key, data) {
-                console.log(key, data)
             }
         }
     }

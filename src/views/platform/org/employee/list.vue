@@ -1,6 +1,6 @@
 <template>
     <ibps-container type="full" class="page">
-        <ibps-crud ref="crud" style="width: 100%" :height="height" :data="listData" :toolbars="listConfig.toolbars" :search-form="listConfig.searchForm" :pk-key="pkKey" :columns="listConfig.columns" :row-handle="listConfig.rowHandle" :pagination="pagination" :loading="loading" display-field="用户管理" :display-field-data="listConfig.displayFieldData" @display-field-change="handleDisplayField" @header-dragend="handleHeaderDragend" @action-event="handleAction" @sort-change="handleSortChange" @pagination-change="handlePaginationChange" />
+        <ibps-crud ref="crud" style="width: 100%" :height="height" :data="listData" :toolbars="listConfig.toolbars" :search-form="listConfig.searchForm" :pk-key="pkKey" :columns="listConfig.columns" :row-handle="listConfig.rowHandle" :pagination="pagination" :loading="loading" display-field="用户管理" :display-field-data="listConfig.displayFieldData" @display-field-change="handleDisplayField" @header-dragend="handleHeaderDragend" @action-event="handleAction" @sort-change="handleSortChange" @pagination-change="handlePaginationChange"/>
         <!-- 新增、编辑、明细 -->
         <edit :id="editId" :title="title" :formType="formType" :visible="dialogFormVisible" :readonly="readonly" :span="span" @dialog-callback="search" @close="(visible) => (dialogFormVisible = visible)" />
         <!-- 重置密码 -->
@@ -70,10 +70,10 @@ export default {
                             itemWidth: 150
                         },
                         {
-                            prop: 'Q^group_id_^SL',
+                            prop: 'Q^POSITIONS_^SL',
                             label: '归属组织',
                             fieldType: 'select',
-                            options: [],
+                            options: this.positionsList,
                             labelWidth: 60,
                             itemWidth: 150
                         },
@@ -88,11 +88,11 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'name', label: this.$t('platform.org.employee.prop.name'), width: 120 },
+                    { prop: 'name', label: this.$t('platform.org.employee.prop.name'),formatter: this.aaa, width: 120 },
                     { prop: 'account', label: this.$t('platform.org.employee.prop.account'), width: 150 },
                     //{ prop: 'wcAccount', label: this.$t('platform.org.employee.prop.wcAccount'),width:120},
-                    { prop: 'orgName', label: this.$t('platform.org.employee.prop.orgPath'), sortable: false, width: 250 },
-                    { prop: 'qq', label: '客户单位名称', width: 250 },
+                    { prop: 'positionsName', label: this.$t('platform.org.employee.prop.orgPath'),sortable: false, width: 500 },
+                    // { prop: 'qq', label: '客户单位名称', width: 250 },
                     { prop: 'status', label: this.$t('platform.org.employee.prop.status'), tags: statusOptions, width: 100 },
                     { prop: 'createTime', label: this.$t('common.field.createTime') }
                 ],
@@ -194,13 +194,17 @@ export default {
             pagination: {},
             sorts: {},
             moreSearchParams: {},
-            dialogMoreSearchVisible: false
+            dialogMoreSearchVisible: false,
+            positionsList: []
         }
     },
     created() {
-        this.getOrg()
-        this.loadData()
-        this.loadDisplayField()
+        this.getOrg().then(res =>{
+            this.loadData()
+            this.loadDisplayField()
+        })
+        // this.loadData()
+        // this.loadDisplayField()
     },
     methods: {
         ...mapMutations({
@@ -214,12 +218,31 @@ export default {
             this.loading = true
             queryPageList(this.getSearcFormData())
                 .then((response) => {
+                    response.data.dataResult.forEach(item => {
+                        if(item.positions){
+                            let name = this.getPositionsName(item.positions)
+                            this.$set(item,'positionsName',name)
+                        }
+                    })
                     ActionUtils.handleListData(this, response.data)
                     this.loading = false
                 })
                 .catch(() => {
                     this.loading = false
                 })
+        },
+        getPositionsName(valueList){
+            let postList = valueList.split(",")
+            let list = []
+            if(postList.length > 0){
+                postList.forEach(item => {
+                    let dataItem = this.positionsList.find(ite => ite.ID_ == item)
+                    list.push(dataItem.NAME_)
+                })
+                return list.join("，")
+            }else{
+                return ''
+            }
         },
         /**
          * 获取格式化参数
@@ -408,18 +431,25 @@ export default {
         },
         //获取组织的数据
         getOrg(){
-            let sql = `select * FROM ibps_party_org ORDER BY field(ORG_ALIAS_,'szslhyyjtxbzljcsys','glc','zhgls','jcs','kh')`
-            curdPost('sql', sql).then(res => {
-                if(res.state == '200'){
-                    const datas = res.variables.data
-                    datas.forEach((item,index) => {
-                        this.$set(item,'value',item.ID_)
-                        this.$set(item,'label',item.NAME_)
-                    })
-                    this.listConfig.searchForm.forms[3].options = datas
-                }
+            return new Promise((resolve, reject) => {
+                let sql = `select ID_,NAME_ FROM ibps_party_position order by CREATE_TIME_`
+                curdPost('sql', sql).then(res => {
+                    if(res.state == '200'){
+                        const datas = res.variables.data
+                        datas.forEach((item,index) => {
+                            this.$set(item,'value',item.ID_)
+                            this.$set(item,'label',item.NAME_)
+                        })
+                        this.positionsList = datas
+
+                        this.listConfig.searchForm.forms[3].options = datas
+                        resolve()
+                    }
+                })
+                
             })
-        }
+            
+        },
     }
 }
 </script>

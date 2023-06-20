@@ -763,51 +763,46 @@ export default {
                             .catch(() => {})
                         break
                     case 'sefStartFlow': // 启动自定义流程
-                        ActionUtils.selectedMultiRecord(selection)
-                            .then((ids) => {
-                                if (button.deflow) {
-                                    this.$confirm('确定启动流程吗？', '消息', {
-                                        confirmButtonText: '确定',
-                                        cancelButtonText: '取消',
-                                        type: 'warning'
-                                    })
-                                        .then(() => {
-                                            this.$message.success('流程任务正在[异步操作]启动中...(期间可做其它操作！)')
-                                            this.handleStartFlowFromList(ids, button.deflow, this.getFormKey())
-                                        })
-                                        .catch(() => {})
-                                } else {
-                                    this.dialogVisible = true
-                                    this.dialogValue = {}
-                                    this.sefStartFlowId = ids
-                                }
-                            })
-                            .catch(() => {})
+                        ActionUtils.selectedMultiRecord(selection).then((ids) => {
+                            if (button.deflow) {
+                                this.$confirm('确定启动流程吗？', '消息', {
+                                    confirmButtonText: '确定',
+                                    cancelButtonText: '取消',
+                                    type: 'warning'
+                                }).then(() => {
+                                    this.$message.success('流程任务正在[异步操作]启动中...(期间可做其它操作！)')
+                                    this.handleStartFlowFromList(ids, button.deflow, this.getFormKey())
+                                }).catch(() => {})
+                            } else {
+                                this.dialogVisible = true
+                                this.dialogValue = {}
+                                this.sefStartFlowId = ids
+                            }
+                        }).catch(() => {})
                         break
                     case 'custom': // 自定义按钮
                         break
                     case 'openTask': // 编制，开启对应流程
-                        console.log(button)
-                        // this.npmDialogFormVisible =true
-                        this.defId = this.defId
+                        // console.log(button)
+                        if (!button.deflow) {
+                            this.$message.warning('请先配置对应流程！')
+                            return
+                        }
+                        this.defId = button.deflow
+                        this.npmDialogFormVisible =true
                     break
                     case 'consult': // 查阅
-                        if(!selection){
-                            this.$message({
-                                message: '请选择一条数据',
-                                type: 'warning'
-                            })
+                        console.log(button)
+                        if (!button.reportPath) {
+                            this.$message.warning('请先配置对应报表路径！')
                             return
                         }
                         src = `${this.$reportPash.replace('show', 'pdf')}${this.previewPath}&id_=${selection}`
                         pintText(this, src)
                     break
                     case 'download': // 下载记录
-                        if(!selection){
-                            this.$message({
-                                message: '请选择一条数据',
-                                type: 'warning'
-                            })
+                        if (!button.reportPath) {
+                            this.$message.warning('请先配置对应报表路径！')
                             return
                         }
                         src = `${this.$reportPash}${this.downloadPath}&id_=${selection}`
@@ -1022,8 +1017,7 @@ export default {
             const functionButtons = this.template.buttons ? this.template.buttons.function_buttons || [] : []
             for(var i of functionButtons){
                 if(i.button_type=='openTask'){
-                    console.log(i)
-                    this.defId = i.defId
+                    this.defId = i.deflow
                 }
                 if(i.button_type === 'consult'){
                     this.previewPath = i.reportPath
@@ -1163,6 +1157,7 @@ export default {
                 icon: rf.icon ? 'ibps-icon-' + rf.icon : defaultButton.icon,
                 type: rf.style || defaultButton.type,
                 deflow: rf.deflow || null,
+                reportPath: rf.reportPath,
                 mode: mode,
                 rightIcon: rightIcon,
                 menus: menus,

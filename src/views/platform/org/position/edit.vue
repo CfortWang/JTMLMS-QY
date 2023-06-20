@@ -2,16 +2,16 @@
   <div>
     <div v-if="readonly">
       <el-form :label-width="formLabelWidth" @submit.native.prevent>
-        <el-form-item label="岗位名称:" prop="name">
+        <el-form-item label="部门名称:" prop="name">
           <span>{{ position.name }}</span>
         </el-form-item>
-        <el-form-item label="岗位别名:" prop="posAlias">
+        <el-form-item label="部门别名:" prop="posAlias">
           <span>{{ position.posAlias }}</span>
         </el-form-item>
-        <el-form-item label="岗位等级:" prop="level">
+        <el-form-item label="部门等级:" prop="level">
           {{ position.levelID|optionsFilter(levelOptions,'label') }}
         </el-form-item>
-        <el-form-item label="岗位说明:" prop="desc">
+        <el-form-item label="部门说明:" prop="desc">
           <pre class="ibps-m-0">{{ position.desc }}</pre>
         </el-form-item>
         <el-form-item label="创建时间:" prop="createTime">
@@ -27,18 +27,18 @@
         <el-button type="primary" icon="ibps-icon-save" @click="handleSave()">保存</el-button>
       </template>
       <el-form ref="positionForm" :model="position" :rules="rules" :label-width="formLabelWidth">
-        <el-form-item label="岗位名称" prop="name">
+        <el-form-item label="部门名称" prop="name">
           <el-input v-model="position.name" v-pinyin="{vm:position,key:'posAlias'}" autocomplete="off" :disabled="reading" />
         </el-form-item>
-        <el-form-item label="岗位别名" prop="posAlias">
+        <el-form-item label="部门别名" prop="posAlias">
           <el-input v-model="position.posAlias" :disabled="formId!==''||reading" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="岗位等级" prop="levelID">
+        <el-form-item label="部门等级" prop="levelID">
           <el-select v-model="position.levelID" style="width:100%;" :disabled="reading" @focus="getWidth">
             <el-option v-for="(v,i) in levelOptions" :key="i" :label="v.label" :value="v.value" :style="{'max-width':optionsWidth}" />
           </el-select>
         </el-form-item>
-        <el-form-item label="岗位说明" prop="desc">
+        <el-form-item label="部门说明" prop="desc">
           <el-input v-model="position.desc" :rows="4" type="textarea" :disabled="reading" />
         </el-form-item>
       </el-form>

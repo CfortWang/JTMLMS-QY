@@ -209,6 +209,10 @@ export default {
         getTreeData(params).then(res => {
           this.loading = false
           const arr = JSON.parse(JSON.stringify(res.data))
+          //岗位数改成部门树
+          if(node.level == '0' && arr.length > 0 && arr[0].name == '岗位树'){
+            arr[0].name = '部门树'
+          }
           let treeData
           if (this.$utils.isEmpty(node.data)) {
             treeData = arr
