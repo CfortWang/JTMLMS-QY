@@ -7,7 +7,7 @@ y
         :height="height"
         :has-contextmenu="true"
         title="数据集分类"
-        category-key="DATASET_TYPE"
+        category-key="BO_TYPE"
         @treeData="treeData"
         @node-click="handleNodeClick"
         @expand-collapse="handleExpandCollapse"
@@ -34,7 +34,7 @@ y
     <setting-type
       :visible="settingTypeFormVisible"
       title="设置数据集分类"
-      category-key="DATASET_TYPE"
+      category-key="BO_TYPE"
       @save="saveSettingType"
       @close="visible => settingTypeFormVisible = visible"
     />

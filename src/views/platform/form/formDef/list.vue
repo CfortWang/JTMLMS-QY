@@ -23,7 +23,7 @@
           :height="treeHeight"
           title="表单分类"
           position="east"
-          category-key="FORM_TYPE"
+          category-key="BO_TYPE"
           :has-contextmenu="true"
           @node-click="handleNodeClick"
           @expand-collapse="handleExpandCollapse"

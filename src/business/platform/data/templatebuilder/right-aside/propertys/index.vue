@@ -31,7 +31,7 @@
           <el-form-item label="模版分类" prop="typeId">
             <ibps-type-select
               v-model="dataTemplate.typeId"
-              category-key="DATA_TEMPLATE_TYPE"
+              category-key="BO_TYPE"
               clearable
               @input="(val)=>handleInput('typeId',val)"
             />

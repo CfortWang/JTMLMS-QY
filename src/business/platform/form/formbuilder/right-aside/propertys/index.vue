@@ -25,7 +25,7 @@
           <el-form-item label="表单分类">
             <ibps-type-select
               v-model="formDef.typeId"
-              category-key="FORM_TYPE"
+              category-key="BO_TYPE"
               placeholder="请选择表单分类"
               clearable
             />

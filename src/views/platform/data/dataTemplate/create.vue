@@ -28,7 +28,7 @@
         <ibps-type-select
           ref="typeSelect"
           v-model="dataTemplate.typeId"
-          category-key="DATA_TEMPLATE_TYPE"
+          category-key="BO_TYPE"
           clearable
         />
       </el-form-item>

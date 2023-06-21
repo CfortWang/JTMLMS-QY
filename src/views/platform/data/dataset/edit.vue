@@ -39,7 +39,7 @@
               ref="ibpsType"
               v-model="form.typeId"
               :readonly="readonly"
-              category-key="DATASET_TYPE"
+              category-key="BO_TYPE"
               class="type"
             />
           </el-form-item>

@@ -165,7 +165,7 @@ export default {
       height: 500,
       title: '创建页面、对话框管理',
       createText: '创建数据模版',
-      categoryKey: 'DATA_TEMPLATE_TYPE',
+      categoryKey: 'BO_TYPE',
       typeId: '',
       pkKey: 'id', // 主键  如果主键不是pk需要传主键
       loading: false,
