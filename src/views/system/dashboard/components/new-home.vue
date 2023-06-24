@@ -198,7 +198,6 @@
             :def-id="activeTab === 'save' ? defId : null"
             :pro-inst-id="activeTab === 'save' ? proInstId : null"
             :title="['wait', 'save'].includes(activeTab) ? FlowName : null"
-            :processName="processName"
             @callback="getData(activeTab)"
             @close="visible => (dialogFormVisible = visible)"
         />
@@ -333,7 +332,6 @@
                 defaultPagination: { page: 1, limit: 15 },
                 sorts: { CREATE_TIME_: 'DESC' },
                 timer: null,
-                processName: '',
                 userList: [],
                 orgInfo: {},
                 activeTab: 'wait',
@@ -547,7 +545,6 @@
                 this.defId = data.procDefId || ''
                 this.proInstId = data.id || ''
                 this.FlowName = data.name
-                this.processName = this.getProjectName(data.procDefKey, data.subject)
                 this.dialogFormVisible = true
             },
             // 开关右侧栏抽屉
@@ -576,13 +573,6 @@
                     }
                 }
                 return result.split('/')
-            },
-            // 判断是否为检测项目流程，是则截取流程标题为表单名称
-            getProjectName(key, subject) {
-                // 从store中获取保存的检测流程信息数组，默认设置已知的四个流程key（三非通用一通用），流程key有变化需修改此处默认值
-                const { testingList = ['Process_0idt26n', 'Process_1rwhy1r', 'Process_05lkhio', 'Process_140upmu'] } = this.$store.getters
-                let res = testingList.includes(key)
-                return res ? subject.includes('#') ? subject.split('#')[0] : '' : ''
             },
             /**
              * 主管提醒

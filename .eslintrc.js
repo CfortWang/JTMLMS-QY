@@ -67,13 +67,13 @@ module.exports = {
             'after': true
         }],
         'handle-callback-err': [2, '^(err|error)$'],
-        // 'indent': [2, 4, {
-        //     'SwitchCase': 1
-        // }],
-        "vue/script-indent": [2, 4, {
-            "baseIndent": 1,
-            "switchCase": 1
+        'indent': [2, 4, {
+            'SwitchCase': 1
         }],
+        // "vue/script-indent": [2, 4, {
+        //     "baseIndent": 1,
+        //     "switchCase": 1
+        // }],
         "vue/html-indent": [2, 4, {
             "attribute": 1,
             "closeBracket": 0,

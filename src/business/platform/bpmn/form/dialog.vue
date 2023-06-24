@@ -16,7 +16,6 @@
       :def-id="defId"
       :pro-inst-id="proInstId"
       :flowName ="title"
-      :processName="processName"
       :task-id="taskId"
       :waiJian="waiJian"
       :instance-id="instanceId"
@@ -66,10 +65,6 @@ export default {
     },
     waiJian: { // 新增参数
       type: String
-    },
-    processName: { // 流程名称
-        type: String,
-        default: ''
     }
   },
   data() {

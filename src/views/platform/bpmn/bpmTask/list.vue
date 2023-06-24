@@ -52,7 +52,6 @@
             :visible="bpmnFormrenderDialogVisible"
             :task-id="editId"
             :title="flowName"
-            :processName="processName"
             @callback="search"
             @close="visible => (bpmnFormrenderDialogVisible = visible)"
         />
@@ -84,7 +83,6 @@
                 action: 'agree', // 打开弹窗的动作
                 pkKey: 'id', // 主键  如果主键不是pk需要传主键
                 flowName: '',
-                processName: '',
                 selectorVisible: false,
                 ids: '',
                 title: '',
@@ -367,8 +365,6 @@
                 // 打开表单前获取flowName和processName，避免流程节点状态bug
                 let selected = this.listData.find(item => item.id === id)
                 this.flowName = selected.name
-                this.processName = this.getProjectName(selected.procDefKey, selected.subject)
-
                 request({
                     url: BUSINESS_BASE_URL() + '/getFormData/flag',
                     method: 'post',
@@ -401,15 +397,7 @@
             },
             handleLinkClick(data, columns) {
                 this.flowName = data.name
-                this.processName = this.getProjectName(data.procDefKey, data.subject)
                 this.handleApprove(data[this.pkKey])
-            },
-            // 判断是否为检测项目流程，是则截取流程标题为表单名称
-            getProjectName(key, subject) {
-                // 从store中获取保存的检测流程信息数组，默认设置已知的四个流程key（三非通用一通用），流程key有变化需修改此处默认值
-                const { testingList = ['Process_0idt26n', 'Process_1rwhy1r', 'Process_05lkhio', 'Process_140upmu'] } = this.$store.getters
-                let res = testingList.includes(key)
-                return res ? subject.includes('#') ? subject.split('#')[0] : '' : ''
             }
         }
     }

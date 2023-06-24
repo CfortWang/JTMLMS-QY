@@ -34,8 +34,6 @@ export default {
   jianCeDuiXiangId: state => state.ibps.jianCeDuiXiangId ? state.ibps.jianCeDuiXiangId : '',
   myform: state => state.ibps.myform ? state.ibps.myform : '',
   jianCeCanShuId: state => state.ibps.jianCeCanShuId ? state.ibps.jianCeCanShuId : '',
-  // 所有检测项目名称及流程key数组
-  testingList: state => state.ibps.param && state.ibps.param.testingList ? state.ibps.param.testingList : [],
   // 获取所有用户信息
   usersList: state => state.ibps.param && state.ibps.param.usersList ? state.ibps.param.usersList : []
 }

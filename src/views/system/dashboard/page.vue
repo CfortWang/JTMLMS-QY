@@ -24,10 +24,10 @@
                 </el-upload>
 
                 <el-upload
+                    v-if="showRepost"
                     style="display: inline-block; margin-left: 10px"
                     class="upload-demo"
                     :action="reportPath"
-                    v-if="showRepost"
                     :headers="headers"
                     :before-upload="ReportBeforeUpload"
                     :show-file-list="false"
@@ -44,9 +44,7 @@
                     style="display: inline-block; margin-left: 10px"
                     icon="el-icon-download"
                     @click="downloadData()"
-                >
-                    下载桌面应用</el-button
-                >
+                >下载桌面应用</el-button>
             </template>
         </newHome>
         <ibps-back-to-top
@@ -154,7 +152,8 @@
 <script>
     import { getMyDesktop } from '@/api/platform/desktop/myLayout'
     import { initColumn, isInit, getComponents } from './components'
-    import { BASE_API, BUSINESS_BASE_URL } from '@/api/baseUrl' //引用导出地址
+    // 引用导出地址
+    import { BASE_API, BUSINESS_BASE_URL } from '@/api/baseUrl'
     //  网格布局组件
     import { GridLayout, GridItem } from 'vue-grid-layout'
     import IbpsBackToTop from '@/components/ibps-back-to-top'
@@ -184,7 +183,7 @@
             'ibps-grid-layout': GridLayout,
             'ibps-grid-item': GridItem
         },
-        data() {
+        data () {
             return {
                 infoMessage: [],
                 uloadPath: BASE_API() + BUSINESS_BASE_URL() + '/ck/task/importExcel',
@@ -216,7 +215,6 @@
 
                 bpmnFormrenderDialogVisible: false, // 流程
                 defId: '',
-                taskId: '',
                 instanceId: '',
                 layoutIndex: '',
                 initInterval: null,
@@ -231,29 +229,31 @@
             }
         },
         computed: {
-            system() {
+            system () {
                 return this.$store.getters.system ? this.$store.getters.system : null
             },
-            systemAlias() {
+            systemAlias () {
                 return this.$store.getters.system ? this.$store.getters.system.alias : ''
             },
-            localSystem() {
+            localSystem () {
                 return this.system.isLocal
             }
         },
-        mounted() {
-            if ('isNormal' == localStorage.getItem('statistic')) this.showRepost = false
+        mounted () {
+            if (localStorage.getItem('statistic') === 'isNormal') {
+                this.showRepost = false
+            }
             this.initLoading = false
             this.initData()
         },
-        created() {
+        created () {
             this.getTestingData()
             this.getUsersList()
             StatisticsData().then(data => {
-                //将参数替换成对应参数
+                // 将参数替换成对应参数
                 if (data.state === 200 && data.variables.data.length > 0) {
-                    let h = this.$createElement,
-                        cont = data.variables.data
+                    const h = this.$createElement
+                    const cont = data.variables.data
                     for (let i = 0; i < cont.length; i++) {
                         window.setTimeout(() => {
                             this.infoMessage[i] = this.$notify.info({
@@ -264,7 +264,7 @@
                                     h('span', null, '任务内容: '),
                                     h('span', { style: 'color: #FF8C00;font-size:12px;' }, cont[i].ding_shi_ren_wu_n),
                                     h('br'),
-                                    h('el-button',{
+                                    h('el-button', {
                                         attrs: {
                                             size: 'mini',
                                             plain: true
@@ -283,13 +283,13 @@
                 }
             })
         },
-        beforeDestroy() {
+        beforeDestroy () {
             for (let i = 0; i < this.infoMessage.length; i++) {
                 this.infoMessage[i].close()
             }
         },
         methods: {
-            cancelInfo(cronId, title, num, processData, taskId) {
+            cancelInfo (cronId, title, num, processData, taskId) {
                 /* 调用流程*/
                 if (taskId) {
                     this.$router.push({
@@ -301,13 +301,13 @@
                 }
                 this.infoMessage[num].close()
             },
-            downloadData() {
+            downloadData () {
                 window.location.href = BASE_API() + BUSINESS_BASE_URL() + '/sys/SysDataContext/downloadData'
             },
-            scrollToTop() {
+            scrollToTop () {
                 this.$refs.dashboardContainer.scrollToTop()
             },
-            initData() {
+            initData () {
                 this.initInterval = setInterval(() => {
                     if (this.$utils.isNotEmpty(this.systemAlias)) {
                         this.initLoading = true
@@ -344,10 +344,10 @@
             //    }
             //    }, 100)
             // },
-            getHeight(h) {
+            getHeight (h) {
                 return (h - 1) * (this.rowHeight + this.margin[1]) + this.margin[1]
             },
-            hasComponent(alias) {
+            hasComponent (alias) {
                 const name = 'ibps-desktop-' + alias
                 const components = getComponents()
                 if (components) {
@@ -356,7 +356,7 @@
                     return false
                 }
             },
-            resizedHandler(i, newH, newW, newHPx, newWPx) {
+            resizedHandler (i, newH, newW, newHPx, newWPx) {
                 if (!this.layout) return
                 this.layout.layout.find(n => {
                     if (i === n.i) {
@@ -365,10 +365,10 @@
                     }
                 })
             },
-            goMyLayout() {
+            goMyLayout () {
                 this.$router.push({ path: '/officeDesk/grzlsw/desktopMyLayout' })
             },
-            handleActionEvent(command, params, index) {
+            handleActionEvent (command, params, index) {
                 this.layoutIndex = index
                 this.alias = params.$alias
                 switch (command) {
@@ -396,31 +396,31 @@
             /**
              * 全屏展示切换
              */
-            handleFullscreen(id) {
+            handleFullscreen (id) {
                 this.dialogPreviewVisible = true
                 this.id = id
             },
             // 处理收缩/展开
-            handleCollapseExpansion(index, isCollapse) {
+            handleCollapseExpansion (index, isCollapse) {
                 this.layout[index].h = isCollapse ? 2 : this.defaultData[index].h
                 this.layout.push({ i: '0' })
                 const deleteIndex = this.layout.findIndex(item => item.i === '0')
                 this.layout.splice(deleteIndex, 1)
             },
 
-            handleApprove(id) {
+            handleApprove (id) {
                 this.ibpsNewsDialogVisible = true
                 this.newsEditId = id
             },
 
-            handleUnreadMessage(id) {
+            handleUnreadMessage (id) {
                 this.ibpsMessageDialogVisible = true
                 this.messageEditId = id
             },
-            fileErr(err, file, fileList) {
+            fileErr (err, file, fileList) {
                 this.$message.error('文件上传失败，请检查格式！')
             },
-            handleFlow(params) {
+            handleFlow (params) {
                 this.defId = params.defId || null
                 this.taskId = params.taskId || null
                 this.instanceId = params.instanceId || null
@@ -430,12 +430,12 @@
 
                 this.bpmnFormrenderDialogVisible = true
             },
-            handleFlowCallback() {
+            handleFlowCallback () {
                 this.$refs[this.alias] ? this.$refs[this.alias][0].refreshData() : null
             },
 
             //
-            initSystemUrl(url) {
+            initSystemUrl (url) {
                 if (url.startsWith('http')) {
                     this.systemUrlType = 'iframe'
                     this.$nextTick(() => {
@@ -452,7 +452,7 @@
                     this.systemUrlName = systemUrlName
                 }
             },
-            urlParse(str) {
+            urlParse (str) {
                 const obj = {}
                 if (str.indexOf('?') !== -1) {
                     const str1 = str.split('?')[1].split('&')
@@ -464,7 +464,7 @@
                 return obj
             },
             /* 文件类型*/
-            beforeUpload(file) {
+            beforeUpload (file) {
                 var testmsg = file.name.substring(file.name.lastIndexOf('.') + 1)
                 const extension = testmsg === 'xls'
                 const extension2 = testmsg === 'xlsx'
@@ -478,7 +478,7 @@
                 return extension || extension2
             },
             /* 文件类型*/
-            ReportBeforeUpload(file) {
+            ReportBeforeUpload (file) {
                 var testmsg = file.name.substring(file.name.lastIndexOf('.') + 1)
                 const extension = testmsg === 'rpx'
                 if (!extension) {
@@ -491,7 +491,7 @@
                 return extension
             },
 
-            handleSuccess(res, file, fileList) {
+            handleSuccess (res, file, fileList) {
                 if (res.state === 200) {
                     this.$message({
                         message: '上传数据成功！',
@@ -504,32 +504,13 @@
                     })
                 }
             },
-            // 获取所有检测流程的peocessKey，存储到store中
-            getTestingData() {
-                let testingList = this.$store.getters.testingList
-                if (testingList.length) {
-                    return
-                } else {
-                    // let sql = 'select xiang_mu_ming_ as name, liu_cheng_bian_ha as processKey from t_jcxmlcpzb'
-                    let sql = 'select distinct defkey_ as processKey from t_mjjcnlfw where length(defkey_) > 0'
-                    curdPost('sql', sql).then(res => {
-                        const { data } = res.variables
-                        const testingData = []
-                        data.forEach(item => testingData.push(item.processKey))
-                        this.$store.dispatch('ibps/param/setTestingList', testingData)
-                    }).catch(error => {
-                        this.$message.error('获取检测流程数据失败！')
-                        console.log(error)
-                    })
-                }
-            },
             // 获取所有用户id及姓名存储到store中
-            getUsersList() {
-                let usersList = this.$store.getters.usersList
+            getUsersList () {
+                const usersList = this.$store.getters.usersList
                 if (usersList.length) {
                     return
                 } else {
-                    let sql = 'select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee'
+                    const sql = 'select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee'
                     curdPost('sql', sql).then(res => {
                         const { data } = res.variables
                         this.$store.dispatch('ibps/param/setUsersList', data)

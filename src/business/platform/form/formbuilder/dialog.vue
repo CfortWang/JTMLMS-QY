@@ -160,17 +160,17 @@
 <style lang="scss" module>
     .content {
         :global {
+            .el-dialog__header {
+                padding: 0;
+                border-bottom: 0;
+            }
+            .el-dialog__body {
+                padding: 0;
+            }
+            .is-fullscreen {
+                overflow: hidden;
+            }
             .form-main .widget-form-container {
-                .el-dialog__header {
-                    padding: 0;
-                    border-bottom: 0;
-                }
-                .el-dialog__body {
-                    padding: 0;
-                }
-                .is-fullscreen {
-                    overflow: hidden;
-                }
                 .el-form-item__label {
                     padding-left: 30px;
                     position: relative;

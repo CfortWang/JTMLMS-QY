@@ -168,11 +168,11 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'name', label: '名称', sortable: true, minWidth: 250 },
+                    { prop: 'name', label: '名称', sortable: true, minWidth: 200 },
                     { prop: 'code', label: '编码', sortable: true, width: 100 },
                     { prop: 'versionCount', label: '版本信息', fieldType: 'slot', slotName: 'versionCount', width: 180 },
                     { prop: 'typeId', label: '归分类型', sortable: true, width: 120 },
-                    { prop: 'status', label: '状态', sortable: true, width: 100, tags: statusOptions },
+                    { prop: 'status', label: '状态', sortable: true, width: 80, tags: statusOptions },
                     { prop: 'boType', label: '对象类型', sortable: true, width: 100, tags: boTypeOptions },
                     { prop: 'isCreateTable', label: '生成表', sortable: true, tags: createTabelOptions, width: 80 },
                     { prop: 'createTime', label: '创建时间', sortable: true, width: 150 }
