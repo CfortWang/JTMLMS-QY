@@ -1,4 +1,3 @@
-y
 <template>
   <ibps-layout ref="layout">
     <div slot="west">

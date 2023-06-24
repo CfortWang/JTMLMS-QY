@@ -230,7 +230,7 @@ export default {
                         const temp = this.typeFiler.find(i => i.id === item.typeId)
                         item.typeId = temp ? temp.name : '未分类'
                     } else {
-                        item.typeId = item.typeId ? 'a0分类被删除' : 'z9未分类'
+                        item.typeId = item.typeId ? '分类被删除' : '未分类'
                     }
                 })
                 ActionUtils.handleListData(this, response.data)

@@ -249,6 +249,7 @@ export default {
             repostCurd('add', JSON.stringify(params)).then((res) => {
                 if (res.state == '200') {
                     let dataItem = res.variables.cont[0]
+                    this.id = dataItem.id_
                     this.$emit('addClick', dataItem.id_, dataItem)
                     this.$message({
                         showClose: true,
