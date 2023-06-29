@@ -154,7 +154,7 @@ import Scan from '@/views/system/jbdScan/scan.vue'
 import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
-import pintText from '../../../form/utils/custom/pintText.js' //打印规则
+import preview from '@/business/platform/form/utils/custom/preview'
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
 import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
 
@@ -789,8 +789,8 @@ export default {
                             return
                         }
                         this.defId = button.deflow
-                        this.npmDialogFormVisible =true
-                    break
+                        this.npmDialogFormVisible = true
+                        break
                     case 'consult': // 查阅
                         console.log(button)
                         if (!button.reportPath) {
@@ -798,16 +798,16 @@ export default {
                             return
                         }
                         src = `${this.$reportPash.replace('show', 'pdf')}${this.previewPath}&id_=${selection}`
-                        pintText(this, src)
-                    break
+                        preview(this, src)
+                        break
                     case 'download': // 下载记录
                         if (!button.reportPath) {
                             this.$message.warning('请先配置对应报表路径！')
                             return
                         }
                         src = `${this.$reportPash}${this.downloadPath}&id_=${selection}`
-                        pintText(this, src)
-                    break
+                        preview(this, src)
+                        break
                     case 'print': // 打印
                         ActionUtils.selectedRecord(selection)
                             .then((id) => {

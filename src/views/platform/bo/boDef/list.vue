@@ -30,7 +30,7 @@
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
         >
-            <!--    @column-link-click="handleLinkClick"-->
+            <!-- @column-link-click="handleLinkClick"-->
             <div slot="versionCount" slot-scope="scope">
                 默认：
                 <el-link type="primary" @click="handleVersion(scope.row.id)">版本({{ scope.row.version }})</el-link>
@@ -158,12 +158,12 @@ export default {
                     forms: [
                         { prop: 'Q^NAME_^SL', label: '名称' },
                         { prop: 'Q^CODE_^SL', label: '编码' }
-                        /* {
-              prop: 'Q^IS_CREATE_TABLE_^S',
-              label: '是否生成表',
-              fieldType: 'select',
-              options: createTabelOptions
-            } */
+                        // {
+                        //     prop: 'Q^IS_CREATE_TABLE_^S',
+                        //     label: '是否生成表',
+                        //     fieldType: 'select',
+                        //     options: createTabelOptions
+                        // }
                     ]
                 },
                 // 表格字段配置
@@ -219,9 +219,9 @@ export default {
         this.loadData()
     },
     methods: {
-    /**
-     * 加载数据
-     */
+        /**
+         * 加载数据
+         */
         loadData (id = '') {
             this.loading = true
             queryPageList(this.getFormatParams(id)).then(response => {
@@ -240,8 +240,8 @@ export default {
             })
         },
         /**
-     * 获取格式化参数
-     */
+         * 获取格式化参数
+         */
         getFormatParams () {
             const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             params['Q^TYPE_ID_^S'] = this.typeId
@@ -251,15 +251,15 @@ export default {
                 this.sorts)
         },
         /**
-     * 处理分页事件
-     */
+         * 处理分页事件
+         */
         handlePaginationChange (page) {
             ActionUtils.setPagination(this.pagination, page)
             this.loadData()
         },
         /**
-     * 处理排序
-     */
+         * 处理排序
+         */
         handleSortChange (sort) {
             ActionUtils.setSorts(this.sorts, sort)
             this.loadData()
@@ -268,15 +268,15 @@ export default {
             this.loadData()
         },
         /**
-     * 设置分类
-     */
+         * 设置分类
+         */
         handleSetCategory (editId) {
             this.editId = editId || ''
             this.settingTypeFormVisible = true
         },
         /**
-     * 保存分类
-     */
+         * 保存分类
+         */
         saveSettingType (typeId) {
             setCategory({
                 boDefIds: this.editId,
@@ -290,16 +290,16 @@ export default {
             })
         },
         /**
-     * 添加
-     */
+         * 添加
+         */
         handleEdit (editId = '', readonly = false) {
             this.editId = editId || ''
             this.readonly = readonly
             this.dialogFormVisible = true
         },
         /**
-     * 更多版本
-     */
+         * 更多版本
+         */
         handleVersions (code = '') {
             this.code = code || ''
             this.versionsFormVisible = true
@@ -309,14 +309,14 @@ export default {
             this.code = row.code
         },
         /**
-     * 点击表格
-     */
-        /* handleLinkClick(data, columns) {
-      console.log(data.id)
-    }, */
+         * 点击表格
+         */
+        // handleLinkClick (data, columns) {
+        //     console.log(data.id)
+        // },
         /**
-     * 复制
-     */
+         * 复制
+         */
         handleCopy (editId = '') {
             this.editId = editId || ''
             this.copyFormVisible = true
@@ -326,8 +326,8 @@ export default {
             this.typeFiler = data
         },
         /**
-     * 处理按钮事件
-     */
+         * 处理按钮事件
+         */
         handleAction (command, position, selection, data) {
             switch (command) {
                 case 'search':// 查询

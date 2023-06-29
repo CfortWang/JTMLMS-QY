@@ -247,7 +247,6 @@
             this.initData()
         },
         created () {
-            this.getTestingData()
             this.getUsersList()
             StatisticsData().then(data => {
                 // 将参数替换成对应参数

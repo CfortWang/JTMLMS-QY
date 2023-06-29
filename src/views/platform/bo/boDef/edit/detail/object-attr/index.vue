@@ -118,11 +118,11 @@ export default {
                 searchForm: {},
                 // 表格字段配置
                 columns: [
-                    { prop: 'name', label: '名称', minWidth: 150 },
+                    { prop: 'name', label: '名称', width: 250 },
                     { prop: 'code', label: '编码', width: 140 },
                     { prop: 'fieldName', label: '字段', width: 140 },
-                    { prop: 'desc', label: '字段描述', width: 200 },
-                    { prop: 'dataType', label: '属性类型', tags: typeOptions, width: 120 }
+                    { prop: 'dataType', label: '属性类型', tags: typeOptions, width: 120 },
+                    { prop: 'desc', label: '字段描述', minWidth: 200 }
                 ]
             }
         }
