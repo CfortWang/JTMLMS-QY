@@ -219,7 +219,11 @@ export default {
             resolve(this.toTree(treeData))
           } else {
             treeData = type === '1' ? arr : this.filterTreeChildren(arr, 'root')
-            resolve(this.toTree(treeData))
+            if(type === '2'){
+                resolve(treeData)
+            }else{
+                resolve(this.toTree(treeData))
+            }
           }
         }).catch(res => {
           this.loading = false
