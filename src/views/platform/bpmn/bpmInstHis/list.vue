@@ -7,7 +7,7 @@
 
                 :location="location"
                 category-key="FLOW_TYPE"
-                :has-permission="hasPermission"
+                :hasPermission="hasPermission"
                 @node-click="handleNodeClick"
                 @expand-collapse="handleExpandCollapse"
             />
@@ -20,7 +20,7 @@
             :toolbars="listConfig.toolbars"
             :search-form="listConfig.searchForm"
             :pk-key="pkKey"
-            :display-field="tableTitle"
+            :displayField="tableTitle"
             :columns="listConfig.columns"
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
@@ -165,7 +165,6 @@ import IbpsTypeTree from '@/business/platform/cat/type/tree'
 import FixHeight from '@/mixins/height'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-// nmb
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import { specialType, specialBtn, specialParams, specialTable, specialField } from './corresponding/index'
 
@@ -373,7 +372,7 @@ export default {
         },
         // 获取所有附件
         getAllFile ({ file, table, field, bizKey }) {
-            const resultList = []
+	    let resultList = []
             table.forEach((item, index) => {
                 const sql = `select ${file[index]} from ${item} where ${field.length && field[index] ? field[index] : 'id_'} = '${bizKey}'`
                 resultList.push(this.getFile(sql, file[index]))
@@ -390,8 +389,8 @@ export default {
         getFile (sql, fileField) {
             return new Promise((resolve, reject) => {
                 curdPost('sql', sql).then(res => {
-                    const result = []
-                    const fileList = fileField.split(',')
+		    let result = []
+		    let fileList = fileField.split(',')
                     // console.log(fileList)
                     let { data = [] } = res.variables || {}
                     data = data.filter(i => i)
@@ -416,8 +415,8 @@ export default {
         getFileId (value) {
             // 判断是否为图片类型，文件类型只存储文件ID，图片会以对象形式保存
             if (value.includes('id')) {
-                const result = []
-                const temp = JSON.parse(value)
+                    let result = []
+                    let temp = JSON.parse(value)
                 temp.forEach(item => result.push(item.id))
                 return result.join(',')
             }
@@ -537,8 +536,8 @@ export default {
                 showClose: false,
                 closeOnClickModal: false
             }).then(() => {
-                const formKeyArr = []
-                const delList = {}
+	    	let formKeyArr = []
+		let delList = {}
                 data.forEach(item => {
                     const { bizKey, formKey } = item
                     if (!delList[formKey]) {

@@ -177,15 +177,13 @@ export default {
     created () {
         this.loadData()
         // this.getConfig() //获取配置的报表
-        const roleArr = this.$store.getters.userInfo.role
-        const pageName = this.$route.name
-        for (let i = 0; i < roleArr.length; i++) {
-            if (roleArr[i].name === '系统管理角色' && pageName === 'wjkzgl-ywyxjlsc') {
-                this.listConfig.toolbars.push({ key: 'remove' })
-                // this.listConfig.toolbars.push({ key: 'edit' })
-                this.selection = true
-                return
-            }
+        const roleList = this.$store.getters.userInfo.role
+        // 系统管理角色添加删除按钮
+        const hasRole = roleList.some(item => item.name === '系统管理角色')
+        if (hasRole) {
+            // 系统管理角色不做分类过滤
+            this.listConfig.toolbars.push({ key: 'remove' })
+            this.selection = true
         }
     },
     methods: {

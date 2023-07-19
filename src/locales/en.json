@@ -28,7 +28,7 @@
 			"removeAllToken": "Delete all tokens",
 			"removeToken": "Delete token",
 			"resetSearch": "Reset",
-			"delete":"Delete",
+			"delete": "Delete",
 			"save": "Save",
 			"search": "Search",
 			"toBottom": "Move last",
@@ -179,7 +179,8 @@
 				"not_contains": "Does not contain the following",
 				"not_ends_with": "Do not end with",
 				"not_equal": "Not equal to",
-				"not_in": "Not In"
+				"not_in": "Not In",
+				"find_in_set": "In it"
 			},
 			"remove_group": "Delete Group",
 			"remove_rule": "Delete",

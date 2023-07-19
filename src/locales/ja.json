@@ -28,7 +28,7 @@
 			"removeAllToken": "すべてのトークンを削除",
 			"removeToken": "トークンを削除",
 			"resetSearch": "リセットする",
-			"delete":"削除",
+			"delete": "削除",
 			"save": "保存する",
 			"search": "検索する",
 			"toBottom": "最後の壱条に移る",
@@ -179,7 +179,8 @@
 				"not_contains": "以下を含まない",
 				"not_ends_with": "で終わらないでください",
 				"not_equal": "等しくない",
-				"not_in": "ではない"
+				"not_in": "ではない",
+				"find_in_set": "その中で"
 			},
 			"remove_group": "グループを削除",
 			"remove_rule": "削除する",

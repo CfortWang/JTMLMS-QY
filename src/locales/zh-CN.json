@@ -28,7 +28,7 @@
 			"removeAllToken": "删除全部令牌",
 			"removeToken": "删除令牌",
 			"resetSearch": "重置",
-			"delete":"删除",
+			"delete": "删除",
 			"save": "保存",
 			"search": "查询",
 			"toBottom": "移至最后一条",
@@ -179,7 +179,8 @@
 				"not_contains": "不包含以下内容",
 				"not_ends_with": "不以...结束",
 				"not_equal": "不等于",
-				"not_in": "不在...之內"
+				"not_in": "不在...之內",
+				"find_in_set": "在其中"
 			},
 			"remove_group": "删除组",
 			"remove_rule": "删除",
