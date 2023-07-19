@@ -4,7 +4,6 @@ import { encryptByAes } from '@/utils/encrypt'
 // 请求方式默认POST
 const post = (type, data, method = 'post', loading = false) => {
     console.log(type, data)
-    console.log(normal)
     const requestUrl = `business/v3/sys/universal/${normal[type]}`
     console.log(normal[type], requestUrl)
     return request({

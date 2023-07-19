@@ -118,7 +118,6 @@
 
 <script>
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
-// import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
 /*
 [
   1:{  //第一层

@@ -3,7 +3,7 @@
         <div class="mb-md">
             <div class="demo-input-suffix">
                 表格名称：
-                <el-input placeholder="请输入表格名称" v-model="title" style="width: 400px"> </el-input>
+                <el-input v-model="title" placeholder="请输入表格名称" style="width: 400px" />
             </div>
             <div class="demo-input-suffix">
                 <el-button type="success" @click="save">保存</el-button>
@@ -14,41 +14,40 @@
             <div class="demo-input-suffix">
                 <el-button type="info" @click="exportExcelBtn">导出xlsx</el-button>
             </div>
-            <input type="file" @change="chageFile" ref="inputFile" style="display: none" />
+            <input ref="inputFile" type="file" style="display: none" @change="chageFile">
         </div>
         <!--web spreadsheet组件-->
         <div class="excel">
-            <div id="luckysheetDom" style="margin: 0px; padding: 0px; width: 100%; height: 100%"></div>
+            <div id="luckysheetDom" style="margin: 0px; padding: 0px; width: 100%; height: 100%" />
         </div>
     </div>
 </template>
 
-  <script>
-//引入依赖包
+<script>
+// 引入依赖包
 import LuckyExcel from 'luckyexcel'
 const luckysheet = window.luckysheet
-//代码见下
+// 代码见下
 import { exportExcel } from './js/export'
-import repostCurd from '@/business/platform/form/utils/custom/joinCURD.js'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 export default {
-    name: 'XspreadsheetDemo',
+    name: 'xspreadsheet-demo',
     props: {
         id: {
             type: String,
             default: ''
         }
     },
-    data() {
+    data () {
         return {
             option: null,
 
             showtoolbarConfig: {
                 // //自定义配置工具栏
-                undoRedo: true, //撤销重做，注意撤消重做是两个按钮，由这一个配置决定显示还是隐藏
-                paintFormat: true, //格式刷
-                currencyFormat: true, //货币格式
-                percentageFormat: true, //百分比格式
+                undoRedo: true, // 撤销重做，注意撤消重做是两个按钮，由这一个配置决定显示还是隐藏
+                paintFormat: true, // 格式刷
+                currencyFormat: true, // 货币格式
+                percentageFormat: true, // 百分比格式
                 numberDecrease: true, // '减少小数位数'
                 numberIncrease: true, // '增加小数位数
                 moreFormats: true, // '更多格式'
@@ -69,8 +68,8 @@ export default {
                 image: true, // '插入图片'
                 link: false, // '插入链接'
                 chart: false, // '图表'（图标隐藏，但是如果配置了chart插件，右击仍然可以新建图表）
-                postil: false, //'批注'
-                pivotTable: false, //'数据透视表'
+                postil: false, // '批注'
+                pivotTable: false, // '数据透视表'
                 function: true, // '公式'
                 frozenMode: false, // '冻结方式'
                 sortAndFilter: true, // '排序和筛选'
@@ -83,7 +82,7 @@ export default {
                 print: false // '打印'
             },
             cellRightClickConfig: {
-                //右键单元格菜单设置
+                // 右键单元格菜单设置
                 copy: true, // 复制
                 copyAs: true, // 复制为
                 paste: true, // 粘贴
@@ -107,7 +106,7 @@ export default {
                 cellFormat: true // 设置单元格格式
             },
             showstatisticBarConfig: {
-                //自定义配置底部计数栏
+                // 自定义配置底部计数栏
                 count: false, // 计数栏
                 view: true, // 打印视图
                 zoom: true // 缩放
@@ -115,7 +114,7 @@ export default {
             title: ''
         }
     },
-    mounted() {
+    mounted () {
         if (this.id) {
             this.getInitData(this.id)
             // this.init()
@@ -124,7 +123,7 @@ export default {
         }
     },
     methods: {
-        init() {
+        init () {
             let options = ''
             if (!options) {
                 options = {
@@ -147,52 +146,51 @@ export default {
             // this.option = options
             luckysheet.create(options)
         },
-        //获取数据表的数据
-        getInitData(id) {
-            let sql = `select * from t_pbgl where id_ = '${id}'`
+        // 获取数据表的数据
+        getInitData (id) {
+            const sql = `select * from t_pbgl where id_ = '${id}'`
             curdPost('sql', sql).then((res) => {
-                if (res.state == '200') {
-                    let dataItem = res.variables.data[0]
+                if (res.state === '200') {
+                    const dataItem = res.variables.data[0]
                     this.title = dataItem.shu_ju_ming_cheng
-                    let options = JSON.parse(dataItem.shu_ju_cun_chu_)
+                    const options = JSON.parse(dataItem.shu_ju_cun_chu_)
                     luckysheet.create(options)
                 }
             })
         },
-        save() {
-            let data = luckysheet.toJson()
-            if(this.id){
+        save () {
+            const data = luckysheet.toJson()
+            if (this.id) {
                 this.updateSumbit(data)
-            }else{
+            } else {
                 this.getSumbit(data)
             }
-
         },
-        //下载文档
-        exportExcelBtn() {
-            let title = this.title ? this.title : '下载'
+        // 下载文档
+        exportExcelBtn () {
+            const title = this.title ? this.title : '下载'
             exportExcel(luckysheet.getluckysheetfile(), title)
         },
-        //上传文档
-        clickHandle() {
+        // 上传文档
+        clickHandle () {
             this.$refs.inputFile.click()
         },
-        chageFile() {
+        chageFile () {
             this.importExcel(this.$refs.inputFile.files[0])
         },
-        importExcel(file) {
-            let name = file.name
+        importExcel (file) {
+            const name = file.name
             this.title = name.split('.xlsx')[0]
-            //获取文件后缀
-            let suffixArr = name.split('.'),
-                suffix = suffixArr[suffixArr.length - 1]
+            // 获取文件后缀
+            const suffixArr = name.split('.')
+            const suffix = suffixArr[suffixArr.length - 1]
             if (suffix !== 'xlsx') {
                 alert('目前只能导入xlsx类型的文件')
                 return
             }
             LuckyExcel.transformExcelToLucky(file, this.fileCb, this.errorCb)
         },
-        fileCb(exportJson, luckysheetfile) {
+        fileCb (exportJson, luckysheetfile) {
             // 转换后获取工作表数据
             if (exportJson.sheets === null || exportJson.sheets.length === 0) {
                 alert('无法读取excel文件的内容，当前不支持xls文件!')
@@ -204,7 +202,7 @@ export default {
             luckysheet.destroy()
 
             luckysheet.create({
-                container: 'luckysheetDom', //luckysheet is the container id
+                container: 'luckysheetDom', // luckysheet is the container id
                 data: exportJson.sheets,
                 title: exportJson.info.name,
                 userInfo: exportJson.info.name.creator,
@@ -215,21 +213,21 @@ export default {
                 showstatisticBarConfig: this.showstatisticBarConfig
             })
         },
-        errorCb(error) {},
-        printFn() {
+        errorCb (error) {},
+        printFn () {
             // 1. 实现全选
-            $('#luckysheet-left-top').click();
+            $('#luckysheet-left-top').click()
             // 2. 生成选区的截图
-            let src = luckysheet.getScreenshot();
-            let $img = `<img src=${src} style="max-width: 90%;" />`
+            const src = luckysheet.getScreenshot()
+            const $img = `<img src=${src} style="max-width: 90%;" />`
             this.$nextTick(() => {
-                document.querySelector('#print_html').innerHTML = $img;
+                document.querySelector('#print_html').innerHTML = $img
             })
             // 3. 调用系统打印：已经用v-print指令绑定在打印按钮上
         },
 
-        getSumbit(option) {
-            if (this.title == '') {
+        getSumbit (option) {
+            if (this.title === '') {
                 this.$message({
                     showClose: true,
                     message: '请填写表格名称',
@@ -237,18 +235,18 @@ export default {
                 })
                 return
             }
-            let data = {
+            const data = {
                 shu_ju_cun_chu_: JSON.stringify(option),
                 shu_ju_lei_xing_: '在线编辑',
                 shu_ju_ming_cheng: this.title
             }
-            let params = {
+            const params = {
                 tableName: 't_pbgl',
                 paramWhere: [data]
             }
-            repostCurd('add', JSON.stringify(params)).then((res) => {
-                if (res.state == '200') {
-                    let dataItem = res.variables.cont[0]
+            curdPost('add', params).then((res) => {
+                if (res.state === '200') {
+                    const dataItem = res.variables.cont[0]
                     this.id = dataItem.id_
                     this.$emit('addClick', dataItem.id_, dataItem)
                     this.$message({
@@ -259,8 +257,8 @@ export default {
                 }
             })
         },
-        updateSumbit(option) {
-            if (this.title == '') {
+        updateSumbit (option) {
+            if (this.title === '') {
                 this.$message({
                     showClose: true,
                     message: '请填写表格名称',
@@ -268,22 +266,22 @@ export default {
                 })
                 return
             }
-            let data = {
-                where:{
-                    id_ : this.id
+            const data = {
+                where: {
+                    id_: this.id
                 },
-                param:{
-                shu_ju_cun_chu_: JSON.stringify(option),
-                shu_ju_lei_xing_: '在线编辑',
-                shu_ju_ming_cheng: this.title
+                param: {
+                    shu_ju_cun_chu_: JSON.stringify(option),
+                    shu_ju_lei_xing_: '在线编辑',
+                    shu_ju_ming_cheng: this.title
                 }
             }
-            let allSampleParams = {
+            const allSampleParams = {
                 tableName: 't_pbgl',
                 updList: [data]
             }
-            repostCurd('updatesByWhere', JSON.stringify(allSampleParams)).then((res) => {
-                if (res.state == '200') {
+            curdPost('update', allSampleParams).then((res) => {
+                if (res.state === '200') {
                     this.$emit('addClick', this.id, option)
                     this.$message({
                         showClose: true,

@@ -190,7 +190,7 @@
 
 <script>
 import * as echarts from "echarts";
-import repostCurd from "@/business/platform/form/utils/custom/joinCURD.js";
+import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
 export default {
   components: {},
   props: {
@@ -604,14 +604,14 @@ export default {
     async getEmployee() {
       let this_ = this;
       let sql = "select ID_,NAME_,CREATE_TIME_ FROM ibps_party_employee ";
-      await repostCurd("sql", sql).then((res) => {
+      await curdPost("sql", sql).then((res) => {
         this_.employeeList = res.variables.data;
       });
     },
     async getPart() {
       let this_ = this;
       let sql = "select ID_,NAME_,CREATE_TIME_ FROM ibps_party_org";
-      await repostCurd("sql", sql).then((res) => {
+      await curdPost("sql", sql).then((res) => {
         this_.partList = res.variables.data;
       });
     },
@@ -682,7 +682,7 @@ export default {
       let obj = {};
       let str =""
       let sql = "select ID_,NAME_ FROM  ibps_party_org";
-      await repostCurd("sql", sql).then((res) => {
+      await curdPost("sql", sql).then((res) => {
         let arr1 = res.variables.data;
         arr.forEach((item, index) => {
           str =""
@@ -745,7 +745,7 @@ export default {
       this_.CNASTableData = [];
       this_.CMAtable = [];
       let sql ="select * FROM t_nsbfhxjlhzb WHERE wai_jian_ =(SELECT id_  FROM t_nshyjyb WHERE ji_hua_zong_wai_j ='" +id +"' ORDER BY create_time_ DESC LIMIT 1)";
-      await repostCurd("sql", sql).then((res) => {
+      await curdPost("sql", sql).then((res) => {
         let data = res.variables.data;
         data.forEach((item) => {
           if (item.shen_he_lei_xing_.includes("CMA")) {

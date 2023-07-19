@@ -45,7 +45,7 @@
 <script>
 import VueBarcode from 'vue-barcode';
 import vueEasyPrint from "vue-easy-print";
-import repostCurd from '@/business/platform/form/utils/custom/joinCURD.js';
+import curdPost from '@/business/platform/form/utils/custom/joinCURD.js';
 export default {
   props: {
     obj: {
@@ -148,7 +148,7 @@ export default {
     },
     getLook(id) {
       let sql = `select * from t_cgysjlb where wai_jian_ in (${id}) UNION ALL SELECT * FROM t_wlzpysjlb WHERE wai_jian_ IN (${id})`
-      repostCurd("sql", sql).then(res => {
+      curdPost("sql", sql).then(res => {
         if (res.state === 200) {
           for (var i of res.variables.data) {
             let listData = {

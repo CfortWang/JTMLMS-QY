@@ -88,7 +88,7 @@
 <script>
 import VueBarcode from 'vue-barcode';
 import vueEasyPrint from "vue-easy-print";
-import repostCurd from '@/business/platform/form/utils/custom/joinCURD.js';
+import curdPost from '@/business/platform/form/utils/custom/joinCURD.js';
 
 export default {
   components: {
@@ -156,7 +156,7 @@ export default {
     getLook(id) {
       let sql = `select * from t_sbdj where find_in_set(id_,'${id}')`
       // console.log(sql)
-      repostCurd("sql", sql).then(res => {
+      curdPost("sql", sql).then(res => {
           const data = res.variables.data
           // console.log(data)
           let list = []

@@ -128,7 +128,7 @@
 <script>
 import VueBarcode from "vue-barcode";
 import vueEasyPrint from "vue-easy-print";
-import repostCurd from "@/business/platform/form/utils/custom/joinCURD.js";
+import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
 
 export default {
   components: {
@@ -212,11 +212,11 @@ export default {
       let this_ = this;
       this.list = [];
       let sql = `select * FROM t_lhpzbzwzb  WHERE FIND_IN_SET(parent_id_,'${id}')`;
-      await repostCurd("sql", sql).then((res) => {
+      await curdPost("sql", sql).then((res) => {
         this_.list = res.variables.data;
       });
       let sql1 = `select id_,bian_zhi_ren_,bian_zhi_shi_jian FROM t_lhbzwzpzrkjlb  WHERE FIND_IN_SET(id_,'${id}')`;
-      await repostCurd("sql", sql1).then((res) => {
+      await curdPost("sql", sql1).then((res) => {
         console.log(res.variables.data);
         this_.listtimes = res.variables.data;
       });

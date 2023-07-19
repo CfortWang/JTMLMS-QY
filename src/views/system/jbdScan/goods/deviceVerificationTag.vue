@@ -94,7 +94,7 @@
 <script>
 import VueBarcode from 'vue-barcode';
 import vueEasyPrint from "vue-easy-print";
-import repostCurd from '@/business/platform/form/utils/custom/joinCURD.js';
+import curdPost from '@/business/platform/form/utils/custom/joinCURD.js';
 
 export default {
   components: {
@@ -167,7 +167,7 @@ export default {
         zx.xiu_zheng_zhi_,zx.xiao_zhun_ri_qi_,zx.jian_ding_xiao_zh
         from t_sbdj dj right JOIN t_sbjdxzzx zx on zx.yi_qi_bian_hao_ = dj.id_ where find_in_set(zx.parent_id_,'${id}')`
       // console.log(sql)
-      repostCurd("sql", sql).then(res => {
+      curdPost("sql", sql).then(res => {
           const data = res.variables.data
           // console.log(data)
           let list = []

@@ -267,7 +267,7 @@
 
   import { DBData ,getConfig,getJiaoYanObj, gethechaObj, getnengliObj, getbiaozhunObj,getbiaozhunTObj,getbzJunZhuObj,getbzJunZhuTObj,getbzXiBaoObj,getbzXiBaoTObj} from './js/selectDB.js'
   import sendDatas from './sendDatas.js'
-  import repostCurd from '@/business/platform/form/utils/custom/joinCURD.js'
+  import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import * as forEach from 'lodash/forEach'
   export default {
     components:{
@@ -378,7 +378,7 @@ import * as forEach from 'lodash/forEach'
       },
       getqualityData() {
         let sql='select xiang_mu_ming_,mu_biao_zhi_ from t_zlmbz'
-        repostCurd('sql', sql).then(response => {
+        curdPost('sql', sql).then(response => {
           let a = response.variables.data //结果一定存在第0个，因为只有一条数据
            this.quality.forEach((t,i)=>{
             a.forEach(e => {
@@ -392,14 +392,14 @@ import * as forEach from 'lodash/forEach'
       },
       /* 查询统计配置中的完成率*/
       getConfigData() {
-        repostCurd('sql', getConfig()).then(response => {
+        curdPost('sql', getConfig()).then(response => {
           this.config = response.variables.data //结果一定存在第0个，因为只有一条数据
           this.getJiaoYanObjData(this.endDate)
 
         })
       },
       getJiaoYanObjData(end) {
-        repostCurd('sql', getJiaoYanObj(end)).then(response => {
+        curdPost('sql', getJiaoYanObj(end)).then(response => {
           this.jiaoyanObj = response.variables.data //结果一定存在第0个，因为只有一条数据
           // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
           // console.log(end,this.jiaoyanObj,"nmnakak")
@@ -407,25 +407,25 @@ import * as forEach from 'lodash/forEach'
         })
       },
       gethechaObjData(end) {
-        repostCurd('sql', gethechaObj(end)).then(response => {
+        curdPost('sql', gethechaObj(end)).then(response => {
           this.hechaObj = response.variables.data //结果一定存在第0个，因为只有一条数据
           // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
           this.getnengliObjData(this.endDate)
         })
       },
       getnengliObjData(end) {
-        repostCurd('sql', getnengliObj(end)).then(response => {
+        curdPost('sql', getnengliObj(end)).then(response => {
           this.nengliObj = response.variables.data //结果一定存在第0个，因为只有一条数据
           // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
           this.getbiaozhunObjData(this.endDate)
         })
       },
       getbiaozhunObjData(end) {
-        repostCurd('sql', getbiaozhunObj(end)).then(response => {
+        curdPost('sql', getbiaozhunObj(end)).then(response => {
           this.biaozhunObj = response.variables.data //结果一定存在第0个，因为只有一条数据
           // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
           // console.log(this.biaozhunObj,'8888')
-          repostCurd('sql', getbiaozhunTObj(end)).then(response => {
+          curdPost('sql', getbiaozhunTObj(end)).then(response => {
             this.biaozhunTObj = response.variables.data //结果一定存在第0个，因为只有一条数据
             // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
             // console.log(this.biaozhunTObj,'8888')
@@ -435,11 +435,11 @@ import * as forEach from 'lodash/forEach'
         })
       },
       getbzJunZhuObjData(end) {
-        repostCurd('sql', getbzJunZhuObj(end)).then(response => {
+        curdPost('sql', getbzJunZhuObj(end)).then(response => {
           this.bzJunZhuObj = response.variables.data //结果一定存在第0个，因为只有一条数据
           // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
           // console.log(this.biaozhunObj,'8888')
-          repostCurd('sql', getbzJunZhuTObj(end)).then(response => {
+          curdPost('sql', getbzJunZhuTObj(end)).then(response => {
             this.bzJunZhuTObj = response.variables.data //结果一定存在第0个，因为只有一条数据
             // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
             // console.log(this.biaozhunTObj,'8888')
@@ -449,11 +449,11 @@ import * as forEach from 'lodash/forEach'
         })
       },
       getbzXiBaoObjData(end) {
-        repostCurd('sql', getbzXiBaoObj(end)).then(response => {
+        curdPost('sql', getbzXiBaoObj(end)).then(response => {
           this.bzXiBaoObj = response.variables.data //结果一定存在第0个，因为只有一条数据
           // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
           // console.log(this.biaozhunObj,'8888')
-          repostCurd('sql', getbzXiBaoTObj(end)).then(response => {
+          curdPost('sql', getbzXiBaoTObj(end)).then(response => {
             this.bzXiBaoTObj = response.variables.data //结果一定存在第0个，因为只有一条数据
             // this.getData(this.BeginDate, this.endDate, true, this.dataScope)
             // console.log(this.biaozhunTObj,'8888')
@@ -465,7 +465,7 @@ import * as forEach from 'lodash/forEach'
       /* 通过拼接的sql进行查询全部数据*/
       getData(beg, end, of, scope) {
         // console.log(2222,DBData(beg, end, scope))
-        repostCurd('sql', DBData(beg, end, scope)).then(response => {
+        curdPost('sql', DBData(beg, end, scope)).then(response => {
           if(typeof response.variables.data[0] === "undefined"){
             this.relData = [0] //结果一定存在第0个，因为只有一条数据
 
