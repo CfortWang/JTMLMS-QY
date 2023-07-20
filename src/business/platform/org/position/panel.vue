@@ -210,21 +210,32 @@ export default {
           this.loading = false
           const arr = JSON.parse(JSON.stringify(res.data))
           //岗位数改成部门树
-          if(node.level == '0' && arr.length > 0 && arr[0].name == '岗位树'){
-            arr[0].name = '部门树'
-          }
-          let treeData
-          if (this.$utils.isEmpty(node.data)) {
-            treeData = arr
-            resolve(this.toTree(treeData))
-          } else {
-            treeData = type === '1' ? arr : this.filterTreeChildren(arr, 'root')
-            if(type === '2'){
-                resolve(treeData)
-            }else{
-                resolve(this.toTree(treeData))
+          // 岗位数改成部门树
+          let arrOne = []
+          let arrTwo = []
+          arr.forEach((item) => {
+            if (item.name === '岗位树') {
+                item.name = '部门树'
+                arrOne[0] = item
+            } else {
+                 arrTwo.push(item)
             }
-          }
+           })
+           let treeData
+           if (type === '2' || type === '3') {
+              arrTwo.forEach((item) => {
+                item.leaf = true
+              })
+              this.treeData = arrTwo
+           } else {
+               if (this.$utils.isEmpty(node.data)) {
+                   treeData = arr
+                   resolve(this.toTree(treeData))
+               } else {
+                   treeData = type === '1' ? arr : this.filterTreeChildren(arr, 'root')
+                   resolve(this.toTree(treeData))
+               }
+           }
         }).catch(res => {
           this.loading = false
           resolve([])

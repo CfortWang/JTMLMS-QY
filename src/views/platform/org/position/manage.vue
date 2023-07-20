@@ -128,9 +128,11 @@ export default {
       }).then(res => {
         let data = res.data
         //岗位树改成部门树
-        if(node.level === 0 && data.length > 0 && data[0].name == '岗位树'){
-            data[0].name = '部门树'
-        }
+        data.forEach((item) => {
+            if (item.name === '岗位树') {
+                item.name = '部门树'
+            }
+        })
         this.loading = false
         resolve(this.toTree(res.data))
       }).catch(res => {
