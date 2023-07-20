@@ -281,6 +281,12 @@
     export default {
         components: { BpmnFormrender, homeCalendar, IbpsTypeTree },
         name: 'calendar',
+        props: {
+            plan: {
+                type: Array,
+                default: () => []
+            }
+        },
         filters: {
             getWorkInfo (v, type) {
                 let hasDesc = v.includes('#')
@@ -453,7 +459,7 @@
                                 data.forEach((item, index) => {
                                     dataResult[index].submitBy = item.name_
                                     dataResult[index].workName = dataResult[index].subject.includes('#') ? dataResult[index].subject.split('#')[0] : dataResult[index].subject.split('(')[0]
-                                    dataResult[index].workType = dataResult[index].workName.includes('计划') ? 'plan' : 'normal'
+                                    dataResult[index].workType = this.plan.includes(dataResult[index].procDefKey) ? 'plan' : 'normal'
                                     dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, '1')
                                 })
                                 this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
@@ -618,7 +624,7 @@
                 workList.forEach(item => {
                     // 截取流程名
                     item.workName = item.subject.includes('#') ? item.subject.split('#')[0] : item.subject.split('(')[0]
-                    item.workType = item.workName.includes('计划') ? 'plan' : 'normal'
+                    item.workType = this.plan.includes(item.procDefKey) ? 'plan' : 'normal'
                     let isExpire = this.judgeExpire(item.createTime, currentTime, item.workType)
                     if (isExpire) {
                         result.expire.push(item)

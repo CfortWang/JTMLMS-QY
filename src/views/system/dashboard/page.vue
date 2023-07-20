@@ -8,7 +8,7 @@
         class="ibps-desktop-page"
         @scroll="({ x, y }) => { scrollTop = y }"
     >
-        <newHome @handleApprove="handleApprove" @handleUnreadMessage="handleUnreadMessage">
+        <newHome v-if="cronTask" :plan="cronTask" @handleApprove="handleApprove" @handleUnreadMessage="handleUnreadMessage">
             <template slot="myslot">
                 <el-upload
                     style="display: inline-block"
@@ -165,13 +165,11 @@
     import { StatisticsData } from '@/api/platform/system/jbdHome'
     import { StatisticsSign } from '@/api/platform/system/jbdHome'
     import { getToken } from '@/utils/auth'
-
     import newHome from './components/new-home'
-
     import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
     const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
-
+    let cronTask = null
     export default {
         components: {
             'ibps-news-dialog': IbpsNewsDialog,
@@ -185,6 +183,7 @@
         },
         data () {
             return {
+                cronTask,
                 infoMessage: [],
                 uloadPath: BASE_API() + BUSINESS_BASE_URL() + '/ck/task/importExcel',
                 reportPath: BASE_API() + BUSINESS_BASE_URL() + '/sys/SysDataContext/replaceReportFile',
@@ -239,6 +238,17 @@
                 return this.system.isLocal
             }
         },
+        beforeRouteEnter(to, from, next){
+            const sql = `select * from t_jhswpzb`
+            curdPost('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                cronTask = data.map(i => i.liu_cheng_key_)
+                next()
+            }).catch(error => {
+                alert('获取计划事务配置表信息失败，请刷新页面重试！')
+                console.log(error)
+            })
+        },
         mounted () {
             if (localStorage.getItem('statistic') === 'isNormal') {
                 this.showRepost = false
@@ -248,38 +258,43 @@
         },
         created () {
             this.getUsersList()
+            const today = new Date().toLocaleDateString()
+            const savedDate = localStorage.getItem('doNotShowToday')
+            if (savedDate !== today) {
+                this.getPeriodTask()
+            }
             StatisticsData().then(data => {
                 // 将参数替换成对应参数
-                if (data.state === 200 && data.variables.data.length > 0) {
-                    const h = this.$createElement
-                    const cont = data.variables.data
-                    for (let i = 0; i < cont.length; i++) {
-                        window.setTimeout(() => {
-                            this.infoMessage[i] = this.$notify.info({
-                                title: '定时任务:' + cont[i].ren_wu_biao_ti_,
-                                message: h('p', null, [
-                                    h('span', null, '任务时间: ' + cont[i].ren_wu_shi_jian_),
-                                    h('br'),
-                                    h('span', null, '任务内容: '),
-                                    h('span', { style: 'color: #FF8C00;font-size:12px;' }, cont[i].ding_shi_ren_wu_n),
-                                    h('br'),
-                                    h('el-button', {
-                                        attrs: {
-                                            size: 'mini',
-                                            plain: true
-                                        },
-                                        on: {
-                                            click: () => {
-                                                this.infoMessage[i].close()
-                                            } // 路由加载之后，调用关闭消息弹窗的方法
-                                        }
-                                    }, '忽略关闭')
-                                ]),
-                                duration: 0
-                            })
-                        }, 0)
-                    }
-                }
+                // if (data.state === 200 && data.variables.data.length > 0) {
+                //     const h = this.$createElement
+                //     const cont = data.variables.data
+                //     for (let i = 0; i < cont.length; i++) {
+                //         window.setTimeout(() => {
+                //             this.infoMessage[i] = this.$notify.info({
+                //                 title: '定时任务:' + cont[i].ren_wu_biao_ti_,
+                //                 message: h('p', null, [
+                //                     h('span', null, '任务时间: ' + cont[i].ren_wu_shi_jian_),
+                //                     h('br'),
+                //                     h('span', null, '任务内容: '),
+                //                     h('span', { style: 'color: #FF8C00;font-size:12px;' }, cont[i].ding_shi_ren_wu_n),
+                //                     h('br'),
+                //                     h('el-button', {
+                //                         attrs: {
+                //                             size: 'mini',
+                //                             plain: true
+                //                         },
+                //                         on: {
+                //                             click: () => {
+                //                                 this.infoMessage[i].close()
+                //                             } // 路由加载之后，调用关闭消息弹窗的方法
+                //                         }
+                //                     }, '忽略关闭')
+                //                 ]),
+                //                 duration: 0
+                //             })
+                //         }, 0)
+                //     }
+                // }
             })
         },
         beforeDestroy () {
@@ -518,6 +533,117 @@
                         console.log(error)
                     })
                 }
+            },
+            getPeriodTask () {
+                const { userId } = this.$store.getters
+                const sql = `select * from t_zqswtxb where shi_fou_ti_xing_ = '是' and zhi_xing_ren_yuan like '%${userId}%' order by field(zhi_xing_zhou_qi_, '1次/天', '1次/周', '1次/月', '1次/季度', '1次/半年', '1次/年')`
+                curdPost('sql', sql).then(res => {
+                    const { data = [] } = res.variables || {}
+                    if (data.length) {
+                        this.showMsg(data)
+                    }
+                }).catch(error => {
+                    this.$message.error('获取周期事务信息失败！')
+                    console.log(error)
+                })
+            },
+            showMsg (data) {
+                const h = this.$createElement
+                const text = {
+                    '1次/天': '本日',
+                    '1次/周': '本周',
+                    '1次/月': '本月',
+                    '1次/季度': '本季度',
+                    '1次/半年': '近半年',
+                    '1次/年': '本年度'
+                }
+                const result = data.reduce((acc, item) => {
+                    const key = item.zhi_xing_zhou_qi_
+                    if (!acc[key]) {
+                        acc[key] = []
+                    }
+                    acc[key].push({
+                        name: item.shi_wu_ming_cheng,
+                        path: item.ye_mian_lu_jing_
+                    })
+                    return acc
+                }, {})
+                let msg = []
+                const doNotShowBtn = h('el-button', {
+                    attrs: {
+                        size: 'mini',
+                        type: 'primary',
+                        plain: true,
+                    },
+                    on: {
+                        click: () => {
+                            this.doNotShowToday()
+                        }
+                    }
+                }, '今日不再提示');
+                const confirmBtn = h('el-button', {
+                    attrs: {
+                        size: 'mini',
+                        type: 'success',
+                        plain: true,
+                    },
+                    on: {
+                        click: () => {
+                            this.infoMessage.close()
+                        }
+                    }
+                }, '确认');
+                Object.keys(result).forEach(key => {
+                    // msg.push(h('p', {style: {
+                    //     'font-weight': 'bold',
+                    //     'color': '#666',
+                    //     'font-size': '16px'
+                    // }}, key))
+                    // result[key].forEach(i => {
+                    //     msg.push(h('span', null, i))
+                    //     msg.push(h('br'))
+                    // })
+                    let ul = [text[key]]
+                    result[key].forEach(i => {
+                        ul.push(h('li', {
+                            style: {
+                                'font-weight': 'normal',
+                                'color': '#666',
+                                'font-size': '14px',
+                                'cursor': 'pointer'
+                            },
+                            on: {
+                                click: () => {
+                                    this.infoMessage.close()
+                                    this.$router.push(i.path)
+                                }
+                            }
+                        }, i.name))
+                    })
+                    msg.push(h('ul', {style: {
+                        'font-weight': 'bold',
+                        'color': '#000',
+                        'font-size': '16px',
+                        'margin': '0',
+                        'padding': '0',
+                        'margin-bottom': '5px'
+                    }}, ul))
+                })
+                msg.push(doNotShowBtn, confirmBtn)
+                window.setTimeout(() => {
+                    this.infoMessage = this.$notify({
+                        title: '以下是您的周期性事务提示',
+                        message: h('div', null, msg),
+                        duration: 0,
+                        iconClass: 'el-icon-bell',
+                        showClose: false
+                    })
+                }, 0)
+            },
+            doNotShowToday () {
+                const today = new Date().toLocaleDateString()
+                localStorage.setItem('doNotShowToday', today)
+                this.infoMessage.close()
             }
         }
     }
