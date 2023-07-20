@@ -332,8 +332,8 @@ export default {
             })
         },
         /**
-       * 获取查询条件格式化参数
-       */
+         * 获取查询条件格式化参数
+         */
         getFormatParams () {
             const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             const key = this.partyType === 'org' ? 'orgId' : this.partyType === 'position' ? 'positionId' : this.partyType === 'role' ? 'roleId' : this.partyType === 'group' ? 'groupId' : ''
@@ -355,45 +355,41 @@ export default {
             // if (this.$utils.isNotEmpty(this.currentOrgId)) {
             //   params['orgId'] = this.partyId || this.currentOrgId
             // }
-            // 筛选客户不要了
-            if (this.orgAddIndex == 'qita' && this.partyId == '' && this.partyType == 'org') {
-                params['orgId'] = this.orgAddId
-            }
             return ActionUtils.formatParams(
                 params,
                 this.pagination,
                 this.sorts)
         },
         /**
-       * 处理分页事件
-       */
+         * 处理分页事件
+         */
         handlePaginationChange (page) {
             this.changePageCoreRecordData()
             ActionUtils.setPagination(this.pagination, page)
             this.loadListData()
         },
         /**
-       * 处理排序
-       */
+         * 处理排序
+         */
         handleSortChange (sort) {
             ActionUtils.setSorts(this.sorts, sort)
             this.loadListData()
         },
         /**
-       * 查询
-       */
+         * 查询
+         */
         search () {
             this.loadListData()
         },
         /**
-       * 重置查询条件
-       */
+         * 重置查询条件
+         */
         reset () {
             this.$refs['crud'].handleReset()
         },
         /**
-       * 处理按钮事件
-       */
+         * 处理按钮事件
+         */
         handleAction (command, position, selection, data) {
             switch (command) {
                 case 'search':// 查询
@@ -408,16 +404,16 @@ export default {
             }
         },
         /**
-       * 处理按钮事件
-       */
+         * 处理按钮事件
+         */
         handleMoreSearchAction (data) {
             ActionUtils.setFirstPagination(this.pagination)
             this.moreSearchParams = data
             this.loadListData()
         },
         /**
-       * 处理更多
-       */
+         * 处理更多
+         */
         handleMoreSearch () {
             this.dialogFormVisible = true
         },
