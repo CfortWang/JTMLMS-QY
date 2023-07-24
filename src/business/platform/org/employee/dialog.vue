@@ -13,9 +13,6 @@
       <ibps-selector-panel
         ref="panel"
         v-bind="scope"
-        :orgAddId="orgAddId"
-        :orgAddIndex="orgAddIndex"
-        :orgAddList="orgAddList"
         :party-type-id="partyTypeId"
         :seeting-search-party-type="seetingSearchPartyType"
         :current-org-id="currentOrgId"
@@ -40,20 +37,6 @@ export default {
     IbpsSelectorPanel
   },
   props: {
-    orgAddIndex: {
-      type: String,
-      default: '',
-    },
-    orgAddId:{
-        type: String,
-      default: '',
-    },
-    orgAddList:{
-        type: Array,
-        default: ()=>{
-            return []
-        }
-    },
     className: String,
     filter: {
       type: Array,

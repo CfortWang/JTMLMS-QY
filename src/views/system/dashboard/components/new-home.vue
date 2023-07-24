@@ -917,7 +917,7 @@
         overflow: scroll;
     }
     .app-container .el-table th {
-        background-color: #a7d6f8 !important;
+        background-color: #84d5cf !important;
         font-size: 14px;
         font-weight: bold;
         color: #000000;
@@ -927,7 +927,7 @@
         padding: 4px;
     }
     .app-container .el-table .warning-row {
-        background: #d3ebfc;
+        background: #e0f0ee;
         color: #000000;
     }
     .app-container .el-table .success-row {

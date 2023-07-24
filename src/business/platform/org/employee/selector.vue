@@ -8,15 +8,13 @@
     />
     <!-- 选择器 -->
     <ibps-employee-selector-dialog
-      :orgAddId="orgAddId"
-      :orgAddIndex="orgAddIndex"
-      :orgAddList="orgAddList"
       :visible="selectorVisible"
       :value="selectorValue"
       :multiple="multiple"
       :class="className"
       :party-type-id="partyTypeId"
       :current-org-id="currentOrgId"
+      :customPartyTypeOptions="customPartyTypeOptions"
       @close="visible => selectorVisible = visible"
       @action-event="handleSelectorActionEvent"
     />
@@ -46,20 +44,6 @@ export default {
   },
   mixins: [emitter],
   props: {
-    orgAddIndex: {
-      type: String,
-      default: '',
-    },
-    orgAddId:{
-        type: String,
-      default: '',
-    },
-    orgAddList:{
-        type: Array,
-        default: ()=>{
-            return []
-        }
-    },
     className: String,
     partyTypeId: [String, Number],
     currentOrgId: [String, Number],
@@ -113,7 +97,8 @@ export default {
     readonlyText: {
       type: String,
       default: 'original'
-    }
+    },
+    customPartyTypeOptions: [Object, Array],
   },
   data() {
     return {

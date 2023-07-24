@@ -82,10 +82,10 @@ export default {
         }
 
         .jbd-login-page-main {
-            margin-top: 0px;
+            margin: 0 auto;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;
-            margin-left: 50px;
+            //margin-left: 50px;
             // height: 340px;
             width: 280px;
             background-repeat: no-repeat;
@@ -95,7 +95,7 @@ export default {
         }
 
         .login-title {
-            font-size: 52px;
+            font-size: 44px;
             color: #01a39e;
             
             // margin: 0 0 40px !important;
@@ -126,12 +126,13 @@ export default {
         .logoTitle{
             display: flex;
             align-items: center;
-            margin-left: 50px;
+            // margin-left: 50px;
         }
         .weizhi{
             position: absolute;
             top:40%;
             transform: translateY(-50%);
+            margin-left: 50px;
         }
     }
 
@@ -152,10 +153,11 @@ export default {
         }
 
         .jbd-login-page-main {
-            margin-top: 0px;
+            margin: 0 auto;
+            // margin-top: 0px;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;
-            margin-left: 40px;
+            // margin-left: 40px;
             // height: 340px;
             width: 280px;
             background-repeat: no-repeat;
@@ -165,7 +167,7 @@ export default {
         }
 
         .login-title {
-            font-size: 48px;
+            font-size: 40px;
             color: #01a39e;
             
             // margin: 0 0 40px !important;
@@ -196,12 +198,13 @@ export default {
         .logoTitle{
             display: flex;
             align-items: center;
-            margin-left: 40px;
+            // margin-left: 40px;
         }
         .weizhi{
             position: absolute;
             top:40%;
             transform: translateY(-50%);
+            margin-left: 40px;
         }
     }
 
@@ -222,10 +225,11 @@ export default {
         }
 
         .jbd-login-page-main {
-            margin-top: 0px;
+            margin: 0 auto;
+            // margin-top: 0px;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;
-            margin-left: 50px;
+            // margin-left: 50px;
             // height: 340px;
             width: 280px;
             background-repeat: no-repeat;
@@ -235,7 +239,7 @@ export default {
         }
 
         .login-title {
-            font-size: 42px;
+            font-size: 34px;
             color: #01a39e;
             margin-bottom: 20px !important;
         }
@@ -265,12 +269,13 @@ export default {
         .logoTitle{
             // display: flex;
             // align-items: center;
-            margin-left: 50px;
+            // margin-left: 50px;
         }
         .weizhi{
             position: absolute;
             top:40%;
             transform: translateY(-50%);
+            margin-left: 50px;
         }
     }
 </style>

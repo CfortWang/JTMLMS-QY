@@ -23,7 +23,7 @@
                 </el-col>
             </el-row>
             <el-form-item label="委托人:" prop="delegatorId">
-                <ibps-employee-selector v-if="!readonly" v-model="bpmAgent.delegatorId" :orgAddId="orgAddId" :orgAddIndex="orgAddIndex" :orgAddList="orgAddList" @callback="callbackDelegatorrInfo" />
+                <ibps-employee-selector v-if="!readonly" v-model="bpmAgent.delegatorId" :customPartyTypeOptions="customPartyTypeOptions" @callback="callbackDelegatorrInfo" />
                 <span v-else>{{ bpmAgent.delegatorName }}</span>
             </el-form-item>
             <el-row>
@@ -43,7 +43,7 @@
 
             <!-- 全部代理 || 部分代理 -->
             <el-form-item v-if="bpmAgent.agentType === 'all' || bpmAgent.agentType === 'part'" label="代理人:" prop="agenterId">
-                <ibps-employee-selector v-if="!readonly" v-model="bpmAgent.agenterId" :orgAddId="orgAddId" :orgAddIndex="orgAddIndex" :orgAddList="orgAddList" @callback="callbackAgenterInfo" />
+                <ibps-employee-selector v-if="!readonly" v-model="bpmAgent.agenterId" :customPartyTypeOptions="customPartyTypeOptions" @callback="callbackAgenterInfo" />
                 <span v-else>{{ bpmAgent.agenterName }}</span>
             </el-form-item>
 
@@ -183,14 +183,11 @@ export default {
             ],
             url: '',
             srcList: [],
-            orgAddIndex: 'qita',
-            orgAddId: '1040706288339648512,1055070808143036416,1040707811132047360,1040707841519779840',
-            orgAddList: [
-                {
-                    value: 'org',
-                    label: '机构'
-                }
-            ]
+
+            customPartyTypeOptions: [{
+                label: "岗位",
+                value: "position"
+            }]
         }
     },
     computed: {

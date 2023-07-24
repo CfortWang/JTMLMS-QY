@@ -124,20 +124,6 @@ export default {
         isSuperInitTree: { // 是否为超管初始化树类型数据
             type: Object,
             default: () => {}
-        },
-        orgAddIndex: {
-            type: String,
-            default: ''
-        },
-        orgAddId: {
-            type: String,
-            default: ''
-        },
-        orgAddList: {
-            type: Array,
-            default: () => {
-                return []
-            }
         }
     },
     data () {
@@ -146,7 +132,7 @@ export default {
             dialogFormVisible: false, // 弹窗
             editId: '',
             title: '更多查询条件',
-            partyTypeOptions: this.orgAddIndex === 'qita' ? this.orgAddList : this.$utils.isNotEmpty(this.customPartyTypeOptions) ? this.customPartyTypeOptions : partyTypeOptions,
+            partyTypeOptions: this.$utils.isNotEmpty(this.customPartyTypeOptions) ? this.customPartyTypeOptions : partyTypeOptions,
             statusOptions: statusOptions,
             genderOptions: genderOptions,
             partyType: this.$utils.isNotEmpty(this.customPartyTypeOptions) ? this.customPartyTypeOptions[0].value : 'org',
@@ -268,7 +254,7 @@ export default {
     mounted () {
         if (this.showTree) {
             if (this.isUseScope) return
-            this.loadTreeData(true)
+            this.loadTreeData(false)
         } else {
             this.loadListData()
         }
@@ -429,7 +415,7 @@ export default {
             // 选择器范围模式函数回调
             this.moreSearchParams = {}
             // 普通模式与选择器范围模式切换调用
-            !this.isUseScope ? this.loadTreeData() : null
+            !this.isUseScope ? this.loadTreeData(false) : null
             this.scriptExecuteTime = false // 初始化脚本类型时的函数调用
             this.$emit('change-party-type', value)
         },
