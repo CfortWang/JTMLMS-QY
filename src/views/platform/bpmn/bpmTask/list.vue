@@ -130,6 +130,10 @@
                                 label: '请求标题'
                             },
                             {
+                                prop: 'Q^proc_def_key_^SL',
+                                label: '业务主键'
+                            },
+                            {
                                 prop: 'Q^NAME_^SL',
                                 label: '当前节点'
                             },
@@ -148,20 +152,25 @@
                             link: 'dialog'
                         },
                         {
+                            prop: 'procDefKey',
+                            label: '业务主键',
+                            width: 120
+                        },
+                        {
                             prop: 'name',
                             label: '当前节点',
-                            width: 200
+                            width: 120
                         },
                         {
                             prop: 'ownerName',
                             label: '候选人',
-                            width: 200,
+                            width: 150,
                             headerName: 'headerIcon'
                         },
                         {
                             prop: 'partyTypeName',
                             label: '候选人范围',
-                            width: 200
+                            width: 150
                         },
                         {
                             prop: 'createTime',

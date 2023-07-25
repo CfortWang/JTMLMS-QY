@@ -18,7 +18,7 @@ export default {
             return data
         },
         alertReport (value, id_) {
-            this.srcUrl = `${this.$reportPash.replace('show', 'pdf')}${value}&id_=${id_}`
+            this.srcUrl = `${this.$reportPath.replace('show', 'pdf')}${value}&id_=${id_}`
             this.visible = true
         },
         /* 2、打开内容与附件，获取相关报告与附件内容*/
@@ -43,20 +43,20 @@ export default {
         },
         /* 3打开报告 */
         clickCont (cont, i) {
-            this.srcUrl = this.$reportPash.replace('show', "pdf") + cont.report[i] + '&id_=' + cont.formId
+            this.srcUrl = this.$reportPath.replace('show', "pdf") + cont.report[i] + '&id_=' + cont.formId
             this.visible = true
         },
         clickConts_GuanLiPingShen (i) {
-            this.srcUrl = this.$reportPash.replace('show', 'pdf') + '37管理评审程序/GDYR-CX30-R04C 管理评审改进跟踪验证表.rpx&id_=' + i
+            this.srcUrl = this.$reportPath.replace('show', 'pdf') + '37管理评审程序/GDYR-CX30-R04C 管理评审改进跟踪验证表.rpx&id_=' + i
             this.visible = true
         },
         clickConts_BuFuHeXiang (i) {
-            this.srcUrl = this.$reportPash.replace('show', 'pdf') + '36内部审核程序/GDYR-CX22-R01B 不符合项报告与纠正措施记录表.rpx&id_=' + i
+            this.srcUrl = this.$reportPath.replace('show', 'pdf') + '36内部审核程序/GDYR-CX22-R01B 不符合项报告与纠正措施记录表.rpx&id_=' + i
             this.visible = true
         },
         // 检测管理打开润乾报表
         clickConts_jianCe (name, i) {
-            this.srcUrl = this.$reportPash.replace('show', 'pdf') + name + '&id_=' + i
+            this.srcUrl = this.$reportPath.replace('show', 'pdf') + name + '&id_=' + i
             this.visible = true
         },
         /*3 获取文件内容，以表名和id去获取对应参数

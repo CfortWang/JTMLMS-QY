@@ -754,7 +754,7 @@
                     return
                 }
                 const params = {
-                    taleName: 't_gqswb',
+                    tableName: 't_gqswb',
                     paramWhere: {
                         id_: deleteList.join(',')
                     }

@@ -203,7 +203,9 @@ export default {
                 }
             },
             pagination: {},
-            sorts: {}
+            sorts: {
+                'CREATE_TIME_': 'DESC'
+            }
         }
     },
     computed: {

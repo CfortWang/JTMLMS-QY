@@ -1,12 +1,13 @@
 // 通用工具类，定义通用函数及常用接口
 import { encryptByAes } from '@/utils/encrypt'
-import previewPdf from '@/business/platform/form/utils/custom/preview'
+import { preview } from '@/business/platform/form/utils/custom/preview'
 import request from '@/business/platform/form/utils/custom/joinCURD'
 import pinyin4js from 'pinyin4js'
 import { snapshoot } from '@/api/platform/file/attachment'
 import { getNextIdByAlias } from '@/api/platform/system/identity'
 import { save as sendMsg } from '@/api/platform/message/innerMessage'
 import { bpmTaskSave } from '@/api/platform/bpmn/bpmTask'
+import { onlyOfficeToPdf } from '@/api/platform/form/seal'
 
 // base64解码
 const decode = str => decodeURIComponent(window.atob(str).split('').map(c => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`).join(''))
@@ -35,8 +36,13 @@ export const download = (o, name) => {
     }
 }
 
+// 获取当前时间
+export const getNow = length => {
+    return new Date(new Date().getTime() + 28800000).toJSON().slice(0, length).replace('T', ' ')
+}
+
 export default {
-    previewPdf,
+    preview,
     request,
     pinyin4js,
     snapshoot,
@@ -45,5 +51,7 @@ export default {
     encryptByAes,
     download,
     sendMsg,
-    bpmTaskSave
+    bpmTaskSave,
+    getNow,
+    onlyOfficeToPdf
 }

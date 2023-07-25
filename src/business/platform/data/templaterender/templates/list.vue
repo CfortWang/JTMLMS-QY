@@ -154,7 +154,7 @@ import Scan from '@/views/system/jbdScan/scan.vue'
 import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
-import preview from '@/business/platform/form/utils/custom/preview'
+import { preview } from '@/business/platform/form/utils/custom/preview'
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
 import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
 
@@ -285,7 +285,6 @@ export default {
 
             importTableDialogVisible: false,
             position: null,
-            selection: null,
             importList: [],
             importVlaue: null
         }
@@ -797,7 +796,7 @@ export default {
                             this.$message.warning('请先配置对应报表路径！')
                             return
                         }
-                        src = `${this.$reportPash.replace('show', 'pdf')}${this.previewPath}&id_=${selection}`
+                        src = `${this.$reportPath.replace('show', 'pdf')}${this.previewPath}&id_=${selection}`
                         preview(this, src)
                         break
                     case 'download': // 下载记录
@@ -805,7 +804,7 @@ export default {
                             this.$message.warning('请先配置对应报表路径！')
                             return
                         }
-                        src = `${this.$reportPash}${this.downloadPath}&id_=${selection}`
+                        src = `${this.$reportPath}${this.downloadPath}&id_=${selection}`
                         preview(this, src)
                         break
                     case 'print': // 打印

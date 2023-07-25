@@ -33,7 +33,6 @@
 <script>
 import InnerMessage from './index'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import getDate from '@/business/platform/form/utils/custom/getDateRule.js'
 import {
     generateUUID
 } from '@/api/platform/file/attachment'
@@ -151,7 +150,7 @@ export default {
                             id: ryjbqkDatas[0].qian_zi_tu_wen_,
                             fileName: '确认签名'
                         }]),
-                        que_ren_ri_qi_: getDate(),
+                        que_ren_ri_qi_: this.$common.getNow(10),
                         qian_ming_id_: ryjbqkDatas[0].qian_zi_tu_wen_
                     }
                     const returnParams = {

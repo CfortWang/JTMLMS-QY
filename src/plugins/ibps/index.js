@@ -15,6 +15,8 @@ import i18n from '@/i18n'
 import store from '@/store'
 // 工具类
 import Utils from '@/utils/util'
+// 全局方法
+import common from '@/utils'
 // global filters 全局过滤
 import * as filters from '@/filters'
 // 拼音指令
@@ -59,13 +61,13 @@ export default {
             return `https://www.szjyxt.com/demo/reportServlet?action=${type}&file=${encodeURIComponent(src)}.rpx&columns=0&srcType=file&paramString=${encodeURIComponent(where)}`
         }
         const reportPath = '金通医学实验室管理系统'
-        let timer = setInterval(() => { //定时循环添加参数
+        const timer = setInterval(() => { // 定时循环添加参数
             if (getToken()) {
-                //报表路径
-                Vue.prototype.$reportPash = `https://www.szjyxt.com/demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${reportPath}/`
-                Vue.prototype.$getReportFile = downloadReport //通过方法函数，拼接url，并将字符串格式化
-                Vue.prototype.$getFileDow = 'https://www.szjyxt.com/ibps/platform/v3/file/download?attachmentId=' //文件下载地址
-                clearInterval(timer) //添加成功后即删除定时任务
+                // 报表路径
+                Vue.prototype.$reportPath = `https://www.szjyxt.com/demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${reportPath}/`
+                Vue.prototype.$getReportFile = downloadReport // 通过方法函数，拼接url，并将字符串格式化
+                Vue.prototype.$getFileDow = 'https://www.szjyxt.com/ibps/platform/v3/file/download?attachmentId=' // 文件下载地址
+                clearInterval(timer) // 添加成功后即删除定时任务
             }
         }, 500)
 
@@ -97,6 +99,7 @@ export default {
         Vue.use(pluginOpen)
         // 使用帮助类
         Vue.prototype.$utils = Utils
+        Vue.prototype.$common = common
         // 快速打印 log
         Vue.prototype.$log = Utils.log
     }

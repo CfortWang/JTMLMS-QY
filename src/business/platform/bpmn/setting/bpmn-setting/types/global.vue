@@ -43,7 +43,7 @@
       </el-collapse-item> -->
      <el-collapse-item title="记录保存" name="varSetting">
     <div style="margin-left:5%;">
-       报表路径以半角"，"分割： <el-input placeholder="报表路径" type="textarea" rows="5" v-model="bao_biao_lu_jing_"> </el-input>
+       报表路径以半角","分割： <el-input placeholder="报表路径" type="textarea" rows="5" v-model="bao_biao_lu_jing_"> </el-input>
        附件字段名以半角"，"分割 (多个数据表以'.'分割)：<el-input placeholder="附件字段"  v-model="fu_jian_nei_rong_"></el-input>
        附件所在数据库 (多个数据表以'.'分割)：<el-input placeholder="附件数据库"  v-model="shi_fou_zi_biao_"></el-input>
        [ 当前表默认id主键 ] 附件子表的外键字段[选填] (多个数据表以'.'分割)：<el-input placeholder="关联字段"  v-model="guan_lian_zi_duan"></el-input>

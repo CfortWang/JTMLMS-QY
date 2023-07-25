@@ -5,7 +5,7 @@ import { FORM_URL } from '@/api/baseUrl'
  * ca电子签章接口
  * @param {*} params
  */
-export function goSeal(params) {
+export const goSeal = params => {
     return request({
         url: FORM_URL() + '/sys/esspdf/fileSign',
         method: 'post',
@@ -17,7 +17,7 @@ export function goSeal(params) {
  * word 转 pdf
  * @param {*} params
  */
-export function wordToPdf(params) {
+export const wordToPdf = params => {
     return request({
         url: FORM_URL() + '/sys/esspdf/wordToPdf',
         method: 'post',
@@ -46,6 +46,15 @@ export const sealByKeywords = data => {
 export const docxToPdfAndSign = params => {
     return request({
         url: FORM_URL() + '/sys/esspdf/onlyOfficeToPdfAndSign',
+        method: 'post',
+        isLoading: true,
+        params
+    })
+}
+
+export const onlyOfficeToPdf = params => {
+    return request({
+        url: FORM_URL() + '/sys/esspdf/onlyOfficeToPdf',
         method: 'post',
         isLoading: true,
         params

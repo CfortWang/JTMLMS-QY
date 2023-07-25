@@ -401,7 +401,7 @@
                 this.loadData(sql)
             },
             alertReport (path, id) {
-                this.srcUrl = `${this.$reportPash.replace('show', 'pdf')}${path}&id_=${id}`
+                this.srcUrl = `${this.$reportPath.replace('show', 'pdf')}${path}&id_=${id}`
                 this.visible = true
             },
             // 文件预览

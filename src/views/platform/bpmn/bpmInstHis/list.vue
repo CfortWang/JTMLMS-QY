@@ -435,7 +435,7 @@ export default {
         },
         // 打开报表
         openReport (path, id) {
-            this.srcUrl = `${this.$reportPash.replace('show', 'pdf')}${path}&id_=${id}`
+            this.srcUrl = `${this.$reportPath.replace('show', 'pdf')}${path}&id_=${id}`
             this.visible = true
         },
         getParenthesesStr (text) {

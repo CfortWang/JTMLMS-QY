@@ -169,8 +169,8 @@ export default {
         router: this.$router,
         message: this.$message,
         link: this,
-        reportPash:this.$reportPash,
-        reportPashs:this.$reportPashs,
+        reportPath:this.$reportPath,
+        reportPaths:this.$reportPaths,
       }
       if (this.$utils.isEmpty(scrip)) return
       const promise = new window.Promise((resolve, reject) => {

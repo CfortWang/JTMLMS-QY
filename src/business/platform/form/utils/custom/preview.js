@@ -5,7 +5,7 @@ import { snapshoot } from '@/api/platform/file/attachment' // 印章，快照
 import { download } from '@/api/platform/file/attachment'
 import ActionUtils from '@/utils/action'
 
-const previewPdf = (tableForm, srcUrl) => {
+export const preview = (tableForm, url) => {
     var flag = true
     if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
         flag = false
@@ -20,10 +20,7 @@ const previewPdf = (tableForm, srcUrl) => {
                     }
                 },
 
-                template: '<div style="height:100%">' +
-                    '<iframe src="' + srcUrl + '"' +
-                    'id="myiframe"  frameborder="0" scrolling="no" height="100%" width="100%"></iframe>' +
-                    '</div>'
+                template: `<div style="height:100%"><iframe src="${url}" id="myiframe" frameborder="0" scrolling="no" height="100%" width="100%"></iframe></div>`
             },
             {
                 dialog: {
@@ -50,73 +47,65 @@ const previewPdf = (tableForm, srcUrl) => {
                         data: '',
                         pdfh5: null,
                         name: '',
-                        url: ``
+                        url: ''
                     }
                 },
                 mounted () {
-                    this.getYab()
+                    this.getFile()
                 },
                 methods: {
-                    getYab () {
-                        const srcUrl1 = srcUrl.split('rpx=')[1]
-                        const srcUrlList = srcUrl1.split('.rpx&id_=')
-                        const name = srcUrlList[0].split('/')
-
-                        const url = tableForm.$getReportFile(srcUrlList[0], `id_=${srcUrlList[1]}`)
-                        this.name = name[name.length - 1] + '.pdf'
+                    getFile () {
+                        const urlList = url.split('rpx=')[1].split('.rpx&id_=')
+                        const name = urlList[0].split('/')
+                        this.name = name[name.length - 1]
                         const params = {
-                            url: url,
-                            name: name[name.length - 1] || '暂无',
+                            url: tableForm.$getReportFile(urlList[0], `id_=${urlList[1]}`),
+                            name: name[name.length - 1] || '未命名',
                             type: 'pdf'
                         }
                         snapshoot(params).then(res => {
-                            if (res.state === 200) {
-                                const data = res.data
-                                this.getDownload(data.id)
+                            const { data = null } = res
+                            if (!data) {
+                                tableForm.$message.error('获取文件信息失败！')
+                                return
                             }
+                            this.getDownload(data.id)
                         })
                     },
                     getDownload (id) {
-                        download({
-                            attachmentId: id
-                        }).then(res => {
-                            this.getMet(res.data)
+                        download({ attachmentId: id }).then(res => {
+                            this.render(res.data)
                             this.url = res.data
                         })
                     },
-                    getMet (url) {
-                        const that = this
-                        // //实例化1
-                        that.$nextTick(() => {
-                            that.pdfh5 = new Pdfh5('#demo', {
+                    render (url) {
+                        this.$nextTick(() => {
+                            this.pdfh5 = new Pdfh5('#demo', {
                                 // pdfurl: window.location.origin + '/' + url,
                                 data: url
                                 // lazy: true
                             })
-                            that.pdfh5.on('complete', function (status, msg, time) {
+                            this.pdfh5.on('complete', (status, msg, time) => {
                                 // console.log(status, msg, time)
                             })
                         })
                     },
-                    finish () {
-                        this.visible = false
+                    close () {
                         tableForm.dialogTemplate = null
+                        this.visible = false
                     },
-                    xiazan () {
-                        ActionUtils.exportFile(
-                            this.url,
-                            this.name
-                        )
+                    download () {
+                        ActionUtils.exportFile(this.url, `${this.name}.pdf`)
                     }
                 },
                 template:
-                    `<div style="height:100%">
-                        <div id="demo"></div>
-                        <div style="position:absolute;right: 17px;top: 15px;" >
-                            <i class="el-icon-download" style="font-size: 24px;margin-right:15px" @click="xiazan"></i>
-                            <i class="el-icon-close" style="font-size: 24px;" @click="finish"></i>
-                        </div>
-                    </div>`
+                `<div style="height:100%">
+                    <div id="demo"></div>
+                    <div style="position:absolute;right: 17px;top: 15px;" >
+                        <i class="el-icon-download" style="font-size: 24px;margin-right:15px" @click="download"></i>
+                        <i class="el-icon-close" style="font-size: 24px;" @click="close"></i>
+                    </div>
+                </div>`
             },
             {
                 dialog: {
@@ -136,4 +125,3 @@ const previewPdf = (tableForm, srcUrl) => {
         })
     }
 }
-export default previewPdf
