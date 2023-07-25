@@ -91,8 +91,8 @@ export default {
                     this.instanceDetailVisible = true
                     break
                 case 'startFlow': // 启动流程
-                    if (this.actionTitle == '同意并结束') {
-                        this.setData("1")
+                    if (this.actionTitle === '同意并结束' || this.actionTitle === '提交并结束') {
+                        this.setData("已完成")
                     } else {
                         this.setData("已编制")
                     }

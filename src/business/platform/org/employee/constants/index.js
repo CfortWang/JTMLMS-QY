@@ -8,7 +8,7 @@ export const partyTypeOptions = [
   },
   {
     value: 'position',
-    label: '岗位'
+    label: '部门'
   },
   {
     value: 'role',

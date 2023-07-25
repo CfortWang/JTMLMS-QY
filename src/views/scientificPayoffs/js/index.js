@@ -1,23 +1,23 @@
-import echarts from "echarts"
+import echarts from 'echarts'
 export default {
-    //轮播表数据封装
-    getDataList(data) {
-        let config = {
+    // 轮播表数据封装
+    getDataList (data) {
+        const config = {
             header: data.header,
             data: data.data,
             rowNum: 6,
-            headerHeight: 45,
+            headerHeight: 45
             // columnWidth: [100]
         }
         return config
     },
 
-    //科研项目
-    getKyxmList(datas) {
-        let header = ['全部参与人', '项目编号', '资助单位', '项目类型', '项目名称', '开始时间', '结束时间', '立项经费（万元）']
-        let data = []
+    // 科研项目
+    getKyxmList (datas) {
+        const header = ['全部参与人', '项目编号', '资助单位', '项目类型', '项目名称', '开始时间', '结束时间', '立项经费（万元）']
+        const data = []
         datas.forEach((item, index) => {
-            let list = []
+            const list = []
             list.push(item.quan_bu_can_yu_re || '')
             list.push(item.xiang_mu_bian_hao || '')
             list.push(item.zi_zhi_dan_wei_ || '')
@@ -27,38 +27,40 @@ export default {
             list.push(item.jie_shu_shi_jian_ || '')
             list.push(item.li_xiang_jing_fei || '')
             data.push(list)
-        });
-        let dataList = {
+        })
+        const dataList = {
             header: header,
             data: data
         }
-        let config = this.getDataList(dataList)
+        const config = this.getDataList(dataList)
         return config
     },
-    //科研获奖成果
-    getkjhjcgList(datas) {
-        let header = ['全部获奖者', '单位', '奖励类型']
-        let data = []
+    // 科研获奖成果
+    getkjhjcgList (datas) {
+        const header = ['全部获奖者', '奖励项目名称', '单位排名', '奖励类型', '获奖时间']
+        const data = []
         datas.forEach((item, index) => {
-            let list = []
+            const list = []
             list.push(item.quan_bu_huo_jiang || '')
-            list.push(item.dan_wei_ || '')
+            list.push(item.jiang_li_xiang_mu || '')
+            list.push(item.dan_wei_pai_ming_ || '')
             list.push(item.jiang_li_lei_xing || '')
+            list.push(item.huo_jiang_shi_jia || '')
             data.push(list)
-        });
-        let dataList = {
+        })
+        const dataList = {
             header: header,
             data: data
         }
-        let config = this.getDataList(dataList)
+        const config = this.getDataList(dataList)
         return config
     },
-    //SCI文章统计表
-    getSCIwztjbList(datas) {
-        let header = ['全部作者', '论文题目', '期刊名称', 'JCR分区', '发表时间', '影响因子IF', '作者排名', 'WOS号']
-        let data = []
+    // SCI文章统计表
+    getSCIwztjbList (datas) {
+        const header = ['全部作者', '论文题目', '期刊名称', 'JCR分区', '发表时间', '影响因子IF', '单位排名', 'WOS号']
+        const data = []
         datas.forEach((item, index) => {
-            let list = []
+            const list = []
             // list.push(item.NAME_ || '')
             list.push(item.quan_bu_zuo_zhe_ || '')
             list.push(item.lun_wen_ti_mu_ || '')
@@ -66,88 +68,87 @@ export default {
             list.push(item.qi_juan_hao_ || '')
             list.push(item.fa_biao_shi_jian_ || '')
             list.push(item.ying_xiang_y_z_if || '')
-            list.push(item.zuo_zhe_pai_ming_ || '')
+            list.push(item.dan_wei_pai_ming_ || '')
             list.push(item.wos_hao_ || '')
             data.push(list)
-        });
-        let dataList = {
+        })
+        const dataList = {
             header: header,
             data: data
         }
-        let config = this.getDataList(dataList)
+        const config = this.getDataList(dataList)
         return config
     },
-    //中文论文
-    getZwlwList(datas) {
-        let header = ['全部作者', '论文题目', '期刊名称', '期卷号', '发表时间', '期刊类别', '作者排名', 'ISSN号']
-        let data = []
+    // 中文论文
+    getZwlwList (datas) {
+        const header = ['全部作者', '论文题目', '期刊名称', '期卷号', '发表时间', '期刊类别', '单位排名', 'ISSN号']
+        const data = []
         datas.forEach((item, index) => {
-            let list = []
+            const list = []
             list.push(item.quan_bu_zuo_zhe_ || '')
             list.push(item.lun_wen_ti_mu_ || '')
             list.push(item.qi_kan_ming_cheng || '')
             list.push(item.qi_juan_hao_ || '')
             list.push(item.fa_biao_shi_jian_ || '')
             list.push(item.qi_kan_lei_bie_ || '')
-            list.push(item.zuo_zhe_pai_ming_ || '')
+            list.push(item.dan_wei_pai_ming_ || '')
             list.push(item.issn_hao_ || '')
             data.push(list)
-        });
-        let dataList = {
+        })
+        const dataList = {
             header: header,
             data: data
         }
-        let config = this.getDataList(dataList)
+        const config = this.getDataList(dataList)
         return config
     },
-    //著作
-    getZhuZuoList(datas) {
-        let header = ['全部作者', '专著名称', '出版社', '出版时间', '编撰字数']
-        let data = []
+    // 著作
+    getZhuZuoList (datas) {
+        const header = ['全部作者', '专著名称', '出版社', '出版时间', '编撰字数']
+        const data = []
         datas.forEach((item, index) => {
-            let list = []
+            const list = []
             list.push(item.quan_bu_zuo_zhe_ || '')
             list.push(item.zhuan_zhuo_ming_c || '')
             list.push(item.chu_ban_she_ || '')
             list.push(item.chu_ban_shi_jian_ || '')
             list.push(item.bian_zhuan_zi_shu || '')
             data.push(list)
-        });
-        let dataList = {
+        })
+        const dataList = {
             header: header,
             data: data
         }
-        let config = this.getDataList(dataList)
+        const config = this.getDataList(dataList)
         return config
     },
-    //专利
-    getZhuanLiList(datas) {
-        let header = ['全部申请人', '专利名称', '专利权人', '类别', '申请时间', '授权时间', '作者排名']
-        let data = []
+    // 专利
+    getZhuanLiList (datas) {
+        const header = ['全部申请人', '专利名称', '专利权人', '类别', '申请时间', '授权时间']
+        const data = []
         datas.forEach((item, index) => {
-            let list = []
+            const list = []
             list.push(item.quan_bu_shen_qing || '')
             list.push(item.zhuan_li_ming_che || '')
             list.push(item.zhuan_li_quan_ren || '')
             list.push(item.lei_bie_ || '')
             list.push(item.shen_qing_shi_jia || '')
             list.push(item.shou_quan_shi_jia || '')
-            list.push(item.zuo_zhe_pai_ming_ || '')
             data.push(list)
-        });
-        let dataList = {
+        })
+        const dataList = {
             header: header,
             data: data
         }
-        let config = this.getDataList(dataList)
+        const config = this.getDataList(dataList)
         return config
     },
-    //继续教育项目/学术活动
-    getJxjyxmxshdList(datas) {
-        let header = ['全部负责人', '项目编号', '会议名称', '项目级别', '学分', '举办时间', '举办地点', '合作单位']
-        let data = []
+    // 继续教育项目/学术活动
+    getJxjyxmxshdList (datas) {
+        const header = ['全部负责人', '项目编号', '会议名称', '项目级别', '学分', '举办时间', '举办地点', '合作单位']
+        const data = []
         datas.forEach((item, index) => {
-            let list = []
+            const list = []
             list.push(item.quan_bu_zuo_zhe_ || '')
             list.push(item.xiang_mu_bian_hao || '')
             list.push(item.hui_yi_ming_cheng || '')
@@ -157,39 +158,39 @@ export default {
             list.push(item.ju_ban_di_dian_ || '')
             list.push(item.he_zuo_dan_wei_ || '')
             data.push(list)
-        });
-        let dataList = {
+        })
+        const dataList = {
             header: header,
             data: data
         }
-        let config = this.getDataList(dataList)
+        const config = this.getDataList(dataList)
         return config
     },
-    //图标数据封装
-    getKyxmData(datas) {
-        let list = []
-        let listData = []
+    // 图标数据封装
+    getKyxmData (datas) {
+        const list = []
+        const listData = []
         datas.forEach(item => {
             item.NAME_ = this.linHeg(item.NAME_)
             list.push(item.NAME_)
-            let o = {
+            const o = {
                 name: item.NAME_,
                 value: item.count
             }
             listData.push(o)
         })
-        let config = {
+        const config = {
             xAxis: list,
             series: listData
         }
         return config
     },
-    linHeg(value) {
-        //rowMAx 控制一行多少字
-        let rowMAx = 1
+    linHeg (value) {
+        // rowMAx 控制一行多少字
+        const rowMAx = 1
         let overValue = ''
         for (let i = 0; i < value.length; i++) {
-            if ((i % rowMAx == 0) && (i != 0)) {
+            if ((i % rowMAx === 0) && (i !== 0)) {
                 overValue += '\n'
                 overValue += value[i]
             } else {
@@ -199,7 +200,6 @@ export default {
         return overValue
     }
 }
-
 
 export const barData = {
     title: {
@@ -253,17 +253,17 @@ export const barData = {
         barMaxWidth: '35px',
         itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: "#83bff6" },
-                { offset: 0.5, color: "#188df0" },
-                { offset: 1, color: "#188df0" },
+                { offset: 0, color: '#83bff6' },
+                { offset: 0.5, color: '#188df0' },
+                { offset: 1, color: '#188df0' }
             ])
         },
         emphasis: {
             itemStyle: {
                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: "#2378f7" },
-                    { offset: 0.7, color: "#2378f7" },
-                    { offset: 1, color: "#83bff6" },
+                    { offset: 0, color: '#2378f7' },
+                    { offset: 0.7, color: '#2378f7' },
+                    { offset: 1, color: '#83bff6' }
                 ])
             }
         }

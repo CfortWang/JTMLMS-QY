@@ -22,7 +22,7 @@
                     ref="basicInfo"
                     :readonly="readonly"
                     :data="employee"
-                    :formType="formType"
+                    :form-type="formType"
                     @input="data => employee = data"
                 />
             </el-tab-pane>
@@ -60,7 +60,7 @@
                     @input="data => employee.posItemList = data"
                 />
             </el-tab-pane>
-            <el-tab-pane v-if="!infoIncludes('role-info')"  label="角色信息" name="role-info">
+            <el-tab-pane v-if="!infoIncludes('role-info')" label="角色信息" name="role-info">
                 <!-- <span slot="label">角色信息
                     <el-tooltip
                         v-if="!readonly"
@@ -99,310 +99,318 @@
 </template>
 
 <script>
-    import { create, update, load,upEmployee } from '@/api/platform/org/employee'
-    import ActionUtils from '@/utils/action'
-    import BasicInfo from './basic-info'
-    import ExtAttr from './ext-attr'
-    import OrgInfo from './org-info'
-    import PositionInfo from './position-info'
-    import RoleInfo from './role-info'
-    import GroupInfo from './group-info'
+import { create, update, load, upEmployee } from '@/api/platform/org/employee'
+import ActionUtils from '@/utils/action'
+import BasicInfo from './basic-info'
+import ExtAttr from './ext-attr'
+import OrgInfo from './org-info'
+import PositionInfo from './position-info'
+import RoleInfo from './role-info'
+import GroupInfo from './group-info'
 
-    export default {
-        components: {
-            BasicInfo,
-            ExtAttr,
-            OrgInfo,
-            PositionInfo,
-            RoleInfo,
-            GroupInfo
+export default {
+    components: {
+        BasicInfo,
+        ExtAttr,
+        OrgInfo,
+        PositionInfo,
+        RoleInfo,
+        GroupInfo
+    },
+    props: {
+        visible: Boolean,
+        id: String,
+        title: String,
+        readonly: {
+            type: Boolean,
+            default: false
         },
-        props: {
-            visible: Boolean,
-            id: String,
-            title: String,
-            readonly: {
-                type: Boolean,
-                default: false
-            },
-            formType: {
-                type: String,
-                default: 'add'
-            },
-            ceroParams: {
-                type: Object,
-                default: () => {}
-            },
-            span: [Number, String]
+        formType: {
+            type: String,
+            default: 'add'
         },
-        data() {
-            return {
-                info: [],
-                orgId: '',
-                dialogLoading: false,
-                dialogVisible: false,
-                activeName: 'basic-info',
-                defaultEmployee: {
-                    id: '',
-                    account: '',
-                    password: '',
-                    isSuper: 'N',
-                    name: '',
-                    status: 'actived',
-                    gender: 'male',
-                    email: '',
-                    photo: '',
-                    mobile: '',
-                    createTime: '',
-                    attrItemList: [], // 扩展属性
-                    groupID: '', // 组织ID
-                    posItemList: [],
-                    roleItemList: [],
-                    userGroupItemList: [],
-                    orgItem: {} // 组织全部信息
+        ceroParams: {
+            type: Object,
+            default: () => {}
+        },
+        span: [Number, String]
+    },
+    data () {
+        return {
+            info: [],
+            orgId: '',
+            dialogLoading: false,
+            dialogVisible: false,
+            activeName: 'basic-info',
+            defaultEmployee: {
+                id: '',
+                account: '',
+                password: '',
+                isSuper: 'N',
+                name: '',
+                status: 'actived',
+                gender: 'male',
+                email: '',
+                photo: '',
+                mobile: '',
+                createTime: '',
+                attrItemList: [], // 扩展属性
+                groupID: '', // 组织ID
+                posItemList: [],
+                roleItemList: [],
+                userGroupItemList: [],
+                orgItem: {} // 组织全部信息
+            },
+            employee: {},
+            toolbars: [
+                {
+                    key: 'save',
+                    hidden: () => { return this.readonly && this.formType == 'detail' }
                 },
-                employee: {},
-                toolbars: [
-                    {
-                        key: 'save',
-                        hidden: () => { return this.readonly && this.formType == 'detail' }
-                    },
-                    { key: 'cancel' }
-                ]
-            }
-        },
-        computed: {
-            formId() {
-                return this.id
-            }
-        },
-        watch: {
-            visible: {
-                handler (val, oldVal) {
-                    this.dialogVisible = this.visible
-                },
-                immediate: true
+                { key: 'cancel' }
+            ]
+        }
+    },
+    computed: {
+        formId () {
+            return this.id
+        }
+    },
+    watch: {
+        visible: {
+            handler (val, oldVal) {
+                this.dialogVisible = this.visible
             },
-            ceroParams: {
-                handler (val, oldVal) {
-                    if (val && val !== {}) {
-                        this.orgId = val.groundId
-                    }
-                },
-                deep: true
-            }
+            immediate: true
         },
-        methods: {
-            infoIncludes(params) {
-                const arr = this.ceroParams !== undefined ? this.ceroParams.unshow : []
-                return arr.includes(params)
-            },
-            handleActionEvent({ key }) {
-                switch (key) {
-                    case 'save':
-                        this.handleSave()
-                        break
-                    case 'cancel':
-                        this.closeDialog()
-                        break
-                    default:
-                        break
+        ceroParams: {
+            handler (val, oldVal) {
+                if (val && val !== {}) {
+                    this.orgId = val.groundId
                 }
             },
-            handleSave() {
-                // 验证表单是否填写
-                this.$refs.basicInfo.validate((valid) => {
-                    if (valid) {
-                        if(this.formId){
-                            this.getUpEmployee()
-                        }else{
-                            this.saveData()
-                        }
+            deep: true
+        }
+    },
+    methods: {
+        infoIncludes (params) {
+            const arr = this.ceroParams !== undefined ? this.ceroParams.unshow : []
+            return arr.includes(params)
+        },
+        handleActionEvent ({ key }) {
+            switch (key) {
+                case 'save':
+                    this.handleSave()
+                    break
+                case 'cancel':
+                    this.closeDialog()
+                    break
+                default:
+                    break
+            }
+        },
+        handleSave () {
+            // 验证表单是否填写
+            this.$refs.basicInfo.validate((valid) => {
+                if (valid) {
+                    if (this.formId) {
+                        this.getUpEmployee()
                     } else {
-                        this.activeName = 'basic-info'
-                        ActionUtils.saveErrorMessage()
+                        this.saveData()
                     }
+                } else {
+                    this.activeName = 'basic-info'
+                    ActionUtils.saveErrorMessage()
+                }
+            })
+        },
+        checkPhone (value) {
+            const reg = /^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/
+            if (!reg.test(value)) {
+                return false
+            }
+            return true
+        },
+        getUpEmployee () {
+            const params = {
+                id: this.employee.id,
+                account: this.employee.account
+            }
+            upEmployee(params).then(res => {
+                if (res.state == 200) {
+                    const data = res.variables.data
+                    if (data == 'Y') {
+                        this.saveData()
+                    } else {
+                        ActionUtils.warning(res.message)
+                    }
+                }
+            })
+        },
+        saveData () {
+            const attrValidator = this.$refs['attrInfo'] ? this.$refs['attrInfo'].callback() : null
+            const vo = this.formatSubmitData()
+            if (!this.$utils.isEmpty(this.formId) && !this.ceroParams) {
+                delete vo.partyEmployeePo.password
+            }
+            this.dialogLoading = true
+            if (!attrValidator) {
+                ActionUtils.warning('请检查扩展属性是否填写正确')
+                this.dialogLoading = false
+                return
+            }
+            const { mobile = '' } = vo.user || {}
+            if (mobile && !this.checkPhone(mobile)) {
+                ActionUtils.warning('请输入正确的手机号')
+                this.dialogLoading = false
+                return
+            }
+            console.log(vo)
+            if (vo.roleVoList.length > 0) {
+                const list = []
+                vo.roleVoList.forEach(item => {
+                    list.push(item.id)
                 })
-            },
-            checkPhone(value) {
-                const reg = /^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/
-                if (!reg.test(value)) {
-                    return false
-                }
-                return true
-            },
-            getUpEmployee(){
-                let params = {
-                    id: this.employee.id,
-                    account: this.employee.account
-                }
-                upEmployee(params).then(res => {
-                    if(res.state == 200){
-                        const data = res.variables.data
-                        if(data == "Y"){
-                            this.saveData()
-                        }else{
-                            ActionUtils.warning(res.message)
+                vo.user.job = list.join(',')
+            }
+            if (this.formId) {
+                update(vo).then(response => {
+                    this.dialogLoading = false
+                    this.$emit('dialog-callback', this)
+                    ActionUtils.saveSuccessMessage(response.message, r => {
+                        // if (this.$utils.isEmpty(this.formId)) {
+                        //     this.$refs[this.formName].resetFields()
+                        // }
+                        if (r) {
+                            this.closeDialog()
                         }
                     }
-                })
-            },
-            saveData() {
-                const attrValidator = this.$refs['attrInfo'] ? this.$refs['attrInfo'].callback() : null
-                const vo = this.formatSubmitData()
-                if (!this.$utils.isEmpty(this.formId) && !this.ceroParams) {
-                    delete vo.partyEmployeePo.password
-                }
-                this.dialogLoading = true
-                if (!attrValidator) {
-                    ActionUtils.warning('请检查扩展属性是否填写正确')
-                    this.dialogLoading = false
-                    return
-                }
-                const { mobile = '' } = vo.user || {}
-                if (mobile && !this.checkPhone(mobile)) {
-                    ActionUtils.warning('请输入正确的手机号')
-                    this.dialogLoading = false
-                    return
-                }
-                if (this.formId) {
-                    update(vo).then(response => {
-                        this.dialogLoading = false
-                        this.$emit('dialog-callback', this)
-                        ActionUtils.saveSuccessMessage(response.message, r => {
-                                // if (this.$utils.isEmpty(this.formId)) {
-                                //     this.$refs[this.formName].resetFields()
-                                // }
-                                if (r) {
-                                    this.closeDialog()
-                                }
-                            }
-                        )
-                    }).catch(() => {
-                        this.dialogLoading = false
-                    })
-                } else {
-                    create(vo).then(response => {
-                        this.dialogLoading = false
-                        this.$emit('dialog-callback', this)
-                        ActionUtils.saveSuccessMessage(response.message, r => {
-                                if (r) {
-                                    this.closeDialog()
-                                } else {
-                                    this.init()
-                                    this.$refs.attrInfo.clearData()
-                                }
-                            }
-                        )
-                    }).catch(() => {
-                        this.dialogLoading = false
-                    })
-                }
-            },
-            // 关闭当前窗口
-            closeDialog() {
-                this.$emit('close', false)
-            },
-            // 初始化页面，出现之前的数据
-            init() {
-                this.activeName = 'basic-info'
-                this.employee = this.$utils.newData(this.defaultEmployee)
-                this.$nextTick(() => {
-                    // if (this.$refs.orgInfo) {
-                    //     this.$refs.orgInfo.init()
-                    // }
-                    // this.$refs.positionInfo.init()
-                    if (this.$refs.roleInfo) {
-                        this.$refs.roleInfo.init()
-                    }
-                })
-            },
-            getFormData() {
-                this.init()
-                this.$nextTick(() => {
-                    this.$refs['basicInfo'].handleGetDefaultUserSecurity()
-                })
-                if (this.$utils.isEmpty(this.formId)) {
-                    // 清空拓展属性数据
-                    this.$nextTick(() => {
-                        this.$refs.attrInfo.clearData()
-                    })
-                    return
-                }
-                this.dialogLoading = true
-                // 用户基本信息
-                load({ employeeId: this.formId }).then((response) => {
-                    this.dialogLoading = false
-                    this.employee = response.data
-                    this.employee.orgItem = response.variables.partyOrg || {}
-                    this.employee.attrItemList = response.variables.partyAttrs || []
-                    this.employee.posItemList = response.variables.partyPositions || []
-                    this.employee.roleItemList = response.variables.partyRoles || []
-                    this.employee.userGroupItemList = response.variables.partyGroups || []
-                    this.$nextTick(() => {
-                        this.$refs.attrInfo.loadAttrData()
-                    })
+                    )
                 }).catch(() => {
                     this.dialogLoading = false
                 })
-            },
-            formatSubmitData() {
-                const vo = {}
-                vo.partyEmployeePo = this.employee
-                vo.user = this.employee
-                vo.user.password = this.formId === '' || this.ceroParams ? this.employee.password : this.defaultEmployee.password
-                vo.partyEmployeePo.groupID = this.ceroParams !== {} && this.ceroParams ? this.ceroParams.groundId : this.formatOrgData()
-                vo.positionVoList = this.formatPositionData()
-                vo.roleVoList = this.formatRoleData()
-                vo.attrValueVoList = this.employee.attrItemList
-                vo.userGroupPoList = this.formatUserGroupData()
-                if (this.ceroParams !== {} && this.ceroParams) {
-                    vo.partyEmployeePo.prem = this.ceroParams.prem
-                }
-                return vo
-            },
-            formatOrgData() {
-                return this.employee.orgItem.id || ''
-            },
-            formatPositionData() {
-                const result = []
-                const list = this.employee.posItemList
-                if (this.$utils.isEmpty(list)) return result
-                for (const variable of list) {
-                    const tmp = { id: variable.id, name: variable.name }
-                    tmp['isMainPost'] = variable.isMainPost === 'Y'
-                    tmp['isPrincipal'] = variable.isPrincipal === 'Y'
-                    result.push(tmp)
-                }
-                return result
-            },
-            formatRoleData() {
-                const result = []
-                const list = this.employee.roleItemList
-                if (this.$utils.isEmpty(list)) return result
-                for (const variable of list) {
-                    const tmp = { id: variable.id, name: variable.name }
-                    tmp['subSystemName'] = variable.subSystemName
-                    tmp['source'] = this.employee.id ? variable.source : '自有'
-                    tmp['canDelete'] = variable.source === '自有'
-                    result.push(tmp)
-                }
-                return result
-            },
-            formatUserGroupData() {
-                const result = []
-                const list = this.employee.userGroupItemList
-                if (this.$utils.isEmpty(list)) return result
-                for (const variable of list) {
-                    result.push({
-                        groupId: variable.id,
-                        groupName: variable.name
-                    })
-                }
-                return result
+            } else {
+                create(vo).then(response => {
+                    this.dialogLoading = false
+                    this.$emit('dialog-callback', this)
+                    ActionUtils.saveSuccessMessage(response.message, r => {
+                        if (r) {
+                            this.closeDialog()
+                        } else {
+                            this.init()
+                            this.$refs.attrInfo.clearData()
+                        }
+                    }
+                    )
+                }).catch(() => {
+                    this.dialogLoading = false
+                })
             }
+        },
+        // 关闭当前窗口
+        closeDialog () {
+            this.$emit('close', false)
+        },
+        // 初始化页面，出现之前的数据
+        init () {
+            this.activeName = 'basic-info'
+            this.employee = this.$utils.newData(this.defaultEmployee)
+            this.$nextTick(() => {
+                // if (this.$refs.orgInfo) {
+                //     this.$refs.orgInfo.init()
+                // }
+                // this.$refs.positionInfo.init()
+                if (this.$refs.roleInfo) {
+                    this.$refs.roleInfo.init()
+                }
+            })
+        },
+        getFormData () {
+            this.init()
+            this.$nextTick(() => {
+                this.$refs['basicInfo'].handleGetDefaultUserSecurity()
+            })
+            if (this.$utils.isEmpty(this.formId)) {
+                // 清空拓展属性数据
+                this.$nextTick(() => {
+                    this.$refs.attrInfo.clearData()
+                })
+                return
+            }
+            this.dialogLoading = true
+            // 用户基本信息
+            load({ employeeId: this.formId }).then((response) => {
+                this.dialogLoading = false
+                this.employee = response.data
+                this.employee.orgItem = response.variables.partyOrg || {}
+                this.employee.attrItemList = response.variables.partyAttrs || []
+                this.employee.posItemList = response.variables.partyPositions || []
+                this.employee.roleItemList = response.variables.partyRoles || []
+                this.employee.userGroupItemList = response.variables.partyGroups || []
+                this.$nextTick(() => {
+                    this.$refs.attrInfo.loadAttrData()
+                })
+            }).catch(() => {
+                this.dialogLoading = false
+            })
+        },
+        formatSubmitData () {
+            const vo = {}
+            vo.partyEmployeePo = this.employee
+            vo.user = this.employee
+            vo.user.password = this.formId === '' || this.ceroParams ? this.employee.password : this.defaultEmployee.password
+            vo.partyEmployeePo.groupID = this.ceroParams !== {} && this.ceroParams ? this.ceroParams.groundId : this.formatOrgData()
+            vo.positionVoList = this.formatPositionData()
+            vo.roleVoList = this.formatRoleData()
+            vo.attrValueVoList = this.employee.attrItemList
+            vo.userGroupPoList = this.formatUserGroupData()
+            if (this.ceroParams !== {} && this.ceroParams) {
+                vo.partyEmployeePo.prem = this.ceroParams.prem
+            }
+            return vo
+        },
+        formatOrgData () {
+            return this.employee.orgItem.id || ''
+        },
+        formatPositionData () {
+            const result = []
+            const list = this.employee.posItemList
+            if (this.$utils.isEmpty(list)) return result
+            for (const variable of list) {
+                const tmp = { id: variable.id, name: variable.name }
+                tmp['isMainPost'] = variable.isMainPost === 'Y'
+                tmp['isPrincipal'] = variable.isPrincipal === 'Y'
+                result.push(tmp)
+            }
+            return result
+        },
+        formatRoleData () {
+            const result = []
+            const list = this.employee.roleItemList
+            if (this.$utils.isEmpty(list)) return result
+            for (const variable of list) {
+                const tmp = { id: variable.id, name: variable.name }
+                tmp['subSystemName'] = variable.subSystemName
+                tmp['source'] = this.employee.id ? variable.source : '自有'
+                tmp['canDelete'] = variable.source === '自有'
+                result.push(tmp)
+            }
+            return result
+        },
+        formatUserGroupData () {
+            const result = []
+            const list = this.employee.userGroupItemList
+            if (this.$utils.isEmpty(list)) return result
+            for (const variable of list) {
+                result.push({
+                    groupId: variable.id,
+                    groupName: variable.name
+                })
+            }
+            return result
         }
     }
+}
 </script>
 <style lang="scss">
     .employee-dialog {
