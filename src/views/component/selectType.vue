@@ -24,8 +24,8 @@ export default {
             let datas1 = res1.variables.data;
             setTimeout(() => {
               let nodes = datas1.map(item => ({
-                value: item.NAME_,
-                label: item.NAME_,
+                value: item.name_,
+                label: item.name_,
               }));
               // 通过调用resolve将子节点数据返回，通知组件数据加载完成
               resolve(nodes);
@@ -39,9 +39,11 @@ export default {
   },
   methods: {
     handleChange(v) {
-      const name = "wenJianLeiXing"; // 文件类型
-      const value = v; //字段的值
-      this.$emit("change-data", name, value);
+      const wenJianLeiXing = "wenJianLeiXing"; // 文件类型
+      const wenJianXiLei = "wenJianXiLei"; // 文件细类
+      const value = v.join(' / '); //字段的值
+      this.$emit("change-data", wenJianLeiXing, v[0]);
+      this.$emit("change-data", wenJianXiLei, value);
     },
 
   },
