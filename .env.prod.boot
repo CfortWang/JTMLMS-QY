@@ -10,8 +10,7 @@ VUE_APP_PUBLIC_PATH  = '/ibps3/'
 
 # ========base api======================
 VUE_APP_BASE_API = 'https://www.szjyxt.com/ibps'
-VUE_APP_BASE_WEBSOCKET_API = 'https://www.szjyxt.com/ibps'
+VUE_APP_BASE_WEBSOCKET_API = ${VUE_APP_BASE_API}
 
 # ========report api======================
-VUE_APP_BASE_REPORT_API = 'https://www.szjyxt.com/ibps'
-#120.78.154.31
+VUE_APP_BASE_REPORT_API = ${VUE_APP_BASE_API}
