@@ -220,7 +220,7 @@ export const defaultAttrs = [
         code: 'bianZhiBuMen',
         fieldName: 'bian_zhi_bu_men_',
         dataType: 'varchar',
-        attrLength: 200,
+        attrLength: 256,
         precision: 0,
         format: ''
     }, {
@@ -230,6 +230,15 @@ export const defaultAttrs = [
         fieldName: 'bian_zhi_shi_jian',
         dataType: 'varchar',
         attrLength: 32,
+        precision: 0,
+        format: ''
+    }, {
+        id: uuid(),
+        name: '快照',
+        code: 'kuaiZhao',
+        fieldName: 'kuai_zhao_',
+        dataType: 'varchar',
+        attrLength: 256,
         precision: 0,
         format: ''
     }

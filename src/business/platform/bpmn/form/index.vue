@@ -407,6 +407,7 @@
                     // 一些参数
                     this.attributes = this.initAttributes(data)
                     this.formParams.nodeId = this.attributes.nodeId
+                    this.formParams.proInstId = data.attributes.proInstId
                     // 操作按钮
                     this.buttons = this.buildButtons(data.buttons, this.attributes) || []
                     // 表单意见

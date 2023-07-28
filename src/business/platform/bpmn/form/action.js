@@ -6,7 +6,7 @@ import Print from '@/utils/print'
 export default {
     methods: {
         // 内嵌url表单,外部url表单 【自定义】
-        emitButtonEventHandler(actionName, args) {
+        emitButtonEventHandler (actionName, args) {
             // 前置事件
             this.beforeScript(actionName, (result) => {
                 if (result) {
@@ -15,15 +15,15 @@ export default {
             })
         },
         // 设置是否过审的状态
-        setData(title) {
+        setData (title) {
             let data = title
             if (!title) {
-                //获取当前流程步骤名
-                data = "已" + this.getFormEL().formDefData.flowName
+                // 获取当前流程步骤名
+                data = '已' + this.getFormEL().formDefData.flowName
             }
-            this.getFormEL().setData("shiFouGuoShen", data)
+            this.getFormEL().setData('shiFouGuoShen', data)
         },
-        emitEventHandler(actionName, args) {
+        emitEventHandler (actionName, args) {
             const this_ = this
             this.actionName = actionName
             const buttonType = args && args.attributes ? args.attributes.button_type || actionName : actionName
@@ -31,12 +31,7 @@ export default {
             this.submitFormOpinion = this.getFormOpinionData()
             switch (buttonType) {
                 case 'agree':// 同意
-                    // 判断是否最后一步流程
-                    if (this.actionTitle == '同意并结束') {
-                        this.setData("1")
-                    } else {
-                        this.setData()
-                    }
+                    this.setData()
                     // if (this.isHide()) {
                     this.handleDirectActionEvent(actionName)
                     // } else {
@@ -46,15 +41,15 @@ export default {
                 case 'oppose':// 反对
                     this_.$confirm(
                         `确定进行 [ ${args.attributes.label} ] 操作 ？`,
-                        "提示:",
+                        '提示:',
                         {
-                            confirmButtonText: "确定",
-                            cancelButtonText: "取消",
-                            type: "warning"
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
                         }
                     ).then(() => {
                         // if (this.isHide()) {
-                        this.setData("未同意")
+                        this.setData('未同意')
                         this.handleDirectActionEvent(actionName)
                         // } else {
                         //     this.agreeDialogVisible = true
@@ -64,11 +59,11 @@ export default {
                 case 'abandon':// 弃权
                     this_.$confirm(
                         `确定进行 [ 弃权 ] 操作 ？`,
-                        "提示:",
+                        '提示:',
                         {
-                            confirmButtonText: "确定",
-                            cancelButtonText: "取消",
-                            type: "warning"
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
                         }
                     ).then(() => {
                         if (this.isHide()) {
@@ -92,21 +87,21 @@ export default {
                     break
                 case 'startFlow': // 启动流程
                     if (this.actionTitle === '同意并结束' || this.actionTitle === '提交并结束') {
-                        this.setData("已完成")
+                        this.setData('已完成')
                     } else {
-                        this.setData("已编制")
+                        this.setData('已编制')
                     }
-                    // this.setData("已编制")
+                    // this.setData('已编制')
                     this.handleStartFlow()
                     break
                 case 'saveDraft': // 保存草稿
-                    this.setData("已暂存")
+                    this.setData('已暂存')
                     this.handleSaveDraft()
                     break
                 case 'rejectToPrevious':// 驳回上一步
                 case 'rejectToStart':// 驳回发起人
                 case 'reject':// 驳回
-                    this.setData("已退回")
+                    this.setData('已退回')
                     // if (this.isBpmOpinionHide && actionName === 'rejectToPrevious') {
                     //     this.handleDirectActionEvent(actionName)
                     // } else {
@@ -127,7 +122,7 @@ export default {
                     this.addSignTaskDialogVisible = true
                     break
                 case 'endProcess':// 终止流程
-                    this.setData("2")
+                    this.setData('已终止')
                     this.handleEndProcess()
                     break
                 case 'print':// 打印
@@ -149,7 +144,7 @@ export default {
                     this.handleRecoverProcess()
                     break
                 case 'save':// 节点按钮设置-保存
-                    this.setData("已暂存")
+                    this.setData('已暂存')
                     this.handleSave()
                     break
                 default:
@@ -159,11 +154,11 @@ export default {
         /**
          * 是否隐藏
          */
-        isHide() {
+        isHide () {
             return (this.isBpmOpinionHide && this.attributes.isHidePath) || (this.attributes.isCommonJumpType && this.attributes.isHideOpinion && this.attributes.isHidePath) || (this.attributes.isEnd && this.attributes.isHideOpinion)
         },
         // 是否保存[节点-按钮设置-保存]
-        handleSave() {
+        handleSave () {
             const formData = this.getFormData()
             const loading = this.$loading({
                 lock: true,
@@ -192,7 +187,7 @@ export default {
         /**
          * 处理启动流程
          */
-        handleStartFlow() {
+        handleStartFlow () {
             const firstNodeUserAssign = this.attributes.firstNodeUserAssign || false
             if (firstNodeUserAssign) {
                 const formData = this.getFormData()
@@ -207,7 +202,7 @@ export default {
          * 保存启动流程
          * @param {*}
          */
-        saveStartFlow(params = {}) {
+        saveStartFlow (params = {}) {
             const formData = this.getFormData()
             if (!formData) return
             const jsonData = {
@@ -232,6 +227,8 @@ export default {
             })
             // 1、直接启动
             startFlow(jsonData).then(response => {
+                const { bizKey = '', proInstId = '' } = response.variables || {}
+                this.createSnapshot(bizKey, proInstId)
                 loading.close()
                 this.$alert(`启动成功！`, {
                     showClose: false
@@ -253,7 +250,7 @@ export default {
         /**
          * 保存草稿
          */
-        handleSaveDraft() {
+        handleSaveDraft () {
             // 表单数据
             const formData = this.getFormData()
             if (!formData) return
@@ -293,7 +290,7 @@ export default {
          * 直接同意流程
          * @param {*} actionName
          */
-        handleDirectActionEvent(actionName) {
+        handleDirectActionEvent (actionName) {
             const opinion = this.hasFormOpinion() ? this.getFormOpinionData() : ''
             this.handleActionEvent(actionName, {
                 opinion: opinion
@@ -304,7 +301,7 @@ export default {
          * @param {*} actionName
          * @param {*} params
          */
-        handleActionEvent(actionName, params) {
+        handleActionEvent (actionName, params) {
             if (actionName === 'agree' || actionName === 'oppose' || actionName === 'abandon' || actionName === 'rejectToPrevious' || actionName === 'rejectToStart' || actionName === 'reject') {
                 this.handleComplete(actionName, params)
             } else if (actionName === 'endProcess') {
@@ -313,7 +310,7 @@ export default {
                 this.handleAddSignTask(params)
             }
         },
-        handleComplete(actionName, params = {}) {
+        handleComplete (actionName, params = {}) {
             const formData = this.getFormData()
             if (!formData) return
             const loading = this.$loading({
@@ -325,7 +322,9 @@ export default {
 
             if (actionName === 'agree') {
                 agree(params).then(response => {
+                    console.log(response)
                     this.handleResponse(actionName, loading, response)
+                    this.createSnapshot()
                 }).catch(() => {
                     loading.close()
                 })
@@ -361,7 +360,7 @@ export default {
                 })
             }
         },
-        handleResponse(actionName, loading, response) {
+        handleResponse (actionName, loading, response) {
             loading.close()
             this.$alert(response.message, {
                 showClose: false
@@ -382,7 +381,7 @@ export default {
                 })
             }).catch(() => { })
         },
-        handleEndProcess() {
+        handleEndProcess () {
             if (this.isBpmOpinionHide) {
                 this.$confirm('确定终止流程!', '提示', {
                     type: 'warning'
@@ -400,7 +399,7 @@ export default {
          * 处理终止任务
          * @param {*} params
          */
-        handleDoEndProcess(params) {
+        handleDoEndProcess (params) {
             const loading = this.$loading({
                 lock: true,
                 text: this.$t('common.saving')
@@ -409,11 +408,19 @@ export default {
                 taskId: this.taskId ? this.taskId : this.endProcessTaskId,
                 endReason: params.opinion
             }).then(response => {
+                console.log(response)
                 loading.close()
                 this.$alert(response.message, {
                     showClose: false
                 }).then(() => {
                     this.approveDialogVisible = false
+                    // 更改数据状态为已终止
+                    const { key = '' } = this.getFormEL().formDefData || {}
+                    const { id = '' } = this.getFormEL().formData || {}
+                    if (!id || !key) {
+                        return
+                    }
+                    this.updateState(id, key, '已终止', null)
                     // 后置事件
                     this.afterScript(this.actionName, {
                         data: response.data,
@@ -423,7 +430,7 @@ export default {
                         this.callbackPage()
                     })
                 })
-            }).catch((err) => {
+            }).catch(() => {
                 loading.close()
             })
         },
@@ -431,7 +438,7 @@ export default {
          * 补签
          * @param {*} params
          */
-        handleAddSignTask(params) {
+        handleAddSignTask (params) {
             const loading = this.$loading({
                 lock: true,
                 text: this.$t('common.saving')
@@ -456,14 +463,14 @@ export default {
                         this.callbackPage()
                     })
                 })
-            }).catch((err) => {
+            }).catch(() => {
                 loading.close()
             })
         },
         /**
          * 打印
          */
-        handlePrint() {
+        handlePrint () {
             if (this.$utils.isNotEmpty(this.printTemplateId)) {
                 this.submitFormData = this.getFormData()
                 // 打开打印模版页面
@@ -486,7 +493,7 @@ export default {
         /**
          * 锁定任务
          */
-        handleLock() {
+        handleLock () {
             this.$confirm('确定锁定任务!', '提示', {
                 type: 'warning'
             }).then(() => {
@@ -516,7 +523,7 @@ export default {
         /**
          * 解锁任务
          */
-        handleUnlock() {
+        handleUnlock () {
             this.$confirm('确定解锁任务!', '提示', {
                 type: 'warning'
             }).then(() => {
@@ -546,7 +553,7 @@ export default {
         /**
          * 强制解锁任务
          */
-        handleForceUnlock() {
+        handleForceUnlock () {
             this.$confirm('确定强制解锁任务!', '提示', {
                 type: 'warning'
             }).then(() => {
@@ -576,7 +583,7 @@ export default {
         /**
          * 挂起任务
          */
-        handleSuspendProcess() {
+        handleSuspendProcess () {
             this.$confirm('确定挂起任务', '提示', {
                 type: 'warning'
             }).then(() => {
@@ -606,7 +613,7 @@ export default {
         /**
          * 恢复任务
          */
-        handleRecoverProcess() {
+        handleRecoverProcess () {
             this.$confirm('确定恢复任务', '提示', {
                 type: 'warning'
             }).then(() => {
@@ -637,8 +644,75 @@ export default {
 
             })
         },
-        finishTask(actionName, params, callback) {
-
+        async createSnapshot (bizKey, proId) {
+            const { key = '', name = '' } = this.getFormEL().formDefData || {}
+            const { proInstId = '' } = this.getFormEL().params || {}
+            const id = bizKey || this.getFormEL().formData.id
+            if (!key) {
+                return
+            }
+            // 轮询流程是否结束，流程未结束不生成快照，每2秒查询一次，最多等待10秒钟
+            let timeout = 10000
+            const intervalTime = 2000
+            while (!(await this.isFinish(proId || proInstId))) {
+                timeout -= intervalTime
+                if (timeout <= 0) {
+                    // 超时，流程还未结束，结束生成快照
+                    console.log('流程未结束，无法生成快照')
+                    return
+                }
+                // 等待一段时间后再次查询
+                await new Promise(resolve => setTimeout(resolve, intervalTime))
+            }
+            // if (!(await this.isFinish(proId || proInstId))) {
+            //     return
+            // }
+            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${key}'`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                if (!data.length) {
+                    return
+                }
+                const path = data[0].bao_biao_lu_jing_
+                const url = this.$getReportFile(path, `id_=${id}`)
+                const fileName = name + this.$common.getNow(16, 'string')
+                console.log(url, fileName)
+                this.$common.snapshoot({
+                    url,
+                    name: fileName,
+                    type: 'pdf'
+                }).then(res => {
+                    if (!res.data || !res.data.id) {
+                        this.$message.error('生成快照失败！')
+                    }
+                    const fileId = res.data && res.data.id ? res.data.id : ''
+                    const fileParams = fileId ? { kuai_zhao_: fileId } : {}
+                    this.updateState(id, key, '已完成', fileParams)
+                })
+            })
+        },
+        // 判断流程是否结束
+        async isFinish (id) {
+            const sql = `select * from ibps_bpm_inst_his where id_ = '${id}'`
+            const res = await this.$common.request('sql', sql)
+            const { data = [] } = res.variables || {}
+            return data.length > 0
+        },
+        // 更新数据状态
+        updateState (id, key, state, fileParams) {
+            const params = {
+                tableName: `t_${key}`,
+                updList: [{
+                    where: {
+                        id_: id
+                    },
+                    param: {
+                        shi_fou_guo_shen_: state,
+                        ...fileParams
+                    }
+                }]
+            }
+            this.$common.request('update', params)
         }
     }
 }

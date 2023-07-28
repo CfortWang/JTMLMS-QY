@@ -39,6 +39,7 @@ import pluginOpen from '@/plugins/open'
 // 平台配置文件
 import setting from '@/setting.js'
 import env from '@/env'
+const BASE_URL = process.env.VUE_APP_BASE_URL
 
 export default {
     async install (Vue, options) {
@@ -56,17 +57,16 @@ export default {
         Vue.prototype.$buildTime = env.VUE_APP_BUILD_TIME
 
         Vue.prototype.$ibpsUrl = env.VUE_APP_BASE_API_0_0_TEST
+        const reportPath = '金通医学实验室管理系统'
         const downloadReport = (src, where, type = 6) => {
             // 目前可用type    6:生成报表的pdf文件【默认】   7:生成报表的word文件   3:生成报表的excel文件
-            return `https://www.szjyxt.com/demo/reportServlet?action=${type}&file=${encodeURIComponent(src)}.rpx&columns=0&srcType=file&paramString=${encodeURIComponent(where)}`
+            return `${BASE_URL}demo/reportServlet?action=${type}&file=${encodeURIComponent(reportPath + '/' + src)}&columns=0&srcType=file&paramString=${encodeURIComponent(where)}`
         }
-        const reportPath = '金通医学实验室管理系统'
         const timer = setInterval(() => { // 定时循环添加参数
             if (getToken()) {
                 // 报表路径
-                Vue.prototype.$reportPath = `https://www.szjyxt.com/demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${reportPath}/`
+                Vue.prototype.$reportPath = `${BASE_URL}demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${reportPath}/`
                 Vue.prototype.$getReportFile = downloadReport // 通过方法函数，拼接url，并将字符串格式化
-                Vue.prototype.$getFileDow = 'https://www.szjyxt.com/ibps/platform/v3/file/download?attachmentId=' // 文件下载地址
                 clearInterval(timer) // 添加成功后即删除定时任务
             }
         }, 500)

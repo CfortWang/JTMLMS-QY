@@ -55,7 +55,7 @@ export const preview = (tableForm, url) => {
                 },
                 methods: {
                     getFile () {
-                        const urlList = url.split('rpx=')[1].split('.rpx&id_=')
+                        const urlList = url.split('rpx=')[1].split('&id_=')
                         const name = urlList[0].split('/')
                         this.name = name[name.length - 1]
                         const params = {

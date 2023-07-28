@@ -804,8 +804,17 @@ export default {
                             this.$message.warning('请先配置对应报表路径！')
                             return
                         }
-                        src = `${this.$reportPath}${this.downloadPath}&id_=${selection}`
-                        preview(this, src)
+                        this.$common.snapshoot({
+                            url: this.$getReportFile(this.downloadPath, `id_=${selection}`),
+                            name: selection,
+                            type: 'pdf'
+                        }).then(res => {
+                            if (!res.data || !res.data.id) {
+                                this.$message.error('生成文件失败，请重试！')
+                                return
+                            }
+                            this.$common.download(res.data)
+                        })
                         break
                     case 'print': // 打印
                         ActionUtils.selectedRecord(selection)

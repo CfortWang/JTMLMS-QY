@@ -8,12 +8,13 @@ import { getNextIdByAlias } from '@/api/platform/system/identity'
 import { save as sendMsg } from '@/api/platform/message/innerMessage'
 import { bpmTaskSave } from '@/api/platform/bpmn/bpmTask'
 import { onlyOfficeToPdf } from '@/api/platform/form/seal'
+import { downloadFile as download } from '@/business/platform/file/utils'
 
 // base64解码
 const decode = str => decodeURIComponent(window.atob(str).split('').map(c => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`).join(''))
 
 // 下载
-export const download = (o, name) => {
+export const downloadByBlob = (o, name) => {
     if (!(o instanceof Blob)) {
         return
     }
@@ -37,7 +38,10 @@ export const download = (o, name) => {
 }
 
 // 获取当前时间
-export const getNow = length => {
+export const getNow = (length, formatType) => {
+    if (formatType === 'string') {
+        return new Date(new Date().getTime() + 28800000).toJSON().slice(0, length).replace(/[-:T]/g, '')
+    }
     return new Date(new Date().getTime() + 28800000).toJSON().slice(0, length).replace('T', ' ')
 }
 
@@ -49,9 +53,10 @@ export default {
     getNextIdByAlias,
     decode,
     encryptByAes,
-    download,
+    downloadByBlob,
     sendMsg,
     bpmTaskSave,
     getNow,
-    onlyOfficeToPdf
+    onlyOfficeToPdf,
+    download
 }
