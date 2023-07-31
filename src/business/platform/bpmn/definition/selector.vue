@@ -280,7 +280,7 @@
              * 通过ID获取数据
              */
             getDataInfo(id) {
-                if (this.valueKey === 'id') {
+                if (this.valueKey === 'id' || this.valueKey === 'defId') {
                     get({ defId: id }).then((response) => {
                         const data = response.data
                         this.cacheData[data[this.valueKey]] = data

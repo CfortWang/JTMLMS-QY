@@ -227,8 +227,6 @@ export default {
             scanVisible: false,
             scanName: '',
             obj: '',
-            previewPath:'',
-            downloadPath:'',
             initialization: false,
             tableHeight: document.body.clientHeight,
             listIdentity: '',
@@ -791,12 +789,11 @@ export default {
                         this.npmDialogFormVisible = true
                         break
                     case 'consult': // 查阅
-                        console.log(button)
                         if (!button.reportPath) {
                             this.$message.warning('请先配置对应报表路径！')
                             return
                         }
-                        src = `${this.$reportPath.replace('show', 'pdf')}${this.previewPath}&id_=${selection}`
+                        src = `${this.$reportPath.replace('show', 'pdf')}${button.reportPath}&id_=${selection}`
                         preview(this, src)
                         break
                     case 'download': // 下载记录
@@ -805,7 +802,7 @@ export default {
                             return
                         }
                         this.$common.snapshoot({
-                            url: this.$getReportFile(this.downloadPath, `id_=${selection}`),
+                            url: this.$getReportFile(button.reportPath, `id_=${selection}`),
                             name: selection,
                             type: 'pdf'
                         }).then(res => {
@@ -1023,17 +1020,6 @@ export default {
             // this.template.attrs ? this.$utils.toBoolean(this.template.attrs.manage_effect) : false
 
             const functionButtons = this.template.buttons ? this.template.buttons.function_buttons || [] : []
-            for(var i of functionButtons){
-                if(i.button_type=='openTask'){
-                    this.defId = i.deflow
-                }
-                if(i.button_type === 'consult'){
-                    this.previewPath = i.reportPath
-                }
-                if(i.button_type === 'download'){
-                    this.downloadPath = i.reportPath
-                }
-            }
             // 工具栏
             const toolbarButtons = []
             // 管理列
@@ -1042,7 +1028,9 @@ export default {
             // 功能按钮
             functionButtons.forEach((rf, i) => {
                 const btn = this.buildButton(rf, i)
-
+                if (rf.button_type === 'openTask') {
+                    this.defId = rf.deflow
+                }
                 // 查询列默认是顶部
                 if (hasSearchPermission(rf.button_type) && !rf.position) {
                     rf.position = 'toolbar'
