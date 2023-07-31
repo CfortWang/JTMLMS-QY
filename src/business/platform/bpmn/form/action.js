@@ -664,13 +664,11 @@ export default {
                 // 等待一段时间后再次查询
                 await new Promise(resolve => setTimeout(resolve, intervalTime))
             }
-            // if (!(await this.isFinish(proId || proInstId))) {
-            //     return
-            // }
-            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${key}'`
+            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${key}' and ti_jiao_kuai_zhao = '是'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
+                    this.updateState(id, key, '已完成', null)
                     return
                 }
                 const path = data[0].bao_biao_lu_jing_

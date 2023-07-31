@@ -3,6 +3,12 @@ import request from '@/utils/request'
 import ActionUtils from '@/utils/action'
 
 export default {
+    data () {
+        return {
+            // 标识是否初次创建
+            flag: false
+        }
+    },
     methods: {
         getRecord (id) {
             const sql = `select * from t_lcidglbdbb where liu_cheng_xuan_ze = '${id}'`
@@ -11,15 +17,20 @@ export default {
                 if (!data.length) {
                     return
                 }
-                this.bao_biao_lu_jing_ = data[0].bao_biao_lu_jing_
-                this.fu_jian_nei_rong_ = data[0].fu_jian_nei_rong_
-                this.shi_fou_zi_biao_ = data[0].shi_fou_zi_biao_
-                this.guan_lian_zi_duan = data[0].guan_lian_zi_duan
-                this.liu_cheng_xuan_ze = id
+                const { bao_biao_lu_jing_, fu_jian_nei_rong_, shi_fou_zi_biao_, guan_lian_zi_duan, ti_jiao_kuai_zhao, bo_hui_kuai_zhao_ } = data[0]
+                Object.assign(this, {
+                    bao_biao_lu_jing_,
+                    fu_jian_nei_rong_,
+                    shi_fou_zi_biao_,
+                    guan_lian_zi_duan,
+                    liu_cheng_xuan_ze: id,
+                    ti_jiao_kuai_zhao,
+                    bo_hui_kuai_zhao_
+                })
             })
         },
         addRecord () {
-            if (this.liu_cheng_xuan_ze) return this.updateRecord()
+            if (this.flag || this.liu_cheng_xuan_ze) return this.updateRecord()
             this.add()
         },
         add () {
@@ -30,10 +41,13 @@ export default {
                     fu_jian_nei_rong_: this.fu_jian_nei_rong_,
                     liu_cheng_xuan_ze: this.data.id,
                     guan_lian_zi_duan: this.guan_lian_zi_duan,
-                    shi_fou_zi_biao_: this.shi_fou_zi_biao_
+                    shi_fou_zi_biao_: this.shi_fou_zi_biao_,
+                    ti_jiao_kuai_zhao: this.ti_jiao_kuai_zhao,
+                    bo_hui_kuai_zhao_: this.bo_hui_kuai_zhao_
                 }]
             }
             curdPost('add', params).then(() => {
+                this.flag = true
                 this.$message({
                     message: '添加成功',
                     type: 'success'
@@ -51,9 +65,10 @@ export default {
                         param: {
                             bao_biao_lu_jing_: this.bao_biao_lu_jing_,
                             fu_jian_nei_rong_: this.fu_jian_nei_rong_,
-                            liu_cheng_xuan_ze: this.liu_cheng_xuan_ze,
                             guan_lian_zi_duan: this.guan_lian_zi_duan,
-                            shi_fou_zi_biao_: this.shi_fou_zi_biao_
+                            shi_fou_zi_biao_: this.shi_fou_zi_biao_,
+                            ti_jiao_kuai_zhao: this.ti_jiao_kuai_zhao,
+                            bo_hui_kuai_zhao_: this.bo_hui_kuai_zhao_
                         }
                     }
                 ]
