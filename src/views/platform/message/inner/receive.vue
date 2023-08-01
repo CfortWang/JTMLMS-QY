@@ -165,14 +165,20 @@ export default {
                             icon: 'ibps-icon-reply-all',
                             label: '回复',
                             hidden: function (row, index) {
-                                return (row.canreply === 0 || row.messageType === 'system' || row.messageType === 'bulletin')
+                                return (row.canreply === 0 || row.messageType === 'system' || row.messageType === 'bulletin' || row.subject==="文件发放通知")
                             }
                         },
                         {
-                            key: 'remove'
+                            key: 'remove',
+                            hidden: function (row, index) {
+                                return (row.subject==="文件发放通知")
+                            }
                         },
                         {
-                            key: 'detail'
+                            key: 'detail',
+                            hidden: function (row, index) {
+                                return (row.subject==="文件发放通知")
+                            }
                         }
                     ]
                 }

@@ -3,18 +3,13 @@
     <!-- 外部 -->
     <div slot="west">
       <div class="box">
-        <p class="title">文件类型</p>
-        <el-input placeholder="输入关键字进行过滤"
-                  v-model="filterText">
-        </el-input>
-        <div class="treeDiv">
-          <el-tree ref="tree"
-                   :width="width"
-                   :data="paramsTypeData"
-                   :props="defaultProps"
+        <ibps-tree :width="width"
+                   :height="height"
+                   :data="treeData"
                    @node-click="handleNodeClick"
-                   :filter-node-method="filterNode"></el-tree>
-        </div>
+                   @expand-collapse="handleExpandCollapse"
+                   title="分类管理">
+        </ibps-tree>
       </div>
       <ibps-container :margin-left="width + 'px'"
                       class="page">
@@ -39,7 +34,7 @@
                      @pagination-change="handlePaginationChange">
             <template slot="wenjinachayue"
                       slot-scope="scope">
-              <ibps-attachment :value="scope.row.wen_jian_id_"
+              <ibps-attachment :value="scope.row.wen_jian_fu_jian_"
                                readonly
                                allow-download
                                :download="false" />
@@ -58,7 +53,7 @@ import { getFileType, getFileByUserId } from '@/api/permission/file'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import FixHeight from '@/mixins/height'
-
+import { findTreeData } from '@/api/platform/cat/type'
 export default {
   components: {
     'ibps-attachment': IbpsAttachment
@@ -66,6 +61,7 @@ export default {
   mixins: [FixHeight],
   data() {
     return {
+      treeData: [],
       show: '',
       rightsArr: ['join', 'delete'],
       rowHandle: true,
@@ -75,31 +71,6 @@ export default {
       orgName: '',
       height: document.clientHeight,
       loading: false,
-      //   typeData: [
-      //     { id: '0', label: '质量管理手册（QM）' },
-      //     { id: '1', label: '程序文件（QP）' },
-      //     { id: '2', label: '生物安全手册（SWAQ）' },
-      //     { id: '3', label: '行政管理制度（ZD）' },
-      //     { id: '4', label: '检测类（JC-SOP）' },
-      //     { id: '5', label: '仪器设备类（YQ-SOP）' },
-      //     { id: '6', label: '期间核查类（HC-SOP）' },
-      //     { id: '7', label: '环境设施类（HJ-SOP）' },
-      //     { id: '8', label: '[限] 技术管理类（ZQ-SOP）' },
-      //     { id: '9', label: '技术记录表（FQ）' },
-      //     { id: '10', label: '管理记录表（FQ）' }
-      //   ],
-      paramsTypeData: [
-        { id: '0', label: '质量管理手册（QM）' },
-        { id: '1', label: '程序文件（QP）' },
-        { id: '2', label: '生物安全手册（SWAQ）' },
-        { id: '3', label: '行政管理制度（ZD）' },
-        { id: '4', label: '检测类（JC-SOP）' },
-        { id: '5', label: '仪器设备类（YQ-SOP）' },
-        { id: '6', label: '期间核查类（HC-SOP）' },
-        { id: '7', label: '环境设施类（HJ-SOP）' },
-        { id: '8', label: '技术管理类（ZQ-SOP）' },
-        { id: '9', label: '记录表单' }
-      ],
       filterText: '',
       defaultProps: {
         children: 'children',
@@ -137,9 +108,9 @@ export default {
           // { prop: 'zi_duan_yi_', label: '部门' },
           { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 180 },
           { prop: 'wen_jian_ming_che', label: '文件名称', width: 400 },
-          { prop: 'ban_ben_hao_', label: '版本号', width: 120 },
+          { prop: 'ban_ben_', label: '版本', width: 120 },
           { prop: 'fa_bu_ri_qi_', label: '发放日期', width: 100, sortable: 'custom' },
-          { prop: 'wen_jian_id_', label: '查阅', slotName: "wenjinachayue", width: 400 }
+          { prop: 'wen_jian_fu_jian_', label: '查阅', slotName: "wenjinachayue", width: 400 }
         ]
       },
       listOptions: {
@@ -150,6 +121,7 @@ export default {
         limit: 20, page: 1
       },
       sorts: {},
+      sqlWhere: {}
       // testData: [{
       //     zi_duan_yi_: '1',
       //     wen_jian_bian_hao: '2',
@@ -160,41 +132,49 @@ export default {
       // }]
     }
   },
+  created() {
+    this.loadTreeData()
+  },
   mounted() {
     // this.loadNode()
   },
   methods: {
-    filterNode(value, data) {
-      if (!value) return true;
-      return data.label.indexOf(value) !== -1;
+    // 加载具体分类数据
+    loadTreeData(isEdit) {
+      findTreeData({ 'categoryKey': 'FILE_TYPE' }).then(response => {
+        const data = response.data
+        this.treeData = data
+        this.show = isEdit
+      })
     },
+    handleExpandCollapse(isExpand, readonly = false) {
+      this.width = isExpand ? 200 : 50
+    },
+
     loadNode() {
       this.loading = true
     },
-    getDatas(sorts) {
+    getDatas() {
+      const { fileCode, fileType, fileName, sorts, userId } = this.sqlWhere
       this.listData = []
       let wheres = ''
-      if (sorts.fileCode) {
-        wheres = wheres + ` and wj.wen_jian_bian_hao like '%${sorts.fileCode}%'`
+      if (fileCode) {
+        wheres = wheres + ` and wj.wen_jian_bian_hao like '%${fileCode}%'`
+      }
+      if (fileName) {
+        wheres = wheres + ` and wj.wen_jian_ming_che like '%${fileName}%'`
+      }
+      if (fileType) {
+        wheres = wheres + ` and FIND_IN_SET (wj.xi_lei_id_,'${fileType}')`
       }
 
-      if (sorts.fileType) {
-        wheres = wheres + ` and wj.wen_jian_lie_xing = '${sorts.fileType}'`
-      }
-      if (sorts.fileName) {
-        wheres = wheres + ` and wj.wen_jian_ming_che like '%${sorts.fileName}%'`
-      }
-      if (sorts.sorts) {
-        if (JSON.stringify(sorts.sorts) !== "{}") {
-          wheres = wheres + ` order by  ${Object.keys(sorts.sorts)}  ${Object.values(sorts.sorts)}`
+      if (sorts) {
+        if (JSON.stringify(sorts) !== "{}") {
+          wheres = wheres + ` order by  ${Object.keys(sorts)}  ${Object.values(sorts)}`
         }
       }
       // 重复发放的文件，在权限表会存在重复的文件信息
-      let sql = `select  wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_hao_,qx.create_time_,wj.wen_jian_id_,qx.fa_bu_ri_qi_ FROM (
-                  SELECT a.id_,a.create_by_,MAX(a.create_time_) create_time_ ,
-                  a.yong_hu_id_,a.wen_jian_id_,a.fa_bu_ri_qi_,a.shou_quan_ FROM t_wjcysqb a  GROUP BY yong_hu_id_,wen_jian_id_
-                ) qx LEFT JOIN t_wjgl wj ON qx.wen_jian_id_=wj.wen_jian_id_ WHERE qx.shou_quan_='1' and qx.yong_hu_id_='${sorts.userId}' ${wheres}`
-
+      let sql = `select  wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,qx.create_time_,wj.wen_jian_fu_jian_,qx.fa_bu_ri_qi_ FROM (SELECT a.id_,a.create_by_,MAX(a.create_time_) create_time_ ,a.yong_hu_id_,a.wen_jian_id_,a.fa_bu_ri_qi_,a.shou_quan_ FROM t_wjcysqb a  GROUP BY yong_hu_id_,wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.shou_quan_='1' and qx.yong_hu_id_='${userId}' ${wheres}`
       curdPost('sql', sql).then(res => {
         let tableDatas = res.variables.data
         this.selectListData = JSON.parse(JSON.stringify(tableDatas))
@@ -221,19 +201,28 @@ export default {
       this.listData = []
       this.getDatas(this.getSearcFormData())
     },
-
     handleNodeClick(data) {
-      this.oldorgId = data
       this.show = 'detail'
+      let fileTypes = []
       if (this.oldorgId == data.id) {
         return
-      } else {
-        this.getDatas({
-          fileType: this.paramsTypeData[data.id].label,
-          userId: this.$store.getters.userInfo.employee.id,
-          sorts: { 'wen_jian_bian_hao': 'desc' }
-        })
       }
+      if (data.children == undefined) {
+        fileTypes.push(data.id)
+      } else {
+        const getTail = item => item.children && item.children.length > 0 ? item.children.map(m => getTail(m)) : [item]
+        const result = _.flattenDeep(data.children.map(m => getTail(m)))
+        for (var i of result) {
+          fileTypes.push(i.id)
+        }
+      }
+      this.oldorgId = data.id
+      this.sqlWhere = {
+        fileType: fileTypes.join(','),
+        userId: this.$store.getters.userInfo.employee.id,
+        sorts: { 'wen_jian_bian_hao': 'desc' }
+      }
+      this.getDatas()
     },
 
     /**
@@ -241,10 +230,17 @@ export default {
      */
     getSearcFormData() {
       const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-      params['fileType'] = this.paramsTypeData[this.oldorgId.id].label
-      params['userId'] = this.$store.getters.userInfo.employee.id
-      params['sorts'] = this.sorts
-      return params
+      if (params.fileCode) {
+        this.sqlWhere.fileCode = params.fileCode
+      } else {
+        this.sqlWhere.fileCode = ''
+      }
+      if (params.fileName) {
+        this.sqlWhere.fileName = params.fileName
+      }else{
+        this.sqlWhere.fileName = ''
+      }
+      this.getDatas()
     },
     /**
  * 处理按钮事件
@@ -262,8 +258,8 @@ export default {
     * 处理排序
     */
     handleSortChange(sort) {
-      ActionUtils.setSorts(this.sorts, sort)
-      this.getDatas(this.getSearcFormData())
+      ActionUtils.setSorts(this.sqlWhere.sorts, sort)
+      this.getDatas()
     },
     // 处理分页事件
     handlePaginationChange(page) {
@@ -293,7 +289,6 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-
 .box {
   width: 230px;
 }

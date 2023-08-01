@@ -126,6 +126,13 @@ export default {
                 this.handleCallback(true)
             })
         },
+        getId (arr) {
+            if (!arr.length) {
+                return ''
+            }
+            const idArrs = arr.map(item => item.id)
+            return idArrs.join(',')
+        },
         // 消息确认，受控文件用
         confirmMsg () {
             // TODO
@@ -136,22 +143,26 @@ export default {
                 showClose: false,
                 closeOnClickModal: false
             }).then(() => {
+                console.log('userInfo', this.$store.getters.userInfo)
                 // TODO 受控文件逻辑处理
                 const perInfosId = this.$store.getters.userInfo.user.id
-                const perInfosorgId = this.$store.getters.userInfo.org.id
+                const perInfosName = this.$store.getters.userInfo.user.name
+                // const perInfosorgId = this.$store.getters.userInfo.org.id
+                const perInfosPositions = this.$store.getters.userInfo.positions
+
                 const sql = "select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '" + perInfosId + "'"
                 curdPost('sql', sql).then((ryjbqkRes) => {
                     const ryjbqkDatas = ryjbqkRes.variables.data
                     const tempObj = {
                         id_: generateUUID(),
                         parent_id_: this.tableId,
-                        tong_zhi_bu_men_i: perInfosorgId,
+                        tong_zhi_bu_men_: this.getId(perInfosPositions),
                         que_ren_qian_ming: JSON.stringify([{
                             id: ryjbqkDatas[0].qian_zi_tu_wen_,
                             fileName: '确认签名'
                         }]),
                         que_ren_ri_qi_: this.$common.getNow(10),
-                        qian_ming_id_: ryjbqkDatas[0].qian_zi_tu_wen_
+                        que_ren_ren_xing_: perInfosName
                     }
                     const returnParams = {
                         tableName: this.tableName.slice(0, this.tableName.indexOf('（')), // 字符串 "表名（发放时间）"

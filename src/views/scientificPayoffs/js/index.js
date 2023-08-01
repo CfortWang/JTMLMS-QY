@@ -6,8 +6,8 @@ export default {
             header: data.header,
             data: data.data,
             rowNum: 6,
-            headerHeight: 45
-            // columnWidth: [100]
+            headerHeight: 45,
+            columnWidth: data.columnWidth
         }
         return config
     },
@@ -30,7 +30,8 @@ export default {
         })
         const dataList = {
             header: header,
-            data: data
+            data: data,
+            columnWidth: [200, 200, 200, 150, 200, 130, 130, 200]
         }
         const config = this.getDataList(dataList)
         return config
@@ -50,7 +51,8 @@ export default {
         })
         const dataList = {
             header: header,
-            data: data
+            data: data,
+            columnWidth: [300, 400, 200, 150, 130]
         }
         const config = this.getDataList(dataList)
         return config
@@ -74,7 +76,8 @@ export default {
         })
         const dataList = {
             header: header,
-            data: data
+            data: data,
+            columnWidth: [200, 200, 200, 150, 130, 200, 200, 200]
         }
         const config = this.getDataList(dataList)
         return config
@@ -97,7 +100,8 @@ export default {
         })
         const dataList = {
             header: header,
-            data: data
+            data: data,
+            columnWidth: [200, 200, 200, 150, 130, 150, 200, 200]
         }
         const config = this.getDataList(dataList)
         return config
@@ -117,7 +121,8 @@ export default {
         })
         const dataList = {
             header: header,
-            data: data
+            data: data,
+            columnWidth: [300, 300, 300, 130, 150]
         }
         const config = this.getDataList(dataList)
         return config
@@ -138,7 +143,8 @@ export default {
         })
         const dataList = {
             header: header,
-            data: data
+            data: data,
+            columnWidth: [300, 300, 150, 150, 130, 130]
         }
         const config = this.getDataList(dataList)
         return config
@@ -161,7 +167,8 @@ export default {
         })
         const dataList = {
             header: header,
-            data: data
+            data: data,
+            columnWidth: [200, 200, 300, 150, 100, 130, 200, 200]
         }
         const config = this.getDataList(dataList)
         return config
