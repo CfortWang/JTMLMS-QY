@@ -415,12 +415,12 @@ export default {
                 }).then(() => {
                     this.approveDialogVisible = false
                     // 更改数据状态为已终止
-                    const { key = '' } = this.getFormEL().formDefData || {}
+                    const { code = '' } = this.getFormEL().formDefData || {}
                     const { id = '' } = this.getFormEL().formData || {}
-                    if (!id || !key) {
+                    if (!id || !code) {
                         return
                     }
-                    this.updateState(id, key, '已终止', null)
+                    this.updateState(id, code, '已终止', null)
                     // 后置事件
                     this.afterScript(this.actionName, {
                         data: response.data,
@@ -645,10 +645,10 @@ export default {
             })
         },
         async createSnapshot (bizKey, proId) {
-            const { key = '', name = '' } = this.getFormEL().formDefData || {}
+            const { code = '', name = '' } = this.getFormEL().formDefData || {}
             const { proInstId = '' } = this.getFormEL().params || {}
             const id = bizKey || this.getFormEL().formData.id
-            if (!key) {
+            if (!code) {
                 return
             }
             // 轮询流程是否结束，流程未结束不生成快照，每2秒查询一次，最多等待10秒钟
@@ -664,11 +664,11 @@ export default {
                 // 等待一段时间后再次查询
                 await new Promise(resolve => setTimeout(resolve, intervalTime))
             }
-            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${key}' and ti_jiao_kuai_zhao = '是'`
+            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${code}' and ti_jiao_kuai_zhao = '是'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
-                    this.updateState(id, key, '已完成', null)
+                    this.updateState(id, code, '已完成', null)
                     return
                 }
                 const path = data[0].bao_biao_lu_jing_
@@ -685,7 +685,7 @@ export default {
                     }
                     const fileId = res.data && res.data.id ? res.data.id : ''
                     const fileParams = fileId ? { kuai_zhao_: fileId } : {}
-                    this.updateState(id, key, '已完成', fileParams)
+                    this.updateState(id, code, '已完成', fileParams)
                 })
             })
         },
@@ -697,9 +697,9 @@ export default {
             return data.length > 0
         },
         // 更新数据状态
-        updateState (id, key, state, fileParams) {
+        updateState (id, code, state, fileParams) {
             const params = {
-                tableName: `t_${key}`,
+                tableName: `t_${code}`,
                 updList: [{
                     where: {
                         id_: id

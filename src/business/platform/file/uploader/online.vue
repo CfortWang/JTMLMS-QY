@@ -2,7 +2,10 @@
     <div :style="{ height: height }">
         <el-form :model="form" :inline="true" @keyup.enter.native="onSearch" @submit.native.prevent>
             <el-form-item label="文件名" prop="name">
-                <el-input v-model="form.name" placeholder="文件名" @keyup.enter.native="onSearch" />
+                <el-input v-model="form.name" placeholder="请输入文件名" clearable @keyup.enter.native="onSearch" />
+            </el-form-item>
+            <el-form-item label="扩展名" prop="ext">
+                <el-input v-model="form.ext" placeholder="请输入扩展名" clearable @keyup.enter.native="onSearch" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="onSearch">查询</el-button>
@@ -40,7 +43,7 @@
                 </template>
             </el-table-column>
             <el-table-column label="文件名" prop="fileName" />
-            <el-table-column label="扩展名" prop="ext" />
+            <el-table-column label="扩展名" prop="ext" width="100px" />
         </el-table>
         <el-pagination
             :current-page="currentPage"
@@ -82,14 +85,15 @@
                 pkKey: 'id',
                 currentPage: 0,
                 pageSizes: [10, 20, 50, 100],
-                pageSize: 20,
+                pageSize: 10,
                 totalKey: 'totalCount',
                 pageKey: 'page',
                 pageCountKey: 'totalPages',
                 selectionRow: true,
                 format: true,
                 form: {
-                    name: ''
+                    name: '',
+                    ext: ''
                 },
                 fileList: [],
                 multipleSelection: [],
@@ -262,7 +266,8 @@
             getSearcFormData() {
                 return ActionUtils.formatParams(
                     {
-                        'Q^FILE_NAME_^SL': this.form.name
+                        'Q^FILE_NAME_^SL': this.form.name,
+                        'Q^EXT_^SL': this.form.ext
                     },
                     this.pagination,
                     this.sorts

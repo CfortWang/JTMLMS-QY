@@ -137,9 +137,6 @@ export default {
         this.editData = null
     },
     methods: {
-        test (v) {
-            this.buttons = v
-        },
         // 新增、编辑变量
         editButton (index) {
             const data = this.$utils.isNotEmpty(index) ? this.buttons[index] : {}

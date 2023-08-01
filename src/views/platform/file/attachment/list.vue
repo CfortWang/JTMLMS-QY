@@ -62,6 +62,7 @@
     import FixHeight from '@/mixins/height'
     import IbpsUploader from '@/business/platform/file/uploader'
     import FilePreview from '@/business/platform/file/file-preview'
+    import { fileTypes } from '@/business/platform/file/constants/fileTypes'
     import Detail from './detail'
     import ModifyName from './modify-name'
     import { SYSTEM_URL, BASE_API } from '@/api/baseUrl'
@@ -263,7 +264,7 @@
                         break
                     case 'preview': // 预览
                         console.log('ext:', data.ext)
-                        if (['png', 'jpeg', 'jpg'].includes(data.ext)) {
+                        if (fileTypes.images.includes(data.ext)) {
                             this.file = data
                             this.filePreviewVisible2 = false
                             this.filePreviewVisible = true

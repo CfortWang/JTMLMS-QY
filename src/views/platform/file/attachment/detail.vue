@@ -59,6 +59,7 @@
     import { get } from '@/api/platform/file/attachment'
     import { downloadFile } from '@/business/platform/file/utils'
     import { SYSTEM_URL, BASE_API } from '@/api/baseUrl'
+    import { fileTypes } from '@/business/platform/file/constants/fileTypes'
 
     export default {
         props: {
@@ -157,6 +158,10 @@
             },
             filePreview () {
                 const { id, fileName, ext } = this.data
+                if (fileTypes.images.includes(ext)) {
+                    this.$message.warning('图片附件请直接在列表预览！')
+                    return
+                }
                 this.fileOption.user.id = this.$store.getters.userId
                 this.fileOption.user.name = this.$store.getters.name
                 this.fileOption.url = BASE_API() + SYSTEM_URL() + `/file/download?attachmentId=${id}`
