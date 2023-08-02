@@ -940,7 +940,7 @@ function generateFieldTemplate(field, prop) {
     setSentences(sentence, component)
 
   // 选择器
-  } else if (fieldType === 'selector' || fieldType === 'currentUser' || fieldType === 'currentOrg') {
+  } else if (fieldType === 'selector' || fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition') {
     template = `
       <ibps-user-selector
         v-model="models.${prop}"
@@ -949,7 +949,7 @@ function generateFieldTemplate(field, prop) {
         ${Utils.isNotEmpty(fieldOptions.filter) ? `filter="${fieldOptions.filter}"` : ''}
         :multiple="${Utils.isNotEmpty(fieldOptions.multiple) ? fieldOptions.multiple : false}"
         store="${fieldOptions.store || 'id'}"
-        :disabled="${(fieldType === 'currentUser' || fieldType === 'currentOrg') ? true : 'readonly'}"
+        :disabled="${(fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition') ? true : 'readonly'}"
         :readonly-text="readonlyText?'text':null"
         :style="{width:width}"
       />

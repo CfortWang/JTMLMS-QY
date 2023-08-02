@@ -1191,7 +1191,7 @@ export default {
             }
 
             // 处理当前用户，当前组织控件
-            if (fieldType === 'currentUser' || fieldType === 'currentOrg') {
+            if (fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition') {
                 fieldType = 'selector'
             }
 

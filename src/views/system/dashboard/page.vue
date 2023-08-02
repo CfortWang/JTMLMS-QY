@@ -573,26 +573,26 @@
                     attrs: {
                         size: 'mini',
                         type: 'primary',
-                        plain: true,
+                        plain: true
                     },
                     on: {
                         click: () => {
                             this.doNotShowToday()
                         }
                     }
-                }, '今日不再提示');
+                }, '今日不再提示')
                 const confirmBtn = h('el-button', {
                     attrs: {
                         size: 'mini',
                         type: 'success',
-                        plain: true,
+                        plain: true
                     },
                     on: {
                         click: () => {
                             this.infoMessage.close()
                         }
                     }
-                }, '确认');
+                }, '确认')
                 Object.keys(result).forEach(key => {
                     // msg.push(h('p', {style: {
                     //     'font-weight': 'bold',

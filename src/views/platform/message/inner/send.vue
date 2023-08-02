@@ -30,11 +30,11 @@
                         </template>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="收件人：" prop="receiverId">
+                <el-form-item label="接收人：" prop="receiverId">
                     <ibps-employee-selector
                         :value="form.receiverId"
                         multiple
-                        placeholder="请选择接收用户"
+                        placeholder="请选择接收人"
                         @input="handleInput"
                     />
                 </el-form-item>
@@ -45,12 +45,12 @@
                         @input="depNameInput"
                     />
                 </el-form-item> -->
-                <el-form-item label="收件部门：" prop="positionId">
+                <el-form-item label="接收部门：" prop="groupId">
                     <ibps-pos-selector
-                        :value="form.positionId"
+                        :value="form.groupId"
                         :multiple="true"
                         placeholder="请选择接收部门"
-                        @input="posNameInput"
+                        @input="depNameInput"
                     />
                 </el-form-item>
                 <el-form-item v-if="form.messageType !== 'bulletin'" label="是否可回复：" prop="canreply">

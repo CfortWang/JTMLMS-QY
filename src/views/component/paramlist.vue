@@ -30,9 +30,7 @@
     },
     computed: {
      ...mapState('ibps/param', {
-       jianCeDuiXiangId: state => state.jianCeDuiXiangId,
-       myform: state => state.myform,
-       jianCeCanShuId: state => state.jianCeCanShuId
+       myform: state => state.myform
      }),
     },
     methods: {
@@ -72,7 +70,6 @@
 
         },
       myLink(val) {
-        this.$store.commit('ibps/param/jianCeCanShuIdSet', { jianCeCanShuId:val })
         this.openDataTemplateParamDialog(this.myform, {
           type:'param'
         })

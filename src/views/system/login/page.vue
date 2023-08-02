@@ -5,9 +5,9 @@
                 <div class="weizhi">
                     <div class="logoTitle">
                         <!-- <h1 class="login-title1"> -->
-                            <!-- <img src="../../../assets/images/login/logo.jpg" class="logoImg" />
+                        <!-- <img src="../../../assets/images/login/logo.jpg" class="logoImg" />
                             金源信通 -->
-                        <img src="~@/assets/images/login/company.png" class="logo" />
+                        <img src="~@/assets/images/login/company.png" class="logo">
                         <!-- </h1> -->
                         <h1 class="login-title">医学实验室管理系统</h1>
                     </div>
@@ -30,7 +30,7 @@
             </el-main>
             <el-footer class="footerclass">
                 <div class="footerOutside">
-                    <hr />
+                    <hr>
                     <div><i class="el-icon-s-platform" /> 深圳市金源信通科技有限公司开发</div>
                 </div>
             </el-footer>
@@ -52,13 +52,13 @@ export default {
         // IbpsPluginLanguage,
         IbpsApiBaseUrlController
     },
-    data() {
+    data () {
         return {
             activeName: 'user'
         }
     },
     methods: {
-        handleLogin() {}
+        handleLogin () {}
     }
 }
 </script>
@@ -66,7 +66,7 @@ export default {
     .jbd-login-page-bg{
         min-width: 560px;
     }
-    @media (min-width: 1200px) {
+    // @media (min-width: 1200px) {
         h1{
             margin: 0 !important;
         }
@@ -91,17 +91,16 @@ export default {
             background-repeat: no-repeat;
             border-radius: 5%;
             box-sizing: border-box;
-            
+            background: rgba(255, 255, 255, 1);
         }
 
         .login-title {
             font-size: 44px;
             color: #01a39e;
-            
             // margin: 0 0 40px !important;
         }
         .logo {
-            width: 200px;
+            height: 50px;
             position: relative;
             // top: 5px;
             margin: 20px 0 20px;
@@ -117,7 +116,7 @@ export default {
             width: 80%;
         }
         .footerOutside{
-            font-size: 12px; 
+            font-size: 12px;
             text-align: right;
         }
         .mainWifi{
@@ -126,7 +125,7 @@ export default {
         .logoTitle{
             display: flex;
             align-items: center;
-            // margin-left: 50px;
+            margin-bottom: 40px;
         }
         .weizhi{
             position: absolute;
@@ -134,7 +133,7 @@ export default {
             transform: translateY(-50%);
             margin-left: 50px;
         }
-    }
+    // }
 
     /*在 992 和 1199 像素之间的屏幕里，中等屏幕，分辨率低的 PC*/
     @media (min-width: 992px) and (max-width: 1199px) {
@@ -163,17 +162,14 @@ export default {
             background-repeat: no-repeat;
             border-radius: 5%;
             box-sizing: border-box;
-            
         }
 
         .login-title {
-            font-size: 40px;
+            font-size: 44px;
             color: #01a39e;
-            
             // margin: 0 0 40px !important;
         }
         .logo {
-            width: 180px;
             position: relative;
             // top: 5px;
             margin: 20px 0 20px;
@@ -189,7 +185,7 @@ export default {
             width: 80%;
         }
         .footerOutside{
-            font-size: 12px; 
+            font-size: 12px;
             text-align: right;
         }
         .mainWifi{
@@ -198,7 +194,9 @@ export default {
         .logoTitle{
             display: flex;
             align-items: center;
-            // margin-left: 40px;
+            img {
+                height: 40px;
+            }
         }
         .weizhi{
             position: absolute;
@@ -235,7 +233,6 @@ export default {
             background-repeat: no-repeat;
             border-radius: 5%;
             box-sizing: border-box;
-            
         }
 
         .login-title {
@@ -244,7 +241,7 @@ export default {
             margin-bottom: 20px !important;
         }
         .logo {
-            width: 160px;
+            height: 40px;
             position: relative;
             // top: 5px;
             margin: 20px 0 20px;
@@ -260,7 +257,7 @@ export default {
             width: 80%;
         }
         .footerOutside{
-            font-size: 12px; 
+            font-size: 12px;
             text-align: right;
         }
         .mainWifi{

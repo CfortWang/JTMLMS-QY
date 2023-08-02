@@ -102,7 +102,6 @@ export default {
             this.isShow = false
         },
         openDataTemplateParamDialog (form, { type }) {
-            this.$store.commit('ibps/param/jianCeDuiXiangIdSet', { jianCeDuiXiangId: form.getData('jianCeDuiXiangId') })
             // 弹窗打开
             /*
             templateStatis: () => import ('@/views/statistics/index.vue')

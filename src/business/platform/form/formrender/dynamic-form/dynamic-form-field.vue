@@ -374,9 +374,9 @@
             v-on="$listeners"
         />
         <!-- 选择器-->
-        <div v-else-if="(fieldType === 'selector' || fieldType === 'currentUser' || fieldType === 'currentOrg') && readonlyText && !dataModel" :class="isTable ? '' : 'ibps-field-text-no'">/</div>
+        <div v-else-if="(fieldType === 'selector' || fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition') && readonlyText && !dataModel" :class="isTable ? '' : 'ibps-field-text-no'">/</div>
         <ibps-user-selector
-            v-else-if="fieldType === 'selector' || fieldType === 'currentUser' || fieldType === 'currentOrg'"
+            v-else-if="fieldType === 'selector' || fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition'"
             :class="isTable ? '' : readonlyText ? 'ibps-field-text' : ''"
             v-model="dataModel"
             :placeholder="selectPlaceholder"
@@ -384,7 +384,7 @@
             :filter="fieldOptions.filter"
             :multiple="multiple"
             :store="fieldOptions.store || 'id'"
-            :disabled="fieldType === 'currentUser' || fieldType === 'currentOrg' ? true : readonly"
+            :disabled="fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition' ? true : readonly"
             :readonly-text="readonlyText ? 'text' : null"
             :style="{ width: width }"
             @change-link-data="handleSeletorLinkageData"

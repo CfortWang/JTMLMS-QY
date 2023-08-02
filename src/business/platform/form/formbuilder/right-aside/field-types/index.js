@@ -31,6 +31,7 @@ import IbpsFieldAddress from './ibps-field-address'
 import IbpsFieldSignature from './ibps-field-signature'
 import IbpsFieldImage from './ibps-field-image'
 // ===============系统组件===================
+import IbpsFieldCurrentPosition from './ibps-field-current-position'
 import IbpsFieldCurrentUser from './ibps-field-current-user'
 import IbpsFieldCurrentOrg from './ibps-field-current-org'
 import IbpsFieldCurrentTime from './ibps-field-current-time'
@@ -86,6 +87,7 @@ export default {
   IbpsFieldSignature,
   IbpsFieldImage,
 
+  IbpsFieldCurrentPosition,
   IbpsFieldCurrentUser,
   IbpsFieldCurrentOrg,
   IbpsFieldCurrentTime,

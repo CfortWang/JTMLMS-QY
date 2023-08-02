@@ -18,7 +18,7 @@ const dealData = (args, type) => {
     // sql方法特殊处理
     if (type === 'sql') {
         args = {
-            sql: args
+            sql: args.replace(/\n/g, ' ')
         }
     }
     const data = typeof args === 'object' ? JSON.stringify(args) : args
