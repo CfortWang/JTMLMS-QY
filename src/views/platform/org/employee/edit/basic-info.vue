@@ -51,6 +51,10 @@
                     <el-input v-if="!readonly" v-model="formData.qq" clearable />
                     <span v-else>{{ formData.qq }}</span>
                 </el-form-item>
+                <el-form-item label="员工编号">
+                    <el-input v-if="!readonly" v-model="formData.jianDingZiGeZ" clearable />
+                    <span v-else>{{ formData.jianDingZiGeZ }}</span>
+                </el-form-item>
                 <el-form-item label="员工姓名" prop="name">
                     <el-input v-if="!readonly" v-model="formData.name" clearable />
                     <span v-else>{{ formData.name }}</span>

@@ -673,7 +673,7 @@ export default {
                 }
                 const path = data[0].bao_biao_lu_jing_
                 const url = this.$getReportFile(path, `id_=${id}`)
-                const fileName = name + this.$common.getNow(16, 'string')
+                const fileName = name + this.$common.getDateNow(16, 'string')
                 console.log(url, fileName)
                 this.$common.snapshoot({
                     url,

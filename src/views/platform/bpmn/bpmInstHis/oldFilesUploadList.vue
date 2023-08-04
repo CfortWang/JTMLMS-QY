@@ -4,9 +4,9 @@
             <ibps-type-tree
                 :width="width"
                 :height="height"
-                title="记录分类"
+                title="文件分类"
                 :location="location"
-                category-key="FLOW_TYPE"
+                category-key="FILE_TYPE"
                 @node-click="handleNodeClick"
                 @expand-collapse="handleExpandCollapse"
             />
@@ -164,7 +164,6 @@ export default {
                     { prop: 'fen_lei_', label: '记录表单分类', width: 120 },
                     { prop: 'biao_dan_ming_che', label: '表单名称', width: 350 },
                     { prop: 'shi_wu_shuo_ming_', label: '事务说明', width: 350 },
-
                     { prop: 'nian_du_', label: '年度', width: 80 },
                     { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 100 },
                     //   { prop: 'bm_name', label: '上传部门', width: 120 },
@@ -310,25 +309,7 @@ export default {
                 })
             }
         },
-        // getParenthesesStr(text) {
-        //         let result = ''
-        //         if (!text) return result
-        //         let regex = /\((.+?)\)/g;
-        //         let options = text.match(regex)
-        //         if (options) {
-        //                 let option = options[0]
-        //                 if (option) {
-        //                         result = option.substring(1, option.length - 1)
-        //                 }
-        //                 if (options[1]) {
-        //                         let yersOption = options[1]
-        //                         if (yersOption) {
-        //                                 result = result + '/' + yersOption.substring(1, yersOption.length - 1)
-        //                         }
-        //                 }
-        //         }
-        //         return result.split('/')
-        // },
+        
         /**
          * 获取格式化参数
          */

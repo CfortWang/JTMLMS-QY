@@ -3,13 +3,12 @@
     <!-- 外部 -->
     <div slot="west">
       <div class="box">
-        <ibps-tree :width="width"
-                   :height="height"
-                   :data="treeData"
-                   @node-click="handleNodeClick"
-                   @expand-collapse="handleExpandCollapse"
-                   title="分类管理">
-        </ibps-tree>
+        <ibps-type-tree :width="width"
+                        :height="height"
+                        title="文件分类"
+                        category-key="FILE_TYPE"
+                        @node-click="handleNodeClick"
+                        @expand-collapse="handleExpandCollapse" />
       </div>
       <ibps-container :margin-left="width + 'px'"
                       class="page">
@@ -34,15 +33,37 @@
                      @pagination-change="handlePaginationChange">
             <template slot="wenjinachayue"
                       slot-scope="scope">
-              <ibps-attachment :value="scope.row.wen_jian_fu_jian_"
+              <ibps-attachment :value="scope.row.fu_jian_"
                                readonly
                                allow-download
+                               multiple
                                :download="false" />
             </template>
           </ibps-crud>
         </template>
       </ibps-container>
+      <bpmn-formrender :visible="dialogFormVisible"
+                       :template-key="templateKey"
+                       :def-id="defId"
+                       :pk-value="pkValue"
+                       :form-key="formKey"
+                       :add-data-cont="addDataCont"
+                       @close="visible => dialogFormVisible = visible" />
 
+      <el-dialog :close-on-click-modal="false"
+                 :close-on-press-escape="false"
+                 :top="'3vh'"
+                 :width="'90%'"
+                 class="js-custom-dialog"
+                 append-to-body
+                 :fullscreen="false"
+                 :visible.sync="visible">
+        <iframe :src="srcUrl"
+                :height="'100%'"
+                :width="'100%'"
+                frameborder="0"
+                scrolling="no" />
+      </el-dialog>
     </div>
 
   </div>
@@ -53,9 +74,13 @@ import { getFileType, getFileByUserId } from '@/api/permission/file'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import FixHeight from '@/mixins/height'
+import IbpsTypeTree from '@/business/platform/cat/type/tree'
 import { findTreeData } from '@/api/platform/cat/type'
+import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 export default {
   components: {
+    IbpsTypeTree,
+    BpmnFormrender,
     'ibps-attachment': IbpsAttachment
   },
   mixins: [FixHeight],
@@ -66,18 +91,15 @@ export default {
       rightsArr: ['join', 'delete'],
       rowHandle: true,
       width: 230,
-      orgId: '',
       oldorgId: '',
-      orgName: '',
       height: document.clientHeight,
       loading: false,
       filterText: '',
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      },
       pkKey: 'id', // 主键  如果主键不是pk需要传主键
-      loading: false,
+      formKey: 'ywyxjl', // 编辑dialog需要使用
+      pkValue: '',
+      templateKey: 'ywyxjlsc',
+      visible: false,
       listData: [],
       selectListData: [],
       bianlistData: {
@@ -97,21 +119,10 @@ export default {
         ],
         // 查询条件
         searchForm: {
-          forms: [
-            { prop: 'fileCode', label: '文件编号' },
-            { prop: 'fileName', label: '文件名称' },
-            // { prop: 'deptName', label: '部门' },
-          ]
+          forms: []
         },
         // 表格字段配置
-        columns: [
-          // { prop: 'zi_duan_yi_', label: '部门' },
-          { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 180 },
-          { prop: 'wen_jian_ming_che', label: '文件名称', width: 400 },
-          { prop: 'ban_ben_', label: '版本', width: 120 },
-          { prop: 'fa_bu_ri_qi_', label: '发放日期', width: 100, sortable: 'custom' },
-          { prop: 'wen_jian_fu_jian_', label: '查阅', slotName: "wenjinachayue", width: 400 }
-        ]
+        columns: []
       },
       listOptions: {
         border: true,
@@ -121,32 +132,57 @@ export default {
         limit: 20, page: 1
       },
       sorts: {},
-      sqlWhere: {}
-      // testData: [{
-      //     zi_duan_yi_: '1',
-      //     wen_jian_bian_hao: '2',
-      //     wen_jian_ming_che: '3',
-      //     ban_ben_hao_: '4',
-      //     fa_bu_ri_qi_: '5',
-      //     wen_jian_id_: '880481571788816384'
-      // }]
+      sqlWhere: {},
+      searchWhere: {},
+      pageKey: '',
+      dialogFormVisible: false,
+      defId: '',
+      addDataCont: {},
+      srcUrl: '', // 报表字段
     }
   },
   created() {
-    this.loadTreeData()
+    this.pageKey = this.$route.name
+    this.userId = this.$store.getters.userInfo.employee.id
+    const roleList = this.$store.getters.userInfo.role
+    // 系统管理角色添加删除按钮
+    const hasRole = roleList.some(item => item.name === '系统管理角色')
+    if (hasRole) {
+      // 系统管理角色不做分类过滤
+      this.listConfig.toolbars.push({ key: 'remove' })
+      this.selection = true
+    }
+    if (this.$route.name == 'nbwj') {
+      this.listConfig.searchForm.forms = [
+        { prop: 'wen_jian_bian_hao', label: '文件编号' },
+        { prop: 'wen_jian_ming_che', label: '文件名称' }
+      ]
+      this.listConfig.columns = [
+        { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 180 },
+        { prop: 'wen_jian_ming_che', label: '文件名称', width: 400 },
+        { prop: 'ban_ben_', label: '版本', width: 120 },
+        { prop: 'fa_bu_ri_qi_', label: '发放日期', width: 100, sortable: 'custom' },
+        { prop: 'fu_jian_', label: '查阅', slotName: "wenjinachayue", width: 400 }
+      ]
+    }
+    if (this.$route.name == 'wjkzgl-ywyxjlsc' || this.$route.name == 'ywtxyxjl') {
+      this.listConfig.searchForm.forms = [
+        { prop: 'nian_du_', label: '年度:', width: 50 },
+        { prop: 'bian_zhi_shi_jian', label: '上传时间:', fieldType: 'daterange', width: 225 }
+      ]
+      this.listConfig.columns = [
+        { prop: 'fen_lei_', label: '记录表单分类', width: 120 },
+        { prop: 'biao_dan_ming_che', label: '表单名称', width: 350 },
+        { prop: 'shi_wu_shuo_ming_', label: '事务说明', width: 350 },
+        { prop: 'nian_du_', label: '年度', width: 80 },
+        { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 100 },
+        { prop: 'ry_name', label: '上传人', width: 100 },
+        { prop: 'fu_jian_', label: '附件', slotName: 'wenjinachayue', width: 300 }
+      ]
+    }
   },
-  mounted() {
-    // this.loadNode()
-  },
+  mounted() { },
   methods: {
-    // 加载具体分类数据
-    loadTreeData(isEdit) {
-      findTreeData({ 'categoryKey': 'FILE_TYPE' }).then(response => {
-        const data = response.data
-        this.treeData = data
-        this.show = isEdit
-      })
-    },
     handleExpandCollapse(isExpand, readonly = false) {
       this.width = isExpand ? 200 : 50
     },
@@ -155,26 +191,39 @@ export default {
       this.loading = true
     },
     getDatas() {
-      const { fileCode, fileType, fileName, sorts, userId } = this.sqlWhere
       this.listData = []
       let wheres = ''
-      if (fileCode) {
-        wheres = wheres + ` and wj.wen_jian_bian_hao like '%${fileCode}%'`
-      }
-      if (fileName) {
-        wheres = wheres + ` and wj.wen_jian_ming_che like '%${fileName}%'`
+      let start = ''
+      const { fileType, sorts } = this.sqlWhere
+      for (var i in this.searchWhere) {
+        if (i == 'b') {
+          start = this.searchWhere[i]
+        }
+        if (i == 'i') {
+          wheres = wheres + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
+        }
+        if (i !== 'i' && i !== 'b') {
+          wheres = wheres + ` and wj.${i} like '%${this.searchWhere[i]}%'`
+        }
       }
       if (fileType) {
-        wheres = wheres + ` and FIND_IN_SET (wj.xi_lei_id_,'${fileType}')`
+        switch (this.pageKey) {
+          case 'nbwj':
+            wheres = wheres + ` and FIND_IN_SET (wj.xi_lei_id_,'${fileType}')`
+            break;
+          default: wheres = wheres + ` and FIND_IN_SET (wj.fen_lei_id_,'${fileType}')`
+        }
       }
-
       if (sorts) {
         if (JSON.stringify(sorts) !== "{}") {
-          wheres = wheres + ` order by  ${Object.keys(sorts)}  ${Object.values(sorts)}`
+          wheres = wheres + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
         }
       }
       // 重复发放的文件，在权限表会存在重复的文件信息
-      let sql = `select  wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,qx.create_time_,wj.wen_jian_fu_jian_,qx.fa_bu_ri_qi_ FROM (SELECT a.id_,a.create_by_,MAX(a.create_time_) create_time_ ,a.yong_hu_id_,a.wen_jian_id_,a.fa_bu_ri_qi_,a.shou_quan_ FROM t_wjcysqb a  GROUP BY yong_hu_id_,wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.shou_quan_='1' and qx.yong_hu_id_='${userId}' ${wheres}`
+      let fileSearchSql = `select  wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,qx.create_time_,wj.wen_jian_fu_jian_ as fu_jian_,qx.fa_bu_ri_qi_ FROM (SELECT a.id_,a.create_by_,MAX(a.create_time_) create_time_ ,a.yong_hu_id_,a.wen_jian_id_,a.fa_bu_ri_qi_,a.shou_quan_ FROM t_wjcysqb a  GROUP BY yong_hu_id_,wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.shou_quan_='1' and qx.yong_hu_id_='${this.userId}' ${wheres}`
+      let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres}  order by bian_zhi_shi_jian desc`
+      let sql = this.pageKey === 'nbwj' ? fileSearchSql : oldRecordSql
+
       curdPost('sql', sql).then(res => {
         let tableDatas = res.variables.data
         this.selectListData = JSON.parse(JSON.stringify(tableDatas))
@@ -199,56 +248,90 @@ export default {
     },
     refreshData() {
       this.listData = []
-      this.getDatas(this.getSearcFormData())
+      this.getDatas()
     },
-    handleNodeClick(data) {
+    handleNodeClick(nodeId, nodeData, treeDatas) {
       this.show = 'detail'
+      this.addDataCont = { fenLei: nodeData.name, fenLeiId: nodeId }
       let fileTypes = []
-      if (this.oldorgId == data.id) {
+      if (this.oldorgId == nodeId) {
         return
       }
-      if (data.children == undefined) {
-        fileTypes.push(data.id)
+      // 判断是否存在下级菜单
+      const noHadNext = nodeData.children == undefined
+      if (noHadNext && this.pageKey === 'wjkzgl-ywyxjlsc') {
+        const chongfu = this.listConfig.toolbars.filter(el => {
+          return el.key === 'add'
+        })
+        if (chongfu.length === 0 && this.depth !== 0) {
+          this.listConfig.toolbars.push({ key: 'add' })
+        }
+      } else {
+        this.listConfig.toolbars = this.listConfig.toolbars.filter(el => {
+          return el.key !== 'add'
+        })
+      }
+
+      if (nodeData.children == undefined) {
+        fileTypes.push(nodeId)
       } else {
         const getTail = item => item.children && item.children.length > 0 ? item.children.map(m => getTail(m)) : [item]
-        const result = _.flattenDeep(data.children.map(m => getTail(m)))
+        const result = _.flattenDeep(nodeData.children.map(m => getTail(m)))
         for (var i of result) {
           fileTypes.push(i.id)
         }
       }
-      this.oldorgId = data.id
+      this.oldorgId = nodeId
       this.sqlWhere = {
-        fileType: fileTypes.join(','),
-        userId: this.$store.getters.userInfo.employee.id,
-        sorts: { 'wen_jian_bian_hao': 'desc' }
+        fileType: fileTypes.join(',')
       }
       this.getDatas()
     },
+    // 开启表单页面
+    openTask(id) {
+      this.dialogFormVisible = true
+      this.defId = id
 
+    },
     /**
      * 获取格式化参数
      */
     getSearcFormData() {
-      const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-      if (params.fileCode) {
-        this.sqlWhere.fileCode = params.fileCode
-      } else {
-        this.sqlWhere.fileCode = ''
-      }
-      if (params.fileName) {
-        this.sqlWhere.fileName = params.fileName
-      }else{
-        this.sqlWhere.fileName = ''
-      }
+      this.searchWhere = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
       this.getDatas()
     },
     /**
  * 处理按钮事件
  */
     handleAction(command, position, selection, data) {
+
       switch (command) {
         case 'search':// 查询
           this.refreshData()
+          break
+        case 'remove':
+          if (selection.length == 0) {
+            this.$message({
+              message: '请选择数据再进行删除',
+              type: 'error'
+            })
+          }
+          const ids = selection.join(',')
+          const deleteParams = {
+            tableName: 't_ywyxjlb',
+            paramWhere: { id_: ids }
+          }
+          curdPost('delete', deleteParams).then(() => {
+            this.$message({
+              message: '删除成功！',
+              type: 'warning'
+            })
+            this.search()
+          })
+
+          break
+        case 'add': // 添加
+          this.openTask('1072813170935988224')
           break
         default:
           break
@@ -258,7 +341,7 @@ export default {
     * 处理排序
     */
     handleSortChange(sort) {
-      ActionUtils.setSorts(this.sqlWhere.sorts, sort)
+      this.sqlWhere.sorts = sort
       this.getDatas()
     },
     // 处理分页事件

@@ -77,8 +77,8 @@ export default {
                     const dataWhere = {}
                     const where1 = {}
                     const param1 = {}
-                    where1['yong_hu_id_'] = this.id
-                    where1['wen_jian_id_'] = i
+                    // where1['yong_hu_id_'] = this.id
+                    where1['id_'] = i
                     param1['shou_quan_'] = '1'
                     dataWhere['where'] = where1
                     dataWhere['param'] = param1
@@ -89,8 +89,8 @@ export default {
                     const dataWhere = {}
                     const where1 = {}
                     const param1 = {}
-                    where1['yong_hu_id_'] = this.id
-                    where1['wen_jian_id_'] = i
+                    // where1['yong_hu_id_'] = this.id
+                    where1['id_'] = i
                     param1['shou_quan_'] = '0'
                     dataWhere['where'] = where1
                     dataWhere['param'] = param1
@@ -122,32 +122,30 @@ export default {
         },
         // 重复发放的文件，在权限表会存在重复的文件信息
         getFormData (id) {
-            const sql = `select  wj.wen_jian_id_ as wenJianId,
-      wj.wen_jian_ming_che as wenJianMingChe,
-      wj.wen_jian_lie_xing as neiLeiXing ,
-      qx.shou_quan_ as shouQuan
-      FROM (
-         SELECT a.id_,a.create_by_,MAX(a.create_time_) create_time_ ,a.yong_hu_id_,a.wen_jian_id_,
-         a.fa_bu_ri_qi_,a.shou_quan_ FROM t_wjcysqb a  GROUP BY yong_hu_id_,wen_jian_id_
-      ) qx LEFT JOIN t_wjgl wj ON qx.wen_jian_id_=wj.wen_jian_id_ where qx.yong_hu_id_='${id}' order by wj.wen_jian_lie_xing desc`
+            const sql = `select qx.id_ as id , wj.wen_jian_fu_jian_ AS wenJianId, wj.wen_jian_ming_che AS wenJianMingChe,   
+   wj.wen_jian_xi_lei_ AS neiLeiXing ,      qx.shou_quan_ AS shouQuan     FROM (
+           SELECT a.id_,a.create_by_,MAX(a.create_time_) create_time_ ,a.yong_hu_id_,a.wen_jian_id_,
+                   a.fa_bu_ri_qi_,a.shou_quan_ FROM t_wjcysqb a  GROUP BY yong_hu_id_,wen_jian_id_      
+                   ) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${id}' ORDER BY wj.xi_lei_id_ DESC
+`
             curdPost('sql', sql).then(res => {
                 for (const i of res.variables.data) {
                     this.allFilesDatas.push(i)
-                    this.allFilesIds.push(i.wenJianId)
+                    this.allFilesIds.push(i.id)
                     if (i.shouQuan == '1') {
                         // 已授权文件
                         const filterFile = {}
-                        filterFile['key'] = i.wenJianId
+                        filterFile['key'] = i.id
                         filterFile['label'] = i.wenJianMingChe
                         filterFile['type'] = i.neiLeiXing
                         filterFile['yongHuId'] = i.yong_hu_id_
                         this.permissionFiles.push(filterFile)
-                        this.permissionFilesKey.push(i.wenJianId)
+                        this.permissionFilesKey.push(i.id)
                         this.allFiles.push(filterFile)
                     } else {
                         // 未授权文件，但是已经发放
                         const fileData = {}
-                        fileData['key'] = i.wenJianId
+                        fileData['key'] = i.id
                         fileData['label'] = i.wenJianMingChe
                         fileData['type'] = i.neiLeiXing ? i.neiLeiXing : i.waiLeiXing
                         fileData['yongHuId'] = id
