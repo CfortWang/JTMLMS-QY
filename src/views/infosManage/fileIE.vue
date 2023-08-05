@@ -158,6 +158,7 @@ export default {
         { prop: 'wen_jian_ming_che', label: '文件名称' }
       ]
       this.listConfig.columns = [
+        { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', width: 180 },
         { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 180 },
         { prop: 'wen_jian_ming_che', label: '文件名称', width: 400 },
         { prop: 'ban_ben_', label: '版本', width: 120 },
@@ -206,6 +207,7 @@ export default {
           wheres = wheres + ` and wj.${i} like '%${this.searchWhere[i]}%'`
         }
       }
+      console.log('this.searchWhere',this.searchWhere)
       if (fileType) {
         switch (this.pageKey) {
           case 'nbwj':
@@ -220,7 +222,7 @@ export default {
         }
       }
       // 重复发放的文件，在权限表会存在重复的文件信息
-      let fileSearchSql = `select  wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,qx.create_time_,wj.wen_jian_fu_jian_ as fu_jian_,qx.fa_bu_ri_qi_ FROM (SELECT a.id_,a.create_by_,MAX(a.create_time_) create_time_ ,a.yong_hu_id_,a.wen_jian_id_,a.fa_bu_ri_qi_,a.shou_quan_ FROM t_wjcysqb a  GROUP BY yong_hu_id_,wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.shou_quan_='1' and qx.yong_hu_id_='${this.userId}' ${wheres}`
+      let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.fa_bu_ri_qi_ ,MAX(qx.create_time_) AS create_time_ FROM t_wjcysqb qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
       let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres}  order by bian_zhi_shi_jian desc`
       let sql = this.pageKey === 'nbwj' ? fileSearchSql : oldRecordSql
 
@@ -248,6 +250,7 @@ export default {
     },
     refreshData() {
       this.listData = []
+      this.getSearcFormData()
       this.getDatas()
     },
     handleNodeClick(nodeId, nodeData, treeDatas) {
