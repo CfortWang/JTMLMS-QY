@@ -23,13 +23,13 @@
                 <el-form-item label="主题：" prop="subject">
                     <el-input v-model="form.subject" />
                 </el-form-item>
-                <el-form-item label="消息类型：" prop="messageType">
+                <!-- <el-form-item label="消息类型：" prop="messageType">
                     <el-radio-group v-model="form.messageType" @input="handleChange">
                         <template v-for="item in typeOptions">
                             <el-radio v-if="item.value" :key="item.value" :label="item.value">{{ item.label }}</el-radio>
                         </template>
                     </el-radio-group>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="接收人：" prop="receiverId">
                     <ibps-employee-selector
                         :value="form.receiverId"

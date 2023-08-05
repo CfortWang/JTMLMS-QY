@@ -10,7 +10,7 @@
             name="iframeContain"
             seamless
             scrolling="yes"
-            src="https://www.szjyxt.com/#/fileView?url=https%3A%2F%2Fwww.szjyxt.com%2Fibps%2Fplatform%2Fv3%2Ffile%2Fdownload%3FattachmentId%3D925044155762081792&isEdit=true&fileType=docx&title=GDYR-CX01-A0%20%E4%BF%9D%E8%AF%81%E5%85%AC%E6%AD%A3%E6%80%A7%E7%AE%A1%E7%90%86%E7%A8%8B%E5%BA%8F&user=%5Bobject%20Object%5D&mode=view&editUrl=https%3A%2F%2Fwww.szjyxt.com%2Fibps%2Fplatform%2Fv3%2Ffile%2FeditCallback%3FfileName%3DGDYR-CX01-A0%20%E4%BF%9D%E8%AF%81%E5%85%AC%E6%AD%A3%E6%80%A7%E7%AE%A1%E7%90%86%E7%A8%8B%E5%BA%8F%26fileType%3Ddocx&key="
+            src=""
         >
         </iframe> -->
 

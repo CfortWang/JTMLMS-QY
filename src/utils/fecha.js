@@ -505,7 +505,7 @@ const dateDealFmt = {
       if (has != null) {
         const val = parseInt(dateStr.substring(has.index, has.index + has[0].length), 10)
         if (p === 'y') { date.setYear(val) }
-        if (p === 'M') { date.setMonth(val - 1) }
+        if (p === 'M') { date.setMonth(val - 1, 1) }
         if (p === 'd') { date.setDate(val) }
         if (p === 'H') { date.setHours(val) }
         if (p === 'm') { date.setMinutes(val) }

@@ -165,19 +165,19 @@ export default {
                             icon: 'ibps-icon-reply-all',
                             label: '回复',
                             hidden: function (row, index) {
-                                return (row.canreply === 0 || row.messageType === 'system' || row.messageType === 'bulletin' || row.subject==="文件发放通知")
+                                return (row.canreply === 0 || row.messageType === 'system' || row.messageType === 'bulletin' || row.subject === '文件发放通知')
                             }
                         },
                         {
                             key: 'remove',
                             hidden: function (row, index) {
-                                return (row.subject==="文件发放通知")
+                                return (row.subject === '文件发放通知')
                             }
                         },
                         {
                             key: 'detail',
                             hidden: function (row, index) {
-                                return (row.subject==="文件发放通知")
+                                return (row.subject === '文件发放通知')
                             }
                         }
                     ]
@@ -206,13 +206,13 @@ export default {
                 ActionUtils.handleListData(this, data)
                 Bus.$emit('getMessageCount', pageResult.totalCount ? pageResult.totalCount : 0)
                 this.loading = false
-            }).catch(err => {
+            }).catch(() => {
                 this.loading = false
             })
         },
         /**
-     * 获取格式化参数
-     */
+         * 获取格式化参数
+         */
         getSearcFormData () {
             return ActionUtils.formatParams(
                 this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
@@ -221,22 +221,22 @@ export default {
             )
         },
         /**
-     * 处理分页事件
-     */
+         * 处理分页事件
+         */
         handlePaginationChange (page) {
             ActionUtils.setPagination(this.pagination, page)
             this.loadData()
         },
         /**
-     * 处理排序
-     */
+         * 处理排序
+         */
         handleSortChange (sort) {
             ActionUtils.setSorts(this.sorts, sort)
             this.loadData()
         },
         /**
-     * 查询
-     */
+         * 查询
+         */
         search () {
             this.loadData()
         },
@@ -248,8 +248,8 @@ export default {
             this.title = '信息明细'
         },
         /**
-     * 处理按钮事件
-     */
+         * 处理按钮事件
+         */
         handleAction (command, position, selection, data) {
             switch (command) {
                 case 'search': // 查询
@@ -284,8 +284,8 @@ export default {
             }
         },
         /**
-     * 标记为已读
-     */
+         * 标记为已读
+         */
         handleAlreadyRead (ids) {
             markRead({ innerMessageIds: ids }).then(response => {
                 ActionUtils.success('标记已读成功')
@@ -293,23 +293,23 @@ export default {
             }).catch(() => { })
         },
         /**
-     * 处理回复
-     */
+         * 处理回复
+         */
         handleReply (id = '') {
             this.editId = id
             this.repliFormVisible = true
         },
         /**
-     * 处理明细
-     */
+         * 处理明细
+         */
         handleEdit (id = '', readonly) {
             this.editId = id
             this.readonly = readonly
             this.dialogFormVisible = true
         },
         /**
-     * 处理删除
-     */
+         * 处理删除
+         */
         handleRemove (ids) {
             remove({ innerMessageIds: ids }).then(response => {
                 ActionUtils.removeSuccessMessage()

@@ -161,7 +161,7 @@ export default {
                             id: ryjbqkDatas[0].qian_zi_tu_wen_,
                             fileName: '确认签名'
                         }]),
-                        que_ren_ri_qi_: this.$common.getNow(10),
+                        que_ren_ri_qi_: this.$common.getDateNow(10),
                         que_ren_ren_xing_: perInfosName
                     }
                     const returnParams = {
