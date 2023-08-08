@@ -82,11 +82,11 @@
                 <div class="ibps-header-right" flex-box="0">
                     <!-- 如果你只想在开发环境显示这个按钮请添加 v-if="$nodeEnv === 'development'" -->
                     <!-- 全局搜索放大镜、日志、环境切换、全屏 -->
-                    <!-- <ibps-header-search @click="handleSearchClick" />
+                    <!-- <ibps-header-search @click="handleSearchClick" /> -->
                     <ibps-header-error-log v-if="$nodeEnv === 'development'" />
                     <ibps-header-base-url v-if="$nodeEnv === 'development'" />
 
-                    <ibps-header-download />
+                    <!-- <ibps-header-download />
                     <ibps-header-locking />
                     <ibps-header-theme />
                     <ibps-header-language />
@@ -100,8 +100,8 @@
                     <!-- 消息中心 -->
                     <span style="margin: 0 10px;">|</span>
                     <ibps-header-user style="margin-right: 15px;"/>
-                    <!-- <span style="margin-left: 10px;">|</span>
-                    <ibps-header-setting /> -->
+                    <span style="margin-left: 10px;">|</span>
+                    <ibps-header-setting />
                 </div>
             </div>
             <!-- 下面 主体 -->
@@ -239,8 +239,8 @@
         //     }
         // },
         mounted() {
-            // window.performance.navigation.type == 1
-            if (this.$route.name == 'dashboard') {
+            // window.performance.navigation.type === 1
+            if (this.$route.name === 'dashboard') {
                 this.sysName = '首页'
             }
         },
@@ -259,21 +259,21 @@
                 themeActiveSetting: 'theme/activeSetting'
             }),
             getSystemName() {
-                return this.header().filter(name => { return name.id == this.activeHeader() })
+                return this.header().filter(name => { return name.id === this.activeHeader() })
             },
             /**
              * @description 用来实现带参路由的缓存
              */
             sysName: {
                 get() {
-                    if (this.$route.name == 'dashboard') {
+                    if (this.$route.name === 'dashboard') {
                         return '首页'
                     } else {
                         return ''
                     }
                 },
                 set() {
-                    if (this.$route.name == 'dashboard') {
+                    if (this.$route.name === 'dashboard') {
                         return '首页'
                     } else {
                         return ''

@@ -394,7 +394,7 @@ export default {
                 this.userList = userList
                 return
             }
-            const sql = 'select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee'
+            const sql = `select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee where status_ = 'actived'`
             curdPost('sql', sql).then(res => {
                 this.userList = res.variables && res.variables.data
             })
