@@ -6,112 +6,132 @@
         :close-on-press-escape="false"
         append-to-body
         width="65%"
-        top="0"
-        custom-class="dialog is-fullscreen"
+        top="10vh"
+        custom-class="dialog"
         @open="getform"
         @close="closeDialog"
     >
-        <el-row>
-            <el-col :span="7">
-                <div style="padding-left:65px;">
-                    <span class="photo-area" @click="dialogPictureVisible = !readonly">
-                        <img v-if="form.picture" :src="image" class="avatar">
-                        <i v-else class="el-icon-plus avatar-uploader-icon" />
-                        <div
-                            v-if="!readonly"
-                            :class="form.picture !== '' ? 'handle-photo-buttons' : null"
-                            @click.stop="() => { dialogPictureVisible = false }"
-                        >
-                            <div v-if="form.picture !== ''">
-                                <i class="el-icon-edit" @click.stop="dialogPictureVisible = !readonly" />
-                                <i class="el-icon-delete" @click.stop="form.picture = ''" />
-                            </div>
+        <el-row style="padding: 10px; max-height: 600px;">
+            <!-- <div style="padding-left:65px;">
+                <span class="photo-area" @click="dialogPictureVisible = !readonly">
+                    <img v-if="form.picture" :src="image" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon" />
+                    <div
+                        v-if="!readonly"
+                        :class="form.picture !== '' ? 'handle-photo-buttons' : null"
+                        @click.stop="() => { dialogPictureVisible = false }"
+                    >
+                        <div v-if="form.picture !== ''">
+                            <i class="el-icon-edit" @click.stop="dialogPictureVisible = !readonly" />
+                            <i class="el-icon-delete" @click.stop="form.picture = ''" />
                         </div>
-                    </span>
-                </div>
-                <span v-if="!readonly" class="operation">点击上方选择封面图片</span>
-                <ibps-uploader
-                    :visible="dialogPictureVisible"
-                    :accept="accept"
-                    @action-event="uploaderPictureAction"
-                    @close="visible => dialogPictureVisible = visible"
-                />
-            </el-col>
-            <el-col :span="15" style="margin-left:25px;">
-                <el-form ref="form" :rules="rules" :model="form" label-width="100px" @submit.native.prevent>
-                    <el-form-item label="发布选项：" prop="publicItem">
-                        <el-radio-group v-model="form.publicItem">
-                            <el-radio label="notices">发布公告</el-radio>
-                            <el-radio label="top">置顶工作首页</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item label="公告分类：" prop="type">
-                        <ibps-type-select v-model="form.typeId" category-key="NOTICE_TYPE" clearable />
-                    </el-form-item>
-                    <el-form-item label="标题：" prop="title">
-                        <el-input v-model="form.title" />
-                    </el-form-item>
-                    <!-- <el-form-item label="发布人：" prop="userId">
-                        <ibps-employee-selector :value="form.userId" @callback="handleInput" />
-                    </el-form-item> -->
-                    <el-row>
-                        <el-col :span="12">
-                            <el-form-item label="是否公共：" prop="public0">
-                                <el-radio-group v-model="form.public0" @change="change">
-                                    <el-radio label="Y">是</el-radio>
-                                    <el-radio label="N">否</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item v-if="show === 'N'" label="是否包含子集" prop="includeChild">
-                                <el-radio-group v-model="form.includeChild">
-                                    <el-radio label="Y">是</el-radio>
-                                    <el-radio label="N">否</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-form-item v-if="show === 'N'" label="发布范围：" prop="depName">
-                        <ibps-org-selector
-                            :value="form.depId"
-                            :multiple="true"
-                            @input="depNameInput"
-                            @callback="callbackDepName"
-                        />
-                    </el-form-item>
-                    <el-form-item label="作者：" prop="author">
-                        <el-input v-model="form.author" />
-                    </el-form-item>
-                    <el-form-item label="关键字：" prop="key">
-                        <el-input v-model="form.key" />
-                    </el-form-item>
-                    <el-form-item label="发布时间：" prop="publicDate">
-                        <el-date-picker
-                            v-model="form.publicDate"
-                            type="date"
-                            style="width:100%;"
-                            placeholder="选择日期"
-                            value-format="yyyy-MM-dd HH:mm:ss"
-                        />
-                    </el-form-item>
-                    <el-form-item label="失效时间：" prop="loseDate">
-                        <el-date-picker
-                            v-model="form.loseDate"
-                            type="date"
-                            style="width:100%;"
-                            placeholder="选择日期"
-                            value-format="yyyy-MM-dd HH:mm:ss"
-                        />
-                    </el-form-item>
-                    <el-form-item label="附件：" prop="fileAttach">
-                        <ibps-attachment-selector v-model="form.fileAttach" accept="*" multiple />
-                    </el-form-item>
-                    <el-form-item label="内容" prop="content">
-                        <ibps-ueditor v-model="form.content" />
-                    </el-form-item>
-                </el-form>
-            </el-col>
+                    </div>
+                </span>
+            </div>
+            <span v-if="!readonly" class="operation">点击上方选择封面图片</span>
+            <ibps-uploader
+                :visible="dialogPictureVisible"
+                :accept="accept"
+                @action-event="uploaderPictureAction"
+                @close="visible => dialogPictureVisible = visible"
+            /> -->
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px" @submit.native.prevent>
+                <!-- <el-form-item label="发布选项：" prop="publicItem">
+                    <el-radio-group v-model="form.publicItem">
+                        <el-radio label="notices">发布公告</el-radio>
+                        <el-radio label="top">置顶工作首页</el-radio>
+                    </el-radio-group>
+                </el-form-item> -->
+                <el-form-item label="公告分类：" prop="typeId">
+                    <ibps-type-select v-model="form.typeId" category-key="NOTICE_TYPE" clearable />
+                </el-form-item>
+                <el-form-item label="标题：" prop="title">
+                    <el-input v-model="form.title" />
+                </el-form-item>
+                <!-- <el-form-item label="发布人：" prop="userId">
+                    <ibps-employee-selector :value="form.userId" @callback="handleInput" />
+                </el-form-item> -->
+                <!-- <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="是否公共：" prop="public0">
+                            <el-radio-group v-model="form.public0" @change="change">
+                                <el-radio label="Y">是</el-radio>
+                                <el-radio label="N">否</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item v-if="show === 'N'" label="是否包含子集" prop="includeChild">
+                            <el-radio-group v-model="form.includeChild">
+                                <el-radio label="Y">是</el-radio>
+                                <el-radio label="N">否</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item v-if="show === 'N'" label="发布范围：" prop="depName">
+                    <ibps-org-selector
+                        :value="form.depId"
+                        :multiple="true"
+                        @input="depNameInput"
+                        @callback="callbackDepName"
+                    />
+                </el-form-item> -->
+                <el-form-item label="作者：" prop="author">
+                    <el-input v-model="form.author" />
+                </el-form-item>
+                <el-form-item label="关键字：" prop="key">
+                    <el-input v-model="form.key" />
+                </el-form-item>
+                <!-- <el-form-item label="发布时间：" prop="publicDate">
+                    <el-date-picker
+                        v-model="form.publicDate"
+                        type="date"
+                        style="width:100%;"
+                        placeholder="选择日期"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                    />
+                </el-form-item>
+                <el-form-item label="失效时间：" prop="loseDate">
+                    <el-date-picker
+                        v-model="form.loseDate"
+                        type="date"
+                        style="width:100%;"
+                        placeholder="选择日期，不可早于发布时间"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                    />
+                </el-form-item> -->
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="发布时间：" prop="publicDate">
+                            <el-date-picker
+                                v-model="form.publicDate"
+                                type="date"
+                                style="width:100%;"
+                                placeholder="选择日期"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                            />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="失效时间：" prop="loseDate">
+                            <el-date-picker
+                                v-model="form.loseDate"
+                                type="date"
+                                style="width:100%;"
+                                placeholder="选择日期，不可早于发布时间"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                            />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item label="附件：" prop="fileAttach">
+                    <ibps-attachment-selector v-model="form.fileAttach" accept="*" multiple />
+                </el-form-item>
+                <el-form-item label="内容：" prop="content">
+                    <ibps-ueditor v-model="form.content" />
+                </el-form-item>
+            </el-form>
         </el-row>
         <ibps-uploader
             :visible="dialogFormVisible"
@@ -188,13 +208,13 @@ export default {
                 id: '',
                 ip: '',
                 public0: 'Y',
-                includeChild: 'Y',
+                includeChild: 'N',
                 key: '',
                 loseDate: '',
                 name: '',
                 picture: '',
                 pk: '',
-                publicDate: '',
+                publicDate: this.$common.getDateNow(19),
                 publicItem: 'notices',
                 status: '',
                 tenantId: '',
@@ -207,9 +227,11 @@ export default {
                 userName: this.$store.getters.name
             },
             rules: {
+                typeId: [{ required: true, message: this.$t('validate.required') }],
                 title: [{ required: true, message: this.$t('validate.required') }],
                 userId: [{ required: true, message: this.$t('validate.required') }],
-                publicDate: [{ required: true, message: this.$t('validate.required') }]
+                publicDate: [{ required: true, message: this.$t('validate.required') }],
+                content: [{ required: true, message: this.$t('validate.required') }]
             },
             toolbars: [
                 {
@@ -311,11 +333,6 @@ export default {
         // 发布
         handleSave () {
             this.form.status = 'publish'
-            this.rules = {
-                title: [{ required: true, message: this.$t('validate.required') }],
-                userId: [{ required: true, message: this.$t('validate.required') }],
-                publicDate: [{ required: true, message: this.$t('validate.required') }]
-            }
             this.$refs[this.formName].validate(valid => {
                 if (valid) {
                     // 置顶公告必须选择图片
@@ -332,7 +349,6 @@ export default {
         // 保存草稿
         handleDrafts () {
             this.form.status = 'drafts'
-            this.rules = {}
             this.$refs[this.formName].validate(valid => {
                 if (valid) {
                     this.saveData()

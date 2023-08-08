@@ -154,7 +154,6 @@ import Scan from '@/views/system/jbdScan/scan.vue'
 import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
-import { preview } from '@/business/platform/form/utils/custom/preview'
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
 import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
 
@@ -794,7 +793,8 @@ export default {
                             return
                         }
                         src = `${this.$reportPath.replace('show', 'pdf')}${button.reportPath}&id_=${selection}`
-                        preview(this, src)
+                        console.log(src)
+                        this.$common.preview(this, src)
                         break
                     case 'download': // 下载记录
                         if (!button.reportPath) {

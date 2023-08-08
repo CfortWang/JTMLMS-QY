@@ -64,7 +64,11 @@ export const typeOptions = [
     },
     {
         value: 'clob',
-        label: '大文本'
+        label: 'text【最大长度为65,535个字符（约64KB）】'
+    },
+    {
+        value: 'mediumtext',
+        label: 'mediumtext【最大长度为16,777,215个字符（约16MB）】'
     }
 ]
 export const formatOptions = [

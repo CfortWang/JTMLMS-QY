@@ -60,7 +60,7 @@ export default {
         const reportPath = '金通医学实验室管理系统'
         const downloadReport = (src, where, type = 6) => {
             // 目前可用type    6:生成报表的pdf文件【默认】   7:生成报表的word文件   3:生成报表的excel文件
-            return `${BASE_URL}demo/reportServlet?action=${type}&file=${encodeURIComponent(reportPath + '/' + src)}&columns=0&srcType=file&paramString=${encodeURIComponent(where)}`
+            return `${BASE_URL}demo/reportServlet?action=${type}&file=${encodeURIComponent(reportPath + '/' + src)}&print=1&srcType=file&paramString=${encodeURIComponent(where)}`
         }
         const timer = setInterval(() => { // 定时循环添加参数
             if (getToken()) {
