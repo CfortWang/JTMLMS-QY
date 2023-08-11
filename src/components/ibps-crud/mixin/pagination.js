@@ -9,7 +9,7 @@ export default {
       default: () => {
         return {
           pagerCount: 5,
-          pageSizes: [10, 20, 50, 100],
+          pageSizes: [10, 15, 20, 25, 30, 50, 100],
           layout: 'prev, pager, next, jumper,sizes, ->,slot'
         }
       }

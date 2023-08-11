@@ -210,6 +210,7 @@ export default {
      */
     restoreDefault() {
       this.password.newPassword = '1'
+      this.password.repeatPassword = '1'
       this.restoreDefaultPassW = 'restoreDefault'
       this.saveData()
     },

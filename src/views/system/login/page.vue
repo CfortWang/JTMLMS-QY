@@ -9,7 +9,7 @@
                             金源信通 -->
                         <img src="~@/assets/images/login/company.png" class="logo">
                         <!-- </h1> -->
-                        <h1 class="login-title">医学实验室管理系统</h1>
+                        <h1 class="login-title">医学实验室标准化智慧管理平台</h1>
                     </div>
 
                     <div class="jbd-login-page-main">

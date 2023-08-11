@@ -573,7 +573,7 @@ export default {
         handleRemove(button, index) {
             const position = button.position
             const selection = this.getSelection(position, index)
-            ActionUtils.removeRecord(selection, '确定删除当前数据？？', true)
+            ActionUtils.removeRecord(selection, '确定删除当前数据？', true)
                 .then((ids) => {
                     for (let i = this.dataModel.length - 1; i >= 0; i--) {
                         if (ids.indexOf(i) > -1) {

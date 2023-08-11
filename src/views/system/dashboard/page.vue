@@ -8,7 +8,7 @@
         class="ibps-desktop-page"
         @scroll="({ x, y }) => { scrollTop = y }"
     >
-        <newHome v-if="cronTask" :plan="cronTask" @handleApprove="handleApprove" @handleUnreadMessage="handleUnreadMessage">
+        <!-- <newHome v-if="cronTask" :plan="cronTask" @handleApprove="handleApprove" @handleUnreadMessage="handleUnreadMessage">
             <template slot="myslot">
                 <el-upload
                     style="display: inline-block"
@@ -46,7 +46,13 @@
                     @click="downloadData()"
                 >下载桌面应用</el-button>
             </template>
-        </newHome>
+        </newHome> -->
+        <workbench
+            v-if="cronTask"
+            :plan="cronTask"
+            @handleApprove="handleApprove"
+            @handleUnreadMessage="handleUnreadMessage"
+        />
         <ibps-back-to-top
             :visibility-height="150"
             :scroll-top="scrollTop"
@@ -166,6 +172,7 @@
     import { StatisticsSign } from '@/api/platform/system/jbdHome'
     import { getToken } from '@/utils/auth'
     import newHome from './components/new-home'
+    import Workbench from './components/workbench'
     import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
     const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
@@ -177,6 +184,7 @@
             IbpsBackToTop,
             Preview,
             newHome,
+            Workbench,
             BpmnFormrender,
             'ibps-grid-layout': GridLayout,
             'ibps-grid-item': GridItem
