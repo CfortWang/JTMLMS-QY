@@ -188,7 +188,7 @@ export default {
     methods: {
         /* 获取配置报表数据*/
         getConfig () {
-            const sql = 'select bao_biao_lu_jing_, fu_jian_nei_rong_, guan_lian_zi_duan, liu_cheng_xuan_ze, shi_fou_zi_biao_ from t_lcidglbdbb'
+            const sql = `select bao_biao_lu_jing_, fu_jian_nei_rong_, guan_lian_zi_duan, liu_cheng_xuan_ze, shi_fou_zi_biao_ from t_lcidglbdbb where gui_dang_lei_xing = 'process'`
             curdPost('sql', sql).then((res) => {
                 this.reportAll = res.variables && res.variables.data
             }).catch(() => {

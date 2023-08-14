@@ -664,7 +664,7 @@ export default {
                 // 等待一段时间后再次查询
                 await new Promise(resolve => setTimeout(resolve, intervalTime))
             }
-            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${code}' and ti_jiao_kuai_zhao = '是'`
+            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {

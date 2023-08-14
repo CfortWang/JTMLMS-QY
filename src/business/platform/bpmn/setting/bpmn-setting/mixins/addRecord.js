@@ -11,7 +11,7 @@ export default {
     },
     methods: {
         getRecord (id) {
-            const sql = `select * from t_lcidglbdbb where liu_cheng_xuan_ze = '${id}'`
+            const sql = `select * from t_lcidglbdbb where gui_dang_lei_xing = 'process' liu_cheng_xuan_ze = '${id}'`
             curdPost('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
@@ -43,7 +43,8 @@ export default {
                     guan_lian_zi_duan: this.guan_lian_zi_duan,
                     shi_fou_zi_biao_: this.shi_fou_zi_biao_,
                     ti_jiao_kuai_zhao: this.ti_jiao_kuai_zhao,
-                    bo_hui_kuai_zhao_: this.bo_hui_kuai_zhao_
+                    bo_hui_kuai_zhao_: this.bo_hui_kuai_zhao_,
+                    gui_dang_lei_xing: 'process'
                 }]
             }
             curdPost('add', params).then(() => {
