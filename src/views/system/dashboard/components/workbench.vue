@@ -76,7 +76,7 @@
             :def-id="activeTab === 'save' ? defId : null"
             :pro-inst-id="activeTab === 'save' ? proInstId : null"
             :title="['wait', 'save'].includes(activeTab) ? FlowName : null"
-            @callback="getData(activeTab)"
+            @callback="updateList"
             @close="visible => (dialogFormVisible = visible)"
         />
         <news-detail
@@ -425,6 +425,12 @@ export default {
             }).catch(() => {
                 this.loading = false
             })
+        },
+        // 延迟更新列表数据
+        updateList () {
+            setTimeout(() => {
+                this.getData(this.activeTab)
+            }, 1000)
         },
         // 查询
         search () {
