@@ -126,13 +126,13 @@ export default {
                 this.handleCallback(true)
             })
         },
-        getId (arr) {
-            if (!arr.length) {
-                return ''
-            }
-            const idArrs = arr.map(item => item.id)
-            return idArrs.join(',')
-        },
+        // getId (arr) {
+        //     if (!arr.length) {
+        //         return ''
+        //     }
+        //     const idArrs = arr.map(item => item.id)
+        //     return idArrs.join(',')
+        // },
         // 消息确认，受控文件用
         confirmMsg () {
             // TODO
@@ -148,15 +148,19 @@ export default {
                 const perInfosId = this.$store.getters.userInfo.user.id
                 const perInfosName = this.$store.getters.userInfo.user.name
                 // const perInfosorgId = this.$store.getters.userInfo.org.id
-                const perInfosPositions = this.$store.getters.userInfo.positions
+                // const perInfosPositions = this.$store.getters.userInfo.positions
 
                 const sql = "select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '" + perInfosId + "'"
                 curdPost('sql', sql).then((ryjbqkRes) => {
                     const ryjbqkDatas = ryjbqkRes.variables.data
+                    if (ryjbqkDatas.length == 0) {
+                        alert('该人并没有签字图文在系统，请先上传系统再进行确认！')
+                        return
+                    }
                     const tempObj = {
                         id_: generateUUID(),
                         parent_id_: this.tableId,
-                        tong_zhi_bu_men_: this.getId(perInfosPositions),
+                        // tong_zhi_bu_men_: this.getId(perInfosPositions),
                         que_ren_qian_ming: JSON.stringify([{
                             id: ryjbqkDatas[0].qian_zi_tu_wen_,
                             fileName: '确认签名'
@@ -173,25 +177,27 @@ export default {
                     const addwjcysqbs = []
                     const { userId = '' } = this.$store.getters
                     files.split(',').forEach(i => {
-                        const obj = {
+                        const addwjcysqb = {
                             yong_hu_id_: userId,
                             wen_jian_id_: i,
                             shou_quan_: '1',
                             fa_bu_ri_qi_: this.tableName.slice(this.tableName.indexOf('（') + 1, this.tableName.lastIndexOf('）'))
                         }
-                        addwjcysqbs.push(obj)
+                        addwjcysqbs.push(addwjcysqb)
                     })
-                    const addParams = {
-                        tableName: 't_wjcysqb',
-                        paramWhere: addwjcysqbs
-                    }
-                    curdPost('add', returnParams).then(() => {
-                        console.log('确认接收到发放文件')
+                     curdPost('add', JSON.stringify(returnParams)).then(() => { console.log('确认接收到发放文件') }).then(
+                        () => {
                         this.type = ''
                         this.getFormData()
-                    })
+                        }
+                    )
 
-                    curdPost('add', addParams)
+                    curdPost('add',
+                        '{"tableName": "t_wjcysqb","paramWhere":' + JSON.stringify(addwjcysqbs) + '}'
+                    ).then(response => {
+                        console.log(response)
+                    }).catch(error => {
+                    })
                 })
                 this.closeDialog()
             }).catch(() => { })

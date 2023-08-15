@@ -17,8 +17,8 @@
             <input ref="inputFile" type="file" style="display: none" @change="chageFile">
         </div>
         <!--web spreadsheet组件-->
-        <div class="excel">
-            <div id="luckysheetDom" style="margin: 0px; padding: 0px; width: 100%; height: 100%" />
+        <div class="excel" :style="{height: height + 'px'}">
+            <div id="luckysheetDom" ref="luckysheet" style="margin: 0px; padding: 0px; width: 100%; height: 100%" />
         </div>
     </div>
 </template>
@@ -36,6 +36,10 @@ export default {
         id: {
             type: String,
             default: ''
+        },
+        dialogShow: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -65,16 +69,16 @@ export default {
                 verticalAlignMode: true, // '垂直对齐方式'
                 textWrapMode: true, // '换行方式'
                 textRotateMode: false, // '文本旋转方式'
-                image: true, // '插入图片'
+                image: false, // '插入图片'
                 link: false, // '插入链接'
                 chart: false, // '图表'（图标隐藏，但是如果配置了chart插件，右击仍然可以新建图表）
                 postil: false, // '批注'
                 pivotTable: false, // '数据透视表'
                 function: true, // '公式'
                 frozenMode: false, // '冻结方式'
-                sortAndFilter: true, // '排序和筛选'
-                conditionalFormat: true, // '条件格式'
-                dataVerification: true, // '数据验证'
+                sortAndFilter: false, // '排序和筛选'
+                conditionalFormat: false, // '条件格式'
+                dataVerification: false, // '数据验证'
                 splitColumn: false, // '分列'
                 screenshot: true, // '截图'
                 findAndReplace: true, // '查找替换'
@@ -97,12 +101,12 @@ export default {
                 columnWidth: true, // 列宽
                 clear: true, // 清除内容
                 matrix: false, // 矩阵操作选区
-                sort: true, // 排序选区
-                filter: true, // 筛选选区
+                sort: false, // 排序选区
+                filter: false, // 筛选选区
                 chart: false, // 图表生成
-                image: true, // 插入图片
+                image: false, // 插入图片
                 link: false, // 插入链接
-                data: true, // 数据验证
+                data: false, // 数据验证
                 cellFormat: true // 设置单元格格式
             },
             showstatisticBarConfig: {
@@ -111,7 +115,15 @@ export default {
                 view: true, // 打印视图
                 zoom: true // 缩放
             },
-            title: ''
+            title: '',
+            height: ''
+        }
+    },
+    created () {
+        if (this.dialogShow) {
+            this.height = window.innerHeight - 110
+        } else {
+            this.height = window.innerHeight - 150
         }
     },
     mounted () {
@@ -121,6 +133,10 @@ export default {
         } else {
             this.init()
         }
+    },
+    destroyed () {
+        luckysheet.destroy()
+        this.$refs.luckysheet.remove()
     },
     methods: {
         init () {
@@ -196,8 +212,6 @@ export default {
                 alert('无法读取excel文件的内容，当前不支持xls文件!')
                 return
             }
-            // console.log('exportJson', exportJson)
-            // console.log('luckysheetfile', luckysheetfile)
 
             luckysheet.destroy()
 
@@ -303,12 +317,14 @@ export default {
     margin-right: 10px;
 }
 .test2 {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    // width: 100%;
+    // height: 100%;
+    // display: flex;
+    // flex-direction: column;
     .excel {
         flex: 1;
+        height: 500px;
     }
 }
+
 </style>

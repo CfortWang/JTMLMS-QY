@@ -222,7 +222,8 @@ export default {
         }
       }
       // 重复发放的文件，在权限表会存在重复的文件信息
-      let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.fa_bu_ri_qi_ ,MAX(qx.create_time_) AS create_time_ FROM t_wjcysqb qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
+      let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.fa_bu_ri_qi_ 
+       FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
       let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres}  order by bian_zhi_shi_jian desc`
       let sql = this.pageKey === 'nbwj' ? fileSearchSql : oldRecordSql
 

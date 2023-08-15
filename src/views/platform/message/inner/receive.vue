@@ -257,10 +257,35 @@ export default {
                     this.search()
                     break
                 case 'markRead': // 标记为已读
-                    ActionUtils.selectedMultiRecord(selection).then(id => {
-                        this.handleAlreadyRead(id)
-                        // this.isEnvelope = false
-                    }).catch(() => { })
+                    // ActionUtils.selectedMultiRecord(selection).then(id => {
+                    //     this.handleAlreadyRead(id)
+                    //     // this.isEnvelope = false
+                    // }).catch(() => { })
+                    try {
+                        if(data == undefined){
+                            throw new Error('请选择数据再标记已读。')
+                        }
+                        let fitDatas=[]
+                        data.forEach(el => {
+                            if(el.subject !=='文件发放通知'){
+                                fitDatas.push(el.id)
+                            }
+                        });
+                        if(fitDatas.length !== data.length){
+                            const comfirm = confirm('文件发放通知并不会被标记为已读')
+                            if(comfirm){
+                                ActionUtils.selectedMultiRecord(fitDatas).then(id => {
+                                this.handleAlreadyRead(id)
+                                }).catch(() => { })
+                            }
+                        }else{
+                            ActionUtils.selectedMultiRecord(fitDatas).then(id => {
+                            this.handleAlreadyRead(id)
+                            }).catch(() => { })
+                        }
+                    } catch (error) {
+                        ActionUtils.warning(error.message) 
+                    }
                     break
                 case 'reply': // 回复
                     ActionUtils.selectedRecord(selection).then(id => {

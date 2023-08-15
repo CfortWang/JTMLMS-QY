@@ -383,6 +383,7 @@
             :type="fieldOptions.selector_type"
             :filter="fieldOptions.filter"
             :multiple="multiple"
+            :filtrate="filtrate"
             :store="fieldOptions.store || 'id'"
             :disabled="fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition' ? true : readonly"
             :readonly-text="readonlyText ? 'text' : null"
@@ -896,6 +897,11 @@
             // 是否多选
             multipleSelect() {
                 return this.$utils.toBoolean(this.fieldOptions['multiple'], false)
+            },
+
+            // 是否过滤
+            filtrate() {
+                return this.$utils.toBoolean(this.fieldOptions['filtrate'] || false, false)
             },
 
             operation_status() {

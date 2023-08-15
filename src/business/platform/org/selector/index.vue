@@ -20,6 +20,7 @@
             :value="selectorValue"
             :filter="filter"
             :multiple="multiple"
+            :filtrate="filtrate"
             @close="visible=>selectorVisible=visible"
             @action-event="handleSelectorActionEvent"
         />
@@ -78,6 +79,10 @@ export default {
             default: ','
         },
         multiple: { // 是否多选
+            type: Boolean,
+            default: false
+        },
+        filtrate: {
             type: Boolean,
             default: false
         },

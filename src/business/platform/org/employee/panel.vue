@@ -98,6 +98,10 @@ export default {
     props: {
         value: [Object, Array],
         multiple: Boolean,
+        filtrate: {
+            type: Boolean,
+            default: false
+        },
         seetingSearchPartyType: String, // 设置查询用户类型
         height: {
             type: String
@@ -254,7 +258,7 @@ export default {
     mounted () {
         if (this.showTree) {
             if (this.isUseScope) return
-            this.loadTreeData(false)
+            this.loadTreeData(true)
         } else {
             this.loadListData()
         }
@@ -415,7 +419,7 @@ export default {
             // 选择器范围模式函数回调
             this.moreSearchParams = {}
             // 普通模式与选择器范围模式切换调用
-            !this.isUseScope ? this.loadTreeData(false) : null
+            !this.isUseScope ? this.loadTreeData() : null
             this.scriptExecuteTime = false // 初始化脚本类型时的函数调用
             this.$emit('change-party-type', value)
         },

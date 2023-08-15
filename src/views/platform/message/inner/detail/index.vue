@@ -74,7 +74,7 @@
                     />
                 </el-form-item>
             </el-col>
-            <el-col v-if="!inside" :span="24">
+            <!-- <el-col v-if="!inside" :span="24">
                 <el-form-item class="list">
                     <el-tabs v-model="activeName" class="detail" @tab-click="handleClick">
                         <el-tab-pane label="已回复信息列表" name="replied" style="height:300px;">
@@ -85,7 +85,7 @@
                         </el-tab-pane>
                     </el-tabs>
                 </el-form-item>
-            </el-col>
+            </el-col> -->
         </el-row>
     </el-form>
 </template>

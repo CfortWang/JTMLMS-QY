@@ -183,11 +183,7 @@ export default {
             }
             getOrgTreeData(params).then(res => {
                 this.loadingTree = false
-                let arr = JSON.parse(JSON.stringify(res.data))
-                //筛选客户 不要了
-                if (arr[0].id != '0' && this.orgAddIndex == 'qita') {
-                    arr = arr.filter(item => item.id !== '1041786072788369408')
-                }
+                const arr = JSON.parse(JSON.stringify(res.data))
                 let treeData
                 if (this.$utils.isNotEmpty(this.isSuperInitTree)) {
                     if (!this.isSuperInitTree.initNode && node.level !== 0) {
@@ -238,29 +234,36 @@ export default {
                 params.includeSub = false
             }
             getPositionTreeData(params).then(response => {
+                const data = response.data
+                data.forEach((item) => {
+                    if (item.name === '岗位树') {
+                        item.name = '部门树'
+                        item.title = '部门树'
+                    }
+                })
                 this.loadingTree = false
                 this.hiddenTree = false
                 // 普通模式
                 if (!this.isUseScope) {
                     if (!init) {
-                        const data = response.data
+                        // const data = response.data
                         this.treeData = TreeUtils.transformToTreeFormat(data)
                         this.setTree(true, this.treeData)
                     }
-                    this.treeDatas = response.data
+                    this.treeDatas = data
                 } else {
                     // 选择器范围模式
                     if (resetParams) {
-                        const data = response.data
+                        // const data = response.data
                         this.treeData = TreeUtils.transformToTreeFormat(data)
                         this.setTree(true, this.treeData)
                     } else {
                         if (!init) {
-                            const data = response.data
+                            // const data = response.data
                             this.treeData = TreeUtils.transformToTreeFormat(data)
                             this.setTree(true, this.treeData)
                         }
-                        this.treeDatas = response.data
+                        this.treeDatas = data
                     }
                 }
             }).catch(() => {
@@ -300,12 +303,31 @@ export default {
                 getPositionTreeData(params).then(res => {
                     this.loadingTree = false
                     const arr = JSON.parse(JSON.stringify(res.data))
+                    arr.forEach((item) => {
+                        if (item.name === '岗位树') {
+                            item.name = '部门树'
+                            item.title = '部门树'
+                        }
+                    })
+                    let arrList
+                    const frist = this.$store.getters.level.first || ''
+                    if (type === '1' && this.filtrate && frist) {
+                        const showBoo = arr.some((item) => item.id === frist)
+                        if (showBoo) {
+                            arrList = arr.filter((item) => item.id === frist)
+                        } else {
+                            arrList = arr
+                        }
+                    } else {
+                        arrList = arr
+                    }
+
                     let treeData
                     if (this.$utils.isEmpty(node.data)) {
-                        treeData = arr
+                        treeData = arrList
                         resolve(this.toTree(treeData))
                     } else {
-                        treeData = type !== '2' ? arr : this.filterPositionTreeChildren(arr, 'root')
+                        treeData = type !== '2' ? arrList : this.filterPositionTreeChildren(arrList, 'root')
                         resolve(this.toTree(treeData))
                     }
                 }).catch(res => {

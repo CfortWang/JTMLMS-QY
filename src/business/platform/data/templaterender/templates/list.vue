@@ -793,7 +793,7 @@ export default {
                             return
                         }
                         src = `${this.$reportPath.replace('show', 'pdf')}${button.reportPath}&id_=${selection}`
-                        console.log(src)
+                        // console.log(src)
                         this.$common.preview(this, src)
                         break
                     case 'download': // 下载记录

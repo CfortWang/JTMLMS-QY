@@ -2,7 +2,7 @@
 <template>
     <div>
         <ul style="padding: 0px;margin: 0px;">
-            <li v-for="(el, index) in staOrRec" :key="index" class="tableClazz" @click="openDataTemplate(el)">
+            <li v-for="(el, index) in StaOrRec" :key="index" class="tableClazz" @click="openDataTemplate(el)">
                 <!-- 统计页面呈现-->
                 <el-tag>
                     {{ el.title }}
@@ -31,7 +31,7 @@ export default {
         templateStatis: templateStatis
     },
     props: {
-        staOrRec: { // 传入的开启对话框数组
+        StaOrRec: { // 传入的开启对话框数组
             type: Array
         },
         form: { // 当前表单示例

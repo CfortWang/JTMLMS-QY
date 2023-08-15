@@ -3,16 +3,27 @@
     <div slot="west">
       <div class="box">
         <p class="title">用户信息</p>
-        <el-input placeholder="输入关键字进行过滤" v-model="filterText">
+        <el-input placeholder="输入关键字进行过滤"
+                  v-model="filterText">
         </el-input>
         <div class="treeDiv">
-          <el-tree ref="tree" :data="peopleData" :props="defaultProps" @node-click="handleNodeClick"
-            :filter-node-method="filterNode"></el-tree>
+          <el-tree ref="tree"
+                   :data="peopleData"
+                   :props="defaultProps"
+                   @node-click="handleNodeClick"
+                   :filter-node-method="filterNode"></el-tree>
         </div>
       </div>
-      <ibps-container :margin-left="205 + 'px'" class="page">
-        <detail v-if="show === 'detail'" :id="orgId" />
-        <el-alert v-else :closable="false" title="尚未指定一个人员" type="warning" show-icon style="height:50px;" />
+      <ibps-container :margin-left="205 + 'px'"
+                      class="page">
+        <detail v-if="show === 'detail'"
+                :id="orgId" />
+        <el-alert v-else
+                  :closable="false"
+                  title="尚未指定一个人员"
+                  type="warning"
+                  show-icon
+                  style="height:50px;" />
       </ibps-container>
 
     </div>
@@ -82,6 +93,5 @@ export default {
 }
 </script>
 <style lang="scss" >
-
 </style>
   

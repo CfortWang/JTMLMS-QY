@@ -292,29 +292,27 @@ export default {
       }
     },
     partFilter: function (value, arr) {
-      return value
-      // if(value.includes(",")){
-      //   let part = "";
-      //   let parts = []
-      //   parts = value.split(',');
-      //   for(let item of arr){
-      //     for(let j = 0; j < parts.length; j++) {
-      //       if(item.ID_ == parts[j]){
-      //         part = part +","+ item.NAME_;
-      //       }
-      //     }
-      //   }
-      //   return part.slice(1,part.length)
-      // }else{  
-      // for (let i = 0; i < arr.length; i++) {
-      //   console.log(arr[i])
-      //   if (arr[i].ID_ == value) {
-      //     return arr[i].NAME_;
-      //   }else{
-      //     return value
-      //   }
-      // }
-      // }
+      // console.log(value, arr,"12")
+      // return value
+      if(value.includes(",")){
+        let part = "";
+        let parts = []
+        parts = value.split(',');
+        for(let item of arr){
+          for(let j = 0; j < parts.length; j++) {
+            if(item.bu_men_id_ == parts[j]){
+              part = part +","+ item.mian_bu_men;
+            }
+          }
+        }
+        return part.slice(1,part.length)
+      }else{  
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].bu_men_id_ == value) {
+          return arr[i].mian_bu_men;
+        }
+      }
+      }
     },
   },
   watch: {
@@ -609,8 +607,9 @@ export default {
       });
     },
     async getPart() {
+      
       let this_ = this;
-      let sql = "select ID_,NAME_,CREATE_TIME_ FROM ibps_party_org";
+      let sql = "select * FROM ibps_main_position";
       await curdPost("sql", sql).then((res) => {
         this_.partList = res.variables.data;
       });
@@ -681,17 +680,17 @@ export default {
       let newarr = [];
       let obj = {};
       let str =""
-      let sql = "select ID_,NAME_ FROM  ibps_party_org";
+      let sql = "select * FROM  ibps_main_position";
       await curdPost("sql", sql).then((res) => {
         let arr1 = res.variables.data;
         arr.forEach((item, index) => {
           str =""
           arr1.forEach((it) => {
-            if (item.ze_ren_shi_ == it.ID_ && !item.ze_ren_shi_.includes(",")) {
-              arr[index].ze_ren_shi_ = it.NAME_;
+            if (item.ze_ren_shi_ == it.bu_men_id_ && !item.ze_ren_shi_.includes(",")) {
+              arr[index].ze_ren_shi_ = it.mian_bu_men;
             }
-            if(item.ze_ren_shi_.includes(",")&& item.ze_ren_shi_.includes(it.ID_)){
-              str += "," + it.NAME_
+            if(item.ze_ren_shi_.includes(",")&& item.ze_ren_shi_.includes(it.bu_men_id_)){
+              str += "," + it.mian_bu_men
             }
           });
           if(str){
