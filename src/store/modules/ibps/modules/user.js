@@ -74,9 +74,11 @@ export default {
                             root: true
                         })
                         if (info.positions && info.positions.length) {
+                            // 当存在第二级为空时，说明具备最高级权限
+                            const hasFirst = info.positions.some(obj => obj.path.split('.')[1] === '')
                             const level = {
-                                first: [...new Set(info.positions.map(obj => obj.path ? obj.path.split('.')[0] : '').filter(Boolean))].join(','),
-                                second: [...new Set(info.positions.map(obj => obj.path ? obj.path.split('.')[1] : '').filter(Boolean))].join(',')
+                                first: [...new Set(info.positions.map(obj => obj.path.split('.')[0]))].join(','),
+                                second: hasFirst ? '' : [...new Set(info.positions.map(obj => obj.path.split('.')[1]))].join(',')
                             }
                             await dispatch('ibps/param/setLevel', level, {
                                 root: true

@@ -352,7 +352,7 @@ const FormUtil = {
     },
     getCurrentDataValue ({ selectorType, bindId, fieldName, storeType }) {
         const userInfo = store.getters.userInfo
-        const { level = '' } = store.getters
+        const { level = {} } = store.getters
         // 缓存用户
         if (userInfo.employee && userInfo.employee.id) {
             const selectors = [{
@@ -363,8 +363,8 @@ const FormUtil = {
         }
         // 当前层级
         if (selectorType === 'currentPosition') {
-            const selectors = level.split(',').map(str => ({ id: str }))
-            console.log(selectors)
+            const t = level.second || level.first
+            const selectors = t ? t.split(',').map(str => ({ id: str })) : ''
             this.CACHE_CURRENT_USER_DATA['currentPosition'] = selectors
         }
         // 当前组织

@@ -181,7 +181,6 @@ const sizeMap = {
   'small': 32,
   'mini': 28
 }
-console.log(Popper, popperMixin)
 
 export default {
   name: 'ibps-tree-select',
