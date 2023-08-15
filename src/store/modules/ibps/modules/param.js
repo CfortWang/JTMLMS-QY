@@ -6,7 +6,10 @@ export default {
         // 所有用户信息
         usersList: [],
         // 当前用户层级
-        level: ''
+        level: {
+            first: '',
+            second: ''
+        }
     },
     mutations: {
         myformSet (state, myform) {
@@ -16,7 +19,7 @@ export default {
             state.usersList = data.length ? data : []
         },
         level (state, data) {
-            state.level = data || ''
+            state.level = data || { first: '', second: '' }
         }
     },
     actions: {

@@ -74,7 +74,10 @@ export default {
                             root: true
                         })
                         if (info.positions && info.positions.length) {
-                            const level = [...new Set(info.positions.map(obj => obj.path ? obj.path.split('.')[1] : '').filter(Boolean))].join(',')
+                            const level = {
+                                first: [...new Set(info.positions.map(obj => obj.path ? obj.path.split('.')[0] : '').filter(Boolean))].join(','),
+                                second: [...new Set(info.positions.map(obj => obj.path ? obj.path.split('.')[1] : '').filter(Boolean))].join(',')
+                            }
                             await dispatch('ibps/param/setLevel', level, {
                                 root: true
                             })

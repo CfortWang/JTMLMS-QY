@@ -162,7 +162,7 @@ const popperMixin = {
       type: String,
       default: 'bottom-start'
     },
-    appendToBody: Popper.props.appendToBody,
+    appendToBody: false,
     arrowOffset: Popper.props.arrowOffset,
     offset: Popper.props.offset,
     boundariesPadding: Popper.props.boundariesPadding,
@@ -181,6 +181,7 @@ const sizeMap = {
   'small': 32,
   'mini': 28
 }
+console.log(Popper, popperMixin)
 
 export default {
   name: 'ibps-tree-select',

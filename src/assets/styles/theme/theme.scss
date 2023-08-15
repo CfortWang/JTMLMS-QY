@@ -49,12 +49,13 @@
     background: $theme-menu-item-background-color-hover;
   }
   %el-menu-icon {
-    i {
-      display: inline-block;
-      width: 14px;
-      text-align: center;
-      margin-right: 5px;
-    }
+    // 去除主题差异
+    // i {
+    //   display: inline-block;
+    //   width: 14px;
+    //   text-align: center;
+    //   margin-right: 5px;
+    // }
     svg {
       margin: 0px;
       height: 14px;
@@ -176,27 +177,27 @@
         }
       }
     }
-    // zxh 新增
-     .ibps-layout-header-user{
-      width:95px;
-      .user-name-span{
-        display: inline-block;
-        margin-top: 5px;
-        margin-left: 5px;
-        width:45px;
-        color: $theme-header-item-color;
-        .user-name-title{
-          overflow: hidden; 
-          white-space: nowrap;
-          width:42px;
-          color: $theme-header-item-color;
-        }
-      }
-       i.user-dropdown{
-        color: $theme-header-item-color;
-      }
+    // // zxh 新增
+    //  .ibps-layout-header-user{
+    //   width:95px;
+    //   .user-name-span{
+    //     display: inline-block;
+    //     margin-top: 5px;
+    //     margin-left: 5px;
+    //     width:45px;
+    //     color: $theme-header-item-color;
+    //     .user-name-title{
+    //       overflow: hidden; 
+    //       white-space: nowrap;
+    //       width:42px;
+    //       color: $theme-header-item-color;
+    //     }
+    //   }
+    //    i.user-dropdown{
+    //     color: $theme-header-item-color;
+    //   }
  
-    }
+    // }
     
   }
   // [布局] 顶栏下面

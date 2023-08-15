@@ -27,7 +27,7 @@
   .ibps-layout-header-aside-content {
     @extend %full;
     .ibps-theme-header {
-      height: 60px;
+      height: 50px;
       .ibps-theme-header-menu {
         overflow: hidden;
         &.is-scrollable {
@@ -68,7 +68,7 @@
 		  }
         }
         .ibps-theme-header-menu__prev, .ibps-theme-header-menu__next {
-          height: 60px;
+          height: 50px;
           position: absolute;
           top: 0;
           font-size: 20px;
@@ -201,7 +201,7 @@
       // 顶栏右侧的按钮
       .ibps-header-right {
         float: right;
-        height: 60px;
+        height: 50px;
         display: flex;
         align-items: center;
         .btn-text {
