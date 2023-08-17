@@ -48,18 +48,22 @@ specialType[guanshen] = [
 specialBtn[neishen] = {
     label: '不符合项报告与纠正措施记录',
     desc: '整改',
-    path: '43罗湖/L35-LHXBJY-QP-8.8-01内部管理体系审核程序/LHXBJY-QP-88-01-FQ-06不符合项报告与纠正措施记录表.rpx'
+    // path: '43罗湖/L35-LHXBJY-QP-8.8-01内部管理体系审核程序/LHXBJY-QP-88-01-FQ-06不符合项报告与纠正措施记录表.rpx'
+    path: '内部审核/不符合项报告与纠正措施记录表.rpx'
 }
 specialBtn[guanshen] = {
     label: '改进项与跟踪验证',
     desc: '改进',
-    path: '43罗湖/L36-LHXBJY-QP-8.9-01管理评审程序/LHXBJY-QP-8.6-01-FQ-01 改进项跟踪验证表.rpx'
+    // path: '43罗湖/L36-LHXBJY-QP-8.9-01管理评审程序/LHXBJY-QP-8.6-01-FQ-01 改进项跟踪验证表.rpx'
+    path: '管理评审/改进项跟踪验证表.rpx'
 }
 
-specialParams[neishen] = 'id_, zheng_gai_qian_ji as beforeImprove, zheng_gai_hou_jia as afterImprove, bian_zhi_ri_qi_ as flag'
+// specialParams[neishen] = 'id_, zheng_gai_qian_ji as beforeImprove, zheng_gai_hou_jia as afterImprove, bian_zhi_ri_qi_ as flag'
+specialParams[neishen] = 'id_, qian_cai_liao_ as beforeImprove, hou_cai_liao_ as afterImprove, bian_zhi_shi_jian as flag'
 specialParams[guanshen] = 'id_, gai_jin_qian_jian as beforeImprove, fu_jian_ as afterImprove, bian_hao_ as flag'
 
-specialTable[neishen] = 't_bfhxbgyjzcsjlbx'
+// specialTable[neishen] = 't_bfhxbgyjzcsjlbx'
+specialTable[neishen] = 't_bfhhjzcsjlb'
 specialTable[guanshen] = 't_glpsjhb'
 
 specialField[neishen] = 'ji_hua_zong_wai_j'

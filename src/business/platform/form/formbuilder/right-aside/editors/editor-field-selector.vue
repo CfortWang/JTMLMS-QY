@@ -21,7 +21,7 @@
                 <template slot="label">是否多选<help-tip prop="multiple" /></template>
                 <el-switch v-model="fieldOptions.multiple" @change="setDefaultValue" />
             </el-form-item>
-            <el-form-item v-if="types.includes('filtrate')">
+            <el-form-item v-if="types.includes('multiple')">
                 <template slot="label">是否过滤</template>
                 <el-switch v-model="fieldOptions.filtrate" @change="setDefaultValue" />
             </el-form-item>

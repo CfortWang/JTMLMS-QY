@@ -177,7 +177,7 @@ export default {
             this.partyTypeId = params.partyTypeId
             this.currentOrgId = params.currentOrgId
             this.script = params.script
-        // console.info(this.partyTypeId, this.currentOrgId, '==>>11')
+            // console.info(this.partyTypeId, this.currentOrgId, '==>>11')
         },
         filterScope (val) {
             const existingTypeScope = []

@@ -1,6 +1,6 @@
 <template>
-    <div style="height:50vh;">
-        <div id="qrcode" ref="qrcode" style="margin-top:25vh;" />
+    <div style="height:150px">
+        <div id="qrcode" ref="qrcode" class="qrCode" />
     </div>
 
 </template>
@@ -22,13 +22,25 @@ export default {
             default: false
         }
     },
+    watch: {
+        'formData.changJingId' () {
+            // console.log('5555')
+            this.qrcode()
+            console.log(window.qrTimer)
+        }
+    },
     mounted () {
-        this.qrcode()
+        // this.qrcode()
+    },
+    destroyed () {
+        if (window.qrTimer) {
+            clearInterval(window.qrTimer)
+        }
     },
 
     methods: {
         qrcode () {
-            console.log(this)
+            console.log(this.formData.changJingId)
             const qrcode = new QRCode('qrcode', {
                 width: 132,
                 height: 132,
@@ -43,9 +55,10 @@ export default {
 }
 </script>
 
-<style scoped>
-#qrcode {
+<style lang="scss" scoped>
+.qrCode {
   width: 100px;
   height: 100px;
+  margin: 0 auto;
 }
 </style>
