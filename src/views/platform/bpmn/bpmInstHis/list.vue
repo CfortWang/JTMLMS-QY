@@ -4,15 +4,16 @@
             <ibps-type-tree
                 :width="width"
                 :height="height"
-
                 :location="location"
                 category-key="FLOW_TYPE"
-                :hasPermission="hasPermission"
+                :has-permission="hasPermission"
                 @node-click="handleNodeClick"
                 @expand-collapse="handleExpandCollapse"
             />
         </div>
+        <template-list v-if="templateData.templateid_" :template-data="templateData" />
         <ibps-crud
+            v-else
             ref="crud"
             :style="{ marginLeft: width + 'px' }"
             :height="height"
@@ -20,7 +21,7 @@
             :toolbars="listConfig.toolbars"
             :search-form="listConfig.searchForm"
             :pk-key="pkKey"
-            :displayField="tableTitle"
+            :display-field="tableTitle"
             :columns="listConfig.columns"
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
@@ -167,12 +168,14 @@ import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import { specialType, specialBtn, specialParams, specialTable, specialField } from './corresponding/index'
+import TemplateList from './templateList'
 
 export default {
     components: {
         IbpsTypeTree,
         BpmnFormrender,
-        'ibps-attachment': IbpsAttachment
+        IbpsAttachment,
+        TemplateList
     },
     filters: {
         // 截取报表名称
@@ -215,7 +218,11 @@ export default {
             title: '',
             loading: true,
             height: document.clientHeight,
-            reportAll: [],
+            reportAll: {
+                process: [],
+                template: []
+            },
+            templateData: {},
             listData: [],
             pagination: {},
             sorts: {},
@@ -242,13 +249,14 @@ export default {
                     { prop: 'procDefName', label: '表单名称', sortable: 'custom', formatter: this.replaceFormName, width: 250 },
                     { prop: 'subject', label: '事务说明', formatter: this.getDesc, 'min-width': 300 },
                     { prop: 'tUser', label: '编制人', width: 80 },
-                    { prop: 'endTime', label: '完成时间', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 90 }
+                    { prop: 'endTime', label: '完成时间', sortable: 'custom', dateFormat: 'yyyy-MM-dd hh:mm:ss', width: 150 }
                 ],
                 rowHandle: {
                     actions: [
                         {
                             key: 'detail',
-                            label: '详情'
+                            label: '详情',
+                            type: 'info'
                         }
                     ],
                     effect: 'display',
@@ -313,9 +321,12 @@ export default {
         },
         // 获取所有流程的报表配置数据
         getConfig () {
-            const sql = 'select bao_biao_lu_jing_, fu_jian_nei_rong_, guan_lian_zi_duan, liu_cheng_xuan_ze, shi_fou_zi_biao_ from t_lcidglbdbb'
+            const sql = `select * from t_lcidglbdbb`
             curdPost('sql', sql).then((res) => {
-                this.reportAll = res.variables && res.variables.data
+                const { data = [] } = res.variables || {}
+                data.forEach(i => {
+                    this.reportAll[i.gui_dang_lei_xing].push(i)
+                })
             }).catch(() => {
                 console.log('获取流程配置报表数据失败！')
             })
@@ -336,7 +347,7 @@ export default {
                 return
             }
             this.numbersClick()
-            const temp = this.reportAll.find(item => item.liu_cheng_xuan_ze === procDefKey)
+            const temp = this.reportAll.process.find(item => item.liu_cheng_xuan_ze === procDefKey)
             if (!temp) {
                 return
             }
@@ -372,7 +383,7 @@ export default {
         },
         // 获取所有附件
         getAllFile ({ file, table, field, bizKey }) {
-	    let resultList = []
+            const resultList = []
             table.forEach((item, index) => {
                 const sql = `select ${file[index]} from ${item} where ${field.length && field[index] ? field[index] : 'id_'} = '${bizKey}'`
                 resultList.push(this.getFile(sql, file[index]))
@@ -389,8 +400,8 @@ export default {
         getFile (sql, fileField) {
             return new Promise((resolve, reject) => {
                 curdPost('sql', sql).then(res => {
-		    let result = []
-		    let fileList = fileField.split(',')
+                    const result = []
+                    const fileList = fileField.split(',')
                     // console.log(fileList)
                     let { data = [] } = res.variables || {}
                     data = data.filter(i => i)
@@ -415,8 +426,8 @@ export default {
         getFileId (value) {
             // 判断是否为图片类型，文件类型只存储文件ID，图片会以对象形式保存
             if (value.includes('id')) {
-                    let result = []
-                    let temp = JSON.parse(value)
+                const result = []
+                const temp = JSON.parse(value)
                 temp.forEach(item => result.push(item.id))
                 return result.join(',')
             }
@@ -536,8 +547,8 @@ export default {
                 showClose: false,
                 closeOnClickModal: false
             }).then(() => {
-	    	let formKeyArr = []
-		let delList = {}
+                const formKeyArr = []
+                const delList = {}
                 data.forEach(item => {
                     const { bizKey, formKey } = item
                     if (!delList[formKey]) {
@@ -582,7 +593,13 @@ export default {
         handleNodeClick (typeId, typeName) {
             this.tableTitle = typeName.name
             this.typeId = typeId
-            this.loadData()
+            this.templateData = this.reportAll.template.find(i => i.fen_lei_id_ === typeId) || {}
+            if (!this.templateData.templateid_) {
+                this.loadData()
+            } else {
+                this.templateData.typeId = typeId
+                this.templateData.typeName = typeName.name
+            }
         },
         handleExpandCollapse (isExpand) {
             this.width = isExpand ? 230 : 30

@@ -85,6 +85,7 @@
         :style="itemStyle + (item.itemWidth ? `width: ${item.itemWidth}px;` : '')"
         :picker-options="item.pickerOptions || {}"
         type="daterange"
+        unlink-panels
         @change="date => changeDate(date, item.prop[0], item.prop[1])"
         @keyup.enter.native.stop="handleEnter"
       />

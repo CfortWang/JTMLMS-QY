@@ -191,13 +191,13 @@ export default {
         },
         // 表格字段配置
         columns: [
-          { prop: 'name', label: '流程名称', slotName: 'defName', sortable: true },
-          { prop: 'defKey', label: '流程业务主键', width: 150, sortable: true },
+          { prop: 'name', label: '流程名称', slotName: 'defName', sortable: true, minWidth: 200 },
+          { prop: 'defKey', label: '流程业务主键', width: 120, sortable: true },
           { prop: 'status', label: '流程状态', tags: statusOptions, width: 90 },
           { prop: 'testStatus', label: '测试状态', tags: testStatusOptions, width: 90 },
-          { prop: 'createTime', label: '创建时间', width: 150, sortable: true },
-          { prop: 'updateTime', label: '更新时间', width: 150, sortable: true },
-          { prop: 'version', label: '版本号', width: 90, sortable: true }
+          { prop: 'createTime', label: '创建时间', width: 140, sortable: true },
+          { prop: 'updateTime', label: '更新时间', width: 140, sortable: true },
+          { prop: 'version', label: '版本号', width: 80, sortable: true }
         ],
         rowHandle: {
           actions: [

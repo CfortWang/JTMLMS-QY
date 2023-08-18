@@ -452,7 +452,7 @@ export default {
         opacity: 0.4!important;
         color: #C0C4CC!important;}
        .el-tree{border-right:1px solid #ccc;}
-       .el-tree-node__label{width:120px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
+       /* .el-tree-node__label{width:120px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;} */
        .span-ellipsis {
         width: 100%;
         overflow: hidden;

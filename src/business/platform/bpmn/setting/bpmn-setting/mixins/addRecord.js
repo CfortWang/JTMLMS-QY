@@ -11,7 +11,7 @@ export default {
     },
     methods: {
         getRecord (id) {
-            const sql = `select * from t_lcidglbdbb where gui_dang_lei_xing = 'process' liu_cheng_xuan_ze = '${id}'`
+            const sql = `select * from t_lcidglbdbb where gui_dang_lei_xing = 'process' and liu_cheng_xuan_ze = '${id}'`
             curdPost('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
