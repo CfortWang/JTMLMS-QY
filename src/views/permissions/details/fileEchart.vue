@@ -27,7 +27,6 @@
 
 
 <script>
-import { getLmitedFile, getUserByFile, saveUserByFile } from '@/api/permission/file'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
 export default {

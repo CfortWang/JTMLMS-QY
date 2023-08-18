@@ -30,10 +30,9 @@
   </ibps-layout>
 </template>
 <script>
-import { getAllUserInfor } from '@/api/permission/page'
 import FixHeight from '@/mixins/height'
 import Detail from '../details/fileEchart.vue'
-
+import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
 export default {
   components: {
@@ -64,12 +63,14 @@ export default {
   methods: {
     loadNode(node, resolve) {
       this.loading = true
-      getAllUserInfor().then(res => {
+      let sql = `select ee.id_ AS eeId,ee.name_ AS eeName,ee.status_,ee.positions_,en.id_ AS enId,en.name_ AS enName,en.path_ FROM ibps_party_employee ee 
+        LEFT JOIN ibps_party_entity en ON FIND_IN_SET(en.id_,ee.positions_) WHERE ee.status_='actived' AND ee.id_<>'-1' AND en.path_ LIKE'%${this.$store.getters.level.first}%' GROUP BY ee.id_`
+      curdPost('sql', sql).then(res => {
         this.loading = false
         for (let i of res.variables.data) {
           let data = {}
-          data["id"] = i.id_
-          data["label"] = i.name_
+          data["id"] = i.eeId
+          data["label"] = i.eeName
           this.peopleData.push(data)
         }
       }).catch(res => {

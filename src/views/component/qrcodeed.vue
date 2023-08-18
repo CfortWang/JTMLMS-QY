@@ -1,6 +1,6 @@
 <template>
     <div style="height:150px">
-        <div id="qrcode" ref="qrcode" class="qrCode" />
+        <div id="qrcode" ref="qrcodes" class="qrCode" />
     </div>
 
 </template>
@@ -22,15 +22,26 @@ export default {
             default: false
         }
     },
+    data () {
+        return {
+            qrCode: ''
+        }
+    },
     watch: {
-        'formData.changJingId' () {
-            // console.log('5555')
-            this.qrcode()
-            console.log(window.qrTimer)
+        'formData.changJingId': {
+            handler () {
+                this.$nextTick(() => {
+                    this.qrcode()
+                })
+            },
+            immediate: true
+
         }
     },
     mounted () {
-        // this.qrcode()
+        // setTimeout(() => {
+        //     this.qrcode()
+        // }, 500)
     },
     destroyed () {
         if (window.qrTimer) {
@@ -40,8 +51,10 @@ export default {
 
     methods: {
         qrcode () {
-            console.log(this.formData.changJingId)
-            const qrcode = new QRCode('qrcode', {
+            if (this.qrCode) {
+                this.$refs.qrcodes.innerHTML = ''
+            }
+            this.qrCode = new QRCode('qrcode', {
                 width: 132,
                 height: 132,
                 text: `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxf0aecf99696061a3&redirect_uri=https%3A%2F%2Fwww.szjyxt.com%2F%23%2Fziliao&response_type=code&scope=snsapi_base&state=${this.formData.changJingId}#wechat_redirect`,
