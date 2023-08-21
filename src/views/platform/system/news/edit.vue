@@ -219,7 +219,8 @@ export default {
                 status: '',
                 tenantId: '',
                 title: '',
-                type: '',
+                // 改字段暂时无用，改存当前层级第一级ID
+                type: this.$store.getters.level ? this.$store.getters.level.first : '',
                 typeId: '',
                 updateBy: '',
                 updateTime: '',

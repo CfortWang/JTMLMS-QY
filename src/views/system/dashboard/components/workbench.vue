@@ -463,6 +463,9 @@ export default {
             if (this.activeTab === 'finish') {
                 params.end = '1'
             }
+            if (this.activeTab === 'news') {
+                params['Q^type_^SL'] = this.$store.getters.level ? this.$store.getters.level.first : ''
+            }
             const s = this.activeTab === 'news' ? { 'PUBLIC_DATE_': 'DESC' } : this.sorts
             return ActionUtils.formatParams(params, page, s)
         },

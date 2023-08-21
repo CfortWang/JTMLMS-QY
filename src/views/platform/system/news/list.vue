@@ -131,8 +131,10 @@ export default {
          * 获取格式化参数
          */
         getSearcFormData () {
+            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            params['Q^type_^SL'] = this.$store.getters.level ? this.$store.getters.level.first : ''
             return ActionUtils.formatParams(
-                this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
+                params,
                 this.pagination,
                 this.sorts)
         },
