@@ -641,35 +641,35 @@ export default {
                 // 筛选出不存在于主管提醒表的过期数据
                 if (!isExist) {
                     // 无部门信息的用户不往过期事务表加数据
-                    if (this.orgInfo.groupID) {
-                        const obj = {
-                            // 事务ID
-                            shi_wu_id_: item.taskId,
-                            // 完整名称
-                            wan_zheng_ming_ch: item.subject,
-                            // 事务说明
-                            shi_wu_shuo_ming_: item.subject.includes('#') ? item.subject.split('#')[1] : '',
-                            // 事务名称
-                            shi_wu_ming_cheng: item.workName,
-                            // 事务状态
-                            shi_wu_zhuang_tai: `待${item.name}`,
-                            // 事务类型
-                            shi_wu_lei_xing_: item.workType,
-                            chu_li_ren_ming_: item.ownerName,
-                            chu_li_ren_id_: this.getInfoByName(item.ownerName, 'id'),
-                            chu_li_ren_dian_h: this.getInfoByName(item.ownerName, 'phone'),
-                            bu_men_: this.orgInfo.orgName,
-                            bu_men_id_: this.orgInfo.groupID,
-                            // 主管ID与当前用户id相等时将主管ID设置为主任【】的ID，主管电话设为空
-                            zhu_guan_id_: this.orgInfo.id === userId ? '990927120278487040' : this.orgInfo.id,
-                            zhu_guan_dian_hua: this.orgInfo.id === userId ? '' : this.orgInfo.mobile,
-                            bian_zhi_shi_jian: item.createTime,
-                            ti_xing_ci_shu_: 1,
-                            duan_xin_ci_shu_: 0,
-                            ti_xing_shi_jian_: nowTime
-                        }
-                        addList.push(obj)
+                    // if (this.orgInfo.groupID) {
+                    const obj = {
+                        // 事务ID
+                        shi_wu_id_: item.taskId,
+                        // 完整名称
+                        wan_zheng_ming_ch: item.subject,
+                        // 事务说明
+                        shi_wu_shuo_ming_: item.subject.includes('#') ? item.subject.split('#')[1] : '',
+                        // 事务名称
+                        shi_wu_ming_cheng: item.workName,
+                        // 事务状态
+                        shi_wu_zhuang_tai: `待${item.name}`,
+                        // 事务类型
+                        shi_wu_lei_xing_: item.workType,
+                        chu_li_ren_ming_: item.ownerName,
+                        chu_li_ren_id_: this.getInfoByName(item.ownerName, 'id'),
+                        chu_li_ren_dian_h: this.getInfoByName(item.ownerName, 'phone'),
+                        bu_men_: this.orgInfo.orgName,
+                        bu_men_id_: this.orgInfo.groupID,
+                        // 主管ID与当前用户id相等时将主管ID设置为主任【】的ID，主管电话设为空
+                        zhu_guan_id_: this.orgInfo.id === userId ? '990927120278487040' : this.orgInfo.id,
+                        zhu_guan_dian_hua: this.orgInfo.id === userId ? '' : this.orgInfo.mobile,
+                        bian_zhi_shi_jian: item.createTime,
+                        ti_xing_ci_shu_: 1,
+                        duan_xin_ci_shu_: 0,
+                        ti_xing_shi_jian_: nowTime
                     }
+                    addList.push(obj)
+                    // }
                     const msg = {
                         subject: msgTitle[item.workType],
                         content: `<p>事务【${item.workName}】${msgContent[item.workType]}<p>`,
