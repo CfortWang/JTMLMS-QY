@@ -165,7 +165,6 @@ import ActionUtils from '@/utils/action'
 import IbpsTypeTree from '@/business/platform/cat/type/tree'
 import FixHeight from '@/mixins/height'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import { specialType, specialBtn, specialParams, specialTable, specialField } from './corresponding/index'
 import TemplateList from './templateList'
@@ -322,13 +321,18 @@ export default {
         // 获取所有流程的报表配置数据
         getConfig () {
             const sql = `select * from t_lcidglbdbb`
-            curdPost('sql', sql).then((res) => {
+            this.$common.request('sql', sql).then((res) => {
                 const { data = [] } = res.variables || {}
                 data.forEach(i => {
-                    this.reportAll[i.gui_dang_lei_xing].push(i)
+                    if (!i.gui_dang_lei_xing) {
+                        this.reportAll.process.push(i)
+                    } else {
+                        this.reportAll[i.gui_dang_lei_xing].push(i)
+                    }
                 })
-            }).catch(() => {
-                console.log('获取流程配置报表数据失败！')
+            }).catch(err => {
+                this.$message.error('获取流程配置报表数据失败！')
+                console.log(err)
             })
         },
         // 获取报表数据及附件数据
@@ -371,7 +375,7 @@ export default {
                 })
                 this.getSpecicalFile(bizKey)
             }
-            console.log(typeIndex)
+            // console.log(typeIndex)
             if (typeIndex !== '') {
                 this.record.report = this.record.report.slice(0, typeIndex)
             }
@@ -399,7 +403,7 @@ export default {
         // 获取单个请求中的文件
         getFile (sql, fileField) {
             return new Promise((resolve, reject) => {
-                curdPost('sql', sql).then(res => {
+                this.$common.request('sql', sql).then(res => {
                     const result = []
                     const fileList = fileField.split(',')
                     // console.log(fileList)
@@ -436,8 +440,8 @@ export default {
         // 获取内审管审文件
         getSpecicalFile (id) {
             const sql = `select ${specialParams[this.typeId]} from ${specialTable[this.typeId]} where ${specialField[this.typeId]} = '${id}'`
-            console.log(sql)
-            curdPost('sql', sql).then(res => {
+            // console.log(sql)
+            this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length) {
                     this.record.special = data.filter(i => i.beforeImprove || i.afterImprove)
@@ -562,7 +566,7 @@ export default {
                 // console.log(delList, formKeyArr)
                 const sql = `select a.bo_code_, b.key_ from ibps_form_bo a, ibps_form_def b where a.form_id_ = b.id_ and find_in_set(b.key_, '${formKeyArr.join(',')}')`
                 // 获取选中记录对应的数据表code
-                curdPost('sql', sql).then(res => {
+                this.$common.request('sql', sql).then(res => {
                     const result = res.variables && res.variables.data
                     const codeList = {}
                     result.forEach(m => {
@@ -573,14 +577,14 @@ export default {
                         paramWhere: { id_: selection.join(',') }
                     }
                     // 删除选中记录
-                    curdPost('delete', deleteParams1).then(() => {
+                    this.$common.request('delete', deleteParams1).then(() => {
                         // 循环删除对应数据表数据
                         Object.keys(codeList).forEach(k => {
                             const deleteParams2 = {
                                 tableName: `t_${codeList[k]}`,
                                 paramWhere: { id_: delList[k].join(',') }
                             }
-                            curdPost('delete', deleteParams2)
+                            this.$common.request('delete', deleteParams2)
                         })
                         this.$message.success('删除成功！')
                         this.search()
