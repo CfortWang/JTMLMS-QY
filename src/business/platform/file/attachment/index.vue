@@ -190,7 +190,6 @@ export default {
         }
     },
     data () {
-        console.log(this.value)
         return {
             fileList: [],
             targetExt: false,
@@ -358,8 +357,8 @@ export default {
         },
         updateSort ({ to, from, item, clone, oldIndex, newlndex }) {
             // console.log(to, from, item, clone, oldIndex, newlndex)
-            console.log(this.value)
-            console.log(this.sortList)
+            // console.log(this.value)
+            // console.log(this.sortList)
         }
     }
 }

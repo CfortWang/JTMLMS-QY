@@ -70,16 +70,16 @@ export default {
             },
             deep: true,
             immediate: true
+        },
+        templateId: {
+            handler (val) {
+                if (this.$utils.isNotEmpty(val)) {
+                    this.dataTemplateId = val
+                    this.loadDataTemplate()
+                }
+            },
+            immediate: true
         }
-        // templateId: {
-        //     handler (val) {
-        //         if (this.$utils.isNotEmpty(val)) {
-        //             this.dataTemplateId = val
-        //             this.loadDataTemplate()
-        //         }
-        //     },
-        //     immediate: true
-        // }
     },
     // created () {
     //     this.loadDataTemplate()

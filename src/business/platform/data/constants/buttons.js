@@ -82,7 +82,7 @@ const buttons = {
         label: '导出模板',
         type: 'primary',
         icon: 'ibps-icon-export',
-        scope: ['toolbar'],
+        scope: ['toolbar']
     },
     'openTask': {
         label: '编制',

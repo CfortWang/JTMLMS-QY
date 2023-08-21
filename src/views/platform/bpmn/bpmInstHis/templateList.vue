@@ -1,7 +1,6 @@
 <template>
     <div class="template-container">
         <template-list
-            v-if="templateId"
             :template-id="templateId"
             :dynamic-params="dynamicParams"
             :filter-params="filterParams"
@@ -24,8 +23,6 @@ export default {
     },
     data () {
         const { templateid_, guo_lv_can_shu_, typeName } = this.templateData
-        console.log(guo_lv_can_shu_)
-        console.log(JSON.parse(guo_lv_can_shu_))
         return {
             typeName,
             templateId: templateid_,
@@ -33,8 +30,16 @@ export default {
             dynamicParams: {}
         }
     },
+    watch: {
+        templateData (v) {
+            const { templateid_, guo_lv_can_shu_, typeName } = v
+            this.typeName = typeName
+            this.templateId = templateid_
+            this.filterParams = guo_lv_can_shu_ ? JSON.parse(guo_lv_can_shu_) : []
+        }
+    }
     // methods: {
-        
+
     // }
 }
 </script>

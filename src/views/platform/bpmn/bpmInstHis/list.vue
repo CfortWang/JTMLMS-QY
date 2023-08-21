@@ -11,7 +11,7 @@
                 @expand-collapse="handleExpandCollapse"
             />
         </div>
-        <template-list v-if="templateData.templateid_" :template-data="templateData" />
+        <template-list v-if="templateShow" :template-data="templateData" />
         <ibps-crud
             v-else
             ref="crud"
@@ -221,6 +221,7 @@ export default {
                 process: [],
                 template: []
             },
+            templateShow: false,
             templateData: {},
             listData: [],
             pagination: {},
@@ -599,8 +600,10 @@ export default {
             this.typeId = typeId
             this.templateData = this.reportAll.template.find(i => i.fen_lei_id_ === typeId) || {}
             if (!this.templateData.templateid_) {
+                this.templateShow = false
                 this.loadData()
             } else {
+                this.templateShow = true
                 this.templateData.typeId = typeId
                 this.templateData.typeName = typeName.name
             }
