@@ -1,85 +1,108 @@
 <template>
   <!--对话框-->
-  <el-dialog
-    v-if="displayType ==='dialog'"
-    :title="title"
-    :visible.sync="dialogVisible"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    append-to-body
-    class="dialog"
-    :class="className"
-    @open="getFormData"
-    @close="closeDialog"
-  >
-    <el-form
-      ref="typeForm"
-      v-loading="dialogLoading"
-      :element-loading-text="$t('common.loading')"
-      :model="type"
-      :rules="rules"
-      :label-width="formLabelWidth"
-      @submit.native.prevent
-    >
+  <el-dialog v-if="displayType ==='dialog'"
+             :title="title"
+             :visible.sync="dialogVisible"
+             :close-on-click-modal="false"
+             :close-on-press-escape="false"
+             append-to-body
+             class="dialog"
+             :class="className"
+             @open="getFormData"
+             @close="closeDialog">
+    <el-form ref="typeForm"
+             v-loading="dialogLoading"
+             :element-loading-text="$t('common.loading')"
+             :model="type"
+             :rules="rules"
+             :label-width="formLabelWidth"
+             @submit.native.prevent>
       <!-- <el-form-item  v-show="!formId" label="父节点名称:">
         <span>{{ parentData.name }}</span>
       </el-form-item> -->
 
-      <el-form-item label="分类名称:" prop="name">
-        <el-input v-model="type.name" v-pinyin="{vm:type,key:'typeKey'}" />
+      <el-form-item label="分类名称:"
+                    prop="name">
+        <el-input v-model="type.name"
+                  v-pinyin="{vm:type,key:'typeKey'}" />
       </el-form-item>
-      <el-form-item label="分类Key:" prop="typeKey">
-        <el-input v-model="type.typeKey" :disabled="$utils.isNotEmpty(formId)" />
+      <el-form-item label="分类Key:"
+                    prop="typeKey">
+        <el-input v-model="type.typeKey"
+                  :disabled="$utils.isNotEmpty(formId)" />
       </el-form-item>
 
-
-
-      <el-form-item v-show="categoryKey==='DIC_TYPE'" label="分类类型:" prop="struType">
+      <el-form-item v-show="categoryKey==='DIC_TYPE'"
+                    label="分类类型:"
+                    prop="struType">
         <el-radio-group v-model="type.struType">
-          <el-radio
-            v-for="option in srtuOptions"
-            :key="option.value"
-            :label="option.value"
-          >{{ option.label }}
+          <el-radio v-for="option in srtuOptions"
+                    :key="option.value"
+                    :label="option.value">{{ option.label }}
           </el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
-    <div slot="footer" class="el-dialog--center">
-      <ibps-toolbar
-        :actions="toolbars"
-        @action-event="handleActionEvent"
-      />
+    <div slot="footer"
+         class="el-dialog--center">
+      <ibps-toolbar :actions="toolbars"
+                    @action-event="handleActionEvent" />
     </div>
   </el-dialog>
   <!--默认形式-->
-  <div v-else class="main-container">
-    <ibps-container type="full" class="page">
+  <div v-else
+       class="main-container">
+    <ibps-container type="full"
+                    class="page">
       <template slot="header">
-        <el-button type="primary" :disabled="readonly" icon="ibps-icon-save" @click="handleSave()">保存</el-button>
+        <el-button type="primary"
+                   :disabled="readonly"
+                   icon="ibps-icon-save"
+                   @click="handleSave()">保存</el-button>
       </template>
-      <el-form ref="typeForm" :model="type" :rules="rules" :label-width="formLabelWidth">
+      <el-form ref="typeForm"
+               :model="type"
+               :rules="rules"
+               :label-width="formLabelWidth">
         <el-form-item label="分类:">
           <span>{{ isPrivateLocal ? '私有分类' : '普通分类' }}</span>
         </el-form-item>
-        <el-form-item v-show="!formId" label="父节点名称:">
+        <el-form-item v-show="!formId"
+                      label="父节点名称:">
           <span>{{ parentData.name }}</span>
         </el-form-item>
-        <el-form-item label="分类名称:" prop="name">
-          <el-input v-if="!readonly" v-model="type.name" v-pinyin="{vm:type,key:'typeKey'}" />
+        <el-form-item label="分类名称:"
+                      prop="name">
+          <el-input v-if="!readonly"
+                    v-model="type.name"
+                    v-pinyin="{vm:type,key:'typeKey'}" />
           <span v-else>{{ type.name }}</span>
         </el-form-item>
-        <el-form-item label="分类Key:" prop="typeKey">
-          <el-input v-if="!readonly" v-model="type.typeKey" :disabled="$utils.isNotEmpty(formId)" />
+        <el-form-item label="分类Key:"
+                      prop="typeKey">
+          <el-input v-if="!readonly"
+                    v-model="type.typeKey"
+                    :disabled="$utils.isNotEmpty(formId)" />
           <span v-else>{{ type.typeKey }}</span>
         </el-form-item>
-        <el-form-item v-show="categoryKey==='DIC_TYPE'" label="字典类型:" prop="struType">
+        <el-form-item label="查阅权限:"
+                      prop="authorityName"
+                      v-show="categoryKey==='FILE_TYPE'">
+          <el-radio-group v-if="!readonly"
+                          v-model="type.authorityName">
+            <el-radio label="公用查阅">公用查阅</el-radio>
+            <el-radio label="部门查阅">部门查阅</el-radio>
+            <el-radio label="受限查阅">受限查阅</el-radio>
+          </el-radio-group>
+          <span v-else>{{ type.authorityName }}</span>
+        </el-form-item>
+        <el-form-item v-show="categoryKey==='DIC_TYPE'"
+                      label="字典类型:"
+                      prop="struType">
           <el-radio-group v-model="type.struType">
-            <el-radio
-              v-for="option in srtuOptions"
-              :key="option.value"
-              :label="option.value"
-            >{{ option.label }}
+            <el-radio v-for="option in srtuOptions"
+                      :key="option.value"
+                      :label="option.value">{{ option.label }}
             </el-radio>
           </el-radio-group>
         </el-form-item>
@@ -126,7 +149,7 @@ export default {
       dialogVisible: false,
       dialogLoading: false,
       isPrivateLocal: false,
-      topKey:'',
+      topKey: '',
 
       srtuOptions: srtuOptions,
       defaultForm: {},
@@ -134,11 +157,13 @@ export default {
         struType: '1',
         name: '',
         typeKey: '',
-        ownerId: '0'
+        ownerId: '0',
+        authorityName: ''
       },
       rules: {
         name: [{ required: true, message: this.$t('validate.required') }],
-        typeKey: [{ required: true, validator: validateKey }]
+        typeKey: [{ required: true, validator: validateKey }],
+        authorityName: [{ required: true, message: '不得为空' }]
       },
       toolbars: [
         { key: 'save', hidden: () => { return this.readonly } },
@@ -162,12 +187,12 @@ export default {
       }
     },
     visible: {
-      handler: function(val, oldVal) {
+      handler: function (val, oldVal) {
         this.dialogVisible = this.visible
         this.isPrivateLocal = this.isPrivate
       },
       immediate: true
-   },
+    },
     /* formId() {
        if (this.displayType !== 'dialog') {
          this.getFormData()
@@ -175,7 +200,7 @@ export default {
        }
     }, */
     isPrivate: {
-      handler: function(val, oldVal) {
+      handler: function (val, oldVal) {
         this.isPrivateLocal = this.isPrivate
       },
       immediate: true
@@ -259,7 +284,7 @@ export default {
     formValidate() {
       if (this.readonly) return
       this.$nextTick(() => {
-        this.$refs[this.formName].validate(() => {})
+        this.$refs[this.formName].validate(() => { })
       })
     },
     /**

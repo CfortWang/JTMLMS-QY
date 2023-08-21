@@ -136,71 +136,74 @@ export default {
         // 消息确认，受控文件用
         confirmMsg () {
             // TODO
-            this.$confirm('点击确认将在系统信息管理模块查看到所通知文件的具体信息', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning',
-                showClose: false,
-                closeOnClickModal: false
-            }).then(() => {
-                console.log('userInfo', this.$store.getters.userInfo)
-                // TODO 受控文件逻辑处理
-                const perInfosId = this.$store.getters.userInfo.user.id
-                const perInfosName = this.$store.getters.userInfo.user.name
-                // const perInfosorgId = this.$store.getters.userInfo.org.id
-                // const perInfosPositions = this.$store.getters.userInfo.positions
+            // this.$confirm('点击确认将在系统信息管理模块查看到所通知文件的具体信息', '提示', {
+            //     confirmButtonText: '确定',
+            //     cancelButtonText: '取消',
+            //     type: 'warning',
+            //     showClose: false,
+            //     closeOnClickModal: false
+            // }).then(() => {
+            //     console.log('userInfo', this.$store.getters.userInfo)
+            //     // TODO 受控文件逻辑处理
+            //     const perInfosId = this.$store.getters.userInfo.user.id
+            //     const perInfosName = this.$store.getters.userInfo.user.name
+            //     // const perInfosorgId = this.$store.getters.userInfo.org.id
+            //     // const perInfosPositions = this.$store.getters.userInfo.positions
 
-                const sql = "select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '" + perInfosId + "'"
-                curdPost('sql', sql).then((ryjbqkRes) => {
-                    const ryjbqkDatas = ryjbqkRes.variables.data
-                    if (ryjbqkDatas.length == 0) {
-                        alert('该人并没有签字图文在系统，请先上传系统再进行确认！')
-                        return
-                    }
-                    const tempObj = {
-                        id_: generateUUID(),
-                        parent_id_: this.tableId,
-                        // tong_zhi_bu_men_: this.getId(perInfosPositions),
-                        que_ren_qian_ming: JSON.stringify([{
-                            id: ryjbqkDatas[0].qian_zi_tu_wen_,
-                            fileName: '确认签名'
-                        }]),
-                        que_ren_ri_qi_: this.$common.getDateNow(10),
-                        que_ren_ren_xing_: perInfosName
-                    }
-                    const returnParams = {
-                        tableName: this.tableName.slice(0, this.tableName.indexOf('（')), // 字符串 "表名（发放时间）"
-                        paramWhere: [tempObj]
-                    }
-                    // 获取所发放的文件
-                    const files = this.$refs.innerMessage.form.fileMsg
-                    const addwjcysqbs = []
-                    const { userId = '' } = this.$store.getters
-                    files.split(',').forEach(i => {
-                        const addwjcysqb = {
-                            yong_hu_id_: userId,
-                            wen_jian_id_: i,
-                            shou_quan_: '1',
-                            fa_bu_ri_qi_: this.tableName.slice(this.tableName.indexOf('（') + 1, this.tableName.lastIndexOf('）'))
-                        }
-                        addwjcysqbs.push(addwjcysqb)
-                    })
-                     curdPost('add', JSON.stringify(returnParams)).then(() => { console.log('确认接收到发放文件') }).then(
-                        () => {
-                        this.type = ''
-                        this.getFormData()
-                        }
-                    )
+            //     const sql = "select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '" + perInfosId + "'"
+            //     curdPost('sql', sql).then((ryjbqkRes) => {
+            //         const ryjbqkDatas = ryjbqkRes.variables.data
+            //         if (ryjbqkDatas.length == 0) {
+            //             alert('该人并没有签字图文在系统，请先上传系统再进行确认！')
+            //             return
+            //         }
+            //         const tempObj = {
+            //             id_: generateUUID(),
+            //             parent_id_: this.tableId,
+            //             // tong_zhi_bu_men_: this.getId(perInfosPositions),
+            //             que_ren_qian_ming: JSON.stringify([{
+            //                 id: ryjbqkDatas[0].qian_zi_tu_wen_,
+            //                 fileName: '确认签名'
+            //             }]),
+            //             que_ren_ri_qi_: this.$common.getDateNow(10),
+            //             que_ren_ren_xing_: perInfosName
+            //         }
+            //         const returnParams = {
+            //             tableName: this.tableName.slice(0, this.tableName.indexOf('（')), // 字符串 "表名（发放时间）"
+            //             paramWhere: [tempObj]
+            //         }
+            //         // 获取所发放的文件
+            //         const files = this.$refs.innerMessage.form.fileMsg
+            //         const addwjcysqbs = []
+            //         const { userId = '' } = this.$store.getters
+            //         files.split(',').forEach(i => {
+            //             const addwjcysqb = {
+            //                 yong_hu_id_: userId,
+            //                 wen_jian_id_: i,
+            //                 shou_quan_: '1',
+            //                 fa_bu_ri_qi_: this.tableName.slice(this.tableName.indexOf('（') + 1, this.tableName.lastIndexOf('）'))
+            //             }
+            //             addwjcysqbs.push(addwjcysqb)
+            //         })
+            //          curdPost('add', JSON.stringify(returnParams)).then(() => { console.log('确认接收到发放文件') }).then(
+            //             () => {
+            //             this.type = ''
+            //             this.getFormData()
+            //             }
+            //         )
 
-                    curdPost('add',
-                        '{"tableName": "t_wjcysqb","paramWhere":' + JSON.stringify(addwjcysqbs) + '}'
-                    ).then(response => {
-                        console.log(response)
-                    }).catch(error => {
-                    })
-                })
-                this.closeDialog()
-            }).catch(() => { })
+            //         curdPost('add',
+            //             '{"tableName": "t_wjcysqb","paramWhere":' + JSON.stringify(addwjcysqbs) + '}'
+            //         ).then(response => {
+            //             console.log(response)
+            //         }).catch(error => {
+            //         })
+            //     })
+            //     this.closeDialog()
+            // }).catch(() => { })
+             this.type = ''
+             this.closeDialog()
+             this.getFormData()
         },
         handleCallback (res) {
             this.$emit('callback', res)

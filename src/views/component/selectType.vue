@@ -26,7 +26,8 @@ export default {
             setTimeout(() => {
               let nodes = datas1.map(item => ({
                 value: item.ID_,
-                label: item.name_
+                label: item.name_,
+                authority: item.AUTHORITY_NAME
               }));
               // 通过调用resolve将子节点数据返回，通知组件数据加载完成
               resolve(nodes);
@@ -48,6 +49,7 @@ export default {
       this.$emit("change-data", "wenJianLeiXing", nodesInfo.pathNodes[0].label)
       this.$emit("change-data", "wenJianXiLei", xilei.join(' / '))
       this.$emit("change-data", "xiLeiId", nodesInfo.value);
+      this.$emit("change-data", "quanXianLeiXing", nodesInfo.data.authority);
     },
 
   },
