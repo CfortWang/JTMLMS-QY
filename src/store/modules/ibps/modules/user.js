@@ -1,6 +1,7 @@
 import { getUserInfo, switchUser, exitSwitchUser, getRegisterOpen } from '@/api/oauth2/user'
 import { getToken, getUuid } from '@/utils/auth'
 import Utils from '@/utils/util'
+import common from '@/utils/common'
 
 export default {
     namespaced: true,
@@ -56,6 +57,8 @@ export default {
                 await dispatch('getAccount')
                 // 获取切换用户账号
                 await dispatch('getSwitchAccount')
+                // 获取所有用户列表
+                await dispatch('getUserList')
 
                 // 获取注册用户账号
                 dispatch('getRegister').then((r) => {
@@ -155,6 +158,21 @@ export default {
                 }, { root: true })
                 // end
                 resolve()
+            })
+        },
+        /**
+         * 获取所有系统用户账号
+         */
+        getUserList ({ state, dispatch }) {
+            const sql = `select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee`
+            common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                dispatch('ibps/param/setUsersList', data, {
+                    root: true
+                })
+            }).catch(error => {
+                console.log(error)
+                alert('获取所有用户信息失败！')
             })
         },
         /**

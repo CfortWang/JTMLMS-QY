@@ -265,7 +265,6 @@
             this.initData()
         },
         created () {
-            this.getUsersList()
             const today = new Date().toLocaleDateString()
             const savedDate = localStorage.getItem('doNotShowToday')
             if (savedDate !== today) {
@@ -523,22 +522,6 @@
                     this.$message({
                         message: res.message,
                         type: 'error'
-                    })
-                }
-            },
-            // 获取所有用户id及姓名存储到store中
-            getUsersList () {
-                const usersList = this.$store.getters.usersList
-                if (usersList.length) {
-                    return
-                } else {
-                    const sql = `select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee where status_ = 'actived'`
-                    curdPost('sql', sql).then(res => {
-                        const { data } = res.variables
-                        this.$store.dispatch('ibps/param/setUsersList', data)
-                    }).catch(error => {
-                        this.$message.error('获取所有用户信息失败！')
-                        console.log(error)
                     })
                 }
             },

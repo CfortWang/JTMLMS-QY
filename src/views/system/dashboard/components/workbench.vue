@@ -464,7 +464,9 @@ export default {
                 params.end = '1'
             }
             if (this.activeTab === 'news') {
+                // 公告限制显示当前医院且状态为已发布的数据，过滤草稿及失效公告
                 params['Q^type_^SL'] = this.$store.getters.level ? this.$store.getters.level.first : ''
+                params['Q^status_^SL'] = 'publish'
             }
             const s = this.activeTab === 'news' ? { 'PUBLIC_DATE_': 'DESC' } : this.sorts
             return ActionUtils.formatParams(params, page, s)
