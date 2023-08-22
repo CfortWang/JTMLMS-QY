@@ -144,7 +144,7 @@ export default {
                     this.handleRecoverProcess()
                     break
                 case 'save':// 节点按钮设置-保存
-                    this.setData('已暂存')
+                    // this.setData('已暂存')
                     this.handleSave()
                     break
                 default:

@@ -89,6 +89,7 @@
           <el-input
             v-model="rulesData.value"
             :autosize="{ minRows: 2, maxRows: 6}"
+            style="width: calc(80vw - 700px); min-width: 200px"
             type="textarea"
             clearable
           />

@@ -214,7 +214,7 @@ export default {
                 this.lazyTree = this.partyType === 'org'
                 if (val === false) {
                     this.listConfig.searchForm.forms = [
-                        { prop: 'name', label: '姓名' }
+                        { prop: 'Q^NAME_^SL', label: '姓名' }
                     ]
                     this.listConfig.columns = [
                         { prop: 'name', label: '姓名' }
