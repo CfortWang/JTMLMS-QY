@@ -48,13 +48,11 @@ specialType[guanshen] = [
 specialBtn[neishen] = {
     label: '不符合项报告与纠正措施记录',
     desc: '整改',
-    // path: '43罗湖/L35-LHXBJY-QP-8.8-01内部管理体系审核程序/LHXBJY-QP-88-01-FQ-06不符合项报告与纠正措施记录表.rpx'
     path: '内部审核/不符合项报告与纠正措施记录表.rpx'
 }
 specialBtn[guanshen] = {
     label: '改进项与跟踪验证',
     desc: '改进',
-    // path: '43罗湖/L36-LHXBJY-QP-8.9-01管理评审程序/LHXBJY-QP-8.6-01-FQ-01 改进项跟踪验证表.rpx'
     path: '管理评审/改进项跟踪验证表.rpx'
 }
 

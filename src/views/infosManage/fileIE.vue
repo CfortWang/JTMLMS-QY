@@ -139,6 +139,11 @@ export default {
       defId: '',
       addDataCont: {},
       srcUrl: '', // 报表字段
+      fileTypesDatas: {
+        comAuthority: [],
+        buMenAuthority: [],
+        authority: []
+      } // 存放所点击列表的分类信息
     }
   },
   created() {
@@ -147,7 +152,7 @@ export default {
     const roleList = this.$store.getters.userInfo.role
     // 系统管理角色添加删除按钮
     const hasRole = roleList.some(item => item.name === '系统管理角色')
-    if (hasRole) {
+    if (hasRole && this.$route.name !== 'nbwj') {
       // 系统管理角色不做分类过滤
       this.listConfig.toolbars.push({ key: 'remove' })
       this.selection = true
@@ -162,7 +167,7 @@ export default {
         { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 180 },
         { prop: 'wen_jian_ming_che', label: '文件名称', width: 400 },
         { prop: 'ban_ben_', label: '版本', width: 120 },
-        { prop: 'fa_bu_ri_qi_', label: '发放日期', width: 100, sortable: 'custom' },
+        { prop: 'fa_fang_shi_jian_', label: '发布日期', width: 100, sortable: 'custom' },
         { prop: 'fu_jian_', label: '查阅', slotName: "wenjinachayue", width: 400 }
       ]
     }
@@ -192,41 +197,90 @@ export default {
       this.loading = true
     },
     getDatas() {
-      this.listData = []
-      let wheres = ''
-      let start = ''
+      const { comAuthority, buMenAuthority, authority } = this.fileTypesDatas
       const { fileType, sorts } = this.sqlWhere
+      this.listData = []
+      let wheres1 = '' // 共用
+      let wheres2 = '' // 部门
+      let wheres3 = '' // 受限
+      let start = ''
+      let positionsDatas = this.$store.getters.userInfo.positions
+      let needSelType = []
       for (var i in this.searchWhere) {
         if (i == 'b') {
           start = this.searchWhere[i]
         }
         if (i == 'i') {
-          wheres = wheres + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
+          wheres1 = wheres1 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
+          wheres2 = wheres2 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
+          wheres3 = wheres3 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
         }
         if (i !== 'i' && i !== 'b') {
-          wheres = wheres + ` and wj.${i} like '%${this.searchWhere[i]}%'`
+          wheres1 = wheres1 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
+          wheres2 = wheres2 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
+          wheres3 = wheres3 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
         }
       }
-      console.log('this.searchWhere',this.searchWhere)
+      if (this.$store.getters.userInfo.positions == 0) {
+        this.$message({
+          message: '该账户并没有所属部门，请先归属部门再来操作。',
+          type: 'error'
+        })
+        return
+      }
       if (fileType) {
-        switch (this.pageKey) {
-          case 'nbwj':
-            wheres = wheres + ` and FIND_IN_SET (wj.xi_lei_id_,'${fileType}')`
-            break;
-          default: wheres = wheres + ` and FIND_IN_SET (wj.fen_lei_id_,'${fileType}')`
+        if (this.pageKey == 'nbwj') {
+          if (comAuthority.length !== 0) {
+            wheres1 = wheres1 + ` and FIND_IN_SET (wj.xi_lei_id_,'${comAuthority}')`
+          }
+          if (buMenAuthority.length !== 0) {
+            let orSql = ''
+            for (var i in positionsDatas) {
+              if (i == 0) {
+                orSql = `wj.bian_zhi_bu_men_ LIKE '%${positionsDatas[i].id}%'`
+              } else {
+                orSql = orSql + `or wj.bian_zhi_bu_men_ LIKE '%${positionsDatas[i].id}%'`
+              }
+            }
+            wheres2 = wheres2 + ` and (${orSql}) and FIND_IN_SET (wj.xi_lei_id_,'${buMenAuthority}')`
+          }
+          if (authority.length !== 0) {
+            wheres3 = wheres3 + ` and FIND_IN_SET (wj.xi_lei_id_,'${authority}')`
+          }
+        } else {
+          wheres1 = wheres1 + ` and FIND_IN_SET (wj.fen_lei_id_,'${fileType}')`
         }
+
       }
       if (sorts) {
         if (JSON.stringify(sorts) !== "{}") {
-          wheres = wheres + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
+          wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
+          wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
+
         }
       }
       // 重复发放的文件，在权限表会存在重复的文件信息
-      let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.fa_bu_ri_qi_ 
-       FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
-      let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres}  order by bian_zhi_shi_jian desc`
-      let sql = this.pageKey === 'nbwj' ? fileSearchSql : oldRecordSql
-
+      //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian 
+      //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
+      let selectSql = 'select wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_fang_shi_jian_  from'
+      // 共用文件
+      let comSql = `${selectSql} t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' ${wheres1}`
+      // 部门权限文件
+      let buMenSql = `${selectSql}  t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' ${wheres2}`
+      // 受限文件
+      let authoritySql = `${selectSql}  t_wjxxb wj WHERE wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
+      let sqlArr = [comSql, buMenSql, authoritySql]
+      let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres1}  order by bian_zhi_shi_jian desc`
+      for (var i in Object.keys(this.fileTypesDatas)) {
+        var key = Object.keys(this.fileTypesDatas)[i];   // key
+        var value = this.fileTypesDatas[key];  // value
+        if (value.length !== 0) {
+          needSelType.push(`(${sqlArr[i]})`)
+        }
+      }
+      let fileSearchSql = needSelType.join('union all')
+      let sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq` : oldRecordSql
+      console.log('sql------------：', sql)
       curdPost('sql', sql).then(res => {
         let tableDatas = res.variables.data
         this.selectListData = JSON.parse(JSON.stringify(tableDatas))
@@ -275,14 +329,36 @@ export default {
           return el.key !== 'add'
         })
       }
-
+      this.fileTypesDatas = {
+        comAuthority: [],
+        buMenAuthority: [],
+        authority: []
+      }
       if (nodeData.children == undefined) {
         fileTypes.push(nodeId)
+        if (nodeData.authorityName == '公用查阅') {
+          this.fileTypesDatas.comAuthority.push(nodeId)
+        }
+        if (nodeData.authorityName == '部门查阅') {
+          this.fileTypesDatas.buMenAuthority.push(nodeId)
+        }
+        if (nodeData.authorityName == '受限查阅') {
+          this.fileTypesDatas.authority.push(nodeId)
+        }
       } else {
         const getTail = item => item.children && item.children.length > 0 ? item.children.map(m => getTail(m)) : [item]
         const result = _.flattenDeep(nodeData.children.map(m => getTail(m)))
         for (var i of result) {
           fileTypes.push(i.id)
+          if (i.authorityName == '公用查阅') {
+            this.fileTypesDatas.comAuthority.push(i.id)
+          }
+          if (i.authorityName == '部门查阅') {
+            this.fileTypesDatas.buMenAuthority.push(i.id)
+          }
+          if (i.authorityName == '受限查阅') {
+            this.fileTypesDatas.authority.push(i.id)
+          }
         }
       }
       this.oldorgId = nodeId
