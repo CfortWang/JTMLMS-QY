@@ -60,12 +60,12 @@
                   width="300"
                 >
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                   prop="ping_shen_yi_ju_"
                   label="评审依据"
                   width="200"
                 >
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
                   prop="tiao_kuan_bian_ha"
                   label="条款编号"
@@ -292,24 +292,24 @@ export default {
       }
     },
     partFilter: function (value, arr) {
-      // console.log(value, arr,"12")
-      // return value
+      return value
+      // debugger
       if(value.includes(",")){
         let part = "";
         let parts = []
         parts = value.split(',');
         for(let item of arr){
           for(let j = 0; j < parts.length; j++) {
-            if(item.bu_men_id_ == parts[j]){
-              part = part +","+ item.mian_bu_men;
+            if(item.ID_ == parts[j]){
+              part = part +","+ item.NAME_;
             }
           }
         }
         return part.slice(1,part.length)
       }else{  
-      for (let i = 0; i < arr.length; i++) {
-        if (arr[i].bu_men_id_ == value) {
-          return arr[i].mian_bu_men;
+        for (let i = 0; i < arr.length; i++) {
+        if (arr[i].ID_ == value) {
+          return arr[i].NAME_;
         }
       }
       }
@@ -417,10 +417,9 @@ export default {
       var chartDom = document.getElementById("in-echarts");
       const setEchartWH = {
         //设置控制图表大小变量
-        width: 400,
-        height: 300,
+        width: 500,
+        height:this.source.length<7?350: (this.source.length- 1)*30 + 100,
       };
-
       var myChart = echarts.init(chartDom, null, setEchartWH);
       var option;
 
@@ -462,7 +461,7 @@ export default {
               // Map the "product" column to Y axis
               y: "product",
             },
-            barWidth: 30,
+            barWidth: 15,
           },
         ],
       };
@@ -530,14 +529,18 @@ export default {
       var chartDom = document.getElementById("department");
       const setEchartWH = {
         //设置控制图表大小变量
-        width: 400,
-        height: 300,
+        width: 500,
+        height: 400,
       };
       var myChart = echarts.init(chartDom, null, setEchartWH);
       var option;
       option = {
         tooltip: {
           trigger: "item",
+        },
+        label: {
+          formatter: '{b}\n({c}项)',
+          edgeDistance: "20%"
         },
         legend: {
           orient: "vertical",
@@ -607,12 +610,11 @@ export default {
       });
     },
     async getPart() {
-      
-      let this_ = this;
-      let sql = "select * FROM ibps_main_position";
-      await curdPost("sql", sql).then((res) => {
-        this_.partList = res.variables.data;
-      });
+        let this_ = this;
+        let sql = "select * FROM ibps_party_position";
+        await curdPost("sql", sql).then((res) => {
+          this_.partList = res.variables.data;
+        });
     },
     jieduan(value) {
       if (value.includes("1")) {
@@ -680,17 +682,17 @@ export default {
       let newarr = [];
       let obj = {};
       let str =""
-      let sql = "select * FROM  ibps_main_position";
+      let sql = "select * FROM  ibps_party_position";
       await curdPost("sql", sql).then((res) => {
         let arr1 = res.variables.data;
         arr.forEach((item, index) => {
           str =""
           arr1.forEach((it) => {
-            if (item.ze_ren_shi_ == it.bu_men_id_ && !item.ze_ren_shi_.includes(",")) {
-              arr[index].ze_ren_shi_ = it.mian_bu_men;
+            if (item.ze_ren_shi_ == it.ID_ && !item.ze_ren_shi_.includes(",")) {
+              arr[index].ze_ren_shi_ = it.NAME_;
             }
-            if(item.ze_ren_shi_.includes(",")&& item.ze_ren_shi_.includes(it.bu_men_id_)){
-              str += "," + it.mian_bu_men
+            if(item.ze_ren_shi_.includes(",") && item.ze_ren_shi_.includes(it.ID_)){
+              str += "," + it.NAME_
             }
           });
           if(str){
@@ -723,7 +725,6 @@ export default {
     },
     getInit() {
       let data = this.obj[0];
-      console.log(data)
       let jieduanvalue;
       if (data.shi_fou_guo_shen_ == "已编制" && data.jie_dian_ren_wu_ == "") {
         jieduanvalue = "2";
@@ -945,14 +946,14 @@ export default {
       width: 100%;
       height: 100%;
     }
-    .department {
-      width: 400px;
-      height: 300px;
-    }
-    #department {
-      width: 400px;
-      height: 300px;
-    }
+    // .department {
+    //   width: 400px;
+    //   height: 300px;
+    // }
+    // #department {
+    //   width: 400px;
+    //   height: 300px;
+    // }
   }
 }
 </style>

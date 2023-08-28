@@ -148,14 +148,19 @@ export default {
                 const perInfosId = this.$store.getters.userInfo.user.id
                 const perInfosName = this.$store.getters.userInfo.user.name
                 let positionsIds = []
-                for(let i of this.$store.getters.userInfo.positions){
+                let positionsArr = this.$store.getters.userInfo.positions
+                if (positionsArr.length == 0|| !positionsArr) {
+                    alert('系统所登录的账户并没有所属部门，请先在系统设置完再进行确认！')
+                    return
+                }   
+                for(let i of positionsArr){
                     positionsIds.push(i.id)
                 }
                 const sql = "select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '" + perInfosId + "'"
                 curdPost('sql', sql).then((ryjbqkRes) => {
                     const ryjbqkDatas = ryjbqkRes.variables.data
                     if (ryjbqkDatas.length == 0) {
-                        alert('该人并没有签字图文在系统，请先上传系统再进行确认！')
+                        alert('系统所登录的账户并没有签字图文在系统，请先上传系统再进行确认！')
                         return
                     }
                     const tempObj = {

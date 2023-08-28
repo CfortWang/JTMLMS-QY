@@ -8,7 +8,7 @@
         <dv-decoration-8 class="right" :reverse="true" />
         <div class="title">{{ titleName }}</div>
         <div class="time">
-          <span>月份：</span>
+          <span>月份:</span>
           <el-date-picker v-model="month" type="month" value-format="yyyy-MM" format="yyyy-MM" placeholder="日期选择" style="width: 120px" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
         </div>
         <div class="back" @click.prevent="goBack()">
@@ -24,15 +24,12 @@
         <div class="middleCard">
           <div style="width:100%;height: 100%;box-sizing: border-box;overflow: hidden;">
             <div class="middleCardLeft">
-              <middleCard v-if="MiddleLeftPieViewList.data.length" :info="MiddleLeftPieViewList" ref="middleCardLeft" />
+              <zhuzhuangtu v-if="sheBeiData.data.length" :info="sheBeiData" ref="sheBeiDataDataref" />
             </div>
             <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
             <div class="middleCardRight1">
               <CarouselTabl v-if="shiyonglvConfig.data.length" :info="shiyonglvConfig" title="仪器设备列表" isup=isup />
             </div>
-            <!-- <div class="middleCardCenter">
-            <middleCard v-if="eBgRateData.data.length" :info="eBgRateData" ref="middleCardCenter"/>
-          </div> -->
             <dv-decoration-2 :reverse="true" style="width:2%;height:100%;" />
             <div class="middleCardRight">
               <CarouselTabl v-if="config.data.length" :info="config" title="设备报废列表" />
@@ -41,40 +38,21 @@
         </div>
         <dv-decoration-10 style="height:2%;display:flex;" />
         <div class="bottomCard">
-          <div style="width:24%">
-            <zhuzhuangtu v-if="sheBeiData.data.length" :info="sheBeiData" ref="sheBeiDataDataref" />
+          <div style="width:33%">
+            <middleCard v-if="MiddleLeftPieViewList.data.length" :info="MiddleLeftPieViewList" ref="middleCardLeft" />
           </div>
           <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
-          <div style="width:25%;height: 100%;overflow: hidden;box-sizing: border-box;display:flex;">
+          <div style="width:32%;height: 100%;overflow: hidden;box-sizing: border-box;display:flex;">
             <div class="bottomCardLeft0">
               <middleCard v-if="weiHuSheBeiData.data.length" :info="weiHuSheBeiData" ref="sheBeiWeiHuRef" />
             </div>
-            <!-- <dv-decoration-2 :reverse="true" style="width:3%;height:100%;;margin: 0 10px;" /> -->
-            <!-- <div style="width:37%">
-              <zhuzhuangtu v-if="sheBeiweiHuData.data.length" :info="sheBeiweiHuData"  ref="sheBeiWeiHuDataref"/>
-            </div> -->
           </div>
           <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
-          <div style="width:25%;display:flex;">
-            <!-- <div style="width:40%">
-              <zhuzhuangtu v-if="zhuantaiEData.data.length" :info="zhuantaiEData" ref="zhuantaiEDataref" />
-            </div> -->
-            <!-- <dv-decoration-2 :reverse="true" style="width:3%;height:100%;" /> -->
+          <div style="width:33%;display:flex;">
             <div class="bottomCardright">
               <middleCard v-if="jianDingjiaoZhunSheBeiData.data.length" :info="jianDingjiaoZhunSheBeiData" ref="jiandingRef" />
             </div>
           </div>
-          <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
-          <div style="width:24%;overflow: hidden;box-sizing: border-box;display:flex;">
-            <div class="bottomCardLeft">
-              <middleCard v-if="sheBeiHeChaData.data.length" :info="sheBeiHeChaData" ref="sheBeiHeChaRef"/>
-            </div>
-            <!-- <dv-decoration-2 :reverse="true" style="width:5px;height:330px;margin: 0 10px;" /> -->
-            <!-- <div style="width:100%">
-              <zhuzhuangtu v-if="bottomData.data.length" :info="bottomData" ref="bottomCardLeft" />
-            </div> -->
-          </div>
-
         </div>
       </dv-border-box-1>
     </dv-full-screen-container>
@@ -83,10 +61,6 @@
 <script>
 import screenfull from "screenfull";
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
-import { color } from "echarts/lib/export";
-// import { config } from 'public/lib/UEditor/third-party/zeroclipboard/ZeroClipboard';
-// import { acceptList } from "./data.js";
-// import { number } from 'echarts/lib/export';
 export default {
   name: "checkBoard",
   components: {
@@ -109,17 +83,10 @@ export default {
       sheBeiHeChaData: {},
       jianDingjiaoZhunSheBeiData: {},
       weiHuSheBeiData: {},
-      shiyonglvConfig: {
-        header: ["编号","名称","存放位置","状态","保管人",],//仪器设备
-        // header: ["名称","编号","使用时间","存放位置", "状态", "频率"], //设备使用列表
-        data: [],
-        // columnWidth: ["180","130","120","150","110","120"],//设备使用列表
-        columnWidth: ["180","180","150","110","110"],
-        rowNum: 7,
-      },
+      shiyonglvConfig: {header: ["编号","名称","存放位置","状态","保管人",],data: [],columnWidth: ["180","180","150","110","110"],rowNum: 7,},
       bottomData: {},
       zhuantaiEData: {},
-      sheBeiData: { xData: [], data: [], config: { idSelector: "" } },
+      sheBeiData: { xData: [], data: [], config: { idselector: "" } },
       sheBeiDataShow:false,
       sheBeiweiHuData: {},
       config: {},
@@ -137,110 +104,67 @@ export default {
       screenfull.toggle();
     }
   },
+  watch:{
+    month(newValue,oldValue){
+      this.updateAll();
+    }
+  },
   methods: {
-    allView() {
-      // 默认显示全屏
+    allView() {// 默认显示全屏
       screenfull.request();
     },
     goBack() {
       this.$router.back(-1);
     },
     updateAll(e) {
-      // this.getSheBeiMony();
       this.getCarouselShiYonglvTable();
       this.getTopBarData();
-      this.getMiddleLeftPieView();
       this.getCarouselTable();
-      // this.getbottomData();
     },
     async getTopBarData() {
       let this_ = this;
-
-      this.MiddleLeftPieViewList = {
-        data: [],
-        config: { idSelector: "main" },
-        rowNum: 7,
-        color: [],
-      };
+      this.MiddleLeftPieViewList = {data: [],config: { idselector: "main" },rowNum: 7,color: [],
+};
       this_.sheBeiDataShow = false;
       this.eBgRateData = { data: [], config: {} };
       this.sheBeiHeChaData = { data: [], config: {} };
       this.jianDingjiaoZhunSheBeiData = { data: [], config: {} };
-      this.sheBeiData={ xData: [], data: [], config: { idSelector: "" } };
+      this.sheBeiData={ xData: [], data: [], config: { idselector: "" } };
       this.weiHuSheBeiData = { data: [], config: {} };
-      this.bottomData = { xData: [], data: [], config: { idSelector: "" } };
-      this.zhuantaiEData = { xData: [], data: [], config: { idSelector: "" } };
-      this.sheBeiweiHuData = {
-        xData: [],
-        data: [],
-        config: { idSelector: "" },
-      };
-      let sql = `select a.Equipments,a1.mony,b.addEquipments,c.testEquipments,c1.testNoEquipments,d.checkEquipments,
-      d1.checkNoEquipments,e.goodEquipments,f.scrapEquipments,g.limitedEquipments,h.weiHuNoEquipments,h1.weiHuEquipments
-      from
-      (select count(*) as Equipments from t_sbdj) as a,
-      (select zi_chan_yuan_zhi_ as mony FROM t_sbdj) as a1,
-      (select count(*) as addEquipments  from t_sbdj where gou_jin_ri_qi_ LIKE '${this_.month}') as b,
-      (select count(*) as testEquipments from t_sbjdxzqr where shi_fou_guo_shen_ ='1') as c,
-      (select count(*) as testNoEquipments from t_sbjdxzqr) as c1,
-      (select count(*) as checkEquipments from t_sbhcjlb where create_time_ LIKE '${this_.month}' and shi_fou_guo_shen_ ='1') as d,
-      (select count(*) as checkNoEquipments from t_sbhcjlb where create_time_ LIKE '${this_.month}') as d1,
-      (select count(*) as goodEquipments  from t_sbdj where she_bei_zhuang_ta ='正常') as e,
-      (select count(*) as scrapEquipments  from t_sbdj where she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') as f,
-      (select count(*) as limitedEquipments  from t_sbdj where she_bei_zhuang_ta ='限制使用' or she_bei_zhuang_ta ='备用') as g,
-      (select count(*) as weiHuNoEquipments  from t_mjsbwhjhzb where create_time_ LIKE '${this_.month}') as h,
-      (select count(*) as weiHuEquipments  from t_mjsbwhbyjlby where create_time_ LIKE '${this_.month}' and shi_fou_guo_shen_ ='1') as h1`;
+      this.bottomData = { xData: [], data: [], config: { idselector: "" } };
+      this.zhuantaiEData = { xData: [], data: [], config: { idselector: "" } };
+      this.sheBeiweiHuData = {xData: [],data: [],config: { idselector: "" },};
+      let sql =
+      `select a.Equipments,a1.mony,b.addEquipments,c.testEquipments,c1.testNoEquipments,e.goodEquipments,f.scrapEquipments,g.limitedEquipments,h.weiHuNoEquipments,h1.weiHuEquipments  FROM  
+      (select COUNT(*) AS Equipments FROM t_sbdj) AS a, 
+      (select zi_chan_yuan_zhi_ AS mony FROM t_sbdj) AS a1, 
+      (select COUNT(*) AS addEquipments  FROM t_yqsbysb WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' AND shi_fou_guo_shen_ ='已完成') AS b,
+      (select COUNT(*) AS testNoEquipments FROM t_mjsbjdxzjhzb WHERE parent_id_ IN (select id_ FROM t_mjsbjdxzjh WHERE shi_fou_guo_shen_ ='已完成')) AS c1,    
+      (select COUNT(*) AS testEquipments FROM t_jyxtxzjgyzhqrjlb WHERE shi_fou_guo_shen_ ='已完成') AS c,  
+      (select COUNT(*) AS goodEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='使用') AS e,    
+      (select COUNT(*) AS scrapEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='停用' OR she_bei_zhuang_ta ='暂停使用') AS f,      
+      (select COUNT(*) AS limitedEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='报废') AS g,    
+      (select  COUNT(*) AS weiHuNoEquipments FROM t_mjsbwhjhzb WHERE parent_id_ IN (select id_ FROM t_mjsbwhjhb WHERE shi_fou_guo_shen_ ='已完成')) AS h,  
+      (select COUNT(*) AS weiHuEquipments  FROM t_mjsbwhbyjlby WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' AND shi_fou_guo_shen_ ='已完成') AS h1`
       await curdPost("sql", sql)
         .then((res) => {
           const data = res.variables.data;
           let zichan = this_.getAllMonyInt(data);
           zichan = zichan +''
           zichan =zichan.substring(0,zichan.length-4)
-          let eIntactnessRate = Number(
-            (
-              (data[0].goodEquipments / data[0].Equipments).toFixed(2) * 100 +
-              ""
-            ).slice(0, 5)
-          );
-          let eBadRate = Number(
-            ((100 - eIntactnessRate).toFixed(4) + "").slice(0, 4)
-          );
+          let eIntactnessRate = Number(((data[0].goodEquipments / data[0].Equipments).toFixed(2) * 100 +"").slice(0, 5));
+          let eBadRate = Number(((100 - eIntactnessRate).toFixed(4) + "").slice(0, 4));
           let obj = {};
-          obj.value = Number(
-            (
-              (data[0].goodEquipments / data[0].Equipments).toFixed(4) * 100 +
-              ""
-            ).slice(0, 5)
-          );
+          obj.value = Number(((data[0].goodEquipments / data[0].Equipments).toFixed(4) * 100 +"").slice(0, 5));
           obj.name = "正常设备数";
           this_.MiddleLeftPieViewList.data.push(obj);
           obj = {};
-          obj.value = Number(
-            (
-              (data[0].limitedEquipments / data[0].Equipments).toFixed(4) *
-                100 +
-              ""
-            ).slice(0, 5)
-          );
-          obj.name = "受限设备数";
-          this_.MiddleLeftPieViewList.data.push(obj);
-          obj = {};
-          obj.value = Number(
-            (
-              (data[0].scrapEquipments / data[0].Equipments).toFixed(4) * 100 +
-              ""
-            ).slice(0, 5)
-          );
+          obj.value = Number(((data[0].scrapEquipments / data[0].Equipments).toFixed(4) * 100 +"").slice(0, 5));
           obj.name = "停用/报废";
           this_.MiddleLeftPieViewList.data.push(obj);
           this_.MiddleLeftPieViewList.color = ["#339933", "#FFFF66", "#FF0033"];
           this_.MiddleLeftPieViewList.config.title = "设备工作状态情况";
-          this_.MiddleLeftPieViewList.config.idSelector = "main2";
-          this_.$nextTick(() => {
-            // setTimeout(() => {
-            // this_.$refs.middleCardLeft.getMiddleLeft(); // hhhh xxxx
-            // }, 1000)
-          });
+          this_.MiddleLeftPieViewList.config.idselector = "main2";
           obj = {};
           let result = [
             {
@@ -259,12 +183,6 @@ export default {
                 {
                   label: "正常数",
                   value: data[0].goodEquipments,
-                  danwei: "",
-                },
-
-                {
-                  label: "受限数",
-                  value: data[0].limitedEquipments,
                   danwei: "",
                 },
                 {
@@ -308,21 +226,6 @@ export default {
               title: "",
               children: [
                 {
-                  label: "本月计划核查数",
-                  value: data[0].checkNoEquipments,
-                  danwei: "",
-                },
-                {
-                  label: "本月已核查数",
-                  value: data[0].checkEquipments,
-                  danwei: "",
-                },
-              ],
-            },
-            {
-              title: "",
-              children: [
-                {
                   label: "完好率",
                   value: eIntactnessRate,
                   danwei: "%",
@@ -332,64 +235,36 @@ export default {
                   value: eBadRate,
                   danwei: "%",
                 },
-                {
-                  label: "总值(万元)",
-                  value: zichan,
-                  danwei: "",
-                },
+                // {
+                //   label: "总值(万元)",
+                //   value: zichan,
+                //   danwei: "",
+                // },
               ],
             },
           ];
           //设备数量统计
-          this_.sheBeiData.xData = [
-            "设备总数",
-            "新增数",
-            "良好数",
-            "受限数",
-            "报废停用数",
-          ];
-
+          this_.sheBeiData.xData = ["设备总数","新增数","良好数","报废停用数",];
           this_.sheBeiData.data.push(data[0].Equipments);
           this_.sheBeiData.data.push(data[0].addEquipments);
           this_.sheBeiData.data.push(data[0].goodEquipments);
-          this_.sheBeiData.data.push(data[0].limitedEquipments);
+          // this_.sheBeiData.data.push(data[0].limitedEquipments);
           this_.sheBeiData.data.push(data[0].scrapEquipments);
           this_.sheBeiData.config.title = "设备数量情况一览";
-          this_.sheBeiData.config.idSelector = "main8";
+          this_.sheBeiData.config.idselector = "main8";
+          console.log(this_.sheBeiData,"1231231")
           this_.sheBeiDataShow = true;
-          //
-          this_.bottomData.xData = ["本月计划核查数", "本月已核查数"];
-          this_.bottomData.data.push(data[0].checkNoEquipments);
-          this_.bottomData.data.push(data[0].checkEquipments);
-          this_.bottomData.config.title = "核查设备完成图";
-          this_.bottomData.config.idSelector = "main4";
-          // this_.$nextTick(()=>{
-          //   setTimeout(() => {
-
-          // 	}, 1000)
-          // })
-          this_.zhuantaiEData.xData = [
-            "计划检定/校准数",
-            "已完成检定/校准数",
-          ];
+          this_.zhuantaiEData.xData = ["计划检定/校准数","已完成检定/校准数",];
           this_.zhuantaiEData.data.push(data[0].testNoEquipments);
           this_.zhuantaiEData.data.push(data[0].testEquipments);
           this_.zhuantaiEData.config.title = "检定/校准设备完成图";
-          this_.zhuantaiEData.config.idSelector = "main3";
+          this_.zhuantaiEData.config.idselector = "main3";
           //维护设备数柱状图
           this_.sheBeiweiHuData.xData = ["计划维护数", "已完成数"];
           this_.sheBeiweiHuData.data.push(data[0].weiHuNoEquipments);
           this_.sheBeiweiHuData.data.push(data[0].weiHuEquipments);
           this_.sheBeiweiHuData.config.title = "设备维护柱状图";
-          this_.sheBeiweiHuData.config.idSelector = "mainWeiHuZ";
-          this_.$nextTick(() => {
-            // setTimeout(() => {
-            // this_.$refs.zhuantaiEDataref.getMiddleLeft(); // hhhh xxxx
-            // this_.$refs.bottomCardLeft.getMiddleLeft(); // hhhh xxxx
-            // this_.$refs.sheBeiWeiHuDataref.getMiddleLeft();
-            // }, 1000)
-          });
-
+          this_.sheBeiweiHuData.config.idselector = "mainWeiHuZ";
           let objRate = {};
           objRate.name = "完好率";
           objRate.value =eIntactnessRate;
@@ -400,7 +275,7 @@ export default {
           this_.eBgRateData.data.push(objRate);
           this_.eBgRateData.color = ["#339933", "#FF0033"];
           this_.eBgRateData.config.title = "设备工作状态完成率";
-          this_.eBgRateData.config.idSelector = "main1";
+          this_.eBgRateData.config.idselector = "main1";
           //设备数维护
           let objweihu = {};
           objweihu.name = "计划维护数";
@@ -412,19 +287,7 @@ export default {
           this_.weiHuSheBeiData.data.push(objweihu);
           this_.weiHuSheBeiData.color = ["#5470c6", "#38a838"];
           this_.weiHuSheBeiData.config.title = "设备维护完成率";
-          this_.weiHuSheBeiData.config.idSelector = "mainWeiHu";
-          //设备数核查
-          let objHeCha = {};
-          objHeCha.name = "本月计划核查数";
-          objHeCha.value = data[0].checkNoEquipments;
-          this_.sheBeiHeChaData.data.push(objHeCha);
-          objHeCha = {};
-          objHeCha.value = data[0].checkEquipments;
-          objHeCha.name = "本月已核查数";
-          this_.sheBeiHeChaData.data.push(objHeCha);
-          this_.sheBeiHeChaData.color = ["#5470c6", "#38a838"];
-          this_.sheBeiHeChaData.config.title = "设备核查完成率";
-          this_.sheBeiHeChaData.config.idSelector = "mainHeCha";
+          this_.weiHuSheBeiData.config.idselector = "mainWeiHu";
           //设备数检定校准
           let objJianding = {};
           objJianding.name = "计划检定/校准数";
@@ -436,24 +299,13 @@ export default {
           this_.jianDingjiaoZhunSheBeiData.data.push(objJianding);
           this_.jianDingjiaoZhunSheBeiData.color = ["#5470c6", "#38a838"];
           this_.jianDingjiaoZhunSheBeiData.config.title = "设备检定/校准完成率";
-          this_.jianDingjiaoZhunSheBeiData.config.idSelector = "mainJianDing";
-          this_.$nextTick(() => {
-            // setTimeout(() => {
-            // this_.$refs.middleCardCenter.getMiddleLeft();// hhhh xxxx
-            // this_.$refs.sheBeiHeChaRef.getMiddleLeft();//
-            // this_.$refs.jiandingRef.getMiddleLeft();
-            // }, 1000)
-          });
+          this_.jianDingjiaoZhunSheBeiData.config.idselector = "mainJianDing";
           objRate = {};
           this_.topBarData = result;
         })
         .catch((err) => {
           console.log(err);
         });
-    },
-    getMiddleLeftPieView() {
-      // [ { value: 1048, name: 'Search Engine' },]
-      console.log();
     },
     async getCarouselShiYonglvTable() { //设备建档信息
       let this_ = this;
@@ -479,46 +331,11 @@ export default {
         });
       this.isup = true;
     },
-    // async getCarouselShiYonglvTable() {设备使用列表
-    //   let this_ = this;
-    //   const sql = `select a.she_bei_ming_chen ,a.create_time_,a.shi_yong_qian_qin,b.name_,c.cun_fang_di_dian_,c.she_bei_shi_bie_h,d.name_ as bumen,COUNT(*) AS pinlv FROM  t_yqsbsydjb as a join ibps_party_employee as b on a.shi_yong_ren_ = b.ID_ join t_sbdj as c on a.yi_qi_bian_hao_ = c.she_bei_shi_bie_h join ibps_party_org as d on d.id_ = a.bian_zhi_bu_men_ GROUP BY create_time_  HAVING create_time_ LIKE '${this.month}%' ORDER BY pinlv DESC`;
-    //   let data1 = [];
-    //   let res1 = [];
-    //   this_.shiyonglvConfig.data = [];
-    //   await curdPost("sql", sql)
-    //     .then((res) => {
-    //       const result = res.variables.data;
-    //       result.forEach((item) => {
-    //         data1 = [];
-    //         data1.push(item.she_bei_ming_chen);
-    //         data1.push(item.she_bei_shi_bie_h);
-    //         // data1.push(item.bumen);
-    //         // data1.push(item.name_);
-    //         data1.push(this_.timestampToTime(item.create_time_ / 1000));
-    //         data1.push(item.cun_fang_di_dian_);
-    //         // data1.push(item.create_time_);
-    //         data1.push(item.shi_yong_qian_qin);
-    //         data1.push(item.pinlv);
-    //         this_.shiyonglvConfig.data.push(data1);
-    //         // this_.$forceUpdate()
-    //       });
-
-    //       // console.log(this_.shiyonglvConfig.data);
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    //   this.isup = true;
-    // },
     timestampToTime(timestamp) {
       var date = new Date(timestamp * 1000);
       var Y = date.getFullYear() + "-";
-      var M =
-        (date.getMonth() + 1 < 10
-          ? "0" + (date.getMonth() + 1)
-          : date.getMonth() + 1) + "-";
-      var D =
-        (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
+      var M =(date.getMonth() + 1 < 10? "0" + (date.getMonth() + 1): date.getMonth() + 1) + "-";
+      var D =(date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
       var h = date.getHours() + ":";
       var m = date.getMinutes() + ":";
       var s = date.getSeconds();
@@ -532,8 +349,7 @@ export default {
         data: [],
       };
       let this_ = this;
-      const sql =
-        "select * from t_sbdj where she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用'";
+      const sql ="select * from t_sbdj where she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用'";
       let data1 = [];
       await curdPost("sql", sql)
         .then((res) => {
@@ -560,21 +376,8 @@ export default {
           mony += filterMony;
         }
       });
-      // console.log(mony.toFixed(2))
-      // return mony.toFixed(2);
       return mony;
     },
-    // async getSheBeiMony (){
-    //   let this_=  this;
-    //   const sql = "select zi_chan_yuan_zhi_ as mony FROM t_sbdj";
-    //   await curdPost("sql",sql).then(res=>{
-    //     let data = res.variables.data;
-    //     this_.zichan=  this_.getAllMonyInt(data);
-    //     console.log(this_.zichan);
-    //   }).catch(err=>{
-    //     console.error(err)
-    //   })
-    // }
   },
 };
 </script>
@@ -598,7 +401,6 @@ export default {
     display: flex;
     flex-direction: column;
   }
-
   .block-left-right-content {
     flex: 1;
     display: flex;
@@ -618,7 +420,6 @@ export default {
     box-sizing: border-box;
     padding-bottom: 0.8%;
   }
-
   .header {
     position: relative;
     width: 100%;
@@ -646,8 +447,7 @@ export default {
       top: 15px;
       transform: translateX(-50%);
     }
-    .time,
-    .back {
+    .time,.back {
       width: 8%;
       cursor: pointer;
       height: 2.825rem;
@@ -688,7 +488,6 @@ export default {
   .bottomCard {
     width: 96%;
     margin-left: 30px;
-    // margin-top: 30px;
     div {
       display: inline-block;
     }
@@ -698,12 +497,6 @@ export default {
       box-sizing: border-box;
       overflow: hidden;
     }
-    // .middleCardCenter{
-    //   width: 25%;
-    //   height: 100%;
-    //   box-sizing: border-box;
-    //   overflow: hidden;
-    // }
     .middleCardRight {
       width: 25%;
       height: 100%;

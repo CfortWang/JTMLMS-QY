@@ -1,7 +1,6 @@
 <template>
   <div id="top-bar" style="width:100%;height:100%">
     <div class="content">
-      <!-- <div class="title">设备信息情况</div> -->
       <div class="bar">
         <div v-for="(item, index) in topBarData" :key="index" class="item">
           <div v-for="(v, i) in item.children" :key="i" class="box1" >
@@ -23,7 +22,6 @@
 </template>
 <script>
 import color from '@/store/modules/ibps/modules/color';
-
 export default {
   name: "topBar",
   props: {
@@ -80,30 +78,21 @@ export default {
             textAlign: "center",
             style: {
               fill: this.fontColor[this.getRandom(0, 11)],
-              //  formatter
             },
           };
           i.unit = i.danwei;
         });
       });
       this.topBarData = JSON.parse(JSON.stringify(this.info));
-      // console.log(this.topBarData);
     },
   },
 };
 </script>
-
 <style lang="scss" scoped>
 .content{
   height: 100%;
   width: 100%;
   min-height: 0px
-  // background-color: rgba(6, 30, 93, 0.5);
-  // .title{
-  //   // width: 100%;
-  //   margin: 20px 2%;
-    
-  // }
 }
 .bar {
   position: relative;
@@ -116,12 +105,11 @@ export default {
   background-color: rgba(6, 30, 93, 0.5);
   .item {
     width: 20%;
-    // width: calc(100% / 13);
     height: 60%;
     padding: 6px 6px;
     border-left: 5px solid rgb(6, 30, 93);
     &:first-child {
-      width: 30%;
+      width: 33%;
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -131,7 +119,7 @@ export default {
       }
     }
     &:nth-child(2) {
-      width: 15%;
+      width: 18%;
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -141,17 +129,7 @@ export default {
       }
     }
     &:nth-child(3) {
-      width: 16%;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      box-sizing: border-box;
-      .box1 {
-        width: 50%;
-      }
-    }
-    &:nth-child(4) {
-      width: 15%;
+      width: 19%;
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -161,7 +139,7 @@ export default {
       }
     }
     &:last-child {
-      width: 24%;
+      width: 27%;
       display: flex;
       justify-content: space-around;
       align-items: center;

@@ -39,10 +39,10 @@
                     <div>{{ item1.time }}</div>
                   </div>
 
-                  <div class="lh">
+                  <!-- <div class="lh">
                     <div>资产原值：</div>
                     <div>{{ item1.money }}</div>
-                  </div>
+                  </div> -->
                   <div class="lh">
                     <div>使用科室：</div>
                     <div>细胞质量检测实验室</div>

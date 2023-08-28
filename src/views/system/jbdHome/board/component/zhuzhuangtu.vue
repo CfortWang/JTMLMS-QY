@@ -2,7 +2,7 @@
   <div class="pieView">
     <div style="height: 10%;line-height: 30px;text-align: left;padding-left: 10px;width: 100%;">{{info.config.title}}</div>   
     <div style="width:100%;height:90%;display: inline-block;">
-      <div :id="info.config.idSelector" style="width:100%;height:100%;"> </div>
+      <div :id="info.config.idselector" style="width:100%;height:100%;"> </div>
     </div>
   </div>
 </template>
@@ -30,13 +30,10 @@ export default {
   },
   methods: {
     getMiddleLeft() {
-      var chartDom = document.getElementById(this.info.config.idSelector);
+      debugger 
+      console.log(this.info,"this.info1231")
+      var chartDom = document.getElementById(this.info.config.idselector);
       var myChart = echarts.init(chartDom);
-      // const setEchartWH = {
-      //   //设置控制图表大小变量
-      //   width: 250,
-      //   height: 300,
-      // };
       let ay =this.info.data;
       let yc;
       ay[0] > ay[1]?yc=ay[0]:yc=ay[1];
@@ -86,7 +83,6 @@ export default {
                 } else {
                     return value;
                 } 
-            
             },
             },
             axisLine: {
@@ -100,7 +96,6 @@ export default {
         yAxis: [
           {
             type: "value",
-          
           axisLine: {
             lineStyle: {
               color: "#fff"

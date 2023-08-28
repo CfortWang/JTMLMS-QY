@@ -2,7 +2,7 @@
   <div class="pieView">
     <div style="height: 14%;line-height: 30px;text-align: left;padding-left: 10px;color: white;">{{info.config.title||""}}</div>   
     <div style="width:100%;height:86%;display: inline-block; overflow: hidden;">
-      <div :id="info.config.idSelector" style="width:100%;height:95%;overflow: hidden;"> </div>
+      <div :id="info.config.idselector" style="width:100%;height:95%;overflow: hidden;"> </div>
     </div>
   </div>
 </template>
@@ -25,16 +25,10 @@ export default {
     this.$nextTick(()=>{
       this_.getMiddleLeft();
     })
-    
   },
   methods:{
     getMiddleLeft(){ 
-      let chartDom = document.getElementById(this.info.config.idSelector);
-      // const setEchartWH = {
-      //   //设置控制图表大小变量
-      //   width: 350,
-      //   height: 320,
-      // };
+      let chartDom = document.getElementById(this.info.config.idselector);
       var myChart = echarts.init(chartDom);
       var option;
       option = {
@@ -47,7 +41,6 @@ export default {
             fontWeight: '600'
         },
         },
-        
         color:this.info.color,
         tooltip: {
           trigger: 'item',
@@ -61,8 +54,6 @@ export default {
         legend: {
           show: true,
           z: 3,
-          
-          // orient: 'vertical', 标题横竖//
           left: 'right',
           textStyle:{
             color: '#fff'
@@ -70,7 +61,7 @@ export default {
         },
         series: [{
           type: 'pie',
-          radius: '50%',
+          radius: '70%',
           center: ['50%', '50%'],
           data:this.info.data,
           emphasis: {
@@ -82,19 +73,16 @@ export default {
           },
           labelLine: {
               distanceToLabelLine: 0,
-             
             },
         }]
       };
       myChart.setOption(option);
     },
-
   }
 };
 </script>
 <style lang="scss" scoped>
 .pieView{
-  // display: flex;
   width: 100%;
   height: 100%;
   overflow: hidden;
