@@ -686,6 +686,10 @@ export default {
                     const fileId = res.data && res.data.id ? res.data.id : ''
                     const fileParams = fileId ? { kuai_zhao_: fileId } : {}
                     this.updateState(id, code, '已完成', fileParams)
+                }).catch(() => {
+                    // 生成快照接口调用失败时，也需要更新状态为已完成
+                    this.$message.error('提交快照生成失败！')
+                    this.updateState(id, code, '已完成')
                 })
             })
         },

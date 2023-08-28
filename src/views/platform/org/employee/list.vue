@@ -327,7 +327,6 @@ export default {
                         this.$set(item, 'positionsName', name)
                         // 转换岗位路径
                         const path = this.getPositionsPath(item.positions)
-                        console.log(path)
                         this.$set(item, 'positionsPath', path)
                     }
                 })
@@ -350,7 +349,6 @@ export default {
             return list.join('，')
         },
         getPositionsPath (valueList) {
-            console.log(valueList)
             const postList = valueList.split(',')
             const list = []
             if (!postList.length) {
@@ -359,7 +357,6 @@ export default {
             postList.forEach((item) => {
                 const temp = this.positionsList.find(i => i.ID_ === item)
                 const pathList = temp ? temp.PATH_.split('.') : []
-                console.log(pathList)
                 let p = ''
                 pathList.filter(i => i).forEach(k => {
                     const t = this.positionsList.find(i => i.ID_ === k)

@@ -109,7 +109,7 @@ export default {
         },
         // 表格字段配置
         columns: [
-          { prop: 'name', label: '名称', sortable: true },
+          { prop: 'name', label: '名称', sortable: true, minWidth: 200 },
           { prop: 'key', label: '业务主键', sortable: true, width: 120 },
           { prop: 'type', label: '类型', tags: datasetTypeOptions, sortable: true, width: 100 },
           {prop:'typeId', label:'归分类型', sortable: true, width: 120 },
@@ -133,7 +133,7 @@ export default {
         }
       },
       pagination: {},
-      sorts: {}
+      sorts: { CREATE_TIME_: 'DESC' }
 
     }
   },
