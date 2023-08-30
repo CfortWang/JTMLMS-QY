@@ -10,6 +10,7 @@ import { save as saveNews } from '@/api/platform/system/news'
 import { bpmTaskSave } from '@/api/platform/bpmn/bpmTask'
 import { onlyOfficeToPdf } from '@/api/platform/form/seal'
 import { downloadFile as download } from '@/business/platform/file/utils'
+import { removeFormData } from '@/api/platform/data/dataTemplate'
 
 // base64解码
 const decode = str => decodeURIComponent(window.atob(str).split('').map(c => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`).join(''))
@@ -145,5 +146,6 @@ export default {
     getDateNow,
     getFormatDate,
     onlyOfficeToPdf,
-    download
+    download,
+    removeFormData
 }
