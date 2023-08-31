@@ -268,7 +268,7 @@ export default {
       // 部门权限文件
       let buMenSql = `${selectSql}  t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' ${wheres2}`
       // 受限文件
-      let authoritySql = `${selectSql}  t_wjxxb wj WHERE wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
+      let authoritySql = `${selectSql}  t_wjxxb wj WHERE wj.shi_fou_guo_shen_ ='有效' and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
       let sqlArr = [comSql, buMenSql, authoritySql]
       let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres1}  order by bian_zhi_shi_jian desc`
       for (var i in Object.keys(this.fileTypesDatas)) {

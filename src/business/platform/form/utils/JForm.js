@@ -6,6 +6,7 @@ import Vue from 'vue'
 import request from '@/utils/request'
 import dialog from '@/utils/dialog'
 import common from '@/utils/common'
+import sealApi from '@/utils/seal'
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
 import store from '@/store'
 import router from '@/router'
@@ -32,6 +33,7 @@ _.extend(JForm, {
         this.$request = request
         this.$dialog = dialog
         this.$common = common
+        this.$sealApi = sealApi
         this.$router = router
         this.$store = store
         this.$import = _import

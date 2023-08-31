@@ -182,6 +182,14 @@ const frameOut = [
             title: 'iframe'
         },
         component: _import('/system/iframe')
+    },
+    {
+      path: '/sealCompleted',
+      name: 'sealCompleted',
+      meta: {
+        title: 'sealCompleted'
+      },
+      component: _import('/remindPage/sealCompleted')
     }
 ]
 
