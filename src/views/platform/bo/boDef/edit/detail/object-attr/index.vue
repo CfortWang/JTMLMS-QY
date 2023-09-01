@@ -122,6 +122,7 @@ export default {
                     { prop: 'code', label: '编码', width: 140 },
                     { prop: 'fieldName', label: '字段', width: 140 },
                     { prop: 'dataType', label: '属性类型', tags: typeOptions, width: 120 },
+                    { prop: 'attrLength', label: '字段长度', width: 100 },
                     { prop: 'desc', label: '字段描述', minWidth: 200 }
                 ]
             }
