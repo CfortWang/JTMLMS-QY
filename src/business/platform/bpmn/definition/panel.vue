@@ -90,7 +90,7 @@
                     ]
                 },
                 pagination: {},
-                sorts: {},
+                sorts: { CREATE_TIME_: 'DESC' },
                 moreSearchParams: {}
             }
         },
