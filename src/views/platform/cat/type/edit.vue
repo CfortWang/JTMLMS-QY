@@ -163,7 +163,7 @@ export default {
       rules: {
         name: [{ required: true, message: this.$t('validate.required') }],
         typeKey: [{ required: true, validator: validateKey }],
-        authorityName: [{ required: true, message: '不得为空' }]
+        authorityName: [{ required: false }]
       },
       toolbars: [
         { key: 'save', hidden: () => { return this.readonly } },
@@ -228,6 +228,7 @@ export default {
     },
     // 保存数据
     handleSave() {
+      this.rules.authorityName = this.categoryKey == 'FILE_TYPE' ? [{ required: true, message: '不得为空' }] : [{ required: false }]
       this.$refs[this.formName].validate(valid => {
         if (valid) {
           this.saveData()
