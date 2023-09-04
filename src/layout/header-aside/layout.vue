@@ -94,6 +94,9 @@
                     <ibps-header-fullscreen />
                     <ibps-header-tenant /> -->
 
+                    <ibps-header-clean-cache v-if="isSuper && account === 'jinyuan'" type="platform" />
+                    <ibps-header-clean-cache v-if="isSuper && account === 'jinyuan'" type="form"/>
+
                     <span style="font-size: 12px; cursor: pointer;" @click="goToMain()">首页</span>
                     <span style="margin: 0 10px;">|</span>
                     <ibps-header-message />
@@ -192,6 +195,7 @@
     import IbpsHeaderUser from './components/header-user'
     import IbpsHeaderErrorLog from './components/header-error-log'
     import IbpsHeaderBaseUrl from './components/header-base-url'
+    import IbpsHeaderCleanCache from './components/header-clean-cache'
     // import IbpsHeaderDownload from './components/header-download'
     // import IbpsNotifyMonitor from '@/business/platform/socket/notify-monitor'
     import { mapState, mapGetters, mapActions } from 'vuex'
@@ -220,17 +224,21 @@
             IbpsHeaderMessage,
             IbpsHeaderUser,
             IbpsHeaderErrorLog,
-            IbpsHeaderBaseUrl
+            IbpsHeaderBaseUrl,
+            IbpsHeaderCleanCache
             // IbpsHeaderDownload,
             // IbpsNotifyMonitor
         },
         mixins: [mixinSearch, mixinLock],
         data() {
+            const {isSuper, account} = this.$store.getters
             return {
                 // [侧边栏宽度] 正常状态
                 asideWidth: '200px',
                 // [侧边栏宽度] 折叠状态
-                asideWidthCollapse: '65px'
+                asideWidthCollapse: '65px',
+                isSuper,
+                account
             }
         },
         // watch: {

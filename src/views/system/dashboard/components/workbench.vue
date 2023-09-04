@@ -415,7 +415,7 @@ export default {
                             this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
                             this.pagination = pageResult
                         })
-                        this.urgeToManager()
+                        // this.urgeToManager()
                     } else {
                         this.dataList = dataResult
                         this.pagination = pageResult
