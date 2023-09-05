@@ -143,8 +143,7 @@ export default {
         // 其它属性
         attributes () {
             if (!this.data.attributes) return
-            this.data.attributes.subjectRule = this.data.attributes.subjectRule == '{发起人:startorName}在{发起时间:startTime}发起{流程标题:title}'
-                ? '{发起人:startorName} |启动：{流程标题:title}' : this.data.attributes.subjectRule
+            // this.data.attributes.subjectRule = this.data.attributes.subjectRule == '{发起人:startorName}在{发起时间:startTime}发起{流程标题:title}' ? '{发起人:startorName} |启动：{流程标题:title}' : this.data.attributes.subjectRule
             return this.data ? this.data.attributes || {} : {}
         }
     },
