@@ -801,17 +801,19 @@ export default {
                             this.$message.warning('请先配置对应报表路径！')
                             return
                         }
-                        this.$common.snapshoot({
-                            url: this.$getReportFile(button.reportPath, `id_=${selection}`),
-                            name: selection,
-                            type: 'pdf'
-                        }).then(res => {
-                            if (!res.data || !res.data.id) {
-                                this.$message.error('生成文件失败，请重试！')
-                                return
-                            }
-                            this.$common.download(res.data)
-                        })
+                        this.$common
+                            .snapshoot({
+                                url: this.$getReportFile(button.reportPath, `id_=${selection}`),
+                                name: selection,
+                                type: 'pdf'
+                            })
+                            .then((res) => {
+                                if (!res.data || !res.data.id) {
+                                    this.$message.error('生成文件失败，请重试！')
+                                    return
+                                }
+                                this.$common.download(res.data)
+                            })
                         break
                     case 'print': // 打印
                         ActionUtils.selectedRecord(selection)
@@ -1074,6 +1076,28 @@ export default {
                 columns: columns,
                 rowHandle: rowHandle,
                 searchForm: searchForms.length > 0 ? { forms: searchForms } : null
+            }
+
+            // 判断地点是否第一层级，如果是显示地点字段
+            const position = this.$store.getters.userInfo.positions
+            const first = this.$store.getters.level.first
+            let showBoolean = false
+            if (position && position.length > 0 && first) {
+                showBoolean = position.some((item) => item.id === first)
+            }
+            const columnsShow = this.listConfig.columns.some((item) => item.prop === 'di_dian_')
+            if (!showBoolean && columnsShow) {
+                this.listConfig.columns.forEach((item) => {
+                    if (item.prop === 'di_dian_') {
+                        item.hidden = true
+                    }
+                })
+            } else {
+                this.listConfig.columns.forEach((item) => {
+                    if (item.prop === 'di_dian_') {
+                        item.hidden = false
+                    }
+                })
             }
 
             // 分页
@@ -1524,14 +1548,14 @@ export default {
                     obj[item.label] = item.name
                 })
                 return obj
-            }else{
+            } else {
                 return obj
             }
         },
-        xlsxFileClick(){
+        xlsxFileClick() {
             this.xlsxFileVisible = true
         },
-        xlsxFileClose(){
+        xlsxFileClose() {
             this.xlsxFileVisible = false
         },
 

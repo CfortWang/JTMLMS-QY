@@ -15,18 +15,33 @@
                     </div>
                 </div>
                 <div class="panel-body">
-                    <el-table :data="copDataModel" ref="elTable" :header-cell-style="{ color: '#000', 'font-size': '14px', padding: '4px 0' }" :row-class-name="tableRowClassName" :show-summary="showSummary" :sum-text="sumText" :summary-method="hasSummaryMethod ? summaryMethod : null" border @selection-change="handleSelectionChange">
+                    <el-table ref="elTable" :data="copDataModel" :header-cell-style="{ color: '#000', 'font-size': '14px', padding: '4px 0' }" :row-class-name="tableRowClassName" :show-summary="showSummary" :sum-text="sumText" :summary-method="hasSummaryMethod ? summaryMethod : null" border @selection-change="handleSelectionChange">
                         <el-table-column v-if="!tableReadonly" type="selection" width="50" />
                         <el-table-column v-if="field.field_options.index" type="index" :label="field.field_options.index_name ? field.field_options.index_name : '序号'" :width="field.field_options.index_width ? field.field_options.index_width : 50" />
                         <template v-for="(column, j) in displayColumns">
-                            <el-table-column show-overflow-tooltip v-if="!columnHidden(column) && column.field_type != 'desc' && column.label != ''" :key="j" :prop="column.name" :width="column.field_options.custom_class || null">
+                            <el-table-column v-if="!columnHidden(column) && column.field_type != 'desc' && column.label != ''" :key="j" show-overflow-tooltip :prop="column.name" :width="column.field_options.custom_class || null">
                                 <template slot="header">
                                     {{ $utils.isNotEmpty(column.field_options.units) ? column.label + '(' + column.field_options.units + ')' : column.label }}
                                     <ibps-help v-if="column && column.desc && descPosition === 'lableIcon'" type="tooltip" :content="$utils.formatText(column.desc)" />
                                 </template>
                                 <template slot-scope="scope">
                                     <template v-if="copDataModelCont && copDataModelCont.length > 0 && dynamicShow">
-                                        <ibps-dynamic-form-table-item :ref="'formItem' + column.name" :key="scope.$index + j" :models.sync="copDataModelCont[scope.$index + (currentPage * 10 - 10)]" :rights.sync="columnsRights" :form-data="models" :field="column" :main-code="mainCode" :code="code" :row="scope.$index" :mode="mode" :params="params" :currPage="currentPage" @updateModel="updateModel" v-on="listeners" />
+                                        <ibps-dynamic-form-table-item
+                                            :ref="'formItem' + column.name"
+                                            :key="scope.$index + j"
+                                            :models.sync="copDataModelCont[scope.$index + (currentPage * 10 - 10)]"
+                                            :rights.sync="columnsRights"
+                                            :form-data="models"
+                                            :field="column"
+                                            :main-code="mainCode"
+                                            :code="code"
+                                            :row="scope.$index"
+                                            :mode="mode"
+                                            :params="params"
+                                            :curr-page="currentPage"
+                                            @updateModel="updateModel"
+                                            v-on="listeners"
+                                        />
                                     </template>
                                 </template>
                             </el-table-column>
@@ -41,7 +56,7 @@
                                 </el-dropdown>
                                 <template v-else>
                                     <template v-for="(button, index) in manageButtons">
-                                        <el-link :icon="button.icon" :key="index" :type="button.type" :underline="false" @click="handleActionEvent(button, scope.$index)">{{ button.label }}</el-link>
+                                        <el-link :key="index" :icon="button.icon" :type="button.type" :underline="false" @click="handleActionEvent(button, scope.$index)">{{ button.label }}</el-link>
                                         <!-- <el-button plain size="mini" :key="index" :type="button.type" @click="handleActionEvent(button, scope.$index)">
                                             {{ button.label }}
                                         </el-button> -->
@@ -53,7 +68,7 @@
                         </el-table-column>
                     </el-table>
                     <!-- 分页 -->
-                    <el-pagination v-if="mode === 'dialog' || mode === 'inner'" @current-change="handleCurrentChange" :page-size="10" layout="total, prev, pager, next" :total="pageSize"> </el-pagination>
+                    <el-pagination v-if="mode === 'dialog' || mode === 'inner'" :current-page="currentPage" :page-size="10" layout="total, prev, pager, next" :total="pageSize" @current-change="handleCurrentChange" />
                 </div>
             </div>
             <!--================表内和弹窗模式end=================================-->
@@ -80,7 +95,20 @@
 
                             <!--块模式：表单-->
                             <div class="panel-body">
-                                <ibps-dynamic-form-table-block v-for="(column, j) in columns" :ref="'formItem' + column.name" :key="index + j" :models.sync="dataModel[index]" :rights.sync="columnsRights" :form-data="models" :field="column" :main-code="mainCode" :code="code" :row="index" :params="params" v-on="listeners" />
+                                <ibps-dynamic-form-table-block
+                                    v-for="(column, j) in columns"
+                                    :ref="'formItem' + column.name"
+                                    :key="index + j"
+                                    :models.sync="dataModel[index]"
+                                    :rights.sync="columnsRights"
+                                    :form-data="models"
+                                    :field="column"
+                                    :main-code="mainCode"
+                                    :code="code"
+                                    :row="index"
+                                    :params="params"
+                                    v-on="listeners"
+                                />
                             </div>
                         </div>
                     </template>
@@ -94,7 +122,7 @@
 
         <import-table :visible="importTableDialogVisible" :title="field.label" @close="(visible) => (importTableDialogVisible = visible)" @action-event="handleImportTableActionEvent" />
         <component :is="dialogTemplate" v-if="dialogTemplate" ref="dialogTemplate" v-bind="dialogTemplateAtts" />
-        <formrender-dialog ref="jyxtEdit" :visible="formDialogVisible" :title="field.label" :form-def="dialogFormDef" :data="dialogFormData" :mode="mode" :editFromType="editFromType" custom-class="ibps-dialog-80" @close="(visible) => (formDialogVisible = visible)" @action-event="handleFormDialogActionEvent" />
+        <formrender-dialog ref="jyxtEdit" :visible="formDialogVisible" :title="field.label" :form-def="dialogFormDef" :data="dialogFormData" :mode="mode" :edit-from-type="editFromType" custom-class="ibps-dialog-80" @close="(visible) => (formDialogVisible = visible)" @action-event="handleFormDialogActionEvent" />
     </div>
 </template>
 <script>
@@ -148,10 +176,10 @@ export default {
             default: ''
         }
     },
-    data() {
-        let val = [],
-            tableType = '',
-            copVal = []
+    data () {
+        let val = []
+        let tableType = ''
+        let copVal = []
         if (this.$utils.isNotEmpty(this.value)) {
             val = this.value || []
             copVal = tableType === 'dialog' || 'inner' ? JSON.parse(JSON.stringify(val)).slice(0, 10) : val
@@ -159,11 +187,11 @@ export default {
         tableType = this.field.field_options.mode || 'inner'
         /* 由于内容遍历卡顿问题，需再建个中间对象进行渲染.*/
         return {
-            editFromType: 'add', //列表编辑弹出框类型
+            editFromType: 'add', // 列表编辑弹出框类型
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
             currentPage: 1,
-            dataPage: 0, //当前条数
+            dataPage: 0, // 当前条数
             pageSize: val.length,
             dataModel: val,
             copDataModel: copVal,
@@ -191,53 +219,55 @@ export default {
 
             importTableDialogVisible: false,
             dialogTemplate: null,
-            dialogTemplateAtts: {}
+            dialogTemplateAtts: {},
+
+            oldList: []
         }
     },
     computed: {
-        thatSocpe() {
+        thatSocpe () {
             return this
         },
-        models() {
+        models () {
             return this.formData
         },
-        fieldOptions() {
+        fieldOptions () {
             const fieldOptions = this.field.field_options || {}
             fieldOptions.default_value_type = fieldOptions.default_value_type || 'fixed'
             return fieldOptions
         },
 
-        toolbarButtons() {
+        toolbarButtons () {
             return this.filterButtons('toolbar')
         },
-        manageButtons() {
+        manageButtons () {
             return this.filterButtons('manage')
         },
-        manageButtonWidth() {
+        manageButtonWidth () {
             return this.manageButtons.length > 2 || this.manageButtons.length === 1 ? 70 : 150
         },
-        mode() {
+        mode () {
             return this.field.field_options.mode || 'inner'
         },
-        showSummary() {
+        showSummary () {
             return this.field.field_options.summary || false
         },
-        sumText() {
+        sumText () {
             return this.field.field_options.sum_text || '合计'
         },
-        hasSummaryMethod() {
+        hasSummaryMethod () {
             return this.field.field_options.summary_method || false
         },
-        code() {
+        code () {
             return this.field.name || ''
         },
-        columns() {
+        columns () {
             return this.field.field_options.columns || []
         },
-        nameColumns() {
+        nameColumns () {
             return FormFieldUtil.getSubDisplayColumns(this.columns)
         },
-        displayColumns() {
+        displayColumns () {
             const displayColumns = []
             const traverse = (fields) => {
                 fields.forEach((field) => {
@@ -256,7 +286,7 @@ export default {
             traverse(this.columns)
             return displayColumns
         },
-        buttons() {
+        buttons () {
             const buttons = this.field.field_options.buttons || []
             const bs = []
             buttons.forEach((button) => {
@@ -269,35 +299,35 @@ export default {
             })
             return bs
         },
-        tableReadonly() {
+        tableReadonly () {
             return this.readonlyRights ? true : this.tableRights === FormOptions.t.PERMISSIONS.READ
         },
-        tableHidden() {
+        tableHidden () {
             return this.tableRights === FormOptions.t.PERMISSIONS.HIDE
         },
-        descPosition() {
+        descPosition () {
             return this.params.descPosition || 'inline'
         },
-        defaultLabelWidth() {
+        defaultLabelWidth () {
             return this.params.labelWidth
         },
-        readonlyRights() {
+        readonlyRights () {
             return this.params.readonly
         },
-        readonlyStyle() {
+        readonlyStyle () {
             return this.params.readonlyStyle
         },
-        formula() {
+        formula () {
             return this.params.responseFormula
         },
-        linkages() {
+        linkages () {
             return this.params.responseLinkages
         },
-        copDataModelCont() {
+        copDataModelCont () {
             /* 进行参数替换，提高子表性能 */
             return JSON.parse(JSON.stringify(this.dataModel))
         },
-        listeners() {
+        listeners () {
             return {
                 'update-form-data': (name, value) => {
                     this.updateFormData(name, value)
@@ -305,14 +335,9 @@ export default {
             }
         }
     },
-    beforeDestroy() {
-        this.dynamicShow = false
-        // 注销当前表格保存在window[this.mainCode+'TableRefs']的this
-        this.destoryTable()
-    },
     watch: {
         value: {
-            handler(val, oldVal) {
+            handler (val, oldVal) {
                 if (!val) return
                 this.dataModel = val
                 /*  if (!valueEquals(val, oldVal)) {
@@ -321,13 +346,14 @@ export default {
             }
         },
         dataModel: {
-            handler(val, oldVal) {
-                //进行分页操作
+            handler (val, oldVal) {
+                // 进行分页操作
                 this.pageOperation(val, oldVal)
-            }
+            },
+            deep: true
         },
         rights: {
-            handler(val, oldVal) {
+            handler (val, oldVal) {
                 if (val !== oldVal) {
                     this.fieldRights = val || {}
                 }
@@ -337,7 +363,7 @@ export default {
         },
         // 字段权限
         fieldRights: {
-            handler(fieldRights) {
+            handler (fieldRights) {
                 if (this.$utils.isNotEmpty(fieldRights) && this.$utils.isPlainObject(fieldRights)) {
                     this.tableRights = this.getRealRights(fieldRights['rights'] || FormOptions.t.PERMISSIONS.EDIT)
                     this.columnsRights = this.getColumnsRights(fieldRights['columns'])
@@ -352,7 +378,12 @@ export default {
             immediate: true
         }
     },
-    mounted() {
+    beforeDestroy () {
+        this.dynamicShow = false
+        // 注销当前表格保存在window[this.mainCode+'TableRefs']的this
+        this.destoryTable()
+    },
+    mounted () {
         this.$nextTick(() => {
             if (this.$refs.elTable) {
                 this.$refs.elTable.doLayout()
@@ -361,50 +392,63 @@ export default {
     },
     methods: {
         /* 更新后的参数*/ // 定义删除、增加 不做操作。修改时才做更新 ，分页修改时，根据页表修改。
-        updateModel(key, val, index, page) {
+        updateModel (key, val, index, page) {
             this.dataModel[page * 10 - 10 + index][key] = val
             this.$emit('change-data', key, val)
         },
         /* 分页操作及数据操作内容*/
-        pageOperation(val, oldVal) {
+        pageOperation (val, oldVal) {
             let page = this.currentPage * 10 - 10
-            let size = val.length
-            if (size >= 10 && this.pageSize % 10 == 1) {
-                //删除了一个参数 ，如果当前总条数小于页数，则退一页。
+            const size = val.length
+            if (val.length > this.oldList.length) {
+                const valBai = size % 10
+                const valChu = parseInt(size / 10)
+                if (valBai === 0) {
+                    this.currentPage = valChu
+                } else {
+                    this.currentPage = valChu + 1
+                }
+
+                page = this.currentPage * 10 - 10
+            }
+
+            if (this.dataModel < this.oldList && size >= 10 && this.pageSize % 10 === 0) {
+                // 删除了一个参数 ，如果当前总条数小于页数，则退一页。
                 if (this.currentPage > 1) this.currentPage = this.currentPage - 1
                 page = this.currentPage * 10 - 10
-                if (page != 0) page - 10
+                if (page !== 0) page - 10
             }
             this.pageSize = size
-            //具体操作
+            this.oldList = JSON.parse(JSON.stringify(this.dataModel))
+            // 具体操作
             if (this.mode === 'dialog' || this.mode === 'inner') {
                 this.copDataModel = JSON.parse(JSON.stringify(val)).slice(page, page + 10)
             }
             this.$emit('update:value', val)
         },
 
-        //简单的分页 usnin
-        handleCurrentChange(val) {
+        // 简单的分页 usnin
+        handleCurrentChange (val) {
             this.dataPage = val * 10 - 10
-            //深度克隆主要数据
+            // 深度克隆主要数据
             this.copDataModel = JSON.parse(JSON.stringify(this.dataModel)).slice(this.dataPage, this.dataPage + 10)
             this.currentPage = val
         },
-        columnHidden(column) {
+        columnHidden (column) {
             // 是否隐藏
             return this.columnsRights[column.name] === FormOptions.t.PERMISSIONS.HIDE || column.field_type === 'hidden'
         },
         /**
          * 获取真实的权限
          */
-        getRealRights(rights) {
+        getRealRights (rights) {
             if (this.tableReadonly) {
                 return rights === FormOptions.t.PERMISSIONS.HIDE ? rights : FormOptions.t.PERMISSIONS.READ
             } else {
                 return rights
             }
         },
-        getColumnsRights(rights = {}) {
+        getColumnsRights (rights = {}) {
             const columnsRights = {}
             if (this.nameColumns && this.nameColumns.length > 0) {
                 this.nameColumns.forEach((column) => {
@@ -413,7 +457,7 @@ export default {
             }
             return columnsRights
         },
-        getButtonsRights(rights = {}) {
+        getButtonsRights (rights = {}) {
             if (this.$utils.isEmpty(rights)) {
                 const buttonsRights = {}
                 if (this.$utils.isNotEmpty(this.buttons)) {
@@ -427,19 +471,19 @@ export default {
             }
         },
 
-        tableRowClassName({ row, rowIndex }) {
+        tableRowClassName ({ row, rowIndex }) {
             // 把每一行的索引放进row
             row.$index = rowIndex
             if (rowIndex % 2 === 1) return 'warning-row'
             return 'success-row'
         },
-        handleSelectionChange(selection) {
+        handleSelectionChange (selection) {
             this.multipleSelection = selection
         },
-        handleRowClick(row, event, column) {
+        handleRowClick (row, event, column) {
             this.$refs.elTable.toggleRowSelection(row)
         },
-        filterButtons(position) {
+        filterButtons (position) {
             if (this.tableReadonly) {
                 return this.filterDetailButtons(position)
             }
@@ -457,7 +501,7 @@ export default {
             })
             return bs
         },
-        filterDetailButtons(position) {
+        filterDetailButtons (position) {
             const bs = []
             this.buttons.forEach((button) => {
                 if (
@@ -475,9 +519,9 @@ export default {
             })
             return bs
         },
-        handleActionEvent(button, buttonIndex) {
+        handleActionEvent (button, buttonIndex) {
             // 起始下标
-            let index = this.currentPage * 10 - 10 + buttonIndex
+            const index = this.currentPage * 10 - 10 + buttonIndex
             this.actionCode = button.key === 'custom' ? button.code || button.key + index : button.key
             this.actionPosition = button.position || 'toolbar'
             // 前置事件
@@ -522,7 +566,7 @@ export default {
                 }
             })
         },
-        destoryTable() {
+        destoryTable () {
             if (this.$utils.isNotEmpty(window[this.mainCode + 'TableRefs']) && this.$utils.isNotEmpty(window[this.mainCode + 'TableRefs'][this.code])) {
                 window[this.mainCode + 'TableRefs'][this.code] = null
                 delete window[this.mainCode + 'TableRefs'][this.code]
@@ -533,7 +577,7 @@ export default {
             }
         },
         // 添加
-        async handleAdd() {
+        async handleAdd () {
             if (this.mode === 'dialog') {
                 this.handleDialogMode()
             } else {
@@ -542,7 +586,7 @@ export default {
             }
         },
         // 新增数据
-        addData(data) {
+        addData (data) {
             // this.dataModel.unshift(data)
             this.dataModel.push(data)
             // 初始化运行公式计算 unshift
@@ -556,11 +600,11 @@ export default {
         /**
          * 获取选择的记录
          */
-        getSelection(position, index) {
+        getSelection (position, index) {
             const selection = []
             if (position === 'toolbar' && this.mode !== 'block') {
                 if (this.multipleSelection && this.multipleSelection.length > 0) {
-                    let startIndex = this.currentPage * 10 - 10
+                    const startIndex = this.currentPage * 10 - 10
                     this.multipleSelection.forEach((row) => {
                         selection.push(row.$index + startIndex)
                     })
@@ -570,7 +614,7 @@ export default {
             }
             return selection
         },
-        handleRemove(button, index) {
+        handleRemove (button, index) {
             const position = button.position
             const selection = this.getSelection(position, index)
             ActionUtils.removeRecord(selection, '确定删除当前数据？', true)
@@ -580,6 +624,7 @@ export default {
                             this.dataModel.splice(i, 1)
                         }
                     }
+                    this.pageSize = this.dataModel.length
                     // 后置事件
                     this.afterScript(this.actionCode, position, {
                         selection: selection,
@@ -589,14 +634,14 @@ export default {
                 .catch(() => {})
         },
         // 初始化运行公式计算
-        initRunCalFormula(row) {
+        initRunCalFormula (row) {
             // 不需要字段的进行公式计算 比如获取但其当前时间，随机数
             FormUtils.runCalFormula(this, this.formula[FormUtils.NOT_NEED_FIELD], this.mainCode, row)
         },
-        handleImport() {
+        handleImport () {
             this.importTableDialogVisible = true
         },
-        handleImportTableActionEvent(file, options) {
+        handleImportTableActionEvent (file, options) {
             const formData = FormUtils.getTableDefaultColumnData(this.field)
             IbpsImport.xlsx(file, options).then(({ header, results }) => {
                 const columnMap = {}
@@ -621,20 +666,20 @@ export default {
                 ActionUtils.success('导入成功')
             })
         },
-        //数据导出
-        getIbpsExport(columns, data, title, message, nameKey = 'name') {
+        // 数据导出
+        getIbpsExport (columns, data, title, message, nameKey = 'name') {
             IbpsExport.excel({
                 columns: columns,
                 data: data,
                 nameKey: nameKey,
                 title: title
             }).then(() => {
-                const msg = message ? message : '导出成功'
+                const msg = message || '导出成功'
                 ActionUtils.success(msg)
             })
         },
         // 导出
-        handleExport(button, index) {
+        handleExport (button, index) {
             const position = button.position
             const selection = this.getSelection(position, index)
             if (selection.length > 1) {
@@ -650,7 +695,7 @@ export default {
         /**
          * 导出数据
          */
-        exportData(ids) {
+        exportData (ids) {
             const columnMap = {}
             const columns = []
             this.nameColumns.forEach((column) => {
@@ -662,8 +707,8 @@ export default {
             const exportData = JSON.parse(JSON.stringify(this.dataModel))
             const data = ids
                 ? exportData.filter((d, i) => {
-                      return ids.includes(i)
-                  })
+                    return ids.includes(i)
+                })
                 : exportData
             // TODO: 需要格式化展示的数据
             this.convertExportData(data, columnMap).then((data) => {
@@ -677,24 +722,24 @@ export default {
                 })
             })
         },
-        async convertExportData(data, columnMap) {
+        async convertExportData (data, columnMap) {
             return new Promise((resolve, reject) => {
                 const result = []
                 data
                     ? data.forEach((d) => {
-                          const o = d
-                          for (const name in d) {
-                              const column = columnMap[name]
-                              const value = this.dataFormatter(d[name], column)
-                              o[name] = value
-                          }
-                          result.push(o)
-                      })
+                        const o = d
+                        for (const name in d) {
+                            const column = columnMap[name]
+                            const value = this.dataFormatter(d[name], column)
+                            o[name] = value
+                        }
+                        result.push(o)
+                    })
                     : ''
                 resolve(result)
             })
         },
-        importDataFormatter(value, column) {
+        importDataFormatter (value, column) {
             if (this.$utils.isEmpty(value) || this.$utils.isEmpty(column)) {
                 return value
             }
@@ -727,7 +772,7 @@ export default {
             }
             return result
         },
-        dataFormatter(value, column) {
+        dataFormatter (value, column) {
             if (this.$utils.isEmpty(value) || this.$utils.isEmpty(column)) {
                 return value
             }
@@ -763,7 +808,7 @@ export default {
         /**
          * 格式化选项
          */
-        formatterOptions(value, options, valueKey = 'value', labelKey = 'label') {
+        formatterOptions (value, options, valueKey = 'value', labelKey = 'label') {
             const optionObj = {}
             options.map((option) => {
                 optionObj[option[valueKey]] = option[labelKey]
@@ -774,12 +819,12 @@ export default {
             })
             return res.join(',')
         },
-        deleteEdit() {
+        deleteEdit () {
             this.formDialogVisible = false
             this.handleCout = null
         },
         // =====================对话框模式数据处理   金源信通改=====================
-        handleDialogMode(index) {
+        handleDialogMode (index) {
             const data = this.$utils.isNotEmpty(index) ? this.dataModel[index] : {}
             this.dialogFormData = {
                 responses: JSON.parse(JSON.stringify(data)),
@@ -818,19 +863,19 @@ export default {
       如果上次为修改，则刷新重置添加。
       如果上次为新增，则不做变化。
     */
-        judgeData(index) {
+        judgeData (index) {
             if (index >= 0 && this.handleCout) {
-                //第一次进入时，不做更新判断。
+                // 第一次进入时，不做更新判断。
                 this.$refs.jyxtEdit.loadFormData()
             } else if (index == undefined && this.handleCout == '编辑') {
                 this.$refs.jyxtEdit.loadFormData()
             }
-            this.handleCout = index >= 0 ? '编辑' : '新增' //记录
+            this.handleCout = index >= 0 ? '编辑' : '新增' // 记录
         },
 
         // =====================对话框模式数据处理=  原====================
 
-        handleEditMode(index) {
+        handleEditMode (index) {
             const data = this.$utils.isNotEmpty(index) ? this.dataModel[index] : {}
             this.dialogFormData = {
                 responses: JSON.parse(JSON.stringify(data)),
@@ -866,7 +911,7 @@ export default {
         /**
          * 对话框模式表单返回值
          */
-        handleFormDialogActionEvent(key, data) {
+        handleFormDialogActionEvent (key, data) {
             this.$message({
                 showClose: true,
                 message: '操作成功！',
@@ -885,7 +930,7 @@ export default {
         },
         // =====================自定义对话框=====================
 
-        async handleAddCustomDialog(button) {
+        async handleAddCustomDialog (button) {
             this.customDialogKey = button.dialog
             this.customDialogDynamicParams = await FormUtils.getLinkDynamicParams(button.custom, this.formData)
             this.customDialogCustom = button.custom
@@ -893,7 +938,7 @@ export default {
                 this.customDialogVisible = true
             }, 10)
         },
-        async handleCustomDialogActionEvent(key, datas) {
+        async handleCustomDialogActionEvent (key, datas) {
             const linkLinkage = this.customDialogCustom['link_linkage']
             if (this.$utils.isEmpty(linkLinkage)) {
                 return
@@ -914,16 +959,16 @@ export default {
             // 后置事件
             this.afterScript(this.actionCode, this.actionPosition)
         },
-        summaryMethod(param) {
+        summaryMethod (param) {
             if (this.showSummary) {
                 return JForm._summaryMethod(this, this.field.name, param)
             }
         },
-        hasScript() {
+        hasScript () {
             return true
         },
         // 前置脚本
-        beforeScript(button, index, callback) {
+        beforeScript (button, index, callback) {
             if (!this.hasScript()) {
                 if (callback) {
                     const flag = true
@@ -941,7 +986,7 @@ export default {
             JForm._beforeSubButton(this, this.actionCode, button.position, params, callback)
         },
         // 后置脚本
-        afterScript(action, position, params, callback) {
+        afterScript (action, position, params, callback) {
             if (!this.hasScript()) {
                 if (callback) {
                     const flag = true
@@ -958,7 +1003,7 @@ export default {
             }
             JForm._afterSubButton(this, action, position, params, callback)
         },
-        getButtonByKey(action) {
+        getButtonByKey (action) {
             return this.buttons.find((button) => {
                 return button.key === action
             })
@@ -966,27 +1011,27 @@ export default {
         /**
          * 更新字段值（主表或其他子表）
          */
-        updateFormData(name, value) {
+        updateFormData (name, value) {
             this.$emit('change-data', name, value)
         },
         // 设置行数据
-        setRowData(row, name, value) {
+        setRowData (row, name, value) {
             this.dataModel[row][name] = value
         },
         // 设置行数据
-        getRowData(row, name) {
+        getRowData (row, name) {
             return this.dataModel[row][name]
         },
         /**
          * 获取表单值
          */
-        getData(key) {
+        getData (key) {
             return this.formData[key]
         },
         /**
          * 设置表单值
          */
-        setData(name, value) {
+        setData (name, value) {
             this.updateFormData(name, value)
         }
     }
@@ -1063,6 +1108,5 @@ export default {
     color: #000000;
 }
 </style>
-
 
   </style>
