@@ -43,13 +43,19 @@ export default {
     handleChange(v) {
       let nodesInfo = this.$refs['cascader'].getCheckedNodes()[0]
       let xilei = []
+      let authorityBuMen = []
+      const authority = JSON.parse(nodesInfo.data.authority)
       for (var i of nodesInfo.pathNodes) {
         xilei.push(i.label)
       }
       this.$emit("change-data", "wenJianLeiXing", nodesInfo.pathNodes[0].label)
       this.$emit("change-data", "wenJianXiLei", xilei.join(' / '))
       this.$emit("change-data", "xiLeiId", nodesInfo.value);
-      this.$emit("change-data", "quanXianLeiXing", nodesInfo.data.authority);
+      this.$emit("change-data", "quanXianLeiXing", authority.chaYue);
+      for (var i of authority.buMen) {
+        authorityBuMen.push(i[i.length-1])
+      }
+      this.$emit("change-data", "quanXianXinXi", authorityBuMen.join(','));
     },
 
   },

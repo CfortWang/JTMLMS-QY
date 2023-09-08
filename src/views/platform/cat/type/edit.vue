@@ -21,19 +21,19 @@
         <span>{{ parentData.name }}</span>
       </el-form-item> -->
 
-      <el-form-item label="分类名称:"
+      <el-form-item label="分类名称："
                     prop="name">
         <el-input v-model="type.name"
                   v-pinyin="{vm:type,key:'typeKey'}" />
       </el-form-item>
-      <el-form-item label="分类Key:"
+      <el-form-item label="分类Key："
                     prop="typeKey">
         <el-input v-model="type.typeKey"
                   :disabled="$utils.isNotEmpty(formId)" />
       </el-form-item>
 
       <el-form-item v-show="categoryKey==='DIC_TYPE'"
-                    label="分类类型:"
+                    label="分类类型："
                     prop="struType">
         <el-radio-group v-model="type.struType">
           <el-radio v-for="option in srtuOptions"
@@ -64,37 +64,48 @@
                :model="type"
                :rules="rules"
                :label-width="formLabelWidth">
-        <el-form-item label="分类:">
+        <el-form-item label="分类：">
           <span>{{ isPrivateLocal ? '私有分类' : '普通分类' }}</span>
         </el-form-item>
         <el-form-item v-show="!formId"
-                      label="父节点名称:">
+                      label="父节点名称：">
           <span>{{ parentData.name }}</span>
         </el-form-item>
-        <el-form-item label="分类名称:"
+        <el-form-item label="分类名称："
                       prop="name">
           <el-input v-if="!readonly"
                     v-model="type.name"
                     v-pinyin="{vm:type,key:'typeKey'}" />
           <span v-else>{{ type.name }}</span>
         </el-form-item>
-        <el-form-item label="分类Key:"
+        <el-form-item label="分类Key："
                       prop="typeKey">
           <el-input v-if="!readonly"
                     v-model="type.typeKey"
                     :disabled="$utils.isNotEmpty(formId)" />
           <span v-else>{{ type.typeKey }}</span>
         </el-form-item>
-        <el-form-item label="查阅权限:"
-                      prop="authorityName"
+        <el-form-item label="查阅权限："
+                      prop="authorityObject.chaYue"
                       v-show="categoryKey==='FILE_TYPE'">
           <el-radio-group v-if="!readonly"
-                          v-model="type.authorityName">
+                          v-model="type.authorityObject.chaYue"
+                          @change="radioChangeHandle">
             <el-radio label="公用查阅">公用查阅</el-radio>
             <el-radio label="部门查阅">部门查阅</el-radio>
             <el-radio label="受限查阅">受限查阅</el-radio>
           </el-radio-group>
-          <span v-else>{{ type.authorityName }}</span>
+          <span v-else>{{ type.authorityObject.chaYue }}</span>
+        </el-form-item>
+        <el-form-item label="部门："
+                      prop="authorityObject.buMen"
+                      v-show="categoryKey==='FILE_TYPE' && type.authorityObject.chaYue=='部门查阅'">
+          <el-cascader placeholder="请选择部门"
+                       :options="cascaderOptions"
+                       :props="cascaderProps"
+                       filterable
+                       :disabled="readonly"
+                       v-model="type.authorityObject.buMen"></el-cascader>
         </el-form-item>
         <el-form-item v-show="categoryKey==='DIC_TYPE'"
                       label="字典类型:"
@@ -115,6 +126,8 @@ import { save, get } from '@/api/platform/cat/type'
 import ActionUtils from '@/utils/action'
 import { srtuOptions } from './constants'
 import { validateKey } from '@/utils/validate'
+import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
+
 export default {
   props: {
     className: String,
@@ -158,17 +171,29 @@ export default {
         name: '',
         typeKey: '',
         ownerId: '0',
-        authorityName: ''
+        authorityObject: {
+          chaYue: '', buMen: ''
+        }
       },
       rules: {
         name: [{ required: true, message: this.$t('validate.required') }],
         typeKey: [{ required: true, validator: validateKey }],
-        authorityName: [{ required: false }]
+        authorityObject: {
+          chaYue: [{ required: false }],
+          buMen: [{ required: false }]
+        }
       },
       toolbars: [
         { key: 'save', hidden: () => { return this.readonly } },
         { key: 'cancel' }
-      ]
+      ],
+      cascaderOptions: [],
+      cascaderProps: {
+        multiple: true,
+        children: 'children',  //匹配响应数据中的children
+        label: 'NAME_',        //匹配响应数据中的name
+        value: 'ID_'
+      }
     }
   },
   computed: {
@@ -190,6 +215,18 @@ export default {
       handler: function (val, oldVal) {
         this.dialogVisible = this.visible
         this.isPrivateLocal = this.isPrivate
+        if (this.categoryKey === 'FILE_TYPE' && this.parentData.authorityName !== undefined) {
+          this.type.authorityObject = JSON.parse(this.parentData.authorityName)
+        }
+      },
+      immediate: true
+    },
+    parentData: {
+      handler: function (val, oldVal) {
+        if (this.categoryKey === 'FILE_TYPE' && (this.$route.name !== 'nbwj' || this.$route.name !== 'wjkzgl-ywyxjlsc') && val.authorityName !== undefined) {
+          this.getRadioOptions()
+          this.type.authorityObject = JSON.parse(val.authorityName)
+        }
       },
       immediate: true
     },
@@ -228,7 +265,16 @@ export default {
     },
     // 保存数据
     handleSave() {
-      this.rules.authorityName = this.categoryKey == 'FILE_TYPE' ? [{ required: true, message: '不得为空' }] : [{ required: false }]
+      if (!this.type.authorityObject.chaYue && this.categoryKey === 'FILE_TYPE') {
+        this.rules.authorityObject.chaYue = [{ required: true, message: "查阅权限不得为空！" }]
+      } else {
+        this.rules.authorityObject.chaYue = [{ required: false }]
+      }
+      if (this.type.authorityObject.chaYue == '部门查阅' && (!this.type.authorityObject.buMen || this.type.authorityObject.buMen.length == 0)) {
+        this.rules.authorityObject.buMen = [{ required: true, message: "部门选择不得为空！" }]
+      } else {
+        this.rules.authorityObject.buMen = [{ required: false }]
+      }
       this.$refs[this.formName].validate(valid => {
         if (valid) {
           this.saveData()
@@ -249,7 +295,6 @@ export default {
         this.type.parentId = this.parentData.id
         this.type.categoryKey = this.categoryKey
         this.type.isPrivate = this.isPrivate
-
         if (this.$utils.isEmpty(this.type.id) && (this.type.isPrivate === true || this.type.isPrivate === 'true')) {
           this.type.ownerId = this.$store.getters.userId
         }
@@ -303,9 +348,92 @@ export default {
       }).then(response => {
         this.$refs[this.formName].clearValidate()
         this.type = response.data
+        this.type.authorityObject = JSON.parse(response.data.authorityObject)
         this.isPrivateLocal = !((this.$utils.isEmpty(this.type.ownerId) || this.type.ownerId === '0'))
       }).catch(() => { })
+    },
+    getRadioOptions() {
+      this.type.authorityObject.buMen = ''
+      let sql = `select * FROM  ibps_party_entity WHERE party_type_='position' AND PATH_ IN (${this.$store.getters.level.first})`
+      curdPost('sql', sql).then(res => {
+        let datas = res.variables.data
+        let treeDatas = this.buildTree(datas, 'ID_', 'PARENT_ID_')
+        let tree = []
+        for (let i in treeDatas) {
+          tree.push(treeDatas[i])
+        }
+        this.cascaderOptions = tree
+      })
+    },
+    radioChangeHandle(h) {
+      if (h == '部门查阅') {
+        this.type.authorityObject.buMen = JSON.parse(this.parentData.authorityName).buMen
+        if (this.cascaderOptions.length == 0) {
+          this.getRadioOptions()
+        }
+      } else {
+        this.type.authorityObject.buMen = ''
+      }
+    },
+    // 数据扁平化处理
+    buildTree(array, id, parent_id) {
+      // 创建临时对象
+      let temp = {};
+      // 创建需要返回的树形对象
+      let tree = {};
+      // 先遍历数组，将数组的每一项添加到temp对象中
+      for (let i in array) {
+        temp[array[i][id]] = array[i];
+      }
+      // 遍历temp对象，将当前子节点与父节点建立连接
+      for (let i in temp) {
+        // 判断是否是根节点下的项
+        if (temp[i][parent_id] !== '0') {
+          if (!temp[temp[i][parent_id]].children) {
+            temp[temp[i][parent_id]].children = new Array();
+          }
+          temp[temp[i][parent_id]].children.push(temp[i]);
+        } else {
+          tree[temp[i][id]] = temp[i];
+        }
+      }
+      return tree;
     }
   }
 }
 </script>
+<style lang="scss">
+.el-cascader {
+  width: 100%;
+}
+.gy-cascader {
+  max-width: 500px;
+  overflow-x: auto;
+  &::-webkit-scrollbar-track-piece {
+    background-color: #f8f8f800;
+  }
+  &::-webkit-scrollbar {
+    transition: all 2s;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #ebeaef;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb;
+  }
+  &::-webkit-scrollbar-track {
+    background: #ffffff;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-corner {
+    background-color: rgba(255, 255, 255, 0);
+  }
+}
+</style>
+
+
+
+
+

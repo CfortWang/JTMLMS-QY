@@ -184,22 +184,34 @@ export default {
                 }
             } else {
                 if (command === 'add') { // 添加
+                 if (this.isSpecial(data.name,0)) {
+                        return
+                    }
+                    if (this.isSpecial(data.name,3)) {
+                        return
+                    }
                     this.editId = null
                     this.nodeData = data
                     this.isPrivate = false
                     this.handTreeEdit()
                 } else if (command === 'addPrivate') {
+                    if (this.isSpecial(data.name,0)) {
+                        return
+                    }
+                    if (this.isSpecial(data.name,3)) {
+                        return
+                    }
                     this.editId = null
                     this.isPrivate = true
                     this.nodeData = data
                     this.handTreeEdit()
                 } else if (command === 'edit') {
-                    if (this.isSpecial(data.name)) {
+                    if (this.isSpecial(data.name,1)) {
                         return
                     }
                     this.handleNodeClick(data, false)
                 } else if (command === 'remove') {
-                    if (this.isSpecial(data.name)) {
+                    if (this.isSpecial(data.name,1)) {
                         return
                     }
                     this.handleTreeRemove(data.id)
@@ -275,10 +287,18 @@ export default {
         callback (data) {
             this.loadTreeData()
         },
-        isSpecial (name) {
-            const type = ['内部文件', '外部文件', '记录表单']
-            if (this.categoryKey === 'FILE_TYPE' && type.includes(name)) {
+        isSpecial (name,type) {
+            const fileType = ['内部文件', '外部文件', '记录表单']
+            if (this.categoryKey === 'FILE_TYPE' && name=='文件分类' && type == '0') {
+                ActionUtils.warning('请不要操作文件分类！！如果需要更改，请联系管理员。')
+                return true
+            }
+            if (this.categoryKey === 'FILE_TYPE' && fileType.includes(name) && type == '1') {
                 ActionUtils.warning('请不要操作内部文件、外部文件、记录表单分类！！如果需要更改，请联系管理员。')
+                return true
+            }
+             if (this.categoryKey === 'FILE_TYPE' && name=='记录表单' && type == '3') {
+                ActionUtils.warning('请不要操作记录表单！！如果需要更改，请联系管理员。')
                 return true
             }
             return false

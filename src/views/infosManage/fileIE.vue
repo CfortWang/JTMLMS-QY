@@ -237,9 +237,9 @@ export default {
             let orSql = ''
             for (var i in positionsDatas) {
               if (i == 0) {
-                orSql = `wj.bian_zhi_bu_men_ LIKE '%${positionsDatas[i].id}%'`
+                orSql = `wj.quan_xian_xin_xi_ LIKE '%${positionsDatas[i].id}%'`
               } else {
-                orSql = orSql + `or wj.bian_zhi_bu_men_ LIKE '%${positionsDatas[i].id}%'`
+                orSql = orSql + `or wj.quan_xian_xin_xi_ LIKE '%${positionsDatas[i].id}%'`
               }
             }
             wheres2 = wheres2 + ` and (${orSql}) and FIND_IN_SET (wj.xi_lei_id_,'${buMenAuthority}')`
@@ -273,7 +273,7 @@ export default {
       let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres1}  order by bian_zhi_shi_jian desc`
       for (var i in Object.keys(this.fileTypesDatas)) {
         var key = Object.keys(this.fileTypesDatas)[i];   // key
-        var value = this.fileTypesDatas[key];  // value
+        var value = this.fileTypesDatas[key];  // value 
         if (value.length !== 0) {
           needSelType.push(`(${sqlArr[i]})`)
         }
@@ -335,14 +335,15 @@ export default {
         authority: []
       }
       if (nodeData.children == undefined) {
+        const authorityName = JSON.parse(nodeData.authorityName)
         fileTypes.push(nodeId)
-        if (nodeData.authorityName == '公用查阅') {
+        if (authorityName.chaYue == '公用查阅') {
           this.fileTypesDatas.comAuthority.push(nodeId)
         }
-        if (nodeData.authorityName == '部门查阅') {
+        if (authorityName.chaYue == '部门查阅') {
           this.fileTypesDatas.buMenAuthority.push(nodeId)
         }
-        if (nodeData.authorityName == '受限查阅') {
+        if (authorityName.chaYue == '受限查阅') {
           this.fileTypesDatas.authority.push(nodeId)
         }
       } else {
@@ -350,13 +351,14 @@ export default {
         const result = _.flattenDeep(nodeData.children.map(m => getTail(m)))
         for (var i of result) {
           fileTypes.push(i.id)
-          if (i.authorityName == '公用查阅') {
+          const authorityName = JSON.parse(i.authorityName)
+          if (authorityName.chaYue == '公用查阅') {
             this.fileTypesDatas.comAuthority.push(i.id)
           }
-          if (i.authorityName == '部门查阅') {
+          if (authorityName.chaYue == '部门查阅') {
             this.fileTypesDatas.buMenAuthority.push(i.id)
           }
-          if (i.authorityName == '受限查阅') {
+          if (authorityName.chaYue == '受限查阅') {
             this.fileTypesDatas.authority.push(i.id)
           }
         }

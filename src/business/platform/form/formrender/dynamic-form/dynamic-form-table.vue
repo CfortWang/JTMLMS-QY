@@ -221,7 +221,7 @@ export default {
             dialogTemplate: null,
             dialogTemplateAtts: {},
 
-            oldList: []
+            oldList: []  // 子表旧数据
         }
     },
     computed: {
@@ -400,7 +400,7 @@ export default {
         pageOperation (val, oldVal) {
             let page = this.currentPage * 10 - 10
             const size = val.length
-            if (val.length > this.oldList.length) {
+            if (this.editFromType === 'add' && val.length > this.oldList.length && this.oldList.length > 0) {
                 const valBai = size % 10
                 const valChu = parseInt(size / 10)
                 if (valBai === 0) {
