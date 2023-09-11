@@ -203,9 +203,19 @@ export default {
       let wheres1 = '' // 共用
       let wheres2 = '' // 部门
       let wheres3 = '' // 受限
+      let wheres4 = '' // 试剂使用说明书条件
+      let wheres5 = '' // 设备使用说明书条件
+
       let start = ''
       let positionsDatas = this.$store.getters.userInfo.positions
       let needSelType = []
+      if (this.$store.getters.userInfo.positions == 0) {
+        this.$message({
+          message: '该账户并没有所属部门，请先归属部门再来操作。',
+          type: 'error'
+        })
+        return
+      }
       for (var i in this.searchWhere) {
         if (i == 'b') {
           start = this.searchWhere[i]
@@ -214,20 +224,19 @@ export default {
           wheres1 = wheres1 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
           wheres2 = wheres2 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
           wheres3 = wheres3 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
+          wheres4 = wheres4 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
+          wheres5 = wheres5 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
+
         }
         if (i !== 'i' && i !== 'b') {
           wheres1 = wheres1 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
           wheres2 = wheres2 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
           wheres3 = wheres3 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
+          wheres4 = wheres4 + ` and shuo_ming_shu_ like '%${this.searchWhere[i]}%'`
+          wheres5 = wheres5 + ` and she_bei_ming_cheng_ like '%${this.searchWhere[i]}%'`
         }
       }
-      if (this.$store.getters.userInfo.positions == 0) {
-        this.$message({
-          message: '该账户并没有所属部门，请先归属部门再来操作。',
-          type: 'error'
-        })
-        return
-      }
+
       if (fileType) {
         if (this.pageKey == 'nbwj') {
           if (comAuthority.length !== 0) {
@@ -250,13 +259,13 @@ export default {
         } else {
           wheres1 = wheres1 + ` and FIND_IN_SET (wj.fen_lei_id_,'${fileType}')`
         }
-
       }
       if (sorts) {
         if (JSON.stringify(sorts) !== "{}") {
           wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
           wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
-
+          wheres4 = wheres4 + ` order by  bian_zhi_shi_jian  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
+          wheres5 = wheres5 + ` order by  bian_zhi_shi_jian  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
         }
       }
       // 重复发放的文件，在权限表会存在重复的文件信息
@@ -269,7 +278,11 @@ export default {
       let buMenSql = `${selectSql}  t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' ${wheres2}`
       // 受限文件
       let authoritySql = `${selectSql}  t_wjxxb wj WHERE wj.shi_fou_guo_shen_ ='有效' and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
-      let sqlArr = [comSql, buMenSql, authoritySql]
+      // 设备使用说明书
+      let selSb = `select '设备使用说明书' as wen_jian_xi_lei_,'' as wen_jian_bian_hao,concat(she_bei_ming_cheng_,'使用说明书') as wen_jian_ming_che,''as ban_ben_,fu_jian_shang AS fu_jian_,bian_zhi_shi_jian as  fa_fang_shi_jian_ from t_sbdj where bian_zhi_bu_men_ LIKE '%${positionsDatas[i].id}%' and she_bei_zhuang_ta <> '停用'  ${wheres5}`
+      //  试剂使用说明书
+      let selSj = `select '试剂使用说明书' as wen_jian_xi_lei_,'' as wen_jian_bian_hao,shuo_ming_shu_ as wen_jian_ming_che,''as ban_ben_,fu_jian_,bian_zhi_shi_jian as  fa_fang_shi_jian_  from t_sjhcsysmsylbzb where bian_zhi_bu_men_ LIKE '%${positionsDatas[i].id}%' ${wheres4}`
+      let sqlArr = [comSql, buMenSql, authoritySql, selSj, selSb]
       let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres1}  order by bian_zhi_shi_jian desc`
       for (var i in Object.keys(this.fileTypesDatas)) {
         var key = Object.keys(this.fileTypesDatas)[i];   // key
@@ -278,9 +291,10 @@ export default {
           needSelType.push(`(${sqlArr[i]})`)
         }
       }
+    //   console.log('needSelType',needSelType)
       let fileSearchSql = needSelType.join('union all')
       let sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq` : oldRecordSql
-      console.log('sql------------：', sql)
+        console.log('sql------------：', sql)
       curdPost('sql', sql).then(res => {
         let tableDatas = res.variables.data
         this.selectListData = JSON.parse(JSON.stringify(tableDatas))
@@ -309,6 +323,7 @@ export default {
       this.getDatas()
     },
     handleNodeClick(nodeId, nodeData, treeDatas) {
+      console.log('nodeData', nodeData)
       this.show = 'detail'
       this.addDataCont = { fenLei: nodeData.name, fenLeiId: nodeId }
       let fileTypes = []
@@ -332,7 +347,9 @@ export default {
       this.fileTypesDatas = {
         comAuthority: [],
         buMenAuthority: [],
-        authority: []
+        authority: [],
+        shiJiSql: [],
+        sheBeiSql: []
       }
       if (nodeData.children == undefined) {
         const authorityName = JSON.parse(nodeData.authorityName)
@@ -340,8 +357,14 @@ export default {
         if (authorityName.chaYue == '公用查阅') {
           this.fileTypesDatas.comAuthority.push(nodeId)
         }
-        if (authorityName.chaYue == '部门查阅') {
+        if (authorityName.chaYue == '部门查阅' && (nodeData.name !== '试剂使用说明书' || nodeData.name !== '设备使用说明书')) {
           this.fileTypesDatas.buMenAuthority.push(nodeId)
+        }
+        if (authorityName.chaYue == '部门查阅' && nodeData.name == '试剂使用说明书') {
+          this.fileTypesDatas.shiJiSql.push(nodeId)
+        }
+        if (authorityName.chaYue == '部门查阅' && nodeData.name == '设备使用说明书') {
+          this.fileTypesDatas.sheBeiSql.push(nodeId)
         }
         if (authorityName.chaYue == '受限查阅') {
           this.fileTypesDatas.authority.push(nodeId)
@@ -355,8 +378,14 @@ export default {
           if (authorityName.chaYue == '公用查阅') {
             this.fileTypesDatas.comAuthority.push(i.id)
           }
-          if (authorityName.chaYue == '部门查阅') {
+          if (authorityName.chaYue == '部门查阅' && (i.name !== '试剂使用说明书' || i.name !== '设备使用说明书')) {
             this.fileTypesDatas.buMenAuthority.push(i.id)
+          }
+          if (authorityName.chaYue == '部门查阅' && i.name == '试剂使用说明书') {
+            this.fileTypesDatas.shiJiSql.push(nodeId)
+          }
+          if (authorityName.chaYue == '部门查阅' && i.name == '设备使用说明书') {
+            this.fileTypesDatas.sheBeiSql.push(nodeId)
           }
           if (authorityName.chaYue == '受限查阅') {
             this.fileTypesDatas.authority.push(i.id)

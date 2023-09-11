@@ -185,10 +185,11 @@ export default {
             let params = {}
             const type = this.partyTypeId !== '' ? this.partyTypeId : '1'
             if (this.isUseScope) {
-                params.type = type
-                params.includeSub = type === '1'
+                params.type = type === '2' ? '1' : type
+                params.includeSub = type === '1' || type === '2'
                 if (type === '2') {
-                    params.partyId = node.level === 0 ? null : node.data.id
+                    // params.partyId = node.level === 0 ? null : node.data.id
+                    params.posId = node.level === 0 ? null : node.data.id
                 }
                 if (type === '3') {
                     params.partyId = this.currentOrgId
@@ -227,17 +228,17 @@ export default {
                         }
                     })
                     let treeData
-                    if (type === '2' || type === '3') {
+                    if (type === '3') {
                         arrTwo.forEach((item) => {
                             item.leaf = true
                         })
                         this.treeData = arrTwo
                     } else {
                         let arrList = []
+                        const fristList = false
                         const frist = this.$store.getters.level.first || ''
-                        if (type === '1' && this.filtrate && frist) {
+                        if ((type === '1' || type === '2') && this.filtrate && frist) {
                             const showBoo = arr.some((item) => item.id === frist)
-                            console.log(this.filtrate, showBoo)
                             if (showBoo) {
                                 arrList = arr.filter((item) => item.id === frist)
                             } else {
@@ -246,11 +247,16 @@ export default {
                         } else {
                             arrList = arr
                         }
+
+                        if (type === '2') {
+                            this.getPosiData(arrList, true)
+                        }
+
                         if (this.$utils.isEmpty(node.data)) {
                             treeData = arrList
                             resolve(this.toTree(treeData))
                         } else {
-                            treeData = type === '1' ? arrList : this.filterTreeChildren(arrList, 'root')
+                            treeData = type === '1' || type === '2' ? arrList : this.filterTreeChildren(arrList, 'root')
                             resolve(this.toTree(treeData))
                         }
                     }
@@ -267,12 +273,61 @@ export default {
                 getTreeData(params).then(res => {
                     this.loading = false
                     const arr = JSON.parse(JSON.stringify(res.data))
-                    resolve(this.toTree(arr))
+
+                    let arrList = []
+                    const second = this.$store.getters.level.second || ''
+                    console.log(second)
+                    if ((type === '1' || type === '2') && this.filtrate && second) {
+                        const showBoo = arr.some((item) => item.id === second)
+                        if (showBoo) {
+                            arrList = arr.filter((item) => item.id === second)
+                        } else {
+                            arrList = arr
+                        }
+                    } else {
+                        arrList = arr
+                    }
+
+                    if (type === '2') {
+                        this.getPosiData(arrList, node.data.disabled)
+                    }
+
+                    resolve(this.toTree(arrList))
                 }).catch(res => {
                     this.loading = false
                     resolve([])
                 })
             }
+        },
+        getPosiData (arrList, disabled) {
+            const positions = this.$store.getters.userInfo.employee.positions
+            if (positions) {
+                const positionsList = positions.split(',')
+                console.log(positionsList)
+                positionsList.forEach(item => {
+                    const index = arrList.findIndex(it => it.id === item)
+                    console.log(index)
+                    if (index >= 0) {
+                        arrList[index].disabled = true
+                    }
+                })
+            }
+            // 如果上级可以选择 也就是 disabled false，下级一定是false
+            if (!disabled) {
+                arrList.forEach(item => {
+                    item.disabled = false
+                })
+            } else {
+                arrList.forEach(item => {
+                    if (item.disabled) {
+                        item.disabled = false
+                    } else {
+                        item.disabled = true
+                    }
+                })
+            }
+
+            console.log(arrList)
         },
         toTree (data) {
             return TreeUtils.transformToTreeFormat(data, {
@@ -381,10 +436,12 @@ export default {
             this.$emit('selected', val)
         },
         changeRadio (data) {
-            if (data.id === 0 || data.id === '0') return
+            console.log(data)
+            if (data.id === 0 || data.id === '0' || data.disabled) return
             this.$emit('selected', data)
         },
         onNodeClick (data, node, obj) {
+            if (data.id === 0 || data.id === '0' || data.disabled) return
             this.radio = data[this.pkKey]
             this.$emit('selected', data)
         }
