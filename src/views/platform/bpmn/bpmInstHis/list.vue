@@ -5,6 +5,7 @@
                 :width="width"
                 :height="height"
                 :location="location"
+                title="记录分类"
                 category-key="FLOW_TYPE"
                 :has-permission="hasPermission"
                 @node-click="handleNodeClick"
@@ -192,7 +193,7 @@ export default {
     },
     data () {
         return {
-            width: 250,
+            width: 220,
             selection: false,
             dialogFormVisible: false,
             // 编辑dialog需要使用
@@ -273,7 +274,7 @@ export default {
         const hasRole = roleList.some(item => item.name === '系统管理角色')
         if (hasRole) {
             // 系统管理角色不做分类过滤
-            this.hasPermission = false
+            // this.hasPermission = false
             this.listConfig.toolbars.push({ key: 'remove' })
             this.selection = true
         }

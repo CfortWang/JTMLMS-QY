@@ -81,7 +81,7 @@
         />
         <news-detail
             :id="newsId"
-            title="公告明细"
+            :title="newsTitle"
             :visible="newsDialogVisible"
             readonly
             @close="visible => newsDialogVisible = visible"
@@ -208,6 +208,7 @@ export default {
             loading: false,
             dialogFormVisible: false,
             newsDialogVisible: false,
+            newsTitle: '公告明细',
             orgName: '',
             roleName: '',
             FlowName: '',
@@ -476,6 +477,7 @@ export default {
             if (this.activeTab === 'news') {
                 this.newsId = data.id
                 this.newsDialogVisible = true
+                this.newsTitle = data.title
                 return
             }
             this.taskId = data.id || ''

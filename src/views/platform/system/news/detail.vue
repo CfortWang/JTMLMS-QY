@@ -13,7 +13,7 @@
     >
         <el-row style="padding: 10px 10px 0 10px; max-height: 600px;">
             <el-form ref="form" :model="form" label-width="100px" disabled>
-                <el-form-item label="公告分类：" prop="typeId">
+                <!-- <el-form-item label="公告分类：" prop="typeId">
                     <ibps-type-select v-model="form.typeId" category-key="NOTICE_TYPE" />
                 </el-form-item>
                 <el-form-item label="标题：" prop="title">
@@ -24,9 +24,14 @@
                 </el-form-item>
                 <el-form-item label="关键字：" prop="key">
                     <el-input v-model="form.key" />
-                </el-form-item>
+                </el-form-item> -->
                 <el-row>
-                    <el-col :span="12">
+                    <el-col :span="8">
+                        <el-form-item label="发布人：" prop="author">
+                            <el-input v-model="form.author" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
                         <el-form-item label="发布时间：" prop="publicDate">
                             <el-date-picker
                                 v-model="form.publicDate"
@@ -37,7 +42,7 @@
                             />
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12">
+                    <el-col :span="8">
                         <el-form-item label="失效时间：" prop="loseDate">
                             <el-date-picker
                                 v-model="form.loseDate"

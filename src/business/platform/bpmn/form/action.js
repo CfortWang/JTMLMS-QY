@@ -322,7 +322,6 @@ export default {
 
             if (actionName === 'agree') {
                 agree(params).then(response => {
-                    console.log(response)
                     this.handleResponse(actionName, loading, response)
                     this.createSnapshot()
                 }).catch(() => {
@@ -408,7 +407,6 @@ export default {
                 taskId: this.taskId ? this.taskId : this.endProcessTaskId,
                 endReason: params.opinion
             }).then(response => {
-                console.log(response)
                 loading.close()
                 this.$alert(response.message, {
                     showClose: false
@@ -674,7 +672,6 @@ export default {
                 const path = data[0].bao_biao_lu_jing_
                 const url = this.$getReportFile(path, `id_=${id}`)
                 const fileName = name + this.$common.getDateNow(16, 'string')
-                console.log(url, fileName)
                 this.$common.snapshoot({
                     url,
                     name: fileName,

@@ -67,11 +67,11 @@ export const unreadMessageOptions = [
     label: '系统消息',
     type: 'danger'
   },
-  {
-    value: 'bulletin',
-    label: '公告',
-    type: 'yellow'
-  }
+//   {
+//     value: 'bulletin',
+//     label: '公告',
+//     type: 'yellow'
+//   }
 ]
 export const statusOptions = [
   {

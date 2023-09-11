@@ -13,11 +13,11 @@ export const typeOptions = [
         label: '系统消息',
         type: 'danger'
     },
-    {
-        value: 'bulletin',
-        label: '公告',
-        type: 'yellow'
-    }
+    // {
+    //     value: 'bulletin',
+    //     label: '公告',
+    //     type: 'yellow'
+    // }
 ]
 export const renderHeader = function (h, { column, $index }) {
     return h('span', [

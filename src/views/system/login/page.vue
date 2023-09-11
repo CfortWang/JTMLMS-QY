@@ -110,7 +110,7 @@ export default {
             height: 100%;
             overflow: hidden;
             border: 0;
-            padding: 0 7.5%;
+            padding: 0 2.5%;
         }
         .footerclass{
             width: 80%;
@@ -131,7 +131,7 @@ export default {
             position: absolute;
             top:40%;
             transform: translateY(-50%);
-            margin-left: 50px;
+            // margin-left: 50px;
         }
     // }
 
