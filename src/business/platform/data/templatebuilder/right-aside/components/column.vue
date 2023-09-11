@@ -271,8 +271,8 @@ export default {
         label: field.label,
         name: field.name
       }
-      if (this.prop === 'sort_columns' && columns.length >= 2) {
-        ActionUtils.warning('排序字段不能超过2个字段')
+      if (this.prop === 'sort_columns' && columns.length >= 3) {
+        ActionUtils.warning('排序字段不能超过3个字段')
         return
       }
       if (this.prop === 'sort_columns') {

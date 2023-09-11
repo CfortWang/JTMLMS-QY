@@ -18,8 +18,8 @@
             :display-field="displayField"
             :display-field-data="displayFieldData"
             class="hidden-print"
-            :dynamicParams="dynamicParams"
-            :formName="template ? template.attrs.form_name : ''"
+            :dynamic-params="dynamicParams"
+            :form-name="template ? template.attrs.form_name : ''"
             :class="{ 'ibps-data-template-list__preview': preview }"
             @display-field-change="handleDisplayField"
             @header-dragend="handleHeaderDragend"
@@ -71,7 +71,22 @@
                     :label-type="getLinkLabelType(scope.column.field_options)"
                     :label-key="getLinkLabelKey(scope.column.field_options)"
                 > -->
-                <ibps-link-data v-if="$utils.isNotEmpty(scope.column)" v-model="scope.value" :template-key="scope.column.field_options.linkdata" :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)" :dynamic-params="getLinkDynamicParams(scope.column.field_options, scope.row)" :has-dynamic-params="hasDynamicParams(scope.column.field_options)" :value-key="getLinkValueKey(scope.column.field_options)" :label-type="getLinkLabelType(scope.column.field_options)" :label-key="getLinkLabelKey(scope.column.field_options)" :structure="getLinkStructure(scope.column.field_options)" :config="getLinkConfig(scope.column.field_options)" readonly readonly-text="text" allow-empty-dynamic-params />
+                <ibps-link-data
+                    v-if="$utils.isNotEmpty(scope.column)"
+                    v-model="scope.value"
+                    :template-key="scope.column.field_options.linkdata"
+                    :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)"
+                    :dynamic-params="getLinkDynamicParams(scope.column.field_options, scope.row)"
+                    :has-dynamic-params="hasDynamicParams(scope.column.field_options)"
+                    :value-key="getLinkValueKey(scope.column.field_options)"
+                    :label-type="getLinkLabelType(scope.column.field_options)"
+                    :label-key="getLinkLabelKey(scope.column.field_options)"
+                    :structure="getLinkStructure(scope.column.field_options)"
+                    :config="getLinkConfig(scope.column.field_options)"
+                    readonly
+                    readonly-text="text"
+                    allow-empty-dynamic-params
+                />
             </template>
             <!--地址-->
             <template v-slot:address="scope">
@@ -82,7 +97,7 @@
             </template>
             <!--图片-->
             <template v-slot:image="scope">
-                <ibps-image v-if="$utils.isNotEmpty(scope.column)" height="45" width="45" v-model="scope.value" :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)" :download="scope.column.field_options.download" :store="scope.column.field_options.store" :disabled="true" />
+                <ibps-image v-if="$utils.isNotEmpty(scope.column)" v-model="scope.value" height="45" width="45" :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)" :download="scope.column.field_options.download" :store="scope.column.field_options.store" :disabled="true" />
             </template>
 
             <template v-slot:customFormatter="scope">
@@ -90,7 +105,21 @@
             </template>
         </ibps-crud>
 
-        <data-template-formrender-dialog ref="formrender" :visible="dialogFormVisible" :form-key="formKey" :print-template-id="printTemplateId" :default-data="defaultFormData" :dynamicParams="dynamicParams" :pk-value="pkValue" :toolbars="editToolbars" :readonly="readonly" :template-key="dataTemplate.key" :addDataCont="addDataCont" @callback="search" @close="(visible) => (dialogFormVisible = visible)" />
+        <data-template-formrender-dialog
+            ref="formrender"
+            :visible="dialogFormVisible"
+            :form-key="formKey"
+            :print-template-id="printTemplateId"
+            :default-data="defaultFormData"
+            :dynamic-params="dynamicParams"
+            :pk-value="pkValue"
+            :toolbars="editToolbars"
+            :readonly="readonly"
+            :template-key="dataTemplate.key"
+            :add-data-cont="addDataCont"
+            @callback="search"
+            @close="(visible) => (dialogFormVisible = visible)"
+        />
         <!-- 流程定义选择器 -->
         <bpm-def-dialog v-model="dialogValue" :visible="dialogVisible" :form-key="formKey" :multiple="false" :is-data-template-use="true" @close="(visible) => (dialogVisible = visible)" @action-event="handleDialogActionEvent" />
         <!-- 字段导出  -->
@@ -102,14 +131,14 @@
         <!-- 表单打印-->
         <form-print-template :id="printTemplateId" :pk="pkValue" :visible="formPrintTemplateDialogVisible" @close="(visible) => (formPrintTemplateDialogVisible = visible)" />
         <component :is="dialogTemplate" v-if="dialogTemplate" ref="dialogTemplate" v-bind="dialogTemplateAtts" />
-        <bpmn-formrender :visible="npmDialogFormVisible" :def-id="defId" :instance-id="instanceId" :task-id="taskId" :addDataCont="addDataCont" @callback="search" @close="loadFlowFData" />
-        <Scan :currentScan="scanName" :scanVisible="scanVisible" :obj="obj" v-if="scanVisible" @scanOff="scanOff" />
+        <bpmn-formrender :visible="npmDialogFormVisible" :def-id="defId" :instance-id="instanceId" :task-id="taskId" :add-data-cont="addDataCont" @callback="search" @close="loadFlowFData" />
+        <Scan v-if="scanVisible" :current-scan="scanName" :scan-visible="scanVisible" :obj="obj" @scanOff="scanOff" />
         <print :show="showPrint" :list="printList" :type="printType" />
         <labelPrint :show="showPrintYi" :list="printList" :type="printType" />
 
         <import-table :visible="importTableDialogVisible" title="导入" @close="(visible) => (importTableDialogVisible = visible)" @action-event="handleImportTableActionEvent" />
 
-        <xlsxFile :visible="xlsxFileVisible" @xlsxFileClose="xlsxFileClose" v-if="xlsxFileVisible"></xlsxFile>
+        <xlsxFile v-if="xlsxFileVisible" :visible="xlsxFileVisible" @xlsxFileClose="xlsxFileClose" />
     </div>
 </template>
 <script>
@@ -150,7 +179,7 @@ import importTable from '@/business/platform/form/formrender/dynamic-form/compon
 import JTemplate from '../utils/JTemplate' // 自定义脚本
 import Scan from '@/views/system/jbdScan/scan.vue'
 
-//import BpmnFormrender from '@/vuew/business/platform/bpmn/form/dialog'//新增流程打开页面
+// import BpmnFormrender from '@/vuew/business/platform/bpmn/form/dialog'//新增流程打开页面
 import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
@@ -183,7 +212,7 @@ export default {
         // DataTemplateFormat
     },
     filters: {
-        filterNumber(data, fieldOptions = {}) {
+        filterNumber (data, fieldOptions = {}) {
             return filterNumber(data, fieldOptions)
         }
     },
@@ -206,12 +235,7 @@ export default {
         },
         xlsxFileVisible: false
     },
-    destroyed() {
-        if (this.dataTemplate.type !== 'dialog') {
-            JTemplate.cleanEvents()
-        }
-    },
-    data() {
+    data () {
         return {
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
@@ -287,13 +311,13 @@ export default {
         }
     },
     computed: {
-        selectionType() {
+        selectionType () {
             return this.multiple ? 'checkbox' : 'radio'
         },
-        pkKey() {
+        pkKey () {
             return this.key || 'id_'
         },
-        formFieldMap() {
+        formFieldMap () {
             if (this.$utils.isEmpty(this.fields)) {
                 return {}
             }
@@ -306,26 +330,26 @@ export default {
             }
             return map
         },
-        composeParam() {
+        composeParam () {
             return this.composeParams
         }
     },
     watch: {
         value: {
-            handler(val, oldVal) {
+            handler (val, oldVal) {
                 this.selectionAll = val
             },
             immediate: true,
             deep: true
         },
         selectionAll: {
-            handler(val, oldVal) {
+            handler (val, oldVal) {
                 this.$emit('selected', val)
             },
             deep: true
         },
         template: {
-            handler(val, oldVal) {
+            handler (val, oldVal) {
                 if (!this.template) {
                     return
                 }
@@ -339,25 +363,28 @@ export default {
             immediate: true
         },
         height: {
-            handler(val, oldVal) {
+            handler (val, oldVal) {
                 this.loadHeight()
             },
             immediate: true
         }
     },
+    destroyed () {
+        if (this.dataTemplate.type !== 'dialog') {
+            JTemplate.cleanEvents()
+        }
+    },
     methods: {
-        getDatabaseType() {
-            getDatabaseType()
-                .then((response) => {
-                    this.databaseType = response.data
-                    this.checkPk(this.dataTemplate.unique)
-                    this.initData()
-                })
-                .catch(() => {
-                    this.loading = false
-                })
+        getDatabaseType () {
+            getDatabaseType().then((response) => {
+                this.databaseType = response.data
+                this.checkPk(this.dataTemplate.unique)
+                this.initData()
+            }).catch(() => {
+                this.loading = false
+            })
         },
-        checkPk(pk) {
+        checkPk (pk) {
             let pkKey = pk || 'id_'
             if (this.databaseType === 'upper') {
                 pkKey = toUpper(pkKey)
@@ -366,7 +393,7 @@ export default {
             }
             this.key = pkKey
         },
-        initUI() {
+        initUI () {
             this.initialization = false
             if (!this.initialization) {
                 this.initJTemplate()
@@ -376,7 +403,7 @@ export default {
                 }, 10)
             }
         },
-        loadHeight() {
+        loadHeight () {
             if (this.$utils.isNotEmpty(this.height)) {
                 this.tableHeight = this.height - 90
             } else {
@@ -387,14 +414,14 @@ export default {
                 }
             }
         },
-        getParentEl(parentEl) {
+        getParentEl (parentEl) {
             if (parentEl.$el && parentEl.$el.nodeName !== '#comment') {
                 return parentEl.$el
             } else {
                 return this.getParentEl(parentEl.$parent)
             }
         },
-        fixHeight() {
+        fixHeight () {
             const parentEl = this.getParentEl(this.$parent)
             const parentHeight = parentEl.offsetHeight
             // header 高度
@@ -411,7 +438,7 @@ export default {
             }
             return parentHeight - headerHeight - tabHeight
         },
-        initData() {
+        initData () {
             // if (this.displayField) {
             //     this.listIdentity = 'ibps-dataTempate-' + this.dataTemplate.key
             //     this.loadDisplayField()
@@ -423,11 +450,11 @@ export default {
             }
             this.loadData()
         },
-        clearSelection() {
+        clearSelection () {
             this.$refs['crud'].clearSelection()
             this.$emit('selected', this.multiple ? [] : '')
         },
-        handleSelectionChange(selection) {
+        handleSelectionChange (selection) {
             this.selection = selection
             setTimeout(() => {
                 this.changePageCoreRecordData()
@@ -436,7 +463,7 @@ export default {
         /**
          * 记忆选择核心方法
          */
-        changePageCoreRecordData() {
+        changePageCoreRecordData () {
             // 如果总记忆中还没有选择的数据，那么就直接取当前页选中的数据，不需要后面一系列计算
             if (this.$utils.isEmpty(this.selectionAll)) {
                 this.selectionAll = this.selection ? JSON.parse(JSON.stringify(this.selection)) : []
@@ -507,7 +534,7 @@ export default {
                 this.selectionAll = selectionAll[0]
             }
         },
-        setSelectRow() {
+        setSelectRow () {
             setTimeout(() => {
                 this.setRowSelect()
             }, 10)
@@ -515,7 +542,7 @@ export default {
         /**
          *  设置选中的方法
          */
-        setRowSelect() {
+        setRowSelect () {
             const tableEl = this.$refs['crud']
             if (!tableEl) {
                 return
@@ -544,7 +571,7 @@ export default {
         /**
          * 获取选择的ID
          */
-        getSelectAllIds() {
+        getSelectAllIds () {
             const selectAllIds = []
             if (this.multiple) {
                 this.selectionAll.forEach((row) => {
@@ -561,7 +588,7 @@ export default {
          * @param {Object} data 需要从中获取值的对象
          * @param {Object} defaultValue 默认值
          */
-        getPkValue(data, defaultValue = '') {
+        getPkValue (data, defaultValue = '') {
             const pkKey = this.pkKey || 'id'
             // 创建一个忽略大小写的正则对象
             const regx = new RegExp(`^${pkKey}$`, 'gi')
@@ -577,31 +604,29 @@ export default {
         /**
          * 加载数据
          */
-        loadData(outerKey) {
+        loadData (outerKey) {
             this.loading = true
             if (this.$utils.isEmpty(this.template)) return
-            queryDataTable(this.getFormatParams(outerKey))
-                .then((response) => {
-                    this.loading = false
-                    ActionUtils.handleListData(this, response.data)
-                    this.setSelectRow()
-                    if (this.$refs.crud) {
-                        this.$refs.crud.handleTableHeight()
-                        debounce(() => {
-                            if (this.$refs.crud) {
-                                this.$refs.crud.handleTableHeight()
-                            }
-                        }, 100)()
-                    }
-                })
-                .catch(() => {
-                    this.loading = false
-                })
+            queryDataTable(this.getFormatParams(outerKey)).then((response) => {
+                this.loading = false
+                ActionUtils.handleListData(this, response.data)
+                this.setSelectRow()
+                if (this.$refs.crud) {
+                    this.$refs.crud.handleTableHeight()
+                    debounce(() => {
+                        if (this.$refs.crud) {
+                            this.$refs.crud.handleTableHeight()
+                        }
+                    }, 100)()
+                }
+            }).catch(() => {
+                this.loading = false
+            })
         },
         /**
          * 获取格式化参数
          */
-        getFormatParams(outerKey) {
+        getFormatParams (outerKey) {
             let formParams = {}
             if (this.$refs['searchForm']) {
                 formParams = this.$refs['searchForm'].getSearcFormData() || {}
@@ -622,7 +647,7 @@ export default {
         /**
          * 处理分页事件
          */
-        handlePaginationChange(page) {
+        handlePaginationChange (page) {
             this.changePageCoreRecordData()
             ActionUtils.setPagination(this.pagination, page)
             this.loadData()
@@ -630,50 +655,50 @@ export default {
         /**
          * 处理排序
          */
-        handleSortChange(sort) {
+        handleSortChange (sort) {
             ActionUtils.setSorts(this.sorts, sort)
             this.loadData()
         },
         // 查询数据
-        search() {
+        search () {
             this.loadData()
             this.addDataCont = {}
         },
         /* 流程页面关闭，刷新当前页面*/
-        loadFlowFData() {
+        loadFlowFData () {
             this.npmDialogFormVisible = false
             this.addDataCont = {}
         },
-        /*扫码操作*/
-        scanHandler(val) {
+        /* 扫码操作*/
+        scanHandler (val) {
             this.scanVisible = true
             this.scanName = val
         },
         // /*按钮传参*/
-        scanHandlerObj(val, obj) {
+        scanHandlerObj (val, obj) {
             this.scanVisible = true
             this.scanName = val
             this.obj = obj
         },
         // 一般验收物料标签打印
-        labelPrint(data, type) {
+        labelPrint (data, type) {
             this.showPrintYi = true
             this.printList = data
             this.printType = type
         },
         // 标签打印
-        printTag(data, type) {
+        printTag (data, type) {
             this.showPrint = true
             this.printList = data
             this.printType = type
         },
         /* 返回关闭*/
-        scanOff(val) {
+        scanOff (val) {
             this.scanVisible = false
             this.scanName = ''
             this.search()
         },
-        resetSearchForm() {
+        resetSearchForm () {
             if (this.$refs['searchForm']) {
                 this.$refs['searchForm'].resetSearchForm()
             }
@@ -681,7 +706,7 @@ export default {
         /**
          * 获取显示字段
          */
-        loadDisplayField() {
+        loadDisplayField () {
             if (!this.preview) {
                 this.getCustomDataDisplay(this.listIdentity).then((data) => {
                     this.displayFieldData = data
@@ -690,7 +715,7 @@ export default {
                 this.displayFieldData = []
             }
         },
-        handleHeaderDragend(newWidth, oldWidth, column, event) {
+        handleHeaderDragend (newWidth, oldWidth, column, event) {
             if (this.preview /* || !this.displayField */) {
                 return
             }
@@ -704,23 +729,21 @@ export default {
         /**
          * 保存显示字段
          */
-        handleDisplayField(data, callback, hasMessage) {
+        handleDisplayField (data, callback, hasMessage) {
             if (!this.preview) {
-                this.saveCustomDataDisplay(data, this.listIdentity)
-                    .then((response) => {
-                        if (hasMessage) ActionUtils.success(response.message)
-                        callback(true)
-                        this.search()
-                    })
-                    .catch(() => {
-                        callback(false)
-                    })
+                this.saveCustomDataDisplay(data, this.listIdentity).then((response) => {
+                    if (hasMessage) ActionUtils.success(response.message)
+                    callback(true)
+                    this.search()
+                }).catch(() => {
+                    callback(false)
+                })
             } else {
                 ActionUtils.success('保存成功,该为演示,不保存数据库！')
                 callback(true)
             }
         },
-        handleAction(command, position, selection, data, index, button) {
+        handleAction (command, position, selection, data, index, button) {
             const buttonType = button.button_type || button.key
             this.action = buttonType
             this.position = position
@@ -745,18 +768,14 @@ export default {
                         break
                     case 'edit': // 编辑
                     case 'detail': // 明细
-                        ActionUtils.selectedRecord(selection)
-                            .then((id) => {
-                                this.handleEdit(id, command, position, selection, data)
-                            })
-                            .catch(() => {})
+                        ActionUtils.selectedRecord(selection).then((id) => {
+                            this.handleEdit(id, command, position, selection, data)
+                        }).catch(() => {})
                         break
                     case 'remove': // 删除
-                        ActionUtils.removeRecord(selection)
-                            .then((ids) => {
-                                this.handleRemove(ids, command, position, selection, data)
-                            })
-                            .catch(() => {})
+                        ActionUtils.removeRecord(selection).then((ids) => {
+                            this.handleRemove(ids, command, position, selection, data)
+                        }).catch(() => {})
                         break
                     case 'sefStartFlow': // 启动自定义流程
                         ActionUtils.selectedMultiRecord(selection).then((ids) => {
@@ -801,26 +820,22 @@ export default {
                             this.$message.warning('请先配置对应报表路径！')
                             return
                         }
-                        this.$common
-                            .snapshoot({
-                                url: this.$getReportFile(button.reportPath, `id_=${selection}`),
-                                name: selection,
-                                type: 'pdf'
-                            })
-                            .then((res) => {
-                                if (!res.data || !res.data.id) {
-                                    this.$message.error('生成文件失败，请重试！')
-                                    return
-                                }
-                                this.$common.download(res.data)
-                            })
+                        this.$common.snapshoot({
+                            url: this.$getReportFile(button.reportPath, `id_=${selection}`),
+                            name: selection,
+                            type: 'pdf'
+                        }).then((res) => {
+                            if (!res.data || !res.data.id) {
+                                this.$message.error('生成文件失败，请重试！')
+                                return
+                            }
+                            this.$common.download(res.data)
+                        })
                         break
                     case 'print': // 打印
-                        ActionUtils.selectedRecord(selection)
-                            .then((id) => {
-                                this.handlePrint(id)
-                            })
-                            .catch(() => {})
+                        ActionUtils.selectedRecord(selection).then((id) => {
+                            this.handlePrint(id)
+                        }).catch(() => {})
                         break
                     case 'import': // 导入
                         this.importColumnsVisible = true
@@ -832,12 +847,10 @@ export default {
                         this.exportActions(buttonType)
                         break
                     case 'exportSelected': // 导出选中
-                        ActionUtils.selectedMultiRecord(selection)
-                            .then((ids) => {
-                                this.selecteds = ids
-                                this.exportActions(buttonType, ids)
-                            })
-                            .catch(() => {})
+                        ActionUtils.selectedMultiRecord(selection).then((ids) => {
+                            this.selecteds = ids
+                            this.exportActions(buttonType, ids)
+                        }).catch(() => {})
                         break
                     case 'exportCurPage': // 导出当前页
                         this.exportActions(buttonType)
@@ -847,7 +860,7 @@ export default {
                 }
             })
         },
-        exportActions(buttonType, ids, exportColumns) {
+        exportActions (buttonType, ids, exportColumns) {
             const { template } = this
             if (this.$utils.isNotEmpty(template.export_columns)) {
                 if (template.export_columns.select_field === 'Y') {
@@ -860,19 +873,19 @@ export default {
                 this.getResponseData(buttonType, ids)
             }
         },
-        //数据导出
-        getIbpsExport(columns, data, title, message, nameKey = 'name') {
+        // 数据导出
+        getIbpsExport (columns, data, title, message, nameKey = 'name') {
             IbpsExport.excel({
                 columns: columns,
                 data: data,
                 nameKey: nameKey,
                 title: title
             }).then(() => {
-                const msg = message ? message : '导出成功'
+                const msg = message || '导出成功'
                 ActionUtils.success(msg)
             })
         },
-        getResponseData(buttonType, ids, exportColumns) {
+        getResponseData (buttonType, ids, exportColumns) {
             const { template, dataTemplate, fields, pagination, sorts } = this
             const params = {}
             template.filter_conditions = []
@@ -938,8 +951,8 @@ export default {
             params.action = buttonType
 
             params['response_data'] = JSON.stringify(response_data)
-            let searcFormData = this.$refs['searchForm'].getSearcFormData() || {}
-            for (let key in searcFormData) {
+            const searcFormData = this.$refs['searchForm'].getSearcFormData() || {}
+            for (const key in searcFormData) {
                 params[key] = searcFormData[key]
             }
             if (this.$utils.isNotEmpty(exportColumns)) {
@@ -963,13 +976,11 @@ export default {
                 saveData = ActionUtils.formatParams(params, pagination, sorts)
             }
 
-            checkExportData(saveData)
-                .then((res) => {
-                    this.handleExportData(saveData)
-                })
-                .catch((err) => console.error(err))
+            checkExportData(saveData).then((res) => {
+                this.handleExportData(saveData)
+            }).catch((err) => console.error(err))
         },
-        handleExportData(saveData) {
+        handleExportData (saveData) {
             exportData(saveData).then((response) => {
                 if (!response) {
                     return
@@ -977,29 +988,27 @@ export default {
                 ActionUtils.exportFile(response.data, this.dataTemplate.name + '_' + fecha.formatDate('yyyyMMddHHmmss') + '.xls')
             })
         },
-        callbackExtFields(data) {
+        callbackExtFields (data) {
             const { action, selecteds } = this
             this.getResponseData(action, selecteds, data)
         },
-        handleStartFlowFromList(id, defKey, formKey) {
+        handleStartFlowFromList (id, defKey, formKey) {
             startFlowFromList({
                 ids: id,
                 defKey: defKey,
                 formKey: formKey
+            }).then((response) => {
+                this.$message({
+                    message: '流程启动成功！',
+                    type: 'success'
+                })
+                this.dialogVisible = false
+                this.search()
+            }).catch(() => {
+                this.dialogVisible = false
             })
-                .then((response) => {
-                    this.$message({
-                        message: '流程启动成功！',
-                        type: 'success'
-                    })
-                    this.dialogVisible = false
-                    this.search()
-                })
-                .catch(() => {
-                    this.dialogVisible = false
-                })
         },
-        handleDialogActionEvent(key, data) {
+        handleDialogActionEvent (key, data) {
             if (key === 'clean') {
                 this.dialogValue = {}
             }
@@ -1007,13 +1016,13 @@ export default {
                 this.handleStartFlowFromList(this.sefStartFlowId, data ? data.defKey : '', this.getFormKey())
             }
         },
-        getFormKey() {
+        getFormKey () {
             return this.dataTemplate.attrs ? this.dataTemplate.attrs.form_key || '' : ''
         },
-        getPrintTemplateId() {
+        getPrintTemplateId () {
             return this.dataTemplate.attrs ? this.dataTemplate.attrs.print_id || '' : ''
         },
-        initParameter() {
+        initParameter () {
             this.formKey = this.getFormKey()
             // 打印模版
             this.printTemplateId = this.getPrintTemplateId()
@@ -1078,7 +1087,7 @@ export default {
                 searchForm: searchForms.length > 0 ? { forms: searchForms } : null
             }
 
-            // 判断地点是否第一层级，如果是显示地点字段
+            // 判断地点是否第一层级
             const position = this.$store.getters.userInfo.positions
             const first = this.$store.getters.level.first
             let showBoolean = false
@@ -1110,7 +1119,7 @@ export default {
             this.indexRow = this.template.attrs ? this.template.attrs.indexRow || false : false
             this.editButtons = this.template.buttons ? this.template.buttons.edit_buttons || [] : []
         },
-        setQueryColumns(queryColumns, columns) {
+        setQueryColumns (queryColumns, columns) {
             queryColumns.forEach((column) => {
                 const field = this.convertField(column)
                 if (field.common === 'N') return
@@ -1121,8 +1130,29 @@ export default {
         /**
          * 显示字段
          */
-        setDisplayColumns(displayColumns, columns) {
+        setDisplayColumns (displayColumns, columns) {
             displayColumns.forEach((col) => {
+                //修改宽度
+                switch (col.name) {
+                    case 'di_dian_':
+                        col.width = '110'
+                        break
+                    case 'bian_zhi_bu_men_':
+                        col.width = '100'
+                        col.label = '部门'
+                        break
+                    case 'bian_zhi_shi_jian':
+                        col.width = '120'
+                        break
+                    case 'bian_zhi_ren_':
+                        col.width = '100'
+                        break
+                    case 'shi_fou_guo_shen_':
+                        if (col.label === '状态') {
+                            col.width = '75'
+                        }
+                        break
+                }
                 const field = this.convertField(col)
                 const column = this.buildDisplayColumn(field)
                 column.sortBy = col.prop
@@ -1144,7 +1174,7 @@ export default {
         /**
          * 构建按钮
          */
-        buildButton(rf, i) {
+        buildButton (rf, i) {
             const defaultButton = ButtonsConstants[rf.button_type] || {}
             let key = rf.button_type
             let mode
@@ -1224,13 +1254,13 @@ export default {
             column['data_type'] = dataType
             return column
         },
-        getDatefmt(fieldOptions) {
+        getDatefmt (fieldOptions) {
             if (fieldOptions['datefmt_type'] && fieldOptions['datefmt_type'] !== 'custom') {
                 return FormOptions.t.DATE_FORMATS[fieldOptions['datefmt_type']] || FormOptions.t.DATE_FORMATS['date']
             }
             return fieldOptions['datefmt'] || FormOptions.t.DATE_FORMATS['date']
         },
-        buildOptions(options = []) {
+        buildOptions (options = []) {
             const rtn = []
             options.forEach((option) => {
                 rtn.push({
@@ -1240,13 +1270,13 @@ export default {
             })
             return rtn
         },
-        buildSwitchOptions(fieldOptions) {
+        buildSwitchOptions (fieldOptions) {
             return FormUtils.getSwitchOptions(fieldOptions, 'value')
         },
         /**
          * 构建查询条件
          */
-        buildSearchForm(field) {
+        buildSearchForm (field) {
             let querySuffix = 'SL'
             if (field['data_type'] === 'number') {
                 querySuffix = 'N'
@@ -1356,7 +1386,7 @@ export default {
             }
             return searchColumn
         },
-        buildDisplayColumn(field) {
+        buildDisplayColumn (field) {
             const displayColumn = {
                 prop: field.name,
                 label: field.label,
@@ -1403,47 +1433,47 @@ export default {
             }
             return false
         },
-        customFormatter(name, value, rowData, column) {
+        customFormatter (name, value, rowData, column) {
             return JTemplate._customFormatter(this, name, value, rowData, column)
         },
-        hasDynamicParams(fieldOptions) {
+        hasDynamicParams (fieldOptions) {
             return FormUtils.hasLinkDynamicParams(fieldOptions)
         },
-        getLinkDynamicParams(fieldOptions, data) {
+        getLinkDynamicParams (fieldOptions, data) {
             return FormUtils.getLinkDynamicParams(fieldOptions, data, this.formFieldMap)
         },
-        getLinkValueKey(fieldOptions, data) {
+        getLinkValueKey (fieldOptions, data) {
             return FormUtils.getLinkValueKey(fieldOptions, data)
         },
-        getLinkLabelType(fieldOptions, data) {
+        getLinkLabelType (fieldOptions, data) {
             return FormUtils.getLinkLabelType(fieldOptions, data)
         },
-        getLinkLabelKey(fieldOptions, data) {
+        getLinkLabelKey (fieldOptions, data) {
             return FormUtils.getLinkLabelKey(fieldOptions, data)
         },
-        getLinkStructure(fieldOptions, data) {
+        getLinkStructure (fieldOptions, data) {
             return FormUtils.getLinkStructure(fieldOptions)
         },
-        getLinkConfig(fieldOptions, data) {
+        getLinkConfig (fieldOptions, data) {
             return FormUtils.getLinkConfig(fieldOptions)
         },
-        getStreet(value) {
+        getStreet (value) {
             if (this.$utils.isNotEmpty(value)) {
                 const data = this.$utils.parseJSON(value)
                 return data['street'] || ''
             }
             return ''
         },
-        getAddressValue(value, fieldOptions) {
+        getAddressValue (value, fieldOptions) {
             return FormUtils.getAddressControlValue(value, fieldOptions)
         },
-        getAddressTopVal(fieldOptions) {
+        getAddressTopVal (fieldOptions) {
             return FormUtils.getAddressTopVal(fieldOptions)
         },
         /**
          * 添加、编辑表单
          */
-        handleEdit(pkValue, action = 'edit', position, selection, data) {
+        handleEdit (pkValue, action = 'edit', position, selection, data) {
             this.formKey = this.getFormKey()
             if (this.$utils.isEmpty(this.formKey)) {
                 ActionUtils.warning('请绑定表单')
@@ -1474,7 +1504,7 @@ export default {
         /**
          * 删除表单
          */
-        handleRemove(ids, action, position, selection, data) {
+        handleRemove (ids, action, position, selection, data) {
             if (this.$utils.isEmpty(this.formKey)) {
                 ActionUtils.warning('请绑定表单')
                 return
@@ -1482,43 +1512,41 @@ export default {
             removeFormData({
                 formKey: this.formKey,
                 ids: ids
-            })
-                .then((response) => {
-                    this.afterScript(action, position, selection, data, () => {
-                        ActionUtils.removeSuccessMessage()
-                        this.search()
-                    })
+            }).then((response) => {
+                this.afterScript(action, position, selection, data, () => {
+                    ActionUtils.removeSuccessMessage()
+                    this.search()
                 })
-                .catch(() => {})
+            }).catch(() => {})
         },
-        handlePrint(ids) {
+        handlePrint (ids) {
             if (this.$utils.isNotEmpty(this.printTemplateId)) {
                 this.pkValue = ids
                 // 打开打印模版页面
                 this.formPrintTemplateDialogVisible = true
             }
         },
-        handleTemplateDialogActionEvent() {
+        handleTemplateDialogActionEvent () {
             // TODO:
         },
-        getDefaultFormData(selection) {
+        getDefaultFormData (selection) {
             const parentIdField = this.fields[this.relatedListFields] || {}
             // 如果不是就按命名规律
             const pidKey = parentIdField ? parentIdField.field_name || this.relatedListFields : this.relatedListFields
             return { [pidKey]: selection }
         },
 
-        //自定义导入
-        handleImport(data = []) {
+        // 自定义导入
+        handleImport (data = []) {
             this.importList = data
             this.importVlaue = this.getKeys(this.importList)
             this.importTableDialogVisible = true
         },
-        handleImportTableActionEvent(file, options) {
+        handleImportTableActionEvent (file, options) {
             this.loading = false
-            let formData = this.setValue(this.importVlaue)
+            const formData = this.setValue(this.importVlaue)
             IbpsImport.xlsx(file, options).then(({ header, results }) => {
-                let list = []
+                const list = []
                 results.forEach((item) => {
                     const data = JSON.parse(JSON.stringify(formData))
                     for (const key in item) {
@@ -1534,15 +1562,15 @@ export default {
                 // ActionUtils.success('导入成功')
             })
         },
-        setValue(data) {
-            let obj = {}
+        setValue (data) {
+            const obj = {}
             Object.values(data).forEach((item) => {
                 obj[item] = ''
             })
             return obj
         },
-        getKeys(data) {
-            let obj = {}
+        getKeys (data) {
+            const obj = {}
             if (data.length > 0) {
                 data.forEach((item) => {
                     obj[item.label] = item.name
@@ -1552,10 +1580,10 @@ export default {
                 return obj
             }
         },
-        xlsxFileClick() {
+        xlsxFileClick () {
             this.xlsxFileVisible = true
         },
-        xlsxFileClose() {
+        xlsxFileClose () {
             this.xlsxFileVisible = false
         },
 
@@ -1563,7 +1591,7 @@ export default {
         /**
          * 初始化脚本
          */
-        initJTemplate() {
+        initJTemplate () {
             const id = 'JTemplate'
             let script = document.getElementById(id)
             if (script) {
@@ -1578,25 +1606,24 @@ export default {
                 try {
                     script.appendChild(document.createTextNode(codeScript))
                 } catch (ex) {
-                    console.error(ex)
                     script.text = codeScript
                 }
                 document.body.appendChild(script)
             }
         },
         // 处理脚本
-        hasScript() {
+        hasScript () {
             return true
         },
         // 加载脚本
-        loadScript() {
+        loadScript () {
             if (!this.hasScript()) {
                 return
             }
             JTemplate._onLoad(this)
         },
         // 前置脚本
-        beforeScript(action, position, selection, data, callback) {
+        beforeScript (action, position, selection, data, callback) {
             if (!this.hasScript()) {
                 const flag = true
                 callback(flag)
@@ -1605,7 +1632,7 @@ export default {
             JTemplate._beforeSubmit(this, action, position, selection, data, callback)
         },
         // 后置脚本
-        afterScript(action, position, selection, data, callback) {
+        afterScript (action, position, selection, data, callback) {
             if (!this.hasScript()) {
                 const flag = true
                 callback(flag)

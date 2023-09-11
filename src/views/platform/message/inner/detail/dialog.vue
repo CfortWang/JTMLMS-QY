@@ -98,6 +98,8 @@ export default {
                     this.type = '1'
                 } else {
                     this.toolbars = btn2
+                    this.type = ''
+
                 }
             }
         }
