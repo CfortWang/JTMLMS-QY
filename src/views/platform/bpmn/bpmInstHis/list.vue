@@ -34,6 +34,7 @@
             @column-link-click="handleLinkClick"
             @pagination-change="handlePaginationChange"
         >
+            <template slot="creator" slot-scope="scope">{{ scope.row.createBy | getUserName(userList) }}</template>
             <template slot="selectCont" slot-scope="scope">
                 <el-popover
                     :ref="'popover2-' + scope.row.id"
@@ -182,6 +183,10 @@ export default {
         getReportName (value) {
             // 通过/与.截取，eg: 43罗湖/L13-LHXBJY-QP-6.4-04 标准菌株管理程序/LHXBJY-QP-6.4-04-FQ-03 标准菌株鉴定验收记录表.rpx
             return value.slice(-value.split('').reverse().join('').indexOf('/'), -value.split('').reverse().join('').indexOf('.') - 1)
+        },
+        getUserName (v, list) {
+            const user = list.find(i => i.userId === v)
+            return user ? user.userName : ''
         }
     },
     mixins: [FixHeight],
@@ -192,7 +197,12 @@ export default {
         }
     },
     data () {
+        const { first = '' } = this.$store.getters.level || {}
+        const { userList = [], deptList = [] } = this.$store.getters || {}
         return {
+            first,
+            userList,
+            deptList,
             width: 210,
             selection: false,
             dialogFormVisible: false,
@@ -244,12 +254,10 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    // { prop: 'subject', label: '任务标题', link: 'dialog', width: 250 },
-                    // { prop: 'tYear', label: '年份', width: 60 },
-                    { prop: 'tDept', label: '部门', width: 90 },
+                    { prop: 'deptName', label: '部门', width: 90 },
                     { prop: 'procDefName', label: '表单名称', sortable: 'custom', formatter: this.replaceFormName, width: 250 },
                     { prop: 'subject', label: '事务说明', formatter: this.getDesc, 'min-width': 300 },
-                    { prop: 'tUser', label: '编制人', width: 80 },
+                    { prop: 'createBy', label: '编制人', width: 80, slotName: 'creator' },
                     { prop: 'endTime', label: '完成时间', sortable: 'custom', dateFormat: 'yyyy-MM-dd hh:mm:ss', width: 150 }
                 ],
                 rowHandle: {
@@ -307,24 +315,24 @@ export default {
             }
             return cellValue.split('#')[1]
         },
+        getInfo (val) {
+            const arr = val.split('#')
+            if (!arr[2]) {
+                return ''
+            }
+            const result = JSON.parse(`{${arr[2]}}`)
+            const t = this.deptList.find(i => i.positionId === result.dept)
+            result.deptName = t ? t.positionName : result.dept
+            return result
+        },
         // 加载数据
         loadData () {
             this.loading = true
             queryClassify(this.getSearcFormData()).then((response) => {
                 const data = response.data && response.data.dataResult
                 data.forEach(item => {
-                    const temp = this.getParenthesesStr(item.subject)
-                    // 如果是年度计划， 标题编辑中取年份， 去除默认给与的年份
-                    if (temp.length === 4) {
-                        // 判断截取内容是否为数字，如果不是则截取创建时间的作为年份
-                        item.tYear = isNaN(Number(temp[0])) ? item.createTime.slice(0, 4) : temp[0]
-                        item.tDept = temp[2]
-                        item.tUser = temp[3]
-                    } else if (temp.length > 1) {
-                        item.tYear = isNaN(Number(temp[0])) ? item.createTime.slice(0, 4) : temp[0]
-                        item.tDept = temp[1]
-                        item.tUser = temp[2]
-                    }
+                    const temp = this.getInfo(item.subject)
+                    item.deptName = temp ? temp.deptName : ''
                 })
                 ActionUtils.handleListData(this, response.data)
                 this.loading = false
@@ -466,30 +474,6 @@ export default {
         openReport (path, id) {
             this.srcUrl = `${this.$reportPath.replace('show', 'pdf')}${path}&id_=${id}`
             this.visible = true
-        },
-        getParenthesesStr (text) {
-            let result = ''
-            if (!text) return result
-            // 新数据年份、部门、发起人以{}包裹
-            const regex1 = /\{(.+?)\}/g
-            // 旧数据年份、部门、发起人以()包裹
-            const regex2 = /\((.+?)\)/g
-            const options1 = text.match(regex1)
-            const options2 = text.match(regex2)
-            const options = options1 && options1.length ? options1 : options2
-            if (options) {
-                const option = options[0]
-                if (option) {
-                    result = option.substring(1, option.length - 1)
-                }
-                if (options[1]) {
-                    const yersOption = options[1]
-                    if (yersOption) {
-                        result = result + '/' + yersOption.substring(1, yersOption.length - 1)
-                    }
-                }
-            }
-            return result.split('/')
         },
         // 获取格式化参数
         getSearcFormData () {

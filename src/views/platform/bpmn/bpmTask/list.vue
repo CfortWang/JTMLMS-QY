@@ -200,10 +200,22 @@
             this.loadData()
         },
         methods: {
+            removeDesc (str) {
+                const parts = str.split('#')
+                if (parts.length > 2) {
+                    return parts.slice(0, 2).join('#') + '#'
+                } else {
+                    return str
+                }
+            },
             // 加载数据
             loadData() {
                 this.loading = true
                 queryPageList(this.getSearcFormData()).then(response => {
+                    const { dataResult = [] } = response.data || {}
+                    dataResult.forEach(i => {
+                        i.subject = this.removeDesc(i.subject)
+                    })
                     ActionUtils.handleListData(this, response.data)
                     this.loading = false
                 }).catch(() => {

@@ -186,10 +186,13 @@ export default {
     },
     data () {
         const { first = '' } = this.$store.getters.level || {}
+        const { userList = [], deptList = [] } = this.$store.getters || {}
         return {
             first,
             tabList,
             stateOption,
+            userList,
+            deptList: [],
             pkKey: 'id',
             taskId: '', // 编辑dialog需要使用
             waiJian: '', // 编辑dialog需要使用
@@ -206,8 +209,6 @@ export default {
             FlowName: '',
             posName: '',
             timer: null,
-            userList: [],
-            positionList: [],
             orgInfo: {},
             activeTab: tabList[0].key,
             height: document.body.clientHeight,
@@ -317,8 +318,6 @@ export default {
     },
     mounted: function () {
         this.getData(this.activeTab)
-        this.getUserList()
-        this.getPositionList()
         this.getOrgInfo()
         if (this.timer) {
             clearInterval(this.timer)
@@ -337,26 +336,6 @@ export default {
         clearInterval(this.timer)
     },
     methods: {
-        // 获取系统用户信息
-        getUserList () {
-            const { userList } = this.$store.getters
-            // store中有则无需请求
-            if (userList && userList.length) {
-                this.userList = userList
-                return
-            }
-            const sql = `select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee where status_ = 'actived'`
-            this.$common.request('sql', sql).then(res => {
-                this.userList = res.variables && res.variables.data
-            })
-        },
-        // 获取系统部门信息
-        getPositionList () {
-            const sql = `select id_ as positionId, name_ as positionName from ibps_party_entity where party_type_ = 'position' and path_ like '%${this.first}%'`
-            this.$common.request('sql', sql).then(res => {
-                this.positionList = res.variables && res.variables.data
-            })
-        },
         // 获取用户部门信息
         getOrgInfo () {
             const { org = {}} = this.$store.getters
@@ -394,7 +373,7 @@ export default {
                 return ''
             }
             const result = JSON.parse(`{${arr[2]}}`)
-            const t = this.positionList.find(i => i.positionId === result.dept)
+            const t = this.deptList.find(i => i.positionId === result.dept)
             result.deptName = t ? t.positionName : result.dept
             return result[arg]
         },
