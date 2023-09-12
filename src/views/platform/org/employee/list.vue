@@ -140,14 +140,14 @@ export default {
                             label: '归属组织',
                             fieldType: 'select',
                             options: this.positionsList,
-                            labelWidth: 60,
+                            labelWidth: 70,
                             itemWidth: 150
                         },
                         {
                             prop: ['Q^CREATE_TIME_^DL', 'Q^CREATE_TIME_^DG'],
                             label: this.$t('common.field.createTime'),
                             fieldType: 'daterange',
-                            labelWidth: 60,
+                            labelWidth: 70,
                             itemWidth: 220
                         }
                     ]
@@ -157,7 +157,6 @@ export default {
                     {
                         prop: 'name',
                         label: this.$t('platform.org.employee.prop.name'),
-                        formatter: this.aaa,
                         width: 120
                     },
                     {
@@ -170,7 +169,7 @@ export default {
                         prop: 'positionsPath',
                         label: this.$t('platform.org.employee.prop.orgPath'),
                         sortable: false,
-                        minWidth: 300
+                        minWidth: 200
                     },
                     // { prop: 'qq', label: '客户单位名称', width: 250 },
                     {

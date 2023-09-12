@@ -47,7 +47,7 @@ export default {
 <style lang="scss" scoped>
     .template-container{
         ::v-deep .container-component{
-            margin-left: 250px;
+            margin-left: 210px;
         }
     }
 </style>

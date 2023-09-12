@@ -193,7 +193,7 @@ export default {
     },
     data () {
         return {
-            width: 220,
+            width: 210,
             selection: false,
             dialogFormVisible: false,
             // 编辑dialog需要使用
@@ -245,7 +245,7 @@ export default {
                 // 表格字段配置
                 columns: [
                     // { prop: 'subject', label: '任务标题', link: 'dialog', width: 250 },
-                    { prop: 'tYear', label: '年份', width: 60 },
+                    // { prop: 'tYear', label: '年份', width: 60 },
                     { prop: 'tDept', label: '部门', width: 90 },
                     { prop: 'procDefName', label: '表单名称', sortable: 'custom', formatter: this.replaceFormName, width: 250 },
                     { prop: 'subject', label: '事务说明', formatter: this.getDesc, 'min-width': 300 },
@@ -254,11 +254,11 @@ export default {
                 ],
                 rowHandle: {
                     actions: [
-                        {
-                            key: 'detail',
-                            label: '详情',
-                            type: 'info'
-                        }
+                        // {
+                        //     key: 'detail',
+                        //     label: '详情',
+                        //     type: 'info'
+                        // }
                     ],
                     effect: 'display',
                     width: '100'
@@ -275,7 +275,19 @@ export default {
         if (hasRole) {
             // 系统管理角色不做分类过滤
             // this.hasPermission = false
-            this.listConfig.toolbars.push({ key: 'remove' })
+            const btn = [
+                {
+                    key: 'detail',
+                    label: '详情',
+                    type: 'info'
+                },
+                {
+                    key: 'remove',
+                    label: '删除',
+                    type: 'danger'
+                }
+            ]
+            this.listConfig.toolbars.push(...btn)
             this.selection = true
         }
     },

@@ -128,7 +128,7 @@ export default {
     data () {
         return {
             parentId: '0',
-            defaultExpandAll: false,
+            defaultExpandAll: true,
             lazyTree: true,
             defaultExpandedKeys: ['0'],
             moreSearchParams: {},
@@ -276,7 +276,6 @@ export default {
 
                     let arrList = []
                     const second = this.$store.getters.level.second || ''
-                    console.log(second)
                     if ((type === '1' || type === '2') && this.filtrate && second) {
                         const showBoo = arr.some((item) => item.id === second)
                         if (showBoo) {
@@ -303,10 +302,8 @@ export default {
             const positions = this.$store.getters.userInfo.employee.positions
             if (positions) {
                 const positionsList = positions.split(',')
-                console.log(positionsList)
                 positionsList.forEach(item => {
                     const index = arrList.findIndex(it => it.id === item)
-                    console.log(index)
                     if (index >= 0) {
                         arrList[index].disabled = true
                     }
@@ -326,8 +323,6 @@ export default {
                     }
                 })
             }
-
-            console.log(arrList)
         },
         toTree (data) {
             return TreeUtils.transformToTreeFormat(data, {
@@ -436,7 +431,6 @@ export default {
             this.$emit('selected', val)
         },
         changeRadio (data) {
-            console.log(data)
             if (data.id === 0 || data.id === '0' || data.disabled) return
             this.$emit('selected', data)
         },
