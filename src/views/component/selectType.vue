@@ -53,9 +53,11 @@ export default {
       this.$emit("change-data", "xiLeiId", nodesInfo.value);
       this.$emit("change-data", "quanXianLeiXing", authority.chaYue);
       for (var i of authority.buMen) {
-        authorityBuMen.push(i[i.length-1])
+        authorityBuMen.push(i[i.length - 1])
       }
       this.$emit("change-data", "quanXianXinXi", authorityBuMen.join(','));
+      this.$emit("change-data", "zhuanYeBuMen",  authorityBuMen.join(','));
+      this.$emit("change-data", "guiShu",  authorityBuMen.join(','));
     },
 
   },

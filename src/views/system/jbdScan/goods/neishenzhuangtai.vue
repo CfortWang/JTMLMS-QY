@@ -121,13 +121,15 @@
                                     <button class="urgingBtn"><i class="el-icon-position"></i> 发送催办</button>
                                 </div>
                             </div>
-                            <el-table :data="allCheckData" :border="true" style="width: 90%; margin: 0 auto">
+                            <el-table :data="allCheckData" :border="true" @selection-change="handleSelectionChange" style="width: 90%; margin: 0 auto">
+                                <el-table-column type="selection"  width="30">
+                                </el-table-column>
                                 <el-table-column prop="nei_shen_yuan_" label="内审员" width="100">
                                     <template slot-scope="scope">
                                         {{ scope.row.nei_shen_yuan_ | emfiltes(employeeList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="bei_nei_shen_bu_m" label="被审核部门" width="200">
+                                <el-table-column prop="bei_nei_shen_bu_m" label="被审核部门" width="200" >
                                     <template slot-scope="scope">
                                         {{ scope.row.bei_nei_shen_bu_m | partFilter(partList) }}
                                     </template>
@@ -286,7 +288,8 @@ export default {
             settime: '',
             setCheckTime: '',
             checkValue: 0,
-            allCheckData: []
+            allCheckData: [],
+            selectCheckData:[]
             // scanVisible:false,
         }
     },
@@ -315,11 +318,23 @@ export default {
         clearInterval(this.setCheckTime)
     },
     methods: {
+        handleSelectionChange(val) {
+          this.selectCheckData = val;
+        },
         // 催办信息点击
         urgingEvent () {
             let this_ = this;
             let receiverId = "";
-            for(let item of this.allCheckData){
+            console.log(this.selectCheckData,"选中的数据");
+            if(this.selectCheckData.length == 0){
+                this.$message({
+                    showClose: true,
+                    message: '您还未选中人员进行发送催办信息，请在列表中选择！',
+                    type: 'error'
+                });
+              return
+            }
+            for(let item of this.selectCheckData){
                 if(item.shi_fou_guo_shen_ !="已完成"){
                     receiverId += item.nei_shen_yuan_ + ",";
                 }
@@ -344,6 +359,7 @@ export default {
               }
             this_.$common.sendMsg(msage).then(res =>{
                 this_.$message({
+                    duration:3000,
                     message: '已成功向未完成编制内审检查表的内审员发送催办信息',
                     type: 'success'
                 }); 

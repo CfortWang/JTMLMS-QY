@@ -164,6 +164,7 @@
           clearable
         />
         <!-- 选择器-->
+        <!-- :filtrate="item.filtrate" -->
         <ibps-user-selector
           v-else-if="item.fieldType === 'selector'"
           style="width: 150px;"
@@ -174,6 +175,7 @@
           :multiple="false"
           :store="'id'"
           :disabled="item.disabled"
+          :filtrate="true"
         />
         <!--自定义对话框-->
         <ibps-custom-dialog

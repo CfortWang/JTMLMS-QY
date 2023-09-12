@@ -38,7 +38,7 @@ export default {
             } else if (this.partyType === 'position') {
                 this.lazyTree = true
                 this.defaultExpandedKeys = ['0']
-                this.defaultExpandAll = false
+                this.defaultExpandAll = true
                 this.loadPositionTreeData(init, resetParams)
             } else {
                 this.lazyTree = false
@@ -110,7 +110,7 @@ export default {
         handleNodeClick (data) {
             const ids = []
             this.getChildrenIds(data, ids)
-            if (data.id === '0') return
+            if (data.id === '0' || data.disabled) return
             this.partyId = data.id
             this.loadListData()
         },
@@ -228,7 +228,7 @@ export default {
                 return
             }
             const params = {}
-            params.type = type
+            params.type = type === '2' ? '1' : type
             if (resetParams && this.isUseScope) {
                 params.partyId = this.currentOrgIdValue
                 params.includeSub = false
@@ -276,10 +276,11 @@ export default {
             const type = this.partyTypeIdValue !== '' ? this.partyTypeIdValue : '1'
             if (this.isUseScope) {
                 // 选择器范围模式参数
-                params.type = type
-                params.includeSub = type === '1'
+                params.type = type === '2' ? '1' : type
+                params.includeSub = type === '1' || type === '2'
                 if (type === '2') {
-                    params.partyId = node.level === 0 ? null : node.data.id
+                    // params.partyId = node.level === 0 ? null : node.data.id
+                    params.posId = node.level === 0 ? null : node.data.id
                 }
                 if (type === '3') {
                     params.partyId = this.currentOrgIdValue
@@ -311,7 +312,7 @@ export default {
                     })
                     let arrList
                     const frist = this.$store.getters.level.first || ''
-                    if (type === '1' && this.filtrate && frist) {
+                    if ((type === '1' || type === '2') && this.filtrate && frist) {
                         const showBoo = arr.some((item) => item.id === frist)
                         if (showBoo) {
                             arrList = arr.filter((item) => item.id === frist)
@@ -322,12 +323,16 @@ export default {
                         arrList = arr
                     }
 
+                    if (type === '2') {
+                        this.getPosiData(arrList, true)
+                    }
+
                     let treeData
                     if (this.$utils.isEmpty(node.data)) {
                         treeData = arrList
                         resolve(this.toTree(treeData))
                     } else {
-                        treeData = type !== '2' ? arrList : this.filterPositionTreeChildren(arrList, 'root')
+                        treeData = type === '1' || type === '2' ? arrList : this.filterPositionTreeChildren(arrList, 'root')
                         resolve(this.toTree(treeData))
                     }
                 }).catch(res => {
@@ -343,10 +348,55 @@ export default {
                 getPositionTreeData(params).then(res => {
                     this.loadingTree = false
                     const arr = JSON.parse(JSON.stringify(res.data))
-                    resolve(this.toTree(arr))
+
+                    let arrList = []
+                    const second = this.$store.getters.level.second || ''
+                    if ((type === '1' || type === '2') && this.filtrate && second) {
+                        const showBoo = arr.some((item) => item.id === second)
+                        if (showBoo) {
+                            arrList = arr.filter((item) => item.id === second)
+                        } else {
+                            arrList = arr
+                        }
+                    } else {
+                        arrList = arr
+                    }
+                    if (type === '2') {
+                        this.getPosiData(arrList, node.data.disabled)
+                    }
+
+                    resolve(this.toTree(arrList))
                 }).catch(res => {
                     this.loadingTree = false
                     resolve([])
+                })
+            }
+        },
+        getPosiData (arrList, disabled) {
+            const positions = this.$store.getters.userInfo.employee.positions
+            if (positions) {
+                const positionsList = positions.split(',')
+                console.log(positionsList)
+                positionsList.forEach(item => {
+                    const index = arrList.findIndex(it => it.id === item)
+                    console.log(index)
+                    if (index >= 0) {
+                        arrList[index].disabled = true
+                    }
+                })
+            }
+            // 如果上级可以选择 也就是 disabled false，下级一定是false
+            if (!disabled) {
+                arrList.forEach(item => {
+                    item.disabled = false
+                })
+            } else {
+                arrList.forEach(item => {
+                    if (item.disabled) {
+                        item.disabled = false
+                    } else {
+                        item.disabled = true
+                    }
                 })
             }
         },

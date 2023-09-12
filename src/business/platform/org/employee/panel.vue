@@ -47,7 +47,11 @@
                         pid-key="parentId"
                         highlight-current
                         @node-click="handleNodeClick"
-                    />
+                    >
+                        <span slot-scope="{ node, data }" class="custom-tree-node" :style="node.disabled ? 'cursor:not-allowed;color:#dcdfe6': ''">
+                            {{ node.label }}
+                        </span>
+                    </el-tree>
                 </el-scrollbar>
             </div>
         </div>
@@ -183,7 +187,7 @@ export default {
             moreSearchParams: {},
             lazyTree: true,
             defaultExpandedKeys: ['0'],
-            defaultExpandAll: false,
+            defaultExpandAll: true,
             lazyOrgTree: true,
             partyTypeIdValue: '',
             currentOrgIdValue: '',
