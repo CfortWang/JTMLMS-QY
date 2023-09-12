@@ -82,7 +82,8 @@ export default {
         }
 
         .jbd-login-page-main {
-            margin: 0 auto;
+            margin-left: 180px;
+            // margin: 0 auto;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;
             //margin-left: 50px;
@@ -152,7 +153,8 @@ export default {
         }
 
         .jbd-login-page-main {
-            margin: 0 auto;
+            // margin: 0 auto;
+            margin-left: 150px;
             // margin-top: 0px;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;
@@ -179,7 +181,7 @@ export default {
             height: 100%;
             overflow: hidden;
             border: 0;
-            padding: 0 7.5%;
+            padding: 0 2.5%;
         }
         .footerclass{
             width: 80%;
@@ -223,7 +225,8 @@ export default {
         }
 
         .jbd-login-page-main {
-            margin: 0 auto;
+            // margin: 0 auto;
+            margin-left: 150px;
             // margin-top: 0px;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;
@@ -251,7 +254,7 @@ export default {
             height: 100%;
             overflow: hidden;
             border: 0;
-            padding: 0 7.5%;
+            padding: 0 2.5%;
         }
         .footerclass{
             width: 80%;
