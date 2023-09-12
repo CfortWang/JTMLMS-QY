@@ -30,7 +30,17 @@
         >
             <!--自定义查询条件-->
             <template v-slot:searchForm>
-                <search-form v-if="listConfig.searchForm" ref="searchForm" :forms="listConfig.searchForm.forms || []" :size="listConfig.searchForm.size" :fuzzy="listConfig.searchForm.fuzzy" :inline="listConfig.searchForm.inline" :label-width="listConfig.searchForm.labelWidth" :item-width="listConfig.searchForm.itemWidth" @search="search" />
+                <search-form
+                    v-if="listConfig.searchForm"
+                    ref="searchForm"
+                    :forms="listConfig.searchForm.forms || []"
+                    :size="listConfig.searchForm.size"
+                    :fuzzy="listConfig.searchForm.fuzzy"
+                    :inline="listConfig.searchForm.inline"
+                    :label-width="listConfig.searchForm.labelWidth"
+                    :item-width="listConfig.searchForm.itemWidth"
+                    @search="search"
+                />
             </template>
             <!--数字-->
             <template v-slot:number="scope">
@@ -46,19 +56,52 @@
             </template>
             <!--数据字典-->
             <template v-slot:dictionary="scope">
-                <dictionary-format :value="scope.value" :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)" :dict="{ typeKey: scope.column.field_options.dictionary, displayMode: scope.column.field_options.display_mode }" />
+                <dictionary-format
+                    :value="scope.value"
+                    :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)"
+                    :dict="{
+                        typeKey: scope.column.field_options.dictionary,
+                        displayMode: scope.column.field_options.display_mode
+                    }"
+                />
             </template>
             <!--附件-->
             <template v-slot:attachment="scope">
-                <ibps-attachment v-if="$utils.isNotEmpty(scope.column) && scope.value" v-model="scope.value" :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)" :download="false" :store="scope.column.field_options.store" :readonly="true" />
+                <ibps-attachment
+                    v-if="$utils.isNotEmpty(scope.column) && scope.value"
+                    v-model="scope.value"
+                    :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)"
+                    :download="false"
+                    :store="scope.column.field_options.store"
+                    :readonly="true"
+                />
             </template>
             <!--选择器-->
             <template v-slot:selector="scope">
-                <ibps-user-selector v-if="$utils.isNotEmpty(scope.column)" v-model="scope.value" :type="scope.column.field_options.selector_type || 'user'" :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)" :store="scope.column.field_options.store || 'id'" disabled readonly-text="text" />
+                <ibps-user-selector
+                    v-if="$utils.isNotEmpty(scope.column)"
+                    v-model="scope.value"
+                    :type="scope.column.field_options.selector_type || 'user'"
+                    :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)"
+                    :store="scope.column.field_options.store || 'id'"
+                    disabled
+                    readonly-text="text"
+                />
             </template>
             <!--自定义对话框-->
             <template v-slot:customDialog="scope">
-                <ibps-custom-dialog v-if="$utils.isNotEmpty(scope.column)" v-model="scope.value" :template-key="scope.column.field_options.dialog" :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)" :store="scope.column.field_options.store" :dynamic-params="getLinkDynamicParams(scope.column.field_options, scope.row)" :icon="scope.column.field_options.icon ? 'ibps-icon-' + scope.column.field_options.icon : ''" :type="scope.column.field_options.dialog_type" readonly-text="text" disabled />
+                <ibps-custom-dialog
+                    v-if="$utils.isNotEmpty(scope.column)"
+                    v-model="scope.value"
+                    :template-key="scope.column.field_options.dialog"
+                    :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)"
+                    :store="scope.column.field_options.store"
+                    :dynamic-params="getLinkDynamicParams(scope.column.field_options, scope.row)"
+                    :icon="scope.column.field_options.icon ? 'ibps-icon-' + scope.column.field_options.icon : ''"
+                    :type="scope.column.field_options.dialog_type"
+                    readonly-text="text"
+                    disabled
+                />
             </template>
             <!--关联数据-->
             <template v-slot:linkdata="scope">
@@ -91,13 +134,31 @@
             <!--地址-->
             <template v-slot:address="scope">
                 <template v-if="$utils.isNotEmpty(scope.column)">
-                    <ibps-address :value="getAddressValue(scope.value, scope.column.field_options)" :size="scope.column.field_options.size" :top="scope.column.field_options.top || 'country'" :top-val="getAddressTopVal(scope.column.field_options)" :level="scope.column.field_options.level || 'district'" data-type="code" :disabled="true" readonly-text="text" />
+                    <ibps-address
+                        :value="getAddressValue(scope.value, scope.column.field_options)"
+                        :size="scope.column.field_options.size"
+                        :top="scope.column.field_options.top || 'country'"
+                        :top-val="getAddressTopVal(scope.column.field_options)"
+                        :level="scope.column.field_options.level || 'district'"
+                        data-type="code"
+                        :disabled="true"
+                        readonly-text="text"
+                    />
                     <span v-if="scope.column.field_options.is_street">{{ getStreet(scope.value) }}</span>
                 </template>
             </template>
             <!--图片-->
             <template v-slot:image="scope">
-                <ibps-image v-if="$utils.isNotEmpty(scope.column)" v-model="scope.value" height="45" width="45" :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)" :download="scope.column.field_options.download" :store="scope.column.field_options.store" :disabled="true" />
+                <ibps-image
+                    v-if="$utils.isNotEmpty(scope.column)"
+                    v-model="scope.value"
+                    height="45"
+                    width="45"
+                    :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)"
+                    :download="scope.column.field_options.download"
+                    :store="scope.column.field_options.store"
+                    :disabled="true"
+                />
             </template>
 
             <template v-slot:customFormatter="scope">
@@ -121,24 +182,93 @@
             @close="(visible) => (dialogFormVisible = visible)"
         />
         <!-- 流程定义选择器 -->
-        <bpm-def-dialog v-model="dialogValue" :visible="dialogVisible" :form-key="formKey" :multiple="false" :is-data-template-use="true" @close="(visible) => (dialogVisible = visible)" @action-event="handleDialogActionEvent" />
+        <bpm-def-dialog
+            v-model="dialogValue"
+            :visible="dialogVisible"
+            :form-key="formKey"
+            :multiple="false"
+            :is-data-template-use="true"
+            @close="(visible) => (dialogVisible = visible)"
+            @action-event="handleDialogActionEvent"
+        />
         <!-- 字段导出  -->
-        <ibps-export-columns-dialog :visible="exportColumnsVisible" :data="template" :action="action" :pagination="pagination" @callback="callbackExtFields" @close="(visible) => (exportColumnsVisible = visible)" />
+        <ibps-export-columns-dialog
+            :visible="exportColumnsVisible"
+            :data="template"
+            :action="action"
+            :pagination="pagination"
+            @callback="callbackExtFields"
+            @close="(visible) => (exportColumnsVisible = visible)"
+        />
         <!-- 字段导入  -->
-        <ibps-import-columns-dialog :visible="importColumnsVisible" :data="template" :fields="fields" :data-template="dataTemplate" @saveUpload="initData" @close="(visible) => (importColumnsVisible = visible)" />
+        <ibps-import-columns-dialog
+            :visible="importColumnsVisible"
+            :data="template"
+            :fields="fields"
+            :data-template="dataTemplate"
+            @saveUpload="initData"
+            @close="(visible) => (importColumnsVisible = visible)"
+        />
         <!-- ______________-->
-        <ibps-data-template-render-dialog :visible="templateDialogVisible" :template-key="templateDialogKey" :dynamic-params="templateDialogDynamicParams" @close="(visible) => (templateDialogVisible = visible)" @action-event="handleTemplateDialogActionEvent" />
+        <ibps-data-template-render-dialog
+            :visible="templateDialogVisible"
+            :template-key="templateDialogKey"
+            :dynamic-params="templateDialogDynamicParams"
+            @close="(visible) => (templateDialogVisible = visible)"
+            @action-event="handleTemplateDialogActionEvent"
+        />
         <!-- 表单打印-->
-        <form-print-template :id="printTemplateId" :pk="pkValue" :visible="formPrintTemplateDialogVisible" @close="(visible) => (formPrintTemplateDialogVisible = visible)" />
-        <component :is="dialogTemplate" v-if="dialogTemplate" ref="dialogTemplate" v-bind="dialogTemplateAtts" />
-        <bpmn-formrender :visible="npmDialogFormVisible" :def-id="defId" :instance-id="instanceId" :task-id="taskId" :add-data-cont="addDataCont" @callback="search" @close="loadFlowFData" />
-        <Scan v-if="scanVisible" :current-scan="scanName" :scan-visible="scanVisible" :obj="obj" @scanOff="scanOff" />
+        <form-print-template
+            :id="printTemplateId"
+            :pk="pkValue"
+            :visible="formPrintTemplateDialogVisible"
+            @close="(visible) => (formPrintTemplateDialogVisible = visible)"
+        />
+        <component
+            :is="dialogTemplate"
+            v-if="dialogTemplate"
+            ref="dialogTemplate"
+            v-bind="dialogTemplateAtts"
+        />
+        <bpmn-formrender
+            :visible="npmDialogFormVisible"
+            :def-id="defId"
+            :instance-id="instanceId"
+            :task-id="taskId"
+            :add-data-cont="addDataCont"
+            @callback="search"
+            @close="loadFlowFData"
+        />
+        <Scan
+            v-if="scanVisible"
+            :current-scan="scanName"
+            :scan-visible="scanVisible"
+            :obj="obj"
+            @scanOff="scanOff"
+        />
         <print :show="showPrint" :list="printList" :type="printType" />
         <labelPrint :show="showPrintYi" :list="printList" :type="printType" />
 
-        <import-table :visible="importTableDialogVisible" title="导入" @close="(visible) => (importTableDialogVisible = visible)" @action-event="handleImportTableActionEvent" />
+        <import-table
+            :visible="importTableDialogVisible"
+            title="导入"
+            @close="(visible) => (importTableDialogVisible = visible)"
+            @action-event="handleImportTableActionEvent"
+        />
 
-        <xlsxFile v-if="xlsxFileVisible" :visible="xlsxFileVisible" @xlsxFileClose="xlsxFileClose" />
+        <xlsxFile
+            v-if="xlsxFileVisible"
+            :visible="xlsxFileVisible"
+            @xlsxFileClose="xlsxFileClose"
+        />
+
+        <ibps-attachment
+            ref="snapshot"
+            v-model="snapshotFile"
+            style="display: none;"
+            :download="false"
+            :readonly="true"
+        />
     </div>
 </template>
 <script>
@@ -307,7 +437,8 @@ export default {
             importTableDialogVisible: false,
             position: null,
             importList: [],
-            importVlaue: null
+            importVlaue: null,
+            snapshotFile: ''
         }
     },
     computed: {
@@ -753,6 +884,7 @@ export default {
             this.beforeScript(command, position, selection, data, () => {
                 let src = ''
                 this.readonly = false
+                const { first = '' } = this.$store.getters.level || {}
                 switch (buttonType) {
                     case 'search': // 查询
                         ActionUtils.setFirstPagination(this.pagination)
@@ -807,13 +939,21 @@ export default {
                         this.npmDialogFormVisible = true
                         break
                     case 'consult': // 查阅
-                        if (!button.reportPath) {
-                            this.$message.warning('请先配置对应报表路径！')
-                            return
+                        this.snapshotFile = ''
+                        if (data.kuai_zhao_) {
+                            this.snapshotFile = data.kuai_zhao_
+                            setTimeout(() => {
+                                this.$refs.snapshot.handleActionEvent('preview', 0)
+                            }, 500)
+                        } else {
+                            if (!button.reportPath) {
+                                this.$message.warning('请先配置对应报表路径！')
+                                return
+                            }
+                            src = `${this.$reportPath.replace('show', 'pdf')}${button.reportPath}&id_=${selection}&org_=${first}`
+                            // console.log(src)
+                            this.$common.preview(this, src)
                         }
-                        src = `${this.$reportPath.replace('show', 'pdf')}${button.reportPath}&id_=${selection}`
-                        // console.log(src)
-                        this.$common.preview(this, src)
                         break
                     case 'download': // 下载记录
                         if (!button.reportPath) {
@@ -821,7 +961,7 @@ export default {
                             return
                         }
                         this.$common.snapshoot({
-                            url: this.$getReportFile(button.reportPath, `id_=${selection}`),
+                            url: this.$getReportFile(button.reportPath, `id_=${selection}&org_=${first}`),
                             name: selection,
                             type: 'pdf'
                         }).then((res) => {
@@ -1159,17 +1299,6 @@ export default {
                 columns.push(column)
             })
             return columns
-        },
-        /**
-         * 判断参数是否是其中之一
-         */
-        oneOf: function (obj, validList, key, key1) {
-            for (let i = 0; i < validList.length; i++) {
-                if (obj[key] === validList[i][key1]) {
-                    return true
-                }
-            }
-            return false
         },
         /**
          * 构建按钮

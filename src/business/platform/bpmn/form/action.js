@@ -663,6 +663,7 @@ export default {
                 await new Promise(resolve => setTimeout(resolve, intervalTime))
             }
             const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process'`
+            const { first = '' } = this.$store.getters.level
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
@@ -670,8 +671,9 @@ export default {
                     return
                 }
                 const path = data[0].bao_biao_lu_jing_
-                const url = this.$getReportFile(path, `id_=${id}`)
+                const url = this.$getReportFile(path, `id_=${id}&org_=${first}`)
                 const fileName = name + this.$common.getDateNow(16, 'string')
+                console.log(url, fileName)
                 this.$common.snapshoot({
                     url,
                     name: fileName,

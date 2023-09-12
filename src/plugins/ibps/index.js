@@ -58,17 +58,32 @@ export default {
 
         Vue.prototype.$ibpsUrl = env.VUE_APP_BASE_API_0_0_TEST
         const reportPath = '金通医学实验室管理系统'
+        // 格式化参数
+        const getParams = (params) => {
+            const parts = params.split('&')
+            const result = []
+            parts.forEach((item, index) => {
+                const [key, value] = item.split('=')
+                // 第一个参数转换=为%3D，后续参数不转换=
+                if (index === 0) {
+                    result.push(`${key}%3D${encodeURIComponent(value)}`)
+                } else {
+                    result.push(`${key}=${encodeURIComponent(value)}`)
+                }
+            })
+            return result.join('&')
+        }
         const downloadReport = (src, where, type = 6) => {
             // 目前可用type    6:生成报表的pdf文件【默认】   7:生成报表的word文件   3:生成报表的excel文件
-            return `${BASE_URL}demo/reportServlet?action=${type}&file=${encodeURIComponent(reportPath + '/' + src)}&print=1&srcType=file&paramString=${encodeURIComponent(where)}`
+            return `${BASE_URL}demo/reportServlet?action=${type}&file=${encodeURIComponent(reportPath + '/' + src)}&print=1&srcType=file&paramString=${getParams(where)}`
         }
         const timer = setInterval(() => { // 定时循环添加参数
             if (getToken()) {
                 // 报表路径
                 Vue.prototype.$reportPath = `${BASE_URL}demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${reportPath}/`
                 Vue.prototype.$getReportFile = downloadReport // 通过方法函数，拼接url，并将字符串格式化
-                Vue.prototype.$getSealUri = 'http://120.77.249.241:9999/no/getSealFile/' //微签 回显获取文件地址
-                Vue.prototype.$getFileDow = 'https://www.szjyxt.com/ibps/platform/v3/file/download?attachmentId=' //文件下载地址
+                Vue.prototype.$getSealUri = 'http://120.77.249.241:9999/no/getSealFile/' // 微签 回显获取文件地址
+                Vue.prototype.$getFileDow = 'https://www.szjyxt.com/ibps/platform/v3/file/download?attachmentId=' // 文件下载地址
                 clearInterval(timer) // 添加成功后即删除定时任务
             }
         }, 500)
