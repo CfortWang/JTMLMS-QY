@@ -318,7 +318,14 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
-            queryPageList(this.getSearcFormData()).then((response) => {
+            const { first = '' } = this.$store.getters.level
+            const { isSuper = '', account = '' } = this.$store.getters
+            const special = ['admin', 'jinyuan']
+            let t = { position: first }
+            if (special.includes(account) && isSuper) {
+                t = null
+            }
+            queryPageList(this.getSearcFormData(), t).then((response) => {
                 response.data.dataResult.forEach(item => {
                     if (item.positions) {
                         // 转换岗位名

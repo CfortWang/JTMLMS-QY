@@ -5,11 +5,12 @@ import { BUSINESS_BASE_URL } from '@/api/baseUrl'
  * 查询列表数据
  * @param {*} params
  */
-export function queryPageList(params) {
+export function queryPageList(data, params) {
   return request({
     url: ORG_URL() + '/employee/query',
     method: 'post',
-    data: params
+    data,
+    params
   })
 }
 /**
