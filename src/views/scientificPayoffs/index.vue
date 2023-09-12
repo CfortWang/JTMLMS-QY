@@ -226,7 +226,7 @@ export default {
             const sql3 = `select * from t_SCIwztjb where lei_xing_ = '统计' order by create_time_ desc`
             const sql4 = `select * from t_zwlw where lei_xing_ = '统计' order by create_time_ desc`
             const sql5 = `select * from t_zz where lei_xing_ = '统计' order by create_time_ desc`
-            const sql6 = `select * from t_zl where lei_xing_ = '统计' order by create_time_ desc`
+            const sql6 = `select * from t_kyzl where lei_xing_ = '统计' order by create_time_ desc`
             const sql7 = `select * from t_jxjyxmxshd where lei_xing_ = '统计' order by create_time_ desc`
             Promise.all([curdPost('sql', sql1), curdPost('sql', sql2), curdPost('sql', sql3), curdPost('sql', sql4), curdPost('sql', sql5), curdPost('sql', sql6), curdPost('sql', sql7)]).then(([res1, res2, res3, res4, res5, res6, res7]) => {
                 if (res1.state == 200) {
@@ -342,7 +342,7 @@ export default {
 
         // 专利
         getZhuanLiDataAndList (month) {
-            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_zl tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
+            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kyzl tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
             curdPost('sql', sql2).then((res2) => {
                 if (res2.state == 200) {
                     const datas = res2.variables.data
