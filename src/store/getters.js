@@ -33,7 +33,9 @@ export default {
     permissions: state => state.ibps.menu.permissions, //  拥有的权限
     myform: state => state.ibps.myform ? state.ibps.myform : '',
     // 获取所有用户信息
-    usersList: state => state.ibps.param && state.ibps.param.usersList ? state.ibps.param.usersList : [],
+    userList: state => state.ibps.param && state.ibps.param.userList ? state.ibps.param.userList : [],
+    // 获取所有部门信息
+    deptList: state => state.ibps.param && state.ibps.param.deptList ? state.ibps.param.deptList : [],
     // 获取用户最高层级
     level: state => state.ibps.param && state.ibps.param.level ? state.ibps.param.level : []
 }

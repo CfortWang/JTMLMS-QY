@@ -95,7 +95,9 @@
                     <ibps-header-tenant /> -->
 
                     <ibps-header-clean-cache v-if="isSuper && account === 'jinyuan'" type="platform" />
-                    <ibps-header-clean-cache v-if="isSuper && account === 'jinyuan'" type="form"/>
+                    <ibps-header-clean-cache v-if="isSuper && account === 'jinyuan'" type="form" />
+                    <!-- <ibps-header-clean-cache v-if="isSuper && account === 'jinyuan'" type="oauth" />
+                    <ibps-header-clean-cache v-if="isSuper && account === 'jinyuan'" type="office" /> -->
 
                     <span style="font-size: 12px; cursor: pointer;" @click="goToMain()">首页</span>
                     <span style="margin: 0 10px;">|</span>

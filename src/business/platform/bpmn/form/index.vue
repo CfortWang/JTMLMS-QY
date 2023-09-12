@@ -379,7 +379,7 @@
                 this.formModel = formModel
                 // 数据预处理，审批意见数据添加审批人姓名
                 if (data.attributes && data.attributes.opinionList && data.attributes.opinionList.length) {
-                    let users = this.$store.getters.usersList || []
+                    let users = this.$store.getters.userList || []
                     data.attributes.opinionList.forEach(item => {
                         let userInfo = users.find(i => i.userId === item.auditor)
                         item.auditorName = userInfo ? userInfo.userName : null

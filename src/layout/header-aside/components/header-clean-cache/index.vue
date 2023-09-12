@@ -2,7 +2,7 @@
 <template>
     <el-tooltip effect="dark" :content="cache[type] ? `清除${cache[type].name }缓存`: ''" placement="bottom">
         <el-button type="text" class="ibps-mr btn-text can-hover" @click="cleanCache()">
-            <ibps-icon :name="cache[type] ? cache[type].icon : 'drupail'" style="font-size: 18px;" />
+            <ibps-icon :name="cache[type] ? cache[type].icon : 'drupal'" style="font-size: 18px;" />
         </el-button>
     </el-tooltip>
 </template>
@@ -27,7 +27,7 @@
         office: {
             name: '办公',
             api: cleanOfficeCache,
-            icon: 'drupail'
+            icon: 'drupal'
         }
     }
     export default {

@@ -8,7 +8,7 @@
 -->
 <template>
     <div class="jbd-sys-title">
-        <span class="jbd-sys-title-cont-center" style="margin-left: 40px;float: left;">医学实验室标准化智慧管理平台</span>
+        <span class="jbd-sys-title-cont-center" style="margin-left: 40px;float: left;">{{ deptName }}医学实验室标准化智慧管理平台</span>
         <span style="float: right; " class="jbd-sys-title-contact">
             <br>
             深圳市金源信通科技有限公司开发 <i style="margin-left: 10px;" class="el-icon-phone" /> 0755-2642-4403
@@ -16,3 +16,15 @@
         </span>
     </div>
 </template>
+<script>
+export default {
+    data () {
+        const { first = '' } = this.$store.getters.level || {}
+        const { deptList = [] } = this.$store.getters || {}
+        const dept = deptList.find(i => i.positionId === first)
+        return {
+            deptName: dept ? dept.positionName : ''
+        }
+    }
+}
+</script>

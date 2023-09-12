@@ -57,8 +57,7 @@ export default {
                 await dispatch('getAccount')
                 // 获取切换用户账号
                 await dispatch('getSwitchAccount')
-                // 获取所有用户列表
-                await dispatch('getUserList')
+                
 
                 // 获取注册用户账号
                 dispatch('getRegister').then((r) => {
@@ -76,10 +75,11 @@ export default {
                         await dispatch('ibps/user/set', info, {
                             root: true
                         })
+                        let level = {}
                         if (info.positions && info.positions.length) {
                             // 当存在第二级为空时，说明具备最高级权限
                             const hasFirst = info.positions.some(obj => obj.path.split('.')[1] === '')
-                            const level = {
+                            level = {
                                 first: [...new Set(info.positions.map(obj => obj.path.split('.')[0]))].join(','),
                                 second: hasFirst ? '' : [...new Set(info.positions.map(obj => obj.path.split('.')[1]))].join(',')
                             }
@@ -87,6 +87,10 @@ export default {
                                 root: true
                             })
                         }
+                        // 获取所有用户信息
+                        await dispatch('getUserList', level)
+                        // 获取所有部门信息
+                        await dispatch('getDeptList', level)
                         // 获取当前子系统
                         await dispatch('ibps/system/loadSystem', null, {
                             root: true
@@ -163,16 +167,32 @@ export default {
         /**
          * 获取所有系统用户账号
          */
-        getUserList ({ state, dispatch }) {
+        getUserList ({ state, dispatch }, { first, second }) {
             const sql = `select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee`
             common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
-                dispatch('ibps/param/setUsersList', data, {
+                dispatch('ibps/param/setUserList', data, {
                     root: true
                 })
             }).catch(error => {
                 console.log(error)
                 alert('获取所有用户信息失败！')
+            })
+        },
+        /**
+         * 获取所有系统部门信息
+         */
+        getDeptList ({ state, dispatch }, { first, second }) {
+            const params = second ? ` and path_ like '%${second}%'` : first ? ` and path_ like '%${first}%'` : ''
+            const sql = `select id_ as positionId, name_ as positionName, path_ as path from ibps_party_entity where party_type_ = 'position'${params}`
+            common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                dispatch('ibps/param/setDeptList', data, {
+                    root: true
+                })
+            }).catch(error => {
+                console.log(error)
+                alert('获取所有部门信息失败！')
             })
         },
         /**
