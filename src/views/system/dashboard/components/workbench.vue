@@ -60,7 +60,7 @@
                             </template>
                             <!-- 已办、办结字段处理 -->
                             <template slot="overStatus" slot-scope="scope">{{ getStatus(scope.row.status) }}</template>
-                            <template slot="overDept" slot-scope="scope">{{ getParenthesesStr(scope.row.subject)[1] }}</template>
+                            <template slot="overDept" slot-scope="scope">{{ getAttr(scope.row.subject, 'deptName') }}</template>
                             <template slot="creator" slot-scope="scope">{{ scope.row.createBy | getUserName(userList) }}</template>
                             <template slot="updateBy" slot-scope="scope">{{ getName(scope.row) }}</template>
                         </ibps-crud>
@@ -166,22 +166,12 @@ export default {
     components: { BpmnFormrender, NewsDetail },
     filters: {
         getWorkInfo (v, type) {
-            const hasDesc = v.includes('#')
             const res = {
-                name: {
-                    '0': v.includes('{') ? v.split('{')[0] : v.includes('(') ? v.split('(')[0] : v,
-                    '1': v.split('#')[0]
-                },
+                name: v.split('#')[0],
                 // 无#返回空，有#返回(左边的字符串,
-                desc: {
-                    '0': '',
-                    '1': v.split('#')[1]
-                }
+                desc: v.split('#')[1] ? v.split('#')[1] : ''
             }
-            if (!hasDesc) {
-                return res[type]['0']
-            }
-            return res[type]['1']
+            return res[type]
         },
         getUserName (v, list) {
             const user = list.find(i => i.userId === v)
@@ -195,7 +185,9 @@ export default {
         }
     },
     data () {
+        const { first = '' } = this.$store.getters.level || {}
         return {
+            first,
             tabList,
             stateOption,
             pkKey: 'id',
@@ -215,6 +207,7 @@ export default {
             posName: '',
             timer: null,
             userList: [],
+            positionList: [],
             orgInfo: {},
             activeTab: tabList[0].key,
             height: document.body.clientHeight,
@@ -282,7 +275,8 @@ export default {
                         { prop: 'scope', label: '事务说明', slotName: 'desc', minWidth: 250 },
                         { prop: 'scope', label: '事务状态', slotName: 'waitStatus', width: 120 },
                         { prop: 'scope', label: '办理进度', headerName: 'stateLabel', slotName: 'state', width: 120 },
-                        { prop: 'startDept', label: '发起部门', width: 120 },
+                        // { prop: 'startDept', label: '发起部门', width: 120 },
+                        { prop: 'scope', label: '发起部门', slotName: 'overDept', width: 120 },
                         { prop: 'submitBy', label: '发起人', headerName: 'submitBy', width: 100 },
                         { prop: 'forwardBy', label: `上节点提交人`, headerName: 'forwardBy', width: 100 },
                         { prop: 'createTime', label: '上节点提交时间', width: 150 }
@@ -324,6 +318,7 @@ export default {
     mounted: function () {
         this.getData(this.activeTab)
         this.getUserList()
+        this.getPositionList()
         this.getOrgInfo()
         if (this.timer) {
             clearInterval(this.timer)
@@ -353,6 +348,13 @@ export default {
             const sql = `select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee where status_ = 'actived'`
             this.$common.request('sql', sql).then(res => {
                 this.userList = res.variables && res.variables.data
+            })
+        },
+        // 获取系统部门信息
+        getPositionList () {
+            const sql = `select id_ as positionId, name_ as positionName from ibps_party_entity where party_type_ = 'position' and path_ like '%${this.first}%'`
+            this.$common.request('sql', sql).then(res => {
+                this.positionList = res.variables && res.variables.data
             })
         },
         // 获取用户部门信息
@@ -385,6 +387,16 @@ export default {
         getStatus (val) {
             const s = taskState[val]
             return s || '暂停'
+        },
+        getAttr (val, arg) {
+            const arr = val.split('#')
+            if (!arr[2]) {
+                return ''
+            }
+            const result = JSON.parse(`{${arr[2]}}`)
+            const t = this.positionList.find(i => i.positionId === result.dept)
+            result.deptName = t ? t.positionName : result.dept
+            return result[arg]
         },
         tableRowClassName ({ row, rowIndex }) {
             if (rowIndex % 2 === 1) return 'warning-row'
@@ -466,7 +478,7 @@ export default {
             }
             if (this.activeTab === 'news') {
                 // 公告限制显示当前医院且状态为已发布的数据，过滤草稿及失效公告
-                params['Q^type_^SL'] = this.$store.getters.level ? this.$store.getters.level.first : ''
+                params['Q^type_^SL'] = this.first
                 params['Q^status_^SL'] = 'publish'
             }
             const s = this.activeTab === 'news' ? { 'PUBLIC_DATE_': 'DESC' } : this.sorts
@@ -516,29 +528,6 @@ export default {
         unique (arr) {
             const res = new Map()
             return arr.filter(arr => !res.has(arr.id) && res.set(arr.id, 1))
-        },
-        // 文字替换
-        getParenthesesStr (text) {
-            let result = ''
-            if (!text) return result
-            const regex1 = /\{(.+?)\}/g
-            const regex2 = /\((.+?)\)/g
-            const options1 = text.match(regex1)
-            const options2 = text.match(regex2)
-            const options = options1 && options1.length ? options1 : options2
-            if (options) {
-                const option = options[0]
-                if (option) {
-                    result = option.substring(1, option.length - 1)
-                }
-                if (options[1]) {
-                    const yersOption = options[1]
-                    if (yersOption) {
-                        result = result + '/' + yersOption.substring(1, yersOption.length - 1)
-                    }
-                }
-            }
-            return result.split('/')
         },
         /**
          * 主管提醒
