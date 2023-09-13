@@ -168,7 +168,8 @@ export default {
          * 获取所有系统用户账号
          */
         getUserList ({ state, dispatch }, { first, second }) {
-            const sql = `select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee`
+            const params = second ? ` and (path_ like '%${second}%' or id_ = '${first}')` : first ? ` and path_ like '%${first}%'` : ''
+            const sql = `select users.id_ as userId, users.name_ as userName, users.mobile_ as phone, (select ifnull(GROUP_CONCAT(DISTINCT roles.name_ SEPARATOR ','), '') from ibps_party_entity as roles where find_in_set(roles.id_, users.job_)) as roles, (select ifnull(GROUP_CONCAT(DISTINCT positions.name_ SEPARATOR ','), '') from ibps_party_entity as positions where find_in_set(positions.id_, users.positions_)) as positions from ibps_party_employee as users`
             common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 dispatch('ibps/param/setUserList', data, {
@@ -183,7 +184,7 @@ export default {
          * 获取所有系统部门信息
          */
         getDeptList ({ state, dispatch }, { first, second }) {
-            const params = second ? ` and path_ like '%${second}%'` : first ? ` and path_ like '%${first}%'` : ''
+            const params = second ? ` and (path_ like '%${second}%' or id_ = '${first}')` : first ? ` and path_ like '%${first}%'` : ''
             const sql = `select id_ as positionId, name_ as positionName, path_ as path from ibps_party_entity where party_type_ = 'position'${params}`
             common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}

@@ -192,7 +192,7 @@ export default {
             tabList,
             stateOption,
             userList,
-            deptList: [],
+            deptList,
             pkKey: 'id',
             taskId: '', // 编辑dialog需要使用
             waiJian: '', // 编辑dialog需要使用
