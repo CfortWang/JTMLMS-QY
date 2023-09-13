@@ -134,8 +134,10 @@ export default {
                     data: []
                 }
             },
+            // ie.STATUS_= 'actived' and ie.ID_ != '1' and ie.ID_ != '-1' and ie.ID_ != '702117247933480960' and ie.ID_ != '1115242459127873536' and ie.ID_ != '1115242765924433920' and ie.GROUP_ID_ not like '%1041786072788369408%' GROUP BY ie.id_
+            likeParams: "ie.STATUS_= 'actived' and ie.ID_ != '1' and ie.ID_ != '-1' and ie.ID_ != '702117247933480960' and ie.ID_ != '1115242459127873536' and ie.ID_ != '1115242765924433920' and ie.GROUP_ID_ not like '%1041786072788369408%' GROUP BY ie.id_",
 
-            likeParams: "ie.STATUS_= 'actived' and ie.ID_ != '1' and ie.ID_ != '-1' and ie.ID_ != '702117247933480960' and ie.ID_ != '1115242459127873536' and ie.ID_ != '1115242765924433920' and ie.GROUP_ID_ not like '%1041786072788369408%' GROUP BY ie.id_"
+            likeTongJi: `lei_xing_ = '统计'`
         }
     },
     created () {
@@ -143,8 +145,10 @@ export default {
             this.allView()
         }
 
-        this.getInit()
-        this.getKeYanChengGuoList()
+        this.getPosition().then(res => {
+            this.getInit()
+            this.getKeYanChengGuoList()
+        })
 
         this.timer = setInterval(() => {
             this.getInit()
@@ -164,6 +168,32 @@ export default {
         clearInterval(this.timer3)
     },
     methods: {
+        getPosition () {
+            return new Promise((resolve, reject) => {
+                let sqlData = ``
+                let sqlData2 = ``
+                const sql = `select ID_ from ibps_party_entity where party_type_ = 'position' and PATH_ like '%1136828146851512320%'`
+                curdPost('sql', sql).then((res2) => {
+                    if (res2.state === 200) {
+                        const datas = res2.variables.data
+                        if (datas.length > 0) {
+                            datas.forEach((item, index) => {
+                                if (index === 0) {
+                                    sqlData += `ie.POSITIONS_ like '%${item.ID_}%'`
+                                    sqlData2 += `bian_zhi_bu_men_ like '%${item.ID_}%'`
+                                } else {
+                                    sqlData += ` or ie.POSITIONS_ like '%${item.ID_}%'`
+                                    sqlData2 += ` or bian_zhi_bu_men_ like '%${item.ID_}%'`
+                                }
+                            })
+                            this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
+                            this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
+                        }
+                        resolve()
+                    }
+                })
+            })
+        },
         // 初始化数据
         getInit () {
             const nowDate = new Date(new Date().getTime() + 8 * 60 * 60 * 1000)
@@ -221,13 +251,13 @@ export default {
             }
         },
         getKeYanChengGuoList () {
-            const sql1 = `select * from t_kyxm where lei_xing_ = '统计' order by create_time_ desc`
-            const sql2 = `select * from t_kjhjcg where lei_xing_ = '统计' order by create_time_ desc`
-            const sql3 = `select * from t_SCIwztjb where lei_xing_ = '统计' order by create_time_ desc`
-            const sql4 = `select * from t_zwlw where lei_xing_ = '统计' order by create_time_ desc`
-            const sql5 = `select * from t_zz where lei_xing_ = '统计' order by create_time_ desc`
-            const sql6 = `select * from t_kyzl where lei_xing_ = '统计' order by create_time_ desc`
-            const sql7 = `select * from t_jxjyxmxshd where lei_xing_ = '统计' order by create_time_ desc`
+            const sql1 = `select * from t_kyxm where ${this.likeTongJi} order by create_time_ desc`
+            const sql2 = `select * from t_kjhjcg where ${this.likeTongJi} order by create_time_ desc`
+            const sql3 = `select * from t_SCIwztjb where ${this.likeTongJi} order by create_time_ desc`
+            const sql4 = `select * from t_zwlw where ${this.likeTongJi} order by create_time_ desc`
+            const sql5 = `select * from t_zz where ${this.likeTongJi} order by create_time_ desc`
+            const sql6 = `select * from t_kyzl where ${this.likeTongJi} order by create_time_ desc`
+            const sql7 = `select * from t_jxjyxmxshd where ${this.likeTongJi} order by create_time_ desc`
             Promise.all([curdPost('sql', sql1), curdPost('sql', sql2), curdPost('sql', sql3), curdPost('sql', sql4), curdPost('sql', sql5), curdPost('sql', sql6), curdPost('sql', sql7)]).then(([res1, res2, res3, res4, res5, res6, res7]) => {
                 if (res1.state == 200) {
                     const datas = res1.variables.data

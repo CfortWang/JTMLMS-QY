@@ -240,6 +240,7 @@ export const barData = {
     yAxis: {
         type: 'value',
         name: '数量（个）',
+        minInterval: 1,
         nameTextStyle: {
             color: '#fff',
             fontSize: 14

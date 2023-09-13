@@ -43,8 +43,16 @@
                                 内审不符合项汇总表(CNAS)
                             </div>
                             <el-table :data="CNASTableData" :border="true" style="width: 90%; margin: 0 auto">
-                                <el-table-column prop="bu_fu_he_xiang_mi" label="不符合项描述" width="300" />
-                                <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="70" />
+                                <el-table-column prop="bu_fu_he_xiang_mi" label="不符合项描述" width="300" >
+                                    <template slot-scope="scope">
+                                        {{ scope.row.bu_fu_he_xiang_mi}}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="70" >
+                                    <template slot-scope="scope">
+                                        {{ scope.row.tiao_kuan_bian_ha}}
+                                    </template>
+                                </el-table-column>
                                 <el-table-column prop="nei_shen_yuan_" label="内审员" width="60">
                                     <template slot-scope="scope">
                                         {{ scope.row.nei_shen_yuan_ | emfiltes(employeeList) }}
