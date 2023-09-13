@@ -24,7 +24,7 @@ export const listTypeData = {
 }
 
 // 内审管审类型ID
-const neishen = '859879582994530304'
+const neishen = '1148206659160506368'
 const guanshen = '859879751135789056'
 
 let specialType = {}
