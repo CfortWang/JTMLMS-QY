@@ -321,19 +321,25 @@ export default {
                 return ''
             }
             const result = JSON.parse(`{${arr[2]}}`)
-            const t = this.deptList.find(i => i.positionId === result.dept)
-            result.deptName = t ? t.positionName : result.dept
+            const depts = result.dept.split(',')
+            const deptNames = []
+            depts.forEach(item => {
+                const t = this.deptList.find(i => i.positionId === item)
+                deptNames.push(t ? t.positionName : result.dept)
+            })
+            result.deptName = deptNames.join(',')
             return result
         },
         // 加载数据
         loadData () {
             this.loading = true
             queryClassify(this.getSearcFormData()).then((response) => {
-                const data = response.data && response.data.dataResult
-                data.forEach(item => {
+                const { dataResult = [] } = response.data || {}
+                dataResult.forEach(item => {
                     const temp = this.getInfo(item.subject)
                     item.deptName = temp ? temp.deptName : ''
                 })
+                response.data.dataResult = dataResult
                 ActionUtils.handleListData(this, response.data)
                 this.loading = false
             }).catch(() => {
@@ -472,7 +478,7 @@ export default {
         },
         // 打开报表
         openReport (path, id) {
-            this.srcUrl = `${this.$reportPath.replace('show', 'pdf')}${path}&id_=${id}`
+            this.srcUrl = `${this.$reportPath.replace('show', 'pdf')}${path}&id_=${id}&org_=${this.first}`
             this.visible = true
         },
         // 获取格式化参数
@@ -482,6 +488,7 @@ export default {
                 params['Q^TYPE_ID_^S'] = this.typeId
             }
             params['Q^status_^S'] = 'end'
+            // params['Q^subject_^SLMV'] = this.deptList.map(i => i.positionId).join(',')
             return ActionUtils.formatParams(params, this.pagination, this.sorts)
         },
         // 处理分页事件

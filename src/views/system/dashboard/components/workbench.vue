@@ -373,8 +373,13 @@ export default {
                 return ''
             }
             const result = JSON.parse(`{${arr[2]}}`)
-            const t = this.deptList.find(i => i.positionId === result.dept)
-            result.deptName = t ? t.positionName : result.dept
+            const depts = result.dept.split(',')
+            const deptNames = []
+            depts.forEach(item => {
+                const t = this.deptList.find(i => i.positionId === item)
+                deptNames.push(t ? t.positionName : result.dept)
+            })
+            result.deptName = deptNames.join(',')
             return result[arg]
         },
         tableRowClassName ({ row, rowIndex }) {
