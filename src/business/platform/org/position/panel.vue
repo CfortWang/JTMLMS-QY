@@ -235,7 +235,6 @@ export default {
                         this.treeData = arrTwo
                     } else {
                         let arrList = []
-                        const fristList = false
                         const frist = this.$store.getters.level.first || ''
                         if ((type === '1' || type === '2') && this.filtrate && frist) {
                             const showBoo = arr.some((item) => item.id === frist)
@@ -249,7 +248,7 @@ export default {
                         }
 
                         if (type === '2') {
-                            this.getPosiData(arrList, true)
+                            this.getPosiData(arrList, true, true)
                         }
 
                         if (this.$utils.isEmpty(node.data)) {
@@ -288,7 +287,7 @@ export default {
                     }
 
                     if (type === '2') {
-                        this.getPosiData(arrList, node.data.disabled)
+                        this.getPosiData(arrList, node.data.disabled, node.data.disabledShow)
                     }
 
                     resolve(this.toTree(arrList))
@@ -298,7 +297,7 @@ export default {
                 })
             }
         },
-        getPosiData (arrList, disabled) {
+        getPosiData (arrList, disabled, disabledShow = false) {
             const positions = this.$store.getters.userInfo.employee.positions
             if (positions) {
                 const positionsList = positions.split(',')
@@ -306,21 +305,39 @@ export default {
                     const index = arrList.findIndex(it => it.id === item)
                     if (index >= 0) {
                         arrList[index].disabled = true
+                        arrList[index].disabledShow = true
                     }
                 })
             }
+            let dotCount = 0
+            if (arrList && Array.isArray(arrList) && arrList.length > 0 && arrList[0].path) {
+                // dotCount = (arrList[0].path.match(/\./g) || []).length
+                dotCount = arrList[0].depth
+            }
             // 如果上级可以选择 也就是 disabled false，下级一定是false
-            if (!disabled) {
+            // if(dotCount)
+
+            if (!disabledShow) {
                 arrList.forEach(item => {
                     item.disabled = false
+                    item.disabledShow = false
                 })
             } else {
                 arrList.forEach(item => {
-                    if (item.disabled) {
+                    if (item.disabledShow) {
                         item.disabled = false
+                        item.disabledShow = false
                     } else {
                         item.disabled = true
+                        item.disabledShow = true
                     }
+                })
+            }
+
+            if (dotCount <= 3) {
+                console.log(5)
+                arrList.forEach(item => {
+                    item.disabled = true
                 })
             }
         },

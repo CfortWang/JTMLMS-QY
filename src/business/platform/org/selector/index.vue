@@ -160,7 +160,17 @@ export default {
          * 初始化数据
          */
         initData () {
-            const data = this.getArrayValue(this.value)
+            let value = ''
+            if (this.type === 'position' && !this.multiple && this.value) {
+                const valueList = this.value.split(',')
+                value = valueList[valueList.length - 1]
+                // this.emitChangeLinkData(value, 'position')
+                this.$emit('input', value)
+            } else {
+                value = this.value
+            }
+
+            const data = this.getArrayValue(value)
             this.selectorValue = this.multiple ? [] : {}
             if (this.$utils.isEmpty(data)) {
                 return
@@ -231,7 +241,6 @@ export default {
                 }
                 return result
             } catch (error) {
-                console.warn(error)
                 return []
             }
         },

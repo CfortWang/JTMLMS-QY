@@ -168,8 +168,7 @@
 
     import IbpsNewsDialog from '@/views/platform/system/news/cms'
     import IbpsMessageDialog from '@/views/platform/message/inner/detail/dialog'
-    import { StatisticsData } from '@/api/platform/system/jbdHome'
-    import { StatisticsSign } from '@/api/platform/system/jbdHome'
+    import { StatisticsData, StatisticsSign } from '@/api/platform/system/jbdHome'
     import { getToken } from '@/utils/auth'
     import newHome from './components/new-home'
     import Workbench from './components/workbench'
