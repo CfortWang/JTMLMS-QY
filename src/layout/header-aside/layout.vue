@@ -105,8 +105,8 @@
                     <!-- 消息中心 -->
                     <span style="margin: 0 10px;">|</span>
                     <ibps-header-user style="margin-right: 15px;"/>
-                    <span style="margin-left: 10px;">|</span>
-                    <ibps-header-setting />
+                    <!-- <span style="margin-left: 10px;">|</span>
+                    <ibps-header-setting /> -->
                 </div>
             </div>
             <!-- 下面 主体 -->

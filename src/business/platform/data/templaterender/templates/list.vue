@@ -1028,7 +1028,8 @@ export default {
         getResponseData (buttonType, ids, exportColumns) {
             const { template, dataTemplate, fields, pagination, sorts } = this
             const params = {}
-            template.filter_conditions = []
+            // 取消重置过滤条件
+            // template.filter_conditions = []
             let response_data = JSON.parse(JSON.stringify(dataTemplate))
             if (this.$utils.isEmpty(template.export_columns)) {
                 const arr = dataTemplate.datasets.filter((d) => d.type !== 'table')

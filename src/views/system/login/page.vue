@@ -7,9 +7,9 @@
                         <!-- <h1 class="login-title1"> -->
                         <!-- <img src="../../../assets/images/login/logo.jpg" class="logoImg" />
                             金源信通 -->
-                        <img src="~@/assets/images/login/company.png" class="logo">
+                        <!-- <img src="~@/assets/images/login/company.png" class="logo"> -->
                         <!-- </h1> -->
-                        <h1 class="login-title">医学实验室标准化智慧管理平台</h1>
+                        <h1 class="login-title">金通医学实验室标准化数字化管理平台</h1>
                     </div>
 
                     <div class="jbd-login-page-main">
@@ -82,7 +82,7 @@ export default {
         }
 
         .jbd-login-page-main {
-            margin-left: 180px;
+            // margin-left: 180px;
             // margin: 0 auto;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;
@@ -111,7 +111,7 @@ export default {
             height: 100%;
             overflow: hidden;
             border: 0;
-            padding: 0 2.5%;
+            padding: 0 5%;
         }
         .footerclass{
             width: 80%;
@@ -154,7 +154,7 @@ export default {
 
         .jbd-login-page-main {
             // margin: 0 auto;
-            margin-left: 150px;
+            // margin-left: 150px;
             // margin-top: 0px;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;
@@ -226,7 +226,7 @@ export default {
 
         .jbd-login-page-main {
             // margin: 0 auto;
-            margin-left: 150px;
+            // margin-left: 150px;
             // margin-top: 0px;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding: 10px 20px;

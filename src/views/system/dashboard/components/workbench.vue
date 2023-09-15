@@ -214,7 +214,7 @@ export default {
             height: document.body.clientHeight,
             selection: [],
             defaultPagination: { page: 1, limit: 15 },
-            sorts: { CREATE_TIME_: 'DESC' },
+            sorts: { },
             dataList: [],
             pagination: {},
             searchParams: {
@@ -251,6 +251,7 @@ export default {
                     news: {
                         forms: [
                             { prop: 'Q^title_^SL', label: '标题', fieldType: 'input' },
+                            { prop: 'Q^dep_name_^SL', label: '发布部门', fieldType: 'input' },
                             { prop: 'Q^user_name_^SL', label: '发布人', fieldType: 'input' },
                             { prop: ['Q^public_date_^DL', 'Q^public_date_^DG'], label: '发布时间', fieldType: 'daterange' }
                         ]
@@ -307,9 +308,10 @@ export default {
                     ],
                     news: [
                         { prop: 'title', label: '标题', minWidth: 250 },
+                        { prop: 'depName', label: '发布部门', sortable: 'custom', width: 120 },
                         { prop: 'userName', label: '发布人', width: 120 },
-                        { prop: 'publicDate', label: '发布时间', dateFormat: 'yyyy-MM-dd', width: 120 },
-                        { prop: 'loseDate', label: '失效时间', dateFormat: 'yyyy-MM-dd', width: 120 },
+                        { prop: 'publicDate', label: '发布日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
+                        { prop: 'loseDate', label: '有效截至日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
                         { prop: 'status', label: '发布状态', tags: typeOptions, width: 100 }
                     ]
                 }
@@ -373,6 +375,9 @@ export default {
                 return ''
             }
             const result = JSON.parse(`{${arr[2]}}`)
+            if (!result.dept) {
+                return ''
+            }
             const depts = result.dept.split(',')
             const deptNames = []
             depts.forEach(item => {
@@ -465,8 +470,8 @@ export default {
                 params['Q^type_^SL'] = this.first
                 params['Q^status_^SL'] = 'publish'
             }
-            const s = this.activeTab === 'news' ? { 'PUBLIC_DATE_': 'DESC' } : this.sorts
-            return ActionUtils.formatParams(params, page, s)
+            // const s = this.activeTab === 'news' ? this.sorts { 'PUBLIC_DATE_': 'DESC' } : this.sorts
+            return ActionUtils.formatParams(params, page, this.sorts)
         },
         // 处理表格点击事件
         handleRowClick (data) {

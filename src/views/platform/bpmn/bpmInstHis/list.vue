@@ -44,64 +44,6 @@
                     trigger="click"
                     @show="getReportAndFile(scope.row)"
                 >
-                    <!-- 二级菜单，内审管审特有 -->
-                    <template v-if="specialType.hasOwnProperty(typeId)">
-                        <el-popover
-                            :ref="'popover3-' + scope.row.id"
-                            placement="left"
-                            width="350"
-                            popper-class="popverClass"
-                            trigger="click"
-                        >
-                            <div slot="reference" class="sub_operation el-icon-s-order">{{ specialBtn[typeId].label }}</div>
-                            <div v-if="record.special && record.special.length" class="div_content">
-                                <div v-for="(item, index) in record.special" :key="index" class="content_item">
-                                    <div class="sub_content">
-                                        <div class="title">{{ specialBtn[typeId].desc }}项{{ item.flag }}</div>
-                                        <div class="sub_item">
-                                            <div class="desc">{{ specialBtn[typeId].desc }}前</div>
-                                            <ibps-attachment
-                                                v-model="item.beforeImprove"
-                                                placeholder="请选择"
-                                                :download="true"
-                                                :readonly="true"
-                                                accept="*"
-                                                :multiple="true"
-                                                upload-type="attachment"
-                                                store="id"
-                                                media-type=""
-                                                media=""
-                                                style="width: 100%;"
-                                            />
-                                        </div>
-                                        <div class="sub_item">
-                                            <div class="desc">{{ specialBtn[typeId].desc }}后</div>
-                                            <ibps-attachment
-                                                v-model="item.afterImprove"
-                                                placeholder="请选择"
-                                                :download="true"
-                                                :readonly="true"
-                                                accept="*"
-                                                :multiple="true"
-                                                upload-type="attachment"
-                                                store="id"
-                                                media-type=""
-                                                media=""
-                                                style="width: 100%;"
-                                            />
-                                        </div>
-                                        <div class="content_item">
-                                            <span style="cursor: pointer;" @click="openReport(specialBtn[typeId].path, item.id_)">
-                                                <i class="el-icon-tickets" style="font-size: 14px;" />
-                                                {{ specialBtn[typeId].path | getReportName }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-else>无对应数据</div>
-                        </el-popover>
-                    </template>
                     <div slot="reference" class="div_operation el-icon-s-order">查阅记录</div>
                     <div class="div_content">
                         <!-- 获取所有输出报告-->
@@ -114,6 +56,64 @@
                                 </span>
                                 <br>
                             </div>
+                        </template>
+                        <!-- 二级菜单，内审管审特有 -->
+                        <template v-if="specialType.hasOwnProperty(typeId)">
+                            <el-popover
+                                :ref="'popover3-' + scope.row.id"
+                                placement="left"
+                                width="350"
+                                popper-class="popverClass"
+                                trigger="click"
+                            >
+                                <div slot="reference" class="sub_operation el-icon-s-order">{{ specialBtn[typeId].label }}</div>
+                                <div v-if="record.special && record.special.length" class="div_content">
+                                    <div v-for="(item, index) in record.special" :key="index" class="content_item">
+                                        <div class="sub_content">
+                                            <div class="title">{{ specialBtn[typeId].desc }}项{{ item.flag }}</div>
+                                            <div class="sub_item">
+                                                <div class="desc">{{ specialBtn[typeId].desc }}前</div>
+                                                <ibps-attachment
+                                                    v-model="item.beforeImprove"
+                                                    placeholder="请选择"
+                                                    :download="true"
+                                                    :readonly="true"
+                                                    accept="*"
+                                                    :multiple="true"
+                                                    upload-type="attachment"
+                                                    store="id"
+                                                    media-type=""
+                                                    media=""
+                                                    style="width: 100%;"
+                                                />
+                                            </div>
+                                            <div class="sub_item">
+                                                <div class="desc">{{ specialBtn[typeId].desc }}后</div>
+                                                <ibps-attachment
+                                                    v-model="item.afterImprove"
+                                                    placeholder="请选择"
+                                                    :download="true"
+                                                    :readonly="true"
+                                                    accept="*"
+                                                    :multiple="true"
+                                                    upload-type="attachment"
+                                                    store="id"
+                                                    media-type=""
+                                                    media=""
+                                                    style="width: 100%;"
+                                                />
+                                            </div>
+                                            <div class="content_item">
+                                                <span style="cursor: pointer;" @click="openReport(specialBtn[typeId].path, item.id_)">
+                                                    <i class="el-icon-tickets" style="font-size: 14px;" />
+                                                    {{ specialBtn[typeId].path | getReportName }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else>无对应数据</div>
+                            </el-popover>
                         </template>
                         <div v-if="record.file.length" class="content_item">
                             <ibps-attachment
@@ -483,13 +483,38 @@ export default {
         },
         // 获取格式化参数
         getSearcFormData () {
-            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-            if (this.$utils.isNotEmpty(this.typeId)) {
-                params['Q^TYPE_ID_^S'] = this.typeId
+            const params = {
+                parameters: [
+                    {
+                        relation: 'AND',
+                        parameters: [
+                            {
+                                relation: 'AND',
+                                parameters: [
+                                    {
+                                        key: 'Q^status_^S',
+                                        value: 'end'
+                                    }
+                                ]
+                            },
+                            // {
+                            //     relation: 'OR',
+                            //     parameters: []
+                            // }
+                        ]
+                    }
+                ],
+                requestPage: {
+                    pageNo: this.pagination.page || 1,
+                    limit: this.pagination.limit || 15
+                },
+                sorts: [this.sorts]
             }
-            params['Q^status_^S'] = 'end'
-            // params['Q^subject_^SLMV'] = this.deptList.map(i => i.positionId).join(',')
-            return ActionUtils.formatParams(params, this.pagination, this.sorts)
+            if (this.$utils.isNotEmpty(this.typeId)) {
+                params.parameters[0].parameters[0].parameters.push({ key: 'Q^TYPE_ID_^S', value: this.typeId })
+            }
+            // params.parameters[0].parameters[1].parameters = this.userList.map(i => ({ key: 'Q^create_by_^S', value: i.userId, relation: 'OR' }))
+            return params
         },
         // 处理分页事件
         handlePaginationChange (page) {

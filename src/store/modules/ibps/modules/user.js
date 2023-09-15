@@ -168,8 +168,8 @@ export default {
          * 获取所有系统用户账号
          */
         getUserList ({ state, dispatch }, { first, second }) {
-            const params = second ? ` and (path_ like '%${second}%' or id_ = '${first}')` : first ? ` and path_ like '%${first}%'` : ''
-            const sql = `select users.id_ as userId, users.name_ as userName, users.mobile_ as phone, (select ifnull(GROUP_CONCAT(DISTINCT roles.name_ SEPARATOR ','), '') from ibps_party_entity as roles where find_in_set(roles.id_, users.job_)) as roles, (select ifnull(GROUP_CONCAT(DISTINCT positions.name_ SEPARATOR ','), '') from ibps_party_entity as positions where find_in_set(positions.id_, users.positions_)) as positions from ibps_party_employee as users`
+            const params = second ? `'%${second}%' or entity.id_ = '${first}'` : first ? `'%${first}%'` : '%%'
+            const sql = `select users.id_ as userId, users.name_ as userName, users.mobile_ as phone, (select ifnull(GROUP_CONCAT(DISTINCT roles.name_ SEPARATOR ','), '') from ibps_party_entity as roles where find_in_set(roles.id_, users.job_)) as roles, (select ifnull(GROUP_CONCAT(DISTINCT positions.name_ SEPARATOR ','), '') from ibps_party_entity as positions where find_in_set(positions.id_, users.positions_)) as positions from ibps_party_employee as users where exists (select 1 from ibps_party_entity as entity where find_in_set(entity.id_, users.positions_) and (entity.path_ like ${params}))`
             common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 dispatch('ibps/param/setUserList', data, {
