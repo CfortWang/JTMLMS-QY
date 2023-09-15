@@ -118,7 +118,7 @@ export default {
             return this.fieldName
         },
         label () { // 显示的文本
-            if (this.fieldType === 'table' || this.field.field_options.hide_label) return null
+            if (this.fieldType === 'table' || this.field.field_options.hide_label) return ''
             return this.$utils.isNotEmpty(this.field.field_options.units) ? this.field.label + '(' + this.field.field_options.units + ')' : this.field.label
         },
         labelSuffix () {

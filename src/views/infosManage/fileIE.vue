@@ -5,8 +5,7 @@
       <div class="box">
         <ibps-type-tree :width="width"
                         :height="height"
-                        title="文件分类"
-                        category-key="FILE_TYPE"
+                        :category-key="categoryKey"
                         @node-click="handleNodeClick"
                         @expand-collapse="handleExpandCollapse" />
       </div>
@@ -28,6 +27,8 @@
                      :columns="listConfig.columns"
                      :loading="loading"
                      :pagination="pagination"
+                     :display-field="tableTitle"
+                     :indexRow="false"
                      @sort-change="handleSortChange"
                      @action-event="handleAction"
                      @pagination-change="handlePaginationChange">
@@ -90,7 +91,7 @@ export default {
       show: '',
       rightsArr: ['join', 'delete'],
       rowHandle: true,
-      width: 230,
+      width: 210,
       oldorgId: '',
       height: document.clientHeight,
       loading: false,
@@ -100,6 +101,8 @@ export default {
       pkValue: '',
       templateKey: 'ywyxjlsc',
       visible: false,
+      categoryKey: "",
+      tableTitle: '',
       listData: [],
       selectListData: [],
       bianlistData: {
@@ -148,11 +151,12 @@ export default {
   },
   created() {
     this.pageKey = this.$route.name
+    this.categoryKey = this.$route.name == 'nbwj' ? "FILE_TYPE" : "FLOW_TYPE"
     this.userId = this.$store.getters.userInfo.employee.id
     const roleList = this.$store.getters.userInfo.role
     // 系统管理角色添加删除按钮
     const hasRole = roleList.some(item => item.name === '系统管理角色')
-    if (hasRole && this.$route.name !== 'nbwj') {
+    if (this.$route.name == 'ywyxjlsc') {
       // 系统管理角色不做分类过滤
       this.listConfig.toolbars.push({ key: 'remove' })
       this.selection = true
@@ -163,27 +167,27 @@ export default {
         { prop: 'wen_jian_ming_che', label: '文件名称' }
       ]
       this.listConfig.columns = [
-        { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', width: 180 },
-        { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 180 },
-        { prop: 'wen_jian_ming_che', label: '文件名称', width: 400 },
-        { prop: 'ban_ben_', label: '版本', width: 120 },
-        { prop: 'fa_fang_shi_jian_', label: '发布日期', width: 100, sortable: 'custom' },
-        { prop: 'fu_jian_', label: '查阅', slotName: "wenjinachayue", width: 400 }
+        { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', minWidth: 100 },
+        { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 100  },
+        { prop: 'wen_jian_ming_che', label: '文件名称', minWidth: 150 },
+        { prop: 'ban_ben_', label: '版本' , width: 65 },
+        { prop: 'fu_jian_', label: '查阅', slotName: "wenjinachayue", width: 150 },
+        { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom' , width: 100}
       ]
     }
     if (this.$route.name == 'wjkzgl-ywyxjlsc' || this.$route.name == 'ywtxyxjl') {
       this.listConfig.searchForm.forms = [
         { prop: 'nian_du_', label: '年度:', width: 50 },
-        { prop: 'bian_zhi_shi_jian', label: '上传时间:', fieldType: 'daterange', width: 225 }
+        { prop: 'bian_zhi_shi_jian', label: '上传时间:', fieldType: 'daterange', width: 200 }
       ]
       this.listConfig.columns = [
-        { prop: 'fen_lei_', label: '记录表单分类', width: 120 },
-        { prop: 'biao_dan_ming_che', label: '表单名称', width: 350 },
-        { prop: 'shi_wu_shuo_ming_', label: '事务说明', width: 350 },
+        { prop: 'fen_lei_', label: '表单分类', width: 120 },
+        { prop: 'biao_dan_ming_che', label: '表单名称', minWidth: 150 },
+        { prop: 'shi_wu_shuo_ming_', label: '事务说明', minWidth: 200 },
+        { prop: 'fu_jian_', label: '附件', slotName: 'wenjinachayue', width: 200 },
         { prop: 'nian_du_', label: '年度', width: 80 },
         { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 100 },
-        { prop: 'ry_name', label: '上传人', width: 100 },
-        { prop: 'fu_jian_', label: '附件', slotName: 'wenjinachayue', width: 300 }
+        { prop: 'ry_name', label: '上传人', width: 100 }
       ]
     }
   },
@@ -205,7 +209,7 @@ export default {
       let wheres3 = '' // 受限
 
       let start = ''
-    //   console.log('this.$store.getters',this.$store.getters)
+      //   console.log('this.$store.getters',this.$store.getters)
       let positionsDatas = this.$store.getters.userInfo.positions
       let needSelType = []
       if (this.$store.getters.userInfo.positions == 0) {
@@ -280,10 +284,10 @@ export default {
           needSelType.push(`(${sqlArr[i]})`)
         }
       }
-    //   console.log('needSelType',needSelType)
+      //   console.log('needSelType',needSelType)
       let fileSearchSql = needSelType.join('union all')
       let sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq` : oldRecordSql
-        console.log('sql------------：', sql)
+      console.log('sql------------：', sql)
       curdPost('sql', sql).then(res => {
         let tableDatas = res.variables.data
         this.selectListData = JSON.parse(JSON.stringify(tableDatas))
@@ -312,7 +316,8 @@ export default {
       this.getDatas()
     },
     handleNodeClick(nodeId, nodeData, treeDatas) {
-      console.log('nodeData', nodeData)
+      //   console.log('nodeData', nodeData)
+      this.tableTitle = nodeData.name
       this.show = 'detail'
       this.addDataCont = { fenLei: nodeData.name, fenLeiId: nodeId }
       let fileTypes = []
@@ -361,7 +366,7 @@ export default {
           if (authorityName.chaYue == '公用查阅') {
             this.fileTypesDatas.comAuthority.push(i.id)
           }
-          if (authorityName.chaYue == '部门查阅' ) {
+          if (authorityName.chaYue == '部门查阅') {
             this.fileTypesDatas.buMenAuthority.push(i.id)
           }
           if (authorityName.chaYue == '受限查阅') {
