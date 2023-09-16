@@ -45,18 +45,17 @@
                     @show="getReportAndFile(scope.row)"
                 >
                     <div slot="reference" class="div_operation el-icon-s-order">查阅记录</div>
-                    <div class="div_content">
+                    <div v-loading="fileLoading" class="div_content">
                         <!-- 获取所有输出报告-->
-                        <template v-if="record.report.length && record.report[0]">
+                        <!-- <template v-if="record.report.length && record.report[0]">
                             <div v-for="(item, index) in record.report" :key="index" class="content_item">
                                 <span style="cursor: pointer;" @click="openReport(item, record.bizKey)">
                                     <i class="el-icon-tickets" style="font-size: 18px;" />
-                                    <!-- 截取表单名称 -->
                                     {{ item | getReportName }}
                                 </span>
                                 <br>
                             </div>
-                        </template>
+                        </template> -->
                         <!-- 二级菜单，内审管审特有 -->
                         <template v-if="specialType.hasOwnProperty(typeId)">
                             <el-popover
@@ -115,22 +114,31 @@
                                 <div v-else>无对应数据</div>
                             </el-popover>
                         </template>
-                        <div v-if="record.file.length" class="content_item">
+                        <div v-if="record.file.length && snapshotId" class="content_item">
+                            <div class="sub_operation">快照文件</div>
                             <ibps-attachment
-                                v-model="fileId"
-                                placeholder="请选择"
-                                :download="true"
-                                :readonly="true"
-                                accept="*"
-                                :multiple="true"
+                                v-model="snapshotId"
+                                download
+                                readonly
+                                multiple
                                 upload-type="attachment"
                                 store="id"
-                                media-type=""
-                                media=""
                                 style="width: 100%;"
                             />
                         </div>
-                        <div v-if="(!record.report.length || !record.report[0]) && (!record.file.length || !fileId)">无报表及附件数据</div>
+                        <div v-if="record.file.length && fileId" class="content_item">
+                            <div class="sub_operation">其他附件</div>
+                            <ibps-attachment
+                                v-model="fileId"
+                                download
+                                readonly
+                                multiple
+                                upload-type="attachment"
+                                store="id"
+                                style="width: 100%;"
+                            />
+                        </div>
+                        <div v-if="!record.file.length || (!fileId && !snapshotId)">无快照及附件数据</div>
                     </div>
                 </el-popover>
             </template>
@@ -214,6 +222,7 @@ export default {
             typeId: '',
             srcUrl: '',
             fileId: '',
+            snapshotId: '',
             // 判断多次点击
             isDisable: false,
             visible: false,
@@ -227,6 +236,7 @@ export default {
             },
             title: '',
             loading: true,
+            fileLoading: false,
             height: document.clientHeight,
             reportAll: {
                 process: [],
@@ -415,16 +425,21 @@ export default {
         },
         // 获取所有附件
         getAllFile ({ file, table, field, bizKey }) {
+            this.fileId = ''
+            this.snapshotId = ''
+            this.fileLoading = true
             const resultList = []
             table.forEach((item, index) => {
                 const sql = `select ${file[index]} from ${item} where ${field.length && field[index] ? field[index] : 'id_'} = '${bizKey}'`
                 resultList.push(this.getFile(sql, file[index]))
             })
-            // console.log(resultList)
             Promise.all(resultList).then(res => {
                 // console.log('所有附件ID：', res)
-                this.fileId = res.join(',')
+                this.fileLoading = false
+                this.fileId = [...new Set(res.reduce((acc, cur) => acc.concat(cur.file), []))].join(',')
+                this.snapshotId = [...new Set(res.reduce((acc, cur) => acc.concat(cur.snapshot), []))].join(',')
             }).catch(err => {
+                this.fileLoading = false
                 console.log('error', err)
             })
         },
@@ -432,25 +447,37 @@ export default {
         getFile (sql, fileField) {
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
-                    const result = []
+                    const result = {
+                        file: [],
+                        snapshot: []
+                    }
                     const fileList = fileField.split(',')
-                    // console.log(fileList)
                     let { data = [] } = res.variables || {}
                     data = data.filter(i => i)
                     data.forEach(item => {
                         // 能获取到值说明文件字段只有一个
+                        // 将快照文件单独拿出来
                         if (item[fileField]) {
-                            result.push(this.getFileId(item[fileField]))
+                            if (fileField === 'kuai_zhao_') {
+                                result.snapshot.push(this.getFileId(item[fileField]))
+                            } else {
+                                result.file.push(this.getFileId(item[fileField]))
+                            }
                         } else if (fileList.length > 1) {
                             // 否则文件字段为多个，需嵌套循环
                             fileList.forEach(i => {
                                 if (item[i]) {
-                                    result.push(this.getFileId(item[i]))
+                                    if (i === 'kuai_zhao_') {
+                                        result.snapshot.push(this.getFileId(item[i]))
+                                    } else {
+                                        result.file.push(this.getFileId(item[i]))
+                                    }
                                 }
                             })
                         }
                     })
-                    resolve(result.join(','))
+                    // console.log(result)
+                    resolve(result)
                 })
             })
         },
@@ -483,6 +510,8 @@ export default {
         },
         // 获取格式化参数
         getSearcFormData () {
+            const temp = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            const { parameters = [] } = ActionUtils.formatParams(temp) || {}
             const params = {
                 parameters: [
                     {
@@ -494,26 +523,27 @@ export default {
                                     {
                                         key: 'Q^status_^S',
                                         value: 'end'
-                                    }
+                                    },
+                                    ...parameters
                                 ]
                             },
-                            // {
-                            //     relation: 'OR',
-                            //     parameters: []
-                            // }
+                            {
+                                relation: 'OR',
+                                parameters: []
+                            }
                         ]
                     }
                 ],
                 requestPage: {
                     pageNo: this.pagination.page || 1,
-                    limit: this.pagination.limit || 15
+                    limit: this.pagination.limit || 100
                 },
                 sorts: [this.sorts]
             }
             if (this.$utils.isNotEmpty(this.typeId)) {
                 params.parameters[0].parameters[0].parameters.push({ key: 'Q^TYPE_ID_^S', value: this.typeId })
             }
-            // params.parameters[0].parameters[1].parameters = this.userList.map(i => ({ key: 'Q^create_by_^S', value: i.userId, relation: 'OR' }))
+            params.parameters[0].parameters[1].parameters = this.userList.map(i => ({ key: 'Q^create_by_^S', value: i.userId, param: this.$utils.guid() }))
             return params
         },
         // 处理分页事件

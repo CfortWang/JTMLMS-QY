@@ -1272,8 +1272,10 @@ export default {
          * 显示字段
          */
         setDisplayColumns (displayColumns, columns) {
+            const fields = ['di_dian_', 'bian_zhi_bu_men_', 'bian_zhi_shi_jian', 'bian_zhi_ren_', 'shi_fou_guo_shen_']
+            const allInIt = displayColumns.every(i => fields.includes(i.name))
             displayColumns.forEach((col) => {
-                //修改宽度
+                // 修改宽度
                 switch (col.name) {
                     case 'di_dian_':
                         col.width = '110'
@@ -1293,6 +1295,9 @@ export default {
                             col.width = '75'
                         }
                         break
+                }
+                if (allInIt) {
+                    displayColumns[displayColumns.length - 1].width = ''
                 }
                 const field = this.convertField(col)
                 const column = this.buildDisplayColumn(field)
