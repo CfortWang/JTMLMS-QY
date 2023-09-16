@@ -168,11 +168,11 @@ export default {
       ]
       this.listConfig.columns = [
         { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', minWidth: 100 },
-        { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 100  },
+        { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 100 },
         { prop: 'wen_jian_ming_che', label: '文件名称', minWidth: 150 },
-        { prop: 'ban_ben_', label: '版本' , width: 65 },
+        { prop: 'ban_ben_', label: '版本', width: 65 },
         { prop: 'fu_jian_', label: '查阅', slotName: "wenjinachayue", width: 150 },
-        { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom' , width: 100}
+        { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom', width: 100 }
       ]
     }
     if (this.$route.name == 'wjkzgl-ywyxjlsc' || this.$route.name == 'ywtxyxjl') {
@@ -211,6 +211,7 @@ export default {
       let start = ''
       //   console.log('this.$store.getters',this.$store.getters)
       let positionsDatas = this.$store.getters.userInfo.positions
+      console.log('getters', this.$store.getters)
       let needSelType = []
       if (this.$store.getters.userInfo.positions == 0) {
         this.$message({
@@ -265,6 +266,7 @@ export default {
           wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
         }
       }
+
       // 重复发放的文件，在权限表会存在重复的文件信息
       //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian 
       //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
@@ -276,7 +278,19 @@ export default {
       // 受限文件
       let authoritySql = `${selectSql}  t_wjxxb wj WHERE wj.shi_fou_guo_shen_ ='有效' and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
       let sqlArr = [comSql, buMenSql, authoritySql]
-      let oldRecordSql = `select * FROM t_ywyxjlb wj  LEFT JOIN lh_bm_ry ry ON ry.ry_id = wj.bian_zhi_ren_ where wj.bian_zhi_ren_='${this.userId}' ${wheres1}  order by bian_zhi_shi_jian desc`
+      let oldRecordSql = ''
+      let buMenWhere = []
+      if (this.pageKey !== 'nbwj') {
+        if (this.$store.getters.deptList.length !== 0) {
+          for (var i of this.$store.getters.deptList) {
+            buMenWhere.push(`bian_zhi_bu_men_ like '%${i.positionId}%'`)
+          }
+          oldRecordSql = `select * FROM t_ywyxjlb wj where (${buMenWhere.join(' or ')}) ${wheres1}  order by bian_zhi_shi_jian desc`
+        } else {
+          console.log('没有部门组织')
+          return
+        }
+      }
       for (var i in Object.keys(this.fileTypesDatas)) {
         var key = Object.keys(this.fileTypesDatas)[i];   // key
         var value = this.fileTypesDatas[key];  // value 
