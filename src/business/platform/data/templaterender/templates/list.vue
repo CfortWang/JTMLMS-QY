@@ -1490,7 +1490,7 @@ export default {
                     field_options: fieldOptions
                 })
             } else if (fieldType === 'customDialog') {
-                const prop = `Q^${field.name}^S`
+                const prop = `Q^${field.name}^SL`
                 searchColumn = Object.assign(searchColumn, {
                     prop: prop,
                     modelValue: prop,
