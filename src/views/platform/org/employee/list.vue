@@ -318,10 +318,10 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
-            const { first = '' } = this.$store.getters.level
+            const { first = '', second = '' } = this.$store.getters.level
             const { isSuper = '', account = '' } = this.$store.getters
             const special = ['admin', 'jinyuan']
-            let t = { position: first }
+            let t = { position: second || first }
             if (special.includes(account) && isSuper) {
                 t = null
             }

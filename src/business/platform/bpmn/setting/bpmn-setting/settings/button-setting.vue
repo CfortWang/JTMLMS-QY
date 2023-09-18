@@ -112,7 +112,6 @@ export default {
         // }
         buttons: {
             get (v) {
-                console.log(this.data)
                 return this.data || []
             },
             set (value) {
