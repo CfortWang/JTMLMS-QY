@@ -8,6 +8,7 @@
                 <dv-decoration-8 class="right" :reverse="true" />
                 <div class="title">{{ titleName }}</div>
                 <div class="time">
+                    <ibpsTreeSelect v-model="selectData" :data="treeData" :props="props" :node-key="nodeKey" :clearable="clearable" style="width: 150px;margin-right: 30px;" />
                     <!-- <span>年度：</span> -->
                     <el-date-picker v-model="month" type="year" value-format="yyyy" format="yyyy" placeholder="日期选择" style="width: 120px" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
                 </div>
@@ -40,12 +41,23 @@ import screenfull from 'screenfull'
 import scientificBoxVue from './compontent/scientificBox.vue'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import indexFile from './js/index.js'
+import ibpsTreeSelect from '@/components/ibps-tree-select'
+import TreeUtils from '@/utils/tree'
 export default {
     name: 'index',
-    components: { scientificBoxVue },
+    components: { scientificBoxVue, ibpsTreeSelect },
     data () {
         return {
             titleName: '科研成果看板',
+            treeData: [],
+            clearable: true,
+            nodeKey: 'ID_',
+            selectData: '',
+            props: {
+                children: 'children',
+                label: 'NAME_'
+            },
+
             month: '',
             timer: '',
             timer2: '',
@@ -135,9 +147,26 @@ export default {
                 }
             },
             // ie.STATUS_= 'actived' and ie.ID_ != '1' and ie.ID_ != '-1' and ie.ID_ != '702117247933480960' and ie.ID_ != '1115242459127873536' and ie.ID_ != '1115242765924433920' and ie.GROUP_ID_ not like '%1041786072788369408%' GROUP BY ie.id_
-            likeParams: "ie.STATUS_= 'actived' and ie.ID_ != '1' and ie.ID_ != '-1' and ie.ID_ != '702117247933480960' and ie.ID_ != '1115242459127873536' and ie.ID_ != '1115242765924433920' and ie.GROUP_ID_ not like '%1041786072788369408%' GROUP BY ie.id_",
+            likeParams: "ie.STATUS_= 'actived' GROUP BY ie.id_",
 
             likeTongJi: `lei_xing_ = '统计'`
+        }
+    },
+    watch: {
+        selectData () {
+            if (this.selectData) {
+                const sqlData = `ie.POSITIONS_ like '%${this.selectData}%'`
+                const sqlData2 = `bian_zhi_bu_men_ like '%${this.selectData}%'`
+                this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
+                this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
+                this.getInit()
+                this.getKeYanChengGuoList()
+            } else {
+                this.getPosition().then((res) => {
+                    this.getInit()
+                    this.getKeYanChengGuoList()
+                })
+            }
         }
     },
     created () {
@@ -145,7 +174,8 @@ export default {
             this.allView()
         }
 
-        this.getPosition().then(res => {
+        this.getPositionList()
+        this.getPosition().then((res) => {
             this.getInit()
             this.getKeYanChengGuoList()
         })
@@ -159,6 +189,7 @@ export default {
         }, 1000 * 60 * 60)
         this.getCreate()
     },
+
     beforeDestroy () {
         if (screenfull.isFullscreen) {
             screenfull.toggle()
@@ -172,26 +203,43 @@ export default {
             return new Promise((resolve, reject) => {
                 let sqlData = ``
                 let sqlData2 = ``
-                const sql = `select ID_ from ibps_party_entity where party_type_ = 'position' and PATH_ like '%1136828146851512320%'`
-                curdPost('sql', sql).then((res2) => {
-                    if (res2.state === 200) {
-                        const datas = res2.variables.data
-                        if (datas.length > 0) {
-                            datas.forEach((item, index) => {
-                                if (index === 0) {
-                                    sqlData += `ie.POSITIONS_ like '%${item.ID_}%'`
-                                    sqlData2 += `bian_zhi_bu_men_ like '%${item.ID_}%'`
-                                } else {
-                                    sqlData += ` or ie.POSITIONS_ like '%${item.ID_}%'`
-                                    sqlData2 += ` or bian_zhi_bu_men_ like '%${item.ID_}%'`
-                                }
-                            })
-                            this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
-                            this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
+                // const sql = `select ID_ from ibps_party_entity where party_type_ = 'position' and PATH_ like '%1136828146851512320%'`
+                // curdPost('sql', sql).then((res2) => {
+                //     if (res2.state === 200) {
+                //         const datas = res2.variables.data
+                //         if (datas.length > 0) {
+                //             datas.forEach((item, index) => {
+                //                 if (index === 0) {
+                //                     sqlData += `ie.POSITIONS_ like '%${item.ID_}%'`
+                //                     sqlData2 += `bian_zhi_bu_men_ like '%${item.ID_}%'`
+                //                 } else {
+                //                     sqlData += ` or ie.POSITIONS_ like '%${item.ID_}%'`
+                //                     sqlData2 += ` or bian_zhi_bu_men_ like '%${item.ID_}%'`
+                //                 }
+                //             })
+                //             this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
+                //             this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
+                //         }
+                //         resolve()
+                //     }
+                // })
+                console.log(this.$store.getters.userInfo.employee.positions)
+                const positions = this.$store.getters.userInfo.employee.positions
+                const positionsList = positions.split(',')
+                if (positionsList.length > 0) {
+                    positionsList.forEach((item, index) => {
+                        if (index === 0) {
+                            sqlData += `ie.POSITIONS_ like '%${item}%'`
+                            sqlData2 += `bian_zhi_bu_men_ like '%${item}%'`
+                        } else {
+                            sqlData += ` or ie.POSITIONS_ like '%${item}%'`
+                            sqlData2 += ` or bian_zhi_bu_men_ like '%${item}%'`
                         }
-                        resolve()
-                    }
-                })
+                    })
+                    this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
+                    this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
+                }
+                resolve()
             })
         },
         // 初始化数据
@@ -394,6 +442,26 @@ export default {
                     this.jxjyxmxshdDataShow = true
                 }
             })
+        },
+
+        getPositionList () {
+            const first = this.$store.getters.level.first
+            const sql2 = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${first}%' and DEPTH_ > 2`
+            curdPost('sql', sql2).then((res2) => {
+                if (res2.state === 200) {
+                    const datas = res2.variables.data
+                    if (datas.length > 0) {
+                        this.treeData = this.toTree(datas)
+                    }
+                }
+            })
+        },
+        toTree (data) {
+            return TreeUtils.transformToTreeFormat(data, {
+                idKey: 'ID_',
+                pIdKey: 'PARENT_ID_',
+                childrenKey: 'children'
+            })
         }
     }
 }
@@ -464,7 +532,7 @@ export default {
             flex: 1;
             position: absolute;
             color: #ffffff;
-            left: 11%;
+            left: 3%;
         }
         .nextPage {
             width: 4%;
