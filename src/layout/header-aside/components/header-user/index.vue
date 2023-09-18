@@ -31,6 +31,7 @@
                     <ibps-icon name="home" class="ibps-mr-10" />
                     {{ $t('navbar.dashboard') }}
                 </el-dropdown-item> -->
+                
                 <el-dropdown-item v-if="!regOpen && $store.getters.isTenantAdmin !== true" command="userInfo">
                     <ibps-icon name="user" class="ibps-mr-10" />
                     {{ $t('navbar.userInfo') }}
@@ -53,9 +54,28 @@
                     <ibps-icon name="my-request" class="ibps-mr-10" />
                     {{ tenantid|optionsFilter(tenants,'name','id') }}
                 </el-dropdown-item>
-                <el-dropdown-item divided command="logout">
+                <el-dropdown-item command="logout">
                     <ibps-icon name="sign-out" class="ibps-mr-10" />
                     {{ $t('navbar.logOut') }}
+                </el-dropdown-item>
+                <el-dropdown-item divided disabled>
+                    <div class="title">
+                        <i class="el-icon-postcard" />地点
+                    </div>
+                    <!-- <div class="item">{{ locationName }}</div> -->
+                    <el-tag class="item" type="success">{{ locationName }}</el-tag>
+                    <template v-if="deptName.length">
+                        <div class="title">
+                            <i class="el-icon-postcard" />部门
+                        </div>
+                        <el-tag v-for="(item, index) in deptName" :key="Date.now() + Math.random() + index" class="item" type="info" size="small">{{ item }}</el-tag>
+                    </template>
+                    <template v-if="roleName.length">
+                        <div class="title">
+                            <i class="el-icon-postcard" />岗位
+                        </div>
+                        <el-tag v-for="(item, index) in roleName" :key="Date.now() + Math.random() + index" class="item" type="warning">{{ item }}</el-tag>
+                    </template>
                 </el-dropdown-item>
             </el-dropdown-menu>
         </el-dropdown>
@@ -91,7 +111,18 @@ export default {
         UserInfo
     },
     data () {
+        const { first = '', second = '' } = this.$store.getters.level
+        const { userList = [], deptList = [], userId = '' } = this.$store.getters
+        const t1 = deptList.find(i => i.positionId === first) || {}
+        const t2 = deptList.find(i => i.positionId === second) || {}
+        const locationName = second ? t1.positionName + t2.positionName : t1.positionName
+        const t3 = userList.find(i => i.userId === userId) || {}
+        const deptName = t3.positions ? deptList.filter(i => t3.positions.includes(i.positionName)).map(i => i.positionName) : []
+        const roleName = t3.roles ? t3.roles.split(',') : []
         return {
+            locationName,
+            deptName,
+            roleName,
             tenants: this.$store.getters.tenants,
             tenantid: this.$store.getters.tenantid,
             dropdownVisible: false,
@@ -199,3 +230,18 @@ export default {
     }
 }
 </script>
+<style lang="scss" scoped>
+    // .ibps-layout-header-user {
+        ::v-deep .el-dropdown-menu__item {
+            max-width: 110px;
+            .title {
+                line-height: 20px;
+                font-weight: 600;
+            }
+            .item {
+                line-height: 20px;
+                font-size: 12px;
+            }
+        }
+    // }
+</style>
