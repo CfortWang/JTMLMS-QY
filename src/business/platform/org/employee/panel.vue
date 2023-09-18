@@ -304,7 +304,15 @@ export default {
                     this.loading = false
                 })
             } else {
-                queryPageList(this.getFormatParams()).then(response => {
+                // 过滤数据
+                const { first = '', second = '' } = this.$store.getters.level
+                const { isSuper = '', account = '' } = this.$store.getters
+                const special = ['admin', 'jinyuan']
+                let t = { position: second || first }
+                if (special.includes(account) && isSuper) {
+                    t = null
+                }
+                queryPageList(this.getFormatParams(), t).then(response => {
                     this.loading = false
                     ActionUtils.handleListData(this, response.data)
                     this.setSelectRow()
