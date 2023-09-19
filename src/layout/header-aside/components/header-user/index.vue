@@ -31,7 +31,6 @@
                     <ibps-icon name="home" class="ibps-mr-10" />
                     {{ $t('navbar.dashboard') }}
                 </el-dropdown-item> -->
-                
                 <el-dropdown-item v-if="!regOpen && $store.getters.isTenantAdmin !== true" command="userInfo">
                     <ibps-icon name="user" class="ibps-mr-10" />
                     {{ $t('navbar.userInfo') }}
@@ -58,23 +57,23 @@
                     <ibps-icon name="sign-out" class="ibps-mr-10" />
                     {{ $t('navbar.logOut') }}
                 </el-dropdown-item>
-                <el-dropdown-item divided disabled>
-                    <div class="title">
-                        <i class="el-icon-postcard" />地点
+                <el-dropdown-item class="dropdown512" divided disabled>
+                    <div class="title512">
+                        <i class="el-icon-location" />地点
                     </div>
                     <!-- <div class="item">{{ locationName }}</div> -->
-                    <el-tag class="item" type="success">{{ locationName }}</el-tag>
+                    <el-tag class="item512" type="success">{{ locationName }}</el-tag>
                     <template v-if="deptName.length">
-                        <div class="title">
-                            <i class="el-icon-postcard" />部门
+                        <div class="title512">
+                            <i class="el-icon-office-building" />部门
                         </div>
-                        <el-tag v-for="(item, index) in deptName" :key="Date.now() + Math.random() + index" class="item" type="info" size="small">{{ item }}</el-tag>
+                        <el-tag v-for="(item, index) in deptName" :key="Date.now() + Math.random() + index" class="item512" type="info" size="small">{{ item }}</el-tag>
                     </template>
                     <template v-if="roleName.length">
-                        <div class="title">
+                        <div class="title512">
                             <i class="el-icon-postcard" />岗位
                         </div>
-                        <el-tag v-for="(item, index) in roleName" :key="Date.now() + Math.random() + index" class="item" type="warning">{{ item }}</el-tag>
+                        <el-tag v-for="(item, index) in roleName" :key="Date.now() + Math.random() + index" class="item512" type="warning">{{ item }}</el-tag>
                     </template>
                 </el-dropdown-item>
             </el-dropdown-menu>
@@ -232,15 +231,20 @@ export default {
 </script>
 <style lang="scss" scoped>
     // .ibps-layout-header-user {
-        ::v-deep .el-dropdown-menu__item {
+        .dropdown512 {
             max-width: 110px;
-            .title {
+            line-height: 24px;
+            padding: 0 5px 0 15px;
+            .title512 {
                 line-height: 20px;
-                font-weight: 600;
+                font-weight: 400;
+                color: #606266;
             }
-            .item {
-                line-height: 20px;
+            .item512 {
                 font-size: 12px;
+                height: 20px;
+                line-height: 18px;
+                padding: 0px 4px;
             }
         }
     // }
