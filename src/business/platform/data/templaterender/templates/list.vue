@@ -1296,7 +1296,8 @@ export default {
                         }
                         break
                 }
-                if (allInIt) {
+                // 所有字段都在fields范围内或最后一个字段在fields范围内时，去除最后一个字段的宽度
+                if (allInIt || fields.includes(displayColumns[displayColumns.length - 1].name)) {
                     displayColumns[displayColumns.length - 1].width = ''
                 }
                 const field = this.convertField(col)
