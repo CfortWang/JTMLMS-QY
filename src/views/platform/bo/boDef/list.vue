@@ -388,9 +388,10 @@ export default {
                     break
                 case 'synBoTable': // 同步表结构
                     ActionUtils.selectedRecord(selection).then((id) => {
-                        this.$confirm('是否同步表结构?', '消息', {
-                            confirmButtonText: '确定',
+                        this.$confirm(`<span style="color:#f56c6c; font-size: 18px; font-weight: 600;">同步表结构存在以下问题：</span><br>1.将用当前表编码去模糊查询，并将匹配到的第一个表结构同步到当前表。因此使用前请搜索当前表编码，确保结果只有一个，否则将表结构混乱！<br>2.同步表结构后数据表字段的编码长度将会被改变，涉及到的所有脚本及表单都需要进行调整。<br><span style="color:#f56c6c; font-size: 18px; font-weight: 600;">请谨慎操作！</span>`, '警告', {
+                            confirmButtonText: '确定同步',
                             cancelButtonText: '取消',
+                            dangerouslyUseHTMLString: true,
                             type: 'warning'
                         }).then(() => {
                             this.handlesynBoTable(id)

@@ -160,7 +160,6 @@ export default {
             return this.data
         },
         formVars () {
-            console.log(getSubjectRuleVars(this.boDefData, this.variables))
             return getSubjectRuleVars(this.boDefData, this.variables)
         }
     },

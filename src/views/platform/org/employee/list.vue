@@ -75,7 +75,15 @@ export default {
     },
     mixins: [CustomDataDisplayMixin],
     data () {
+        const { first = '', second = '' } = this.$store.getters.level
+        const { isSuper = '', account = '' } = this.$store.getters
+        const special = ['admin', 'jinyuan']
+        let level = second || first
+        if (special.includes(account) && isSuper) {
+            level = null
+        }
         return {
+            level,
             height: document.clientHeight,
             title: '',
             moreSearchTitle: '更多查询',
@@ -318,14 +326,7 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
-            const { first = '', second = '' } = this.$store.getters.level
-            const { isSuper = '', account = '' } = this.$store.getters
-            const special = ['admin', 'jinyuan']
-            let t = { position: second || first }
-            if (special.includes(account) && isSuper) {
-                t = null
-            }
-            queryPageList(this.getSearcFormData(), t).then((response) => {
+            queryPageList(this.getSearcFormData()).then((response) => {
                 response.data.dataResult.forEach(item => {
                     if (item.positions) {
                         // 转换岗位名
@@ -380,7 +381,13 @@ export default {
             if (this.moreSearchParams) {
                 Object.assign(params, this.moreSearchParams)
             }
-            return ActionUtils.formatParams(params, this.pagination, this.sorts)
+            const res = ActionUtils.formatParams(params, this.pagination, this.sorts)
+            if (this.level) {
+                res.customs = {
+                    position: this.level
+                }
+            }
+            return res
         },
         /**
          * 处理分页事件

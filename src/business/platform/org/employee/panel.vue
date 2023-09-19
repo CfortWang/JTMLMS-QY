@@ -135,7 +135,15 @@ export default {
         }
     },
     data () {
+        const { first = '', second = '' } = this.$store.getters.level
+        const { isSuper = '', account = '' } = this.$store.getters
+        const special = ['admin', 'jinyuan']
+        let level = second || first
+        if (special.includes(account) && isSuper) {
+            level = null
+        }
         return {
+            level,
             width: 200,
             dialogFormVisible: false, // 弹窗
             editId: '',
@@ -269,8 +277,8 @@ export default {
     },
     methods: {
         /**
-       * 加载数据
-       */
+         * 加载数据
+         */
         loadListData () {
             let type = this.partyType
             this.loading = true
@@ -304,15 +312,7 @@ export default {
                     this.loading = false
                 })
             } else {
-                // 过滤数据
-                const { first = '', second = '' } = this.$store.getters.level
-                const { isSuper = '', account = '' } = this.$store.getters
-                const special = ['admin', 'jinyuan']
-                let t = { position: second || first }
-                if (special.includes(account) && isSuper) {
-                    t = null
-                }
-                queryPageList(this.getFormatParams(), t).then(response => {
+                queryPageList(this.getFormatParams('1')).then(response => {
                     this.loading = false
                     ActionUtils.handleListData(this, response.data)
                     this.setSelectRow()
@@ -336,7 +336,7 @@ export default {
         /**
          * 获取查询条件格式化参数
          */
-        getFormatParams () {
+        getFormatParams (flag = '0') {
             const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             const key = this.partyType === 'org' ? 'orgId' : this.partyType === 'position' ? 'positionId' : this.partyType === 'role' ? 'roleId' : this.partyType === 'group' ? 'groupId' : ''
             if (this.showTree) {
@@ -357,10 +357,14 @@ export default {
             // if (this.$utils.isNotEmpty(this.currentOrgId)) {
             //   params['orgId'] = this.partyId || this.currentOrgId
             // }
-            return ActionUtils.formatParams(
-                params,
-                this.pagination,
-                this.sorts)
+            const res = ActionUtils.formatParams(params, this.pagination, this.sorts)
+            // 数据过滤
+            if (this.level && (flag === '1' || this.partyType === 'role')) {
+                res.customs = {
+                    position: this.level
+                }
+            }
+            return res
         },
         /**
          * 处理分页事件
