@@ -323,7 +323,7 @@ export default {
             if (actionName === 'agree') {
                 agree(params).then(response => {
                     this.handleResponse(actionName, loading, response)
-                    this.createSnapshot()
+                    // this.createSnapshot()
                 }).catch(() => {
                     loading.close()
                 })
@@ -369,6 +369,9 @@ export default {
                     this.agreeDialogVisible = false
                 } else if (actionName === 'rejectToPrevious' || actionName === 'rejectToStart' || actionName === 'reject') {
                     this.rejectDialogVisible = false
+                }
+                if (actionName === 'agree') {
+                    this.createSnapshot()
                 }
                 // 后置事件
                 this.afterScript(this.actionName, {

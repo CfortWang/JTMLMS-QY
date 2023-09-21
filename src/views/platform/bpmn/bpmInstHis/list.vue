@@ -266,9 +266,9 @@ export default {
                 columns: [
                     { prop: 'deptName', label: '部门', width: 90 },
                     { prop: 'procDefName', label: '表单名称', sortable: 'custom', formatter: this.replaceFormName, width: 250 },
-                    { prop: 'subject', label: '事务说明', formatter: this.getDesc, 'min-width': 300 },
+                    { prop: 'desc', label: '事务说明', 'min-width': 300 },
                     { prop: 'createBy', label: '编制人', width: 80, slotName: 'creator' },
-                    { prop: 'endTime', label: '完成时间', sortable: 'custom', dateFormat: 'yyyy-MM-dd hh:mm:ss', width: 150 }
+                    { prop: 'endTime', label: '完成时间', sortable: 'custom', width: 150 }
                 ],
                 rowHandle: {
                     actions: [
@@ -318,12 +318,12 @@ export default {
             return cellValue
         },
         // 截取事务说明字段内容
-        getDesc (row, column, cellValue, index) {
-            const hasDesc = cellValue.includes('#')
+        getDesc (str) {
+            const hasDesc = str.includes('#')
             if (!hasDesc) {
                 return ''
             }
-            return cellValue.split('#')[1]
+            return str.split('#')[1]
         },
         getInfo (val) {
             const arr = val.split('#')
@@ -348,6 +348,7 @@ export default {
                 dataResult.forEach(item => {
                     const temp = this.getInfo(item.subject)
                     item.deptName = temp ? temp.deptName : ''
+                    item.desc = this.getDesc(item.subject)
                 })
                 response.data.dataResult = dataResult
                 ActionUtils.handleListData(this, response.data)

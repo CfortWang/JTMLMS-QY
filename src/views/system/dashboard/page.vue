@@ -171,7 +171,7 @@
     import { StatisticsData, StatisticsSign } from '@/api/platform/system/jbdHome'
     import { getToken } from '@/utils/auth'
     import newHome from './components/new-home'
-    import Workbench from './components/workbench'
+    import Workbench from './components/workbench.vue'
     import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
     const _import = require('@/utils/util.import.' + process.env.NODE_ENV)

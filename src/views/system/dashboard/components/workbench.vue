@@ -143,6 +143,7 @@ export default {
         }
     },
     data () {
+        const fieldWidth = window.innerWidth > 1600 ? 150 : 120
         const { first = '', second = '' } = this.$store.getters.level || {}
         const level = second || first
         const { userList = [], deptList = [] } = this.$store.getters || {}
@@ -246,10 +247,10 @@ export default {
                     },
                     guide: {
                         forms: [
-                            { prop: 'suo_shu_xi_tong_', label: '子系统', fieldType: 'input' },
-                            { prop: 'gong_neng_mo_kuai', label: '功能模块', fieldType: 'input' },
+                            { prop: 'suo_shu_xi_tong_', label: '所属子系统', fieldType: 'input' },
+                            { prop: 'gong_neng_mo_kuai', label: '所属功能模块', labelWidth: 100, fieldType: 'input' },
                             { prop: 'biao_dan_ming_che', label: '记录表单', fieldType: 'input' },
-                            { prop: 'shi_wu_lei_xing_', label: '事务类型',fieldType: 'select', options: taskTypeOptions }
+                            { prop: 'shi_wu_lei_xing_', label: '事务类型', fieldType: 'select', options: taskTypeOptions }
                         ]
                     }
                 },
@@ -312,16 +313,16 @@ export default {
                     ],
                     guide: [
                         { prop: 'sn', label: '序号', width: 60 },
-                        { prop: 'sysName', label: '子系统', sortable: 'custom', width: 100 },
-                        { prop: 'module', label: '功能模块', width: 120 },
+                        { prop: 'sysName', label: '所属子系统', sortable: 'custom', width: 100 },
+                        { prop: 'module', label: '所属功能模块', width: fieldWidth },
                         { prop: 'tableName', label: '记录表单', width: 200 },
                         // { prop: 'tableNo', label: '表单编号', width: 100 },
-                        { prop: 'timing', label: '填写时机', minWidth: 120 },
+                        { prop: 'timing', label: '填写时机/记录频次', minWidth: fieldWidth },
                         { prop: 'taskType', label: '事务类型', tags: taskTypeOptions, width: 100 },
                         { prop: 'fileName', label: '程序文件', width: 160 },
-                        { prop: 'creator', label: '编制人', width: 120 },
-                        { prop: 'reviewer', label: '审核人', width: 120 },
-                        { prop: 'approver', label: '审批人', width: 120 }
+                        { prop: 'creator', label: '编制人', width: fieldWidth },
+                        { prop: 'reviewer', label: '审核人', width: fieldWidth },
+                        { prop: 'approver', label: '审批人', width: fieldWidth }
                     ]
                 }
             }
