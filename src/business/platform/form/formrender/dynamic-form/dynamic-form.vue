@@ -8,14 +8,14 @@
                     {{ formDef.name }}
                     <span v-if="formDef && formDef.flowName">{{ formDef.flowName }}</span>
                     <relevance-table
-                        v-if="titleList.length > 0 && formParams.formAttrs.customClass.includes('true')"
+                        v-if="titleList.length > 0 && (formParams.formAttrs.customClass && formParams.formAttrs.customClass.includes('true'))"
                         :list="titleList"
                         :form="form"
                         class="relevanceTable"
                     />
                     <Statis-or-record-table
-                        v-if="StaOrRec.length > 0"
-                        :StaOrRec="StaOrRec"
+                        v-if="record.length > 0"
+                        :list="record"
                         :form="form"
                     />
                 </div>
@@ -171,7 +171,7 @@
                 invalidFields: {},
                 activeStep: 0,
                 titleList: [],
-                StaOrRec: []
+                record: []
             }
         },
         computed: {
@@ -291,7 +291,7 @@
             //     }
             // }) 
             this.titleList = []
-            this.StaOrRec = []
+            this.record = []
         },
         methods: {
             /**
@@ -604,7 +604,7 @@
             },
             // 将对象参数传入， 进行渲染
             getStatisOrRecord(type) {
-                this.StaOrRec = type
+                this.record = type
             }
             /**
              * 获取表单字段的具体控件组件实例

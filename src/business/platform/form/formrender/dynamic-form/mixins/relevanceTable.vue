@@ -80,6 +80,7 @@ export default {
     justify-content: flex-end;
     .sin{
         margin: 5px;
+        cursor: pointer;
     }
 }
 </style>
