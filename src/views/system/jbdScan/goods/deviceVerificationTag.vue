@@ -52,10 +52,10 @@
                                             <div class="qianZhi">校准单位：</div>
                                             <div class="zuoJuZhong">{{ item.unit }}</div>
                                         </div>
-                                        <div class="lh" style="border-bottom: 0px;" v-if="item.range !== ''">
+                                        <!-- <div class="lh" style="border-bottom: 0px;" v-if="item.range !== ''">
                                             <div class="qianZhi">限用范围：</div>
                                             <div class="zuoJuZhong">{{ item.range }}</div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
 
@@ -168,7 +168,7 @@ export default {
                         prove: this.switchProve(item.she_bei_zhuang_ta),
                         slogan: this.switchSlogan(item.she_bei_zhuang_ta),
                         deviceStatus: item.she_bei_zhuang_ta,
-                        range: item.cai_gou_he_tong_,
+                        range: this.judgementVal(item.cai_gou_he_tong_)?item.cai_gou_he_tong_:"",
 
                         name: item.she_bei_ming_cheng_,
                         serial: item.she_bei_shi_bie_h,
@@ -182,6 +182,9 @@ export default {
 
                 this.list = list
             })
+        },
+        judgementVal(value){
+            return value != null && value != undefined
         },
         switchProve(status) {
             switch (status) {

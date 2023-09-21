@@ -9,7 +9,13 @@
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
 export default {
   data() {
-    const { first } = this.$store.getters.level
+    let levelInfos;
+    const { first, second } = this.$store.getters.level;
+    if (second) {
+      levelInfos = second
+    } else {
+      levelInfos = first
+    }
     return {
       props: {
         lazy: true,
@@ -36,7 +42,7 @@ export default {
           })
         }
       },
-      first
+      levelInfos
     };
   },
   mounted() {
@@ -55,7 +61,7 @@ export default {
       this.$emit("change-data", "xiLeiId", nodesInfo.value);
       this.$emit("change-data", "quanXianLeiXing", authority.chaYue);
       for (var i of authority.buMen) {
-        if (i[0] == this.first) {
+        if (i[0] == this.levelInfos || i[1] == this.levelInfos) {
           authorityBuMen.push(i[i.length - 1])
         }
       }

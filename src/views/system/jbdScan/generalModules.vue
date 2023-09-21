@@ -7,10 +7,12 @@
 <script>
 /* 共同调用类， 与脚本统一调用。*/
 import satisfaction from './satisfaction/satisfaction.vue'
+import approve from './approve/approve.vue'
 
 export default {
     components: {
-        satisfaction
+        satisfaction,
+        approve
     },
     props: {
         currentType: {

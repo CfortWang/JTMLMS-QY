@@ -16,7 +16,6 @@ export default {
                 const sql = `select * from t_myddcpzb where di_dian_ = '${second}' order by create_time_ desc LIMIT 1`
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
-                    console.log(data)
                     if (data.length > 0) {
                         const list = []
                         list.push('1.' + data[0].pei_zhi_1_)
@@ -133,7 +132,7 @@ export default {
                     },
                     textAlign: 'center',
                     left: '50%',
-                    top: '0px'
+                    top: '10px'
                 },
                 legend: {
                     orient: 'horizontal',
@@ -144,12 +143,6 @@ export default {
                     // itemWidth: 25,
                     // itemHeight: 14,
                     // itemGap: 10,
-                    // {
-                    //     name: '未完成',
-                    //     textStyle: {
-                    //         color: '#ff6347'
-                    //     }
-                    // },
                     data: legendData
                 },
                 series: [

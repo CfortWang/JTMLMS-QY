@@ -1,0 +1,102 @@
+{
+    "list1": [{
+        "name": "条款号",
+        "value": "tiao_kuan_hao_",
+        "width": "50"
+    },{
+        "name": "条款名称",
+        "value": "tiao_kuan_ming_ch",
+        "width": "50"
+    },{
+        "name": "状态",
+        "value": "shi_fou_guo_shen_",
+        "width": "50"
+    }],
+    "list2": [{
+        "name": "条款号",
+        "value": "tiao_kuan_hao_",
+        "width": "50"
+    },{
+        "name": "条款名称",
+        "value": "tiao_kuan_ming_ch",
+        "width": "50"
+    },{
+        "name": "状态",
+        "value": "shi_fou_guo_shen_",
+        "width": "50"
+    },{
+        "name": "实施部门",
+        "value": "zuZhangBnMen",
+        "width": "50"
+    },{
+        "name": "实施组长",
+        "value": "zuZhangName",
+        "width": "50"
+    }],
+    "list3": [{
+        "name": "条款号",
+        "value": "tiao_kuan_hao_",
+        "width": "50"
+    },{
+        "name": "条款名称",
+        "value": "tiao_kuan_ming_ch",
+        "width": "50"
+    },{
+        "name": "状态",
+        "value": "shi_fou_guo_shen_",
+        "width": "50"
+    },{
+        "name": "核查部门",
+        "value": "zuYuanPosiName",
+        "width": "50"
+    },{
+        "name": "核查人",
+        "value": "zuYuanName",
+        "width": "50"
+    },{
+        "name": "核查结果",
+        "value": "he_cha_jie_guo_",
+        "width": "50"
+    },{
+        "name": "核查情况说明",
+        "value": "he_cha_qing_kuang",
+        "width": "100"
+    }],
+    "list4": [{
+        "name": "条款号",
+        "value": "tiao_kuan_hao_",
+        "width": "50"
+    },{
+        "name": "条款名称",
+        "value": "tiao_kuan_ming_ch",
+        "width": "50"
+    },{
+        "name": "状态",
+        "value": "shi_fou_guo_shen_",
+        "width": "50"
+    },{
+        "name": "核查部门",
+        "value": "zuYuanPosiName",
+        "width": "50"
+    },{
+        "name": "核查人",
+        "value": "zuYuanName",
+        "width": "50"
+    },{
+        "name": "核查结果",
+        "value": "he_cha_jie_guo_",
+        "width": "50"
+    },{
+        "name": "核查情况说明",
+        "value": "he_cha_qing_kuang",
+        "width": "100"
+    },{
+        "name": "审核结论",
+        "value": "shen_he_",
+        "width": "50"
+    },{
+        "name": "审核原因",
+        "value": "shen_he_yuan_yin_",
+        "width": "100"
+    }]
+}

@@ -86,6 +86,11 @@ export default {
   },
   mixins: [FixHeight],
   data() {
+    let depArrs = []
+    const { deptList } = this.$store.getters
+    for (var i of deptList) {
+      depArrs.push(`wj.bian_zhi_bu_men_ like '${i.positionId}'`)
+    }
     return {
       treeData: [],
       show: '',
@@ -146,7 +151,8 @@ export default {
         comAuthority: [],
         buMenAuthority: [],
         authority: []
-      } // 存放所点击列表的分类信息
+      }, // 存放所点击列表的分类信息
+      depArrs
     }
   },
   created() {
@@ -272,9 +278,9 @@ export default {
       //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
       let selectSql = 'select wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_fang_shi_jian_  from'
       // 共用文件
-      let comSql = `${selectSql} t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' ${wheres1}`
+      let comSql = `${selectSql} t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' and (${this.depArrs.join(' or ')}) ${wheres1}`
       // 部门权限文件
-      let buMenSql = `${selectSql}  t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' ${wheres2}`
+      let buMenSql = `${selectSql}  t_wjxxb wj where wj.shi_fou_guo_shen_ in ('有效','使用') ${wheres2}`
       // 受限文件
       let authoritySql = `${selectSql}  t_wjxxb wj WHERE wj.shi_fou_guo_shen_ ='有效' and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
       let sqlArr = [comSql, buMenSql, authoritySql]
