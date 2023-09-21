@@ -43,7 +43,9 @@
                                 内审不符合项汇总表(CNAS)
                             </div>
                             <el-table :data="CNASTableData" :border="true" style="width: 90%; margin: 0 auto">
-                                <el-table-column prop="bu_fu_he_xiang_mi" label="不符合项描述" width="300" >
+                                <el-table-column type="selection"  width="1">
+                                </el-table-column>
+                                <el-table-column prop="bu_fu_he_xiang_mi" label="不符合项描述" width="250" >
                                     <template slot-scope="scope">
                                         {{ scope.row.bu_fu_he_xiang_mi}}
                                     </template>
@@ -68,7 +70,11 @@
                                         {{ scope.row.fu_ze_ren_ | emfiltes(employeeList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="bu_fu_he_cheng_du" label="不符合程度" width="80" />
+                                <el-table-column prop="bu_fu_he_cheng_du" label="不符合程度" width="80" > 
+                                    <template slot-scope="scope">
+                                        {{ scope.row.bu_fu_he_cheng_du}}
+                                    </template>
+                                </el-table-column>
                             </el-table>
                         </div>
                         <div class="table-echarts">
@@ -82,7 +88,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="CMAtable.length > 0">
+                    <div v-if="false">
                         <div class="cma">
                             <div style="width: 90%; margin: 0 auto; line-height: 35px">
                                 内审不符合项汇总表(CMA)
@@ -1107,6 +1113,9 @@ export default {
     //   width: 400px;
     //   height: 300px;
     // }
+    .el-checkbox__inner{
+        display: none;
+    }
   }
 }
 </style>

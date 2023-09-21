@@ -161,7 +161,7 @@ export default {
             Promise.all([curdPost("sql", sql),curdPost("sql", personSql)]).then(([res1,res2])=>{
                 const { data } = res1.variables || []
                 const personData = res2.variables.data || []
-                // console.log(data)
+                console.log(data)
                 // console.log(personData)
                 let list = []
                 data.forEach(item => {
@@ -169,7 +169,7 @@ export default {
                         prove: this.switchProve(item.she_bei_zhuang_ta),
                         slogan: this.switchSlogan(item.she_bei_zhuang_ta),
                         deviceStatus: item.she_bei_zhuang_ta,
-                        range: item.cai_gou_he_tong_,
+                        range: this.judgementVal(item.cai_gou_he_tong_)?item.cai_gou_he_tong_:"",
 
                         name: item.she_bei_ming_cheng_,
                         serial: item.she_bei_shi_bie_h,
@@ -178,10 +178,14 @@ export default {
                         verificationDate:item.bi_xu_she_shi_
                     }
                     list.push(o)
+                    console.log(o)
                 })
                 this.list = list
 
             })
+        },
+        judgementVal(value){
+            return value != null && value != undefined
         },
         switchProve(status) {
             switch (status) {

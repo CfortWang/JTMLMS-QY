@@ -123,8 +123,9 @@ export default {
     },
     async getTopBarData() {
       let this_ = this;
-      this.MiddleLeftPieViewList = {data: [],config: { idselector: "main" },rowNum: 7,color: [],
-};
+      let didian = "";
+      this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      this.MiddleLeftPieViewList = {data: [],config: { idselector: "main" },rowNum: 7,color: [],};
       this_.sheBeiDataShow = false;
       this.eBgRateData = { data: [], config: {} };
       this.sheBeiHeChaData = { data: [], config: {} };
@@ -136,16 +137,16 @@ export default {
       this.sheBeiweiHuData = {xData: [],data: [],config: { idselector: "" },};
       let sql =
       `select a.Equipments,a1.mony,b.addEquipments,c.testEquipments,c1.testNoEquipments,e.goodEquipments,f.scrapEquipments,g.limitedEquipments,h.weiHuNoEquipments,h1.weiHuEquipments  FROM  
-      (select COUNT(*) AS Equipments FROM t_sbdj) AS a, 
-      (select zi_chan_yuan_zhi_ AS mony FROM t_sbdj) AS a1, 
-      (select COUNT(*) AS addEquipments  FROM t_yqsbysb WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' AND shi_fou_guo_shen_ ='已完成') AS b,
-      (select COUNT(*) AS testNoEquipments FROM t_mjsbjdxzjhzb WHERE parent_id_ IN (select id_ FROM t_mjsbjdxzjh WHERE shi_fou_guo_shen_ ='已完成')) AS c1,    
-      (select COUNT(*) AS testEquipments FROM t_jyxtxzjgyzhqrjlb WHERE shi_fou_guo_shen_ ='已完成') AS c,  
-      (select COUNT(*) AS goodEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='使用') AS e,    
-      (select COUNT(*) AS scrapEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='停用' OR she_bei_zhuang_ta ='暂停使用') AS f,      
-      (select COUNT(*) AS limitedEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='报废') AS g,    
-      (select  COUNT(*) AS weiHuNoEquipments FROM t_mjsbwhjhzb WHERE parent_id_ IN (select id_ FROM t_mjsbwhjhb WHERE shi_fou_guo_shen_ ='已完成')) AS h,  
-      (select COUNT(*) AS weiHuEquipments  FROM t_mjsbwhbyjlby WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' AND shi_fou_guo_shen_ ='已完成') AS h1`
+      (select COUNT(*) AS Equipments FROM t_sbdj where di_dian_ = '${didian}') AS a, 
+      (select zi_chan_yuan_zhi_ AS mony FROM t_sbdj where  di_dian_ = '${didian}') AS a1, 
+      (select COUNT(*) AS addEquipments  FROM t_yqsbysb WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' AND shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS b,
+      (select COUNT(*) AS testNoEquipments FROM t_jyxtxzjgyzhqrjlb WHERE bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' or create_time_ LIKE '%${this_.month.slice(0,4)}%' and  di_dian_ = '${didian}') AS c1,    
+      (select COUNT(*) AS testEquipments FROM t_jyxtxzjgyzhqrjlb WHERE bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' and  shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS c,  
+      (select COUNT(*) AS goodEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='使用' and  di_dian_ = '${didian}') AS e,    
+      (select COUNT(*) AS scrapEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='停用' OR she_bei_zhuang_ta ='暂停使用' and  di_dian_ = '${didian}') AS f,      
+      (select COUNT(*) AS limitedEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='报废' and  di_dian_ = '${didian}') AS g,    
+      (select  COUNT(*) AS weiHuNoEquipments FROM t_mjsbwhbyjlby WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' or create_time_ LIKE '%${this_.month}%' and  di_dian_ = '${didian}') AS h,  
+      (select COUNT(*) AS weiHuEquipments  FROM t_mjsbwhbyjlby WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' AND shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS h1`
       await curdPost("sql", sql)
         .then((res) => {
           const data = res.variables.data;
@@ -255,14 +256,14 @@ export default {
           console.log(this_.sheBeiData,"1231231")
           this_.sheBeiDataShow = true;
           this_.zhuantaiEData.xData = ["计划检定/校准数","已完成检定/校准数",];
-          this_.zhuantaiEData.data.push(data[0].testNoEquipments);
-          this_.zhuantaiEData.data.push(data[0].testEquipments);
+          this_.zhuantaiEData.data.push(data[0].testNoEquipments==0?1:data[0].testNoEquipments);
+          this_.zhuantaiEData.data.push(data[0].testEquipments==0?1:data[0].testEquipments);
           this_.zhuantaiEData.config.title = "检定/校准设备完成图";
           this_.zhuantaiEData.config.idselector = "main3";
           //维护设备数柱状图
           this_.sheBeiweiHuData.xData = ["计划维护数", "已完成数"];
-          this_.sheBeiweiHuData.data.push(data[0].weiHuNoEquipments);
-          this_.sheBeiweiHuData.data.push(data[0].weiHuEquipments);
+          this_.sheBeiweiHuData.data.push(data[0].weiHuNoEquipments==0?1:data[0].weiHuNoEquipments);
+          this_.sheBeiweiHuData.data.push(data[0].weiHuEquipments==0?1:data[0].weiHuEquipments);
           this_.sheBeiweiHuData.config.title = "设备维护柱状图";
           this_.sheBeiweiHuData.config.idselector = "mainWeiHuZ";
           let objRate = {};
@@ -309,7 +310,9 @@ export default {
     },
     async getCarouselShiYonglvTable() { //设备建档信息
       let this_ = this;
-      const sql = `select a.she_bei_shi_bie_h,a.she_bei_ming_cheng_,a.cun_fang_di_dian_,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a JOIN ibps_party_employee AS b ON a.guan_li_ren_ = b.ID_`;
+      let didian = "";
+      this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      const sql = `select a.she_bei_shi_bie_h,a.she_bei_ming_cheng_,a.cun_fang_di_dian_,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a JOIN ibps_party_employee AS b ON a.guan_li_ren_ = b.ID_ where a.di_dian_ = '${didian}'`;
       let data1 = [];
       let res1 = [];
       this_.shiyonglvConfig.data = [];
@@ -349,7 +352,9 @@ export default {
         data: [],
       };
       let this_ = this;
-      const sql ="select * from t_sbdj where she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用'";
+      let didian = "";
+      this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      const sql =`select * from t_sbdj where (she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') and  di_dian_ = '${didian}'`;
       let data1 = [];
       await curdPost("sql", sql)
         .then((res) => {
@@ -370,6 +375,7 @@ export default {
     getAllMonyInt(monyArr) {
       let mony = 0;
       let filterMony;
+      return //暂无资产
       monyArr.forEach((item) => {
         if (item.mony.includes("元")) {
           filterMony = item.mony.slice(0, item.mony.length - 1) * 1;

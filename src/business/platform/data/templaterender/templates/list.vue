@@ -246,6 +246,7 @@
             :obj="obj"
             @scanOff="scanOff"
         />
+        <generalModules v-if="generalShow" :general-show="generalShow" :current-type="currentType" :general-list="generalList" @generalClose="generalClose" />
         <print :show="showPrint" :list="printList" :type="printType" />
         <labelPrint :show="showPrintYi" :list="printList" :type="printType" />
 
@@ -315,6 +316,7 @@ import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
 import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
+import generalModules from '@/views/system/jbdScan/generalModules.vue'
 
 export default {
     name: 'list',
@@ -336,7 +338,8 @@ export default {
         importTable,
         Print: () => import('../components/print'),
         LabelPrint: () => import('../components/labelPrint'),
-        xlsxFile
+        xlsxFile,
+        generalModules
 
         // BpmnFormrender
         // DataTemplateFormat
@@ -438,7 +441,11 @@ export default {
             position: null,
             importList: [],
             importVlaue: null,
-            snapshotFile: ''
+            snapshotFile: '',
+
+            generalShow: false,
+            currentType: '',
+            generalList: []
         }
     },
     computed: {
@@ -804,6 +811,14 @@ export default {
         scanHandler (val) {
             this.scanVisible = true
             this.scanName = val
+        },
+        generalClick (val, list) {
+            this.currentType = val
+            this.generalList = list
+            this.generalShow = true
+        },
+        generalClose (val = false) {
+            this.generalShow = val
         },
         // /*按钮传参*/
         scanHandlerObj (val, obj) {

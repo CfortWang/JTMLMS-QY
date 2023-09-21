@@ -354,16 +354,18 @@ export default {
     },
     getRadioOptions() {
       this.type.authorityObject.buMen = ''
-      let sql = `select * FROM  ibps_party_entity WHERE party_type_='position' AND PATH_ IN (${this.$store.getters.level.first})`
-      curdPost('sql', sql).then(res => {
-        let datas = res.variables.data
-        let treeDatas = this.buildTree(datas, 'ID_', 'PARENT_ID_')
-        let tree = []
-        for (let i in treeDatas) {
-          tree.push(treeDatas[i])
-        }
-        this.cascaderOptions = tree
-      })
+      if (this.$store.getters.userId == '702117247933480960') {
+        let sql = `select * FROM  ibps_party_entity WHERE party_type_='position' `
+        curdPost('sql', sql).then(res => {
+          let datas = res.variables.data
+          let treeDatas = this.buildTree(datas, 'ID_', 'PARENT_ID_')
+          let tree = []
+          for (let i in treeDatas) {
+            tree.push(treeDatas[i])
+          }
+          this.cascaderOptions = tree
+        })
+      }
     },
     radioChangeHandle(h) {
       if (h == '部门查阅') {
