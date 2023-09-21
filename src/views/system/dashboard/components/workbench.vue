@@ -99,66 +99,24 @@ import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import ActionUtils from '@/utils/action'
 import { typeOptions } from '@/views/platform/system/news/constants'
 import NewsDetail from '@/views/platform/system/news/detail'
+import { tabList, taskState, stateOption, taskTypeOptions } from './workbench'
 
-const tabList = [
-    {
-        label: '待办事宜',
-        key: 'wait',
-        icon: 'el-icon-edit'
-    },
-    {
-        label: '已办事宜',
-        key: 'over',
-        icon: 'el-icon-document-remove'
-    },
-    {
-        label: '办结事宜',
-        key: 'finish',
-        icon: 'el-icon-paperclip'
-    },
-    {
-        label: '暂存事宜',
-        key: 'save',
-        icon: 'el-icon-receiving'
-    },
-    {
-        label: '通知公告',
-        key: 'news',
-        icon: 'el-icon-message'
-    }
-]
-const taskState = {
-    running: '已发起',
-    end: '已结束',
-    manualend: '人工结束'
-}
 const paramsType = {
     wait: 'temp.',
     over: '',
     finish: 'inst.',
     save: '',
-    news: ''
+    news: '',
+    guide: ''
 }
-const stateOption = {
-    wait: {
-        label: '待办理',
-        type: ''
-    },
-    soon: {
-        label: '即将超时',
-        type: 'warning'
-    },
-    overtime: {
-        label: '已超时',
-        type: 'danger'
-    }
-}
+
 const operate = {
     wait: pending,
     over: handledTask,
     finish: handledTask,
     save: myDraft,
-    news: newsList
+    news: newsList,
+    guide: ''
 }
 
 export default {
@@ -185,10 +143,40 @@ export default {
         }
     },
     data () {
-        const { first = '' } = this.$store.getters.level || {}
+        const { first = '', second = '' } = this.$store.getters.level || {}
+        const level = second || first
         const { userList = [], deptList = [] } = this.$store.getters || {}
+        const getGuide = ({ parameters, requestPage, sorts }) => {
+            // 获取查询字段
+            const params = parameters.reduce((acc, curr) => {
+                return `${acc} and ${curr.key} like '%${curr.value}%'`
+            }, '')
+            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver from t_bdbhpzb where sn_ + 0 > 0 and di_dian_ = '${level}' ${params} order by sn_ + 0 asc`
+            const { pageNo = 1, limit = 15 } = requestPage || {}
+            return new Promise((resolve, reject) => {
+                this.$common.request('sql', sql).then(res => {
+                    const { data = [] } = res.variables || {}
+                    const page = {
+                        limit,
+                        page: pageNo,
+                        totalCount: data.length,
+                        totalPages: Math.ceil(data.length / limit)
+                    }
+                    const result = {
+                        data: {
+                            dataResult: data.slice((pageNo - 1) * limit, pageNo * limit),
+                            pageResult: page
+                        }
+                    }
+                    resolve(result)
+                }).catch(error => {
+                    reject(error)
+                })
+            })
+        }
+        operate.guide = getGuide
         return {
-            first,
+            level,
             tabList,
             stateOption,
             userList,
@@ -255,6 +243,14 @@ export default {
                             { prop: 'Q^user_name_^SL', label: '发布人', fieldType: 'input' },
                             { prop: ['Q^public_date_^DL', 'Q^public_date_^DG'], label: '发布时间', fieldType: 'daterange' }
                         ]
+                    },
+                    guide: {
+                        forms: [
+                            { prop: 'suo_shu_xi_tong_', label: '子系统', fieldType: 'input' },
+                            { prop: 'gong_neng_mo_kuai', label: '功能模块', fieldType: 'input' },
+                            { prop: 'biao_dan_ming_che', label: '记录表单', fieldType: 'input' },
+                            { prop: 'shi_wu_lei_xing_', label: '事务类型',fieldType: 'select', options: taskTypeOptions }
+                        ]
                     }
                 },
                 toolbars: [
@@ -313,6 +309,19 @@ export default {
                         { prop: 'publicDate', label: '发布日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
                         { prop: 'loseDate', label: '有效截至日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
                         { prop: 'status', label: '发布状态', tags: typeOptions, width: 100 }
+                    ],
+                    guide: [
+                        { prop: 'sn', label: '序号', width: 60 },
+                        { prop: 'sysName', label: '子系统', sortable: 'custom', width: 100 },
+                        { prop: 'module', label: '功能模块', width: 120 },
+                        { prop: 'tableName', label: '记录表单', width: 200 },
+                        // { prop: 'tableNo', label: '表单编号', width: 100 },
+                        { prop: 'timing', label: '填写时机', minWidth: 120 },
+                        { prop: 'taskType', label: '事务类型', tags: taskTypeOptions, width: 100 },
+                        { prop: 'fileName', label: '程序文件', width: 160 },
+                        { prop: 'creator', label: '编制人', width: 120 },
+                        { prop: 'reviewer', label: '审核人', width: 120 },
+                        { prop: 'approver', label: '审批人', width: 120 }
                     ]
                 }
             }
@@ -467,8 +476,11 @@ export default {
             }
             if (this.activeTab === 'news') {
                 // 公告限制显示当前医院且状态为已发布的数据，过滤草稿及失效公告
-                params['Q^type_^SL'] = this.first
+                params['Q^type_^SL'] = this.level
                 params['Q^status_^SL'] = 'publish'
+            }
+            if (this.activeTab === 'guide') {
+                page.limit = 100
             }
             // const s = this.activeTab === 'news' ? this.sorts { 'PUBLIC_DATE_': 'DESC' } : this.sorts
             return ActionUtils.formatParams(params, page, this.sorts)
