@@ -89,7 +89,7 @@
         //   barData.push(e)
         // }
         //  let e=[this.data.t_ryywpxjlNum.number[0],this.data.t_ryywpxjlNum.numberAll[0],this.data.t_ryywpxjlNum.res[0]]
-        let e=100-this.data.t_mjsbjdxzjhzbNum.valna
+        let e=100-this.data.t_mjsbjdxzjhzbNum.val
 
 
 
@@ -114,8 +114,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_mjsbjdxzjhzbNum.valna, name: '检定完成率' },
-                { value: e, name: '检定未完成率' }
+                { value: this.data.t_mjsbjdxzjhzbNum.val, name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

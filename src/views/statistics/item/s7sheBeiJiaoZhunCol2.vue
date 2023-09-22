@@ -106,27 +106,32 @@
                           type: 'shadow'
                         },
                         formatter: function (datas) {
-                            var res=datas[0].name+"<BR>"+'完成:'+datas[0].value+"<BR>"
-                            res+='计划:'+datas[1].value+"<BR>"
-                            res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
+                          console.log(datas,'eeeeeeeeeeeeeeeeeeeeeeeeeeee')
+                            var res=datas[0].data.mz+"<BR>"+'完成:'+datas[0].data.wnum+"<BR>"
+                            res+='计划:'+datas[0].data.num+"<BR>"
+                            res+='百分比:'+(datas[0].data.num==null||datas[0].data.num==0?"0.00":(datas[0].data.wnum/datas[0].data.num*100).toFixed(2))+"%"
                             return res
                         }
           },
           legend: {},
           grid: {
-                        top: '10%',
-                        left: '3%',
-                        right: '4%',
-                        bottom: '5%',
-                        containLabel: true
-                    },
+              top: '10%',
+              left: '3%',
+              right: '4%',
+              bottom: '5%',
+              containLabel: true
+          },
+          dataset: {
+            dimensions: ['mz','num','wnum'],
+            source: this.data.t_mjsbjdxzjhzbNum.nummg
+          },
           xAxis: {
             type: 'value',
             boundaryGap: [0, 0.01]
           },
           yAxis: {
             type: 'category',
-            data: this.data.t_mjsbjdxzjhzbNum.name,
+            // data: this.data.t_mjsbjdxzjhzbNum.name,
             axisLabel: {
                 show: true, // 是否显示X轴的内容，不包含两端的文字
                 interval: 0,
@@ -152,7 +157,7 @@
           series: [
             {
               type: 'bar',
-              data: this.data.t_mjsbjdxzjhzbNum.number,
+              // data: this.data.t_mjsbjdxzjhzbNum.number,
               label: {
                 show: true,
                 position: 'right'
@@ -163,7 +168,7 @@
             },
             {
               type: 'bar',
-              data: this.data.t_mjsbjdxzjhzbNum.numberAll,
+              // data: this.data.t_mjsbjdxzjhzbNum.numberAll,
               label: {
                 show: true,
                 position: 'right'

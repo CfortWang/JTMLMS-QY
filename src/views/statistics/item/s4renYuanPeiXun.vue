@@ -49,7 +49,7 @@
     },
     data () {
       return {
-        title:'人员培训完成率',
+        title:'在岗人员培训计划完成率',
         dialogOff:false,
       }
     },
@@ -93,8 +93,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_ryywpxjlNum.res[0], name: '培训完成率' },
-                { value: e, name: '培训未完成率' }
+                { value: this.data.t_ryywpxjlNum.res[0], name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

@@ -48,7 +48,7 @@
     },
     data () {
       return {
-        title:'各个标准菌株期间核查数量',
+        title:'改进项类型数量统计',
         dialogOff:false,
       }
     },
@@ -67,116 +67,108 @@
       },
       drawLine(){
         let s16bzJunZhu = echarts.init(document.getElementById(this.id))
-         
-
+        var option;
+        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barNum = []
+        for (let i = 0; i < this.data.Num.title.length-1; i++) {
+          barNum.push({
+            type: 'bar',
+            itemStyle: {color: barColor[i]},
+            label:{
+              normal:{
+                show:true,
+                position:'top',
+                        
+                textStyle:{
+                  fontSize:16,
+                  color:'#B0CEFC'
+                }
+              }
+            }
+          })
           
-        // let beginInof = GetPercent(Number(this.data.t_sbhcjlbBegin.number),Number(this.data.t_sbhcjhBegin.number))
-        // let endInof = GetPercent(Number(this.data.t_sbhcjlbEnd.number),Number(this.data.t_sbhcjhEnd.number))
-         
-        //  let data1 = [];
-        //  data1.push(this.data.t_sbhcjhBegin.number);
-        //  data1.push(this.data.t_sbhcjhEnd.number);
-        //  let data2 = [];
-        //  data2.push(this.data.t_sbhcjlbBegin.number);
-        //  data2.push(this.data.t_sbhcjlbEnd.number);
-        //  let data3 = [];
-        //  data3.push(this.data.t_sbhcjlbBegin.date);
-        //  data3.push(this.data.t_sbhcjlbEnd.date);
-        //  let max1=GetMax(data1)+1;
-        //  let max2=GetMax(data2)+1;
-        //  let maxVal=max1>max2?max1:max2;
-        //  console.log("max1:",max1,"max2:",max2);
-       let option = {
-           //v3
-          title: {
+        }  
+        //v3
+        // let e=[this.data.t_bfhxbgyjzcsjlbxNum.numberAll[0],this.data.t_bfhxbgyjzcsjlbxNum.number[0]]
+        // let e=[this.data.t_mjsyshdfxsbykzjhxbNum.number[0],this.data.t_mjsyshdfxsbykzjhxbNum.numberAll[0],this.data.t_mjsyshdfxsbykzjhxbNum.res[0]]
+
+        option = {
+            title: {
             text: this.title,
             textStyle:{ fontSize:14,color: this.colorw }
+          },
+          // tooltip: {
+          //               trigger: 'axis',
+          //               axisPointer: {
+          //                 type: 'shadow'
+          //               },
+          //               formatter: function (datas) {
+          //                 // console.log(datas)
+          //                   var res=datas[0].name+"<BR>"+'期间核查次数:'+datas[0].data+"<BR>期间核查完成次数"+datas[1].data
+          //                   // res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
+          //                   return res
+          //               }
+          // },
+          // legend: {
+          //   textStyle: {
+          //       color: '#B0CEFC'  // 图例文字颜色
+          //   }
 
-            // subtext: this.data.Num.date+"年"
-          },
-          tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                          type: 'shadow'
-                        },
-                        formatter: function (datas) {
-                          // console.log(datas)
-                            var res=datas[0].name+"<BR>"+'期间核查次数:'+datas[0].data+"<BR>期间核查完成次数"+datas[1].data
-                            // res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
-                            return res
-                        }
-          },
-          legend: {},
+          // },
           grid: {
                 top: '10%',
                 left: '3%',
                 right: '4%',
                 bottom: '5%',
                 containLabel: true
-                    },
-          xAxis: {
-            type: 'value',
-            boundaryGap: [0, 0.01]
+          },
+          xAxis: { 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: '#fff'   //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:'#fff',
+                width:1, //x轴线的宽度
+              }
+            }
           },
           yAxis: {
-            type: 'category',
-            data: this.data.Num.name,
+            splitLine:{show: false},
             axisLabel: {
-                show: true, // 是否显示X轴的内容，不包含两端的文字
-                interval: 0,
-                // rotate: '50', // 旋转50°
-                lineHeight: 18,
-                // formatter: function(params) {
-                //   //  console.log('formatter', params, params.length)
-                //   var newParamsName = ''// 最终拼接成的字符串
-                //   var paramsNameNumber = params.length// 实际标签的个数
-                //   var provideNumber = 3// 每行能显示的字的个数
-                //   // 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
-                //   if (paramsNameNumber > provideNumber) {
-                //   // ********重点在这里********
-                //     newParamsName = params.substring(0, 3) + '..'// 最终拼成的字符串
-                //   } else { // 将旧标签的值赋给新标签
-                //     newParamsName = params
-                //   }
-                //   // 将最终的字符串返回
-                //   return newParamsName
-                // }
-              },
+              show: true,
+              textStyle: {
+                color: '#fff'    //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:'#fff',
+                width:1, //x轴线的宽度
+              }
+            }
           },
-          series: [
+          dataset: {
+            dimensions: this.data.Num.title,
+            source: this.data.Num.number
+          },
+          series: barNum,
+          dataZoom: [
             {
-              type: 'bar',
-              data: this.data.Num.number,
-              itemStyle: {color: '#006699'},
-              label: {
-                show: true,
-                position: 'right'
-              },
-            },
-            {
-              type: 'bar',
-              data: this.data.Num.numberAll,
-              itemStyle: {color: '#006633'},
-              label: {
-                show: true,
-                position: 'right'
-              },
-            },
-            // {
-            //   type: 'bar',
-            //   data: this.data.Num.numberAll
-            // },
+                id: 'dataZoomY',
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty'
+            }
           ],
-                dataZoom: [
-        {
-            id: 'dataZoomY',
-            type: 'inside',
-            yAxisIndex: [0],
-            filterMode: 'empty'
-        }
-      ],
        
-       };
+        };
+
 
        option && s16bzJunZhu.setOption(option);
       }

@@ -50,7 +50,7 @@
     },
     data () {
       return {
-        title:'检测任务完成数量',
+        title:'管理评审计划完成数量统计',
         dialogOff:false,
       }
     },
@@ -69,131 +69,9 @@
       },
       drawLine(){
         let s5zhiLiangMuBiao = echarts.init(document.getElementById(this.id))
-
-        // let data1 = [];
-        // data1.push(0);
-        // data1.push(0);
-        // let data2 = [];
-        // data2.push(83);
-        // data2.push(90);
-        // let data3 = [];
-        // data3.push(70);
-        // data3.push(60);
-        // let data4 = [];
-        // data4.push(2021);
-        // data4.push(2022);
-        // const posList = [
-        //   'left',
-        //   'right',
-        //   'top',
-        //   'bottom',
-        //   'inside',
-        //   'insideTop',
-        //   'insideLeft',
-        //   'insideRight',
-        //   'insideBottom',
-        //   'insideTopLeft',
-        //   'insideTopRight',
-        //   'insideBottomLeft',
-        //   'insideBottomRight'
-        // ];
-        // app.configParameters = {
-        //   rotate: {
-        //     min: -90,
-        //     max: 90
-        //   },
-        //   align: {
-        //     options: {
-        //       left: 'left',
-        //       center: 'center',
-        //       right: 'right'
-        //     }
-        //   },
-        //   verticalAlign: {
-        //     options: {
-        //       top: 'top',
-        //       middle: 'middle',
-        //       bottom: 'bottom'
-        //     }
-        //   },
-        //   position: {
-        //     options: posList.reduce(function (map, pos) {
-        //       map[pos] = pos;
-        //       return map;
-        //     }, {})
-        //   },
-        //   distance: {
-        //     min: 0,
-        //     max: 100
-        //   }
-        // };
-        // app.config = {
-        //   rotate: 90,
-        //   align: 'left',
-        //   verticalAlign: 'center',
-        //   position: 'bottom',
-        //   distance: 0,
-        //   onChange: function () {
-        //     const labelOption = {
-        //       rotate: app.config.rotate,
-        //       align: app.config.align,
-        //       verticalAlign: app.config.verticalAlign,
-        //       position: app.config.position,
-        //       distance: app.config.distance,
-        //       color:'#FE8463'
-        //     };
-        //     myChart.setOption({
-        //       series: [
-        //         {
-        //           label: labelOption
-        //         },
-        //         {
-        //           label: labelOption
-        //         },
-        //         {
-        //           label: labelOption
-        //         },
-        //         {
-        //           label: labelOption
-        //         }
-        //       ]
-        //     });
-        //   }
-        // };
-        // const labelOption = {
-        //   show: true,
-        //   position: app.config.position,
-        //   distance: app.config.distance,
-        //   align: app.config.align,
-        //   verticalAlign: app.config.verticalAlign,
-        //   rotate: app.config.rotate,
-        //   formatter: '{c}  {name|{a}}',
-        //   fontSize: 14,
-        //   rich: {
-        //       name: {
-        //           textBorderColor: '#fff'
-        //       }
-        //   },
-        //   color:'#FE8463'
-        // };
-        // let barData = []
-        // for (let i = 0; i < this.data.t_jchzbNum.date.length; i++) {
-        //   let e=[this.data.t_jchzbNum.date[i],this.data.t_jchzbNum.number[i],this.data.t_jchzbNum.numberAll[i]]
-        //   barData.push(e)
-        // }
-        // }
-
-        // let barData = []
-        // for (let i = 0; i < this.data.t_jchzbNum.date.length; i++) {
-          let e=[]
-          e=[this.data.t_jchzbNum.numberAll[0],this.data.t_jchzbNum.number[0]]
-          // if (this.data.t_jchzbNum.numberAll[i]===0) {
-          //   e =[this.data.t_jchzbNum.date[i], 0]
-          // } else {
-          //   e =[this.data.t_jchzbNum.date[i], Math.floor(this.data.t_jchzbNum.number[i]/this.data.t_jchzbNum.numberAll[i] * 10000) / 100]
-          // }
-          // barData.push(e)
-        // }
+        let e=[]
+        e=[this.data.t_jchzbNum.numberAll,this.data.t_jchzbNum.number]
+      
         let option = {
           //v3
           legend: {},
@@ -202,17 +80,35 @@
               axisPointer: {
                 type: 'shadow'
               },
-              // formatter: function (params) {
-              //   return params[0].data[0] + '<br/>满意份数：' + params[0].data[1] + '<br/>调查总份数: ' + params[0].data[2];
-              // }
             },
-            // dataset: {
-            //   source: barData
-            // },
             xAxis: { 
               type: 'category',
-              // data:['按时完成数', '有效任务数', '及时完成率']
-              data:['有效检测任务总数', '按时完成的检测项目数量数量']
+              data:['计划完成数', '计划未完成数量'],
+              // data:['有效检测任务总数', '及时完成的检测项目数量','未及时完成的检测项目数量','未完成的检测项目数量'],
+              axisLabel: {  
+                interval: 0,  
+                formatter:function(value){  
+                    var ret = "";//拼接加\n返回的类目项  
+                    var maxLength = 5;//每项显示文字个数  
+                    var valLength = value.length;//X轴类目项的文字个数  
+                    var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数  
+                    if (rowN > 1)//如果类目项的文字大于5,  
+                    {  
+                        for (var i = 0; i < rowN; i++) {  
+                            var temp = "";//每次截取的字符串  
+                            var start = i * maxLength;//开始截取的位置  
+                            var end = start + maxLength;//结束截取的位置  
+                      //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧  
+                            temp = value.substring(start, end) + "\n";  
+                            ret += temp; //凭借最终的字符串  
+                        }  
+                        return ret;  
+                    }  
+                    else {  
+                        return value;  
+                    }  
+                }  
+            } 
 
             },
             yAxis: [
@@ -220,24 +116,9 @@
                 type: 'value',
                 scale: true,
                 name: '数量',
-                max: this.data.t_jchzbNum.number[0]>this.data.t_jchzbNum.numberAll[0]?this.data.t_jchzbNum.number[0]+1:this.data.t_jchzbNum.numberAll[0]+1,
                 min: 0,
-                // boundaryGap: [0.2, 0.2]
               },
-              // {
-              //   type: 'value',
-              //   scale: true,
-              //   name: '任务及时完成率',
-              //   max: this.data.t_jchzbNum.res[0],
-              //   min: 0,
-              //   axisLabel: {
-              //     formatter: '{value} %'
-              //   }
-              // }
             ],
-            // Declare several bar series, each will be mapped
-            // to a column of dataset.source by default.
-            // series: [{ type: 'bar' }],
             series: [
               {
                 data: e,
@@ -262,128 +143,8 @@
             title: {
               text: this.title,
               textStyle:{ fontSize:14,color: this.colorw }
-
-              // subtext: "        "+beingDate+"-"+endDate
             },
-          //v2
-          //  legend: {},
-          //   tooltip: {
-          //     trigger: 'axis',
-          //     axisPointer: {
-          //       type: 'shadow'
-          //     },
-          //     formatter: function (params) {
-          //       return params[0].data[0] + '<br/>任务完成率：' + params[0].data[1];
-          //     }
-          //   },
-          //   dataset: {
-          //     source: barData
-          //   },
-          //   xAxis: { type: 'category' },
-          //   yAxis: {
-          //     type: 'value',
-          //     axisLabel: {
-          //       show: true,
-          //       textStyle:{color:'#000'},
-          //       interval: 'auto',
-          //       formatter: '{value} %'
-          //     },
-            
-          //   },
-          //   // Declare several bar series, each will be mapped
-          //   // to a column of dataset.source by default.
-          //   series: [{ type: 'bar',barWidth:50}],
-          //   grid: {
-          //     top: '20%',
-          //     left: '3%',
-          //     right: '4%',
-          //     bottom: '10%',
-          //     containLabel: true
-          //   },
-          //   title: {
-          //     text: this.title,
-          //     subtext: "        "+this.data.t_jchzbNum.date[0]+"-"+this.data.t_jchzbNum.date[this.data.t_jchzbNum.date.length-1]
-          //   },
-
-          //v1
-          // grid: {
-          //   top: '20%',
-          //   left: '3%',
-          //   right: '4%',
-          //   bottom: '10%',
-          //   containLabel: true
-          // },
-          // title: {
-          //   text: this.title,
-          //   subtext: "2021-2022年质量检测目标"
-          // },
-          // color : [
-          //   '#FE8463','#9BCA63','#FCCE10','#E87C25','#27727B',
-          //   '#FE8463','#9BCA63','#FAD860','#F3A43B','#60C0DD',
-          //   '#D7504B','#C6E579','#F4E001','#F0805A','#26C0C0'
-          // ],
-          // tooltip: {
-          //   trigger: 'axis',
-          //   axisPointer: {
-          //     type: 'shadow'
-          //   },
-          //   formatter: function (datas) {
-          //     var res='投诉处理率:'+datas[0].value+"%<BR>"
-          //     res+='满意度:'+datas[1].value+"%<BR>"
-          //     res+='培训完成率:'+datas[2].value+"%"
-          //     return res
-          //   }
-          // },
-          // legend: {show:false},
-          // xAxis: [
-          //   {
-          //     type: 'category',
-          //     axisTick: { show: false },
-          //     data: data4,
-          //     textStyle:{color:'#FE8463'},
-          //   }
-          // ],
-          // yAxis: [
-          //   {
-          //     type: 'value',
-          //     axisLabel: {
-          //       show: true,
-          //       textStyle:{color:'#000'},
-          //       interval: 'auto',
-          //       formatter: '{value} %'
-          //     },
-          //   }
-          // ],
-          // series: [
-          //   {
-          //     name: '投诉处理率',
-          //     type: 'bar',
-          //     barGap: 0,
-          //     label: labelOption,
-          //     emphasis: {
-          //       focus: 'series'
-          //     },
-          //     data: data1
-          //   },
-          //   {
-          //     name: '满意度',
-          //     type: 'bar',
-          //     label: labelOption,
-          //     emphasis: {
-          //       focus: 'series'
-          //     },
-          //     data:data2
-          //   },
-          //   {
-          //     name: '培训完成率',
-          //     type: 'bar',
-          //     label: labelOption,
-          //     emphasis: {
-          //       focus: 'series'
-          //     },
-          //     data:data3
-          //   }
-          // ]
+          
         };
         option && s5zhiLiangMuBiao.setOption(option);
       }

@@ -88,7 +88,7 @@
         // }
         //v3
         //  let e=[this.data.t_complaintNum.number[0],this.data.t_complaintNum.numberAll[0],this.data.t_complaintNum.res[0]]
-         let e=[this.data.t_complaintNum.number[0],this.data.t_complaintNum.numtong[0]]
+         let e=[this.data.t_complaintNum.numberAll,this.data.t_complaintNum.number]
         
 
         option = {
@@ -109,14 +109,14 @@
             xAxis: { 
               type: 'category',
               // data:['投诉总数', '委托总数', '客户投诉率']
-              data:['有效投诉总数','已通知总数']
+              data:['应急预案演练计划总数','应急预案演练计划已完成数']
             },
             yAxis: [
               {
                 type: 'value',
                 scale: true,
                 name: '次数',
-                max: this.data.t_complaintNum.number[0]>this.data.t_complaintNum.numtong[0]?this.data.t_complaintNum.number[0]+1:this.data.t_complaintNum.numtong[0]+1,
+                // max: this.data.t_complaintNum.number[0]>this.data.t_complaintNum.numtong[0]?this.data.t_complaintNum.number[0]+1:this.data.t_complaintNum.numtong[0]+1,
                 min: 0,
                 // boundaryGap: [0.2, 0.2]
               },

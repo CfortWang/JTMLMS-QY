@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -48,7 +49,7 @@
     },
     data () {
       return {
-        title:'不符合项数量',
+        title:'不符合项类型数量统计',
         dialogOff:false,
         measured:[]
       }
@@ -74,78 +75,105 @@
         // let beingDate=this.data.t_complaintBegin.date
         // let endDate=this.data.t_complaintEnd.date
         var option;
-
+        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barNum = []
+        for (let i = 0; i < this.data.t_bfhxbgyjzcsjlbxNum.title.length-1; i++) {
+          barNum.push({
+            type: 'bar',
+            itemStyle: {color: barColor[i]},
+            label:{
+              normal:{
+                show:true,
+                position:'top',
+                        
+                textStyle:{
+                  fontSize:16,
+                  color:'#B0CEFC'
+                }
+              }
+            }
+          })
+          
+        }  
         //v3
-        let e=[this.data.t_bfhxbgyjzcsjlbxNum.numberAll[0],this.data.t_bfhxbgyjzcsjlbxNum.number[0]]
+        // let e=[this.data.t_bfhxbgyjzcsjlbxNum.numberAll[0],this.data.t_bfhxbgyjzcsjlbxNum.number[0]]
         // let e=[this.data.t_mjsyshdfxsbykzjhxbNum.number[0],this.data.t_mjsyshdfxsbykzjhxbNum.numberAll[0],this.data.t_mjsyshdfxsbykzjhxbNum.res[0]]
 
         option = {
-            legend: {},
-            tooltip: {
-              trigger: 'axis',
-              axisPointer: {
-                type: 'shadow'
-              },
-              // formatter: function (params) {
-              //   return params[0].data[0] + '<br/>满意份数：' + params[0].data[1] + '<br/>调查总份数: ' + params[0].data[2];
-              // }
-            },
-            // dataset: {
-            //   source: barData
-            // },
-            xAxis: { 
-              type: 'category',
-              data:[ '不符合项开立总数','不符合项整改完成数量']
-              // data:['已完成', '总数量', '完成率']
-            },
-            yAxis: [
-              {
-                type: 'value',
-                scale: true,
-                name: '数量',
-                max: this.data.t_bfhxbgyjzcsjlbxNum.number[0]>this.data.t_bfhxbgyjzcsjlbxNum.numberAll[0]?this.data.t_bfhxbgyjzcsjlbxNum.number[0]+1:this.data.t_bfhxbgyjzcsjlbxNum.numberAll[0]+1,
-                min: 0,
-                // boundaryGap: [0.2, 0.2]
-              },
-              // {
-              //   type: 'value',
-              //   scale: true,
-              //   name: '完成率',
-              //   max: this.data.t_mjsyshdfxsbykzjhxbNum.res[0],
-              //   min: 0,
-              //   axisLabel: {
-              //     formatter: '{value} %'
-              //   }
-              // }
-            ],
-            series: [
-              {
-                data: e,
-                type: 'bar',
-                barWidth: '20%',
-
-                itemStyle: {
-                  color: '#c35566'
-                },
-                label: {
-                show: true,
-                position: 'top'
-              },
-              }
-            ],
-            grid: {
-              top: '20%',
-              left: '3%',
-              right: '4%',
-              bottom: '10%',
-              containLabel: true
-            },
             title: {
-              text: this.title,
-              textStyle:{ fontSize:14,color: this.colorw }
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
+          },
+          // tooltip: {
+          //               trigger: 'axis',
+          //               axisPointer: {
+          //                 type: 'shadow'
+          //               },
+          //               formatter: function (datas) {
+          //                 // console.log(datas)
+          //                   var res=datas[0].name+"<BR>"+'期间核查次数:'+datas[0].data+"<BR>期间核查完成次数"+datas[1].data
+          //                   // res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
+          //                   return res
+          //               }
+          // },
+          // legend: {
+          //   textStyle: {
+          //       color: '#B0CEFC'  // 图例文字颜色
+          //   }
 
-              // subtext: "        "+beingDate+"-"+endDate
+          // },
+          grid: {
+                top: '10%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
+          },
+          xAxis: { 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: '#fff'   //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:'#fff',
+                width:1, //x轴线的宽度
+              }
             }
+          },
+          yAxis: {
+            splitLine:{show: false},
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: '#fff'    //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:'#fff',
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          dataset: {
+            dimensions: this.data.t_bfhxbgyjzcsjlbxNum.title,
+            source: this.data.t_bfhxbgyjzcsjlbxNum.number
+          },
+          series: barNum,
+          dataZoom: [
+            {
+                id: 'dataZoomY',
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty'
+            }
+          ],
+       
         };
 
         option && s14bufuhexiang.setOption(option);

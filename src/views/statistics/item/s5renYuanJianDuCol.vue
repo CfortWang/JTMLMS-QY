@@ -68,110 +68,110 @@
       },
       drawLine(){
         let s5renYuanJianDu = echarts.init(document.getElementById(this.id))
-        let beginInof = GetPercent(Number(this.data.t_zljdssBegin.number),Number(this.data.t_zljdBegin.number))
-        let endInof = GetPercent(Number(this.data.t_zljdssEnd.number),Number(this.data.t_zljdEnd.number))
+        // let beginInof = GetPercent(Number(this.data.t_zljdssBegin.number),Number(this.data.t_zljdBegin.number))
+        // let endInof = GetPercent(Number(this.data.t_zljdssEnd.number),Number(this.data.t_zljdEnd.number))
 
-         let data1 = [];
-         data1.push(this.data.t_zljdBegin.number);
-         data1.push(this.data.t_zljdEnd.number);
-         let data2 = [];
-         data2.push(this.data.t_zljdssBegin.number);
-         data2.push(this.data.t_zljdssEnd.number);
-         let data3 = [];
-         data3.push(this.data.t_zljdssBegin.date);
-         data3.push(this.data.t_zljdssEnd.date);
-         const posList = [
-          'left',
-          'right',
-          'top',
-          'bottom',
-          'inside',
-          'insideTop',
-          'insideLeft',
-          'insideRight',
-          'insideBottom',
-          'insideTopLeft',
-          'insideTopRight',
-          'insideBottomLeft',
-          'insideBottomRight'
-        ];
-        app.configParameters = {
-          rotate: {
-            min: -90,
-            max: 90
-          },
-          align: {
-            options: {
-              left: 'left',
-              center: 'center',
-              right: 'right'
-            }
-          },
-          verticalAlign: {
-            options: {
-              top: 'top',
-              middle: 'middle',
-              bottom: 'bottom'
-            }
-          },
-          position: {
-            options: posList.reduce(function (map, pos) {
-              map[pos] = pos;
-              return map;
-            }, {})
-          },
-          distance: {
-            min: 0,
-            max: 100
-          }
-        };
-        app.config = {
-          rotate: 90,
-          align: 'left',
-          verticalAlign: 'middle',
-          position: 'bottom',
-          distance: 0,
-          onChange: function () {
-            const labelOption = {
-              rotate: app.config.rotate,
-              align: app.config.align,
-              verticalAlign: app.config.verticalAlign,
-              position: app.config.position,
-              distance: app.config.distance
-            };
-            myChart.setOption({
-              series: [
-                {
-                  label: labelOption
-                },
-                {
-                  label: labelOption
-                },
-                {
-                  label: labelOption
-                },
-                {
-                  label: labelOption
-                }
-              ]
-            });
-          }
-        };
-        const labelOption = {
-          show: true,
-          position: app.config.position,
-          distance: app.config.distance,
-          align: app.config.align,
-          verticalAlign: app.config.verticalAlign,
-          rotate: app.config.rotate,
-          formatter: '{c}  {name|{a}}',
-          fontSize: 16,
-          rich: {
-              name: {
-                  textBorderColor: '#fff'
-              }
-          }
-        };
+        //  let data1 = [];
+        //  data1.push(this.data.t_zljdBegin.number);
+        //  data1.push(this.data.t_zljdEnd.number);
+        //  let data2 = [];
+        //  data2.push(this.data.t_zljdssBegin.number);
+        //  data2.push(this.data.t_zljdssEnd.number);
+        //  let data3 = [];
+        //  data3.push(this.data.t_zljdssBegin.date);
+        //  data3.push(this.data.t_zljdssEnd.date);
+        //  const posList = [
+        //   'left',
+        //   'right',
+        //   'top',
+        //   'bottom',
+        //   'inside',
+        //   'insideTop',
+        //   'insideLeft',
+        //   'insideRight',
+        //   'insideBottom',
+        //   'insideTopLeft',
+        //   'insideTopRight',
+        //   'insideBottomLeft',
+        //   'insideBottomRight'
+        // ];
+        // app.configParameters = {
+        //   rotate: {
+        //     min: -90,
+        //     max: 90
+        //   },
+        //   align: {
+        //     options: {
+        //       left: 'left',
+        //       center: 'center',
+        //       right: 'right'
+        //     }
+        //   },
+        //   verticalAlign: {
+        //     options: {
+        //       top: 'top',
+        //       middle: 'middle',
+        //       bottom: 'bottom'
+        //     }
+        //   },
+        //   position: {
+        //     options: posList.reduce(function (map, pos) {
+        //       map[pos] = pos;
+        //       return map;
+        //     }, {})
+        //   },
+        //   distance: {
+        //     min: 0,
+        //     max: 100
+        //   }
+        // };
+        // app.config = {
+        //   rotate: 90,
+        //   align: 'left',
+        //   verticalAlign: 'middle',
+        //   position: 'bottom',
+        //   distance: 0,
+        //   onChange: function () {
+        //     const labelOption = {
+        //       rotate: app.config.rotate,
+        //       align: app.config.align,
+        //       verticalAlign: app.config.verticalAlign,
+        //       position: app.config.position,
+        //       distance: app.config.distance
+        //     };
+        //     myChart.setOption({
+        //       series: [
+        //         {
+        //           label: labelOption
+        //         },
+        //         {
+        //           label: labelOption
+        //         },
+        //         {
+        //           label: labelOption
+        //         },
+        //         {
+        //           label: labelOption
+        //         }
+        //       ]
+        //     });
+        //   }
+        // };
+        // const labelOption = {
+        //   show: true,
+        //   position: app.config.position,
+        //   distance: app.config.distance,
+        //   align: app.config.align,
+        //   verticalAlign: app.config.verticalAlign,
+        //   rotate: app.config.rotate,
+        //   formatter: '{c}  {name|{a}}',
+        //   fontSize: 16,
+        //   rich: {
+        //       name: {
+        //           textBorderColor: '#fff'
+        //       }
+        //   }
+        // };
 
         //v2
         // let barData = []
@@ -180,7 +180,7 @@
         //   barData.push(e)
         // }
         //v3
-         let e=[this.data.t_zljdNum.number[0],this.data.t_zljdNum.numberAll[0],this.data.t_zljdNum.res[0]]
+         let e=[this.data.t_zljdNum.number,this.data.t_zljdNum.numberAll]
 
         let option = {
           //v3
@@ -197,27 +197,27 @@
             // dataset: {
             //   source: barData
             // },
-            xAxis: { type: 'category',data:['已完成数量', '所有数量', '监督完成率']},
-            yAxis: [
+            xAxis: { type: 'category',data:['已完成数量', '所有数量']},
+            yAxis: 
               {
                 type: 'value',
                 scale: true,
                 name: '数量',
-                max: this.data.t_zljdNum.number[0]>this.data.t_zljdNum.numberAll[0]?this.data.t_zljdNum.number[0]+1:this.data.t_zljdNum.numberAll[0]+1,
+                // max: this.data.t_zljdNum.number[0]>this.data.t_zljdNum.numberAll[0]?this.data.t_zljdNum.number[0]+1:this.data.t_zljdNum.numberAll[0]+1,
                 min: 0,
                 // boundaryGap: [0.2, 0.2]
               },
-              {
-                type: 'value',
-                scale: true,
-                name: '监督完成率',
-                max: this.data.t_zljdNum.res[0],
-                min: 0,
-                axisLabel: {
-                  formatter: '{value} %'
-                }
-              }
-            ],
+              // {
+              //   type: 'value',
+              //   scale: true,
+              //   name: '监督完成率',
+              //   max: this.data.t_zljdNum.res[0],
+              //   min: 0,
+              //   axisLabel: {
+              //     formatter: '{value} %'
+              //   }
+              // }
+            
             // Declare several bar series, each will be mapped
             // to a column of dataset.source by default.
             // series: [{ type: 'bar' }],

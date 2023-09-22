@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+''"
@@ -38,12 +38,12 @@
               <br>
            <div class="dataCont" style="font-size: 14px;">
 
-          <el-divider content-position="left">{{data.Num.date}} 年度</el-divider>
+          <el-divider content-position="left">{{data.Num.date[0]}} ~ {{data.Num.date[1]}}</el-divider>
           <!-- <div v-for="(item,i) in data.Num.name" :key="i"> -->
               <!-- <el-divider content-position="left">{{data.Num.name[i]}}</el-divider> -->
-              能力验证计划完成次数 ：<el-tag>{{data.Num.valnum}} 次</el-tag>
+              外部质量评价计划完成次数 ：<el-tag>{{data.Num.number}} 次</el-tag>
               <br>
-              能力验证计划次数 ：<el-tag>{{data.Num.valAll}} 次</el-tag>
+              外部质量评价计划次数 ：<el-tag>{{data.Num.numberAll}} 次</el-tag>
               <br>
               <!-- 年度核查 ：<el-tag>{{data.Num.numberAll[i]}} 次</el-tag>
               <br> -->
@@ -86,6 +86,7 @@
           default:window.screen.height * 0.5 +'px'
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s10s10waiBuNengLiItem = () => import('../item/s10waiBuNengLi.vue')
@@ -112,6 +113,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

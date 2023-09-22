@@ -99,8 +99,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_bfhxbgyjzcsjlbxNum.res[0], name: '不符合项完成率' },
-                { value: e, name: '不符合项未完成率' }
+                { value: this.data.t_bfhxbgyjzcsjlbxNum.res[0], name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

@@ -77,7 +77,7 @@
 
         //v3
         // let e=[this.data.t_mjsyshdfxsbykzjhxbNum.number[0],this.data.t_mjsyshdfxsbykzjhxbNum.numberAll[0],this.data.t_mjsyshdfxsbykzjhxbNum.res[0]]
-        let e = 100 -this.data.t_mjsyshdfxsbykzjhxbNum.res[0]
+        let e = 100 -this.data.t_mjsyshdfxsbykzjhxbNum.val
 
 
         option = {
@@ -99,8 +99,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_mjsyshdfxsbykzjhxbNum.res[0], name: '风险控制已完成率' },
-                { value: e, name: '风险控制未完成率' }
+                { value: this.data.t_mjsyshdfxsbykzjhxbNum.val, name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

@@ -55,7 +55,7 @@
     },
     data () {
       return {
-        title:'检测任务完成率',
+        title:'管理评审计划完成情况',
         dialogOff:false,
       }
     },
@@ -86,7 +86,9 @@
           // }
           // barData.push(e)
         // }
-        let e = 100 -this.data.t_jchzbNum.res[0]
+        let e = 100 -this.data.t_jchzbNum.val
+        // let n = 100 -this.data.t_jchzbNum.res[1]
+        // let d = 100 -this.data.t_jchzbNum.res[2]
         let option = {
           title: {
             text: this.title,
@@ -97,7 +99,7 @@
           tooltip: {
             trigger: 'item'
           },
-          color:['#ffcc00','#66cc66'],
+          color:['#ffcc00','#66cc66','#999999'],
           series: [
             {
               type: 'pie',
@@ -106,8 +108,10 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_jchzbNum.res[0], name: '检测任完成率' },
-                { value: e, name: '检测任务未完成率' }
+                { value: this.data.t_jchzbNum.val, name: '完成率' },
+                { value: e, name: '未完成率' },
+                // { value: this.data.t_jchzbNum.res[2], name: '未完成率' },
+                // { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

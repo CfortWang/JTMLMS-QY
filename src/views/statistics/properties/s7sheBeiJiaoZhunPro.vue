@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+''"
@@ -44,15 +44,16 @@
         <el-aside style="border:0px;width: 30%; height: 700px;overflow: auto;">
               <br>
 
-          <div>{{data.t_mjsbjdxzjhzbNum.date}} 年度</div>
+          <div>{{data.t_mjsbjdxzjhzbNum.date[0]}} ~ {{data.t_mjsbjdxzjhzbNum.date[1]}} </div>
 
-          <div v-for="(item,i) in data.t_mjsbjdxzjhzbNum.name" :key="i">
-              <el-divider content-position="left">{{data.t_mjsbjdxzjhzbNum.name[i]}}</el-divider>
-              仪器已完成校准次数 ：<el-tag>{{data.t_mjsbjdxzjhzbNum.number[i]}} 次</el-tag>
+          <div v-for="(item,i) in data.t_mjsbjdxzjhzbNum.nummg" :key="i">
+              <el-divider content-position="left">{{data.t_mjsbjdxzjhzbNum.nummg[i].mz}}</el-divider>
+              仪器已完成校准次数 ：<el-tag>{{data.t_mjsbjdxzjhzbNum.nummg[i].wnum}} 次</el-tag>
               <br>
-              仪器计划校准次数 ：<el-tag>{{data.t_mjsbjdxzjhzbNum.numberAll[i]}} 次</el-tag>
+              仪器计划校准次数 ：<el-tag>{{data.t_mjsbjdxzjhzbNum.nummg[i].num}} 次</el-tag>
               <br>
-              校准完成率 ：<el-tag>{{data.t_mjsbjdxzjhzbNum.val[i]}} %</el-tag>
+              
+              校准完成率 ：<el-tag>{{data.t_mjsbjdxzjhzbNum.nummg[i].num==null||data.t_mjsbjdxzjhzbNum.nummg[i].num==0?"0.00":(data.t_mjsbjdxzjhzbNum.nummg[i].wnum/data.t_mjsbjdxzjhzbNum.nummg[i].num*100).toFixed(2)}} %</el-tag>
               <br>
             </div>
            <!-- <div class="dataCont" style="font-size: 14px;">
@@ -93,6 +94,7 @@
           default:window.screen.height * 0.4 +'px'
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s7sheBeiJiaoZhunItem = () => import('../item/s7sheBeiJiaoZhun.vue')
@@ -121,6 +123,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

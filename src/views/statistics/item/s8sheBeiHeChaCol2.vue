@@ -102,8 +102,8 @@
                         },
                         formatter: function (datas) {
                           console.log(datas)
-                            var res=datas[0].name+"<BR>"+'计划外核查:'+datas[0].data+"<BR>"
-                            res+='年度核查'+datas[1].data+"<BR>"
+                            var res=datas[0].data.mz+"<BR>"+'完成:'+datas[0].data.wnum+"<BR>"
+                            res+='计划:'+datas[0].data.num+"<BR>"
                             // res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
                             return res
                         }
@@ -116,13 +116,17 @@
                 bottom: '5%',
                 containLabel: true
                     },
+          dataset: {
+            dimensions: ['mz','num','wnum'],
+            source: this.data.t_sbhcjlbNum.nummg
+          },
           xAxis: {
             type: 'value',
             boundaryGap: [0, 0.01]
           },
           yAxis: {
             type: 'category',
-            data: this.data.t_sbhcjlbNum.name,
+            // data: this.data.t_sbhcjlbNum.name,
             axisLabel: {
                 show: true, // 是否显示X轴的内容，不包含两端的文字
                 interval: 0,
@@ -148,7 +152,7 @@
           series: [
             {
               type: 'bar',
-              data: this.data.t_sbhcjlbNum.number,
+              // data: this.data.t_sbhcjlbNum.number,
               label: {
                 show: true,
                 position: 'right'
@@ -159,7 +163,7 @@
             },
             {
               type: 'bar',
-              data: this.data.t_sbhcjlbNum.numberAll,
+              // data: this.data.t_sbhcjlbNum.numberAll,
               label: {
                 show: true,
                 position: 'right'

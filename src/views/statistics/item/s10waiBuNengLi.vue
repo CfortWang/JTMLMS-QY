@@ -48,7 +48,7 @@
     },
     data () {
       return {
-        title:'能力验证完成情况',
+        title:'外部质量评价完成情况',
         dialogOff:false,
       }
     },
@@ -86,7 +86,7 @@
         //  let max2=GetMax(data2)+1;
         //  let maxVal=max1>max2?max1:max2;
         //  console.log("max1:",max1,"max2:",max2);
-        let e = 100 -this.data.Num.valna
+        let e = 100 -this.data.Num.val
         console.log(e,'eeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
 
        let option = {
@@ -109,8 +109,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.Num.valna, name: '能力验证完成率' },
-                { value: e, name: '能力验证未完成率' }
+                { value: this.data.Num.val, name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

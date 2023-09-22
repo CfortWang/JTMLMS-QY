@@ -95,7 +95,10 @@
            this.$options.components.s11biaoZhunWuItem = () => import('../item/s11biaoZhunWu.vue')
            this.$options.components.s11biaoZhunWuCItem = () => import('../item/s11biaoZhunWuCol.vue')
            this.$options.components.s11biaoZhunWuC2Item = () => import('../item/s11biaoZhunWuCol2.vue')
-          },
+      },
+      mounted(){
+        console.log(this.data.Num)
+      },
 
     watch:{
      dialogOff: {

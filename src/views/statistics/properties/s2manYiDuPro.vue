@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog  v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+''"
@@ -37,14 +37,14 @@
         <!-- 参数页面列 -->
         <el-aside style="border:0px;width: 30%;">
            <div  class="dataCont" style="font-size: 14px;">
-              <el-divider content-position="left">{{data.t_khmydtjbNum.date}} 年度</el-divider>
-              评分得分 ：<el-tag>{{data.t_khmydtjbNum.number[0]}} </el-tag>
+              <el-divider content-position="left">{{data.t_khmydtjbNum.date[0]}} ~ {{data.t_khmydtjbNum.date[1]}}</el-divider>
+              年度内审计划完成数 ：<el-tag>{{data.t_khmydtjbNum.number}} </el-tag>
               <br>
-              有效问卷总分 ：<el-tag>{{data.t_khmydtjbNum.num}} </el-tag>
+              年度内审计划总数 ：<el-tag>{{data.t_khmydtjbNum.numberAll}} </el-tag>
               <br>
-              客户满意度 ：<el-tag>{{data.t_khmydtjbNum.res[0]}} %</el-tag>
+              年度内审计划完成率 ：<el-tag>{{data.t_khmydtjbNum.val}} %</el-tag>
               <br>
-              当前目标值 ：<el-tag>{{mubiao}}</el-tag>
+              <!-- 当前目标值 ：<el-tag>{{mubiao}}</el-tag> -->
               <br>
            </div>
            <!-- <div v-for="(item,i) in data.t_khmydtjbNum.date" :key="i">
@@ -86,6 +86,7 @@
           default:''
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s2manYiDuItem = () => import('../item/s2manYiDu.vue')
@@ -205,6 +206,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

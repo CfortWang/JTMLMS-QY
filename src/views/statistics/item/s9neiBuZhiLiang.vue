@@ -48,7 +48,7 @@
     },
     data () {
       return {
-        title:'质量控制完成率',
+        title:'内部比对实验计划完成率',
         dialogOff:false,
         measured:[]
       }
@@ -77,7 +77,7 @@
 
         //v3
         // let e=[this.data.t_complaintNum.number[0],this.data.t_complaintNum.numberAll[0],this.data.t_complaintNum.res[0]]
-        let e = 100 -this.data.t_mjzlkzxbNum.valna
+        let e = 100 -this.data.t_mjzlkzxbNum.val
 
         option = {
           title: {
@@ -98,8 +98,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_mjzlkzxbNum.valna, name: '质量控制计划完成率' },
-                { value: e, name: '质量控制计划未完成率' }
+                { value: this.data.t_mjzlkzxbNum.val, name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

@@ -37,11 +37,11 @@
         <el-aside style="border:0px;width: 30%;">
            <div class="dataCont" style="font-size: 14px;">
             <el-divider content-position="left">{{data.t_complaintNum.date}} 年度</el-divider>
-              投诉回复已完成数 ：<el-tag>{{data.t_complaintNum.number[0]}} 次</el-tag>
+              投诉回复已完成数 ：<el-tag>{{data.t_complaintNum.num48[0]}} 次</el-tag>
               <br>
-              有效投诉总次数 ：<el-tag>{{data.t_complaintNum.numberAll[0]}} 次</el-tag>
+              有效投诉总次数 ：<el-tag>{{data.t_complaintNum.number[0]}} 次</el-tag>
               <br>
-              投诉回复及时率 ：<el-tag>{{data.t_complaintNum.res[0]}} %</el-tag>
+              投诉回复及时率 ：<el-tag>{{data.t_complaintNum.res1[0]}} %</el-tag>
               <br>
               当前目标值 ：<el-tag>{{mubiao}}</el-tag>
               <br>

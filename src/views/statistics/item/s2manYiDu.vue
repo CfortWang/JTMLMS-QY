@@ -55,7 +55,7 @@
     },
     data () {
       return {
-        title:'客户满意度',
+        title:'年度内审计划完成率',
         dialogOff:false,
       }
     },
@@ -97,10 +97,10 @@
         //   barData.push(e)
         // }
         // let e=[this.data.t_khmydtjbNum.number[0],this.data.t_khmydtjbNum.numberAll[0],this.data.t_khmydtjbNum.res[0]]
-        let e=100-this.data.t_khmydtjbNum.res[0]
+        let e=100-this.data.t_khmydtjbNum.val
 
-        let beingDate=this.data.t_myddc2Begin.date
-        let endDate=this.data.t_myddc2End.date
+        // let beingDate=this.data.t_myddc2Begin.date
+        // let endDate=this.data.t_myddc2End.date
         let option = {
             title: {
             text: this.title,
@@ -120,8 +120,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_khmydtjbNum.res[0], name: '客户满意率' },
-                { value: e, name: '客户不满意率' }
+                { value: this.data.t_khmydtjbNum.val, name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

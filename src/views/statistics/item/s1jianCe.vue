@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <div class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -112,8 +113,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_mjjcbgNum.res[0], name: '检测报告差错率' },
-                { value: e, name: '检测报告正确率' }
+                { value: this.data.t_mjjcbgNum.res[0], name: '差错率' },
+                { value: e, name: '正确率' }
               ],
               emphasis: {
                 itemStyle: {

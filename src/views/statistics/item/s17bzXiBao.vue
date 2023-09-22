@@ -107,8 +107,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.Num.valna, name: '标准细胞期间核查完成率' },
-                { value: e, name: '标准细胞质期间核查未完成率' }
+                { value: this.data.Num.valna, name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

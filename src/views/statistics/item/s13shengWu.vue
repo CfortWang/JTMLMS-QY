@@ -104,8 +104,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_complaintNum.res1[0], name: '投诉回复及时率' },
-                { value: e, name: '投诉回复不及时率' }
+                { value: this.data.t_complaintNum.res1[0], name: '及时率' },
+                { value: e, name: '不及时率' }
               ],
               emphasis: {
                 itemStyle: {

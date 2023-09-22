@@ -247,7 +247,7 @@ export default {
                     },
                     guide: {
                         forms: [
-                            { prop: 'suo_shu_xi_tong_', label: '所属子系统', fieldType: 'input' },
+                            { prop: 'suo_shu_xi_tong_', label: '所属子系统', labelWidth: 100, fieldType: 'input' },
                             { prop: 'gong_neng_mo_kuai', label: '所属功能模块', labelWidth: 100, fieldType: 'input' },
                             { prop: 'biao_dan_ming_che', label: '记录表单', fieldType: 'input' },
                             { prop: 'shi_wu_lei_xing_', label: '事务类型', fieldType: 'select', options: taskTypeOptions }
@@ -313,7 +313,7 @@ export default {
                     ],
                     guide: [
                         { prop: 'sn', label: '序号', width: 60 },
-                        { prop: 'sysName', label: '所属子系统', sortable: 'custom', width: 100 },
+                        { prop: 'sysName', label: '所属子系统', width: 100 },
                         { prop: 'module', label: '所属功能模块', width: fieldWidth },
                         { prop: 'tableName', label: '记录表单', width: 200 },
                         // { prop: 'tableNo', label: '表单编号', width: 100 },
@@ -458,7 +458,7 @@ export default {
             // 数据、筛选条件初始化
             this.dataList = []
             this.selection = []
-            this.pagination = {}
+            this.pagination = { }
             this.getData(this.activeTab)
         },
         handleSortChange (sort) {
@@ -480,14 +480,20 @@ export default {
                 params['Q^type_^SL'] = this.level
                 params['Q^status_^SL'] = 'publish'
             }
+            let pageParams
             if (this.activeTab === 'guide') {
-                page.limit = 100
+                pageParams = { page: 1, limit: 100 }
+            } else {
+                pageParams = page
             }
             // const s = this.activeTab === 'news' ? this.sorts { 'PUBLIC_DATE_': 'DESC' } : this.sorts
-            return ActionUtils.formatParams(params, page, this.sorts)
+            return ActionUtils.formatParams(params, pageParams, this.sorts)
         },
         // 处理表格点击事件
         handleRowClick (data) {
+            if (this.activeTab === 'guide') {
+                return
+            }
             if (this.activeTab === 'news') {
                 this.newsId = data.id
                 this.newsDialogVisible = true

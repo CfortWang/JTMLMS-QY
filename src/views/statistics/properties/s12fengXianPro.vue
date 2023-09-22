@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+''"
@@ -35,12 +35,12 @@
       </el-aside>
         <!-- 参数页面列 -->
         <el-aside style="border:0px;width: 30%;">
-          <el-divider content-position="left">{{data.t_mjsyshdfxsbykzjhxbNum.date}} 年度</el-divider>
-            实验室活动风险识别与控制计划已完成数量 ：<el-tag>{{data.t_mjsyshdfxsbykzjhxbNum.number[0]}} 次</el-tag>
+          <el-divider content-position="left">{{data.t_mjsyshdfxsbykzjhxbNum.date[0]}} ~ {{data.t_mjsyshdfxsbykzjhxbNum.date[1]}} </el-divider>
+            实验室活动风险识别与控制计划已完成数量 ：<el-tag>{{data.t_mjsyshdfxsbykzjhxbNum.number}} 次</el-tag>
             <br>
-            实验室活动风险识别与控制计划总数 ：<el-tag>{{data.t_mjsyshdfxsbykzjhxbNum.numberAll[0]}} 次</el-tag>
+            实验室活动风险识别与控制计划总数 ：<el-tag>{{data.t_mjsyshdfxsbykzjhxbNum.numberAll}} 次</el-tag>
             <br>
-            实验室活动风险识别与控制计划完成率 ：<el-tag>{{data.t_mjsyshdfxsbykzjhxbNum.res[0]}} %</el-tag>
+            实验室活动风险识别与控制计划完成率 ：<el-tag>{{data.t_mjsyshdfxsbykzjhxbNum.val}} %</el-tag>
             <br>
           <!-- <div v-for="(item,i) in data.t_zljdNum.date" :key="i">
             <el-divider content-position="left">{{data.t_zljdNum.date[i]}} 年度</el-divider>
@@ -89,6 +89,7 @@
           default:window.screen.height * 0.5 +'px'
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s12fengXianItem = () => import('../item/s12fengXian.vue')
@@ -115,6 +116,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

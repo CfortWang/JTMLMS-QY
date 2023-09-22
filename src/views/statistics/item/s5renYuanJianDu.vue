@@ -49,7 +49,7 @@
     },
     data () {
       return {
-        title:'人员监督',
+        title:'岗前培训计划完成率',
         dialogOff:false,
       }
     },
@@ -92,8 +92,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_zljdNum.res[0], name: '监督完成率' },
-                { value: e, name: '监督未完成率' }
+                { value: this.data.t_zljdNum.res[0], name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

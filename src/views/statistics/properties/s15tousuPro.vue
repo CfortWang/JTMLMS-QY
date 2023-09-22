@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog  v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+''"
@@ -36,12 +36,12 @@
         <!-- 参数页面列 -->
         <el-aside style="border:0px;width: 30%;">
            <div class="dataCont" style="font-size: 14px;">
-            <el-divider content-position="left">{{data.t_complaintNum.date}} 年度</el-divider>
-              投诉总数次数 ：<el-tag>{{data.t_complaintNum.number[0]}} 次</el-tag>
+            <el-divider content-position="left">{{data.t_complaintNum.date[0]}} ~ {{data.t_complaintNum.date[1]}}</el-divider>
+              应急预案演练计划总数 ：<el-tag>{{data.t_complaintNum.numberAll}} 次</el-tag>
               <br>
-              投诉已通知次数 ：<el-tag>{{data.t_complaintNum.numtong[0]}} 次</el-tag>
+              应急预案演练计划已完成数 ：<el-tag>{{data.t_complaintNum.number}} 次</el-tag>
               <br>
-              客户投诉已通知率 ：<el-tag>{{data.t_complaintNum.res2[0]}} %</el-tag>
+              应急预案演练计划完成率 ：<el-tag>{{data.t_complaintNum.val}} %</el-tag>
             <br>
               <!-- <div v-for="(item,i) in data.t_complaintNum.number" :key="i">
                   <el-divider content-position="left">{{data.t_complaintNum.date[i]}} 年度</el-divider>
@@ -78,6 +78,7 @@
           default:window.screen.height * 0.5 +'px'
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s15tousuItem = () => import('../item/s15tousu.vue')
@@ -104,6 +105,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

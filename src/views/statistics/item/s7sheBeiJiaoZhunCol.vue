@@ -90,7 +90,7 @@
         // }
         //  let e=[this.data.t_ryywpxjlNum.number[0],this.data.t_ryywpxjlNum.numberAll[0],this.data.t_ryywpxjlNum.res[0]]
 
-        let e=[this.data.t_mjsbjdxzjhzbNum.valAll,this.data.t_mjsbjdxzjhzbNum.valnum]
+        let e=[this.data.t_mjsbjdxzjhzbNum.numberAll,this.data.t_mjsbjdxzjhzbNum.number]
         var option;
         option = {
           //v3
@@ -117,7 +117,7 @@
                 type: 'value',
                 scale: true,
                 name: '数量',
-                max: this.data.t_mjsbjdxzjhzbNum.valnum>this.data.t_mjsbjdxzjhzbNum.valAll?this.data.t_mjsbjdxzjhzbNum.valnum+1:this.data.t_mjsbjdxzjhzbNum.valAll+1,
+                // max: this.data.t_mjsbjdxzjhzbNum.valnum>this.data.t_mjsbjdxzjhzbNum.valAll?this.data.t_mjsbjdxzjhzbNum.valnum+1:this.data.t_mjsbjdxzjhzbNum.valAll+1,
                 min: 0,
               },
             ],

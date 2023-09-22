@@ -86,7 +86,7 @@
         //  let max2=GetMax(data2)+1;
         //  let maxVal=max1>max2?max1:max2;
         //  console.log("max1:",max1,"max2:",max2);
-        let e=[this.data.Num.valAll,this.data.Num.valnum]
+        let e=[this.data.Num.numberAll,this.data.Num.number]
 
        let option = {
            //v3
@@ -105,7 +105,7 @@
             // },
             xAxis: { 
               type: 'category',
-              data:['能力验证计划数量', '能力验证完成数量']
+              data:['外部质量评价计划数量', '外部质量评价完成数量']
 
             },
             yAxis: [
@@ -113,7 +113,7 @@
                 type: 'value',
                 scale: true,
                 name: '数量',
-                max: this.data.Num.valnum>this.data.Num.valAll?this.data.Num.valnum+1:this.data.Num.valAll+1,
+                // max: this.data.Num.valnum>this.data.Num.valAll?this.data.Num.valnum+1:this.data.Num.valAll+1,
                 min: 0,
               },
             ],

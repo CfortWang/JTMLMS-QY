@@ -91,11 +91,11 @@
         //   }
         //   barData.push(e)
         // }
-        let e=[this.data.t_khmydtjbNum.num,this.data.t_khmydtjbNum.number[0]]
+        let e=[this.data.t_khmydtjbNum.numberAll,this.data.t_khmydtjbNum.number]
         // let e=100-this.data.t_khmydtjbNum.res[0]
 
-        let beingDate=this.data.t_myddc2Begin.date
-        let endDate=this.data.t_myddc2End.date
+        // let beingDate=this.data.t_myddc2Begin.date
+        // let endDate=this.data.t_myddc2End.date
         let option = {
           //   title: {
           //   text: this.title,
@@ -146,14 +146,14 @@
             xAxis: { 
               type: 'category',
               // data:['满意份数', '调查份数', '满意度']
-              data:['有效问卷总分','评分得分']
+              data:['年度计划总数','已完成计划总数']
             },
             yAxis: [
               {
                 type: 'value',
                 scale: true,
                 name: '份数',
-                max: this.data.t_khmydtjbNum.number[0]>this.data.t_khmydtjbNum.numberAll[0]?this.data.t_khmydtjbNum.number[0]+1:this.data.t_khmydtjbNum.numberAll[0]+1,
+                // max: this.data.t_khmydtjbNum.number[0]>this.data.t_khmydtjbNum.numberAll[0]?this.data.t_khmydtjbNum.number[0]+1:this.data.t_khmydtjbNum.numberAll[0]+1,
                 min: 0,
                 // boundaryGap: [0.2, 0.2]
               },

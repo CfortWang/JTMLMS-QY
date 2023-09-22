@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+''"
@@ -44,13 +44,13 @@
         <el-aside style="border:0px;width: 30%; height: 700px;overflow: auto;">
               <br>
 
-          <div>{{data.t_sbhcjlbNum.date}} 年度</div>
+          <div>{{data.t_sbhcjlbNum.date[0]}} ~ {{data.t_sbhcjlbNum.date[1]}}</div>
 
-          <div v-for="(item,i) in data.t_sbhcjlbNum.name" :key="i">
-              <el-divider content-position="left">{{data.t_sbhcjlbNum.name[i]}}</el-divider>
-              计划外核查 ：<el-tag>{{data.t_sbhcjlbNum.number[i]}} 次</el-tag>
+          <div v-for="(item,i) in data.t_sbhcjlbNum.nummg" :key="i">
+              <el-divider content-position="left">{{data.t_sbhcjlbNum.nummg[i].mz}}</el-divider>
+              已维护 ：<el-tag>{{data.t_sbhcjlbNum.nummg[i].wnum}} 次</el-tag>
               <br>
-              年度核查 ：<el-tag>{{data.t_sbhcjlbNum.numberAll[i]}} 次</el-tag>
+              计划维护 ：<el-tag>{{data.t_sbhcjlbNum.nummg[i].num}} 次</el-tag>
               <br>
             </div>
            <!-- <div class="dataCont" style="font-size: 14px;">
@@ -91,6 +91,7 @@
           default:window.screen.height * 0.4 +'px'
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s8sheBeiHeChaItem = () => import('../item/s8sheBeiHeCha.vue')
@@ -118,6 +119,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

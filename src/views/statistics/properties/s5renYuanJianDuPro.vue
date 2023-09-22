@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+''"
@@ -37,10 +37,10 @@
         <el-aside style="border:0px;width: 30%;">
           <div class="dataCont" style="font-size: 14px;">
 
-            <el-divider content-position="left">{{data.t_zljdNum.date}} 年度</el-divider>
-              已完成监督数量 ：<el-tag>{{data.t_zljdNum.number[0]}} 次</el-tag>
+            <el-divider content-position="left">{{data.t_zljdNum.date[0]}} ~ {{data.t_zljdNum.date[1]}}</el-divider>
+              已完成培训数量 ：<el-tag>{{data.t_zljdNum.numberAll}} 次</el-tag>
               <br>
-              所有监督数量 ：<el-tag>{{data.t_zljdNum.numberAll[0]}} 次</el-tag>
+              所有培训数量 ：<el-tag>{{data.t_zljdNum.number}} 次</el-tag>
               <br>
               监督完成率 ：<el-tag>{{data.t_zljdNum.res[0]}} %</el-tag>
               <br>
@@ -92,6 +92,7 @@
           default:window.screen.height * 0.5 +'px'
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s5renYuanJianDuItem = () => import('../item/s5renYuanJianDu.vue')
@@ -118,6 +119,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

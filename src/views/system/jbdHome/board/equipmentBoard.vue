@@ -83,7 +83,7 @@ export default {
       sheBeiHeChaData: {},
       jianDingjiaoZhunSheBeiData: {},
       weiHuSheBeiData: {},
-      shiyonglvConfig: {header: ["编号","名称","存放位置","状态","保管人",],data: [],columnWidth: ["180","180","150","110","110"],rowNum: 7,},
+      shiyonglvConfig: {header: ["编号","名称","存放位置","状态","保管人",],data: [],columnWidth: ["110","230","180","110","110"],rowNum: 7,},
       bottomData: {},
       zhuantaiEData: {},
       sheBeiData: { xData: [], data: [], config: { idselector: "" } },
@@ -164,7 +164,7 @@ export default {
           obj.name = "停用/报废";
           this_.MiddleLeftPieViewList.data.push(obj);
           this_.MiddleLeftPieViewList.color = ["#339933", "#FFFF66", "#FF0033"];
-          this_.MiddleLeftPieViewList.config.title = "设备工作状态情况";
+          this_.MiddleLeftPieViewList.config.title = "设备各工作状态数量统计";
           this_.MiddleLeftPieViewList.config.idselector = "main2";
           obj = {};
           let result = [
@@ -251,7 +251,7 @@ export default {
           this_.sheBeiData.data.push(data[0].goodEquipments);
           // this_.sheBeiData.data.push(data[0].limitedEquipments);
           this_.sheBeiData.data.push(data[0].scrapEquipments);
-          this_.sheBeiData.config.title = "设备数量情况一览";
+          this_.sheBeiData.config.title = "设备完好情况";
           this_.sheBeiData.config.idselector = "main8";
           console.log(this_.sheBeiData,"1231231")
           this_.sheBeiDataShow = true;
@@ -287,7 +287,7 @@ export default {
           objweihu.name = "已维护数";
           this_.weiHuSheBeiData.data.push(objweihu);
           this_.weiHuSheBeiData.color = ["#5470c6", "#38a838"];
-          this_.weiHuSheBeiData.config.title = "设备维护完成率";
+          this_.weiHuSheBeiData.config.title = "设备维护完成情况";
           this_.weiHuSheBeiData.config.idselector = "mainWeiHu";
           //设备数检定校准
           let objJianding = {};
@@ -299,7 +299,7 @@ export default {
           objJianding.name = "已完成数";
           this_.jianDingjiaoZhunSheBeiData.data.push(objJianding);
           this_.jianDingjiaoZhunSheBeiData.color = ["#5470c6", "#38a838"];
-          this_.jianDingjiaoZhunSheBeiData.config.title = "设备检定/校准完成率";
+          this_.jianDingjiaoZhunSheBeiData.config.title = "设备检定/校准完成情况";
           this_.jianDingjiaoZhunSheBeiData.config.idselector = "mainJianDing";
           objRate = {};
           this_.topBarData = result;
@@ -347,7 +347,7 @@ export default {
     async getCarouselTable() {
       this.config = {
         header: ["设备名称", "编号", "状态"],
-        columnWidth: ["180","150", "70"],
+        columnWidth: ["220","110", "70"],
         rowNum: 6,
         data: [],
       };

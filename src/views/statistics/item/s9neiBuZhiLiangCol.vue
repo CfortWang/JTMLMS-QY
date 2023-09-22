@@ -74,12 +74,52 @@
         // let beingDate=this.data.t_complaintBegin.date
         // let endDate=this.data.t_complaintEnd.date
         var option;
-        let e = []
-        e.push(this.data.t_mjzlkzxbNum.val[0])
+        let e=[this.data.t_mjzlkzxbNum.numberAll,this.data.t_mjzlkzxbNum.number]
         //v3
         // let e=[this.data.t_complaintNum.number[0],this.data.t_complaintNum.numberAll[0],this.data.t_complaintNum.res[0]]
 
         option = {
+            legend: {},
+            tooltip: {
+              trigger: 'axis',
+              axisPointer: {
+                type: 'shadow'
+              },
+              // formatter: function (params) {
+              //   return params[0].data[0] + '<br/>满意份数：' + params[0].data[1] + '<br/>调查总份数: ' + params[0].data[2];
+              // }
+            },
+            // dataset: {
+            //   source: barData
+            // },
+            xAxis: { 
+              type: 'category',
+              data:['内部比对实验计划总数', '内部比对实验计划已完成数量']
+
+            },
+            yAxis: [
+              {
+                type: 'value',
+                scale: true,
+                name: '数量',
+                // max: this.data.t_sbhcjlbNum.valnum>this.data.t_sbhcjlbNum.valAll?this.data.t_sbhcjlbNum.valnum+1:this.data.t_sbhcjlbNum.valAll+1,
+                min: 0,
+              },
+            ],
+            series: [
+              {
+                data: e,
+                type: 'bar',
+                barWidth: '20%',
+                itemStyle: {
+                  color: '#0099ff'
+                },
+                label: {
+                  show: true,
+                  position: 'top'
+                },
+              }
+            ],
             grid: {
               top: '20%',
               left: '3%',
@@ -93,47 +133,6 @@
 
               // subtext: "        "+beingDate+"-"+endDate
             },
-            legend: {},
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                  type: 'shadow'
-                },
-                formatter: function (datas) {
-                    console.log(datas,'sdsdds')
-                    var res=datas[0].data[0]+"<BR>"+'已完成：'+datas[0].data[2]+"<BR>"
-                    res+='总计划：'+datas[0].data[1]+"<BR>"
-                    res+='百分比:'+(datas[0].data[1]==null||datas[0].data[1]==0?"0.00":(datas[0].data[2]/datas[0].data[1]*100).toFixed(2))+"%"
-                    return res
-                }
-            },
-            dataset: {
-                source: e
-            },
-            xAxis: { type: 'category' },
-            yAxis: {},
-            // Declare several bar series, each will be mapped
-            // to a column of dataset.source by default.
-            series: [{ 
-              type: 'bar',
-              itemStyle: {color: '#cccc33'},
-              barWidth: '20%',
-              label: {
-                show: true,
-                position: 'top'
-              },
-            },
-            { 
-              type: 'bar',
-              itemStyle: {color: '#66CCCC'},
-              barWidth: '20%',
-
-              label: {
-                show: true,
-                position: 'top'
-              },
-            }
-            ]
         };
 
         option && s9neibu.setOption(option);

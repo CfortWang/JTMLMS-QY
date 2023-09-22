@@ -89,8 +89,8 @@
         //   barData.push(e)
         // }
         //  let e=[this.data.t_ryywpxjlNum.number[0],this.data.t_ryywpxjlNum.numberAll[0],this.data.t_ryywpxjlNum.res[0]]
-         let e=[this.data.t_ryywpxjlNum.numberAll[0],this.data.t_ryywpxjlNum.number[0]]
-
+         let e=[this.data.t_ryywpxjlNum.numberAll,this.data.t_ryywpxjlNum.number]
+        //  console.log(this.data.t_ryywpxjlNum.numberAll,this.data.t_ryywpxjlNum.number,'577777777777777777777777777777777')
 
         var option;
         option = {
@@ -119,7 +119,7 @@
                 type: 'value',
                 scale: true,
                 name: '次数',
-                max: this.data.t_ryywpxjlNum.number[0]>this.data.t_ryywpxjlNum.numberAll[0]?this.data.t_ryywpxjlNum.number[0]+1:this.data.t_ryywpxjlNum.numberAll[0]+1,
+                // max: this.data.t_ryywpxjlNum.number[0]>this.data.t_ryywpxjlNum.numberAll[0]?this.data.t_ryywpxjlNum.number[0]+1:this.data.t_ryywpxjlNum.numberAll[0]+1,
                 min: 0,
                 // boundaryGap: [0.2, 0.2]
               },

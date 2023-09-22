@@ -86,7 +86,7 @@
         //  let max2=GetMax(data2)+1;
         //  let maxVal=max1>max2?max1:max2;
         //  console.log("max1:",max1,"max2:",max2);
-        let e=[this.data.t_sbhcjlbNum.valAll,this.data.t_sbhcjlbNum.valnum]
+        let e=[this.data.t_sbhcjlbNum.numberAll,this.data.t_sbhcjlbNum.number]
         let option = {
            //v3
           legend: {},
@@ -112,7 +112,7 @@
                 type: 'value',
                 scale: true,
                 name: '数量',
-                max: this.data.t_sbhcjlbNum.valnum>this.data.t_sbhcjlbNum.valAll?this.data.t_sbhcjlbNum.valnum+1:this.data.t_sbhcjlbNum.valAll+1,
+                // max: this.data.t_sbhcjlbNum.valnum>this.data.t_sbhcjlbNum.valAll?this.data.t_sbhcjlbNum.valnum+1:this.data.t_sbhcjlbNum.valAll+1,
                 min: 0,
               },
             ],

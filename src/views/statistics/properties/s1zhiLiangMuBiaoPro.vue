@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog  v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+''"
@@ -35,14 +35,12 @@
             <!-- 参数页面列 -->
             <el-aside style="border:0px;width: 30%;">
               <div class="dataCont" style="font-size: 14px;">
-                <el-divider content-position="left">{{data.t_jchzbNum.date}} 年度</el-divider>
-                按时完成的检测项目数量 ：<el-tag>{{data.t_jchzbNum.number[0]}} 次</el-tag>
+                <el-divider content-position="left">{{data.t_jchzbNum.date[0]}} ~ {{data.t_jchzbNum.date[1]}}</el-divider>
+                计划完成数量 ：<el-tag>{{data.t_jchzbNum.number}} 次</el-tag>
                 <br>
-                有效检测任务总数 ：<el-tag>{{data.t_jchzbNum.numberAll[0]}} 次</el-tag>
+             
+                计划总数 ：<el-tag>{{data.t_jchzbNum.numberAll}} 次</el-tag>
                 <br>
-                任务完成率 ：<el-tag>{{data.t_jchzbNum.res[0]}} %</el-tag>
-                <br>
-                当前目标值 ：<el-tag>{{mubiao}}</el-tag>
                 <br>
               </div>
               <!-- <div class="dataCont" style="font-size: 14px;">
@@ -98,6 +96,7 @@
           default:''
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s5zhiLiangMuBiaoItem = () => import('../item/s1zhiLiangMuBiao.vue')
@@ -124,6 +123,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

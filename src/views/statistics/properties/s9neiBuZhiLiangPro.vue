@@ -1,5 +1,5 @@
 <template>
-    <el-dialog
+    <el-dialog v-on:mouseenter.native="rollstopz()"
       :visible.sync="visible"
       ref="dialog"
       :title="title+'详情'"
@@ -36,12 +36,12 @@
         <!-- 参数页面列 -->
         <el-aside style="border:0px;width: 30%;">
            <div class="dataCont" style="font-size: 14px;">
-            <el-divider content-position="left">{{data.t_mjzlkzxbNum.date}} 年度</el-divider>
-              计划内质量控制完成数量 ：<el-tag>{{data.t_mjzlkzxbNum.number[1]}} 次</el-tag>
+            <el-divider content-position="left">{{data.t_mjzlkzxbNum.date[0]}} ~ {{data.t_mjzlkzxbNum.date[1]}}</el-divider>
+              计划内质量控制完成数量 ：<el-tag>{{data.t_mjzlkzxbNum.number}} 次</el-tag>
               <br>
-              计划内质量控制总数 ：<el-tag>{{data.t_mjzlkzxbNum.number[2]}} 次</el-tag>
+              计划内质量控制总数 ：<el-tag>{{data.t_mjzlkzxbNum.numberAll}} 次</el-tag>
               <br>
-              计划内质量控制完成率 ：<el-tag>{{data.t_mjzlkzxbNum.number[1]==null||data.t_mjzlkzxbNum.number[1]==0?"0.00":(data.t_mjzlkzxbNum.number[2]/data.t_mjzlkzxbNum.number[1]*100).toFixed(2)}} %</el-tag>
+              计划内质量控制完成率 ：<el-tag>{{data.t_mjzlkzxbNum.val}} %</el-tag>
               <br>
               <!-- <br>
               计划外质量控制计划完成数量 ：<el-tag>{{data.t_mjzlkzxbNum.numberAll[1]}} 次</el-tag>
@@ -86,6 +86,7 @@
           default:window.screen.height * 0.5 +'px'
         }
       },
+      inject:['rollstop'],
       beforeCreate: function () {
           // 官方文档给出的是require
            this.$options.components.s9neiBuZhiLiangItem = () => import('../item/s9neiBuZhiLiang.vue')
@@ -112,6 +113,10 @@
        // 关闭窗口
       handleClose(){
        this.$emit('close', false)
+      },
+      rollstopz(){
+        this.rollstop()
+        console.log("监听到了")
       }
     }
   }

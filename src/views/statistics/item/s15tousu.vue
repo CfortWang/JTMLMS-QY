@@ -48,7 +48,7 @@
     },
     data () {
       return {
-        title:'客户投诉已通知率',
+        title:'应急预案演练计划完成率',
         dialogOff:false,
         measured:[]
       }
@@ -88,7 +88,7 @@
         // }
         //v3
         //  let e=[this.data.t_complaintNum.number[0],this.data.t_complaintNum.numberAll[0],this.data.t_complaintNum.res[0]]
-        let e = 100-this.data.t_complaintNum.res2[0]
+        let e = 100-this.data.t_complaintNum.val
         option = {
           title: {
             text: this.title,
@@ -108,8 +108,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_complaintNum.res2[0], name: '投诉已完成率' },
-                { value: e, name: '投诉未完成率' }
+                { value: this.data.t_complaintNum.val, name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

@@ -113,8 +113,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_complaintNum.res[0], name: '客户投诉率' },
-                { value: e, name: '客户未投诉率' }
+                { value: this.data.t_complaintNum.res[0], name: '投诉率' },
+                { value: e, name: '未投诉率' }
               ],
               emphasis: {
                 itemStyle: {

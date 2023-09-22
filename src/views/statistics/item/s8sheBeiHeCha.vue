@@ -48,7 +48,7 @@
     },
     data () {
       return {
-        title:'设备期间核查完成情况',
+        title:'设备维护计划完成情况',
         dialogOff:false,
       }
     },
@@ -86,7 +86,7 @@
         //  let max2=GetMax(data2)+1;
         //  let maxVal=max1>max2?max1:max2;
         //  console.log("max1:",max1,"max2:",max2);
-       let e = 100 -this.data.t_sbhcjlbNum.valna
+       let e = 100 -this.data.t_sbhcjlbNum.val
 
        let option = {
            title: {
@@ -107,8 +107,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_sbhcjlbNum.valna, name: '设备期间核查完成率' },
-                { value: e, name: '设备期间核查未完成率' }
+                { value: this.data.t_sbhcjlbNum.val, name: '完成率' },
+                { value: e, name: '未完成率' }
               ],
               emphasis: {
                 itemStyle: {

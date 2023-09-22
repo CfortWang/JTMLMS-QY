@@ -76,7 +76,7 @@
         var option;
 
         //v3
-        let e=[this.data.t_mjsyshdfxsbykzjhxbNum.numberAll[0],this.data.t_mjsyshdfxsbykzjhxbNum.number[0]]
+        let e=[this.data.t_mjsyshdfxsbykzjhxbNum.numberAll,this.data.t_mjsyshdfxsbykzjhxbNum.numbe]
         // let e=[this.data.t_mjsyshdfxsbykzjhxbNum.number[0],this.data.t_mjsyshdfxsbykzjhxbNum.numberAll[0],this.data.t_mjsyshdfxsbykzjhxbNum.res[0]]
 
         option = {
