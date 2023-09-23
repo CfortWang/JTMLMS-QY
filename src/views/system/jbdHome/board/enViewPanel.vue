@@ -2,7 +2,7 @@
   <div class="test-content">
     <div class="title">
       <div class="title-center" style="font-size: 26px; color: #c12530">
-       实验室温湿度负压动态监控系统
+        实验室温湿度负压动态监控系统
       </div>
       <div class="info-right">
         <span style="color: #c12530; margin-right: 5px">采集时间:</span><span style="color: #276bcc; margin-right: 15px">{{ newTiMe }}</span>
@@ -13,7 +13,7 @@
       <div class="marquee-wrap" v-if="false">
         <div>
           <ul class="marquee-list" :class="{ 'animate-up': animateUp }" :style="{ width: btnShow ? '360px' : '0px' }">
-            <li v-for="(item, index) in envirListData" :key="index">
+            <li v-for="(item, index) in envirListData" :key="index" >
               <span>{{ item.deviceName }}</span> &nbsp;
               <span>{{ item.t1 | numToFixed }}</span>&nbsp; <span>{{ item.h1 | numToFixed }}</span>&nbsp; <span>{{ item.p1 | numToFixed }}</span>&nbsp;
             </li>
@@ -24,13 +24,12 @@
           </div>
         </div>
       </div>
-      <div class="mapShow">
+      <div class="mapShow" @click="dropCoordinate">
         <div class="mapurl"></div>
-        <div class="img-box" @click="mapEvent">
-          <img src="~@/views/statistics/img/laboratory.jpg" class="img" alt="" ref="wrap" />
-          <div ref="shijiku1" v-for="(item, index) in newweizhi" :key="index" :style="{ top: `${item.y}px`, left: `${item.x}px` }" :class="[ item.run != '1' ? item.ifshow == 'false' ? 'shiyanshi_false' : 'shiyanshi_success' : 'bggray',]">
-            <div class="contentshow">
-              <!-- <div :class="[item.ifshow == 'false' ? 'contentshow' : 'content']" v-show="item.run == 1"> -->
+        <div class="img-box" >
+          <img src="~@/assets/images/screen/laboratory.jpg" class="img" alt="" ref="wrap" />
+          <div ref="shijiku1" v-for="(item, index) in newweizhi" :key="index" :style="{ top: `${item.y}px`, left: `${item.x}px` }" :class="[item.run == '1' ? item.ifshow == 'false' ? 'shiyanshi_false' : 'shiyanshi_success' : 'bggray', ]">
+            <div :class="[item.ifshow == 'false' ? 'contentshow' : 'content']" v-show="item.run == 1">
               <div class="envir-conditoin" v-show="item.temp ? true : false">
                 温度:{{ item.temp|numToFixed }}
               </div>
@@ -61,7 +60,6 @@
 
 <script>
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
-import { number } from "echarts/lib/export";
 export default {
   name: "DataView",
   data() {
@@ -71,15 +69,59 @@ export default {
       envirListData: [],
       fullHeight: "",
       fullWidth: "",
-      list: [],
+      list: [
+        {
+          room: "*HAU01",
+          time: "2020-07-08 18:27:23",
+          temp: "20",
+        },
+        {
+          room: "*HAU01",
+          time: "2020-07-08 18:27:23",
+          temp: "20",
+        },
+        {
+          room: "*HAU01",
+          time: "2020-07-08 18:27:23",
+          temp: "20",
+        },
+        {
+          room: "*HAU01",
+          time: "2020-07-08 18:27:23",
+          temp: "20",
+        },
+        {
+          room: "*HAU01",
+          time: "2020-07-08 18:27:23",
+          temp: "20",
+        },
+      ],
       screen: [],
       x: 396,
       y: 453,
       newposition: [],
       newweizhi: [],
       newTiMe: "",
-      weizhi:[{ x: 463,y: 353},{ x: 863,y: 553},{ x: 163,y: 853},{ x: 663,y: 133}],
-      domsize: [{ width: 1560, height: 857, },],
+      weizhi: [
+        { x: 456, y: 179},
+        { x: 826, y: 179},
+        { x: 1200, y: 179},
+        { x: 1387, y: 179},
+        { x: 1675, y: 179},
+        { x:349, y:370},
+        { x:1462, y:365},
+        {x:360, y:570},
+        {x:225, y:704},
+        {x:398, y:704},
+        {x:1475, y:680},
+        {x:1475, y:725},
+      ],
+      domsize: [
+        {
+          width: 1560,
+          height: 857,
+        },
+      ],
       timelistData: [],
       ifshow: true,
       setIntervalDis: false,
@@ -94,8 +136,11 @@ export default {
     },
   },
   methods: {
+    dropCoordinate(e){
+      console.log(e.offsetX,e.offsetY,"坐标",e.clientX,e.clientY)
+    },
     envirData() {
-      let sqlString = "select * FROM DATA WHERE deviceName IN ('HAU01','HAU02','HAU03','HAU04','PAU01','PAU02')  ORDER BY saveTime DESC LIMIT 12";
+      let sqlString ="select * FROM DATA WHERE deviceName IN ('HAU01','HAU02','HAU03','HAU04','PAU01','PAU02')  ORDER BY saveTime DESC LIMIT 12";
       var this_ = this;
       curdPost("sql", sqlString).then((response) => {
         this_.envirListData = response.variables.data;
@@ -121,7 +166,7 @@ export default {
       if(s<10){
         s = '0' +s;
       }
-      return ( y + "-" + m.substring(m.length - 2, m.length) + "-" + d.substring(d.length - 2, d.length) + "  " + h + ":" + min + ":" + s );
+      return (y +"-" + m.substring(m.length - 2, m.length) + "-" + d.substring(d.length - 2, d.length) + "  " + h + ":" + min + ":" + s);
     },
     scrollAnimate() {
       let this_ = this;
@@ -149,7 +194,6 @@ export default {
       this.screenChange();
       this.mapChange();
     },
-    mapEvent(e) {},
     screenChange() {
       this.fullHeight = `${document.documentElement.clientHeight}`;
       const that = this;
@@ -160,39 +204,36 @@ export default {
         })();
       };
     },
-    mapChange() { //图片变动函数
+    mapChange() {//图片大小加载
       let this_ = this;
-      setTimeout(() => {
+      //1908 1000/843 
+      // setTimeout(() => { 
         var dom = document.getElementsByClassName("img");
+        // alert(this_.domsize[0].width,this_.domsize[0].height)
+         console.log(this_.domsize[0])
         this_.screen = [];
         this_.screen.push(dom[0].clientWidth);
         this_.screen.push(dom[0].clientHeight);
         this_.newweizhi = [];
         this_.weizhi.forEach((item, index) => {
-          this_.x = parseInt(
-            (item.x * this_.screen[0]) / this_.domsize[0].width
-          );
-          this_.y = parseInt((item.y * this_.screen[1]) / this_.domsize[0].height);
+          this_.x = parseInt((item.x * window.innerWidth) / this_.domsize[0].width/1.23);
+           this_.y = parseInt((item.y * window.innerHeight) / this_.domsize[0].height/1.075);
+          //  this_.x = item.x;
+          // this_.y = item.y;
           var newobj = {
-            x: "",
-            y: "",
+            x: this_.x,
+            y: this_.y,
             temp: "",
             humidness: "",
             airPressure: "",
             ifshow: "",
-            run: "",
+            run: "1",
           };
-          newobj.x = this_.x;
-          newobj.y = this_.y;
-          newobj.temp = "";
-          newobj.humidness = "";
-          newobj.airPressure = "";
-          newobj.ifshow = "";
           this_.newweizhi.push(newobj);
         });
-      }, 10);
+      // }, 0);
     },
-    setIntervalData() {//刷新频率
+    setIntervalData() { //刷新频率
       let this_ = this;
       var timer = setInterval(() => {
         if (this_.setIntervalDis == true) {
@@ -201,16 +242,15 @@ export default {
         }
         this_.screenChange();
         this_.mapChange();
-        this_.timeData();
-      }, 300000);
+        this_.dataLoad();
+      }, 300000); 
     },
     returnifShow(t, h, p, qiya, qiyaer) {
       let ifshow = "";
       let temp =  t.toFixed(2); //温度
       let humidness = Number(h.toFixed(2)) ; //湿度
       let airPressure = Number(p.toFixed(2)); //气压
-      if (temp > 999 || temp <= 0) {//不给予赋值
-        
+      if (temp > 999 || temp <= 0) { //不给予赋值
       } else if (temp >= 18 && temp <= 26) {
         ifshow = "true";
       } else {
@@ -222,7 +262,6 @@ export default {
       } else {
         ifshow = "false";
       }
-      console.log(airPressure > qiya, airPressure, qiya, qiyaer, "数据");
 
       if (airPressure >= 999) { //不给予赋值
       } else if (airPressure >= qiya && airPressure <= qiyaer && airPressure >0) {
@@ -233,491 +272,470 @@ export default {
        else {
         ifshow = "false";
       }
-
       return ifshow;
     },
 
-    timeData() {
+    async dataLoad() {  // 大屏数据列表赋值
       let this_ = this;
-      let enData = [
-        {temp:24,humidness:56,airPressure:12,run:1},
-        {temp:24,humidness:56,airPressure:12,run:1},
-        {temp:24,humidness:56,airPressure:12,run:1},
-        {temp:24,humidness:56,airPressure:12,run:1}
-      ]
-      // 大屏数据列表赋值
-      for(let i in enData){
-        let obj = {};
-        obj.temp = enData[i].temp; 
-        obj.humidness = enData[i].humidness;
-        obj.airPressure = enData[i].airPressure;
-        obj.run = enData[i].run;
-        obj.ifshow = this_.returnifShow(enData[i].temp,enData[i].humidness,enData[i].airPressure,-15,-35);
-        this.newweizhi.push(obj)
+      let zhi_wu_yi_run = "";
+      let time = new Date();
+      this_.newTiMe = time.toLocaleString().replace(/\//g, "-");
+      for(let i in this_.newweizhi){
+        this_.newweizhi[i].temp = 25;
+        this_.newweizhi[i].humidness = 65;
+        this_.newweizhi[i].airPressure = 65;
+        this_.newweizhi[i].run = "1";
+        this_.newweizhi[0].ifshow = true;
       }
-    //   let sql = "select * FROM DATA WHERE deviceName = 'HAU01'  ORDER BY saveTime DESC LIMIT 1"; //细胞的退更缓冲区域
-    //   await curdPost("sql", sql).then((res) => {
-    //     let data = res.variables.data;
-    //     this_.newweizhi[0].temp = data[0].t1;
-    //     this_.newweizhi[0].humidness = data[0].h1;
-    //     this_.newweizhi[0].airPressure = data[0].p6;
-    //     this_.newweizhi[0].run = data[0].run;
-    //     this_.newTiMe = this_.fmtDate(data[0].saveTime);
-    //     this_.newweizhi[0].ifshow = this_.returnifShow(
-    //       //细胞1
-    //       //数据范围校准
-    //       data[0].t1,
-    //       data[0].h1,
-    //       data[0].p6,
-    //       5,
-    //       9999
-    //     );
+      // let sql =  "select * FROM DATA WHERE deviceName = 'HAU01'  ORDER BY saveTime DESC LIMIT 1"; //细胞的退更缓冲区域
+      // await curdPost("sql", sql).then((res) => {
+      //   let data = res.variables.data;
+      //   this_.newweizhi[0].temp = data[0].t1;
+      //   this_.newweizhi[0].humidness = data[0].h1;
+      //   this_.newweizhi[0].airPressure = data[0].p6;
+      //   this_.newweizhi[0].run = data[0].run;
+      //   this_.newTiMe = this_.fmtDate(data[0].saveTime);
+      //   this_.newweizhi[0].ifshow = this_.returnifShow(
+      //     //细胞1数据范围校准
+      //     data[0].t1,
+      //     data[0].h1,
+      //     data[0].p6,
+      //     5,
+      //     9999
+      //   );
 
-    //     this_.newweizhi[1].temp = data[0].t2;
-    //     this_.newweizhi[1].humidness = data[0].h2;
-    //     this_.newweizhi[1].airPressure = data[0].p7;
-    //     this_.newweizhi[1].run = data[0].run;
-    //     this_.newweizhi[1].ifshow = this_.returnifShow(
-    //       ////细胞2
-    //       data[0].t2,
-    //       data[0].h2,
-    //       data[0].p7,
-    //       5,
-    //       9999
-    //     );
+      //   this_.newweizhi[1].temp = data[0].t2;
+      //   this_.newweizhi[1].humidness = data[0].h2;
+      //   this_.newweizhi[1].airPressure = data[0].p7;
+      //   this_.newweizhi[1].run = data[0].run;
+      //   this_.newweizhi[1].ifshow = this_.returnifShow(
+      //     ////细胞2
+      //     data[0].t2,
+      //     data[0].h2,
+      //     data[0].p7,
+      //     5,
+      //     9999
+      //   );
 
-    //     this_.newweizhi[2].temp = data[0].t3;
-    //     this_.newweizhi[2].humidness = data[0].h3;
-    //     this_.newweizhi[2].airPressure = data[0].p8;
-    //     this_.newweizhi[2].run = data[0].run;
-    //     this_.newweizhi[2].ifshow = this_.returnifShow(
-    //       //细胞三
-    //       data[0].t3,
-    //       data[0].h3,
-    //       data[0].p8,
-    //       5,
-    //       9999
-    //     );
-    //     this_.newweizhi[3].temp = data[0].t4;
-    //     this_.newweizhi[3].humidness = data[0].h4;
-    //     this_.newweizhi[3].airPressure = data[0].p9;
-    //     this_.newweizhi[3].run = data[0].run;
-    //     this_.newweizhi[3].ifshow = this_.returnifShow(
-    //       //细胞四
-    //       data[0].t4,
-    //       data[0].h4,
-    //       data[0].p9,
-    //       5,
-    //       9999
-    //     );
-    //     this_.newweizhi[14].airPressure = data[0].p1; //; 1更
-    //     this_.newweizhi[14].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p1,
-    //       10,
-    //       9999
-    //     );
-    //     this_.newweizhi[14].run = data[0].run;
+      //   this_.newweizhi[2].temp = data[0].t3;
+      //   this_.newweizhi[2].humidness = data[0].h3;
+      //   this_.newweizhi[2].airPressure = data[0].p8;
+      //   this_.newweizhi[2].run = data[0].run;
+      //   this_.newweizhi[2].ifshow = this_.returnifShow(
+      //     //细胞三
+      //     data[0].t3,
+      //     data[0].h3,
+      //     data[0].p8,
+      //     5,
+      //     9999
+      //   );
+      //   this_.newweizhi[3].temp = data[0].t4;
+      //   this_.newweizhi[3].humidness = data[0].h4;
+      //   this_.newweizhi[3].airPressure = data[0].p9;
+      //   this_.newweizhi[3].run = data[0].run;
+      //   this_.newweizhi[3].ifshow = this_.returnifShow(
+      //     //细胞四
+      //     data[0].t4,
+      //     data[0].h4,
+      //     data[0].p9,
+      //     5,
+      //     9999
+      //   );
+      //   this_.newweizhi[14].airPressure = data[0].p1; //; 1更
+      //   this_.newweizhi[14].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p1,
+      //     10,
+      //     9999
+      //   );
+      //   this_.newweizhi[14].run = data[0].run;
 
-    //     this_.newweizhi[15].airPressure = data[0].p3; //2更
-    //     this_.newweizhi[15].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p3,
-    //       5,
-    //       9999
-    //     );
-    //     this_.newweizhi[15].run = data[0].run;
-    //     this_.newweizhi[16].airPressure = data[0].p4; //退更缓冲
-    //     this_.newweizhi[16].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p4,
-    //       5,
-    //       9999
-    //     );
-    //     this_.newweizhi[16].run = data[0].run;
+      //   this_.newweizhi[15].airPressure = data[0].p3; //2更
+      //   this_.newweizhi[15].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p3,
+      //     5,
+      //     9999
+      //   );
+      //   this_.newweizhi[15].run = data[0].run;
+      //   this_.newweizhi[16].airPressure = data[0].p4; //退更缓冲
+      //   this_.newweizhi[16].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p4,
+      //     5,
+      //     9999
+      //   );
+      //   this_.newweizhi[16].run = data[0].run;
 
-    //     this_.newweizhi[17].airPressure = data[0].p1; //退更
-    //     this_.newweizhi[17].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p1,
-    //       10,
-    //       9999
-    //     );
-    //     this_.newweizhi[17].run = data[0].run;
-    //     this_.newweizhi[18].airPressure = data[0].p5; //万级洁净走廊
-    //     this_.newweizhi[18].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p5,
-    //       5,
-    //       9999
-    //     );
-    //     this_.newweizhi[18].run = data[0].run;
-    //   });
-    //   let sql1 =
-    //     "select * FROM DATA WHERE deviceName ='HAU02'  ORDER BY saveTime DESC LIMIT 1";
-    //   await curdPost("sql", sql1).then((res) => {
-    //     let data = res.variables.data;
-    //     this_.newweizhi[4].temp = data[0].t1; //分练区1
-    //     this_.newweizhi[4].humidness = data[0].h1;
-    //     this_.newweizhi[4].airPressure = data[0].p1;
-    //     this_.newweizhi[4].run = data[0].run;
-    //     this_.newweizhi[4].ifshow = this_.returnifShow(
-    //       data[0].t1,
-    //       data[0].h1,
-    //       data[0].p1,
-    //       -15,
-    //       -35
-    //     );
-    //     this_.newweizhi[5].temp = data[0].t2; //分练区2
-    //     this_.newweizhi[5].humidness = data[0].h2;
-    //     this_.newweizhi[5].airPressure = data[0].p2;
-    //     this_.newweizhi[5].run = data[0].run;
+      //   this_.newweizhi[17].airPressure = data[0].p1; //退更
+      //   this_.newweizhi[17].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p1,
+      //     10,
+      //     9999
+      //   );
+      //   this_.newweizhi[17].run = data[0].run;
+      //   this_.newweizhi[18].airPressure = data[0].p5; //万级洁净走廊
+      //   this_.newweizhi[18].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p5,
+      //     5,
+      //     9999
+      //   );
+      //   this_.newweizhi[18].run = data[0].run;
+      // });
+      // let sql1 =
+      //   "select * FROM DATA WHERE deviceName ='HAU02'  ORDER BY saveTime DESC LIMIT 1";
+      // await curdPost("sql", sql1).then((res) => {
+      //   let data = res.variables.data;
+      //   this_.newweizhi[4].temp = data[0].t1; //分练区1
+      //   this_.newweizhi[4].humidness = data[0].h1;
+      //   this_.newweizhi[4].airPressure = data[0].p1;
+      //   this_.newweizhi[4].run = data[0].run;
+      //   this_.newweizhi[4].ifshow = this_.returnifShow(
+      //     data[0].t1,
+      //     data[0].h1,
+      //     data[0].p1,
+      //     -15,
+      //     -35
+      //   );
+      //   this_.newweizhi[5].temp = data[0].t2; //分练区2
+      //   this_.newweizhi[5].humidness = data[0].h2;
+      //   this_.newweizhi[5].airPressure = data[0].p2;
+      //   this_.newweizhi[5].run = data[0].run;
 
-    //     this_.newweizhi[5].ifshow = this_.returnifShow(
-    //       data[0].t2,
-    //       data[0].h2,
-    //       data[0].p2,
-    //       -15,
-    //       -35
-    //     );
+      //   this_.newweizhi[5].ifshow = this_.returnifShow(
+      //     data[0].t2,
+      //     data[0].h2,
+      //     data[0].p2,
+      //     -15,
+      //     -35
+      //   );
 
-    //     this_.newweizhi[19].airPressure = data[0].p3;
-    //     this_.newweizhi[19].ifshow = this_.returnifShow(
-    //       //1更
-    //       999,
-    //       999,
-    //       data[0].p3,
-    //       10,
-    //       999
-    //     );
-    //     this_.newweizhi[19].run = data[0].run;
+      //   this_.newweizhi[19].airPressure = data[0].p3;
+      //   this_.newweizhi[19].ifshow = this_.returnifShow(
+      //     //1更
+      //     999,
+      //     999,
+      //     data[0].p3,
+      //     10,
+      //     999
+      //   );
+      //   this_.newweizhi[19].run = data[0].run;
 
-    //     this_.newweizhi[20].airPressure = data[0].p4;
-    //     this_.newweizhi[20].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p4,
-    //       10,
-    //       999
-    //     );
-    //     this_.newweizhi[20].run = data[0].run;
-    //     this_.newweizhi[21].airPressure = data[0].p5;
-    //     this_.newweizhi[21].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p5,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[21].run = data[0].run;
-    //   });
-    //   let sql2 ="select * FROM DATA WHERE deviceName ='HAU03' ORDER BY saveTime DESC LIMIT 1"; //支原体室
-    //   await curdPost("sql", sql2).then((res) => {
-    //     let data = res.variables.data;
-    //     this_.newweizhi[6].temp = data[0].t1;
-    //     this_.newweizhi[6].humidness = data[0].h1;
-    //     this_.newweizhi[6].airPressure = data[0].p1;
-    //     this_.newweizhi[6].run = data[0].run;
-    //     this_.newweizhi[6].ifshow = this_.returnifShow(
-    //       data[0].t1,
-    //       data[0].h1,
-    //       data[0].p1,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[22].airPressure = data[0].p2; //支原体 与无菌共用一更
-    //     this_.newweizhi[22].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p2,
-    //       10,
-    //       999
-    //     );
-    //     this_.newweizhi[22].run = data[0].run;
-    //     zhi_wu_yi_run = data[0].run;
-    //     this_.newweizhi[23].airPressure = data[0].p3;
-    //     this_.newweizhi[23].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p3,
-    //       10,
-    //       999
-    //     );
-    //     this_.newweizhi[23].run = data[0].run; //二更
+      //   this_.newweizhi[20].airPressure = data[0].p4;
+      //   this_.newweizhi[20].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p4,
+      //     10,
+      //     999
+      //   );
+      //   this_.newweizhi[20].run = data[0].run;
+      //   this_.newweizhi[21].airPressure = data[0].p5;
+      //   this_.newweizhi[21].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p5,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[21].run = data[0].run;
+      // });
+      // let sql2 ="select * FROM DATA WHERE deviceName ='HAU03' ORDER BY saveTime DESC LIMIT 1"; //支原体室
+      // await curdPost("sql", sql2).then((res) => {
+      //   let data = res.variables.data;
+      //   this_.newweizhi[6].temp = data[0].t1;
+      //   this_.newweizhi[6].humidness = data[0].h1;
+      //   this_.newweizhi[6].airPressure = data[0].p1;
+      //   this_.newweizhi[6].run = data[0].run;
+      //   this_.newweizhi[6].ifshow = this_.returnifShow(
+      //     data[0].t1,
+      //     data[0].h1,
+      //     data[0].p1,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[22].airPressure = data[0].p2; //支原体 与无菌共用一更
+      //   this_.newweizhi[22].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p2,
+      //     10,
+      //     999
+      //   );
+      //   this_.newweizhi[22].run = data[0].run;
+      //   zhi_wu_yi_run = data[0].run;
+      //   this_.newweizhi[23].airPressure = data[0].p3;
+      //   this_.newweizhi[23].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p3,
+      //     10,
+      //     999
+      //   );
+      //   this_.newweizhi[23].run = data[0].run; //二更
 
-    //     this_.newweizhi[24].airPressure = data[0].p4;
-    //     this_.newweizhi[24].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p4,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[24].run = data[0].run; //缓冲
+      //   this_.newweizhi[24].airPressure = data[0].p4;
+      //   this_.newweizhi[24].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p4,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[24].run = data[0].run; //缓冲
+      // });
+      // let sql3 ="select * FROM DATA WHERE deviceName ='HAU04'  ORDER BY saveTime DESC LIMIT 1";
+      // await curdPost("sql", sql3).then((res) => {
+      //   let data = res.variables.data;
+      //   this_.newweizhi[7].temp = data[0].t1; //无菌检测室
+      //   this_.newweizhi[7].humidness = data[0].h1;  
+      //   this_.newweizhi[7].airPressure = data[0].p1;
+      //   this_.newweizhi[7].run = data[0].run;
+      //   this_.newweizhi[7].ifshow = this_.returnifShow(
+      //     data[0].t1,
+      //     data[0].h1,
+      //     data[0].p1,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[22].airPressure = data[0].p4; //支原体 与无菌共用一更
+      //   this_.newweizhi[22].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p4,
+      //     10,
+      //     999
+      //   );
+      //   zhi_wu_yi_run != 1 ? (this_.newweizhi[22].run = data[0].run) : "";
 
-    //     // this_.newweizhi[25].airPressure = data[0].p3; //无菌二更
-    //     // this_.newweizhi[25].ifshow = this_.returnifShow(
-    //     //   999,
-    //     //   999,
-    //     //   data[0].p3,
-    //     //   5
-    //     // );
-    //     // this_.newweizhi[25].run = data[0].run;
-    //   });
-    //   let sql3 ="select * FROM DATA WHERE deviceName ='HAU04'  ORDER BY saveTime DESC LIMIT 1";
-    //   await curdPost("sql", sql3).then((res) => {
-    //     let data = res.variables.data;
-    //     this_.newweizhi[7].temp = data[0].t1; //无菌检测室
-    //     this_.newweizhi[7].humidness = data[0].h1;  
-    //     this_.newweizhi[7].airPressure = data[0].p1;
-    //     this_.newweizhi[7].run = data[0].run;
-    //     this_.newweizhi[7].ifshow = this_.returnifShow(
-    //       data[0].t1,
-    //       data[0].h1,
-    //       data[0].p1,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[22].airPressure = data[0].p4; //支原体 与无菌共用一更
-    //     this_.newweizhi[22].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p4,
-    //       10,
-    //       999
-    //     );
-    //     zhi_wu_yi_run != 1 ? (this_.newweizhi[22].run = data[0].run) : "";
+      //   this_.newweizhi[25].airPressure = data[0].p2;
+      //   this_.newweizhi[25].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p2,
+      //     10,
+      //     999
+      //   );
+      //   this_.newweizhi[25].run = data[0].run; //二更
+      //   this_.newweizhi[26].airPressure = data[0].p3;
+      //   this_.newweizhi[26].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p3,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[26].run = data[0].run;//缓冲
+      // });
+      // let sql4 ="select * FROM DATA WHERE deviceName ='PAU01'  ORDER BY saveTime DESC LIMIT 1";
+      // await curdPost("sql", sql4).then((res) => {
+      //   let data = res.variables.data;
+      //   this_.newweizhi[8].temp = data[0].t1;
+      //   this_.newweizhi[8].humidness = data[0].h1;
+      //   this_.newweizhi[8].airPressure = data[0].p1; //产物
+      //   this_.newweizhi[8].run = data[0].run;
+      //   this_.newweizhi[8].ifshow = this_.returnifShow(
+      //     data[0].t1,
+      //     data[0].h1,
+      //     data[0].p1,
+      //     -15,
+      //     -45
+      //   );
 
-    //     this_.newweizhi[25].airPressure = data[0].p2;
-    //     this_.newweizhi[25].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p2,
-    //       10,
-    //       999
-    //     );
-    //     this_.newweizhi[25].run = data[0].run; //二更
-    //     this_.newweizhi[26].airPressure = data[0].p3;
-    //     this_.newweizhi[26].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p3,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[26].run = data[0].run;//缓冲
-    //   });
-    //   let sql4 ="select * FROM DATA WHERE deviceName ='PAU01'  ORDER BY saveTime DESC LIMIT 1";
-    //   await curdPost("sql", sql4).then((res) => {
-    //     let data = res.variables.data;
-    //     this_.newweizhi[8].temp = data[0].t1;
-    //     this_.newweizhi[8].humidness = data[0].h1;
-    //     this_.newweizhi[8].airPressure = data[0].p1; //产物
-    //     this_.newweizhi[8].run = data[0].run;
-    //     this_.newweizhi[8].ifshow = this_.returnifShow(
-    //       data[0].t1,
-    //       data[0].h1,
-    //       data[0].p1,
-    //       -15,
-    //       -45
-    //     );
+      //   this_.newweizhi[9].temp = data[0].t2;
+      //   this_.newweizhi[9].humidness = data[0].h2;
+      //   this_.newweizhi[9].airPressure = data[0].p2; //扩增
+      //   this_.newweizhi[9].run = data[0].run;
+      //   this_.newweizhi[9].ifshow = this_.returnifShow(
+      //     data[0].t2,
+      //     data[0].h2,
+      //     data[0].p2,
+      //     -15,
+      //     -35
+      //   );
 
-    //     this_.newweizhi[9].temp = data[0].t2;
-    //     this_.newweizhi[9].humidness = data[0].h2;
-    //     this_.newweizhi[9].airPressure = data[0].p2; //扩增
-    //     this_.newweizhi[9].run = data[0].run;
-    //     this_.newweizhi[9].ifshow = this_.returnifShow(
-    //       data[0].t2,
-    //       data[0].h2,
-    //       data[0].p2,
-    //       -15,
-    //       -35
-    //     );
+      //   this_.newweizhi[10].temp = data[0].t3;
+      //   this_.newweizhi[10].humidness = data[0].h3;
+      //   this_.newweizhi[10].airPressure = data[0].p3; //样本制备
+      //   this_.newweizhi[10].run = data[0].run;
+      //   this_.newweizhi[10].ifshow = this_.returnifShow(
+      //     data[0].t3,
+      //     data[0].h3,
+      //     data[0].p3,
+      //     5,
+      //     999
+      //   );
 
-    //     this_.newweizhi[10].temp = data[0].t3;
-    //     this_.newweizhi[10].humidness = data[0].h3;
-    //     this_.newweizhi[10].airPressure = data[0].p3; //样本制备
-    //     this_.newweizhi[10].run = data[0].run;
-    //     this_.newweizhi[10].ifshow = this_.returnifShow(
-    //       data[0].t3,
-    //       data[0].h3,
-    //       data[0].p3,
-    //       5,
-    //       999
-    //     );
+      //   this_.newweizhi[11].temp = data[0].t4;
+      //   this_.newweizhi[11].humidness = data[0].h4;
+      //   this_.newweizhi[11].airPressure = data[0].p4 //试剂准备
+      //   this_.newweizhi[11].run = data[0].run;
+      //   this_.newweizhi[11].ifshow = this_.returnifShow(
+      //     data[0].t4,
+      //     data[0].h4,
+      //     data[0].p4,
+      //     15,
+      //     999
+      //   );
 
-    //     this_.newweizhi[11].temp = data[0].t4;
-    //     this_.newweizhi[11].humidness = data[0].h4;
-    //     this_.newweizhi[11].airPressure = data[0].p4 //试剂准备
-    //     this_.newweizhi[11].run = data[0].run;
-    //     this_.newweizhi[11].ifshow = this_.returnifShow(
-    //       data[0].t4,
-    //       data[0].h4,
-    //       data[0].p4,
-    //       15,
-    //       999
-    //     );
+      //   this_.newweizhi[28].airPressure = data[0].p9; //试剂准备缓冲
+      //   this_.newweizhi[28].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p9,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[28].run = data[0].run;
 
-    //     this_.newweizhi[28].airPressure = data[0].p9; //试剂准备缓冲
-    //     this_.newweizhi[28].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p9,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[28].run = data[0].run;
+      //   this_.newweizhi[29].airPressure = data[0].p6; 
+      //   this_.newweizhi[29].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p6,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[29].run = data[0].run;//产物缓冲
+      //   this_.newweizhi[30].airPressure = data[0].p7; 
+      //   this_.newweizhi[30].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p7,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[30].run = data[0].run; //扩增缓冲
 
-    //     this_.newweizhi[29].airPressure = data[0].p6; 
-    //     this_.newweizhi[29].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p6,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[29].run = data[0].run;//产物缓冲
-    //     this_.newweizhi[30].airPressure = data[0].p7; 
-    //     this_.newweizhi[30].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p7,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[30].run = data[0].run; //扩增缓冲
+      //   this_.newweizhi[31].airPressure = data[0].p8; 
+      //   this_.newweizhi[31].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p8,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[31].run = data[0].run; //样本缓冲三
 
-    //     this_.newweizhi[31].airPressure = data[0].p8; 
-    //     this_.newweizhi[31].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p8,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[31].run = data[0].run; //样本缓冲三
+      //   this_.newweizhi[27].run = data[0].run;
+      //   this_.newweizhi[27].airPressure = data[0].p5; //PCR走廊
+      //   this_.newweizhi[27].ifshow = this_.returnifShow(
+      //     999,
+      //     999,
+      //     data[0].p5,
+      //     5,
+      //     999
+      //   );
+      //   this_.newweizhi[27].run = data[0].run;
+      // });
+      // let sql5 ="select * FROM DATA WHERE deviceName ='PAU02'  ORDER BY saveTime DESC LIMIT 1";
+      // await curdPost("sql", sql5).then((res) => {
+      //   let data = res.variables.data;
+      //   this_.newweizhi[12].temp = data[0].t1; //无菌阳性制备室
+      //   this_.newweizhi[12].humidness = data[0].h1;
+      //   this_.newweizhi[12].airPressure = data[0].p2;
+      //   this_.newweizhi[12].run = data[0].run;
+      //   this_.newweizhi[12].ifshow = this_.returnifShow(
+      //     data[0].t1,
+      //     data[0].h1,
+      //     data[0].p2,
+      //     -10,
+      //     -30
+      //   );
+        // this_.newweizhi[13].temp = data[0].t2; //支原体阳性制备室
+        // this_.newweizhi[13].humidness = data[0].h2;
+        // this_.newweizhi[13].airPressure = data[0].p1;
+        // this_.newweizhi[13].run = data[0].run;
 
-    //     this_.newweizhi[27].run = data[0].run;
-    //     this_.newweizhi[27].airPressure = data[0].p5; //PCR走廊
-    //     this_.newweizhi[27].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p5,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[27].run = data[0].run;
-    //   });
-    //   let sql5 ="select * FROM DATA WHERE deviceName ='PAU02'  ORDER BY saveTime DESC LIMIT 1";
-    //   // console.log()
-    //   await curdPost("sql", sql5).then((res) => {
-    //     let data = res.variables.data;
-    //     this_.newweizhi[12].temp = data[0].t1; //无菌阳性制备室
-    //     this_.newweizhi[12].humidness = data[0].h1;
-    //     this_.newweizhi[12].airPressure = data[0].p2;
-    //     this_.newweizhi[12].run = data[0].run;
-    //     this_.newweizhi[12].ifshow = this_.returnifShow(
-    //       data[0].t1,
-    //       data[0].h1,
-    //       data[0].p2,
-    //       -10,
-    //       -30
-    //     );
-    //     this_.newweizhi[13].temp = data[0].t2; //支原体阳性制备室
-    //     this_.newweizhi[13].humidness = data[0].h2;
-    //     this_.newweizhi[13].airPressure = data[0].p1;
-    //     this_.newweizhi[13].run = data[0].run;
+        // this_.newweizhi[13].ifshow = this_.returnifShow(
+        //   data[0].t2,
+        //   data[0].h2,
+        //   data[0].p1,
+        //   -10,
+        //   -35
+        // );
 
-    //     this_.newweizhi[13].ifshow = this_.returnifShow(
-    //       data[0].t2,
-    //       data[0].h2,
-    //       data[0].p1,
-    //       -10,
-    //       -35
-    //     );
+        // this_.newweizhi[33].airPressure = data[0].p5;
+        // this_.newweizhi[33].ifshow = this_.returnifShow(
+        //   999,
+        //   999,
+        //   data[0].p5,
+        //   5,
+        //   999
+        // );
+        // this_.newweizhi[33].run = data[0].run; //无菌阳性二更
 
-    //     this_.newweizhi[33].airPressure = data[0].p5;
-    //     this_.newweizhi[33].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p5,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[33].run = data[0].run; //无菌阳性二更
+        // this_.newweizhi[34].airPressure = data[0].p7; //无菌阳性缓冲
+        // this_.newweizhi[34].ifshow = this_.returnifShow(
+        //   999,
+        //   999,
+        //   data[0].p7,
+        //   5,
+        //   999
+        // );
+        // this_.newweizhi[34].run = data[0].run;
 
-    //     this_.newweizhi[34].airPressure = data[0].p7; //无菌阳性缓冲
-    //     this_.newweizhi[34].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p7,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[34].run = data[0].run;
+        // this_.newweizhi[35].airPressure = data[0].p4; //支原体二更
+        // this_.newweizhi[35].ifshow = this_.returnifShow(
+        //   999,
+        //   999,
+        //   data[0].p4,
+        //   5,
+        //   999
+        // );
+        // this_.newweizhi[35].run = data[0].run;
 
-    //     this_.newweizhi[35].airPressure = data[0].p4; //支原体二更
-    //     this_.newweizhi[35].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p4,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[35].run = data[0].run;
+        // this_.newweizhi[37].airPressure = data[0].p3; //无菌阳性 支原体 一更
+        // this_.newweizhi[37].ifshow = this_.returnifShow(
+        //   999,
+        //   999,
+        //   data[0].p3,
+        //   10,
+        //   999
+        // );
+        // this_.newweizhi[37].run = data[0].run;
 
-    //     this_.newweizhi[37].airPressure = data[0].p3; //无菌阳性 支原体 一更
-    //     this_.newweizhi[37].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p3,
-    //       10,
-    //       999
-    //     );
-    //     this_.newweizhi[37].run = data[0].run;
-
-    //     this_.newweizhi[36].airPressure = data[0].p6; //支原体性缓冲
-    //     this_.newweizhi[36].ifshow = this_.returnifShow(
-    //       999,
-    //       999,
-    //       data[0].p6,
-    //       5,
-    //       999
-    //     );
-    //     this_.newweizhi[36].run = data[0].run;
-    //   });
+        // this_.newweizhi[36].airPressure = data[0].p6; //支原体性缓冲
+        // this_.newweizhi[36].ifshow = this_.returnifShow(
+        //   999,
+        //   999,
+        //   data[0].p6,
+        //   5,
+        //   999
+        // );
+        // this_.newweizhi[36].run = data[0].run;
+      // });
     },
-
   },
   mounted() {
-    // this.envirData();
-    // this.screenChange();
-    // this.mapChange();
-    this.timeData();
-    // this.setIntervalData();
+    this.envirData();
+    this.screenChange();
+    this.mapChange();
+    this.dataLoad();
+    this.setIntervalData();
   },
   destroyed() {
     this.setIntervalDis = true;
   },
-  // watch: {
-  //   // 如果 `fullHeight ` 发生改变，这个函数就会运行
-  //   fullHeight: function (val) {
-  //     this.screenChange();
-  //     this.mapChange();
-  //     this.timeData();
-  //   },
-  // },
+  watch: {// 如果 `fullHeight ` 发生改变，这个函数就会运行
+    fullHeight: function (val) {
+      this.screenChange();
+      this.mapChange();
+      this.dataLoad();
+    },
+  },
 };
 </script>
 
- <style lang="less" scoped>
-ul,
-li {
+<style lang="less" scoped>
+ul,li {
   margin: 0;
   padding: 0;
 }
@@ -788,7 +806,6 @@ li {
       height: 100%;
       overflow: hidden;
       white-space: nowrap;
-      // padding: 0 20px;
       list-style: none;
       line-height: 40px;
       text-align: center;
@@ -869,13 +886,11 @@ li {
       width: 100%;
       padding-right: 100px;
       position: relative;
-      display: flex;
-      justify-content: center;
-      // .img {
-      //   background-size: contain;
-      //   width: 100%;
-      //   height: calc(100vh - 80px);
-      // }
+      .img {
+        background-size: contain;
+        width: 100%;
+        height: calc(100vh - 80px);
+      }
       .shiyanshi_success {
         width: 20px;
         height: 20px;
@@ -885,6 +900,23 @@ li {
         animation: traffic-light 2s linear 4s infinite;
         text-align: center;
         background: green;
+        // @keyframes traffic-light {
+        //   from {
+        //     background: transparent; /* 黄灯 */
+
+        //     box-shadow: 0px 0 15px 0 transparent; /* 黄灯光影 */
+        //   }
+        //   50% {
+        //     background: #a7f09e; /* 黄灯 */
+
+        //     box-shadow: 0px 0 15px 0 #82d277; /* 黄灯光影 */
+        //   }
+        //   to {
+        //     background: transparent; /* 黄灯 */
+
+        //     box-shadow: 0px 0 15px 0 transparent; /* 黄灯光影 */
+        //   }
+        // }
       }
       .shiyanshi_false {
         width: 20px;
@@ -919,7 +951,6 @@ li {
         height: 20px;
         position: absolute;
         border-radius: 50%;
-        // z-index: 99;
         animation: traffic-light 2s linear 4s infinite;
         text-align: center;
         background: #828282 !important;
@@ -949,7 +980,7 @@ li {
         left: 0px;
         top: 0px;
         padding-top: 15px;
-        height: 17px;
+        height: 64px;
         color: black;
         opacity: 0;
         padding-left: 20px;
