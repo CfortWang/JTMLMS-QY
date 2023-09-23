@@ -168,6 +168,7 @@
                 responseOpinionFields: {}, // 表单的意见字段
                 responseFormOpinionData: {}, // 已填写的表单意见
                 responseLabelFields: {}, // 表单的文本字段
+                unComplateOpinion: '', // 未提交的审批意见
                 invalidFields: {},
                 activeStep: 0,
                 titleList: [],
@@ -241,6 +242,7 @@
                     responseFormula: this.responseFormula,
                     responseLinkages: this.responseLinkages,
                     responseFormOpinionData: this.responseFormOpinionData,
+                    unComplateOpinion: this.unComplateOpinion,
                     readonly: this.readonly,
                     readonlyStyle: this.readonlyStyle,
                     labelWidth: this.labelWidth,
@@ -461,10 +463,12 @@
             // 初始化表单意见
             initResponseOpinionData() {
                 this.responseFormOpinionData = {}
+                this.unComplateOpinion = null
                 const opinionData = this.params ? this.params.formOpinionData || {} : {}
                 if (this.$utils.isEmpty(opinionData) || !this.hasFormOpinion()) {
                     return
                 }
+                this.unComplateOpinion = opinionData.unComplateOpinion
                 const hasBindNode = opinionData.hasBindNode
                 const formOpinionConfig = opinionData.formOpinionConfig
                 if (hasBindNode) {

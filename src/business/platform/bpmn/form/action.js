@@ -160,6 +160,7 @@ export default {
         // 是否保存[节点-按钮设置-保存]
         handleSave () {
             const formData = this.getFormData()
+            const opinion = this.hasFormOpinion() ? this.getFormOpinionData() : ''
             const loading = this.$loading({
                 lock: true,
                 text: this.$t('common.saving')
@@ -167,7 +168,8 @@ export default {
             if (!formData) return
             bpmTaskSave({
                 taskId: this.taskId,
-                data: JSON.stringify(formData)
+                data: JSON.stringify(formData),
+                opinion
             }).then(response => {
                 loading.close()
                 this.$alert(`已保存表单内容！`, {
@@ -652,23 +654,23 @@ export default {
             if (!code) {
                 return
             }
-            // 轮询流程是否结束，流程未结束不生成快照，每2秒查询一次，最多等待10秒钟
-            let timeout = 10000
-            const intervalTime = 2000
-            while (!(await this.isFinish(proId || proInstId))) {
-                timeout -= intervalTime
-                if (timeout <= 0) {
-                    // 超时，流程还未结束，结束生成快照
-                    console.log('流程未结束，无法生成快照')
-                    return
-                }
-                // 等待一段时间后再次查询
-                await new Promise(resolve => setTimeout(resolve, intervalTime))
-            }
             const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process'`
             const { first = '' } = this.$store.getters.level
-            this.$common.request('sql', sql).then(res => {
+            this.$common.request('sql', sql).then(async res => {
                 const { data = [] } = res.variables || {}
+                // 轮询流程是否结束，流程未结束不生成快照，每2秒查询一次，最多等待10秒钟
+                let timeout = 10000
+                const intervalTime = 2000
+                while (!(await this.isFinish(proId || proInstId))) {
+                    timeout -= intervalTime
+                    if (timeout <= 0) {
+                        // 超时，流程还未结束，结束生成快照
+                        console.log('流程未结束，无法生成快照')
+                        return
+                    }
+                    // 等待一段时间后再次查询
+                    await new Promise(resolve => setTimeout(resolve, intervalTime))
+                }
                 if (!data.length) {
                     this.updateState(id, code, '已完成', null)
                     return

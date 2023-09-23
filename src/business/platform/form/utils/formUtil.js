@@ -848,6 +848,9 @@ const FormUtil = {
             if (Utils.isEmpty(opinion.completeTime)) { continue }
             formOpinionList.push(opinion)
         }
+        // 筛选出已保存未提交的审批意见
+        const unComplateOpinion = opinionList.find(i => i.completeTime === null).opinion
+        opinionData.unComplateOpinion = unComplateOpinion
 
         if (Utils.isEmpty(formOpinionConfig)) { // 没有绑定节点的
             opinionData.hasBindNode = false

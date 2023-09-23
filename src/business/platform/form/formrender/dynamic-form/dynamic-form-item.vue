@@ -29,6 +29,7 @@
                     :readonly="readonly"
                     :readonly-style="readonlyStyle"
                     :opinion-data="formOpinionData[fieldName]"
+                    :un-complate="unComplateOpinion"
                     :params="params"
                     v-on="listeners"
                 />
@@ -186,6 +187,9 @@ export default {
         },
         formOpinionData () {
             return this.params.responseFormOpinionData || {}
+        },
+        unComplateOpinion () {
+            return this.params.unComplateOpinion || ''
         },
         listeners () {
             return {
