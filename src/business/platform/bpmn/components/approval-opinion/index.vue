@@ -213,7 +213,7 @@ export default {
     },
     created () {
         setTimeout(() => {
-            this.data = this.unCompleteOpinion || this.value
+            this.data = this.unCompleteOpinion || this.value || '同意'
         }, 500)
     },
     methods: {

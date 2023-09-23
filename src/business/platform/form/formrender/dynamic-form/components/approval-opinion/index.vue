@@ -265,7 +265,7 @@ export default {
             handler (val) {
                 this.$emit('update:value', val || this.unComplate)
             },
-            // deep: true,
+            deep: true,
             immediate: true
         },
         opinionData: {

@@ -42,9 +42,9 @@
                         <el-radio label="top">置顶工作首页</el-radio>
                     </el-radio-group>
                 </el-form-item> -->
-                <el-form-item label="公告分类：" prop="typeId">
+                <!-- <el-form-item label="公告分类：" prop="typeId">
                     <ibps-type-select v-model="form.typeId" category-key="NOTICE_TYPE" clearable />
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="标题：" prop="title">
                     <el-input v-model="form.title" />
                 </el-form-item>
