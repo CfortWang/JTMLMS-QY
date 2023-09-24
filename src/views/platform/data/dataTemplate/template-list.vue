@@ -177,10 +177,27 @@ export default {
             return btn
         },
         dealFilter (dataList) {
-            if (!dataList.length || !this.filterParams.length) {
-                return []
+            // 1.去除原过滤条件中的编制部门在其中
+            // 2.追加数据模板归档中的过滤条件
+            // 3.增加地点过滤（若为第一层级用户，则过滤出所有一二级地点数据；若为第二级用户，则过滤当前地点数据）
+            const levelFilter = this.getLevelFilter()
+            if (!dataList.length) {
+                // 无过滤条件时默认地点过滤
+                return [
+                    {
+                        label: '默认条件',
+                        key: this.$utils.guid(),
+                        type: 'condition',
+                        rights: [{ type: 'all' }],
+                        filter: {
+                            condition: 'AND',
+                            rules: [levelFilter]
+                        }
+                    }
+                ]
             }
             const newDataList = dataList.map(data => {
+                const rules = data.filter.rules.filter(i => i.id !== 'find_in_set' && !i.value.includes('cscript.findPositionId()'))
                 const newRules = [
                     ...this.filterParams.map(item => ({
                         id: item.field,
@@ -188,11 +205,40 @@ export default {
                         input: 'text',
                         ...item
                     })),
-                    ...data.filter.rules
+                    ...rules,
+                    levelFilter
                 ]
                 return { ...data, filter: { ...data.filter, rules: newRules }}
             })
             return newDataList
+        },
+        // 获取当前用户地点信息 equal-等于 in-在…之内
+        getLevelFilter () {
+            const { second = '' } = this.$store.getters.level
+            const { deptList = [] } = this.$store.getters
+            if (second) {
+                return {
+                    field: 'di_dian_',
+                    id: 'di_dian_',
+                    input: 'text',
+                    label: '地点',
+                    operator: 'equal',
+                    source: 'fixed',
+                    type: 'string',
+                    value: second
+                }
+            }
+
+            return {
+                field: 'di_dian_',
+                id: 'di_dian_',
+                input: 'text',
+                label: '地点',
+                operator: 'in',
+                source: 'fixed',
+                type: 'string',
+                value: deptList.filter(i => i.depth * 1 >= 2).map(i => i.id)
+            }
         }
     }
 }
