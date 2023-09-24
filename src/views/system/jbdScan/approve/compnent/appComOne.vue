@@ -42,7 +42,6 @@ export default {
     },
     methods: {
         switchWatch (index) {
-            console.log(index)
             switch (index) {
                 case 1:
                     this.jiHuaList = approveJSON.list1
@@ -57,6 +56,9 @@ export default {
                 case 5:
                 case 6:
                     this.jiHuaList = approveJSON.list4
+                    break
+                case 7:
+                    this.jiHuaList = approveJSON.list7
                     break
             }
         }

@@ -1,8 +1,9 @@
 <template>
   <div class="pieView">
-    <div style="height: 10%;line-height: 30px;text-align: left;padding-left: 10px;width: 100%;color: white;">{{config.title}}</div>   
+    <div style="height: 10%;line-height: 30px;text-align: left;padding-left: 10px;width: 100%;color: white;">{{config.title}}</div>
     <div style="width:100%;height:90%;display: inline-block;overflow: hidden;box-sizing: border-box;">
-      <div :id="config.id" style="width:100%;height:100%;"> </div>
+      <div :id="config.id"
+           style="width:100%;height:100%;"> </div>
     </div>
   </div>
 </template>
@@ -18,26 +19,29 @@ export default {
       type: Object,
       default: {},
     },
-    config:{
-      type:Object,
-      default:{
-        title:"title",
-        id:"idSelector"
+    config: {
+      type: Object,
+      default: {
+        title: "title",
+        id: "idSelector"
       }
     }
   },
   mounted() {
     let this_ = this;
-    this.$nextTick(()=>{
+    this.$nextTick(() => {
       this_.getMiddleLeft();
-  })
-},
+    })
+  },
   methods: {
     getMiddleLeft() {
       var chartDom = document.getElementById(this.config.id);
       var myChart = echarts.init(chartDom);
-      // var option;
-      this.info && myChart.setOption(this.info);
+      console.log('this.info', this.info)
+      setTimeout(() => {
+        this.info && myChart.setOption(this.info);
+
+      }, 500)
     },
   },
 };
@@ -50,6 +54,6 @@ export default {
   box-sizing: border-box;
   overflow: hidden;
   color: white;
-  background-color: rgba(6,30,93,.5);
+  background-color: rgba(6, 30, 93, 0.5);
 }
 </style>

@@ -91,12 +91,29 @@
         "value": "he_cha_qing_kuang",
         "width": "100"
     },{
-        "name": "审核结论",
-        "value": "shen_he_",
+        "name": "审核结果",
+        "value": "shen_he_jie_guo_",
         "width": "50"
     },{
-        "name": "审核原因",
-        "value": "shen_he_yuan_yin_",
+        "name": "审核备注",
+        "value": "shen_he_yi_jian_",
+        "width": "100"
+    }],
+    "list7": [{
+        "name": "条款号",
+        "value": "tiao_kuan_hao_",
+        "width": "50"
+    },{
+        "name": "条款名称",
+        "value": "tiao_kuan_ming_ch",
+        "width": "50"
+    },{
+        "name": "审核结果",
+        "value": "shen_he_jie_guo_",
+        "width": "50"
+    },{
+        "name": "审核备注",
+        "value": "shen_he_yi_jian_",
         "width": "100"
     }]
 }

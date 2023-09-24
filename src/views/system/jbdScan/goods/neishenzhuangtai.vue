@@ -356,7 +356,7 @@ export default {
             receiverId = receiverId.slice(0,receiverId.length - 1);
             let msage = {
                   canreply: "0",
-                  content: `<p>`+ "内审检查表还未完成，请及时完成"+`</p>`,
+                  content: "内审检查表还未完成，请及时完成",
                   editorValue: "",
                   fileMsg: "",
                   groupId: "",

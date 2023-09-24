@@ -1,8 +1,9 @@
 <template>
   <div class="pieView">
-    <div style="height: 14%;line-height: 30px;text-align: left;padding-left: 10px;color: white;">{{info.config.title||""}}</div>   
+    <div style="height: 14%;line-height: 30px;text-align: left;padding-left: 10px;color: white;">{{info.config.title||""}}</div>
     <div style="width:100%;height:86%;display: inline-block; overflow: hidden;">
-      <div :id="info.config.idselector" style="width:100%;height:95%;overflow: hidden;"> </div>
+      <div :id="info.config.idSelector"
+           style="width:100%;height:95%;overflow: hidden;"> </div>
     </div>
   </div>
 </template>
@@ -10,25 +11,25 @@
 <script>
 import * as echarts from "echarts";
 export default {
-  data(){
-    return{
+  data() {
+    return {
     }
   },
-  props:{
-    info:{
-      type:Object,
-      default:{}
+  props: {
+    info: {
+      type: Object,
+      default: {}
     }
   },
   mounted() {
     let this_ = this;
-    this.$nextTick(()=>{
+    this.$nextTick(() => {
       this_.getMiddleLeft();
     })
   },
-  methods:{
-    getMiddleLeft(){ 
-      let chartDom = document.getElementById(this.info.config.idselector);
+  methods: {
+    getMiddleLeft() {
+      let chartDom = document.getElementById(this.info.config.idSelector);
       var myChart = echarts.init(chartDom);
       var option;
       option = {
@@ -39,9 +40,9 @@ export default {
             color: '#fff',
             fontSize: 20,
             fontWeight: '600'
+          },
         },
-        },
-        color:this.info.color,
+        color: this.info.color,
         tooltip: {
           trigger: 'item',
           formatter: '{d}%'
@@ -50,12 +51,12 @@ export default {
           formatter: '{b}\n({d}%)',
           edgeDistance: "20%"
         },
-        
+
         legend: {
           show: true,
           z: 3,
           left: 'right',
-          textStyle:{
+          textStyle: {
             color: '#fff'
           }
         },
@@ -63,7 +64,7 @@ export default {
           type: 'pie',
           radius: '70%',
           center: ['50%', '50%'],
-          data:this.info.data,
+          data: this.info.data,
           emphasis: {
             itemStyle: {
               shadowBlur: 10,
@@ -72,8 +73,8 @@ export default {
             }
           },
           labelLine: {
-              distanceToLabelLine: 0,
-            },
+            distanceToLabelLine: 0,
+          },
         }]
       };
       myChart.setOption(option);
@@ -82,10 +83,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.pieView{
+.pieView {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: rgba(6,30,93,.5);
+  background-color: rgba(6, 30, 93, 0.5);
 }
 </style>

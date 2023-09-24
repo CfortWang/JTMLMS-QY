@@ -25,9 +25,31 @@
                                 :closable="false"
                             />
                         </div>
-                        <div>
-                            <div ref="Echart" class="chart" />
+                        <div style="display: flex;justify-content: space-between;width: 100%;">
+                            <div v-if="activeIndex != 5" style="width: 100%">
+                                <div ref="Echart" class="chart" />
+                            </div>
+                            <div v-if="activeIndex == 5" style="width: 50%;position: relative;">
+                                <div ref="Echart" class="chart" />
+                            </div>
+                            <div v-if="activeIndex == 5" style="width: 50%;position: relative;">
+                                <div ref="Echart2" class="chart" />
+                            </div>
+
                         </div>
+
+                    </div>
+                </div>
+                <div v-if="activeIndex == 5" class="tableLin">
+                    <div class="tableTop">
+                        <el-alert
+                            title="不符合条款清单"
+                            type="success"
+                            :closable="false"
+                        />
+                    </div>
+                    <div>
+                        <appComOne ref="appBuCom" :click-index="7" :table-data="buTableData" />
                     </div>
                 </div>
                 <div class="tableLin">
@@ -41,7 +63,9 @@
                     <div>
                         <appComOne ref="appCom" :click-index="clickIndex" :active-index="activeIndex" :table-data="tableData" />
                     </div>
-
+                </div>
+                <div v-if="activeIndex != 5" class="tyongj">
+                    暂无不符合项统计，请等待本次认可准则条款确认结束后统计
                 </div>
             </div>
         </el-dialog>
@@ -71,7 +95,7 @@ export default {
             generalShow: this.show,
             id: '',
             clickIndex: 2,
-            activeIndex: 1,
+            activeIndex: 5,
             stepList: [
                 {
                     stepIndex: 11,
@@ -100,7 +124,11 @@ export default {
                 }
             ],
             tableData: [],
-            description: `核查计划项目进度计分：'待分配'计1分, '待核查'计2分, '待审核'计3分, '待确认'计4分, '已结束'计5分，核查进度率 = 各项计划项目进度计分之和 / 计划项目总数 / 5 * 100`
+            description: `核查计划项目进度计分：'待分配'计1分, '待核查'计2分, '待审核'计3分, '待确认'计4分, '已结束'计5分，核查进度率 = 各项计划项目进度计分之和 / 计划项目总数 / 5 * 100`,
+            buTableData: [],
+            show1: false,
+            show2: false,
+            innerWidth
         }
     },
     watch: {
@@ -115,6 +143,7 @@ export default {
     created () {
         this.id = this.generalList[0].id_
         this.getJiHuaZhuangTai(this.id)
+        this.innerWidth = window.innerWidth /2
     },
     methods: {
         close () {
@@ -129,7 +158,6 @@ export default {
             this.clickIndex = index
         },
         getIndexName (index) {
-            console.log(this.clickIndex)
             const name = this.stepList[this.clickIndex - 1 === 5 ? 4 : this.clickIndex - 1].title || ''
             return name
         }
@@ -145,6 +173,7 @@ export default {
     border-top: none;
 }
 .step{
+    position: relative;
     margin: 20px 30px;
 }
 .tableLin{
@@ -159,5 +188,26 @@ export default {
 .chart{
     width: 100%;
     height: 250px;
+}
+
+.tyongj{
+    color: #606266;
+    margin: 20px auto;
+    text-align: center;
+    font-size: 16px;
+}
+
+.buFuHu{
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 30px;
+    .buLeft{
+        width: 100%;
+
+        .textLeft{
+            color: #606266;
+            margin-bottom: 20px;
+        }
+    }
 }
 </style>

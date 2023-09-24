@@ -113,7 +113,7 @@ export default {
 
                         const accept4 = echarts.init(this.$refs.Echart4)
                         accept4.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list4, titleData4))))
-                    }else{
+                    } else {
                         this.close()
                         this.$message.error('统计的数据已经被清除，请检查数据是否被清除')
                     }
@@ -148,6 +148,7 @@ export default {
                 series: [
                     {
                         name: '任务完成情况',
+                        stillShowZeroSum: false,
                         type: 'pie',
                         radius,
                         center: ['50%', '50%'],
@@ -170,7 +171,8 @@ export default {
                                     show: true
                                 }
                             }
-                        }
+                        },
+                        startAngle: 10
                     }
                 ],
                 color: ['#f85a40',
