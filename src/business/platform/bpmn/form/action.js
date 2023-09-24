@@ -679,22 +679,25 @@ export default {
                 const url = this.$getReportFile(path, `id_=${id}&org_=${first}`)
                 const fileName = name + this.$common.getDateNow(16, 'string')
                 console.log(url, fileName)
-                this.$common.snapshoot({
-                    url,
-                    name: fileName,
-                    type: 'pdf'
-                }).then(res => {
-                    if (!res.data || !res.data.id) {
-                        this.$message.error('生成快照失败！')
-                    }
-                    const fileId = res.data && res.data.id ? res.data.id : ''
-                    const fileParams = fileId ? { kuai_zhao_: fileId } : {}
-                    this.updateState(id, code, '已完成', fileParams)
-                }).catch(() => {
-                    // 生成快照接口调用失败时，也需要更新状态为已完成
-                    this.$message.error('提交快照生成失败！')
-                    this.updateState(id, code, '已完成')
-                })
+                // 延迟生成快照，避免数据获取失败
+                setTimeout(() => {
+                    this.$common.snapshoot({
+                        url,
+                        name: fileName,
+                        type: 'pdf'
+                    }).then(res => {
+                        if (!res.data || !res.data.id) {
+                            this.$message.error('生成快照失败！')
+                        }
+                        const fileId = res.data && res.data.id ? res.data.id : ''
+                        const fileParams = fileId ? { kuai_zhao_: fileId } : {}
+                        this.updateState(id, code, '已完成', fileParams)
+                    }).catch(() => {
+                        // 生成快照接口调用失败时，也需要更新状态为已完成
+                        this.$message.error('提交快照生成失败！')
+                        this.updateState(id, code, '已完成')
+                    })
+                }, 300)
             })
         },
         // 判断流程是否结束

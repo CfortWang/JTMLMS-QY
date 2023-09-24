@@ -848,8 +848,9 @@ const FormUtil = {
             if (Utils.isEmpty(opinion.completeTime)) { continue }
             formOpinionList.push(opinion)
         }
-        // 筛选出已保存未提交的审批意见
-        const unComplateOpinion = opinionList.find(i => i.completeTime === null).opinion
+        // 筛选出已保存未提交的审批意见（已结束流程无此数据，需判空）
+        const unComplate = opinionList.find(i => i.completeTime === null)
+        const unComplateOpinion = unComplate ? unComplate.opinion : ''
         opinionData.unComplateOpinion = unComplateOpinion
 
         if (Utils.isEmpty(formOpinionConfig)) { // 没有绑定节点的
