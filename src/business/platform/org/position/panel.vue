@@ -334,8 +334,7 @@ export default {
                 })
             }
 
-            if (dotCount <= 3) {
-                console.log(5)
+            if (dotCount <= 2) {
                 arrList.forEach(item => {
                     item.disabled = true
                 })

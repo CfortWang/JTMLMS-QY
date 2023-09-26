@@ -5,7 +5,6 @@
                 :width="width"
                 :height="height"
                 :location="location"
-                title="记录分类"
                 category-key="FLOW_TYPE"
                 :has-permission="hasPermission"
                 @node-click="handleNodeClick"

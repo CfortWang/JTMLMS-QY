@@ -6,6 +6,7 @@
         <ibps-type-tree :width="width"
                         :height="height"
                         :category-key="categoryKey"
+                        :has-permission="true"
                         @node-click="handleNodeClick"
                         @expand-collapse="handleExpandCollapse" />
       </div>

@@ -675,28 +675,49 @@ export default {
                     this.updateState(id, code, '已完成', null)
                     return
                 }
-                const path = data[0].bao_biao_lu_jing_
-                const url = this.$getReportFile(path, `id_=${id}&org_=${first}`)
-                const fileName = name + this.$common.getDateNow(16, 'string')
-                console.log(url, fileName)
+                const paths = data[0].bao_biao_lu_jing_ ? data[0].bao_biao_lu_jing_.split(',') : []
+                if (!paths.length) {
+                    this.$message.error('未配置快照路径！')
+                    return
+                }
                 // 延迟生成快照，避免数据获取失败
                 setTimeout(() => {
-                    this.$common.snapshoot({
-                        url,
-                        name: fileName,
-                        type: 'pdf'
-                    }).then(res => {
-                        if (!res.data || !res.data.id) {
+                    Promise.all(paths.map(path => {
+                        const url = this.$getReportFile(path, `id_=${id}&org_=${first}`)
+                        const fileName = name + this.$common.getDateNow(16, 'string')
+                        console.log(url, fileName)
+                        return this.$common.snapshoot({
+                            url,
+                            name: fileName,
+                            type: 'pdf'
+                        })
+                    })).then(results => {
+                        const ids = results.map(result => result.data.id)
+                        if (!ids.length) {
                             this.$message.error('生成快照失败！')
                         }
-                        const fileId = res.data && res.data.id ? res.data.id : ''
-                        const fileParams = fileId ? { kuai_zhao_: fileId } : {}
+                        const fileParams = ids.length ? { kuai_zhao_: ids.join(',') } : {}
                         this.updateState(id, code, '已完成', fileParams)
                     }).catch(() => {
-                        // 生成快照接口调用失败时，也需要更新状态为已完成
                         this.$message.error('提交快照生成失败！')
                         this.updateState(id, code, '已完成')
                     })
+                    // this.$common.snapshoot({
+                    //     url,
+                    //     name: fileName,
+                    //     type: 'pdf'
+                    // }).then(res => {
+                    //     if (!res.data || !res.data.id) {
+                    //         this.$message.error('生成快照失败！')
+                    //     }
+                    //     const fileId = res.data && res.data.id ? res.data.id : ''
+                    //     const fileParams = fileId ? { kuai_zhao_: fileId } : {}
+                    //     this.updateState(id, code, '已完成', fileParams)
+                    // }).catch(() => {
+                    //     // 生成快照接口调用失败时，也需要更新状态为已完成
+                    //     this.$message.error('提交快照生成失败！')
+                    //     this.updateState(id, code, '已完成')
+                    // })
                 }, 300)
             })
         },

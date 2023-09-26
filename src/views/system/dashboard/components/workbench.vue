@@ -482,7 +482,7 @@ export default {
             }
             let pageParams
             if (this.activeTab === 'guide') {
-                pageParams = { page: 1, limit: 100 }
+                pageParams = { ...page, limit: 100 }
             } else {
                 pageParams = page
             }
