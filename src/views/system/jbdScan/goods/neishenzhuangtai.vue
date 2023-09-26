@@ -42,12 +42,12 @@
                             <div style="width: 90%; margin: 0 auto; line-height: 35px">
                                 内审不符合项汇总表(CNAS)
                             </div>
-                            <el-table :data="CNASTableData" :border="true" style="width: 90%; margin: 0 auto">
-                                <el-table-column type="selection"  width="1">
-                                </el-table-column>
-                                <el-table-column prop="bu_fu_he_xiang_mi" label="不符合项描述" width="250" >
+                            <el-table :data="CNASTableData"  style="width: 90%;margin: 0 auto;">
+                                <!-- <el-table-column type="selection"  width="1" /> -->
+                                
+                                <el-table-column prop="miao_shu_" label="不符合描述" width="250"  :key="Math.random()">
                                     <template slot-scope="scope">
-                                        {{ scope.row.bu_fu_he_xiang_mi}}
+                                        {{ scope.row.miao_shu_}}
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="70" >
@@ -94,7 +94,7 @@
                                 内审不符合项汇总表(CMA)
                             </div>
                             <el-table :data="CMAtable" :border="true" style="width: 90%; margin: 0 auto">
-                                <el-table-column prop="bu_fu_he_xiang_mi" label="不符合项描述" width="300" />
+                                <el-table-column prop="miao_shu_" label="不符合项描述" width="300" />
                                 <el-table-column prop="ping_shen_yi_ju_" label="评审依据" width="200" />
                                 <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="70" />
                                 <el-table-column prop="nei_shen_yuan_" label="内审员" width="60">
@@ -890,7 +890,7 @@ export default {
             const this_ = this
             this_.CNASTableData = []
             this_.CMAtable = []
-            const sql = "select * FROM t_nsbfhxjlhzb WHERE wai_jian_ =(SELECT id_  FROM t_nshyjyb WHERE ji_hua_zong_wai_j ='" + id + "' ORDER BY create_time_ DESC LIMIT 1)"
+            const sql = "select * FROM t_nsbfhxjlhzzb WHERE parent_id_ =(SELECT id_  FROM t_nsbfhxjlhzbzc WHERE ji_hua_zong_wai_j ='" + id + "' ORDER BY create_time_ DESC LIMIT 1)"
             await curdPost('sql', sql).then((res) => {
                 const data = res.variables.data
                 data.forEach((item) => {
@@ -1113,9 +1113,9 @@ export default {
     //   width: 400px;
     //   height: 300px;
     // }
-    .el-checkbox__inner{
-        display: none;
-    }
+    ::deep .el-checkbox__inner{
+        opacity: 0;
+    } 
   }
 }
 </style>

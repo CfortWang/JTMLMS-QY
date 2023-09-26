@@ -1,9 +1,27 @@
 <template>
   <div class="pieView">
-    <div style="height: 10%;line-height: 30px;text-align: left;padding-left: 10px;width: 100%;color: white;">{{config.title}}</div>
-    <div style="width:100%;height:90%;display: inline-block;overflow: hidden;box-sizing: border-box;">
-      <div :id="config.id"
-           style="width:100%;height:100%;"> </div>
+    <div
+      style="
+        height: 10%;
+        line-height: 30px;
+        text-align: left;
+        padding-left: 10px;
+        width: 100%;
+        color: white;
+      "
+    >
+      {{ config.title }}
+    </div>
+    <div
+      style="
+        width: 100%;
+        height: 90%;
+        display: inline-block;
+        overflow: hidden;
+        box-sizing: border-box;
+      "
+    >
+      <div :id="config.id" style="width: 100%; height: 100%"></div>
     </div>
   </div>
 </template>
@@ -23,25 +41,32 @@ export default {
       type: Object,
       default: {
         title: "title",
-        id: "idSelector"
-      }
-    }
+        id: "idSelector",
+      },
+    },
   },
   mounted() {
     let this_ = this;
     this.$nextTick(() => {
       this_.getMiddleLeft();
-    })
+    });
   },
   methods: {
     getMiddleLeft() {
       var chartDom = document.getElementById(this.config.id);
       var myChart = echarts.init(chartDom);
-      console.log('this.info', this.info)
       setTimeout(() => {
         this.info && myChart.setOption(this.info);
-
-      }, 500)
+      }, 500);
+    },
+  },
+  watch: {
+    info: {
+      handler(newVal, oldVal) {
+        console.log("11111");
+        this.getMiddleLeft();
+      },
+      deep: true,
     },
   },
 };

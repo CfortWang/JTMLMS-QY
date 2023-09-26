@@ -1,8 +1,23 @@
 <template>
   <div class="pieView">
-    <div style="height: 16%;line-height: 30px;text-align: left;padding-left: 10px;color: white;">{{info.config.title||""}}</div>
-    <div style="width:100%;height:86%;display: inline-block; overflow: hidden;">
-      <div :id="info.config.idSelector" style="width:100%;height:95%;overflow: hidden;"> </div>
+    <div
+      style="
+        height: 16%;
+        line-height: 30px;
+        text-align: left;
+        padding-left: 10px;
+        color: white;
+      "
+    >
+      {{ info.config.title || "" }}
+    </div>
+    <div
+      style="width: 100%; height: 86%; display: inline-block; overflow: hidden"
+    >
+      <div
+        :id="info.config.idSelector"
+        style="width: 100%; height: 95%; overflow: hidden"
+      ></div>
     </div>
   </div>
 </template>
@@ -42,40 +57,40 @@ export default {
         },
         tooltip: {
           trigger: "item",
-          formatter: ''
+          formatter: "",
         },
         color: this.info.color,
         legend: {
           // show: true,
           z: 2,
-          top:'2%',
+          top: "2%",
           // orient: 'vertical',
-          left: 'right',
-          textStyle:{
-            color: '#fff'
-          }
+          left: "right",
+          textStyle: {
+            color: "#fff",
+          },
         },
         label: {
-          formatter: '{b}:{d}%'
+          formatter: "{b}:{d}%",
         },
         series: [
           {
             // name: "Access From",
             type: "pie",
             radius: ["40%", "70%"],
-            top:'16%',
+            top: "16%",
             right: "5%",
             left: "5%",
-            bottom:'2%',
+            bottom: "2%",
             avoidLabelOverlap: false,
             label: {
               show: true,
               // fontSize: 20,
               position: "outside",
               fontWeight: "bold",
-              alignTo: 'edge',
+              alignTo: "edge",
               margin: "1px",
-              fontSize:12,
+              fontSize: 12,
               // color:'#fff'
             },
             emphasis: {
@@ -87,13 +102,21 @@ export default {
             },
             labelLine: {
               show: false,
-              distanceToLabelLine: 0
+              distanceToLabelLine: 0,
             },
             data: this.info.data,
           },
         ],
       };
       option && myChart.setOption(option);
+    },
+  },
+  watch: {
+    info: {
+      handler(newVal, oldVal) {
+        this.getMiddleLeft();
+      },
+      deep: true,
     },
   },
 };

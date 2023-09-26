@@ -165,6 +165,7 @@ export default {
                 // console.log(personData)
                 let list = []
                 data.forEach(item => {
+                    let verificationDateStr = item.bi_xu_she_shi_?item.bi_xu_she_shi_:''
                     let o = {
                         prove: this.switchProve(item.she_bei_zhuang_ta),
                         slogan: this.switchSlogan(item.she_bei_zhuang_ta),
@@ -175,7 +176,7 @@ export default {
                         serial: item.she_bei_shi_bie_h,
                         model: item.gui_ge_xing_hao_,
                         verifier:this.findPersonName(item.bi_xu_de_huan_jin,personData),
-                        verificationDate:item.bi_xu_she_shi_
+                        verificationDate:verificationDateStr.substring(0,10)
                     }
                     list.push(o)
                     console.log(o)

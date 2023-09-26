@@ -86,7 +86,7 @@ export default {
       shiyonglvConfig: {header: ["编号","名称","存放位置","状态","保管人",],data: [],columnWidth: ["110","230","180","110","110"],rowNum: 7,},
       bottomData: {},
       zhuantaiEData: {},
-      sheBeiData: { xData: [], data: [], config: { idselector: "" } },
+      sheBeiData: { xData: [], data: [], config: { idSelector: "" } },
       sheBeiDataShow:false,
       sheBeiweiHuData: {},
       config: {},
@@ -125,16 +125,16 @@ export default {
       let this_ = this;
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
-      this.MiddleLeftPieViewList = {data: [],config: { idselector: "main" },rowNum: 7,color: [],};
+      this.MiddleLeftPieViewList = {data: [],config: { idSelector: "main" },rowNum: 7,color: [],};
       this_.sheBeiDataShow = false;
       this.eBgRateData = { data: [], config: {} };
       this.sheBeiHeChaData = { data: [], config: {} };
       this.jianDingjiaoZhunSheBeiData = { data: [], config: {} };
-      this.sheBeiData={ xData: [], data: [], config: { idselector: "" } };
+      this.sheBeiData={ xData: [], data: [], config: { idSelector: "" } };
       this.weiHuSheBeiData = { data: [], config: {} };
-      this.bottomData = { xData: [], data: [], config: { idselector: "" } };
-      this.zhuantaiEData = { xData: [], data: [], config: { idselector: "" } };
-      this.sheBeiweiHuData = {xData: [],data: [],config: { idselector: "" },};
+      this.bottomData = { xData: [], data: [], config: { idSelector: "" } };
+      this.zhuantaiEData = { xData: [], data: [], config: { idSelector: "" } };
+      this.sheBeiweiHuData = {xData: [],data: [],config: { idSelector: "" },};
       let sql =
       `select a.Equipments,a1.mony,b.addEquipments,c.testEquipments,c1.testNoEquipments,e.goodEquipments,f.scrapEquipments,g.limitedEquipments,h.weiHuNoEquipments,h1.weiHuEquipments  FROM  
       (select COUNT(*) AS Equipments FROM t_sbdj where di_dian_ = '${didian}') AS a, 
@@ -165,7 +165,7 @@ export default {
           this_.MiddleLeftPieViewList.data.push(obj);
           this_.MiddleLeftPieViewList.color = ["#339933", "#FFFF66", "#FF0033"];
           this_.MiddleLeftPieViewList.config.title = "设备各工作状态数量统计";
-          this_.MiddleLeftPieViewList.config.idselector = "main2";
+          this_.MiddleLeftPieViewList.config.idSelector = "main2";
           obj = {};
           let result = [
             {
@@ -252,20 +252,19 @@ export default {
           // this_.sheBeiData.data.push(data[0].limitedEquipments);
           this_.sheBeiData.data.push(data[0].scrapEquipments);
           this_.sheBeiData.config.title = "设备完好情况";
-          this_.sheBeiData.config.idselector = "main8";
-          console.log(this_.sheBeiData,"1231231")
+          this_.sheBeiData.config.idSelector = "main8";
           this_.sheBeiDataShow = true;
           this_.zhuantaiEData.xData = ["计划检定/校准数","已完成检定/校准数",];
-          this_.zhuantaiEData.data.push(data[0].testNoEquipments==0?1:data[0].testNoEquipments);
-          this_.zhuantaiEData.data.push(data[0].testEquipments==0?1:data[0].testEquipments);
+          this_.zhuantaiEData.data.push(data[0].testNoEquipments);
+          this_.zhuantaiEData.data.push(data[0].testEquipments);
           this_.zhuantaiEData.config.title = "检定/校准设备完成图";
-          this_.zhuantaiEData.config.idselector = "main3";
+          this_.zhuantaiEData.config.idSelector = "main3";
           //维护设备数柱状图
           this_.sheBeiweiHuData.xData = ["计划维护数", "已完成数"];
-          this_.sheBeiweiHuData.data.push(data[0].weiHuNoEquipments==0?1:data[0].weiHuNoEquipments);
-          this_.sheBeiweiHuData.data.push(data[0].weiHuEquipments==0?1:data[0].weiHuEquipments);
+          this_.sheBeiweiHuData.data.push(data[0].weiHuNoEquipments);
+          this_.sheBeiweiHuData.data.push(data[0].weiHuEquipments);
           this_.sheBeiweiHuData.config.title = "设备维护柱状图";
-          this_.sheBeiweiHuData.config.idselector = "mainWeiHuZ";
+          this_.sheBeiweiHuData.config.idSelector = "mainWeiHuZ";
           let objRate = {};
           objRate.name = "完好率";
           objRate.value =eIntactnessRate;
@@ -276,7 +275,7 @@ export default {
           this_.eBgRateData.data.push(objRate);
           this_.eBgRateData.color = ["#339933", "#FF0033"];
           this_.eBgRateData.config.title = "设备工作状态完成率";
-          this_.eBgRateData.config.idselector = "main1";
+          this_.eBgRateData.config.idSelector = "main1";
           //设备数维护
           let objweihu = {};
           objweihu.name = "计划维护数";
@@ -288,7 +287,7 @@ export default {
           this_.weiHuSheBeiData.data.push(objweihu);
           this_.weiHuSheBeiData.color = ["#5470c6", "#38a838"];
           this_.weiHuSheBeiData.config.title = "设备维护完成情况";
-          this_.weiHuSheBeiData.config.idselector = "mainWeiHu";
+          this_.weiHuSheBeiData.config.idSelector = "mainWeiHu";
           //设备数检定校准
           let objJianding = {};
           objJianding.name = "计划检定/校准数";
@@ -300,7 +299,7 @@ export default {
           this_.jianDingjiaoZhunSheBeiData.data.push(objJianding);
           this_.jianDingjiaoZhunSheBeiData.color = ["#5470c6", "#38a838"];
           this_.jianDingjiaoZhunSheBeiData.config.title = "设备检定/校准完成情况";
-          this_.jianDingjiaoZhunSheBeiData.config.idselector = "mainJianDing";
+          this_.jianDingjiaoZhunSheBeiData.config.idSelector = "mainJianDing";
           objRate = {};
           this_.topBarData = result;
         })

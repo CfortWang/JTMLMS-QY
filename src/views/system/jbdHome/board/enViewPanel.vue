@@ -2,7 +2,7 @@
   <div class="test-content">
     <div class="title">
       <div class="title-center" style="font-size: 26px; color: #c12530">
-        实验室温湿度负压动态监控系统
+        设施环境控制图
       </div>
       <div class="info-right">
         <span style="color: #c12530; margin-right: 5px">采集时间:</span><span style="color: #276bcc; margin-right: 15px">{{ newTiMe }}</span>

@@ -163,7 +163,7 @@ export default {
     const roleList = this.$store.getters.userInfo.role
     // 系统管理角色添加删除按钮
     const hasRole = roleList.some(item => item.name === '系统管理角色')
-    if (this.$route.name == 'ywyxjlsc') {
+    if (this.$route.name == 'wjkzgl-ywyxjlsc') {
       // 系统管理角色不做分类过滤
       this.listConfig.toolbars.push({ key: 'remove' })
       this.selection = true
@@ -174,12 +174,13 @@ export default {
         { prop: 'wen_jian_ming_che', label: '文件名称' }
       ]
       this.listConfig.columns = [
-        { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', minWidth: 100 },
-        { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 100 },
+        // { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', minWidth: 100 },
+        { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', minWidth: 100 },
         { prop: 'wen_jian_ming_che', label: '文件名称', minWidth: 150 },
         { prop: 'ban_ben_', label: '版本', width: 65 },
-        { prop: 'fu_jian_', label: '查阅', slotName: "wenjinachayue", width: 150 },
-        { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom', width: 100 }
+        { prop: 'fu_jian_', label: '查阅', slotName: "wenjinachayue", minWidth: 150 },
+        { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom', minWidth: 100 },
+        { prop: 'cha_yue_jie_zhi_s', label: '查阅截止时间', sortable: 'custom', minWidth: 120 }
       ]
     }
     if (this.$route.name == 'wjkzgl-ywyxjlsc' || this.$route.name == 'ywtxyxjl') {
@@ -189,12 +190,12 @@ export default {
       ]
       this.listConfig.columns = [
         // { prop: 'fen_lei_', label: '表单分类', width: 120 },
-        { prop: 'biao_dan_ming_che', label: '表单名称', minWidth: 150 },
-        { prop: 'shi_wu_shuo_ming_', label: '事务说明', minWidth: 200 },
+        { prop: 'biao_dan_ming_che', label: '表单名称', width: 210 },
+        { prop: 'shi_wu_shuo_ming_', label: '事务说明', minWidth: 250 },
         { prop: 'fu_jian_', label: '附件', slotName: 'wenjinachayue', width: 150 },
-        { prop: 'nian_du_', label: '年度', width: 80 },
-        { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 100 },
-        { prop: 'ry_name', label: '上传人', width: 100 }
+        { prop: 'nian_du_', label: '年度', width: 60 },
+        { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 120 },
+        { prop: 'ry_name', label: '上传人', width: 70 }
       ]
     }
   },
@@ -282,8 +283,11 @@ export default {
       let comSql = `${selectSql} t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' and (${this.depArrs.join(' or ')}) ${wheres1}`
       // 部门权限文件
       let buMenSql = `${selectSql}  t_wjxxb wj where wj.shi_fou_guo_shen_ in ('有效','使用') ${wheres2}`
-      // 受限文件
-      let authoritySql = `${selectSql}  t_wjxxb wj WHERE wj.shi_fou_guo_shen_ ='有效' and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
+      // 受限文件:结合查阅授权模块的截止时间
+      let authoritySql = `select wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s  from
+        t_wjxxb wj left join (select *from t_skwjcysqsqzb order by create_time_ desc limit 1) sq on wj.id_=sq.wen_jian_id_  
+      WHERE wj.shi_fou_guo_shen_ ='有效' and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
+       and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
       let sqlArr = [comSql, buMenSql, authoritySql]
       let oldRecordSql = ''
       let buMenWhere = []

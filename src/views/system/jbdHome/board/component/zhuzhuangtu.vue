@@ -2,7 +2,7 @@
   <div class="pieView">
     <div style="height: 10%;line-height: 30px;text-align: left;padding-left: 10px;width: 100%;">{{info.config.title}}</div>   
     <div style="width:100%;height:90%;display: inline-block;">
-      <div :id="info.config.idselector" style="width:100%;height:100%;"> </div>
+      <div :id="info.config.idSelector" style="width:100%;height:100%;"> </div>
     </div>
   </div>
 </template>
@@ -30,9 +30,8 @@ export default {
   },
   methods: {
     getMiddleLeft() {
-      debugger 
-      console.log(this.info,"this.info1231")
-      var chartDom = document.getElementById(this.info.config.idselector);
+      console.log(this.info.config,"asdho")
+      var chartDom = document.getElementById(this.info.config.idSelector);
       var myChart = echarts.init(chartDom);
       let ay =this.info.data;
       let yc;
