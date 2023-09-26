@@ -650,11 +650,12 @@ export default {
         async createSnapshot (bizKey, proId) {
             const { code = '', name = '' } = this.getFormEL().formDefData || {}
             const { proInstId = '' } = this.getFormEL().params || {}
+            const instId = proId || proInstId
             const id = bizKey || this.getFormEL().formData.id
             if (!code) {
                 return
             }
-            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process'`
+            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process' and (liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst where id_ = '${instId}' limit 1) or liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst_his where id_ = '${instId}' limit 1))`
             const { first = '' } = this.$store.getters.level
             this.$common.request('sql', sql).then(async res => {
                 const { data = [] } = res.variables || {}
@@ -702,22 +703,6 @@ export default {
                         this.$message.error('提交快照生成失败！')
                         this.updateState(id, code, '已完成')
                     })
-                    // this.$common.snapshoot({
-                    //     url,
-                    //     name: fileName,
-                    //     type: 'pdf'
-                    // }).then(res => {
-                    //     if (!res.data || !res.data.id) {
-                    //         this.$message.error('生成快照失败！')
-                    //     }
-                    //     const fileId = res.data && res.data.id ? res.data.id : ''
-                    //     const fileParams = fileId ? { kuai_zhao_: fileId } : {}
-                    //     this.updateState(id, code, '已完成', fileParams)
-                    // }).catch(() => {
-                    //     // 生成快照接口调用失败时，也需要更新状态为已完成
-                    //     this.$message.error('提交快照生成失败！')
-                    //     this.updateState(id, code, '已完成')
-                    // })
                 }, 300)
             })
         },

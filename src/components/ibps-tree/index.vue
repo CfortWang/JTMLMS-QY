@@ -535,7 +535,7 @@ $border-color: #e5e6e7;
         }
     }
     .ibps-custom-tree-node {
-        font-size: 14px;
+        font-size: 13px;
         padding-right: 8px;
     }
 }

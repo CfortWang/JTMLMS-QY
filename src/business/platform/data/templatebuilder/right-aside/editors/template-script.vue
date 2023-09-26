@@ -23,7 +23,7 @@
                         </span>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item command="onLoad">页面加载事件（onLoad）</el-dropdown-item>
-                            <!-- <el-dropdown-item command="customFormatter">自定义格式（customFormatter）</el-dropdown-item> -->
+                            <el-dropdown-item command="customFormatter">自定义格式（customFormatter）</el-dropdown-item>
                             <!-- <el-dropdown-item command="onLoadActions">按钮加载事件（onLoadActions）</el-dropdown-item> -->
                             <el-dropdown-item command="beforeSubmit">按钮前置事件（beforeSubmit）</el-dropdown-item>
                             <el-dropdown-item command="afterSubmit">按钮后置事件（afterSubmit）</el-dropdown-item>
@@ -169,6 +169,9 @@
                 switch (command) {
                     case 'onLoad':
                         val = '\n\t// 加载事件\n\tonLoad (template) {\n\t\t\n\t}'
+                        break
+                    case 'customFormatter':
+                        val = '\n\t// 自定义格式\n\tcustomFormatter (template, name, value, rowData, column) {\n\t\t\n\t}'
                         break
                     case 'onLoadActions':
                         val = '\n\t// 按钮加载事件\n\tonLoadActions (template) {\n\t\t\n\t}'
