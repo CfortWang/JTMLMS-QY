@@ -6,6 +6,7 @@
       </div>
       <div class="info-right">
         <span style="color: #c12530; margin-right: 5px">采集时间:</span><span style="color: #276bcc; margin-right: 15px">{{ newTiMe }}</span>
+        <button @click="allView" class="black">全屏</button>
         <button @click="returnBlack" class="black">返回</button>
       </div>
     </div>
@@ -59,6 +60,7 @@
 </template>
 
 <script>
+import screenfull from "screenfull";
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
 export default {
   name: "DataView",
@@ -103,19 +105,20 @@ export default {
       newweizhi: [],
       newTiMe: "",
       weizhi: [
-        { x: 456, y: 179},
-        { x: 826, y: 179},
-        { x: 1200, y: 179},
-        { x: 1387, y: 179},
-        { x: 1675, y: 179},
-        { x:349, y:370},
-        { x:1462, y:365},
-        {x:360, y:570},
-        {x:225, y:704},
-        {x:398, y:704},
-        {x:1475, y:680},
-        {x:1475, y:725},
+        { x: 610, y: 179},
+        { x: 900, y: 179},
+        { x: 1070, y: 179},
+        { x: 1160, y: 179},
+        { x: 1320, y: 179},
+        { x:655, y:370},
+        { x:1225, y:365},
+        {x:655, y:570},
+        {x:602, y:704},
+        {x:690, y:704},
+        {x:1225, y:680},
+        {x:1225, y:730},
       ],
+
       domsize: [
         {
           width: 1560,
@@ -135,7 +138,22 @@ export default {
       return str;
     },
   },
+  created() {
+    if (screenfull.isEnabled && !screenfull.isFullscreen) {
+      this.allView();
+    }
+    this.updateAll();
+  },
+  beforeDestroy() {
+    if (screenfull.isFullscreen) {
+      screenfull.toggle();
+    }
+  },
+
   methods: {
+    allView() {// 默认显示全屏
+      screenfull.request();
+    },
     dropCoordinate(e){
       console.log(e.offsetX,e.offsetY,"坐标",e.clientX,e.clientY)
     },
@@ -210,14 +228,13 @@ export default {
       // setTimeout(() => { 
         var dom = document.getElementsByClassName("img");
         // alert(this_.domsize[0].width,this_.domsize[0].height)
-         console.log(this_.domsize[0])
         this_.screen = [];
         this_.screen.push(dom[0].clientWidth);
         this_.screen.push(dom[0].clientHeight);
         this_.newweizhi = [];
         this_.weizhi.forEach((item, index) => {
           this_.x = parseInt((item.x * window.innerWidth) / this_.domsize[0].width/1.23);
-           this_.y = parseInt((item.y * window.innerHeight) / this_.domsize[0].height/1.075);
+          this_.y = parseInt((item.y * window.innerHeight +20) / this_.domsize[0].height/1.07);
           //  this_.x = item.x;
           // this_.y = item.y;
           var newobj = {
@@ -884,11 +901,13 @@ ul,li {
     }
     .img-box {
       width: 100%;
-      padding-right: 100px;
+      // padding-right: 100px;
       position: relative;
+      display: flex;
+      justify-content: center;
       .img {
         background-size: contain;
-        width: 100%;
+        width: 990px;
         height: calc(100vh - 80px);
       }
       .shiyanshi_success {

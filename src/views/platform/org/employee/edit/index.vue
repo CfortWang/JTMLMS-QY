@@ -159,7 +159,8 @@ export default {
                 posItemList: [],
                 roleItemList: [],
                 userGroupItemList: [],
-                orgItem: {} // 组织全部信息
+                orgItem: {}, // 组织全部信息
+                wxyhId: ''
             },
             employee: {},
             toolbars: [
@@ -265,7 +266,7 @@ export default {
                 this.dialogLoading = false
                 return
             }
-            console.log(vo)
+
             if (vo.roleVoList.length > 0) {
                 const list = []
                 vo.roleVoList.forEach(item => {
@@ -273,9 +274,13 @@ export default {
                 })
                 vo.user.job = list.join(',')
             }
+
             if (this.formId) {
                 update(vo).then(response => {
                     this.dialogLoading = false
+                    if (this.wxyhId) {
+                        this.updateWxyh()
+                    }
                     this.$emit('dialog-callback', this)
                     ActionUtils.saveSuccessMessage(response.message, r => {
                         // if (this.$utils.isEmpty(this.formId)) {
@@ -350,6 +355,9 @@ export default {
                 this.$nextTick(() => {
                     this.$refs.attrInfo.loadAttrData()
                 })
+                // 添加更新 t_wxyh 用于扫码签到
+                // if()
+                this.getWxyh(this.employee)
             }).catch(() => {
                 this.dialogLoading = false
             })
@@ -408,6 +416,35 @@ export default {
                 })
             }
             return result
+        },
+
+        // 更新扫码签到表的数据
+        getWxyh (data) {
+            const sql = `select * from t_wxyh where xing_ming_ = '${data.name}' and shou_ji_ = '${data.mobile}'`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                if (!data.length) {
+                    return
+                }
+                this.wxyhId = data[0].id_
+            })
+        },
+        updateWxyh () {
+            const obj = {
+                where: {
+                    id_: this.wxyhId
+                },
+                param: {
+                    xing_ming_: this.employee.name,
+                    shou_ji_: this.employee.mobile
+                }
+            }
+
+            const params = {
+                tableName: 't_wxyh',
+                updList: [obj]
+            }
+            this.$common.request('update', params)
         }
     }
 }

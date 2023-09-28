@@ -1,12 +1,32 @@
+import dataTemplate from '@/store/modules/ibps/modules/dataTemplate'
 import echarts from 'echarts'
 export default {
     data () {
         return {
-            typeList: ['待分配', '待核查', '待审核', '待确认', '已结束']
+            typeList: ['待分配', '待核查', '待审核', '待确认', '已结束'],
+            posiList: [],
+            positionList: []
         }
     },
 
     methods: {
+        getPosition () {
+            const second = this.$store.getters.level.second
+            const sql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${second}%' and DEPTH_ = '4'`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                if (data.length > 0) {
+                    const list = []
+                    const list2 = []
+                    data.forEach(item => {
+                        list.push(item.NAME_)
+                        list2.push(this.linHeg(item.NAME_))
+                    })
+                    this.posiList = list
+                    this.positionList = list2
+                }
+            })
+        },
         getColorRe (list) {
             const colors = [
                 '#d20962',
@@ -106,21 +126,48 @@ export default {
             })
         },
         getBuFuHeTuBiao (id) {
-            const sql = `select f.bian_zhi_bu_men_,g.NAME_ as name,count(f.bian_zhi_bu_men_) as count from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.parent_id_ = '${id}' and a.shen_he_jie_guo_ = 'N' GROUP BY f.bian_zhi_bu_men_`
+            const second = this.$store.getters.level.second
+            const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' AND b.shen_he_jie_guo_ = 'N' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' AND b.shen_he_jie_guo_ = 'Y' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
 
-            this.$common.request('sql', sql).then(res => {
-                const { data = [] } = res.variables || {}
-                if (data.length > 0) {
-                    // this.buTableData = data
-                    const list = []
-                    data.forEach(item => {
-                        list.push(item.name)
-                    })
-                    const dt = this.getColorRe(data)
+            Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then(res => {
+                if (res.length > 0) {
+                    const data1 = res[0].variables.data
+                    const data2 = res[1].variables.data
+                    const list1 = data1.map(item => item.value)
+                    const list2 = data2.map(item => item.value)
+                    console.log(this.barData(list1, list2))
                     const accept = echarts.init(this.$refs.Echart2)
-                    accept.setOption(JSON.parse(JSON.stringify(this.barData(list, dt.res, dt.colorList))))
+                    accept.setOption(JSON.parse(JSON.stringify(this.barData(list1, list2))))
                 }
             })
+            // this.$common.request('sql', sql).then(res => {
+            //     const { data = [] } = res.variables || {}
+            //     if (data.length > 0) {
+            //         // this.buTableData = data
+            //         const list = []
+            //         data.forEach(item => {
+            //             list.push(item.name)
+            //         })
+            //         const dt = this.getColorRe(data)
+            //         const accept = echarts.init(this.$refs.Echart2)
+            //         accept.setOption(JSON.parse(JSON.stringify(this.barData(list, dt.res, dt.colorList))))
+            //     }
+            // })
+        },
+        linHeg (value) {
+            // rowMAx 控制一行多少字
+            const rowMAx = 1
+            let overValue = ''
+            for (let i = 0; i < value.length; i++) {
+                if ((i % rowMAx === 0) && (i !== 0)) {
+                    overValue += '\n'
+                    overValue += value[i]
+                } else {
+                    overValue += value[i]
+                }
+            }
+            return overValue
         },
         getOption (totalMs = 0) {
             const option = {
@@ -177,69 +224,132 @@ export default {
             }
             const accept = echarts.init(this.$refs.Echart)
             accept.setOption(JSON.parse(JSON.stringify(option)))
-            this.show1 = true
+            // this.show1 = true
         },
-        barData (legendData, seriesData, color) {
-            const barData = {
+        barData (data1, data2) {
+            const barDataTy = {
+                // 图例设置
+                legend: {
+                    textStyle: {
+                        fontSize: 12,
+                        color: '#333'
+                    }
+                },
                 title: {
                     show: true,
-                    text: '不符合条款清单比例',
+                    text: '条款清单',
                     textStyle: {
-                        color: '#000000',
+                        // color: '#fff',
                         fontSize: 20,
                         fontWeight: '600'
                     },
                     textAlign: 'center',
                     left: '50%',
-                    top: '10px'
+                    top: '20px'
                 },
-                legend: {
-                    orient: 'horizontal',
-                    show: true,
-                    left: 'center',
-                    bottom: 10,
-                    z: 3,
-                    // itemWidth: 25,
-                    // itemHeight: 14,
-                    // itemGap: 10,
-                    data: legendData
-                },
-                series: [
-                    {
-                        name: '',
-                        type: 'pie',
-                        radius: '60%',
-                        center: ['50%', '50%'],
-                        data: seriesData,
-                        itemStyle: {
-                            emphasis: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            },
-                            normal: {
-                                label: {
-                                    show: true,
-                                    position: 'outer',
-                                    // formatter: `占比：{d}%\n\n\r{b}:{c}`,
-                                    formatter: `{b}：{c}\n占比：{d}%`,
-                                    fontSize: 14
-                                },
-                                labelLine: {
-                                    show: true
-                                }
-                            }
-                        }
+                xAxis: {
+                    name: '部门',
+                    type: 'category',
+                    data: this.positionList,
+                    axisTick: {
+                        alignWithLabel: true
                     }
-                ],
-                color,
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '数量（项目）',
+                    minInterval: 1,
+                    nameTextStyle: {
+                        fontSize: 14
+                    },
+                    splitLine: {
+                        show: false
+                    }
+                },
+                series: [{
+                    name: '符合',
+                    type: 'bar',
+                    barGap: 0,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: data2
+                },
+                {
+                    name: '不符合',
+                    type: 'bar',
+                    barGap: 0,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: data1
+                }],
+                color: ['#64C7BF', '#73A0FA'],
                 tooltip: {
                     show: true,
-                    trigger: 'item',
-                    formatter: '不符合条款清单<br/>{b}：{c}<br/>占比：{d}%'
+                    trigger: 'axis'
                 }
             }
-            return barData
+            // const barData = {
+            //     title: {
+            //         show: true,
+            //         text: '不符合条款清单比例',
+            //         textStyle: {
+            //             color: '#000000',
+            //             fontSize: 20,
+            //             fontWeight: '600'
+            //         },
+            //         textAlign: 'center',
+            //         left: '50%',
+            //         top: '10px'
+            //     },
+            //     legend: {
+            //         orient: 'horizontal',
+            //         show: true,
+            //         left: 'center',
+            //         bottom: 10,
+            //         z: 3,
+            //         // itemWidth: 25,
+            //         // itemHeight: 14,
+            //         // itemGap: 10,
+            //         data: legendData
+            //     },
+            //     series: [
+            //         {
+            //             name: '',
+            //             type: 'pie',
+            //             radius: '60%',
+            //             center: ['50%', '50%'],
+            //             data: seriesData,
+            //             itemStyle: {
+            //                 emphasis: {
+            //                     shadowBlur: 10,
+            //                     shadowOffsetX: 0,
+            //                     shadowColor: 'rgba(0, 0, 0, 0.5)'
+            //                 },
+            //                 normal: {
+            //                     label: {
+            //                         show: true,
+            //                         position: 'outer',
+            //                         // formatter: `占比：{d}%\n\n\r{b}:{c}`,
+            //                         formatter: `{b}：{c}\n占比：{d}%`,
+            //                         fontSize: 14
+            //                     },
+            //                     labelLine: {
+            //                         show: true
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     ],
+            //     color,
+            //     tooltip: {
+            //         show: true,
+            //         trigger: 'item',
+            //         formatter: '不符合条款清单<br/>{b}：{c}<br/>占比：{d}%'
+            //     }
+            // }
+            return barDataTy
         }
     }
 }

@@ -1,27 +1,24 @@
 <template>
   <div class="pieView">
-    <div
-      style="
+    <div style="
         height: 10%;
         line-height: 30px;
         text-align: left;
         padding-left: 10px;
         width: 100%;
         color: white;
-      "
-    >
+      ">
       {{ config.title }}
     </div>
-    <div
-      style="
+    <div style="
         width: 100%;
         height: 90%;
         display: inline-block;
         overflow: hidden;
         box-sizing: border-box;
-      "
-    >
-      <div :id="config.id" style="width: 100%; height: 100%"></div>
+      ">
+      <div :id="config.id"
+           style="width: 100%; height: 100%"></div>
     </div>
   </div>
 </template>
@@ -63,7 +60,6 @@ export default {
   watch: {
     info: {
       handler(newVal, oldVal) {
-        console.log("11111");
         this.getMiddleLeft();
       },
       deep: true,

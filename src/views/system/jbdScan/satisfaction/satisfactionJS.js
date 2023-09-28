@@ -50,7 +50,7 @@ export default {
                         const list3 = []
                         const list4 = []
                         const titleData = {
-                            title: '小计',
+                            title: '总计',
                             color: '#ff6347'
                         }
                         const titleData1 = {

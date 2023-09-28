@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-dialog
-            title="满意度统计图"
+            :title="'满意度统计（编制时间：' + generalList[0].bian_zhi_shi_jian+'）'"
             :visible.sync="generalShow"
             width="80%"
             top="0"

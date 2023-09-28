@@ -29,10 +29,10 @@
                             <div v-if="activeIndex != 5" style="width: 100%">
                                 <div ref="Echart" class="chart" />
                             </div>
-                            <div v-if="activeIndex == 5" style="width: 50%;position: relative;">
+                            <div v-if="activeIndex == 5" style="width:40%;position: relative;">
                                 <div ref="Echart" class="chart" />
                             </div>
-                            <div v-if="activeIndex == 5" style="width: 50%;position: relative;">
+                            <div v-if="activeIndex == 5" style="width: 60%;position: relative;">
                                 <div ref="Echart2" class="chart" />
                             </div>
 
@@ -141,9 +141,10 @@ export default {
         }
     },
     created () {
+        this.getPosition()
         this.id = this.generalList[0].id_
         this.getJiHuaZhuangTai(this.id)
-        this.innerWidth = window.innerWidth /2
+        this.innerWidth = window.innerWidth / 2
     },
     methods: {
         close () {
@@ -187,7 +188,7 @@ export default {
 }
 .chart{
     width: 100%;
-    height: 250px;
+    height: 300px;
 }
 
 .tyongj{

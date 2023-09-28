@@ -10,7 +10,7 @@
                 v-if="el.type =='Statis'"
                 v-model="isShow"
                 width="380"
-                style="margin-left: 90px; padding-left: 100px;"
+            
                 trigger="manual"
             >
                 <span class="el-icon-close" style="float: right;" @click.stop="closePopover" />
@@ -22,7 +22,7 @@
 
 <script>
 import $dialog from '@/utils/dialog'
-import templateStatis from '@/views/statistics/index.vue'
+import templateStatis from '@/views/statistics/index_kanban.vue'
 
 export default {
     components: {
