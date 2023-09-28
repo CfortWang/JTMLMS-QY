@@ -30,6 +30,10 @@ export default {
             })
         },
         addRecord () {
+            if (!this.boCode) {
+                this.$message.warning('请先绑定业务对象！')
+                return
+            }
             if (this.flag || this.liu_cheng_xuan_ze) return this.updateRecord()
             this.add()
         },
@@ -37,6 +41,7 @@ export default {
             const params = {
                 tableName: 't_lcidglbdbb',
                 paramWhere: [{
+                    tableKey_: this.boCode,
                     bao_biao_lu_jing_: this.bao_biao_lu_jing_,
                     fu_jian_nei_rong_: this.fu_jian_nei_rong_,
                     liu_cheng_xuan_ze: this.data.id,
@@ -49,10 +54,7 @@ export default {
             }
             curdPost('add', params).then(() => {
                 this.flag = true
-                this.$message({
-                    message: '添加成功',
-                    type: 'success'
-                })
+                this.$message.success('添加成功！')
             })
         },
         updateRecord () {
@@ -64,6 +66,7 @@ export default {
                             liu_cheng_xuan_ze: this.liu_cheng_xuan_ze
                         },
                         param: {
+                            tableKey_: this.boCode,
                             bao_biao_lu_jing_: this.bao_biao_lu_jing_,
                             fu_jian_nei_rong_: this.fu_jian_nei_rong_,
                             guan_lian_zi_duan: this.guan_lian_zi_duan,
@@ -75,10 +78,7 @@ export default {
                 ]
             }
             curdPost('update', params).then(() => {
-                this.$message({
-                    message: '修改成功',
-                    type: 'warning'
-                })
+                this.$message.info('修改成功')
             })
         }
     }

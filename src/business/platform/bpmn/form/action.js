@@ -655,7 +655,7 @@ export default {
             if (!code) {
                 return
             }
-            const sql = `select * from t_lcidglbdbb where shi_fou_zi_biao_ = 't_${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process' and (liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst where id_ = '${instId}' limit 1) or liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst_his where id_ = '${instId}' limit 1))`
+            const sql = `select * from t_lcidglbdbb where tablekey_ = '${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process' and (liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst where id_ = '${instId}' limit 1) or liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst_his where id_ = '${instId}' limit 1))`
             const { first = '' } = this.$store.getters.level
             this.$common.request('sql', sql).then(async res => {
                 const { data = [] } = res.variables || {}

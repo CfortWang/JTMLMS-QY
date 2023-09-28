@@ -104,7 +104,7 @@ export default {
         }
     },
     computed: {
-    // 业务对象
+        // 业务对象
         boData () {
             return this.data ? this.data.bo || {} : {}
         },
