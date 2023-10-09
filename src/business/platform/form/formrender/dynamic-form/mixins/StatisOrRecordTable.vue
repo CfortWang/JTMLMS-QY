@@ -10,7 +10,6 @@
                 v-if="el.type =='Statis'"
                 v-model="isShow"
                 width="380"
-            
                 trigger="manual"
             >
                 <span class="el-icon-close" style="float: right;" @click.stop="closePopover" />
@@ -111,6 +110,7 @@ export default {
         display: flex;
         flex-flow: wrap;
         justify-content: flex-end;
+        margin-left: -13%;
         .sin{
             margin: 5px;
             cursor: pointer;

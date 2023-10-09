@@ -1,24 +1,27 @@
 <template>
     <div class="test2">
         <div class="mb-md">
-            <div class="demo-input-suffix">
+            <div v-if="grooveData.xlsxTitleShow" class="demo-input-suffix">
                 表格名称：
                 <el-input v-model="title" placeholder="请输入表格名称" style="width: 400px" />
             </div>
-            <div class="demo-input-suffix">
+            <div v-if="grooveData.saveShow" class="demo-input-suffix">
                 <el-button type="success" @click="save">保存</el-button>
             </div>
-            <div class="demo-input-suffix">
+            <div v-if="grooveData.clickHandleShow" class="demo-input-suffix">
                 <el-button type="warning" @click="clickHandle">上传xlsx</el-button>
             </div>
             <div class="demo-input-suffix">
                 <el-button type="info" @click="exportExcelBtn">导出xlsx</el-button>
             </div>
             <input ref="inputFile" type="file" style="display: none" @change="chageFile">
+            <!-- <div v-if="!grooveData.xlsxTitleShow && !grooveData.saveShow && !grooveData.clickHandleShow && !grooveData.exportExcelShow" style="height: 30px"></div> -->
         </div>
         <!--web spreadsheet组件-->
         <div class="excel" :style="{height: height + 'px'}">
-            <div id="luckysheetDom" ref="luckysheet" style="margin: 0px; padding: 0px; width: 100%; height: 100%" />
+            <div id="luckysheetDom" ref="luckysheet" style="margin: 0px; padding: 0px; width:100%; height: 100%;z-index: 100;" />
+
+            <!-- <div id="luckysheetDom" ref="luckysheet" style="margin: 0px; padding: 0px; width: calc(100% + 200px); height: calc(100% + 50px);z-index: 100;" /> -->
         </div>
     </div>
 </template>
@@ -29,6 +32,7 @@ import LuckyExcel from 'luckyexcel'
 const luckysheet = window.luckysheet
 // 代码见下
 import { exportExcel } from './js/export'
+import { upload } from '@/api/detection/jtsjpz'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 export default {
     name: 'xspreadsheet-demo',
@@ -40,6 +44,28 @@ export default {
         dialogShow: {
             type: Boolean,
             default: false
+        },
+        grooveData: {
+            type: Object,
+            default: function () {
+                return {
+                    title: '提示',
+                    saveShow: true,
+                    exportExcelShow: true,
+                    clickHandleShow: true,
+                    xlsxTitleShow: true,
+                    readOnly: true,
+                    showtoolbarConfig: null,
+                    cellRightClickConfig: null,
+                    showstatisticBarConfig: null
+                }
+            }
+        },
+        grooveList: {
+            type: Array,
+            default: () => {
+                return []
+            }
         }
     },
     data () {
@@ -115,7 +141,7 @@ export default {
                 view: true, // 打印视图
                 zoom: true // 缩放
             },
-            title: '',
+            title: this.grooveData.title,
             height: ''
         }
     },
@@ -124,6 +150,24 @@ export default {
             this.height = window.innerHeight - 110
         } else {
             this.height = window.innerHeight - 150
+        }
+
+        if (this.grooveData.showtoolbarConfig && Object.keys(this.grooveData.showtoolbarConfig).length > 0) {
+            Object.keys(this.grooveData.showtoolbarConfig).forEach(item => {
+                this.showtoolbarConfig[item] = this.grooveData.showtoolbarConfig[item]
+            })
+        }
+
+        if (this.grooveData.cellRightClickConfig && Object.keys(this.grooveData.cellRightClickConfig).length > 0) {
+            Object.keys(this.grooveData.cellRightClickConfig).forEach(item => {
+                this.cellRightClickConfig[item] = this.grooveData.cellRightClickConfig[item]
+            })
+        }
+
+        if (this.grooveData.showstatisticBarConfig && Object.keys(this.grooveData.showstatisticBarConfig).length > 0) {
+            Object.keys(this.grooveData.showstatisticBarConfig).forEach(item => {
+                this.showstatisticBarConfig[item] = this.grooveData.showstatisticBarConfig[item]
+            })
         }
     },
     mounted () {
@@ -136,7 +180,7 @@ export default {
     },
     destroyed () {
         luckysheet.destroy()
-        this.$refs.luckysheet.remove()
+        // this.$refs.luckysheet.remove()
     },
     methods: {
         init () {
@@ -156,6 +200,14 @@ export default {
                     cellRightClickConfig: this.cellRightClickConfig,
                     showstatisticBarConfig: this.showstatisticBarConfig
                 }
+            }
+            if (this.grooveList.length > 0) {
+                this.grooveList.forEach((item, index) => {
+                    if (!item.name) {
+                        item.name = 'sheet' + index
+                    }
+                })
+                options.data = this.grooveList
             }
             // 可开启只读模式
             // options.allowEdit = false
@@ -184,9 +236,11 @@ export default {
         },
         // 下载文档
         exportExcelBtn () {
+            console.log(luckysheet.toJson())
             const title = this.title ? this.title : '下载'
             exportExcel(luckysheet.getluckysheetfile(), title)
         },
+
         // 上传文档
         clickHandle () {
             this.$refs.inputFile.click()
@@ -252,14 +306,15 @@ export default {
             const data = {
                 shu_ju_cun_chu_: JSON.stringify(option),
                 shu_ju_lei_xing_: '在线编辑',
-                shu_ju_ming_cheng: this.title
+                shu_ju_ming_cheng: this.title,
+                bao_cun_dao_chu_s: JSON.stringify(luckysheet.getluckysheetfile())
             }
             const params = {
                 tableName: 't_pbgl',
                 paramWhere: [data]
             }
             curdPost('add', params).then((res) => {
-                if (res.state === '200') {
+                if (res.state == '200') {
                     const dataItem = res.variables.cont[0]
                     this.id = dataItem.id_
                     this.$emit('addClick', dataItem.id_, dataItem)
@@ -287,7 +342,8 @@ export default {
                 param: {
                     shu_ju_cun_chu_: JSON.stringify(option),
                     shu_ju_lei_xing_: '在线编辑',
-                    shu_ju_ming_cheng: this.title
+                    shu_ju_ming_cheng: this.title,
+                    bao_cun_dao_chu_s: JSON.stringify(luckysheet.getluckysheetfile())
                 }
             }
             const allSampleParams = {

@@ -1,9 +1,9 @@
 <template>
   <dv-full-screen-container>
-    <el-scrollbar class="screen" ref="scrollDiv" >
+    <div class="screen" ref="scrollDiv" >
     <!-- :style="{height:height}" -->
       <div class="statistics" v-on:mouseenter="rollstop" v-on:mouseleave="rollcontinue">
-        <div class="editDate">
+        <div class="editDate" style="background-color: rgba(0,0,0,0);display: block;width: 100%;height: 10%;">
            <!-- 标题装饰组件 -->
           <header-decoration /> 
           <!-- <div class="stitle">实验室管理看板</div> -->
@@ -29,11 +29,12 @@
           <!-- </div> -->
           <div 
             style="width: 50%;
-            height:2.825rem;
-            line-height: 2.825rem;
+            height:45%;
+            line-height: 45%;
             text-align:center;
             float: left;
-            margin: -3% 0 0 1%;
+            margin: -2.5% 0 0 1%;
+            font-size: 100%;
             color: #fff !important;
             align-items: center;
             display:flex" >
@@ -110,12 +111,13 @@
           <div 
             @click.prevent="goBack()" 
             style="width: 8%;
-            height:2.825rem;
-            line-height: 2.825rem;
+            height:43%;
+            font-size: 100%;
+            line-height: 45%;
             text-align:center;
             float: right;
-            margin: -3% 17.1% 0 0;" >
-            <dv-border-box-8>返回</dv-border-box-8>
+            margin: -2.5% 17.1% 0 0;" >
+            <dv-border-box-8 class="shiyankanbanfanhui">返回</dv-border-box-8>
           </div>
           
         </div>
@@ -177,9 +179,9 @@
             <div class="mubiaozhi">当前目标值：{{quality[4].val}}</div>
           </div>
         </div> -->
-        <div class="congxiebox7"  v-if="pageOT==1&&bumen!=''">
+        <div class="congxiebox7" style="display:inline-block;height:42%;width:100%;" v-if="pageOT==1&&bumen!=''">
           <div class="ttitle" style="text-align: center;">部门质量目标与质量指标</div>
-          <div class="componentsData" v-if="relOf">
+          <div class="componentsData" style="height:82%" v-if="relOf">
               <!-- 
               <s1jianCe :height="'290%'" :width="static=='row' ? '19.5%': '100%'" :colorw = "colorw" :mubiao = "quality[1].val"
               v-if="showAll || showComponents[5]" :data = "getS2jianCe()" />
@@ -187,50 +189,53 @@
               v-if="showAll || showComponents[6]" :data = "getS3tousu()"/>
               <s13shengWu :height="'290%'" :width="static=='row' ? '19.5%': '100%'" :colorw = "colorw" :mubiao = "quality[4].val"
               v-if="showAll || showComponents[17]" :data = "getS3tousu()"/> -->
-              <s11biaoZhunWucol :height="'390%'" :width="static=='row' ? '100%': '100%'" :colorw = "colorw"
-              v-if="showAll || showComponents[15]" :data = "getfenzuZLZBObjNum()"/>
+              <s11biaoZhunWucol style="height:100%" :width="static=='row' ? '100%': '100%'" :colorw = "colorw"
+              v-if="fenzuzlmb.length>0&&(showAll || showComponents[15])" :data = "getfenzuZLZBObjNum()"/>
+              <div class="nullDate" v-if="fenzuzlmb.length<=0&&( showAll || showComponents[15])">暂无数据</div>
               <div class="clear"></div>
           </div>
         </div>
-        <div class="congxiebox7" style="overflow:hiddien" v-if="pageOT==1&&bumen!=''">
+        <div class="congxiebox7" style="display:inline-block;height:42%;width:100%;text-align: center;overflow:hiddien" v-if="pageOT==1&&bumen!=''">
           <div class="ttitle" style="margin:2% 0;text-align: center;">质量目标与质量指标公式</div>
-          <div class="componentsData" v-if="relOf">
-              <dv-scroll-board style="height:350px;white-space:pre-wrap"
-                v-if="showAll || showComponents[23]||tableData1.data.length>0"
+          <div class="componentsData" style="height:82%"  v-if="relOf">
+              <dv-scroll-board style="height:100%;white-space:pre-wrap"
+                v-if="(showAll || showComponents[23])&&tableData1.data.length>0"
                 :config="tableData1"
               />
+              <div class="nullDate" v-if="(showAll || showComponents[23])&&tableData1.data.length<=0">暂无数据</div>
               <div class="clear"></div>
 
           </div>
         </div>
-        <div class="congxiebox7" style="display:inline-block;width:79%;" v-if="pageOT==1&&bumen==''">
-          <div class="ttitle" style="margin:2% 0;text-align: center;">各部门质量目标与质量指标</div>
+        <div class="congxiebox7" style="display:inline-block;width:79%;height:85%" v-if="pageOT==1&&bumen==''">
+          <div class="ttitle" style="text-align: center;">各部门质量目标与质量指标</div>
           <div class="componentsData" v-if="relOf">
-              <s11biaoZhunWu :height="'840%'" :width="static=='row' ? '100%': '100%'" :colorw = "colorw"
-              v-if="showAll || showComponents[15]" :data = "getyangPinCaiJiObjNum()"/>
+              <s11biaoZhunWu style="height:100%" :width="static=='row' ? '100%': '100%'" :colorw = "colorw"
+              v-if=" buhegelvObj.length>0 && (showAll || showComponents[15])" :data = "getyangPinCaiJiObjNum()"/>
+              <div class="nullDate" v-if="buhegelvObj.length<=0&&( showAll || showComponents[15])">暂无数据</div>
               <div class="clear"></div>
 
           </div>
         </div>
-        <div class="congxiebox7" style="display:inline-block;width:19%;float:right;overflow:hiddien" v-if="pageOT==1&&bumen==''">
-          <div class="ttitle" style="margin:9% 0;text-align: center;">质量目标与质量指标总计</div>
+        <div class="congxiebox7" style="display:inline-block;width:19%;float:right;height:85%;overflow:hiddien" v-if="pageOT==1&&bumen==''">
+          <div class="ttitle" style="margin:8% 0;text-align: center;">质量目标与质量指标总计</div>
           <div class="componentsData" v-if="relOf">
-              <dv-scroll-board style="height:835px;"
-                v-if="showAll || showComponents[22]||tableData.data.length>0"
+              <dv-scroll-board style="height:100%;"
+                v-if="(showAll || showComponents[22])&&tableData.data.length>0"
                 :config="tableData"
               />
-              
+              <div class="nullDate" style="height:100%;" v-if="(showAll || showComponents[22])&&tableData.data.length<=0">暂无数据</div>
               <div class="clear"></div>
 
           </div>
         </div>
         
-        <div class="congxiebox7" style="display:inline-block;width:49%;" v-if="pageOT==2">
+        <div class="congxiebox7" style="display:inline-block;width:49%;height:25%;" v-if="pageOT==2">
           <div class="ttitle" style="text-align: center;">人员培训与管理</div>
-          <div class="componentsData" v-if="relOf">
-            <s4renYuanPeiXun :height="'250%'" :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
+          <div class="componentsData" style="height:87%" v-if="relOf">
+            <s4renYuanPeiXun style="height:100%"  :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[8]" :data = "getS4renYuanPeiXun()"/>
-            <s5renYuanJianDu :height="'250%'" :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
+            <s5renYuanJianDu style="height:100%"  :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[9]" :data = "getS5renYuanJianDu()"/>
               <!-- <s16bzJunZhu :height="'290%'" :width="static=='row' ? '33%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[20]" :data = "getbzJunZhujNum()"/>
@@ -239,56 +244,62 @@
               <div class="clear"></div> -->
           </div>
         </div>
-        <div class="congxiebox7" style="display:inline-block;width:49%;float:right;" v-if="pageOT==2">
+        <div class="congxiebox7" style="display:inline-block;width:49%;float:right;height:25%;" v-if="pageOT==2">
           <div class="ttitle" style="text-align: center;">设备维保</div>
-          <div class="componentsData" v-if="relOf">
-            <s7sheBeiJiaoZhun :height="'250%'" :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
+          <div class="componentsData" style="height:87%" v-if="relOf">
+            <s7sheBeiJiaoZhun style="height:100%" :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[12]" :data = "getJiaoYanObjNum()"/>
-              <s8sheBeiHeCha :height="'250%'" :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
+              <s8sheBeiHeCha style="height:100%"  :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[11]" :data = "gethechaObjNum()"/>
               <!-- <div class="clear"></div> -->
           </div>
         </div>
-         <div class="congxiebox7" v-if="pageOT==2">
+         <div class="congxiebox7" style="display:inline-block;width:100%;height:60%;" v-if="pageOT==2">
 
           <div class="ttitle" style="text-align: center;">质量管理</div>
-          <div class="componentsData" v-if="relOf">
-              <s9neiBuZhiLiang :height="'250%'" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+          <div class="componentsData" style="height:87%" v-if="relOf">
+              <s9neiBuZhiLiang style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[13]" :data = "getS9neiBuZhiLiang()"/>
-              <s10waiBuNengLi :height="'250%'" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+              <s10waiBuNengLi style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[14]" :data = "getnengtliObjNum()"/>
               
-              <s15tousu :height="'250%'" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+              <s15tousu style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[19]" :data = "getS3tousu()"/>
-              <s12fengXian :height="'250%'" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+              <s12fengXian style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
               v-if="showAll || showComponents[16]" :data = "getS12fengXian()"/>
+              
+              <s2manYiDu style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw" 
+              v-if="showAll || showComponents[7]"  :data = "getS2manYiDu()"/>
+              <s14bufuhexiang style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+              v-if="bufuheObj.length>0&&(showAll || showComponents[18])" :data = "getS14bufuhexiang()"/>
+              <div class="nullDate1" v-if="bufuheObj.length<=0&&(showAll || showComponents[18])">暂无数据</div>
+              
+              <s1zhiLiangMuBiao style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw" 
+              v-if="showAll || showComponents[1]" :data = "getS1renwu()"/>
+              <s16bzJunZhu style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+              v-if="gaijinxiangObj.length>0&&(showAll || showComponents[20])" :data = "getbzJunZhujNum()"/>
+              <div class="nullDate1" v-if="gaijinxiangObj.length<=0&&(showAll || showComponents[20])">暂无数据</div>
               <div class="clear"></div>
           </div>
         </div> 
-        <div class="congxiebox7" style="display:inline-block;width:49%;" v-if="pageOT==2">
+        <!-- <div class="congxiebox7" style="display:inline-block;width:49%;" v-if="pageOT==2">
           <div class="ttitle" style="text-align: center;">内审计划</div>
           <div class="componentsData" v-if="relOf">
-             <s2manYiDu :height="'250%'" :width="static=='row' ? '50%': '100%'" :colorw = "colorw" 
-              v-if="showAll || showComponents[7]"  :data = "getS2manYiDu()"/>
-            <s14bufuhexiang :height="'250%'" :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
-              v-if="showAll || showComponents[18]" :data = "getS14bufuhexiang()"/>
+             
           </div>
         </div>
         <div class="congxiebox7" style="display:inline-block;width:49%;float:right;" v-if="pageOT==2">
           <div class="ttitle" style="text-align: center;">管审计划</div>
           <div class="componentsData" v-if="relOf">
-            <s1zhiLiangMuBiao :height="'250%'" :width="static=='row' ? '50%': '100%'" :colorw = "colorw" 
-              v-if="showAll || showComponents[1]" :data = "getS1renwu()"/>
-              <s16bzJunZhu :height="'250%'" :width="static=='row' ? '50%': '100%'" :colorw = "colorw"
-              v-if="showAll || showComponents[20]" :data = "getbzJunZhujNum()"/>
+            
           </div>
         </div>
-       
+        -->
 
 
 
       </div>
-    </el-scrollbar>
+    </div>
   </dv-full-screen-container>
 </template>
 
@@ -329,7 +340,7 @@
   import { DBData ,getConfig,getJiaoYanObj, gethechaObj, getnengliObj,getkangningyangpinObj,getgaijinxiangObj,getbufuheObj,getguanshenObj,getneishenObj,getfengxianObj,getyingjiObj,getneibuObj,getwaibuObj,gethechaMGObj,getJiaoYanMGObj,getgangqianpeixunObj,getzaigangrenyuanObj,getfenzuZLZBObj,getzongZLMBObj,getzhiliangzhibiaotitleObj, getyangPinCaiJiObj,getbiaozhunTObj,getbzJunZhuObj,getbzJunZhuTObj,getbzXiBaoObj,getbzXiBaoTObj} from './js/selectDB.js'
   import sendDatas from './sendDatas.js'
   import repostCurd from '@/business/platform/form/utils/custom/joinCURD.js'
-import * as forEach from 'lodash/forEach'
+  import * as forEach from 'lodash/forEach'
   export default {
     components:{
       headerDecoration,
@@ -456,16 +467,16 @@ import * as forEach from 'lodash/forEach'
           columnWidth: [600, 400],
           align: ['left','right'],
           data: [
-            ['行1列1', '行1列2', '行1列3'],
+            // ['行1列1', '行1列2', '行1列3'],
           ]
         },
         tableData1:{
           header: ['<span style="font-size:16px;height:53px">质量指标</span>','<span style="font-size:16px;height:53px">计算公式</span>', '<span style="font-size:16px;height:53px">指标限值</span>'],
           rowNum: 5,
-          columnWidth: [500,700, 200],
+          columnWidth: [300,900, 200],
           align: ['left','left','right'],
           data: [
-            ['行1列1', '行1列2', '行1列3'],
+            // ['行1列1', '行1列2', '行1列3'],
           ]
         }
       }
@@ -510,65 +521,104 @@ import * as forEach from 'lodash/forEach'
       /* 查询统计配置中的完成率*/
       getConfigData(end,info) {
         let that = this
-        repostCurd('sql', getConfig()).then(response => {
-          that.config = response.variables.data //结果一定存在第0个，因为只有一条数据
-          repostCurd('sql', getyangPinCaiJiObj(end,info)).then(response1 => {
-            that.buhegelvObj = response1.variables.data 
-            repostCurd('sql', getzhiliangzhibiaotitleObj(end,info)).then(response2 => {
-              that.zhiliangzhibiaotitle = response2.variables.data
-              repostCurd('sql', getzongZLMBObj(end,info)).then(response3 => {
-                that.tableNum = response3.variables.data 
-                repostCurd('sql', getfenzuZLZBObj(end,info)).then(response4 => {
-                  that.fenzuzlmb = response4.variables.data 
-                  repostCurd('sql', getzaigangrenyuanObj(end,info)).then(response5 => {
-                    that.zaigangrenyuan = response5.variables.data 
-                    repostCurd('sql', getgangqianpeixunObj(end,info)).then(response6 => {
+        Promise.all([repostCurd('sql', getConfig()),repostCurd('sql', getyangPinCaiJiObj(end,info)),repostCurd('sql', getzhiliangzhibiaotitleObj(end,info)),
+                     repostCurd('sql', getzongZLMBObj(end,info)),repostCurd('sql', getfenzuZLZBObj(end,info)),repostCurd('sql', getzaigangrenyuanObj(end,info)),
+                     repostCurd('sql', getgangqianpeixunObj(end,info)),repostCurd('sql', getJiaoYanObj(end,info)),repostCurd('sql', getJiaoYanMGObj(end,info)),
+                     repostCurd('sql', gethechaObj(end,info)),repostCurd('sql', gethechaMGObj(end,info)),repostCurd('sql', getwaibuObj(end,info)),
+                     repostCurd('sql', getneibuObj(end,info)),repostCurd('sql', getyingjiObj(end,info)),repostCurd('sql', getfengxianObj(end,info)),
+                     repostCurd('sql', getneishenObj(end,info)),repostCurd('sql', getguanshenObj(end,info)),repostCurd('sql', getbufuheObj(end,info)),
+                     repostCurd('sql', getgaijinxiangObj(end,info))]).then(([response,response1, response2,response3,response4,response5,response6,response7,response8,response9,response10,response11,response12,response13,response14,response15,response16,response17,response18]) => {
+
+                      that.config = response.variables.data
+                      that.buhegelvObj = response1.variables.data 
+                      that.zhiliangzhibiaotitle = response2.variables.data
+                      that.tableNum = response3.variables.data 
+                      let arr  = this.tableNum
+                      let aa =[]
+                      for (let j = 0; j < arr.length; j++) {
+                        let changeArr = ['<span style="font-size:14px;height:45px;line-height:45px;display:inline-block">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;line-height:45px;display:inline-block">' + arr[j].location.toFixed(2) + '</span>']
+                        // aa.push(changeArr)
+                        let changeArr1 = ['<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].ji_suan_gong_shi_ + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_biao_xian_zhi + '</span>']
+                        that.tableData.data.push(changeArr)
+                        that.tableData1.data.push(changeArr1)
+                      }
+                      that.fenzuzlmb = response4.variables.data
+                      that.zaigangrenyuan = response5.variables.data 
                       that.gangqianpeixun = response6.variables.data 
-                      repostCurd('sql', getJiaoYanObj(end,info)).then(response7 => {
-                        that.jiaoyanObj = response7.variables.data
-                        repostCurd('sql', getJiaoYanMGObj(end,info)).then(response8 => {
-                          that.jiaoyanMGObj = response8.variables.data
-                          repostCurd('sql', gethechaObj(end,info)).then(response9 => {
-                            that.hechaObj = response9.variables.data
-                            repostCurd('sql', gethechaMGObj(end,info)).then(response10 => {
-                              that.hechaMGObj = response10.variables.data
-                              repostCurd('sql', getwaibuObj(end,info)).then(response11 => {
-                                that.waibuObj = response11.variables.data
-                                repostCurd('sql', getneibuObj(end,info)).then(response12 => {
-                                  that.neibuObj = response12.variables.data
-                                  repostCurd('sql', getyingjiObj(end,info)).then(response13 => {
-                                    that.yingjiObj = response13.variables.data
-                                    repostCurd('sql', getfengxianObj(end,info)).then(response14 => {
-                                      that.fengxianObj = response14.variables.data
-                                      repostCurd('sql', getneishenObj(end,info)).then(response15 => {
-                                        that.neishenObj = response15.variables.data
-                                        repostCurd('sql', getguanshenObj(end,info)).then(response16 => {
-                                          that.guanshenObj = response16.variables.data
-                                          repostCurd('sql', getbufuheObj(end,info)).then(response17 => {
-                                            that.bufuheObj = response17.variables.data
-                                            repostCurd('sql', getgaijinxiangObj(end,info)).then(response18 => {
-                                              that.gaijinxiangObj = response18.variables.data
-                                              
-                                              that.relOf = true
-                                            })
-                                          })
-                                        })
-                                      })
-                                    })
-                                  })
-                                })
-                              })
-                            })
-                          })
-                        })
-                      })
-                    })
-                  })
-                })
-              })
-            })
-          })
+                      that.jiaoyanObj = response7.variables.data
+                      that.jiaoyanMGObj = response8.variables.data
+                      that.hechaObj = response9.variables.data
+                      that.hechaMGObj = response10.variables.data
+                      that.waibuObj = response11.variables.data
+                      that.neibuObj = response12.variables.data
+                      that.yingjiObj = response13.variables.data
+                      that.fengxianObj = response14.variables.data
+                      that.neishenObj = response15.variables.data
+                      that.guanshenObj = response16.variables.data
+                      that.bufuheObj = response17.variables.data
+                      that.gaijinxiangObj = response18.variables.data
+                      that.relOf = true
         })
+        // repostCurd('sql', getConfig()).then(response => {
+        //   that.config = response.variables.data //结果一定存在第0个，因为只有一条数据
+        //   repostCurd('sql', getyangPinCaiJiObj(end,info)).then(response1 => {
+        //     that.buhegelvObj = response1.variables.data 
+        //     console.log(that.buhegelvObj>0,'222222222222222222222222222222222222222222222222222222222')
+        //     repostCurd('sql', getzhiliangzhibiaotitleObj(end,info)).then(response2 => {
+        //       that.zhiliangzhibiaotitle = response2.variables.data
+        //       repostCurd('sql', getzongZLMBObj(end,info)).then(response3 => {
+        //         that.tableNum = response3.variables.data 
+        //         repostCurd('sql', getfenzuZLZBObj(end,info)).then(response4 => {
+        //           that.fenzuzlmb = response4.variables.data 
+        //           repostCurd('sql', getzaigangrenyuanObj(end,info)).then(response5 => {
+        //             that.zaigangrenyuan = response5.variables.data 
+        //             repostCurd('sql', getgangqianpeixunObj(end,info)).then(response6 => {
+        //               that.gangqianpeixun = response6.variables.data 
+        //               repostCurd('sql', getJiaoYanObj(end,info)).then(response7 => {
+        //                 that.jiaoyanObj = response7.variables.data
+        //                 repostCurd('sql', getJiaoYanMGObj(end,info)).then(response8 => {
+        //                   that.jiaoyanMGObj = response8.variables.data
+        //                   repostCurd('sql', gethechaObj(end,info)).then(response9 => {
+        //                     that.hechaObj = response9.variables.data
+        //                     repostCurd('sql', gethechaMGObj(end,info)).then(response10 => {
+        //                       that.hechaMGObj = response10.variables.data
+        //                       repostCurd('sql', getwaibuObj(end,info)).then(response11 => {
+        //                         that.waibuObj = response11.variables.data
+        //                         repostCurd('sql', getneibuObj(end,info)).then(response12 => {
+        //                           that.neibuObj = response12.variables.data
+        //                           repostCurd('sql', getyingjiObj(end,info)).then(response13 => {
+        //                             that.yingjiObj = response13.variables.data
+        //                             repostCurd('sql', getfengxianObj(end,info)).then(response14 => {
+        //                               that.fengxianObj = response14.variables.data
+        //                               repostCurd('sql', getneishenObj(end,info)).then(response15 => {
+        //                                 that.neishenObj = response15.variables.data
+        //                                 repostCurd('sql', getguanshenObj(end,info)).then(response16 => {
+        //                                   that.guanshenObj = response16.variables.data
+        //                                   repostCurd('sql', getbufuheObj(end,info)).then(response17 => {
+        //                                     that.bufuheObj = response17.variables.data
+        //                                     repostCurd('sql', getgaijinxiangObj(end,info)).then(response18 => {
+        //                                       that.gaijinxiangObj = response18.variables.data
+                                              
+        //                                       that.relOf = true
+        //                                     })
+        //                                   })
+        //                                 })
+        //                               })
+        //                             })
+        //                           })
+        //                         })
+        //                       })
+        //                     })
+        //                   })
+        //                 })
+        //               })
+        //             })
+        //           })
+        //         })
+        //       })
+        //     })
+        //   })
+        // })
         
         
         
@@ -590,7 +640,7 @@ import * as forEach from 'lodash/forEach'
           this.timer = setTimeout(() => {
             this.relOf = false
             clearTimeout(this.timer)
-          }, 0)
+          }, 10)
           
         // } 
       },
@@ -601,13 +651,14 @@ import * as forEach from 'lodash/forEach'
       getDate(year) {
         year = year || 0
         let nowDate = new Date();
-        let date = new Date(new Date().setDate(1)+ 30 * 24 * 60 * 60 * 1000);
+        let date = new Date(new Date().setDate(1)+ 31 * 24 * 60 * 60 * 1000);
         let month = date.getMonth()+1;
         let m1 = nowDate.getMonth()+1
         let month1 = m1 < 10 ? "0" +m1:nowDate.getMonth()+1;
         month = month<10 ? "0"+month : ""+month;
-        // console.log([nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month])
-        return [nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month];
+        console.log([nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month])
+        // return [nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month];
+        return [nowDate.getFullYear() - year + "-01",nowDate.getFullYear() - year + "-" + month1];
       },
       allView(){
         screenfull.request() //默认显示全屏
@@ -634,8 +685,9 @@ import * as forEach from 'lodash/forEach'
     }
   }
 </script>
-<style lang="scss">
+<style lang="scss" >
   .statistics {
+    height: 100%;
     color: #fff;
     .editDate{
       display: contents;
@@ -675,8 +727,13 @@ import * as forEach from 'lodash/forEach'
     position: absolute;
     right: 0;
   }
-  #dv-border-box-8{
+  .shiyankanbanfanhui{
     border: none;
+    .border-box-content{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
   .stitle{
     text-align: center;
@@ -688,7 +745,8 @@ import * as forEach from 'lodash/forEach'
   .ttitle{
     font-size: 120%;
     font-weight: 600;
-    margin: 1% 0;
+    height: 2%;
+    margin: 2% 0;
   }
   .screen{
     height: 100%;
@@ -722,6 +780,29 @@ import * as forEach from 'lodash/forEach'
   .mubiaozhi{
     text-align: center;
     margin-top: 3%;
+  }
+  .nullDate{
+    height: 100%;
+    text-align: center;
+    line-height: 100%;
+    font-size: 6vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .componentsData{
+    height: 92%;
+  }
+  .nullDate1{
+    height: 50%;
+    width: 25%;
+    display: inline-block;
+    text-align: center;
+    line-height: 50%;
+    font-size: 2vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>
 <style lang="scss">

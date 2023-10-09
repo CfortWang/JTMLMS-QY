@@ -270,9 +270,13 @@
             :download="false"
             :readonly="true"
         />
+        <on-line-index :groove-data="grooveData" :groove-list="grooveList" :dialog-visible.sync="grooveDialogVisible" style="z-index: 9999;" />
+
     </div>
 </template>
 <script>
+import onLineIndex from '@/views/onLineEditing/onLineIndex'
+
 import { queryDataTable, removeFormData, exportData, checkExportData } from '@/api/platform/data/dataTemplate'
 import { startFlowFromList } from '@/api/platform/bpmn/bpmInst'
 import { getDatabaseType } from '@/api/platform/form/formDef'
@@ -339,7 +343,8 @@ export default {
         Print: () => import('../components/print'),
         LabelPrint: () => import('../components/labelPrint'),
         xlsxFile,
-        generalModules
+        generalModules,
+        onLineIndex
 
         // BpmnFormrender
         // DataTemplateFormat
@@ -445,7 +450,13 @@ export default {
 
             generalShow: false,
             currentType: '',
-            generalList: []
+            generalList: [],
+
+            grooveDialogVisible: false,
+            grooveData: {
+                title: ''
+            },
+            grooveList: []
         }
     },
     computed: {
@@ -1736,6 +1747,11 @@ export default {
         },
         xlsxFileClose () {
             this.xlsxFileVisible = false
+        },
+        getGroo (data, list) {
+            this.grooveData = data
+            this.grooveList = list
+            this.grooveDialogVisible = true
         },
 
         // =================================处理脚本================================

@@ -33,7 +33,7 @@
       },
       height:{
         type:String,
-        default: window.screen.height/5+"px"
+        default: "100%"
         // default: "100%"
       },
       id:{

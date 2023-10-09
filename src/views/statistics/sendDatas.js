@@ -106,13 +106,15 @@ export default {
                                 
                         }
                         
-                        let arr  = this.tableNum
-                        let aa =[]
-                        for (let j = 0; j < arr.length; j++) {
-                                let changeArr = ['<span style="font-size:14px;height:45px;line-height:45px;display:inline-block">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;line-height:45px;display:inline-block">' + arr[j].location.toFixed(2) + '</span>']
-                                aa.push(changeArr)
-                        }
-                        this.$set(this.tableData, 'data', aa)
+                        // let arr  = this.tableNum
+                        // let aa =[]
+                        // for (let j = 0; j < arr.length; j++) {
+                        //         let changeArr = ['<span style="font-size:14px;height:45px;line-height:45px;display:inline-block">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;line-height:45px;display:inline-block">' + arr[j].location.toFixed(2) + '</span>']
+                        //         aa.push(changeArr)
+                        // }
+
+                        // this.$set(this.tableData, 'data', aa)
+                        // this.$forceUpdate()
                         // console.log(arr,this.tableData.data,'djlkddddddddddddddddddddddddddddddddd')
 
                         return {
@@ -171,13 +173,13 @@ export default {
                                 title.push(this.zhiliangzhibiaotitle[t].zhi_liang_zhi_bia)
                                 
                         }
-                        let arr  = this.tableNum
-                        let aa =[]
-                        for (let j = 0; j < arr.length; j++) {
-                                let changeArr = ['<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].ji_suan_gong_shi_ + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_biao_xian_zhi + '</span>']
-                                aa.push(changeArr)
-                        }
-                        this.$set(this.tableData1, 'data', aa)
+                        // let arr  = this.tableNum
+                        // let aa =[]
+                        // for (let j = 0; j < arr.length; j++) {
+                        //         let changeArr = ['<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].ji_suan_gong_shi_ + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_biao_xian_zhi + '</span>']
+                        //         aa.push(changeArr)
+                        // }
+                        // this.$set(this.tableData1, 'data', aa)
                         
                         return {
                                 "Num" :{"date": this.endDate,"number": zlzbfz,"title":title},

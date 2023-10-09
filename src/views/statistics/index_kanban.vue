@@ -1,6 +1,6 @@
 <template>
   <!-- <dv-full-screen-container> -->
-    <el-scrollbar class="screen" ref="scrollDiv" >
+    <el-scrollbar class="screenshiyanshikanban" ref="scrollDiv" >
     <!-- :style="{height:height}" -->
       <div class="statistics" v-on:mouseenter="rollstop" v-on:mouseleave="rollcontinue">
         <div class="editDate">
@@ -602,13 +602,14 @@ import * as forEach from 'lodash/forEach'
       getDate(year) {
         year = year || 0
         let nowDate = new Date();
-        let date = new Date(new Date().setDate(1)+ 30 * 24 * 60 * 60 * 1000);
+        let date = new Date(new Date().setDate(1)+ 31 * 24 * 60 * 60 * 1000);
         let month = date.getMonth()+1;
         let m1 = nowDate.getMonth()+1
         let month1 = m1 < 10 ? "0" +m1:nowDate.getMonth()+1;
         month = month<10 ? "0"+month : ""+month;
         // console.log([nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month])
-        return [nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month];
+        return [nowDate.getFullYear() - year + "-01",nowDate.getFullYear() - year + "-" + month1];
+        // return [nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month];
       },
     //   allView(){
     //     screenfull.request() //默认显示全屏
@@ -669,10 +670,10 @@ import * as forEach from 'lodash/forEach'
 
   //  }
   }
-  .el-scrollbar__wrap{
-    overflow-x: hidden;
-	background-color: grey;
-  }
+//   .el-scrollbar__wrap{
+//     overflow-x: hidden;
+// 	background-color: grey;
+//   }
   .goBackButton{
     width: 2%;
     position: absolute;
@@ -693,9 +694,10 @@ import * as forEach from 'lodash/forEach'
     font-weight: 600;
     margin: 1% 0;
   }
-  .screen{
+  .screenshiyanshikanban{
     height: 100%;
-    
+    overflow-x: hidden;
+	background-color: grey;
     margin: 0 0.5%;
   }
   .clear{ clear: both; }

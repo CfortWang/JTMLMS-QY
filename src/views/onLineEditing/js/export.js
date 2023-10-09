@@ -1379,7 +1379,7 @@ var alignmentConvert = function (vt = 'default', ht = 'default', tb = 'default',
             0: 'middle',
             1: 'top',
             2: 'bottom',
-            default: 'top'
+            default: 'middle'
         },
         horizontal: {
             0: 'center',
