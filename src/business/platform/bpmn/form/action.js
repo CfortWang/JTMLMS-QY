@@ -229,12 +229,12 @@ export default {
             })
             // 1、直接启动
             startFlow(jsonData).then(response => {
-                const { bizKey = '', proInstId = '' } = response.variables || {}
-                this.createSnapshot(bizKey, proInstId)
                 loading.close()
                 this.$alert(`启动成功！`, {
                     showClose: false
                 }).then(() => {
+                    const { bizKey = '', proInstId = '' } = response.variables || {}
+                    this.createSnapshot(bizKey, proInstId)
                     this.startFlowDialogVisible = false
                     // 后置事件
                     this.afterScript(this.actionName, {
