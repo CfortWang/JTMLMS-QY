@@ -81,18 +81,20 @@ export default {
                     forms: [
                         { prop: 'Q^TITLE_^SL', label: '标题' },
                         { prop: 'Q^USER_NAME_^SL', label: '发布人' },
-                        { prop: ['Q^PUBLIC_DATE_^DL', 'Q^PUBLIC_DATE_^DG'], label: '发布时间', fieldType: 'daterange' }
+                        { prop: ['Q^PUBLIC_DATE_^DL', 'Q^PUBLIC_DATE_^DG'], label: '发布时间', fieldType: 'daterange' },
+                        { prop: 'Q^STATUS_^SL', label: '发布状态', fieldType: 'select', options: typeOptions }
                     ]
                 },
                 // 表格字段配置
                 columns: [
                     { prop: 'title', label: '标题', minWidth: 250 },
                     // { prop: 'publicItem', label: '发布选项', tags: publicItemOptions },
+                    { prop: 'depName', label: '发布部门', width: 120 },
                     { prop: 'userName', label: '发布人', width: 120 },
-                    { prop: 'publicDate', label: '发布时间', dateFormat: 'yyyy-MM-dd', width: 120 },
-                    { prop: 'loseDate', label: '失效时间', dateFormat: 'yyyy-MM-dd', width: 120 },
+                    { prop: 'publicDate', label: '发布时间', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 120 },
+                    { prop: 'loseDate', label: '失效时间', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 120 },
                     // { prop: 'public0', label: '是否公共', tags: isPublicOptions },
-                    { prop: 'status', label: '发布状态', tags: typeOptions, width: 100 },
+                    { prop: 'status', label: '发布状态', tags: typeOptions, sortable: 'custom', width: 100 }
                     // { prop: 'depName', label: '发布范围' }
                 ],
                 rowHandle: {
