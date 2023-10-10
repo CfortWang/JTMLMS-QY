@@ -1,6 +1,6 @@
 <template>
   <div class="pieView">
-    <div style="height: 10%;line-height: 30px;text-align: left;padding-left: 10px;width: 100%;">{{info.config.title}}</div>   
+    <div style="height: 10%;width: 100%;line-height: 30px;text-align: left;padding-left: 10px;">{{info.config.title}}</div>   
     <div style="width:100%;height:90%;display: inline-block;">
       <div :id="info.config.idSelector" style="width:100%;height:100%;"> </div>
     </div>

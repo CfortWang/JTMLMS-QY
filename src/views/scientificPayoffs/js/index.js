@@ -178,7 +178,7 @@ export default {
         const list = []
         const listData = []
         datas.forEach(item => {
-            item.NAME_ = this.linHeg(item.NAME_)
+            // item.NAME_ = this.linHeg(item.NAME_)
             list.push(item.NAME_)
             const o = {
                 name: item.NAME_,
@@ -229,7 +229,10 @@ export const barData = {
             alignWithLabel: true
         },
         axisLabel: {
-            color: '#FFF'
+            color: '#FFF',
+            rotate: 30,
+            interval: 0,
+            margin: 10
         },
         axisLine: {
             lineStyle: {

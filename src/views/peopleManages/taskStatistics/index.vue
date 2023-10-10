@@ -33,7 +33,7 @@
                style="color: #4ea5d6; margin-right: 3px"></i>
             员工数量：{{ employeeNum }}人</dv-decoration-11>
           <dv-border-box-8 class="date"
-                           style="margin-right: 10%; display: flex; align-items: center">
+                           style="margin-right: 5%; display: flex; align-items: center">
             <!-- 部门选择 -->
             <SelectPositions @handleFunc="handleFunc" />
             <div style="width: 30%; display: inline-block; margin-right: 3px">
@@ -50,9 +50,10 @@
                             :picker-options="pickerOptions"
                             @change="changeDate">
             </el-date-picker>
+
             <div class="back"
                  @click.prevent="goBack()">
-              <dv-border-box-8>返回</dv-border-box-8>
+              返回
             </div>
           </dv-border-box-8>
         </div>
@@ -237,6 +238,8 @@ export default {
               textStyle: {
                 color: "rgba(251, 251, 251, 1)",
               },
+              interval: 0,
+              rotate: 70
             },
           },
         ],
@@ -319,6 +322,7 @@ export default {
             data: [],
           },
         ],
+
       },
       // 任务事宜统计图配置
       optionPerson: {
@@ -766,13 +770,32 @@ export default {
       text-align: right;
       // padding-right: 20px;
       display: flex;
-      width: 700px;
+      width: 750px;
       height: 80%;
+      .dv-border-svg-container {
+        width: 750px;
+      }
     }
+    .back {
+      width: 15%;
+      margin-right: 10px;
+    }
+
     /deep/.dv-border-box-8 .border-box-content {
       display: flex;
       align-items: center;
       padding: 0px 2px;
+    }
+    /deep/ .el-range-input {
+      color: #fcfcfc;
+      background-color: #00083e;
+    }
+    /deep/ .el-range-separator {
+      color: #fcfcfc;
+    }
+    /deep/.el-input__inner {
+      background-color: #00083e;
+      border: 1px solid #4ea5d6;
     }
   }
 }

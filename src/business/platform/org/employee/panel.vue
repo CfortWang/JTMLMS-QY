@@ -288,7 +288,12 @@ export default {
                 } else if (this.currentOrgIdValue && this.currentOrgIdValue !== '') {
                     type = 'org'
                 }
-                query(type, this.getFormatParams()).then(response => {
+                let flag = 0
+                if (type === 'position' && !this.partyId && this.partyTypeIdValue === '1') {
+                    type = 'user'
+                    flag = '1'
+                }
+                query(type, this.getFormatParams(flag)).then(response => {
                     this.loading = false
                     ActionUtils.handleListData(this, response.data)
                     this.setSelectRow()

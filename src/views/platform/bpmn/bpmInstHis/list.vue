@@ -114,7 +114,7 @@
                             </el-popover>
                         </template>
                         <div v-if="record.file.length && snapshotId" class="content_item">
-                            <div class="sub_operation">快照文件</div>
+                            <!-- <div class="sub_operation">快照</div> -->
                             <ibps-attachment
                                 v-model="snapshotId"
                                 download
@@ -126,7 +126,7 @@
                             />
                         </div>
                         <div v-if="record.file.length && fileId" class="content_item">
-                            <div class="sub_operation">其他附件</div>
+                            <div class="sub_operation">附件</div>
                             <ibps-attachment
                                 v-model="fileId"
                                 download
@@ -256,18 +256,20 @@ export default {
                 ],
                 searchForm: {
                     forms: [
-                        { prop: 'Q^subject_^SL', label: '关键字:', itemWidth: 330, placeholder: '可输入年份/部门/表单名称/事务说明/编制人模糊查询' },
                         { prop: 'Q^proc_def_name_^SL', label: '表单名称:', itemWidth: 150, placeholder: '请输入' },
-                        { prop: ['Q^end_time_^DL', 'Q^end_time_^DG'], label: '完成时间', fieldType: 'daterange', itemWidth: 220 }
+                        { prop: ['Q^end_time_^DL', 'Q^end_time_^DG'], label: '完成时间', fieldType: 'daterange', itemWidth: 220 },
+                        { prop: 'Q^subject_^SL', label: '事务说明:', itemWidth: 150, placeholder: '请输入' },
+                        { prop: 'Q^subject_^SL', label: '事务说明:', itemWidth: 150, placeholder: '请输入' },
+                        { prop: 'Q^subject_^SL', label: '事务说明:', itemWidth: 150, placeholder: '请输入' }
                     ]
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'deptName', label: '部门', width: 90 },
-                    { prop: 'procDefName', label: '表单名称', sortable: 'custom', formatter: this.replaceFormName, width: 230 },
-                    { prop: 'desc', label: '事务说明', 'min-width': 300 },
-                    { prop: 'createBy', label: '编制人', width: 80, slotName: 'creator' },
-                    { prop: 'endTime', label: '完成时间', sortable: 'custom', width: 150 }
+                    { prop: 'deptName', label: '部门', width: 85 },
+                    { prop: 'procDefName', label: '表单名称', formatter: this.replaceFormName, width: 220 },
+                    { prop: 'desc', label: '事务说明', 'min-width': 280 },
+                    { prop: 'endTime', label: '完成时间', sortable: 'custom', width: 135 },
+                    { prop: 'createBy', label: '编制人', width: 70, slotName: 'creator' }
                 ],
                 rowHandle: {
                     actions: [

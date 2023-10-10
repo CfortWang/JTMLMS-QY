@@ -57,6 +57,7 @@
               type="monthrange"
               align="right"
               unlink-panels
+              style="background-color: rgba(0,0,0,0);"
               format="yyyy 年 MM 月"
               value-format="yyyy-MM"
               @change="checkYear(endDate,'end')"
@@ -811,4 +812,11 @@
   font-weight: 100 !important;
 }
  
+</style>
+<style lang="scss" scoped>
+
+::v-deep(.el-input__inner) {
+  background-color: rgba(0,0,0,0);
+  color: #fff;
+}
 </style>

@@ -1,37 +1,12 @@
 <template>
   <div class="pieView">
-    <div
-      style="
-        height: 14%;
-        line-height: 30px;
-        text-align: left;
-        padding-left: 10px;
-        color: white;
-      "
-    >
+    <div style="  height:14%;line-height:30px;text-align: left;padding-left: 10px;color: white;">
       {{ info.config.title || "" }}
     </div>
-    <div
-      style="width: 100%; height: 86%; display: inline-block; overflow: hidden"
-      v-show="showChart"
-    >
-      <div
-        :id="info.config.idSelector"
-        style="width: 100%; height: 95%; overflow: hidden"
-      ></div>
+    <div style="width: 100%; height: 86%; display: inline-block; overflow: hidden" v-show="showChart">
+      <div :id="info.config.idSelector" style="width: 100%; height: 95%; overflow: hidden" ></div>
     </div>
-    <div
-      style="
-        background: #061237;
-        width: 100%;
-        height: 70%;
-        display: flex;
-        justify-content: cne;
-        justify-content: center;
-        align-items: center;
-      "
-      v-if="!showChart"
-    >
+    <div style="background: #061237;width: 100%;height: 70%;display: flex;justify-content: center;align-items: center;" v-if="!showChart">
       <div style="color: #c7c7c7">目前无数据</div>
     </div>
   </div>
@@ -79,7 +54,7 @@ export default {
           left: "center",
           textStyle: {
             color: "#fff",
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: "600",
           },
         },
@@ -95,8 +70,10 @@ export default {
 
         legend: {
           show: true,
+          // orient: 'vertical',
+          itemGap: 6,
           z: 3,
-          left: "right",
+          left: "left",
           textStyle: {
             color: "#fff",
           },

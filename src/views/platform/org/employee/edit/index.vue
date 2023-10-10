@@ -232,6 +232,13 @@ export default {
             }
             return true
         },
+        checkEmail (value) {
+            const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            if (!reg.test(value)) {
+                return false
+            }
+            return true
+        },
         getUpEmployee () {
             const params = {
                 id: this.employee.id,
@@ -263,6 +270,13 @@ export default {
             const { mobile = '' } = vo.user || {}
             if (mobile && !this.checkPhone(mobile)) {
                 ActionUtils.warning('请输入正确的手机号')
+                this.dialogLoading = false
+                return
+            }
+
+            const { email = '' } = vo.user || {}
+            if (email && !this.checkEmail(email)) {
+                ActionUtils.warning('请输入正确的邮箱')
                 this.dialogLoading = false
                 return
             }

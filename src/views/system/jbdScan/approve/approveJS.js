@@ -20,7 +20,7 @@ export default {
                     const list2 = []
                     data.forEach(item => {
                         list.push(item.NAME_)
-                        list2.push(this.linHeg(item.NAME_))
+                        list2.push(item.NAME_)
                     })
                     this.posiList = list
                     this.positionList = list2
@@ -253,6 +253,11 @@ export default {
                     data: this.positionList,
                     axisTick: {
                         alignWithLabel: true
+                    },
+                    axisLabel: {
+                        rotate: 30,
+                        interval: 0,
+                        margin: 10
                     }
                 },
                 yAxis: {

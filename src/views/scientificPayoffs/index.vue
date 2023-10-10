@@ -8,9 +8,13 @@
                 <dv-decoration-8 class="right" :reverse="true" />
                 <div class="title">{{ titleName }}</div>
                 <div class="time">
-                    <ibpsTreeSelect v-model="selectData" :data="treeData" :props="props" :node-key="nodeKey" :clearable="clearable" style="width: 150px;margin-right: 30px;" />
+                    <dv-border-box-8 style="width: 40%;margin-right: 25px">
+                        <ibpsTreeSelect v-model="selectData" :data="treeData" :props="props" :node-key="nodeKey" :clearable="clearable" style="width: 150px;margin-right: 30px;" />
+                    </dv-border-box-8>
                     <!-- <span>年度：</span> -->
-                    <el-date-picker v-model="month" type="year" value-format="yyyy" format="yyyy" placeholder="日期选择" style="width: 120px" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
+                    <dv-border-box-8 style="width: 25%;">
+                        <el-date-picker v-model="month" type="year" value-format="yyyy" format="yyyy" placeholder="日期选择" style="width: 120px" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
+                    </dv-border-box-8>
                 </div>
                 <div class="back" @click.prevent="goBack()">
                     <dv-border-box-8>返回</dv-border-box-8>
@@ -551,6 +555,13 @@ export default {
             justify-content: flex-end;
             width: 20%;
             right: 75%;
+            ::v-deep .el-input--small .el-input__inner {
+                        width: 100% !important;
+                        background: rgba(255, 255, 255, 0);
+                        border: none;
+                        color: #fff;
+                        font-size: 16px;
+                    }
         }
         .back {
             left: 75%;

@@ -1,12 +1,10 @@
 <template>
-  <el-cascader
-    ref="cascader"
-    v-model="selectDatas"
-    :options="options"
-    :props="props"
-    :collapse-tags="true"
-    :filterable="true"
-  >
+  <el-cascader ref="cascader"
+               v-model="selectDatas"
+               :options="options"
+               :props="props"
+               :collapse-tags="true"
+               class="cascader">
   </el-cascader>
 </template>
   
@@ -114,3 +112,13 @@ export default {
   },
 };
 </script>
+<style lang="less" scoped>
+/deep/ .el-tag--info {
+  color: #fcfcfc;
+  background-color: #00083e;
+}
+/deep/.el-input__inner {
+  background-color: #00083e;
+  border: 1px solid #4ea5d6;
+}
+</style>

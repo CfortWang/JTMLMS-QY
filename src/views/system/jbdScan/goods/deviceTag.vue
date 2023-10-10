@@ -37,6 +37,10 @@
                                             <div>{{ item.serial }}</div>
                                         </div>
                                         <div class="lh">
+                                            <div>固定资产号：</div>
+                                            <div>{{ item.assetNum }}</div>
+                                        </div>
+                                        <div class="lh">
                                             <div>核查人：</div>
                                             <div>{{ item.verifier }}</div>
                                         </div>
@@ -118,7 +122,8 @@ export default {
                 prove: '测试证', // 证名
                 slogan: '标语', // 标语
                 deviceStatus: '设备状态',
-                range: '限用范围' // 限用范围
+                range: '限用范围', // 限用范围
+                assetNum: '固定资产号'
             }],
             visible: true,
         }
@@ -151,7 +156,8 @@ export default {
                     dj.she_bei_zhuang_ta,
                     dj.bi_xu_de_huan_jin,
                     dj.bi_xu_she_shi_,
-                    dj.cai_gou_he_tong_
+                    dj.cai_gou_he_tong_,
+                    dj.zi_chan_bian_hao_
                 FROM
                     t_sbdj dj
                 WHERE
@@ -171,7 +177,8 @@ export default {
                         slogan: this.switchSlogan(item.she_bei_zhuang_ta),
                         deviceStatus: item.she_bei_zhuang_ta,
                         range: this.judgementVal(item.cai_gou_he_tong_)?item.cai_gou_he_tong_:"",
-
+                        assetNum: item.zi_chan_bian_hao_,
+                        
                         name: item.she_bei_ming_cheng_,
                         serial: item.she_bei_shi_bie_h,
                         model: item.gui_ge_xing_hao_,

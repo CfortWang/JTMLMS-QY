@@ -8,8 +8,8 @@
         <dv-decoration-8 class="right" :reverse="true" />
         <div class="title">{{ titleName }}</div>
         <div class="time">
-          <span>月份:</span>
-          <el-date-picker v-model="month" type="month" value-format="yyyy-MM" format="yyyy-MM" placeholder="日期选择" style="width: 120px" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
+          <span>年度:</span>
+          <el-date-picker v-model="month" type="year" value-format="yyyy" format="yyyy" placeholder="日期选择" style="width: 120px" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
         </div>
         <div class="back" @click.prevent="goBack()">
           <dv-border-box-8>返回</dv-border-box-8>
@@ -18,39 +18,55 @@
       <dv-border-box-1 style="height:88%;overflow: hidden;">
         <!-- 顶部数据 -->
         <div class="topCard">
-          <top-bar v-if="topBarData.length" :info="topBarData" />
+          <!-- <top-bar v-if="topBarData.length" :info="topBarData" /> -->
+          <div style="width:100%;height: 100%;box-sizing: border-box;overflow: hidden;">
+            <div class="middleCardLeft" style="width:20%;height:100%">
+              <middleCard v-if="allSheBeiData.data.length" :info="allSheBeiData" />
+            </div>
+            <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
+            <div class="middleCardLeft" style="width:40%;height:100%">
+              <moreBar v-if="moreBarData.data.source.length > 0 " :info="moreBarData" />
+            </div>
+            <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
+            <div class="middleCardLeft" style="width:36%;height:100%">
+              <zhuzhuangtu v-if="zichangBarData.data.length" :info="zichangBarData" />
+            </div>
+          </div>
         </div>
         <dv-decoration-10 style="height:2%;display:flex;" />
         <div class="middleCard">
           <div style="width:100%;height: 100%;box-sizing: border-box;overflow: hidden;">
-            <div class="middleCardLeft">
-              <zhuzhuangtu v-if="sheBeiData.data.length" :info="sheBeiData" ref="sheBeiDataDataref" />
+            <div class="middleCardLeft" style="width:20%">
+              <middleCard v-if="allWeihuSheBeiData.data.length" :info="allWeihuSheBeiData" />
             </div>
             <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
-            <div class="middleCardRight1">
-              <CarouselTabl v-if="shiyonglvConfig.data.length" :info="shiyonglvConfig" title="仪器设备列表" isup=isup />
+            <div class="middleCardLeft" style="width:40%">
+              <moreBar v-if="weihuBarData.data.source.length > 0 " :info="weihuBarData" />
             </div>
-            <dv-decoration-2 :reverse="true" style="width:2%;height:100%;" />
-            <div class="middleCardRight">
+            <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
+            <div class="middleCardRight1" style="width:36%">
+              <CarouselTabl v-if="BaofeiBarData.data.length" :info="BaofeiBarData" title="检验科设备报废列表" />
+            </div>
+            <div class="middleCardRight" style="width:35%">
               <CarouselTabl v-if="config.data.length" :info="config" title="设备报废列表" />
             </div>
           </div>
         </div>
         <dv-decoration-10 style="height:2%;display:flex;" />
         <div class="bottomCard">
-          <div style="width:33%">
-            <middleCard v-if="MiddleLeftPieViewList.data.length" :info="MiddleLeftPieViewList" ref="middleCardLeft" />
-          </div>
-          <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
-          <div style="width:32%;height: 100%;overflow: hidden;box-sizing: border-box;display:flex;">
-            <div class="bottomCardLeft0">
-              <middleCard v-if="weiHuSheBeiData.data.length" :info="weiHuSheBeiData" ref="sheBeiWeiHuRef" />
+          <div style="width:33%;display:flex;">
+            <div class="bottomCardright">
+              <middleCard v-if="enTypeData.data.length" :info="enTypeData" />
             </div>
           </div>
           <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
-          <div style="width:33%;display:flex;">
-            <div class="bottomCardright">
-              <middleCard v-if="jianDingjiaoZhunSheBeiData.data.length" :info="jianDingjiaoZhunSheBeiData" ref="jiandingRef" />
+          <div style="width:33%">
+            <middleCard v-if="allJiaozhunSheBeiData.data.length" :info="allJiaozhunSheBeiData" />
+          </div>
+          <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
+          <div style="width:60%;height: 100%;overflow: hidden;box-sizing: border-box;display:flex;">
+            <div class="bottomCardLeft0">
+              <moreBar v-if="jiaozhunBarData.data.source.length > 0 " :info="jiaozhunBarData" />
             </div>
           </div>
         </div>
@@ -61,6 +77,7 @@
 <script>
 import screenfull from "screenfull";
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
+import data from '@/components/ibps-icon-select/data';
 export default {
   name: "checkBoard",
   components: {
@@ -68,6 +85,8 @@ export default {
     middleCard: () => import("./component/getPieView"),
     zhuzhuangtu: () => import("./component/zhuzhuangtu"),
     CarouselTabl: () => import("./component/CarouselTabl"),
+    //最新
+    moreBar: () => import("./component/moreBar"),
   },
   data() {
     const d = new Date();
@@ -83,21 +102,59 @@ export default {
       sheBeiHeChaData: {},
       jianDingjiaoZhunSheBeiData: {},
       weiHuSheBeiData: {},
-      shiyonglvConfig: {header: ["编号","名称","存放位置","状态","保管人",],data: [],columnWidth: ["110","230","180","110","110"],rowNum: 7,},
+      shiyonglvConfig: {header: ["编号","名称","存放位置","状态","保管人"],data: [],columnWidth: ["110","230","180","110","110"],rowNum: 7,},
       bottomData: {},
       zhuantaiEData: {},
       sheBeiData: { xData: [], data: [], config: { idSelector: "" } },
       sheBeiDataShow:false,
       sheBeiweiHuData: {},
-      config: {},
+      BaofeiBarData: {
+        header: ["部门","设备名称","设备编号","状态"],data:[], 
+        columnWidth: ["120","250","180","110"],
+        rowNum: 5
+      },
       zichan: 0,
+      enTypeData: { data: [], config: {},},
+      //新
+      moreBarData:{ 
+        data: {dimensions:[],source:[]}, 
+        config: {idSelector:"eqFinish",title:"各部门设备完好情况",colors:['#3870e0','#12bc79','#ff0066']} 
+      },
+      zichangBarData:{ 
+        data: [],
+        xData:[], 
+        config: {idSelector:"eqZichan",title:"各部门设备资产金额情况(万元)"}
+      },
+      weihuBarData:{ 
+        data: {dimensions:[],source:[]}, 
+        config: {idSelector:"eqWeihu",title:"各部门设备维护完成情况",colors:['#3870e0','#12bc79',]}
+      },
+      jiaozhunBarData:{ 
+        data: {dimensions:[],source:[]}, 
+        config: {idSelector:"eqJiaozhun",title:"各部门设备检定/校准完成情况",colors:['#3870e0','#12bc79',]} 
+      },
+      allSheBeiData:{
+        data:[{name:'设备总数',value:0},{name:'良好数',value:0},{name:'停用数',value:0}],
+        config:{title:'检验科设备完好情况',idSelector:'allShebei'},
+        color:["#339933", "#3870e0", "#FF0033"]
+      },
+      allWeihuSheBeiData:{
+        data:[{name:'计划数',value:0},{name:'完成数',value:0}],
+        config:{title:'检验科设备维护完成情况',idSelector:'allWeihuShebei'},
+        color:["#3870e0", "#FFFF66",]
+      },
+      allJiaozhunSheBeiData:{
+        data:[{name:'计划数',value:0},{name:'完成数',value:0}],
+        config:{title:'检验科设备检定/校准完成情况',idSelector:'allJiaozhunShebei'},
+        color:["#3870e0", "#FFFF66",]
+      }
     };
   },
   created() {
+    this.updateAll();
     if (screenfull.isEnabled && !screenfull.isFullscreen) {
       this.allView();
     }
-    this.updateAll();
   },
   beforeDestroy() {
     if (screenfull.isFullscreen) {
@@ -116,10 +173,16 @@ export default {
     goBack() {
       this.$router.back(-1);
     },
-    updateAll(e) {
-      this.getCarouselShiYonglvTable();
-      this.getTopBarData();
-      this.getCarouselTable();
+    updateAll() {
+      // this.getCarouselShiYonglvTable();
+      // this.getTopBarData();
+      this.getBaofeiBarData();
+      //新
+      this.getEnTypeData();
+      this.getMoreBarData();
+      this.getJiaozhunBarData();
+      this.getWeihuBarData();
+      this.getZichanBarData();
     },
     async getTopBarData() {
       let this_ = this;
@@ -150,9 +213,13 @@ export default {
       await curdPost("sql", sql)
         .then((res) => {
           const data = res.variables.data;
+          
           let zichan = this_.getAllMonyInt(data);
           zichan = zichan +''
-          zichan =zichan.substring(0,zichan.length-4)
+          if(zichan.length > 4){
+            zichan =zichan.substring(0,zichan.length-4);
+          }
+          
           let eIntactnessRate = Number(((data[0].goodEquipments / data[0].Equipments).toFixed(2) * 100 +"").slice(0, 5));
           let eBadRate = Number(((100 - eIntactnessRate).toFixed(4) + "").slice(0, 4));
           let obj = {};
@@ -236,21 +303,22 @@ export default {
                   value: eBadRate,
                   danwei: "%",
                 },
-                // {
-                //   label: "总值(万元)",
-                //   value: zichan,
-                //   danwei: "",
-                // },
+                {
+                  label: zichan.length > 4?"总值(万元)": "总值(元)",
+                  value: zichan,
+                  danwei: "",
+                },
               ],
             },
           ];
           //设备数量统计
-          this_.sheBeiData.xData = ["设备总数","新增数","良好数","报废停用数",];
+          // this_.sheBeiData.xData = ["设备总数","新增数","良好数","报废停用数",];
+          this_.sheBeiData.xData = ["设备总数","良好数",];
           this_.sheBeiData.data.push(data[0].Equipments);
-          this_.sheBeiData.data.push(data[0].addEquipments);
+          // this_.sheBeiData.data.push(data[0].addEquipments);
           this_.sheBeiData.data.push(data[0].goodEquipments);
           // this_.sheBeiData.data.push(data[0].limitedEquipments);
-          this_.sheBeiData.data.push(data[0].scrapEquipments);
+          // this_.sheBeiData.data.push(data[0].scrapEquipments);
           this_.sheBeiData.config.title = "设备完好情况";
           this_.sheBeiData.config.idSelector = "main8";
           this_.sheBeiDataShow = true;
@@ -343,7 +411,269 @@ export default {
       var s = date.getSeconds();
       return Y + M + D;
     },
-    async getCarouselTable() {
+     async getMoreBarData(){
+      const this_ = this;
+      this.moreBarData.data.source = [];
+      let didian = "";
+      this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      this.moreBarData.data.dimensions = ['product', '设备总数', '良好数','停用数'];
+      let sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+      let sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='使用'  GROUP BY a.bian_zhi_bu_men_`
+      let sql3 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='停用'  GROUP BY a.bian_zhi_bu_men_`
+      let data1,data2,data3;
+      await Promise.all([curdPost('sql', sql1),curdPost('sql', sql2),curdPost('sql', sql3)]).then(([res1, res2,res3]) => {
+        if (res1.state == 200) {
+           data1 = res1.variables.data
+        }
+        if(res2.state == 200){
+           data2 = res2.variables.data
+        }
+        if(res3.state == 200){
+           data3 = res3.variables.data
+        }           
+      })
+      let source = [];
+      data1.forEach((item,index)=>{
+        source.push({
+          product:item.name_,
+          '设备总数':item.total,
+          '良好数':0,
+          '停用数':0
+        })
+      })
+      data2.forEach(item=>{
+        source.forEach((el,index)=>{
+          if(item.name_ == el.product){
+            source[index]["良好数"] = item.total;
+          }
+        })
+      })
+      data3.forEach(item=>{
+        source.forEach((el,index)=>{
+          if(item.name_ == el.product){
+            source[index]["停用数"] = item.total;
+          }
+        })
+      })
+      if(source.length == 0){
+        this.moreBarData.data.source = [999];
+      }else{
+        this.moreBarData.data.source = source;
+      }
+      
+      let allTotal = 0,goods = 0 ,deactivates = 0
+      source.forEach(item=>{
+        allTotal += item["设备总数"];
+        goods += item["良好数"];
+        deactivates += item["停用数"];
+      })
+     this.allSheBeiData.data[0].value = allTotal;
+     this.allSheBeiData.data[1].value = goods;
+     this.allSheBeiData.data[2].value = deactivates;
+    },
+    async getWeihuBarData(){
+      let this_ = this;
+      this.weihuBarData.data.source  =[];
+      let didian = "";
+      this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      let sql1 = `select DISTINCT(q.id_) ,q.name_,COUNT(*) AS total  FROM  
+      (select DISTINCT(a.she_bei_bian_hao_),b.name_,b.id_ FROM t_mjsbwhjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN 
+      (select id_ FROM t_mjsbwhjhb WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' OR create_time_ LIKE '%${this_.month.slice(0,4)}%') AND shi_fou_guo_shen_ = '已完成' AND di_dian_ = '${didian}') GROUP BY a.she_bei_bian_hao_) AS q  GROUP BY q.id_`
+      let sql2 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE (a.bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' OR a.create_time_ LIKE '%${this_.month.slice(0,4)}%') AND a.shi_fou_guo_shen_ = '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+      this.weihuBarData.data.dimensions = ['product', '计划数', '完成数'];
+      let data1,data2;
+      await Promise.all([curdPost('sql', sql1),curdPost('sql', sql2)]).then(([res1, res2]) => {
+        if (res1.state == 200) {
+           data1 = res1.variables.data
+        }
+        if(res2.state == 200){
+           data2 = res2.variables.data
+        }         
+      })
+      let source = [];
+      data1.forEach((item,index)=>{
+        source.push({
+          product:item.name_,
+          '计划数':item.total,
+          '完成数':0
+        })
+      })
+      data2.forEach(item=>{
+        let lock = true;
+        source.forEach((el,index)=>{
+          if(item.name_ == el.product){
+            source[index]["完成数"] = item.total;
+            lock = false;
+          } else if(lock && index == source.length - 1){
+            source.push({
+              product:item.name_,
+              '计划数':0,
+              '完成数':item.total
+            })
+          }
+        })
+      })
+      let allPlan = 0,finishs = 0;
+      source.forEach(item=>{
+        allPlan += item["计划数"];
+        finishs += item["完成数"];
+      })
+      this.allWeihuSheBeiData.data[0].value = allPlan;
+      this.allWeihuSheBeiData.data[1].value = finishs;
+      this.moreBarData.data.source.forEach(item=>{
+        let lock = true;
+        source.forEach((el,index)=>{
+          if(item.product == el.product){
+            lock = false;
+          }
+          if(item.product != el.product && index == source.length - 1 && lock){
+            source.push({
+              product:item.product,
+              '计划数':0,
+              '完成数':0
+            })
+          }
+        })
+      })
+      if(source.length == 0){
+        this.weihuBarData.data.source =[999]
+      }else{
+        this.weihuBarData.data.source = source;
+      }
+    },
+    async getZichanBarData(){
+      let this_ = this;
+      let didian = "";
+      this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      let sql1 = `select a.bian_zhi_bu_men_,name_,a.zi_chan_yuan_zhi_ FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ ASC`
+      let source = [];
+      let data1;
+      await Promise.all([curdPost('sql', sql1)]).then(([res1, res2]) => {
+        if (res1.state == 200) {
+           data1 = res1.variables.data
+        }        
+      })
+      let partyMony = [];
+      let i = 0;
+        data1.forEach((item,index)=>{
+        let zichan;
+        zichan  = item.zi_chan_yuan_zhi_;
+          if(zichan.includes('.')){
+            zichan = zichan.split('.')[0]
+          }
+          if(zichan =='' || zichan == null || zichan == undefined){
+            zichan = "0";
+          }
+        zichan  = Number(zichan.replace(/\D/g,''));//非数字去掉
+
+        if(partyMony.length == 0){
+          partyMony = [{party:item.name_,mony:zichan}];
+        }else{
+          if(item.name_ == data1[index - 1].name_){
+            partyMony[i].mony += zichan;
+          }else{
+            partyMony.push({party:item.name_,mony:zichan});
+            i++;
+          }
+        }
+      })
+      let allmony = 0;
+      for(let el of partyMony){
+        allmony += el.mony;
+        el.mony = this.formatNumber(el.mony);
+        this.zichangBarData.data.push(el.mony)
+        this.zichangBarData.xData.push(el.party)
+      }
+      this.zichangBarData.data.unshift(this.formatNumber(allmony));
+      this.zichangBarData.xData.unshift("检验科");
+    },
+    formatNumber(num) {
+      num = Number(num);
+      if (num == 0) {
+        return num + "";
+      } else {
+        if ((num / 10000).toFixed(2) == 0) {
+          //小于100的保留2位
+          return (num / 100).toFixed(4)
+        } else {
+          // parseFloat() 去掉后面不用的0，如50.00
+          //大于100的保留2位
+          return parseFloat((num / 10000).toFixed(2))
+        }
+      }
+    },
+    async getJiaozhunBarData(){
+      let this_ = this;
+      this.jiaozhunBarData.data.source  = [];
+      let didian = "";
+      this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      let sql1 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' OR create_time_ LIKE '%${this_.month.slice(0,4)}%') AND (shi_fou_guo_shen_ = '已审批' or shi_fou_guo_shen_ = '已完成')) AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+      let sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' OR create_time_ LIKE '%${this_.month.slice(0,4)}%') AND shi_fou_guo_shen_ = '已完成') AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+      this.jiaozhunBarData.data.dimensions = ['product', '计划数', '完成数'];
+      let data1,data2;
+      await Promise.all([curdPost('sql', sql1),curdPost('sql', sql2)]).then(([res1, res2]) => {
+        if (res1.state == 200) {
+           data1 = res1.variables.data
+        }
+        if(res2.state == 200){
+           data2 = res2.variables.data
+        }         
+      })
+      let source = [];
+      data1.forEach((item,index)=>{
+        source.push({
+          product:item.name_,
+          '计划数':item.total,
+          '完成数':0
+        })
+      })
+      data2.forEach(item=>{
+        let lock = true;
+        source.forEach((el,index)=>{
+          if(item.name_ == el.product){
+            source[index]["完成数"] = item.total;
+            lock = false;
+          }
+          if(lock && index == source.length - 1){
+            source.push({
+              product:item.name_,
+              '计划数':0,
+              '完成数':item.total,
+            })
+          }
+        })
+      })
+      let allPlan = 0,finishs = 0;
+      source.forEach(item=>{
+        allPlan += item["计划数"];
+        finishs += item["完成数"];
+      })
+      this.allJiaozhunSheBeiData.data[0].value = allPlan;
+      this.allJiaozhunSheBeiData.data[1].value = finishs;
+      this.moreBarData.data.source.forEach(item=>{
+        let lock = true;
+        source.forEach((el,index)=>{
+          if(item.product == el.product){
+            lock = false;
+          }
+          if(item.product != el.product && index == source.length - 1 && lock){
+            source.push({
+              product:item.product,
+              '计划数':0,
+              '完成数':0
+            })
+          }
+        })
+      })
+      if(source.length == 0){
+        this.jiaozhunBarData.data.source = [999];
+        
+      }else{
+        this.jiaozhunBarData.data.source = source;
+      }
+      
+    },
+    async getBaofeiBarData() {
       this.config = {
         header: ["设备名称", "编号", "状态"],
         columnWidth: ["220","110", "70"],
@@ -353,18 +683,22 @@ export default {
       let this_ = this;
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
-      const sql =`select * from t_sbdj where (she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') and  di_dian_ = '${didian}'`;
+      // const sql =`select * from t_sbdj where (she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') and  di_dian_ = '${didian}'`;
+      let sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
       let data1 = [];
       await curdPost("sql", sql)
         .then((res) => {
           const result = res.variables.data;
+          if(result.length == 0){
+            this_.BaofeiBarData.data = [999]
+          }
           result.forEach((item) => {
             data1 = [];
+            data1.push(item.name_);
             data1.push(item.she_bei_ming_cheng_);
             data1.push(item.she_bei_shi_bie_h);
-            // data1.push(item.gui_ge_xing_hao_);
             data1.push(item.she_bei_zhuang_ta);
-            this_.config.data.push(data1);
+            this_.BaofeiBarData.data.push(data1);
           });
         })
         .catch((err) => {
@@ -374,15 +708,54 @@ export default {
     getAllMonyInt(monyArr) {
       let mony = 0;
       let filterMony;
-      return //暂无资产
+
       monyArr.forEach((item) => {
-        if (item.mony.includes("元")) {
+        if (item.mony  && item.mony.includes("元")) {
+          
           filterMony = item.mony.slice(0, item.mony.length - 1) * 1;
           mony += filterMony;
         }
       });
+      
       return mony;
     },
+    async getEnTypeData(){
+      let this_ = this;
+      let didian = "";
+      this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      let sql = `select DISTINCT(she_bei_lei_xing_),COUNT(*) AS total  FROM t_sbdj where di_dian_ = '${didian}' GROUP BY she_bei_lei_xing_`;
+      let data = await curdPost("sql", sql);
+      data  =  data.variables.data;
+      
+      let dataTypes = [
+        {she_bei_lei_xing_:"检验系统",total:"0"},
+        {she_bei_lei_xing_:"通用设备",total:"0"},
+        {she_bei_lei_xing_:"软件",total:"0"},
+        {she_bei_lei_xing_:"信息系统",total:"0"},
+      ]
+      dataTypes.forEach(item=>{
+        data.forEach(el=>{
+          if(item.she_bei_lei_xing_ == el.she_bei_lei_xing_){
+            item.total = el.total;
+          }
+        })
+      })
+      
+      let objJianding = {};
+      this_.enTypeData.data = [];
+      console.log(this_.enTypeData)
+      // dataTypes.forEach(item=>{
+        for(let item of dataTypes){
+        objJianding = {};
+        objJianding.name = item.she_bei_lei_xing_;
+        objJianding.value = item.total;
+        this_.enTypeData.data.push(objJianding);
+      }
+      this_.enTypeData.color = ["#339933","#3366CC", "#FF9933", "#FFFF00"];
+      this_.enTypeData.config.title = "检验科各型设备分布情况";
+      console.log(this_.enTypeData,"分布")
+      this_.enTypeData.config.idSelector = "enTypeId";
+    }
   },
 };
 </script>
@@ -474,21 +847,22 @@ export default {
     }
   }
   .topCard {
-    width: 100%;
-    height: 18%;
+    height: 30%;
+    margin-top: 10px;
     box-sizing: border-box;
     overflow: hidden;
-  }
-  .bottomCard {
-    height: 36%;
-    overflow: hidden;
-    box-sizing: border-box;
   }
   .middleCard {
-    height: 38%;
+    height: 31%;
     overflow: hidden;
     box-sizing: border-box;
   }
+  .bottomCard {
+    height: 31%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  .topCard,
   .middleCard,
   .bottomCard {
     width: 96%;
@@ -497,19 +871,19 @@ export default {
       display: inline-block;
     }
     .middleCardLeft {
-      width: 28%;
+      // width: 28%;
       height: 100%;
       box-sizing: border-box;
       overflow: hidden;
     }
     .middleCardRight {
-      width: 25%;
+      // width: 25%;
       height: 100%;
       box-sizing: border-box;
       overflow: hidden;
     }
     .middleCardRight1 {
-      width: 43%;
+      // width: 43%;
       height: 100%;
       box-sizing: border-box;
       overflow: hidden;
