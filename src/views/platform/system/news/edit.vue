@@ -182,6 +182,9 @@ export default {
         status: String
     },
     data () {
+        const { first = '', second = '' } = this.$store.getters.level || {}
+        const { positions = [] } = this.$store.getters.userInfo || {}
+        const position = positions.length ? positions[0] : {}
         return {
             limit: 1,
             accept: '.jpeg,.gif,.png,.jpg', // 规定上传类型
@@ -202,8 +205,8 @@ export default {
                 createTime: '',
                 dataStatus: '',
                 dbtype: '',
-                depId: '',
-                depName: '',
+                depId: position.id,
+                depName: position.name,
                 fileAttach: '',
                 id: '',
                 ip: '',
@@ -220,7 +223,7 @@ export default {
                 tenantId: '',
                 title: '',
                 // 改字段暂时无用，改存当前层级第一级ID
-                type: this.$store.getters.level ? this.$store.getters.level.first : '',
+                type: second || first,
                 typeId: '',
                 updateBy: '',
                 updateTime: '',

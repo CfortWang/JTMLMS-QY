@@ -173,6 +173,7 @@
     import newHome from './components/new-home'
     import Workbench from './components/workbench.vue'
     import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
+    import param from '@/store/modules/ibps/modules/param'
 
     const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
     let cronTask = null
@@ -246,7 +247,8 @@
             }
         },
         beforeRouteEnter(to, from, next){
-            const sql = `select * from t_jhswpzb`
+            const { first = '', second = '' } = param.state.level
+            const sql = `select * from t_jhswpzb where di_dian_ = '${second || first}'`
             curdPost('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 cronTask = data.map(i => i.liu_cheng_key_)
@@ -453,8 +455,6 @@
             handleFlowCallback () {
                 this.$refs[this.alias] ? this.$refs[this.alias][0].refreshData() : null
             },
-
-            //
             initSystemUrl (url) {
                 if (url.startsWith('http')) {
                     this.systemUrlType = 'iframe'
@@ -527,7 +527,7 @@
             getPeriodTask () {
                 const { userId } = this.$store.getters
                 const sql = `select * from t_zqswtxb where shi_fou_ti_xing_ = '是' and zhi_xing_ren_yuan like '%${userId}%' order by field(zhi_xing_zhou_qi_, '1次/天', '1次/周', '1次/月', '1次/季度', '1次/半年', '1次/年')`
-                curdPost('sql', sql).then(res => {
+                this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
                     if (data.length) {
                         this.showMsg(data)
