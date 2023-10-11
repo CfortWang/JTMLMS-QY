@@ -229,7 +229,6 @@ export default {
         },
         fileList: {
             handler (val, oldVal) {
-                console.log(val)
                 this.$emit('input', this.getValue())
             },
             deep: true
@@ -366,7 +365,6 @@ export default {
                 try {
                     return this.$utils.parseData(value)
                 } catch (error) {
-                    console.error(error)
                     return []
                 }
             } else if (this.store === 'id') { // id

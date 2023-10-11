@@ -376,10 +376,8 @@ export default {
             const positions = this.$store.getters.userInfo.employee.positions
             if (positions) {
                 const positionsList = positions.split(',')
-                console.log(positionsList)
                 positionsList.forEach(item => {
                     const index = arrList.findIndex(it => it.id === item)
-                    console.log(index)
                     if (index >= 0) {
                         arrList[index].disabled = true
                     }

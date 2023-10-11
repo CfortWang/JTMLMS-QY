@@ -349,6 +349,11 @@ export default {
                     if (this.partyId !== 0 && this.partyId !== '0') {
                         params[key] = this.partyId === '' ? this.currentOrgIdValue : this.partyId
                     }
+
+                    if (!this.partyId && this.partyTypeId === '2' && this.partyType === 'position') {
+                        const position = this.$store.getters.userInfo.employee.positions
+                        params.positionId = position
+                    }
                 } else {
                     params[key] = this.partyTypeId === '1' ? '' : this.partyTypeId
                 }

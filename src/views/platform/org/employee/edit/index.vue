@@ -261,6 +261,10 @@ export default {
             if (!this.$utils.isEmpty(this.formId) && !this.ceroParams) {
                 delete vo.partyEmployeePo.password
             }
+            if (vo.positionVoList.length === 0) {
+                ActionUtils.warning('请选择部门')
+                return
+            }
             this.dialogLoading = true
             if (!attrValidator) {
                 ActionUtils.warning('请检查扩展属性是否填写正确')

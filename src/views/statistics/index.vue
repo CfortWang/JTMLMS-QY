@@ -815,7 +815,7 @@
 </style>
 <style lang="scss" scoped>
 
-::v-deep(.el-input__inner) {
+::v-deep .el-input__inner {
   background-color: rgba(0,0,0,0);
   color: #fff;
 }

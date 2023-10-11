@@ -740,8 +740,15 @@ export default {
 .personView {
   width: 100%;
   height: calc(100vh - 100px);
-  background-image: url("~@/assets/images/screen/bg.png");
+//   background-image: url("~@/assets/images/screen/bg.png");
   z-index: -1;
+  #dv-full-screen-container {
+    background-image: url("~@/assets/images/screen/bg.png");
+    background-size: 100% 100%;
+    box-shadow: 0 0 3px blue;
+    display: flex;
+    flex-direction: column;
+  }
 }
 .topView {
   overflow: hidden;

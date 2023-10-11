@@ -1,11 +1,74 @@
 <template>
-    <el-dialog :title="title" :visible.sync="dialogVisible" :close-on-click-modal="false" :close-on-press-escape="false" append-to-body class="bpmn-agent-dialog" width="80%" top="10vh" @open="getFormData" @close="closeDialog">
-        <el-form ref="agentForm" v-loading="dialogLoading" :element-loading-text="$t('common.loading')" :model="bpmAgent" :rules="rules" :label-width="formLabelWidth" @submit.native.prevent>
-            <el-image style="width: 400px; height: 500px; margin-left: 100px" :src="url" :preview-src-list="srcList"> </el-image>
-            <el-form-item label="标题:" prop="title">
-                <el-input v-if="!readonly" v-model="bpmAgent.title" />
-                <span v-else>{{ bpmAgent.title }}</span>
-            </el-form-item>
+    <el-dialog :title="title" :visible.sync="dialogVisible" :close-on-click-modal="false" :close-on-press-escape="false" append-to-body class="bpmn-agent-dialog" width="60%" top="10vh" @open="getFormData" @close="closeDialog">
+        <el-form ref="agentForm" v-loading="dialogLoading" class="bpmnForm" :element-loading-text="$t('common.loading')" :model="bpmAgent" :rules="rules" :label-width="formLabelWidth" @submit.native.prevent>
+            <div v-if="srcList.length > 0" class="imageListClass">
+                <div v-for="(item,index) in srcList" :key="index">
+                    <el-image :src="item" class="sinImageList" :preview-src-list="srcList" />
+                </div>
+            </div>
+            <el-row>
+                <el-col :span="24">
+                    <el-form-item label="标题：" prop="title">
+                        <el-input v-if="!readonly" v-model="bpmAgent.title" placeholder="请输入标题"/>
+                        <span v-else>{{ bpmAgent.title }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="生效时间：" prop="effectiveTime">
+                        <el-date-picker v-if="!readonly" v-model="bpmAgent.effectiveTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择生效时间"/>
+                        <span v-else>{{ bpmAgent.effectiveTime }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="失效时间：" prop="expiryTime">
+                        <el-date-picker v-if="!readonly" v-model="bpmAgent.expiryTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择失效时间"/>
+                        <span v-else>{{ bpmAgent.expiryTime }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="委托人：" prop="delegatorId">
+                        <ibps-user-selector
+                            v-if="!readonly"
+                            v-model="bpmAgent.delegatorId"
+                            :type="type"
+                            :filter="filter"
+                            :multiple="multiple"
+                            :filtrate="filtrate"
+                            :store="store"
+                            :disabled="disabled"
+                            :readonly-text="readonlyText"
+                            placeholder="请选择委托人"
+                            @change-link-data="callbackDelegatorrInfo"
+                        />
+                        <span v-else>{{ bpmAgent.delegatorName }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item v-if="bpmAgent.agentType === 'all' || bpmAgent.agentType === 'part'" label="代理人：" prop="agenterId">
+                        <ibps-user-selector
+                            v-if="!readonly"
+                            v-model="bpmAgent.agenterId"
+                            :type="type"
+                            :filter="filter"
+                            :multiple="multiple"
+                            :filtrate="filtrate"
+                            :store="store"
+                            :disabled="disabled"
+                            :readonly-text="readonlyText"
+                            placeholder="请选择代理人"
+                            @change-link-data="callbackAgenterInfo"
+                        />
+                        <span v-else>{{ bpmAgent.agenterName }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <!-- 全部代理 || 部分代理 -->
             <el-row>
                 <el-col :span="12" col>
                     <el-form-item label="代理类型:" prop="agentType">
@@ -22,30 +85,6 @@
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-form-item label="委托人:" prop="delegatorId">
-                <ibps-employee-selector v-if="!readonly" v-model="bpmAgent.delegatorId" :customPartyTypeOptions="customPartyTypeOptions" @callback="callbackDelegatorrInfo" />
-                <span v-else>{{ bpmAgent.delegatorName }}</span>
-            </el-form-item>
-            <el-row>
-                <el-col :span="12" col>
-                    <el-form-item label="生效时间:" prop="effectiveTime">
-                        <el-date-picker v-if="!readonly" v-model="bpmAgent.effectiveTime" type="date" value-format="yyyy-MM-dd" style="width：100%;" />
-                        <span v-else>{{ bpmAgent.effectiveTime }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12" col>
-                    <el-form-item label="失效时间:" prop="expiryTime">
-                        <el-date-picker v-if="!readonly" v-model="bpmAgent.expiryTime" type="date" value-format="yyyy-MM-dd" style="width：100%;" />
-                        <span v-else>{{ bpmAgent.expiryTime }}</span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <!-- 全部代理 || 部分代理 -->
-            <el-form-item v-if="bpmAgent.agentType === 'all' || bpmAgent.agentType === 'part'" label="代理人:" prop="agenterId">
-                <ibps-employee-selector v-if="!readonly" v-model="bpmAgent.agenterId" :customPartyTypeOptions="customPartyTypeOptions" @callback="callbackAgenterInfo" />
-                <span v-else>{{ bpmAgent.agenterName }}</span>
-            </el-form-item>
 
             <div v-if="bpmAgent.agentType === 'part'">
                 <el-form-item label="流程定义">
@@ -112,6 +151,7 @@ import { agentTypeOptions, statusOptions } from './constants'
 import ActionUtils from '@/utils/action'
 import IbpsEmployeeSelector from '@/business/platform/org/employee/selector'
 import BpmDefinitionSelector from '@/business/platform/bpmn/definition/selector'
+import ibpsUserSelector from '@/business/platform/org/selector'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import Condition from './condition'
 import { setTimeout } from 'timers'
@@ -120,7 +160,8 @@ export default {
     components: {
         IbpsEmployeeSelector,
         BpmDefinitionSelector,
-        Condition
+        Condition,
+        ibpsUserSelector
     },
     props: {
         visible: {
@@ -134,10 +175,10 @@ export default {
         id: String,
         title: String
     },
-    data() {
+    data () {
         return {
             formName: 'agentForm',
-            formLabelWidth: '120px',
+            formLabelWidth: '100px',
             dialogVisible: this.visible,
             conditionDialogVisible: false, // 条件规则界面
             dialogLoading: false,
@@ -184,14 +225,27 @@ export default {
             url: '',
             srcList: [],
 
-            customPartyTypeOptions: [{
-                label: "岗位",
-                value: "position"
-            }]
+            // 委托人和代理人 选择器修改通用选择器，需要这些参数
+            type: 'user',
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
+            multiple: false,
+            filtrate: true,
+            store: 'id',
+            disabled: false,
+            readonlyText: 'null'
         }
     },
     computed: {
-        formId() {
+        formId () {
             return this.id
         }
     },
@@ -203,11 +257,12 @@ export default {
             immediate: true
         }
     },
-    created() {
+    created () {
         this.defaultForm = JSON.parse(JSON.stringify(this.bpmAgent))
         this.getImage()
+        this.getInit()
     },
-    mounted() {
+    mounted () {
         this.$nextTick(() => {
             if (this.$refs.multipleTable) {
                 this.$refs.multipleTable.doLayout()
@@ -215,24 +270,28 @@ export default {
         })
     },
     methods: {
-        handleEdit() {
+        // 初始化
+        getInit () {
+            this.filter[0].partyId = this.$store.getters.userInfo.employee.positions || ''
+        },
+        handleEdit () {
             this.rowLoading = true
             setTimeout(() => {
                 this.rowLoading = false
                 // TODO:
             })
         },
-        handleRemove() {
+        handleRemove () {
             this.rowLoading = true
             setTimeout(() => {
                 this.rowLoading = false
                 // TODO:
             })
         },
-        callbackBpmAgentConditionPoList(data) {
+        callbackBpmAgentConditionPoList (data) {
             console.log(data)
         },
-        handleDelete(index, arr) {
+        handleDelete (index, arr) {
             this.rowLoading = true
             setTimeout(() => {
                 if (arr !== []) {
@@ -249,7 +308,7 @@ export default {
                 this.rowLoading = false
             })
         },
-        handleAllDelete(arr) {
+        handleAllDelete (arr) {
             this.rowLoading = true
             setTimeout(() => {
                 if (!this.$utils.isEmpty(arr)) {
@@ -264,13 +323,13 @@ export default {
                 this.rowLoading = false
             })
         },
-        handleSelectionChange(val) {
+        handleSelectionChange (val) {
             this.multipleSelection = val
         },
-        handleConditionChange(val) {
+        handleConditionChange (val) {
             this.conditionSelection = val
         },
-        handleActionEvent({ key }) {
+        handleActionEvent ({ key }) {
             switch (key) {
                 case 'save':
                     this.handleSave()
@@ -283,7 +342,7 @@ export default {
             }
         },
         // 保存数据
-        handleSave() {
+        handleSave () {
             this.$refs[this.formName].validate((valid) => {
                 if (valid) {
                     this.saveData()
@@ -293,7 +352,7 @@ export default {
             })
         },
         // 提交保存数据
-        saveData() {
+        saveData () {
             const data = JSON.parse(JSON.stringify(this.bpmAgent))
             data.effectiveTime = new Date(this.bpmAgent.effectiveTime).getTime() || ''
             data.expiryTime = new Date(this.bpmAgent.expiryTime).getTime() || ''
@@ -323,14 +382,14 @@ export default {
                 })
         },
         // 关闭当前窗口
-        closeDialog() {
+        closeDialog () {
             this.$emit('close', false)
             this.$refs[this.formName].resetFields()
         },
         /**
          * 表单验证
          */
-        formValidate() {
+        formValidate () {
             if (this.readonly) return
             this.$nextTick(() => {
                 this.$refs[this.formName].validate(() => {})
@@ -339,7 +398,7 @@ export default {
         /**
          * 获取表单数据
          */
-        getFormData() {
+        getFormData () {
             if (this.$utils.isEmpty(this.formId)) {
                 // 重置表单
                 this.bpmAgent = JSON.parse(JSON.stringify(this.defaultForm))
@@ -360,16 +419,16 @@ export default {
                     this.dialogLoading = false
                 })
         },
-        addDef() {
+        addDef () {
             alert('打开流程选择器')
         },
-        callbackDelegatorrInfo(data) {
+        callbackDelegatorrInfo (value, data, type) {
             this.bpmAgent.delegatorName = data.name
         },
-        callbackAgenterInfo(data) {
+        callbackAgenterInfo (value, data, type) {
             this.bpmAgent.agenterName = data.name
         },
-        updateDefine(data) {
+        updateDefine (data) {
             this.rowLoading = true
             const arr = data.map((item) => {
                 return {
@@ -389,7 +448,7 @@ export default {
                 this.rowLoading = false
             })
         },
-        openConditionDialog() {
+        openConditionDialog () {
             if (this.$utils.isEmpty(this.bpmAgent.procDefId)) {
                 ActionUtils.warning('请选择流程！!')
                 return
@@ -397,28 +456,34 @@ export default {
             this.conditionDialogVisible = true
         },
 
-        getImage() {
-            let sql = `select * from t_dlpz order by create_time_ desc LIMIT 1`
+        getImage () {
+            const sql = `select * from t_dlpz order by create_time_ desc LIMIT 1`
             curdPost('sql', sql).then((res) => {
-                if (res.state == 200) {
-                    let datas = res.variables.data
-                    let image = JSON.parse(datas[0].tu_pian_)
-                    let id = image[0].id
-                    this.getUrl(id)
+                if (res.state === 200) {
+                    const datas = res.variables.data
+                    if (datas.length > 0) {
+                        const image = JSON.parse(datas[0].tu_pian_)
+                        const idList = image.map(item => {
+                            return item.id
+                        })
+                        const ids = idList.join(',')
+                        this.getUrl(ids)
+                    }
                 }
             })
         },
-        getUrl(id) {
-            let sql1 = `select nei_rong_ from t_ipcc where id_ = '1'`
-            let sql2 = `select FILE_PATH_ from ibps_file_attachment where ID_ = '${id}'`
+        getUrl (id) {
+            const sql1 = `select nei_rong_ from t_ipcc where id_ = '1'`
+            const sql2 = `select * from ibps_file_attachment where find_in_set(ID_,'${id}')`
             Promise.all([curdPost('sql', sql1), curdPost('sql', sql2)]).then(([res1, res2]) => {
-                if (res1.state == 200 && res2.state == 200) {
-                    let datas1 = res1.variables.data
-                    let datas2 = res2.variables.data
-                    let ip = datas1[0].nei_rong_
-                    let image = datas2[0].FILE_PATH_
-                    this.url = ip + '/' + image
-                    this.srcList[0] = this.url
+                if (res1.state === 200 && res2.state === 200) {
+                    const datas1 = res1.variables.data
+                    const datas2 = res2.variables.data
+                    const ip = datas1[0].nei_rong_
+                    const imageList = datas2.map(item => {
+                        return ip + '/' + item.FILE_PATH_
+                    })
+                    this.srcList = imageList
                 }
             })
         }
@@ -426,9 +491,9 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .bpmn-agent-dialog {
-    .el-dialog__body {
+    ::v-deep .el-dialog__body {
         height: calc(70vh - 110px) !important;
     }
     .dialog-right {
@@ -438,11 +503,20 @@ export default {
         }
     }
 }
-</style>
-
-<style scoped>
 .imageListClass {
     display: flex;
-    justify-content: center;
+    flex-wrap: wrap;
 }
+.bpmnForm{
+    padding: 20px;
+}
+.time{
+    width: 100%;
+}
+.sinImageList{
+    width: 150px;
+    height: 150px;
+    margin: 10px;
+}
+
 </style>
