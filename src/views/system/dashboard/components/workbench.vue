@@ -328,7 +328,7 @@ export default {
             }
         }
     },
-    mounted: function () {
+    mounted () {
         this.getData(this.activeTab)
         this.getOrgInfo()
         if (this.timer) {
@@ -368,7 +368,7 @@ export default {
         },
         getName ({ createBy, updateBy }) {
             const id = updateBy || createBy
-            const { name = '' } = this.$store.getters
+            const { name = '' } = this.$store.getters || {}
             if (this.activeTab === 'finish') {
                 const t = this.userList.find(i => i.userId === id)
                 return t ? t.userName : ''
@@ -397,6 +397,13 @@ export default {
             result.deptName = deptNames.join(',')
             return result[arg]
         },
+        getDept (v, arg = 'positionName') {
+            if (!v) {
+                return ''
+            }
+            const t = this.deptList.find(i => i.positionId === v)
+            return t ? t[arg] : ''
+        },
         tableRowClassName ({ row, rowIndex }) {
             if (rowIndex % 2 === 1) return 'warning-row'
             return 'success-row'
@@ -422,12 +429,13 @@ export default {
                                 dataResult[index].submitBy = item.name_
                                 dataResult[index].workName = dataResult[index].subject.includes('#') ? dataResult[index].subject.split('#')[0] : dataResult[index].subject.split('(')[0]
                                 dataResult[index].workType = this.plan.includes(dataResult[index].procDefKey) ? 'plan' : 'normal'
-                                dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, '1')
+                                const limit = this.getAttr(dataResult[index].subject, 'loseDate') || this.getAttr(dataResult[index].subject, 'timeLimit') || 3
+                                dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, limit, '1')
                             })
                             this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
                             this.pagination = pageResult
                         })
-                        // this.urgeToManager()
+                        this.urgeToManager()
                     } else {
                         this.dataList = dataResult
                         this.pagination = pageResult
@@ -549,7 +557,7 @@ export default {
                 parameters: [],
                 sorts: []
             }
-            const sql = `select id_, shi_wu_id_ as taskId from t_gqswb where position('${userId}' in chu_li_ren_id_) FOR UPDATE`
+            const sql = `select id_, shi_wu_id_ as taskId from t_gqswb where position('${userId}' in chu_li_ren_id_)`
             // Promise.all([pending(params), this.$common.request('sql', sql)]).then(([res1, res2]) => {
             //     let workData = res1.data && res1.data.dataResult
             //     let noticeData = res2.variables && res2.variables.data
@@ -582,7 +590,9 @@ export default {
                 // 截取流程名
                 item.workName = item.subject.includes('#') ? item.subject.split('#')[0] : item.subject.split('(')[0]
                 item.workType = this.plan.includes(item.procDefKey) ? 'plan' : 'normal'
-                const isExpire = this.judgeExpire(item.createTime, currentTime, item.workType)
+                item.deptId = this.getAttr(item.subject, 'dept')
+                const limit = this.getAttr(item.subject, 'loseDate') || this.getAttr(item.subject, 'timeLimit')
+                const isExpire = this.judgeExpire(item.createTime, currentTime, item.workType, limit)
                 if (isExpire) {
                     result.expire.push(item)
                 } else {
@@ -600,28 +610,46 @@ export default {
                 this.dealUnexpile(result.all, noticeList)
             }
         },
-        // 判断是否过期、获取办理状态
-        judgeExpire (time, current, type, isState) {
+        /**
+         * 判断是否过期、获取办理状态
+         * @param {string} time 比较时间
+         * @param {number} current 当前时间戳
+         * @param {string} type 事务类型
+         * @param {string} limit 限时，值分为两种类型，传值为字符串格式的时间时，判定逻辑为当前时间小于该时间，传值为字符串类型数字时，判定逻辑为创建limit天后，大于当前时间
+         * @param {string} isState 调用类型
+         */
+        judgeExpire (time, current, type, limit, isState) {
             const D = new Date(time)
             const a = new Date(time).getTime()
             const b = new Date(current).getTime()
+            const l = limit || 3
             // 创建时间当月最后一天的时间戳
             const c = new Date(D.getFullYear(), D.getMonth() + 1, 0).getTime() + 86400000
+            const isDate = l.toString().includes('-')
             // 返回办理状态
             if (isState) {
                 let state = ''
                 if (type === 'plan') {
-                    state = b >= c ? 'overtime' : b + (86400000 * 7) > c ? 'soon' : 'wait'
+                    const M = isDate ? new Date(l).getTime() : c
+                    state = b >= M ? 'overtime' : b + (86400000 * 7) > M ? 'soon' : 'wait'
                 } else {
-                    state = a + (86400000 * 3) < b ? 'overtime' : 'wait'
+                    if (isDate) {
+                        const L = new Date(l).getTime()
+                        state = b >= L ? 'overtime' : 'wait'
+                    } else {
+                        state = a + (86400000 * parseInt(l)) < b ? 'overtime' : 'wait'
+                    }
                 }
                 return state
             }
             // 返回是否过期
+            if (isDate) {
+                return b + (86400000 * 7) > new Date(l).getTime()
+            }
             if (type === 'plan') {
                 return b + (86400000 * 7) > c
             } else {
-                return a + (86400000 * 3) < b
+                return a + (86400000 * parseInt(l)) < b
             }
         },
         // 处理已过期数据
@@ -632,7 +660,7 @@ export default {
             const addList = []
             const sendList = []
             const msgContent = {
-                plan: '距离过期还剩七天，请及时处理！',
+                plan: '距离超时还剩七天，请及时处理！',
                 normal: '至今三天未处理，已超时，请及时处理！'
             }
             const msgTitle = {
@@ -640,6 +668,7 @@ export default {
                 normal: '事务超时提醒'
             }
             const nowTime = new Date(new Date().getTime() + 28800000).toJSON().slice(0, 16).replace('T', ' ')
+            // console.log(data)
             data.forEach(item => {
                 const isExist = !!noticeList.find(i => i.taskId === item.taskId)
                 // 筛选出不存在于主管提醒表的过期数据
@@ -662,11 +691,10 @@ export default {
                         chu_li_ren_ming_: item.ownerName,
                         chu_li_ren_id_: this.getInfoByName(item.ownerName, 'id'),
                         chu_li_ren_dian_h: this.getInfoByName(item.ownerName, 'phone'),
-                        bu_men_: this.orgInfo.orgName,
-                        bu_men_id_: this.orgInfo.groupID,
-                        // 主管ID与当前用户id相等时将主管ID设置为主任【】的ID，主管电话设为空
-                        zhu_guan_id_: this.orgInfo.id === userId ? '990927120278487040' : this.orgInfo.id,
-                        zhu_guan_dian_hua: this.orgInfo.id === userId ? '' : this.orgInfo.mobile,
+                        bu_men_: this.getDept(item.deptId),
+                        bu_men_id_: item.deptId,
+                        zhu_guan_id_: this.getDept(item.deptId, 'managerId'),
+                        zhu_guan_dian_hua: this.getInfoByName(this.getDept(item.deptId, 'manager'), 'phone'),
                         bian_zhi_shi_jian: item.createTime,
                         ti_xing_ci_shu_: 1,
                         duan_xin_ci_shu_: 0,

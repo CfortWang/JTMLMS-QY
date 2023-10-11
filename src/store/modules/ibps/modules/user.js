@@ -57,7 +57,6 @@ export default {
                 await dispatch('getAccount')
                 // 获取切换用户账号
                 await dispatch('getSwitchAccount')
-                
 
                 // 获取注册用户账号
                 dispatch('getRegister').then((r) => {
@@ -184,8 +183,9 @@ export default {
          * 获取所有系统部门信息
          */
         getDeptList ({ state, dispatch }, { first, second }) {
-            const params = second ? ` and (path_ like '%${second}%' or id_ = '${first}')` : first ? ` and path_ like '%${first}%'` : ''
-            const sql = `select id_ as positionId, name_ as positionName, path_ as path, depth_ as depth, sn_ as sn from ibps_party_entity where party_type_ = 'position'${params} order by depth_ asc, sn_ asc`
+            const params = second ? ` and (pe.path_ like '%${second}%' or pe.id_ = '${first}')` : first ? ` and pe.path_ like '%${first}%'` : ''
+            // const sql = `select id_ as positionId, name_ as positionName, path_ as path, depth_ as depth, sn_ as sn from ibps_party_entity where party_type_ = 'position'${params} order by depth_ asc, sn_ asc`
+            const sql = `select pe.id_ as positionId, pe.name_ as positionName, pe.path_ as path, pe.depth_ as depth, pe.sn_ as sn, r.name_ as manager, r.id_ as managerId from ibps_party_entity as pe left join (select em.id_, em.positions_, em.name_ from ibps_party_employee as em left join ibps_party_user_role as ur on em.id_ = ur.user_id_ left join ibps_party_role as pr on pr.id_ = ur.role_id_ where role_alias_ in ('zhsfzr', 'syszr', 'zhglzzc')) as r on find_in_set(pe.id_, r.positions_) > 0 where pe.party_type_ = 'position'${params} order by pe.depth_ asc, pe.sn_ asc`
             common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 dispatch('ibps/param/setDeptList', data, {
