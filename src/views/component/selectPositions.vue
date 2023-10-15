@@ -25,6 +25,7 @@ export default {
         value: "ID_",
         multiple: true,
         expandTrigger: "hover",
+        checkStrictly: true
       },
       options: [],
       selectDatas: [],
@@ -40,14 +41,22 @@ export default {
       let positonsSql = "";
       // 金通账号id
       if (this.userId == "702117247933480960") {
-        positonsSql = `select * from ibps_party_entity where party_type_ = 'position' `;
+        positonsSql = `select * FROM ibps_party_entity WHERE party_type_ = 'position' 
+                AND (
+                DEPTH_ IN (1,2) OR (
+                (DEPTH_=3 AND NAME_ = '检验科') OR  parent_id_ IN (SELECT id_ FROM ibps_party_entity WHERE DEPTH_=3 AND NAME_ = '检验科'  )  )
+                )`;
       } else {
         // 所属医院的系统管理员
         let isAdmin = this.userInfo.role.some((so) => {
           return so.name == "系统管理角色";
         });
         if (isAdmin) {
-          positonsSql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${this.level.first}%'  `;
+          positonsSql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${this.level.first}%' 
+          AND (
+                DEPTH_ IN (1,2) OR (
+                (DEPTH_=3 AND NAME_ = '检验科') OR  parent_id_ IN (SELECT id_ FROM ibps_party_entity WHERE DEPTH_=3 AND NAME_ = '检验科'  )  )
+                )`;
         } else {
           let allPositions = [];
           for (var i of this.userInfo.positions) {
@@ -69,20 +78,33 @@ export default {
           const datas = res.variables.data;
           let positionsValue = [];
           if (datas.length > 0) {
+            // datas = datas.filter(fil => {
+            //   return fil.DEPTH_ == 3 && fil.NAME_ !== '检验科'
+            // })
             this.options = this.toTree(datas);
-            for (var i of this.options) {
-              if (i.children !== undefined) {
-                const getTail = (item) =>
-                  item.children && item.children.length > 0
-                    ? item.children.map((m) => getTail(m))
-                    : [item];
-                let result = _.flattenDeep(i.children.map((m) => getTail(m)));
-                for (var item of result) {
-                  let itemArr = item.PATH_.split(".");
-                  itemArr.splice(itemArr.length - 1, 1);
-                  positionsValue.push(itemArr);
-                }
-              }
+            // for (var i of this.options) {
+            //   //   if (i.children !== undefined) {
+
+            //   //   }
+            //   const getTail = (item) =>
+            //     item.children && item.children.length > 0
+            //       ? item.children.map((m) => getTail(m))
+            //       : [item];
+            //   let result = _.flattenDeep(i.children.map((m) => getTail(m)));
+            //   console.log('result', result)
+
+            //   for (var item of result) {
+            //     let itemArr = item.PATH_.split(".");
+            //     // console.log('itemArr', itemArr)
+
+            //     itemArr.splice(itemArr.length - 1, 1);
+            //     positionsValue.push(itemArr);
+            //   }
+            // }
+            for (var i of datas) {
+              let itemArr = i.PATH_.split(".");
+              itemArr.splice(itemArr.length - 1, 1);
+              positionsValue.push(itemArr);
             }
             this.selectDatas = positionsValue;
             if (this.iniselectDatas.length == 0) {

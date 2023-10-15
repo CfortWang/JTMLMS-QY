@@ -412,6 +412,8 @@ export default {
         ],
         color: ['#6666FF', '#9b4400'],
       },
+      // 轮询部门信息用
+      positionIni: []
     };
   },
   methods: {
@@ -450,10 +452,11 @@ export default {
       let data = [];
       let personInfo = [];
       // let ranksObj = {};
-      let sql = `select a.id_,a.parent_id_,ee.name_,a.zui_gao_xue_li_x_,a.zhi_cheng_deng_ji,ee.jian_ding_zi_ge_z,a.ren_zhi_shi_jian_,
-      a.ru_zhi_shi_jian_ from  t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where a.id_ !='861622496187645952' and (${this.otherPositions.join(
+      const positionsWhere = this.otherPositions.length !== 0 ? `(${this.otherPositions.join(
         " or "
-      )})`;
+      )} )` : `ee.positions_ = '没有选择部门'`
+      let sql = `select a.id_,a.parent_id_,ee.name_,a.zui_gao_xue_li_x_,a.zhi_cheng_deng_ji,ee.jian_ding_zi_ge_z,a.ren_zhi_shi_jian_,
+      a.ru_zhi_shi_jian_ from  t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where a.id_ !='861622496187645952' and ${positionsWhere}`;
       await curdPost("sql", sql).then((res) => {
         data = res.variables.data;
       });
@@ -479,6 +482,9 @@ export default {
       this.ranksPieData.data[1].value = 0;
       this.ranksPieData.data[2].value = 0;
       let data = [];
+      const positionsWhere = this.otherPositions.length !== 0 ? `(${this.otherPositions.join(
+        " or "
+      )} )` : `ee.positions_ = '没有选择部门'`
       let sql = `select
                 sum(a.zui_gao_xue_li_x_ = '博士') as doctor,
                 sum(a.zui_gao_xue_li_x_ = '硕士') as Master,
@@ -488,12 +494,13 @@ export default {
                 sum(a.zhi_cheng_deng_ji = '中级') as middleRank,
                 sum(a.zhi_cheng_deng_ji = '高级') as senior,
                 sum(a.zhi_cheng_deng_ji = '' || a.zhi_cheng_deng_ji is null) as other
-                from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where ee.id_ != '702117247933480960' and (${this.otherPositions.join(
-        " or "
-      )} )`;
+                from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where ee.id_ != '702117247933480960' and ${positionsWhere}`;
       await curdPost("sql", sql).then((res) => {
         data = res.variables.data;
       });
+      if (data.length == 0 || data[0] == null) {
+        return
+      }
       this.degreePieData.data[0].value = data[0].doctor ? data[0].doctor : 0;
       this.degreePieData.data[1].value = data[0].Master ? data[0].Master : 0;
       this.degreePieData.data[2].value = data[0].undergraduate
@@ -512,6 +519,9 @@ export default {
     },
     // 部门信息统计
     positionsInfoData() {
+      const positionsWhere = this.positions.length !== 0 ? `(${this.positions.join(
+        " or "
+      )} )` : `en.path_ = '没有选择部门'`
       let sql = `select jh.*from (select  en.id_ ,en.name_ AS enName,  
             sum(gy.zui_gao_xue_li_x_ = '博士') AS doctor_,
             sum(gy.zui_gao_xue_li_x_ = '硕士') AS Master_,
@@ -522,9 +532,7 @@ export default {
             sum(gy.zhi_cheng_deng_ji = '高级') AS seniorZ_ FROM (SELECT
             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji
             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_ WHERE ee.id_ != '702117247933480960'
-            )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where (${this.positions.join(
-        " or "
-      )}) GROUP BY enName) jh`;
+            )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where ${positionsWhere} GROUP BY enName) jh`;
       curdPost("sql", sql).then((res) => {
         const data = res.variables.data;
         // 组装数据集，以学历职称为列，以部门为行:{"高中":['1','2','3']}
@@ -577,11 +585,13 @@ export default {
       //   create_by_ += create_by_ + "," + item.id_;
       // }
       // create_by_ = create_by_.slice(0, create_by_.length - 1);
+      const positionsWhere = this.otherPositions.length !== 0 ? `(${this.otherPositions.join(
+        " or "
+      )} )` : `ee.positions_ = '没有选择部门'`
       let sql = `select  executor_,count(executor_) as num ,ee.name_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b  
                 on a.task_id_ = b.task_id_ join ibps_party_employee as ee on b.executor_ = ee.id_ and
-                ee.STATUS_= 'actived' and ee.ID_ != '1' and ee.ID_ != '-1' and ee.ID_ != '702117247933480960' and (${this.otherPositions.join(
-        " or "
-      )} ) and  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate
+                ee.STATUS_= 'actived' and ee.ID_ != '1' and ee.ID_ != '-1' and ee.ID_ != '702117247933480960' and ${positionsWhere} 
+                and  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate
         }'
                 and ee.GROUP_ID_ not like '%1041786072788369408%'   GROUP BY  executor_ order by ee.CREATE_TIME_ asc `;
       await curdPost("sql", sql).then((res) => {
@@ -594,9 +604,7 @@ export default {
       //超时
       let cssql = `select  executor_ ,count(executor_) as num ,ee.name_,a.create_time_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b
                   on a.task_id_ = b.task_id_ join ibps_party_employee as ee on b.executor_ = ee.id_
-                  where now()> SUBDATE(a.create_time_,interval - 3 day) and  ee.STATUS_= 'actived' and (${this.otherPositions.join(
-        " or "
-      )} )
+                  where now()> SUBDATE(a.create_time_,interval - 3 day) and  ee.STATUS_= 'actived' and ${positionsWhere}
                   and ee.ID_ != '1' and ee.ID_ != '-1' and ee.ID_ != '702117247933480960' and ee.GROUP_ID_ not like '%1041786072788369408%'
                   GROUP BY  executor_  order by  ee.CREATE_TIME_ asc `;
       await curdPost("sql", cssql).then((res) => {
@@ -606,10 +614,13 @@ export default {
         personIds += "'" + it.executor_ + "',";
       }
       personIds = personIds.slice(0, personIds.length - 1);
+      if (!personIds) {
+        return
+      }
       let yibansql1 = `select count(AUDITOR_) as num,AUDITOR_,name_,STATUS_,CREATE_TIME_ from (select a.AUDITOR_,ee.name_,
                       a.STATUS_,ee.CREATE_TIME_ from IBPS_BPM_APPROVAL as a join ibps_party_employee as ee on a.AUDITOR_ = ee.id_
                       where  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate
-        }' and (${this.otherPositions.join(" or ")} ) and
+        }' and ${positionsWhere} and
                                     ee.id_ in(${personIds})   group by a.PROC_inst_ID_) as zz  group by AUDITOR_  order by  CREATE_TIME_ asc `;
       await curdPost("sql", yibansql1).then((res) => {
         yibanData1 = res.variables.data;
@@ -618,7 +629,7 @@ export default {
                         ee.name_,a.AUDITOR_,a.STATUS_,ee.CREATE_TIME_ from IBPS_BPM_APPROVAL_HIS as a join ibps_party_employee as ee on a.AUDITOR_ = ee.id_
                         where  a.CREATE_TIME_  between '${this.startDate
         }' and '${this.endDate
-        }' and ee.id_ in(${personIds}) and (${this.otherPositions.join(" or ")} )   group by a.PROC_inst_ID_) as bb  group by AUDITOR_ order by  CREATE_TIME_ asc `;
+        }' and ee.id_ in(${personIds}) and ${positionsWhere}   group by a.PROC_inst_ID_) as bb  group by AUDITOR_ order by  CREATE_TIME_ asc `;
       await curdPost("sql", yibansql2).then((res) => {
         yibanData2 = res.variables.data;
       });
@@ -663,6 +674,9 @@ export default {
     simplifyPosition(v) {
       this.positions = []; // 用于sql条件查询
       this.otherPositions = [];
+      //   if (v.length == 1 || v.length == 2) {
+      //     return
+      //   }
       for (let i = 0; i < v.length; i++) {
         this.positions.push(`en.path_ like '%${v[i][v[i].length - 1]}%'`);
         this.otherPositions.push(
@@ -677,14 +691,34 @@ export default {
       this.getTtaskMattersData();
     },
     handleFunc(e) {
+      this.positionIni = e
+      this.simplifyPosition(e);
+      this.handleAllGetFunc();
+      clearInterval(this.interval);
+      this.intervalHandle();
+    },
+    handleInt(e) {
       this.simplifyPosition(e);
       this.handleAllGetFunc();
     },
     // 定时任务调用接口，一分钟一次
     intervalHandle() {
+      let cishu = 0
       this.interval = setInterval(() => {
-        this.handleAllGetFunc();
-      }, 180000);
+        const positionIniDatas = this.positionIni.filter((fil) => {
+          return fil[2] !== undefined
+        })
+        if (positionIniDatas.length == 0) {
+          return
+        }
+        if (cishu > positionIniDatas.length) {
+          cishu = 0
+          this.handleInt([positionIniDatas[0]])
+        } else {
+          this.handleInt([positionIniDatas[cishu]])
+          cishu++
+        }
+      }, 5000);
     },
     allView() {
       // 默认显示全屏
@@ -723,7 +757,7 @@ export default {
     }
   },
   mounted() {
-    this.intervalHandle();
+
   },
   beforeDestroy() {
     if (this.interval) {
@@ -740,7 +774,7 @@ export default {
 .personView {
   width: 100%;
   height: calc(100vh - 100px);
-//   background-image: url("~@/assets/images/screen/bg.png");
+  //   background-image: url("~@/assets/images/screen/bg.png");
   z-index: -1;
   #dv-full-screen-container {
     background-image: url("~@/assets/images/screen/bg.png");

@@ -150,6 +150,8 @@ export default {
         },
         // 加载岗位树
         loadTreeNode (node, resolve) {
+            const isSuper = this.$store.getters.isSuper
+            const level = this.$store.getters.level
             this.loading = true
             const params = {}
             params.type = '1'
@@ -161,11 +163,31 @@ export default {
             getTreeData(params).then(res => {
                 this.loading = false
                 const arr = JSON.parse(JSON.stringify(res.data))
-                const treeData = this.toTree(arr)
-                if (treeData[0].id === '0') {
-                    treeData[0].name = '部门树'
-                    treeData[0].disabled = true
-                } // 根节点不能选择
+                // 岗位树改成部门树
+                arr.forEach(item => {
+                    if (item.name === '岗位树') {
+                        item.name = '部门树'
+                        item.disabled = true
+                    }
+                })
+                // 过滤部门  管理员不过滤
+                let arrList = []
+                if (!isSuper) {
+                    const firstShow = arr.some(item => item.id === level.first)
+                    const secondShow = arr.some(item => item.id === level.second)
+                    if (level.first && firstShow) {
+                        arrList = arr.filter(item => item.id === level.first)
+                    } else if (level.second && secondShow) {
+                        console.log(arr)
+                        arrList = arr.filter(item => item.id === level.second)
+                    } else {
+                        arrList = arr
+                    }
+                } else {
+                    arrList = arr
+                }
+
+                const treeData = this.toTree(arrList)
                 resolve(treeData)
             }).catch(res => {
                 this.loading = false

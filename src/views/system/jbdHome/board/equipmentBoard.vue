@@ -8,8 +8,10 @@
         <dv-decoration-8 class="right" :reverse="true" />
         <div class="title">{{ titleName }}</div>
         <div class="time">
-          <span>年度:</span>
-          <el-date-picker v-model="month" type="year" value-format="yyyy" format="yyyy" placeholder="日期选择" style="width: 120px" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
+          <dv-border-box-8>
+          <span >年度:</span>
+          <el-date-picker v-model="month" type="year" value-format="yyyy" format="yyyy" placeholder="日期选择" style="width: 100px;" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
+          </dv-border-box-8>
         </div>
         <div class="back" @click.prevent="goBack()">
           <dv-border-box-8>返回</dv-border-box-8>
@@ -760,6 +762,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+   ::v-deep.el-input--small .el-input__inner {
+        background-color: rgb(7 16 43 / 50%);
+        color: white;
+        border: none;
+      }
 .content {
   width: 100%;
   height: 100%;
@@ -839,13 +846,15 @@ export default {
     .time {
       display: flex;
       justify-content: flex-end;
-      width: 20%;
+      width: 154px;
       right: 75%;
+
     }
     .back {
       left: 75%;
     }
-  }
+  }    
+
   .topCard {
     height: 30%;
     margin-top: 10px;
