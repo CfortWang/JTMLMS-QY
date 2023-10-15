@@ -482,6 +482,12 @@ export default {
         top: -5px;
         position: absolute;
     }
+    .el-table .sort-caret.ascending{
+        border-bottom-color: #909399;
+    }
+    .el-table .sort-caret.descending{
+        border-top-color: #909399;
+    }
     .el-table td{
         padding: 4px 0 !important;
         color: #000000;
@@ -495,5 +501,8 @@ export default {
     .el-table .success-row {
         background: #F9FFFF;
         color: #000000;
+    }
+    .el-table .el-table-column--selection {
+        text-align: center;
     }
 </style>

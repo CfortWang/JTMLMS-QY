@@ -63,6 +63,7 @@
                             <template slot="overDept" slot-scope="scope">{{ getAttr(scope.row.subject, 'deptName') }}</template>
                             <template slot="creator" slot-scope="scope">{{ scope.row.createBy | getUserName(userList) }}</template>
                             <template slot="updateBy" slot-scope="scope">{{ getName(scope.row) }}</template>
+                            <template slot="time" slot-scope="scope">{{ scope.row.endTime || scope.row.updateTime || scope.row.createTime }}</template>
                         </ibps-crud>
                     </div>
                 </div>
@@ -287,7 +288,7 @@ export default {
                         { prop: 'scope', label: '发起部门', slotName: 'overDept', width: 120 },
                         { prop: 'scope', label: '发起人', headerName: 'submitBy', slotName: 'creator', width: 100 },
                         { prop: 'scope', label: `提交人`, slotName: 'updateBy', width: 100 },
-                        { prop: 'createTime', label: '创建时间', width: 150 }
+                        { prop: 'scope', label: '办理时间', slotName: 'time', width: 150 }
                     ],
                     finish: [
                         { prop: 'scope', label: '事务名称', slotName: 'name', width: 250 },
@@ -296,7 +297,7 @@ export default {
                         { prop: 'scope', label: '发起部门', slotName: 'overDept', width: 120 },
                         { prop: 'scope', label: '发起人', headerName: 'submitBy', slotName: 'creator', width: 100 },
                         { prop: 'scope', label: `提交人`, slotName: 'updateBy', width: 100 },
-                        { prop: 'createTime', label: '结束时间', width: 150 }
+                        { prop: 'scope', label: '结束时间', slotName: 'time', width: 150 }
                     ],
                     save: [
                         { prop: 'scope', label: '事务名称', slotName: 'name', width: 250 },
@@ -668,13 +669,10 @@ export default {
                 normal: '事务超时提醒'
             }
             const nowTime = new Date(new Date().getTime() + 28800000).toJSON().slice(0, 16).replace('T', ' ')
-            // console.log(data)
             data.forEach(item => {
                 const isExist = !!noticeList.find(i => i.taskId === item.taskId)
                 // 筛选出不存在于主管提醒表的过期数据
                 if (!isExist) {
-                    // 无部门信息的用户不往过期事务表加数据
-                    // if (this.orgInfo.groupID) {
                     const obj = {
                         // 事务ID
                         shi_wu_id_: item.taskId,
@@ -701,7 +699,6 @@ export default {
                         ti_xing_shi_jian_: nowTime
                     }
                     addList.push(obj)
-                    // }
                     const msg = {
                         subject: msgTitle[item.workType],
                         content: `<p>事务【${item.workName}】${msgContent[item.workType]}<p>`,

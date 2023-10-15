@@ -245,7 +245,7 @@ export default {
             templateData: {},
             listData: [],
             pagination: {},
-            sorts: {},
+            sorts: { END_TIME_: 'DESC' },
             // 默认过滤部分分类
             hasPermission: true,
             specialType,
@@ -540,7 +540,7 @@ export default {
                     pageNo: this.pagination.page || 1,
                     limit: this.pagination.limit || 100
                 },
-                sorts: [this.sorts]
+                ...ActionUtils.formatParams(null, null, this.sorts)
             }
             if (this.$utils.isNotEmpty(this.typeId)) {
                 params.parameters[0].parameters[0].parameters.push({ key: 'Q^TYPE_ID_^S', value: this.typeId })
