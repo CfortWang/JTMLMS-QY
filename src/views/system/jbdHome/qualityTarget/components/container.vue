@@ -70,12 +70,24 @@ export default {
             setTimeout(() => {
                 this.info.forEach((item, index) => {
                     const chart = echarts.init(document.getElementById(`card${index}`))
-                    const option = chartOption
-                    const xData = item.data.map((i, index) => index).slice(0, m)
+                    const option = JSON.parse(JSON.stringify(chartOption))
+                    const xData = item.data.map((i, index) => index + 1).slice(0, m)
                     const yData = item.data.map(i => i.result || 0).slice(0, m)
+                    const yMax = Math.max(...yData)
+                    const yMin = Math.min(...yData)
                     const limit = item.data.map(i => i.limit).filter(i => i !== undefined)[0]
                     const limitValue = item.data.map(i => i.limitValue).filter(i => i)[0]
+                    // if (parseFloat(limit) > parseFloat(yMax)) {
+                    //     // console.log('>', parseFloat(limit), parseFloat(yMax), item.title)
+                    //     option.yAxis.max = limit
+                    // }
+                    // if (parseFloat(limit) < parseFloat(yMin)) {
+                    //     // console.log('<', parseFloat(limit), parseFloat(yMax), item.title)
+                    //     option.yAxis.min = limit
+                    // }
+                    // console.log(option.yAxis.max, option.yAxis.min, item.title)
 
+                    // console.log(item.title, yData)
                     option.title.text = item.title
                     option.title.textStyle.fontSize = this.fontSize
                     option.title.subtext = `限值${limitValue}`
@@ -85,7 +97,7 @@ export default {
                     option.series[0].markLine.data[0].label.formatter = limit
                     chart.setOption(option)
                 })
-            }, 1)
+            }, 100)
         }
     }
 }
