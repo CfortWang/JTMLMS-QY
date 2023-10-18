@@ -1,15 +1,22 @@
 <template>
     <el-dialog :title="title" :visible.sync="dialogVisible" :close-on-click-modal="false" :close-on-press-escape="false" append-to-body class="bpmn-agent-dialog" width="60%" top="10vh" @open="getFormData" @close="closeDialog">
         <el-form ref="agentForm" v-loading="dialogLoading" class="bpmnForm" :element-loading-text="$t('common.loading')" :model="bpmAgent" :rules="rules" :label-width="formLabelWidth" @submit.native.prevent>
-            <div v-if="srcList.length > 0" class="imageListClass">
-                <div v-for="(item,index) in srcList" :key="index">
-                    <el-image :src="item" class="sinImageList" :preview-src-list="srcList" />
-                </div>
-            </div>
+            <el-row v-if="srcList.length > 0">
+                <el-col :span="24">
+                    <el-form-item label="选择代理人参考图片：">
+                        <div class="imageListClass">
+                            <div v-for="(item,index) in srcList" :key="index">
+                                <el-image :src="item" class="sinImageList" :preview-src-list="srcList" />
+                            </div>
+                        </div>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
             <el-row>
                 <el-col :span="24">
                     <el-form-item label="标题：" prop="title">
-                        <el-input v-if="!readonly" v-model="bpmAgent.title" placeholder="请输入标题"/>
+                        <el-input v-if="!readonly" v-model="bpmAgent.title" placeholder="请输入标题" />
                         <span v-else>{{ bpmAgent.title }}</span>
                     </el-form-item>
                 </el-col>
@@ -18,13 +25,13 @@
             <el-row>
                 <el-col :span="12">
                     <el-form-item label="生效时间：" prop="effectiveTime">
-                        <el-date-picker v-if="!readonly" v-model="bpmAgent.effectiveTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择生效时间"/>
+                        <el-date-picker v-if="!readonly" v-model="bpmAgent.effectiveTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择生效时间" />
                         <span v-else>{{ bpmAgent.effectiveTime }}</span>
                     </el-form-item>
                 </el-col>
                 <el-col :span="12">
                     <el-form-item label="失效时间：" prop="expiryTime">
-                        <el-date-picker v-if="!readonly" v-model="bpmAgent.expiryTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择失效时间"/>
+                        <el-date-picker v-if="!readonly" v-model="bpmAgent.expiryTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择失效时间" />
                         <span v-else>{{ bpmAgent.expiryTime }}</span>
                     </el-form-item>
                 </el-col>

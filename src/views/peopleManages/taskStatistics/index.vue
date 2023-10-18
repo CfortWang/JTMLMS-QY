@@ -711,14 +711,14 @@ export default {
         if (positionIniDatas.length == 0) {
           return
         }
-        if (cishu > positionIniDatas.length) {
+        if (cishu > positionIniDatas.length - 1) {
           cishu = 0
           this.handleInt([positionIniDatas[0]])
         } else {
           this.handleInt([positionIniDatas[cishu]])
           cishu++
         }
-      }, 5000);
+      }, 10000);
     },
     allView() {
       // 默认显示全屏

@@ -178,7 +178,6 @@ export default {
                     if (level.first && firstShow) {
                         arrList = arr.filter(item => item.id === level.first)
                     } else if (level.second && secondShow) {
-                        console.log(arr)
                         arrList = arr.filter(item => item.id === level.second)
                     } else {
                         arrList = arr

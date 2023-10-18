@@ -12,7 +12,7 @@ export default {
     methods: {
         getPosition () {
             const second = this.$store.getters.level.second
-            const sql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${second}%' and DEPTH_ = '4'`
+            const sql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${second}%' and DEPTH_ = '4' order by ID_ desc`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length > 0) {
@@ -96,12 +96,12 @@ export default {
                     const sum = list.reduce((total, current) => total + current)
                     const dataLength = data.length
                     const totalMs = sum / dataLength / 5 * 100
-                    this.getOption(totalMs)
+                    this.getOption(parseInt(totalMs))
                 }
             })
         },
         getShiShiData (id, activeIndex) {
-            const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.parent_id_ = '${id}' order by a.tiao_kuan_hao_`
+            const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen,h.NAME_ as yuanZuZhangBuMen,i.NAME_ as yuanZuZhangName from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_position h on a.bu_men_ = h.ID_ left join ibps_party_employee i on a.zu_chang_ = i.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.parent_id_ = '${id}' order by a.tiao_kuan_hao_`
 
             // if (activeIndex === 1) {
             //     sql = `select * from t_rkzztkhcjhzb where parent_id_ = '${id}' order by tiao_kuan_hao_`
@@ -136,7 +136,6 @@ export default {
                     const data2 = res[1].variables.data
                     const list1 = data1.map(item => item.value)
                     const list2 = data2.map(item => item.value)
-                    console.log(this.barData(list1, list2))
                     const accept = echarts.init(this.$refs.Echart2)
                     accept.setOption(JSON.parse(JSON.stringify(this.barData(list1, list2))))
                 }

@@ -49,7 +49,7 @@
                         />
                     </div>
                     <div>
-                        <appComOne ref="appBuCom" :click-index="7" :table-data="buTableData" />
+                        <appComOne ref="appBuCom" :click-index="7" :table-data="buTableData" :type="false" />
                     </div>
                 </div>
                 <div class="tableLin">
@@ -61,7 +61,7 @@
                         />
                     </div>
                     <div>
-                        <appComOne ref="appCom" :click-index="clickIndex" :active-index="activeIndex" :table-data="tableData" />
+                        <appComOne ref="appCom" :type="true" :general-list="generalList" :click-index="clickIndex" :active-index="activeIndex" :table-data="tableData" />
                     </div>
                 </div>
                 <div v-if="activeIndex != 5" class="tyongj">

@@ -256,11 +256,9 @@ export default {
                 ],
                 searchForm: {
                     forms: [
+                        { prop: 'Q^subject_^SL', label: '关键字:', itemWidth: 330, placeholder: '可输入年份/部门/表单名称/事务说明/编制人模糊查询' },
                         { prop: 'Q^proc_def_name_^SL', label: '表单名称:', itemWidth: 150, placeholder: '请输入' },
-                        { prop: ['Q^end_time_^DL', 'Q^end_time_^DG'], label: '完成时间', fieldType: 'daterange', itemWidth: 220 },
-                        { prop: 'Q^subject_^SL', label: '事务说明:', itemWidth: 150, placeholder: '请输入' },
-                        { prop: 'Q^subject_^SL', label: '事务说明:', itemWidth: 150, placeholder: '请输入' },
-                        { prop: 'Q^subject_^SL', label: '事务说明:', itemWidth: 150, placeholder: '请输入' }
+                        { prop: ['Q^end_time_^DL', 'Q^end_time_^DG'], label: '完成时间', fieldType: 'daterange', itemWidth: 220 }
                     ]
                 },
                 // 表格字段配置
