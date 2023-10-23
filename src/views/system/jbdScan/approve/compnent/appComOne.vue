@@ -15,7 +15,7 @@
                         {{ scope.row['zuZhangName'] || scope.row['yuanZuZhangName'] }}
                     </div>
                     <div v-else-if="item.value == 'zuYuanPosiName'">
-                        {{ scope.row['zuYuanPosiName'] || scope.row['yuanZuZhangName'] }}
+                        {{ scope.row['zuYuanPosiName'] || scope.row['yuanZuZhangBuMen'] }}
                     </div>
                     <div v-else>{{ scope.row[item.value] }}</div>
                 </template>
