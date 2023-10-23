@@ -189,6 +189,7 @@
                 :filterable="allowCreate"
                 :allow-create="allowCreate"
                 v-on="$listeners"
+                @change="selectLinkageChange"
             >
                 <el-option v-for="o in dataOptions" :key="o.val" :label="o.label" :value="o.val" />
             </el-select>
@@ -663,7 +664,8 @@
                 selectModel: [],
                 watchKey: false,
                 inputKey: '',
-                dict_add: false
+                dict_add: false,
+                selectDataResult: []
             }
         },
         computed: {
@@ -1032,6 +1034,7 @@
                 queryDataTable(this.getValuesourceParams(template, this.dataTemplate)).then(resp => {
                     const data = resp.data || {}
                     const dataResult = data.dataResult || []
+                    this.selectDataResult = dataResult
                     const options = dataResult.map(item => {
                         return {
                             val: item[this.valueKey],
@@ -1067,6 +1070,12 @@
                     if (this.$utils.isNotEmpty(fieldName) && this.models.hasOwnProperty(fieldName)) {
                         this.changeFormData(fieldName, targetString || '')
                     }
+                }
+            },
+            selectLinkageChange(value){
+                let dataValue = this.selectDataResult.find(item => item.id_ === value)
+                if(dataValue){
+                    this.handleLinkageData(value, dataValue)
                 }
             },
             // 联动数据
