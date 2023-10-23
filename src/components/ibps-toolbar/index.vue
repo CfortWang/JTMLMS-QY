@@ -32,7 +32,7 @@
           :disabled="handleActionDisabled(button.disabled)"
           @click="emitEventHandler('action-event',button,position,data,index)"
         >
-          {{ button.label }}
+        {{ `&nbsp;${button.label}` }}
         </el-link>
         <el-divider v-if="(actions.length == 2 && index == 0) || (actions.length == 3 && index != 2)" :key="index" direction="vertical" />
       </template>
@@ -46,7 +46,7 @@
               :disabled="handleActionDisabled(button.disabled)"
               @click="emitEventHandler('action-event',button,position,data,index)"
             >
-              {{ button.label }}
+              {{ `&nbsp;${button.label}` }}
             </el-link>
         </p>
       </template>
@@ -59,10 +59,10 @@
             @command="(action)=> { emitEventHandler('action-event',action,position,data,index) }"
           >
             <span v-if="button.buttonType==='link'" class="el-dropdown-link">
-              {{ button.label }}<i v-if="hasRighticon(button.rightIcon)" class="el-icon-arrow-down el-icon--right" />
+              {{ `&nbsp;${button.label}` }}<i v-if="hasRighticon(button.rightIcon)" class="el-icon-arrow-down el-icon--right" />
             </span>
             <el-button v-else :type="getType(button)" size="mini" :icon="getIcon(button)">
-              {{ button.label }}<i v-if="hasRighticon(button.rightIcon)" class="el-icon-arrow-down el-icon--right" />
+              {{ `&nbsp;${button.label}` }}<i v-if="hasRighticon(button.rightIcon)" class="el-icon-arrow-down el-icon--right" />
             </el-button>
             <el-dropdown-menu v-if="button.menus && button.menus.length >0" slot="dropdown">
               <el-dropdown-item

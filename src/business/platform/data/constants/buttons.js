@@ -41,10 +41,18 @@ const buttons = {
         scope: ['manage'],
         contextmenu: 'sub'
     },
+    // 原明细
+    // 'detail': {
+    //     label: '明细',
+    //     type: 'info',
+    //     icon: 'ibps-icon-detail',
+    //     scope: ['manage'],
+    //     contextmenu: 'sub'
+    // },
     'detail': {
-        label: '明细',
-        type: 'info',
-        icon: 'ibps-icon-detail',
+        label: '查阅',
+        type: 'primary',
+        icon: 'ibps-icon-eye',
         scope: ['manage'],
         contextmenu: 'sub'
     },
@@ -92,9 +100,9 @@ const buttons = {
         contextmenu: 'all'
     },
     'consult': {
-        label: '查阅',
+        label: '表单',
         type: 'primary',
-        icon: 'ibps-icon-eye',
+        icon: 'ibps-icon-table',
         scope: ['manage'],
         contextmenu: 'sub'
     },

@@ -37,6 +37,7 @@
                                 <el-option label="模版名称" value="Q^name_^SL" />
                                 <el-option label="模版key" value="Q^key_^SL" />
                                 <el-option label="数据集key" value="Q^dataset_key_^SL" />
+                                <el-option label="模板类型" value="Q^type_^SL" />
                             </el-select>
                             <el-button slot="append" icon="el-icon-search" @click="search" />
                         </el-input>
