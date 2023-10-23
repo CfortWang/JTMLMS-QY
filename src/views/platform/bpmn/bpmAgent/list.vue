@@ -160,9 +160,14 @@ export default {
         }
     },
     created () {
+        this.getInit()
         this.loadData()
     },
     methods: {
+        // 初始化
+        getInit () {
+            this.filter[0].partyId = this.$store.getters.userInfo.employee.positions || ''
+        },
         getDelegatorId (value) {
             this.searchDelegatorId = value
         },

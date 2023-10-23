@@ -3,7 +3,7 @@
         <el-col :span="6">
             <div style="padding-left: 55px">
                 <span class="photo-area" @click="dialogFormVisible = !readonly">
-                    <img v-if="formData.photo" :src="image" class="avatar" />
+                    <img v-if="formData.photo" :src="image" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon" />
                     <div
                         v-if="!readonly"
@@ -26,7 +26,7 @@
         </el-col>
         <el-col :span="16">
             <el-form ref="employeeForm" :rules="rules" :model="formData" label-width="130px" @submit.native.prevent>
-                <input type="password" style="width: 0; height: 0; line-height: 0; padding: 0; border-width: 0" />
+                <input type="password" style="width: 0; height: 0; line-height: 0; padding: 0; border-width: 0">
                 <el-form-item label="账号" prop="account">
                     <el-input v-if="!readonly" v-model="formData.account" autocomplete="off" clearable />
                     <span v-else>{{ formData.account }}</span>
@@ -81,17 +81,30 @@
                         {{ formData.gender | optionsFilter(genderOptions, 'label') }}
                     </el-tag>
                 </el-form-item>
+                <el-form-item>
+                    <template slot="label">
+                        用户类型
+                        <help-tip prop="formAsterisk" />
+                    </template>
+                    <el-radio-group v-if="!readonly" v-model="formData.jiNengZhiCheng">
+                        <el-radio label="inside">内部用户</el-radio>
+                        <el-radio label="ordinary">普通用户</el-radio>
+                    </el-radio-group>
+                    <el-tag v-else>
+                        {{ formData.jiNengZhiCheng == 'ordinary' ? '普通用户' : '内部用户'}}
+                    </el-tag>
+                </el-form-item>
                 <el-form-item label="邮箱" prop="email">
                     <!-- <el-input v-model="formData.email" clearable /> -->
-                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.email" clearable/>
+                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.email" clearable />
                     <span v-else>{{ formData.email }}</span>
                 </el-form-item>
                 <el-form-item label="地址">
-                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.address" clearable/>
+                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.address" clearable />
                     <span v-else>{{ formData.address }}</span>
                 </el-form-item>
                 <el-form-item label="手机号码">
-                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.mobile" clearable/>
+                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.mobile" clearable />
                     <span v-else>{{ formData.mobile }}</span>
                 </el-form-item>
             </el-form>
@@ -99,6 +112,7 @@
     </el-row>
 </template>
 <script>
+import helpTip from '@/business/platform/form/formbuilder/right-aside/components/help-tip.vue'
 import { fileUrl } from '@/api/platform/file/attachment'
 import { getDefaultUserSecurity } from '@/api/platform/auth/userSecurity'
 import IbpsUploader from '@/business/platform/file/uploader'
@@ -107,7 +121,8 @@ import { getFile } from '@/utils/avatar'
 import { validateEmpty } from '@/utils/validate'
 export default {
     components: {
-        IbpsUploader
+        IbpsUploader,
+        helpTip
     },
     props: {
         data: Object,
@@ -120,7 +135,7 @@ export default {
             default: 'add'
         }
     },
-    data() {
+    data () {
         const validateWcAccount = (rule, value, callback) => {
             const re = /^\S+$/
             if (!re.test(value)) {
@@ -182,6 +197,10 @@ export default {
             }
         }
         return {
+            formAsterisk: {
+                title: '关于用户类型',
+                content: `此属性用于设置用户端展示的功能`
+            },
             dialogFormVisible: false,
             limit: 1, // 规定上传个数
             accept: '.jpeg,.gif,.png,.jpg', // 规定上传类型
@@ -234,12 +253,12 @@ export default {
         }
     },
     computed: {
-        image() {
+        image () {
             return getFile(this.formData.photo)
         }
     },
     watch: {
-        data() {
+        data () {
             this.formData = this.data
         },
         formData: {
@@ -257,14 +276,14 @@ export default {
             deep: true
         }
     },
-    mounted() {
+    mounted () {
         this.formData = this.data
     },
-    created() {
+    created () {
         this.isSuper = this.$store.getters.isSuper
     },
     methods: {
-        handleGetDefaultUserSecurity() {
+        handleGetDefaultUserSecurity () {
             getDefaultUserSecurity()
                 .then((response) => {
                     const userSecurityTextObj = this.userSecurityTextObj
@@ -285,12 +304,12 @@ export default {
         /**
          * 表单验证
          */
-        formValidate() {
+        formValidate () {
             this.$nextTick(() => {
                 this.$refs[this.formName].validate(() => {})
             })
         },
-        validate(callback) {
+        validate (callback) {
             this.$refs[this.formName].validate((v) => {
                 callback(v)
             })
@@ -298,13 +317,13 @@ export default {
         /**
          * 重置字段
          */
-        resetFields() {
+        resetFields () {
             this.$refs[this.formName].resetFields()
         },
-        handleEmitEvent() {
+        handleEmitEvent () {
             this.$emit('input', this.formData)
         },
-        uploaderAction(buttonKey, data) {
+        uploaderAction (buttonKey, data) {
             this.formData.photo = fileUrl(data.id || data[0].id)
             this.dialogFormVisible = false
         }

@@ -79,6 +79,8 @@ export default {
                     if (index === 4) {
                         this.getBuFuHeXiangMu(id)
                         this.getBuFuHeTuBiao(id)
+                    } else {
+                        this.getHeChaList(id)
                     }
                 }
             })
@@ -140,19 +142,25 @@ export default {
                     accept.setOption(JSON.parse(JSON.stringify(this.barData(list1, list2))))
                 }
             })
-            // this.$common.request('sql', sql).then(res => {
-            //     const { data = [] } = res.variables || {}
-            //     if (data.length > 0) {
-            //         // this.buTableData = data
-            //         const list = []
-            //         data.forEach(item => {
-            //             list.push(item.name)
-            //         })
-            //         const dt = this.getColorRe(data)
-            //         const accept = echarts.init(this.$refs.Echart2)
-            //         accept.setOption(JSON.parse(JSON.stringify(this.barData(list, dt.res, dt.colorList))))
-            //     }
-            // })
+        },
+        getHeChaList (id) {
+            const second = this.$store.getters.level.second
+            const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待审核' or b.shi_fou_guo_shen_ = '待确认' or b.shi_fou_guo_shen_ = '已结束') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待分配' or b.shi_fou_guo_shen_ = '待核查') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+
+            Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2), this.$common.request('sql', sql3)]).then(res => {
+                if (res.length > 0) {
+                    const data1 = res[0].variables.data
+                    const data2 = res[1].variables.data
+                    const data3 = res[2].variables.data
+                    const list1 = data1.map(item => item.value)
+                    const list2 = data2.map(item => item.value)
+                    const list3 = data3.map(item => item.value)
+                    const accept = echarts.init(this.$refs.Echart2)
+                    accept.setOption(JSON.parse(JSON.stringify(this.barDataPlan(list1, list2, list3))))
+                }
+            })
         },
         linHeg (value) {
             // rowMAx 控制一行多少字
@@ -288,71 +296,91 @@ export default {
                     },
                     data: data1
                 }],
-                color: ['#64C7BF', '#73A0FA'],
+                color: ['#64C7BF', '#fd666d'],
                 tooltip: {
                     show: true,
                     trigger: 'axis'
                 }
             }
-            // const barData = {
-            //     title: {
-            //         show: true,
-            //         text: '不符合条款清单比例',
-            //         textStyle: {
-            //             color: '#000000',
-            //             fontSize: 20,
-            //             fontWeight: '600'
-            //         },
-            //         textAlign: 'center',
-            //         left: '50%',
-            //         top: '10px'
-            //     },
-            //     legend: {
-            //         orient: 'horizontal',
-            //         show: true,
-            //         left: 'center',
-            //         bottom: 10,
-            //         z: 3,
-            //         // itemWidth: 25,
-            //         // itemHeight: 14,
-            //         // itemGap: 10,
-            //         data: legendData
-            //     },
-            //     series: [
-            //         {
-            //             name: '',
-            //             type: 'pie',
-            //             radius: '60%',
-            //             center: ['50%', '50%'],
-            //             data: seriesData,
-            //             itemStyle: {
-            //                 emphasis: {
-            //                     shadowBlur: 10,
-            //                     shadowOffsetX: 0,
-            //                     shadowColor: 'rgba(0, 0, 0, 0.5)'
-            //                 },
-            //                 normal: {
-            //                     label: {
-            //                         show: true,
-            //                         position: 'outer',
-            //                         // formatter: `占比：{d}%\n\n\r{b}:{c}`,
-            //                         formatter: `{b}：{c}\n占比：{d}%`,
-            //                         fontSize: 14
-            //                     },
-            //                     labelLine: {
-            //                         show: true
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     ],
-            //     color,
-            //     tooltip: {
-            //         show: true,
-            //         trigger: 'item',
-            //         formatter: '不符合条款清单<br/>{b}：{c}<br/>占比：{d}%'
-            //     }
-            // }
+            return barDataTy
+        },
+        barDataPlan (data1, data2, data3) {
+            const barDataTy = {
+                // 图例设置
+                legend: {
+                    textStyle: {
+                        fontSize: 12,
+                        color: '#333'
+                    }
+                },
+                title: {
+                    show: true,
+                    text: '核查进度',
+                    textStyle: {
+                        // color: '#fff',
+                        fontSize: 20,
+                        fontWeight: '600'
+                    },
+                    textAlign: 'center',
+                    left: '50%',
+                    top: '20px'
+                },
+                xAxis: {
+                    name: '部门',
+                    type: 'category',
+                    data: this.positionList,
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    axisLabel: {
+                        rotate: 30,
+                        interval: 0,
+                        margin: 10
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '数量（项目）',
+                    minInterval: 1,
+                    nameTextStyle: {
+                        fontSize: 14
+                    },
+                    splitLine: {
+                        show: false
+                    }
+                },
+                series: [{
+                    name: '总数',
+                    type: 'bar',
+                    barGap: 0,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: data1
+                },
+                {
+                    name: '已核查',
+                    type: 'bar',
+                    barGap: 0,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: data2
+                }, {
+                    name: '未核查',
+                    type: 'bar',
+                    barGap: 0,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: data3
+                }],
+                color: ['#037ef3', '#7552cc', '#0cb9c1'],
+                tooltip: {
+                    show: true,
+                    trigger: 'axis'
+                }
+            }
             return barDataTy
         }
     }

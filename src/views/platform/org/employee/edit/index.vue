@@ -160,7 +160,8 @@ export default {
                 roleItemList: [],
                 userGroupItemList: [],
                 orgItem: {}, // 组织全部信息
-                wxyhId: ''
+                wxyhId: '',
+                jiNengZhiCheng: 'inside'
             },
             employee: {},
             toolbars: [

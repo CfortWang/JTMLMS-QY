@@ -27,7 +27,7 @@ export default {
     methods: {
         openDataTemplate (el) {
             this.openDataTemplateDialog(this.form, {
-                title: el.name,
+                title: !el.noTitleShow ? el.name : ' ',
                 templateId: el.templateId,
                 dynamicParams: el.filter
             })
@@ -83,4 +83,6 @@ export default {
         cursor: pointer;
     }
 }
+
+
 </style>

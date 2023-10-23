@@ -50,7 +50,7 @@
                        :pk-value="pkValue"
                        :form-key="formKey"
                        :add-data-cont="addDataCont"
-                       @close="visible => dialogFormVisible = visible" />
+                       @close="closeHandle" />
 
       <el-dialog :close-on-click-modal="false"
                  :close-on-press-escape="false"
@@ -93,10 +93,10 @@ export default {
       depArrs.push(`wj.bian_zhi_bu_men_ like '${i.positionId}'`)
     }
     return {
-      treeData: [],
+      //   treeData: [],
       show: '',
-      rightsArr: ['join', 'delete'],
-      rowHandle: true,
+      //   rightsArr: ['join', 'delete'],
+      //   rowHandle: true,
       width: 210,
       oldorgId: '',
       height: document.clientHeight,
@@ -120,7 +120,7 @@ export default {
           totalPages: 0
         }
       },
-      listTreeData: [],
+      //   listTreeData: [],
       listConfig: {
         // 工具栏
         toolbars: [
@@ -133,10 +133,10 @@ export default {
         // 表格字段配置
         columns: []
       },
-      listOptions: {
-        border: true,
-        stripe: true
-      },
+      //   listOptions: {
+      //     border: true,
+      //     stripe: true
+      //   },
       pagination: {
         limit: 20, page: 1
       },
@@ -233,9 +233,9 @@ export default {
           start = this.searchWhere[i]
         }
         if (i == 'i') {
-          wheres1 = wheres1 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
-          wheres2 = wheres2 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
-          wheres3 = wheres3 + ` and bian_zhi_shi_jian between '${start}' and '${this.searchWhere[i]}'`
+          wheres1 = wheres1 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
+          wheres2 = wheres2 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
+          wheres3 = wheres3 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
 
         }
         if (i !== 'i' && i !== 'b') {
@@ -409,20 +409,23 @@ export default {
     openTask(id) {
       this.dialogFormVisible = true
       this.defId = id
-
+    },
+    // 关闭编辑表单
+    closeHandle(v) {
+      this.dialogFormVisible = v
+      this.refreshData()
     },
     /**
      * 获取格式化参数
      */
     getSearcFormData() {
       this.searchWhere = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-      this.getDatas()
+      //   this.getDatas()
     },
     /**
  * 处理按钮事件
  */
     handleAction(command, position, selection, data) {
-
       switch (command) {
         case 'search':// 查询
           this.refreshData()
