@@ -28,7 +28,7 @@
                 <el-row>
                     <el-col :span="8">
                         <el-form-item label="发布人：" prop="author">
-                            <el-input v-model="form.author" />
+                            <el-input v-model="form.author || form.userName" />
                         </el-form-item>
                     </el-col>
                     <el-col :span="8">

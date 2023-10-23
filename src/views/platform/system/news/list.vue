@@ -8,6 +8,7 @@
             :search-form="listConfig.searchForm"
             :pk-key="pkKey"
             :columns="listConfig.columns"
+            display-field="通知公告"
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
@@ -81,6 +82,7 @@ export default {
                     forms: [
                         { prop: 'Q^TITLE_^SL', label: '标题' },
                         { prop: 'Q^USER_NAME_^SL', label: '发布人' },
+                        { prop: 'Q^DEP_NAME_^SL', label: '发布部门' },
                         { prop: ['Q^PUBLIC_DATE_^DL', 'Q^PUBLIC_DATE_^DG'], label: '发布时间', fieldType: 'daterange' },
                         { prop: 'Q^STATUS_^SL', label: '发布状态', fieldType: 'select', options: typeOptions }
                     ]

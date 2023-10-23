@@ -50,6 +50,9 @@
                     <i class="ibps-icon-paperclip" />
                 </el-tooltip>
             </template>
+            <template slot="file" slot-scope="v">
+                <span> {{ v.fileMsg ? '有' : '无' }}</span>
+            </template>
         </ibps-crud>
         <!-- 明细 -->
         <detail
@@ -138,13 +141,13 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    {
-                        prop: 'stateIcon',
-                        label: '',
-                        slotName: 'handIcon',
-                        width: '60',
-                        renderHeader: renderHeader
-                    },
+                    // {
+                    //     prop: 'stateIcon',
+                    //     label: '',
+                    //     slotName: 'handIcon',
+                    //     width: '60',
+                    //     renderHeader: renderHeader
+                    // },
                     {
                         prop: 'subject',
                         sortBy: 'SUBJECT_',
@@ -153,10 +156,11 @@ export default {
                         sortable: 'custom',
                         width: '150'
                     },
-                    { prop: 'ownerName', label: '发送人', width: '100' },
+                    { prop: 'ownerName', label: '发送人', width: '90' },
                     { prop: 'messageType', label: '消息类型', tags: typeOptions, width: '100' },
                     { prop: 'content', label: '消息描述', minWidth: '200' },
-                    { prop: 'createTime', label: '发送时间', dateFormat: 'yyyy-MM-dd HH:mm:ss', width: '150' }
+                    { prop: 'fileMsg', label: '有无附件', slotName: 'file', width: '90' },
+                    { prop: 'createTime', label: '发送时间', sortable: 'custom', dateFormat: 'yyyy-MM-dd HH:mm:ss', width: '150' }
                 ],
                 rowHandle: {
                     actions: [
@@ -241,11 +245,10 @@ export default {
             this.loadData()
         },
         handleLinkClick (data, columns) {
-            console.log('data', data)
             this.handleEdit(data.id, true)
             this.tableId = data.tableId
             this.tableName = data.tableName
-            this.title = '信息明细'
+            this.title = '消息明细'
         },
         /**
          * 处理按钮事件
@@ -262,29 +265,29 @@ export default {
                     //     // this.isEnvelope = false
                     // }).catch(() => { })
                     try {
-                        if(data == undefined){
+                        if (data === undefined) {
                             throw new Error('请选择数据再标记已读。')
                         }
-                        let fitDatas=[]
+                        const fitDatas = []
                         data.forEach(el => {
-                            if(el.subject !=='文件发放通知'){
+                            if (el.subject !== '文件发放通知') {
                                 fitDatas.push(el.id)
                             }
-                        });
-                        if(fitDatas.length !== data.length){
+                        })
+                        if (fitDatas.length !== data.length) {
                             const comfirm = confirm('文件发放通知并不会被标记为已读')
-                            if(comfirm){
+                            if (comfirm) {
                                 ActionUtils.selectedMultiRecord(fitDatas).then(id => {
-                                this.handleAlreadyRead(id)
+                                    this.handleAlreadyRead(id)
                                 }).catch(() => { })
                             }
-                        }else{
+                        } else {
                             ActionUtils.selectedMultiRecord(fitDatas).then(id => {
-                            this.handleAlreadyRead(id)
+                                this.handleAlreadyRead(id)
                             }).catch(() => { })
                         }
                     } catch (error) {
-                        ActionUtils.warning(error.message) 
+                        ActionUtils.warning(error.message)
                     }
                     break
                 case 'reply': // 回复

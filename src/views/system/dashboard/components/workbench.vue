@@ -701,7 +701,7 @@ export default {
                     addList.push(obj)
                     const msg = {
                         subject: msgTitle[item.workType],
-                        content: `<p>事务【${item.workName}】${msgContent[item.workType]}<p>`,
+                        content: `事务【${item.workName}】${msgContent[item.workType]}`,
                         receiverId: userId,
                         canreply: '0',
                         taskId: item.taskId

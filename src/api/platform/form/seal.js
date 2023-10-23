@@ -1,6 +1,9 @@
 import request from '@/utils/request'
 import { FORM_URL } from '@/api/baseUrl'
 import axios from 'axios'
+
+const BASE_URL = process.env.VUE_APP_BASE_URL
+
 /**
  * ca电子签章接口
  * @param {*} params
@@ -62,64 +65,58 @@ export const onlyOfficeToPdf = params => {
 }
 
 /* 自动微签：脚本对文件盖章 */
-export function seal(url, fileType, type) {
-    let Base64 = require('js-base64').Base64
-    let data = {
-        "signKey": "V1FTMjAyMTEyMjFkOTVjNWM=",
-        "signSecret": "YWQwMmY3ZjQ4ZDJmMmYwNDA=",
-        "sealUser": "YWRtaW4=",
-        "password": "MTIzNA==",
-        //"ruleName": "6aqR57yd56ug6KeE5YiZLOmmlumhteeblueroA==",
-        "ruleName": type,
-        "provideSigFile": Base64.encode(url),
-        "fileKey": Base64.encode(generateUUID() + '.' + fileType)
+export function seal (url, fileType, type) {
+    const Base64 = require('js-base64').Base64
+    const data = {
+        'signKey': 'V1FTMjAyMTEyMjFkOTVjNWM=',
+        'signSecret': 'YWQwMmY3ZjQ4ZDJmMmYwNDA=',
+        'sealUser': 'YWRtaW4=',
+        'password': 'MTIzNA==',
+        // "ruleName": "6aqR57yd56ug6KeE5YiZLOmmlumhteeblueroA==",
+        'ruleName': type,
+        'provideSigFile': Base64.encode(url),
+        'fileKey': Base64.encode(generateUUID() + '.' + fileType)
     }
     return axios({
-        url: 'https://www.szjyxt.com/doSeal/',
+        url: `${BASE_URL}doSeal/`,
         method: 'post',
         data: data
     })
 }
 
 /* 手动微签：脚本对文件进行手动盖章-预处理 */
-export function sealPre(url, fileKey) {
-    let Base64 = require('js-base64').Base64
-    let data = {
-        "signKey": "V1FTMjAyMTEyMjFkOTVjNWM=",
-        "signSecret": "YWQwMmY3ZjQ4ZDJmMmYwNDA=",
-        "sealUser": "YWRtaW4=",
-        "password": "MTIzNA==",
-        "provideSigFile": Base64.encode(url),
+export function sealPre (url, fileKey) {
+    const Base64 = require('js-base64').Base64
+    const data = {
+        'signKey': 'V1FTMjAyMTEyMjFkOTVjNWM=',
+        'signSecret': 'YWQwMmY3ZjQ4ZDJmMmYwNDA=',
+        'sealUser': 'YWRtaW4=',
+        'password': 'MTIzNA==',
+        'provideSigFile': Base64.encode(url),
         // "getSigFile":  Base64.encode(this.$form.$getSigFile),
-        "getSigFile": Base64.encode('https://www.szjyxt.com/#/sealCompleted'),
-        "fileKey": Base64.encode(fileKey),
+        'getSigFile': Base64.encode(`${BASE_URL}#/sealCompleted`),
+        'fileKey': Base64.encode(fileKey)
     }
     return axios({
-        url: 'https://www.szjyxt.com/preprocess/' ,
+        url: `${BASE_URL}preprocess/`,
         method: 'post',
         data: data
     })
 }
 
 /* 手动微签：脚本对文件进行手动盖章-手动签章页面的url */
-export function getSigPageUrl(sigFile) {
-    let sigUrl = 'http://120.77.249.241:9999/manualSig/manualSigPage/?signKey=V1FTMjAyMTEyMjFkOTVjNWM=&signSecret=YWQwMmY3ZjQ4ZDJmMmYwNDA=&sigFile=' + sigFile;
+export function getSigPageUrl (sigFile) {
+    const sigUrl = 'http://120.77.249.241:9999/manualSig/manualSigPage/?signKey=V1FTMjAyMTEyMjFkOTVjNWM=&signSecret=YWQwMmY3ZjQ4ZDJmMmYwNDA=&sigFile=' + sigFile
     return sigUrl
 }
 
-export function generateUUID() {
-    var d = new Date().getTime();
+export function generateUUID () {
+    var d = new Date().getTime()
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-    return uuid;
-};
-
-
-
-
-
-
+        var r = (d + Math.random() * 16) % 16 | 0
+        d = Math.floor(d / 16)
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+    })
+    return uuid
+}
 
