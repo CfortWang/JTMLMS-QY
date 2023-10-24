@@ -21,8 +21,8 @@
                             @sort-change="handleSortChange"
                             @pagination-change="handlePaginationChange"
                         >
-                            <template slot="name" slot-scope="scope">{{ scope.row.subject | getWorkInfo('name') }}</template>
-                            <template slot="desc" slot-scope="scope">{{ scope.row.subject | getWorkInfo('desc') }}</template>
+                            <template slot="name" slot-scope="scope">{{ getWorkInfo(scope.row.subject, 'name') }}</template>
+                            <template slot="desc" slot-scope="scope">{{ getWorkInfo(scope.row.subject, 'desc') }}</template>
                             <!-- 待办字段处理 -->
                             <template slot="waitStatus" slot-scope="scope">{{ '待' + scope.row.name }}</template>
                             <template slot="stateLabel" slot-scope="scope">
@@ -124,14 +124,6 @@ export default {
     name: 'calendar',
     components: { BpmnFormrender, NewsDetail },
     filters: {
-        getWorkInfo (v, type) {
-            const res = {
-                name: v.split('#')[0],
-                // 无#返回空，有#返回(左边的字符串,
-                desc: v.split('#')[1] ? v.split('#')[1] : ''
-            }
-            return res[type]
-        },
         getUserName (v, list) {
             const user = list.find(i => i.userId === v)
             return user ? user.userName : ''
@@ -331,7 +323,6 @@ export default {
     },
     mounted () {
         this.getData(this.activeTab)
-        this.getOrgInfo()
         if (this.timer) {
             clearInterval(this.timer)
         }
@@ -349,23 +340,16 @@ export default {
         clearInterval(this.timer)
     },
     methods: {
-        // 获取用户部门信息
-        getOrgInfo () {
-            const { org = {}} = this.$store.getters
-            if (!org || !org.id) {
-                return
+        getWorkInfo (v, type) {
+            if (!v.includes('#')) {
+                return ''
             }
-            const params = {
-                parameters: [{ key: 'Q^MANAGER_ORG_ID_^S', value: org.id }]
+            const res = {
+                name: v.split('#')[0],
+                // 无#返回空，有#返回(左边的字符串,
+                desc: v.split('#')[1] ? v.split('#')[1] : ''
             }
-            queryOrgManager(params).then(res => {
-                this.orgInfo = {}
-                const data = res.data.dataResult
-                if (data && data.length) {
-                    const { id, name, mobile, account, gender, groupID } = data[0]
-                    this.orgInfo = { id, name, mobile, account, gender, groupID, orgName: org.name }
-                }
-            })
+            return res[type]
         },
         getName ({ createBy, updateBy }) {
             const id = updateBy || createBy
@@ -415,32 +399,31 @@ export default {
             const pageParams = this.pagination.page ? this.pagination : this.defaultPagination
             operate[this.activeTab](this.getFormatParams(null, pageParams)).then(response => {
                 const { dataResult, pageResult } = response.data
-                if (dataResult && dataResult.length) {
-                    // 待办事宜对任务发起人做额外处理
-                    if (type === 'wait') {
-                        const instList = []
-                        dataResult.forEach(item => {
-                            instList.push(item.bpmnInstId)
+                // 待办事宜对任务发起人做额外处理
+                if (type === 'wait') {
+                    const instList = []
+                    dataResult.forEach(item => {
+                        instList.push(item.bpmnInstId)
+                    })
+                    const sql = `select b.bpmn_inst_id_, b.create_by_, a.name_ from ibps_bpm_inst b left join ibps_party_employee a on a.id_ = b.create_by_ where b.bpmn_inst_id_ in (${instList.join(',')}) order by find_in_set(b.bpmn_inst_id_,'${instList.join(',')}')`
+                    const currentTime = Date.now()
+                    this.$common.request('sql', sql).then(res => {
+                        const data = res.variables && res.variables.data
+                        data.forEach((item, index) => {
+                            dataResult[index].submitBy = item.name_
+                            dataResult[index].workName = this.getWorkInfo(dataResult[index].subject, 'name')
+                            dataResult[index].workDesc = this.getWorkInfo(dataResult[index].subject, 'desc')
+                            dataResult[index].workType = this.plan.includes(dataResult[index].procDefKey) ? 'plan' : 'normal'
+                            const limit = this.getAttr(dataResult[index].subject, 'loseDate') || this.getAttr(dataResult[index].subject, 'timeLimit') || 3
+                            dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, limit)
                         })
-                        const sql = `select b.bpmn_inst_id_, b.create_by_, a.name_ from ibps_bpm_inst b left join ibps_party_employee a on a.id_ = b.create_by_ where b.bpmn_inst_id_ in (${instList.join(',')}) order by find_in_set(b.bpmn_inst_id_,'${instList.join(',')}')`
-                        const currentTime = Date.now()
-                        this.$common.request('sql', sql).then(res => {
-                            const data = res.variables && res.variables.data
-                            data.forEach((item, index) => {
-                                dataResult[index].submitBy = item.name_
-                                dataResult[index].workName = dataResult[index].subject.includes('#') ? dataResult[index].subject.split('#')[0] : dataResult[index].subject.split('(')[0]
-                                dataResult[index].workType = this.plan.includes(dataResult[index].procDefKey) ? 'plan' : 'normal'
-                                const limit = this.getAttr(dataResult[index].subject, 'loseDate') || this.getAttr(dataResult[index].subject, 'timeLimit') || 3
-                                dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, limit, '1')
-                            })
-                            this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
-                            this.pagination = pageResult
-                        })
-                        this.urgeToManager()
-                    } else {
-                        this.dataList = dataResult
+                        this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
                         this.pagination = pageResult
-                    }
+                    })
+                    this.urgeToManager()
+                } else {
+                    this.dataList = dataResult
+                    this.pagination = pageResult
                 }
                 this.loading = false
             }).catch(() => {
@@ -451,7 +434,7 @@ export default {
         updateList () {
             setTimeout(() => {
                 this.getData(this.activeTab)
-            }, 1000)
+            }, 500)
         },
         // 查询
         search () {
@@ -589,12 +572,13 @@ export default {
             // 筛选已过期数据
             workList.forEach(item => {
                 // 截取流程名
-                item.workName = item.subject.includes('#') ? item.subject.split('#')[0] : item.subject.split('(')[0]
+                item.workName = this.getWorkInfo(item.subject, 'name')
+                item.workDesc = this.getWorkInfo(item.subject, 'desc')
                 item.workType = this.plan.includes(item.procDefKey) ? 'plan' : 'normal'
                 item.deptId = this.getAttr(item.subject, 'dept')
+                item.state = this.judgeExpire(item.createTime, currentTime, item.workType, limit)
                 const limit = this.getAttr(item.subject, 'loseDate') || this.getAttr(item.subject, 'timeLimit')
-                const isExpire = this.judgeExpire(item.createTime, currentTime, item.workType, limit)
-                if (isExpire) {
+                if (['overtime', 'soon'].includes(item.state)) {
                     result.expire.push(item)
                 } else {
                     result.unexpire.push(item)
@@ -619,7 +603,7 @@ export default {
          * @param {string} limit 限时，值分为两种类型，传值为字符串格式的时间时，判定逻辑为当前时间小于该时间，传值为字符串类型数字时，判定逻辑为创建limit天后，大于当前时间
          * @param {string} isState 调用类型
          */
-        judgeExpire (time, current, type, limit, isState) {
+        judgeExpire (time, current, type, limit) {
             const D = new Date(time)
             const a = new Date(time).getTime()
             const b = new Date(current).getTime()
@@ -628,30 +612,19 @@ export default {
             const c = new Date(D.getFullYear(), D.getMonth() + 1, 0).getTime() + 86400000
             const isDate = l.toString().includes('-')
             // 返回办理状态
-            if (isState) {
-                let state = ''
-                if (type === 'plan') {
-                    const M = isDate ? new Date(l).getTime() : c
-                    state = b >= M ? 'overtime' : b + (86400000 * 7) > M ? 'soon' : 'wait'
-                } else {
-                    if (isDate) {
-                        const L = new Date(l).getTime()
-                        state = b >= L ? 'overtime' : 'wait'
-                    } else {
-                        state = a + (86400000 * parseInt(l)) < b ? 'overtime' : 'wait'
-                    }
-                }
-                return state
-            }
-            // 返回是否过期
-            if (isDate) {
-                return b + (86400000 * 7) > new Date(l).getTime()
-            }
+            let state = ''
             if (type === 'plan') {
-                return b + (86400000 * 7) > c
+                const M = isDate ? new Date(l).getTime() : c
+                state = b >= M ? 'overtime' : b + (86400000 * 7) > M ? 'soon' : 'wait'
             } else {
-                return a + (86400000 * parseInt(l)) < b
+                if (isDate) {
+                    const L = new Date(l).getTime()
+                    state = b >= L ? 'overtime' : 'wait'
+                } else {
+                    state = a + (86400000 * parseInt(l)) < b ? 'overtime' : 'wait'
+                }
             }
+            return state
         },
         // 处理已过期数据
         dealExpile (data, noticeList) {
@@ -661,12 +634,12 @@ export default {
             const addList = []
             const sendList = []
             const msgContent = {
-                plan: '距离超时还剩七天，请及时处理！',
-                normal: '至今三天未处理，已超时，请及时处理！'
+                soon: '即将超时，请及时处理！',
+                overtime: '已超时，请及时处理！'
             }
             const msgTitle = {
-                plan: '计划事务即将到期提醒',
-                normal: '事务超时提醒'
+                soon: '计划事务即将到期提醒',
+                overtime: '事务超时提醒'
             }
             const nowTime = new Date(new Date().getTime() + 28800000).toJSON().slice(0, 16).replace('T', ' ')
             data.forEach(item => {
@@ -679,7 +652,7 @@ export default {
                         // 完整名称
                         wan_zheng_ming_ch: item.subject,
                         // 事务说明
-                        shi_wu_shuo_ming_: item.subject.includes('#') ? item.subject.split('#')[1] : '',
+                        shi_wu_shuo_ming_: item.workDesc,
                         // 事务名称
                         shi_wu_ming_cheng: item.workName,
                         // 事务状态
@@ -696,12 +669,13 @@ export default {
                         bian_zhi_shi_jian: item.createTime,
                         ti_xing_ci_shu_: 1,
                         duan_xin_ci_shu_: 0,
-                        ti_xing_shi_jian_: nowTime
+                        ti_xing_shi_jian_: nowTime,
+                        guo_qi_zhuang_tai: item.state
                     }
                     addList.push(obj)
                     const msg = {
-                        subject: msgTitle[item.workType],
-                        content: `事务【${item.workName}】${msgContent[item.workType]}`,
+                        subject: msgTitle[item.state],
+                        content: `${item.workName}【${item.workDesc}】${msgContent[item.state]}`,
                         receiverId: userId,
                         canreply: '0',
                         taskId: item.taskId

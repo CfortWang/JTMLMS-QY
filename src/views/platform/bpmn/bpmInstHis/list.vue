@@ -256,9 +256,12 @@ export default {
                 ],
                 searchForm: {
                     forms: [
-                        { prop: 'Q^subject_^SL', label: '关键字:', itemWidth: 330, placeholder: '可输入年份/部门/表单名称/事务说明/编制人模糊查询' },
-                        { prop: 'Q^proc_def_name_^SL', label: '表单名称:', itemWidth: 150, placeholder: '请输入' },
-                        { prop: ['Q^end_time_^DL', 'Q^end_time_^DG'], label: '完成时间', fieldType: 'daterange', itemWidth: 220 }
+                        // { prop: 'Q^subject_^SL', label: '关键字', itemWidth: 330, placeholder: '可输入年份/部门/表单名称/事务说明/编制人模糊查询' },
+                        { prop: 'dept', label: '部门', itemWidth: 150, placeholder: '请输入', labelWidth: 50 },
+                        { prop: 'tableName', label: '表单名称', itemWidth: 150, placeholder: '请输入', labelWidth: 70 },
+                        { prop: 'desc', label: '事务说明', itemWidth: 150, placeholder: '请输入', labelWidth: 70 },
+                        { prop: 'createBy', label: '编制人', itemWidth: 150, placeholder: '请输入', labelWidth: 60 },
+                        { prop: ['Q^end_time_^DL', 'Q^end_time_^DG'], label: '完成时间', fieldType: 'daterange', labelWidth: 70, itemWidth: 220 }
                     ]
                 },
                 // 表格字段配置
@@ -289,15 +292,15 @@ export default {
         const roleList = this.$store.getters.userInfo.role
         // 系统管理角色添加删除按钮
         const hasRole = roleList.some(item => item.name === '系统管理角色')
+        this.listConfig.toolbars.push({
+            key: 'detail',
+            label: '详情',
+            type: 'info'
+        })
         if (hasRole) {
             // 系统管理角色不做分类过滤
             // this.hasPermission = false
             const btn = [
-                {
-                    key: 'detail',
-                    label: '详情',
-                    type: 'info'
-                },
                 {
                     key: 'remove',
                     label: '删除',
@@ -511,7 +514,10 @@ export default {
         // 获取格式化参数
         getSearcFormData () {
             const temp = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-            const { parameters = [] } = ActionUtils.formatParams(temp) || {}
+            const parameters = this.getParams(temp) || []
+            // console.log(parameters)
+            const creator = parameters.filter(i => i.key.includes('create_by_'))
+            const others = parameters.filter(i => !i.key.includes('create_by_'))
             const params = {
                 parameters: [
                     {
@@ -524,12 +530,12 @@ export default {
                                         key: 'Q^status_^S',
                                         value: 'end'
                                     },
-                                    ...parameters
+                                    ...others
                                 ]
                             },
                             {
                                 relation: 'OR',
-                                parameters: []
+                                parameters: creator
                             }
                         ]
                     }
@@ -543,8 +549,44 @@ export default {
             if (this.$utils.isNotEmpty(this.typeId)) {
                 params.parameters[0].parameters[0].parameters.push({ key: 'Q^TYPE_ID_^S', value: this.typeId })
             }
-            params.parameters[0].parameters[1].parameters = this.userList.map(i => ({ key: 'Q^create_by_^S', value: i.userId, param: this.$utils.guid() }))
+            if (!creator.length) {
+                params.parameters[0].parameters[1].parameters = this.userList.map(i => ({ key: 'Q^create_by_^S', value: i.userId, param: this.$utils.guid() }))
+            }
             return params
+        },
+        getParams (data) {
+            const result = []
+            const special = ['dept', 'tableName', 'desc', 'createBy']
+            Object.keys(data).forEach(key => {
+                if (special.includes(key)) {
+                    if (key === 'createBy') {
+                        // 转换用户ID
+                        const t = this.userList.filter(i => i.userName.includes(data[key]))
+                        if (!t.length) {
+                            result.push({ key: 'Q^create_by_^SL', value: data[key] })
+                        }
+                        const res = t.map(i => i.userId)
+                        res.forEach(i => {
+                            result.push({ key: 'Q^create_by_^SL', value: i })
+                        })
+                    } else if (key === 'dept') {
+                        // 转换部门ID
+                        const t = this.deptList.filter(i => i.positionName.includes(data[key]))
+                        if (!t.length) {
+                            result.push({ key: 'Q^subject_^SL', value: data[key] })
+                        }
+                        const res = t.map(i => i.positionId)
+                        res.forEach(i => {
+                            result.push({ key: 'Q^subject_^SL', value: i })
+                        })
+                    } else {
+                        result.push({ key: 'Q^subject_^SL', value: data[key] })
+                    }
+                } else {
+                    result.push({ key, value: data[key] })
+                }
+            })
+            return result.map(i => ({ ...i, param: this.$utils.guid() }))
         },
         // 处理分页事件
         handlePaginationChange (page) {
