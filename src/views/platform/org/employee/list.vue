@@ -114,7 +114,7 @@ export default {
                             'platform.org.employee.button.changePassword'
                         ),
                         icon: 'el-icon-refresh'
-                    }
+                    },
                     // { key: 'more', icon: 'ibps-icon-ellipsis-h' }
                 ],
                 searchForm: {
@@ -143,14 +143,14 @@ export default {
                             labelWidth: 50,
                             itemWidth: 150
                         },
-                        {
-                            prop: 'Q^POSITIONS_^SL',
-                            label: '归属组织',
-                            fieldType: 'select',
-                            options: this.positionsList,
-                            labelWidth: 70,
-                            itemWidth: 150
-                        },
+                        // {
+                        //     prop: 'Q^POSITIONS_^SL',
+                        //     label: '归属组织',
+                        //     fieldType: 'select',
+                        //     options: this.positionsList,
+                        //     labelWidth: 70,
+                        //     itemWidth: 150
+                        // },
                         {
                             prop: ['Q^CREATE_TIME_^DL', 'Q^CREATE_TIME_^DG'],
                             label: this.$t('common.field.createTime'),
@@ -172,6 +172,12 @@ export default {
                         label: this.$t('platform.org.employee.prop.account'),
                         width: 150
                     },
+                    {
+                        prop: 'gender',
+                        label: this.$t('platform.org.employee.prop.gender'),
+                        tags: genderOptions,
+                        width: 90
+                    },
                     // { prop: 'wcAccount', label: this.$t('platform.org.employee.prop.wcAccount'),width:120},
                     {
                         prop: 'positionsPath',
@@ -179,7 +185,6 @@ export default {
                         sortable: false,
                         minWidth: 200
                     },
-                    // { prop: 'qq', label: '客户单位名称', width: 250 },
                     {
                         prop: 'status',
                         label: this.$t('platform.org.employee.prop.status'),
@@ -281,21 +286,13 @@ export default {
                         },
                         {
                             key: 'switchUser',
-                            label: this.$t(
-                                'platform.org.employee.button.switchUser'
-                            ),
+                            label: this.$t('platform.org.employee.button.switchUser'),
                             icon: 'el-icon-sort',
                             hidden: function (rowData, index) {
                                 const userId = this.$store.getters.userId
                                 const isSuper = this.$store.getters.isSuper
-                                const isTenantAdmin =
-                                    this.$store.getters.isTenantAdmin
-                                return (
-                                    isTenantAdmin === true ||
-                                    rowData.status !== 'actived' ||
-                                    userId === rowData.id ||
-                                    !isSuper
-                                )
+                                const isTenantAdmin = this.$store.getters.isTenantAdmin
+                                return (isTenantAdmin === true || rowData.status !== 'actived' || userId === rowData.id || !isSuper)
                             }
                         }
                     ]
