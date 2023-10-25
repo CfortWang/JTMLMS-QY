@@ -207,39 +207,24 @@ export default {
             return new Promise((resolve, reject) => {
                 let sqlData = ``
                 let sqlData2 = ``
-                // const sql = `select ID_ from ibps_party_entity where party_type_ = 'position' and PATH_ like '%1136828146851512320%'`
-                // curdPost('sql', sql).then((res2) => {
-                //     if (res2.state === 200) {
-                //         const datas = res2.variables.data
-                //         if (datas.length > 0) {
-                //             datas.forEach((item, index) => {
-                //                 if (index === 0) {
-                //                     sqlData += `ie.POSITIONS_ like '%${item.ID_}%'`
-                //                     sqlData2 += `bian_zhi_bu_men_ like '%${item.ID_}%'`
-                //                 } else {
-                //                     sqlData += ` or ie.POSITIONS_ like '%${item.ID_}%'`
-                //                     sqlData2 += ` or bian_zhi_bu_men_ like '%${item.ID_}%'`
-                //                 }
-                //             })
-                //             this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
-                //             this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
-                //         }
-                //         resolve()
-                //     }
-                // })
-                console.log(this.$store.getters.userInfo.employee.positions)
                 const positions = this.$store.getters.userInfo.employee.positions
                 const positionsList = positions.split(',')
                 if (positionsList.length > 0) {
-                    positionsList.forEach((item, index) => {
-                        if (index === 0) {
-                            sqlData += `ie.POSITIONS_ like '%${item}%'`
-                            sqlData2 += `bian_zhi_bu_men_ like '%${item}%'`
-                        } else {
-                            sqlData += ` or ie.POSITIONS_ like '%${item}%'`
-                            sqlData2 += ` or bian_zhi_bu_men_ like '%${item}%'`
-                        }
-                    })
+                    // 默认所在部门
+                    // positionsList.forEach((item, index) => {
+                    //     if (index === 0) {
+                    //         sqlData += `ie.POSITIONS_ like '%${item}%'`
+                    //         sqlData2 += `bian_zhi_bu_men_ like '%${item}%'`
+                    //     } else {
+                    //         sqlData += ` or ie.POSITIONS_ like '%${item}%'`
+                    //         sqlData2 += ` or bian_zhi_bu_men_ like '%${item}%'`
+                    //     }
+                    // })
+                    // 默认最后一个数据
+                    sqlData = `ie.POSITIONS_ like '%${positionsList[positionsList.length - 1]}%'`
+                    sqlData2 = `bian_zhi_bu_men_ like '%${positionsList[positionsList.length - 1]}%'`
+                    this.selectData = positionsList[positionsList.length - 1]
+
                     this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
                     this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
                 }

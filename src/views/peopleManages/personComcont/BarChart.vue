@@ -1,7 +1,6 @@
 <template>
   <div class="pieView">
     <div style="
-        height: 10%;
         line-height: 30px;
         text-align: left;
         padding-left: 10px;
@@ -10,15 +9,26 @@
       ">
       {{ config.title }}
     </div>
-    <div style="
+    <div v-if="config.state=='100'" style="
         width: 100%;
-        height: 90%;
+        height: 100%;
         display: inline-block;
         overflow: hidden;
         box-sizing: border-box;
       ">
       <div :id="config.id"
            style="width: 100%; height: 100%"></div>
+    </div>
+    <div v-else style="
+        width: 100%;
+        height: 90%;
+        display: inline-block;
+        overflow: hidden;
+        box-sizing: border-box;
+        margin-top:5%;
+      ">
+      <div :id="config.id"
+           style="width: 100%; height:90%"></div>
     </div>
   </div>
 </template>
@@ -72,6 +82,7 @@ export default {
   // display: flex;
   width: 100%;
   height: 100%;
+  padding-bottom: -10px;
   box-sizing: border-box;
   overflow: hidden;
   color: white;

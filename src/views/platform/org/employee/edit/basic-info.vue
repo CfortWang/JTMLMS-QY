@@ -84,7 +84,7 @@
                 <el-form-item>
                     <template slot="label">
                         用户类型
-                        <help-tip prop="formAsterisk" />
+                        <help-tip :title="formAsterisk.title" :content="formAsterisk.content"/>
                     </template>
                     <el-radio-group v-if="!readonly" v-model="formData.jiNengZhiCheng">
                         <el-radio label="inside">内部用户</el-radio>

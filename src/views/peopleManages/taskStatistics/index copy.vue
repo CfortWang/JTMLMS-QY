@@ -3,6 +3,7 @@
     <dv-full-screen-container>
       <div class="topView"
            style="width: 100%; height: 11%">
+        <!-- <div class="jbd-title"> 人员管理看板 </div> -->
         <div class="jbd-title">
           <dv-decoration-8 style="
             width: 20%;
@@ -32,7 +33,7 @@
                style="color: #4ea5d6; margin-right: 3px"></i>
             员工数量：{{ employeeNum }}人</dv-decoration-11>
           <dv-border-box-8 class="date"
-                           style="margin-right: 2%; display: flex; align-items: center">
+                           style="margin-right: 5%; display: flex; align-items: center">
             <!-- 部门选择 -->
             <SelectPositions @handleFunc="handleFunc" />
             <div style="width: 30%; display: inline-block; margin-right: 3px">
@@ -59,37 +60,33 @@
       </div>
       <dv-border-box-1 style="width: 100%; height: 89%; box-sizing: border-box; overflow: hidden">
         <div style="height: 3%"></div>
-        <div class="botView">
+        <div class="middleView">
           <div class="viewLeft">
-            <div class="middleView">
-              <div class="midViewLeft">
-                <pieView :info="degreePieData" />
-              </div>
-              <dv-decoration-2 :reverse="true"
-                               style="width: 2%; height: 100%" />
-              <div class="midViewRight">
-                <BarChart :info="PositionsDegreeOption"
-                          :config="{ title: '部门学位学历信息统计', id: 'positionsId1' }" />
-              </div>
-            </div>
-            <dv-decoration-10 style="height: 2%; width: 100%; margin: 0 auto" />
-            <div class="middleView">
-              <div class="midViewLeft">
-                <RingChart :info="ranksPieData" />
-              </div>
-              <dv-decoration-2 :reverse="true"
-                               style="width: 2%; height: 100%" />
-              <div class="midViewRight">
-                <BarChart :info="PositionsRanksOption"
-                          :config="{ title: '部门职称信息统计', id: 'positionsId2' }" />
-              </div>
-            </div>
+            <pieView :info="degreePieData" />
           </div>
           <dv-decoration-2 :reverse="true"
-                           style="width: 1%; height: 100%" />
+                           style="width: 2%; height: 100%" />
+          <div class="viewCenter">
+            <RingChart :info="ranksPieData" />
+          </div>
+          <dv-decoration-2 :reverse="true"
+                           style="width: 2%; height: 100%" />
           <div class="viewRight">
+            <CarouselTabl :info="personInfoData"
+                          title="员工基本信息列表" />
+          </div>
+        </div>
+        <dv-decoration-10 style="height: 2%; width: 96%; margin: 0 auto" />
+        <div class="bottomView">
+          <div class="detectionTask">
+            <BarChart :info="PositionsOption"
+                      :config="{ title: '部门信息统计', id: 'positionsId' }" />
+          </div>
+          <dv-decoration-2 :reverse="true"
+                           style="width: 2%; height: 100%" />
+          <div class="taskMatters">
             <BarChart :info="optionPerson"
-                      :config="optionPersonConfig" /> 
+                      :config="{ title: '任务事宜统计', id: 'taskMatters' }" />
           </div>
         </div>
       </dv-border-box-1>
@@ -121,14 +118,9 @@ export default {
       employeeNum: 0,
       employeeInfo: [],
       options: [],
-      initPositionsDatas: [],
       otherPositions: [], // 用于其他图sql条件查询
       positions: [], // 用于部门统计信息sql条件查询
       pisitionsValue: [], // 回填给子组件的部门全值
-      // 查询出来的部门选择数据
-      sqlPositionsDatasIni: [],
-      // 轮询部门信息用
-      positionIni: [],
       // 日期选择配置
       pickerOptions: {
         shortcuts: [
@@ -204,8 +196,17 @@ export default {
         color: ["#eacd76", "#896c39", "#9b4400"],
         config: { title: "职称统计", idSelector: "ranksid" },
       },
-      // 部门学位学历信息统计配置表
-      PositionsDegreeOption: {
+      // 员工基本信息图配置表
+      personInfoData: {
+        header: ["姓名", "学历学位", "职称", "员工编号", "入职时间"],
+        data: [],
+        columnWidth: ["120", "90", "80", "120", "120"],
+        rowNum: 7,
+        align: "center",
+        hoverPause: true,
+      },
+      // 部门信息统计配置表
+      PositionsOption: {
         animation: true,
         tooltip: {
           trigger: "axis",
@@ -219,7 +220,7 @@ export default {
             color: "rgba(251, 251, 251, 1)",
           }
         },
-        color: ['#c91f37', '#6666FF', "#99CC00", "#FFFF00"],
+        color: ['#c91f37', '#6666FF', "#99CC00", "#FFFF00", "#9b4400", "#896c39", "#eacd76"],
         grid: {
           left: "3%",
           right: "4%",
@@ -238,7 +239,7 @@ export default {
                 color: "rgba(251, 251, 251, 1)",
               },
               interval: 0,
-              rotate: 50
+              rotate: 70
             },
           },
         ],
@@ -264,183 +265,52 @@ export default {
             emphasis: {
               focus: "series",
             },
-            stack: "Search Engine",
             data: [],
-            label: { //柱体上显示数值
-              show: true,//开启显示
-              position: 'insideTop',
-              textStyle: {//数值样式
-                fontSize: '6px',
-                color: 'rgba(251, 251, 251, 1)'
-              },
-              formatter: function (name) {
-                return name.value == 0 ? '' : '高:' + name.value;
-              }
-            }
-
           },
           {
             name: "本科",
             type: "bar",
-            stack: "Search Engine",
+            stack: "Ad",
             emphasis: {
               focus: "series",
             },
             data: [],
-            label: { //柱体上显示数值
-              show: true,//开启显示
-              position: 'insideRight ',
-              textStyle: {//数值样式
-                fontSize: '6px',
-                color: 'rgba(251, 251, 251, 1)'
-              },
-              formatter: function (name) {
-                return name.value == 0 ? '' : '本:' + name.value;
-              }
-            }
-
           },
           {
             name: "硕士",
             type: "bar",
-            stack: "Search Engine",
+            stack: "Ad",
             emphasis: {
               focus: "series",
             },
             data: [],
-            label: { //柱体上显示数值
-              show: true,//开启显示
-              position: 'insideLeft ',
-              textStyle: {//数值样式
-                fontSize: '6px',
-                color: 'rgba(251, 251, 251, 1)'
-              },
-              formatter: function (name) {
-                return name.value == 0 ? '' : '硕:' + name.value;
-              }
-            }
-
           },
           {
             name: "博士",
             type: "bar",
-            stack: "Search Engine",
+            stack: "Ad",
             emphasis: {
               focus: "series",
             },
             data: [],
-            label: { //柱体上显示数值
-              show: true,//开启显示
-              position: 'top',
-              textStyle: {//数值样式
-                fontSize: '6px',
-                color: 'rgba(251, 251, 251, 1)'
-              },
-              formatter: function (name) {
-                return name.value == 0 ? '' : '博:' + name.value;
-              }
-            }
-
-          }
-        ],
-        dataZoom: [
-          {
-            type: 'inside'
-          }
-        ],
-      },
-      // 部门职称信息统计配置表
-      PositionsRanksOption: {
-        animation: true,
-        tooltip: {
-          trigger: "axis",
-          axisPointer: {
-            type: "shadow",
           },
-        },
-        legend: {
-          textStyle: {
-            color: "rgba(251, 251, 251, 1)",
-          }
-        },
-        color: ["#9b4400", "#896c39", "#eacd76"],
-        grid: {
-          left: "3%",
-          right: "4%",
-          bottom: "3%",
-          containLabel: true,
-        },
-        xAxis: [
-          {
-            type: "category",
-            data: [],
-            nameTextStyle: {
-              color: "rgba(251, 251, 251, 1)",
-            },
-            axisLabel: {
-              textStyle: {
-                color: "rgba(251, 251, 251, 1)",
-              },
-              interval: 0,
-              rotate: 50
-            },
-          },
-        ],
-        yAxis: [
-          {
-            name: "个数（人）",
-            type: "value",
-            nameTextStyle: {
-              color: "rgba(251, 251, 251, 1)",
-            },
-            axisLabel: {
-              textStyle: {
-                color: "rgba(251, 251, 251, 1)",
-              },
-            },
-          },
-        ],
-        //  "初级职称", "中级职称", "高级职称"
-        series: [
           {
             name: "初级职称",
             type: "bar",
             data: [],
-            stack: "Search Engine",
             emphasis: {
               focus: "series",
-            },
-            label: { //柱体上显示数值
-              show: true,//开启显示
-              position: 'insideRight ',
-              textStyle: {//数值样式
-                fontSize: '6px',
-                color: 'rgba(251, 251, 251, 1)'
-              },
-              formatter: function (name) {
-                return name.value == 0 ? '' : '初:' + name.value;
-              }
             }
           },
           {
             name: "中级职称",
             type: "bar",
+            barWidth: 5,
             stack: "Search Engine",
             emphasis: {
               focus: "series",
             },
             data: [],
-            label: { //柱体上显示数值
-              show: true,//开启显示
-              position: 'insideLeft ',
-              textStyle: {//数值样式
-                fontSize: '6px',
-                color: 'rgba(251, 251, 251, 1)'
-              },
-              formatter: function (name) {
-                return name.value == 0 ? '' : '中:' + name.value;
-              }
-            }
           },
           {
             name: "高级职称",
@@ -450,24 +320,9 @@ export default {
               focus: "series",
             },
             data: [],
-            label: { //柱体上显示数值
-              show: true,//开启显示
-              position: 'top',
-              textStyle: {//数值样式
-                fontSize: '6px',
-                color: 'rgba(251, 251, 251, 1)'
-              },
-              formatter: function (name) {
-                return name.value == 0 ? '' : '高:' + name.value;
-              }
-            }
           },
         ],
-        dataZoom: [
-          {
-            type: 'inside'
-          }
-        ],
+
       },
       // 任务事宜统计图配置
       optionPerson: {
@@ -525,28 +380,20 @@ export default {
             name: "待办事宜数",
             type: "bar",
             data: [],
-            barMaxWidth: '20%',
             label: {
               show: true,
               position: "right",
               valueAnimation: true,
-              formatter: function (name) {
-                return name.value == 0 ? '' : '待办事宜数:' + name.value;
-              }
             }
           },
           {
             name: "已办事宜数",
             type: "bar",
             data: [],
-            barMaxWidth: '20%',
             label: {
               show: true,
               position: "right",
               valueAnimation: true,
-              formatter: function (name) {
-                return name.value == 0 ? '' : '已办事宜数:' + name.value;
-              }
             }
           },
         ],
@@ -565,11 +412,8 @@ export default {
         ],
         color: ['#6666FF', '#9b4400'],
       },
-      optionPersonConfig: {
-        title: '部门员工任务统计',
-        id: 'taskMatters',
-        state: '100'
-      }
+      // 轮询部门信息用
+      positionIni: []
     };
   },
   methods: {
@@ -603,7 +447,11 @@ export default {
     },
     // 人员基本信息 轮播表数据
     async employeeInfoData() {
-      let data = []
+      let this_ = this;
+      this.personInfoData.data = [];
+      let data = [];
+      let personInfo = [];
+      // let ranksObj = {};
       const positionsWhere = this.otherPositions.length !== 0 ? `(${this.otherPositions.join(
         " or "
       )} )` : `ee.positions_ = '没有选择部门'`
@@ -612,7 +460,17 @@ export default {
       await curdPost("sql", sql).then((res) => {
         data = res.variables.data;
       });
-      this.employeeNum = data.length
+      this.employeeInfo = data;
+      this.employeeNum = data.length;
+      for (let item of data) {
+        personInfo = [];
+        personInfo.push(item.name_);
+        personInfo.push(item.zui_gao_xue_li_x_ || `   `);
+        personInfo.push(item.zhi_cheng_deng_ji || `   `);
+        personInfo.push(item.jian_ding_zi_ge_z || `   `);
+        personInfo.push(item.ru_zhi_shi_jian_ || `   `);
+        this.personInfoData.data.push(personInfo || `   `);
+      }
     },
     //饼图 环形图数据
     async degreeGradeInfoData() {
@@ -678,17 +536,17 @@ export default {
       curdPost("sql", sql).then((res) => {
         const data = res.variables.data;
         // 组装数据集，以学历职称为列，以部门为行:{"高中":['1','2','3']}
-        let degreeSeriesDatas = this.PositionsDegreeOption.series;
-        let ranksSeriesDatas = this.PositionsRanksOption.series;
-        this.PositionsDegreeOption.xAxis[0].data = [];
-        this.PositionsRanksOption.xAxis[0].data = [];
-        this.PositionsDegreeOption.series[0].data = [];
-        this.PositionsDegreeOption.series[1].data = [];
-        this.PositionsDegreeOption.series[2].data = [];
-        this.PositionsDegreeOption.series[3].data = [];
-        this.PositionsRanksOption.series[0].data = [];
-        this.PositionsRanksOption.series[1].data = [];
-        this.PositionsRanksOption.series[2].data = [];
+        // let xAxisDatas = this.PositionsOption.xAxis[0].data;
+        let seriesDatas = this.PositionsOption.series;
+        this.PositionsOption.xAxis[0].data = [];
+        this.PositionsOption.series[0].data = [];
+        this.PositionsOption.series[1].data = [];
+        this.PositionsOption.series[2].data = [];
+        this.PositionsOption.series[3].data = [];
+        this.PositionsOption.series[4].data = [];
+        this.PositionsOption.series[5].data = [];
+        this.PositionsOption.series[6].data = [];
+
         if (data.length !== 0) {
           // 跟《部门信息统计配置表》排列顺序一致
           let shuZuList = [
@@ -701,17 +559,13 @@ export default {
             "seniorZ_",
           ];
           for (let t = 0; t < data.length; t++) {
-            this.PositionsDegreeOption.xAxis[0].data.push(data[t].enName);
-            this.PositionsRanksOption.xAxis[0].data.push(data[t].enName);
-            for (let i = 0; i < degreeSeriesDatas.length; i++) {
-              degreeSeriesDatas[i].data[t] = data[t][shuZuList[i]];
-            }
-            for (let i = 0; i < ranksSeriesDatas.length; i++) {
-              ranksSeriesDatas[i].data[t] = data[t][shuZuList[i]];
+            this.PositionsOption.xAxis[0].data.push(data[t].enName);
+            for (let i = 0; i < seriesDatas.length; i++) {
+              seriesDatas[i].data[t] = data[t][shuZuList[i]];
             }
           }
-          this.PositionsDegreeOption.series = degreeSeriesDatas;
-          this.PositionsRanksOption.series = ranksSeriesDatas;
+          //   this.PositionsOption.xAxis[0].data = xAxisDatas;
+          this.PositionsOption.series = seriesDatas;
         }
       });
     },
@@ -820,6 +674,9 @@ export default {
     simplifyPosition(v) {
       this.positions = []; // 用于sql条件查询
       this.otherPositions = [];
+      //   if (v.length == 1 || v.length == 2) {
+      //     return
+      //   }
       for (let i = 0; i < v.length; i++) {
         this.positions.push(`en.path_ like '%${v[i][v[i].length - 1]}%'`);
         this.otherPositions.push(
@@ -828,34 +685,25 @@ export default {
       }
     },
     handleAllGetFunc() {
-      this.employeeInfoData();
       this.positionsInfoData();
+      this.employeeInfoData();
       this.degreeGradeInfoData();
+      this.getTtaskMattersData();
     },
     handleFunc(e) {
-      this.sqlPositionsDatasIni = e.i
-      this.positionIni = e.v
-      this.simplifyPosition(e.v);
+      this.positionIni = e
+      this.simplifyPosition(e);
       this.handleAllGetFunc();
-      this.getTtaskMattersData();
-
       clearInterval(this.interval);
       this.intervalHandle();
     },
     handleInt(e) {
-      // 找到对应id的部门信息
-      let obj = this.sqlPositionsDatasIni.find(item => item.ID_ == e[0][e[0].length - 1])
-      if (obj == undefined) {
-        this.optionPersonConfig.title = `部门（/）员工任务统计`
-      } else {
-        this.optionPersonConfig.title = `部门（${obj.NAME_}）员工任务统计`
-      }
       this.simplifyPosition(e);
-      this.getTtaskMattersData();
+      this.handleAllGetFunc();
     },
     // 定时任务调用接口，一分钟一次
     intervalHandle() {
-      let cishu = 0 // 记录所选择的部门个数，即需要轮询多少次
+      let cishu = 0
       this.interval = setInterval(() => {
         const positionIniDatas = this.positionIni.filter((fil) => {
           return fil[2] !== undefined
@@ -993,57 +841,57 @@ export default {
   }
 }
 
-.botView {
-  height: 95%;
-  width: 98%;
+.middleView {
+  height: 36%;
+  width: 96%;
   margin: 0 auto;
   display: flex;
   justify-content: left;
   overflow: hidden;
   box-sizing: border-box;
   .viewLeft {
-    width: 58%;
+    width: 28%;
     height: 100%;
     overflow: hidden;
     box-sizing: border-box;
   }
-  //   .viewCenter {
-  //     width: 28%;
-  //     height: 100%;
-  //     overflow: hidden;
-  //     box-sizing: border-box;
-  //   }
+  .viewCenter {
+    width: 28%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
   .viewRight {
     width: 40%;
     height: 100%;
     overflow: hidden;
-    // padding-bottom: 10px;
     box-sizing: border-box;
-    .taskMatters {
-      width: 49%;
-      height: 100%;
-    }
   }
 }
-.middleView {
-  width: 100%;
+.bottomView {
+  width: 96%;
   margin: 0 auto;
-  height: 50%;
+  height: 56%;
+
+  //   background: red;
   overflow: hidden;
   box-sizing: border-box;
   display: flex;
-  .midViewLeft {
-    width: 40%;
-    height: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
+  .dialogbox {
+    display: flex;
+    flex-direction: column;
   }
-  .midViewRight {
-    width: 60%;
-
+  .detectionTask {
+    width: 49%;
     height: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
+  }
+  .taskMatters {
+    width: 49%;
+    height: 100%;
+  }
+  .ibps {
+    top: 55px;
+    border: 1px solid rgb(241, 238, 238);
   }
 }
 </style>

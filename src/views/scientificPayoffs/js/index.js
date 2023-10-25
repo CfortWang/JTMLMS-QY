@@ -31,7 +31,7 @@ export default {
         const dataList = {
             header: header,
             data: data,
-            columnWidth: [200, 200, 200, 150, 200, 130, 130, 200]
+            columnWidth: [200, 200, 200, 150, 200, 170, 170, 200]
         }
         const config = this.getDataList(dataList)
         return config

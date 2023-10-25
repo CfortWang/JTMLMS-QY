@@ -83,7 +83,7 @@ export default {
                 Vue.prototype.$reportPath = `${BASE_URL}demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${reportPath}/`
                 Vue.prototype.$getReportFile = downloadReport // 通过方法函数，拼接url，并将字符串格式化
                 Vue.prototype.$getSealUri = 'http://120.77.249.241:9999/no/getSealFile/' // 微签 回显获取文件地址
-                Vue.prototype.$getFileDow = `${process.env.VUE_APP_BASE_URL}ibps/platform/v3/file/download?attachmentId=` // 文件下载地址
+                Vue.prototype.$getFileDow = `${BASE_URL}ibps/platform/v3/file/download?attachmentId=` // 文件下载地址
                 clearInterval(timer) // 添加成功后即删除定时任务
             }
         }, 500)

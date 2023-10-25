@@ -938,7 +938,8 @@ const FormUtil = {
                         if (Array.isArray(data)) {
                             val = data[code] && data[code][row] ? data[code][row][changeName] : (data[changeName] || '')
                         } else {
-                            val = (data[changeName] || '')
+                            // val = (data[changeName] || '')
+                            val = data[code][row][changeName]
                         }
                     } else { // 弹窗模式
                         const changeCode = changeObj[changeObj.length - 2]

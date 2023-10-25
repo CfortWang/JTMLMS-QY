@@ -3,8 +3,9 @@
                v-model="selectDatas"
                :options="options"
                :props="props"
-               :collapse-tags="true"
-               class="cascader">
+               collapse-tags
+               class="cascader"
+               clearable>
   </el-cascader>
 </template>
   
@@ -27,6 +28,7 @@ export default {
         expandTrigger: "hover",
         checkStrictly: true
       },
+      sqlDatas: [],
       options: [],
       selectDatas: [],
       iniselectDatas: [],
@@ -76,6 +78,7 @@ export default {
       curdPost("sql", positonsSql).then((res) => {
         if (res.state === 200) {
           const datas = res.variables.data;
+          this.sqlDatas = datas
           let positionsValue = [];
           if (datas.length > 0) {
             // datas = datas.filter(fil => {
@@ -84,7 +87,6 @@ export default {
             this.options = this.toTree(datas);
             // for (var i of this.options) {
             //   //   if (i.children !== undefined) {
-
             //   //   }
             //   const getTail = (item) =>
             //     item.children && item.children.length > 0
@@ -128,7 +130,7 @@ export default {
         this.selectDatas = this.iniselectDatas;
         this.$emit("handleFunc", this.iniselectDatas);
       } else {
-        this.$emit("handleFunc", v);
+        this.$emit("handleFunc", { v, i: this.sqlDatas });
       }
     },
   },

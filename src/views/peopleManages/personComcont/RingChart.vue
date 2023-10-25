@@ -2,7 +2,7 @@
   <div class="pieView">
     <div
       style="
-        height: 16%;
+        height: 14%;
         line-height: 30px;
         text-align: left;
         padding-left: 10px;
@@ -65,7 +65,7 @@ export default {
           z: 2,
           top: "2%",
           // orient: 'vertical',
-          left: "right",
+          left: "",
           textStyle: {
             color: "#fff",
           },
