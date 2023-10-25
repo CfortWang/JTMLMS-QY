@@ -80,10 +80,10 @@
                 <el-form-item label="作者：" prop="author">
                     <el-input v-model="form.author" />
                 </el-form-item>
-                <el-form-item label="关键字：" prop="key">
+                <!-- <el-form-item label="关键字：" prop="key">
                     <el-input v-model="form.key" />
                 </el-form-item>
-                <!-- <el-form-item label="发布时间：" prop="publicDate">
+                <el-form-item label="发布时间：" prop="publicDate">
                     <el-date-picker
                         v-model="form.publicDate"
                         type="date"
