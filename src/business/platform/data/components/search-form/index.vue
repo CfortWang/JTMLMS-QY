@@ -8,6 +8,7 @@
         label-position="left"
         class="ibps-crud-search-form"
         size="mini"
+        @submit.native.prevent
         @keyup.enter.native.stop="handleEnter"
     >
         <template v-for="(item, index) in forms">
@@ -101,9 +102,9 @@
                     @keyup.enter.native.stop="handleEnter"
                 />
                 <!--
-         :placeholder="item.placeholder"
-         :picker-options="item.pickerOptions || {}"
-         -->
+                    :placeholder="item.placeholder"
+                    :picker-options="item.pickerOptions || {}"
+                -->
                 <el-date-picker
                     v-else-if="item.fieldType === 'monthrange' "
                     v-model="params[item.modelValue]"
@@ -205,7 +206,6 @@
                     :label-type="getLinkLabelType(item.field_options)"
                     :label-key="getLinkLabelKey(item.field_options)"
                 />
-
                 <!-- 地址-->
                 <ibps-address
                     v-else-if="item.fieldType === 'address'"
@@ -329,9 +329,9 @@ export default {
 
     },
     methods: {
-    /**
-     * 处理回车
-     */
+        /**
+         * 处理回车
+         */
         handleEnter () {
             this.$emit('search')
         },
@@ -342,8 +342,8 @@ export default {
             return this.fuzzyOps
         },
         /**
-     * 获取参数
-     */
+         * 获取参数
+         */
         getSearcFormData () {
             const { params, nameParams, datePrefix, format } = this
             const formattedForm = {}
@@ -362,8 +362,8 @@ export default {
             return formattedForm
         },
         /**
-     *重置表单
-     */
+         *重置表单
+        */
         resetSearchForm () {
             const { params, datePrefix } = this
             Object.keys(params).forEach(v => {
@@ -438,8 +438,8 @@ export default {
             return year + '-' + month
         },
         /**
-     * 获取的远程数据【下拉框】
-     */
+         * 获取的远程数据【下拉框】
+         */
         getRemoteData ({ fetch, dataKey, resultField, resultHandler }) {
             fetch().then(response => {
                 let result = response
@@ -481,8 +481,7 @@ export default {
 }
 </script>
 <style>
-  .el-form-item__label{
-    font-size: 12px !important;
-  }
-
+    .el-form-item__label{
+        font-size: 12px !important;
+    }
 </style>
