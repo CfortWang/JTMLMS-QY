@@ -17,7 +17,7 @@
                 <div class="panel-body">
                     <el-table ref="elTable" :data="copDataModel" :header-cell-style="{ color: '#000', 'font-size': '14px', padding: '4px 0' }" :row-class-name="tableRowClassName" :show-summary="showSummary" :sum-text="sumText" :summary-method="hasSummaryMethod ? summaryMethod : null" border @selection-change="handleSelectionChange">
                         <el-table-column v-if="!tableReadonly" type="selection" width="50" />
-                        <el-table-column v-if="field.field_options.index" type="index" :label="field.field_options.index_name ? field.field_options.index_name : '序号'" :width="field.field_options.index_width ? field.field_options.index_width : 50" />
+                        <el-table-column v-if="field.field_options.index" type="index" :label="field.field_options.index_name ? field.field_options.index_name : '序号'" :width="field.field_options.index_width ? field.field_options.index_width : 50" :index="indexMethod" />
                         <template v-for="(column, j) in displayColumns">
                             <el-table-column v-if="!columnHidden(column) && column.field_type != 'desc' && column.label != ''" :key="j" show-overflow-tooltip :prop="column.name" :width="column.field_options.custom_class || null">
                                 <template slot="header">
@@ -221,7 +221,7 @@ export default {
             dialogTemplate: null,
             dialogTemplateAtts: {},
 
-            oldList: []  // 子表旧数据
+            oldList: [] // 子表旧数据
         }
     },
     computed: {
@@ -391,6 +391,9 @@ export default {
         })
     },
     methods: {
+        indexMethod (index) {
+            return (this.currentPage - 1) * 10 + index + 1
+        },
         /* 更新后的参数*/ // 定义删除、增加 不做操作。修改时才做更新 ，分页修改时，根据页表修改。
         updateModel (key, val, index, page) {
             this.dataModel[page * 10 - 10 + index][key] = val
@@ -682,12 +685,8 @@ export default {
         handleExport (button, index) {
             const position = button.position
             const selection = this.getSelection(position, index)
-            if (selection.length > 1) {
-                ActionUtils.selectedMultiRecord(selection)
-                    .then((ids) => {
-                        this.exportData(ids)
-                    })
-                    .catch(() => {})
+            if (selection.length > 0) {
+                this.exportData(selection)
             } else {
                 this.exportData()
             }

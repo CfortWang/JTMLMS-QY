@@ -42,38 +42,63 @@ export default {
     getPositionList() {
       let positonsSql = "";
       // 金通账号id
-      if (this.userId == "702117247933480960") {
-        positonsSql = `select * FROM ibps_party_entity WHERE party_type_ = 'position' 
-                AND (
-                DEPTH_ IN (1,2) OR (
+      //   if (this.userId == "702117247933480960") {
+      //     positonsSql = `select * FROM ibps_party_entity WHERE party_type_ = 'position' 
+      //             AND (
+      //             DEPTH_ IN (1,2) OR (
+      //             (DEPTH_=3 AND NAME_ = '检验科') OR  parent_id_ IN (SELECT id_ FROM ibps_party_entity WHERE DEPTH_=3 AND NAME_ = '检验科'  )  )
+      //             )`;
+      //   } else {
+      //     // 所属医院的系统管理员
+      //     let isAdmin = this.userInfo.role.some((so) => {
+      //       return so.name == "系统管理角色";
+      //     });
+      //     if (isAdmin) {
+      //       positonsSql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${this.level.first}%' 
+      //       AND (
+      //             DEPTH_ IN (1,2) OR (
+      //             (DEPTH_=3 AND NAME_ = '检验科') OR  parent_id_ IN (SELECT id_ FROM ibps_party_entity WHERE DEPTH_=3 AND NAME_ = '检验科'  )  )
+      //             )`;
+      //     } else {
+      //       let allPositions = [];
+      //       for (var i of this.userInfo.positions) {
+      //         for (var item of i.path.split(".")) {
+      //           if (item !== "") {
+      //             allPositions.push(`id_ like '%${item}%'`);
+      //           }
+      //         }
+      //       }
+      //       allPositions = [...new Set(allPositions)];
+      //       // 如果是单纯的是普通账户登录，就只显示所属部门的信息
+      //       positonsSql = `select * from ibps_party_entity where ${allPositions.join(
+      //         " or "
+      //       )}`;
+      //     }
+      //   }
+      // 所属医院的系统管理员
+      let isAdmin = this.userInfo.role.some((so) => {
+        return so.name == "系统管理角色";
+      });
+      if (isAdmin) {
+        positonsSql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${this.level.first}%' 
+          AND (
+                DEPTH_ not  IN (1,2) OR (
                 (DEPTH_=3 AND NAME_ = '检验科') OR  parent_id_ IN (SELECT id_ FROM ibps_party_entity WHERE DEPTH_=3 AND NAME_ = '检验科'  )  )
                 )`;
       } else {
-        // 所属医院的系统管理员
-        let isAdmin = this.userInfo.role.some((so) => {
-          return so.name == "系统管理角色";
-        });
-        if (isAdmin) {
-          positonsSql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${this.level.first}%' 
-          AND (
-                DEPTH_ IN (1,2) OR (
-                (DEPTH_=3 AND NAME_ = '检验科') OR  parent_id_ IN (SELECT id_ FROM ibps_party_entity WHERE DEPTH_=3 AND NAME_ = '检验科'  )  )
-                )`;
-        } else {
-          let allPositions = [];
-          for (var i of this.userInfo.positions) {
-            for (var item of i.path.split(".")) {
-              if (item !== "") {
-                allPositions.push(`id_ like '%${item}%'`);
-              }
+        let allPositions = [];
+        for (var i of this.userInfo.positions) {
+          for (var item of i.path.split(".")) {
+            if (item !== "") {
+              allPositions.push(`id_ like '%${item}%'`);
             }
           }
-          allPositions = [...new Set(allPositions)];
-          // 如果是单纯的是普通账户登录，就只显示所属部门的信息
-          positonsSql = `select * from ibps_party_entity where ${allPositions.join(
-            " or "
-          )}`;
         }
+        allPositions = [...new Set(allPositions)];
+        // 如果是单纯的是普通账户登录，就只显示所属部门的信息
+        positonsSql = `select * from ibps_party_entity where ${allPositions.join(
+          " or "
+        )} and DEPTH_ not  IN (1,2)`;
       }
       curdPost("sql", positonsSql).then((res) => {
         if (res.state === 200) {
@@ -105,6 +130,8 @@ export default {
             // }
             for (var i of datas) {
               let itemArr = i.PATH_.split(".");
+              // 先删除前面部门的数据，比如："xxx医院/院本部/检验科....."，只保留"检验科....."
+              itemArr.splice(0, 2);
               itemArr.splice(itemArr.length - 1, 1);
               positionsValue.push(itemArr);
             }

@@ -555,19 +555,19 @@ export default {
            data1 = res1.variables.data
         }        
       })
+      
       let partyMony = [];
       let i = 0;
         data1.forEach((item,index)=>{
-        let zichan;
-        zichan  = item.zi_chan_yuan_zhi_;
+        let zichan = item.zi_chan_yuan_zhi_;
+        if(zichan == "" || zichan == null || zichan == undefined){
+            zichan = 0;
+        }else{
           if(zichan.includes('.')){
             zichan = zichan.split('.')[0]
           }
-          if(zichan =='' || zichan == null || zichan == undefined){
-            zichan = "0";
-          }
-        zichan  = Number(zichan.replace(/\D/g,''));//非数字去掉
-
+          zichan  = Number(zichan.replace(/\D/g,''));//非数字去掉
+        }
         if(partyMony.length == 0){
           partyMony = [{party:item.name_,mony:zichan}];
         }else{
@@ -578,6 +578,7 @@ export default {
             i++;
           }
         }
+     
       })
       let allmony = 0;
       for(let el of partyMony){
@@ -586,8 +587,11 @@ export default {
         this.zichangBarData.data.push(el.mony)
         this.zichangBarData.xData.push(el.party)
       }
-      this.zichangBarData.data.unshift(this.formatNumber(allmony));
-      this.zichangBarData.xData.unshift("检验科");
+
+      console.log(this.zichangBarData,111111111111)
+       this.zichangBarData.data.unshift(this.formatNumber(allmony));
+       this.zichangBarData.xData.unshift("检验科");
+       console.log(this.zichangBarData,22222222222)
     },
     formatNumber(num) {
       num = Number(num);

@@ -249,6 +249,8 @@ export default {
 
                         if (type === '2') {
                             this.getPosiData(arrList, true, true)
+                        } else if (type === '1') {
+                            this.disabledDotCount(arrList)
                         }
 
                         if (this.$utils.isEmpty(node.data)) {
@@ -288,6 +290,8 @@ export default {
 
                     if (type === '2') {
                         this.getPosiData(arrList, node.data.disabled, node.data.disabledShow)
+                    } else if (type === '1') {
+                        this.disabledDotCount(arrList)
                     }
 
                     resolve(this.toTree(arrList))
@@ -309,13 +313,7 @@ export default {
                     }
                 })
             }
-            let dotCount = 0
-            if (arrList && Array.isArray(arrList) && arrList.length > 0 && arrList[0].path) {
-                // dotCount = (arrList[0].path.match(/\./g) || []).length
-                dotCount = arrList[0].depth
-            }
             // 如果上级可以选择 也就是 disabled false，下级一定是false
-            // if(dotCount)
 
             if (!disabledShow) {
                 arrList.forEach(item => {
@@ -333,7 +331,14 @@ export default {
                     }
                 })
             }
-
+            this.disabledDotCount(arrList)
+        },
+        disabledDotCount (arrList) {
+            let dotCount = 0
+            if (arrList && Array.isArray(arrList) && arrList.length > 0 && arrList[0].path) {
+                dotCount = arrList[0].depth
+            }
+            //
             if (dotCount <= 2) {
                 arrList.forEach(item => {
                     item.disabled = true

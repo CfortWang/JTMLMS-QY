@@ -89,7 +89,7 @@
                            style="width: 1%; height: 100%" />
           <div class="viewRight">
             <BarChart :info="optionPerson"
-                      :config="optionPersonConfig" /> 
+                      :config="optionPersonConfig" />
           </div>
         </div>
       </dv-border-box-1>
@@ -119,16 +119,15 @@ export default {
       startDate: "2023-03-01",
       endDate: "",
       employeeNum: 0,
-      employeeInfo: [],
-      options: [],
-      initPositionsDatas: [],
+      //   employeeInfo: [],
       otherPositions: [], // 用于其他图sql条件查询
       positions: [], // 用于部门统计信息sql条件查询
-      pisitionsValue: [], // 回填给子组件的部门全值
       // 查询出来的部门选择数据
       sqlPositionsDatasIni: [],
       // 轮询部门信息用
       positionIni: [],
+      // 判断是否初步加载,1：已初步加载
+      initOnLoad: 0,
       // 日期选择配置
       pickerOptions: {
         shortcuts: [
@@ -177,7 +176,7 @@ export default {
             value: 0,
           },
           {
-            name: "高中",
+            name: " 大专",
             value: 0,
           },
         ],
@@ -256,10 +255,10 @@ export default {
             },
           },
         ],
-        // "高中", "本科", "硕士", "博士", "初级职称", "中级职称", "高级职称"
+        // " 大专", "本科", "硕士", "博士", "初级职称", "中级职称", "高级职称"
         series: [
           {
-            name: "高中",
+            name: " 大专",
             type: "bar",
             emphasis: {
               focus: "series",
@@ -588,7 +587,7 @@ export default {
           ? value[1].getMonth() + 1
           : "0" + (value[1].getMonth() + 1)) +
         "-" +
-        (day > 9 ? day : "0" + day);
+        (day > 9 ? day : "0" + day) + ' 23:59:59';
       this.startDate =
         value[0].getFullYear() +
         "-" +
@@ -598,7 +597,7 @@ export default {
         "-" +
         (value[0].getDate() > 9
           ? value[0].getDate()
-          : "0" + value[0].getDate());
+          : "0" + value[0].getDate()) + ' 00:00:00';
       this.getTtaskMattersData();
     },
     // 人员基本信息 轮播表数据
@@ -631,12 +630,12 @@ export default {
                 sum(a.zui_gao_xue_li_x_ = '博士') as doctor,
                 sum(a.zui_gao_xue_li_x_ = '硕士') as Master,
                 sum(a.zui_gao_xue_li_x_ = '本科') as undergraduate,
-                sum(a.zui_gao_xue_li_x_ = '高中') as gaoZhong,
+                sum(a.zui_gao_xue_li_x_ = ' 大专') as gaoZhong,
                 sum(a.zhi_cheng_deng_ji = '初级') as elementary,
                 sum(a.zhi_cheng_deng_ji = '中级') as middleRank,
                 sum(a.zhi_cheng_deng_ji = '高级') as senior,
                 sum(a.zhi_cheng_deng_ji = '' || a.zhi_cheng_deng_ji is null) as other
-                from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where ee.id_ != '702117247933480960' and ${positionsWhere}`;
+                from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where  ${positionsWhere}`;
       await curdPost("sql", sql).then((res) => {
         data = res.variables.data;
       });
@@ -668,16 +667,16 @@ export default {
             sum(gy.zui_gao_xue_li_x_ = '博士') AS doctor_,
             sum(gy.zui_gao_xue_li_x_ = '硕士') AS Master_,
             sum(gy.zui_gao_xue_li_x_ = '本科') AS undergraduate_,
-            sum(gy.zui_gao_xue_li_x_ = '高中') AS senior_,
+            sum(gy.zui_gao_xue_li_x_ = ' 大专') AS senior_,
             sum(gy.zhi_cheng_deng_ji = '初级') AS elementary_,
             sum(gy.zhi_cheng_deng_ji = '中级') AS middleRank_,
             sum(gy.zhi_cheng_deng_ji = '高级') AS seniorZ_ FROM (SELECT
             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji
-            FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_ WHERE ee.id_ != '702117247933480960'
+            FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_ 
             )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where ${positionsWhere} GROUP BY enName) jh`;
       curdPost("sql", sql).then((res) => {
         const data = res.variables.data;
-        // 组装数据集，以学历职称为列，以部门为行:{"高中":['1','2','3']}
+        // 组装数据集，以学历职称为列，以部门为行:{" 大专":['1','2','3']}
         let degreeSeriesDatas = this.PositionsDegreeOption.series;
         let ranksSeriesDatas = this.PositionsRanksOption.series;
         this.PositionsDegreeOption.xAxis[0].data = [];
@@ -736,9 +735,8 @@ export default {
       )} )` : `ee.positions_ = '没有选择部门'`
       let sql = `select  executor_,count(executor_) as num ,ee.name_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b  
                 on a.task_id_ = b.task_id_ join ibps_party_employee as ee on b.executor_ = ee.id_ and
-                ee.STATUS_= 'actived' and ee.ID_ != '1' and ee.ID_ != '-1' and ee.ID_ != '702117247933480960' and ${positionsWhere} 
-                and  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate
-        }'
+                ee.STATUS_= 'actived' and ee.ID_ != '1' and ee.ID_ != '-1'  and ${positionsWhere} 
+                and  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
                 and ee.GROUP_ID_ not like '%1041786072788369408%'   GROUP BY  executor_ order by ee.CREATE_TIME_ asc `;
       await curdPost("sql", sql).then((res) => {
         data = res.variables.data;
@@ -751,7 +749,7 @@ export default {
       let cssql = `select  executor_ ,count(executor_) as num ,ee.name_,a.create_time_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b
                   on a.task_id_ = b.task_id_ join ibps_party_employee as ee on b.executor_ = ee.id_
                   where now()> SUBDATE(a.create_time_,interval - 3 day) and  ee.STATUS_= 'actived' and ${positionsWhere}
-                  and ee.ID_ != '1' and ee.ID_ != '-1' and ee.ID_ != '702117247933480960' and ee.GROUP_ID_ not like '%1041786072788369408%'
+                  and ee.ID_ != '1' and ee.ID_ != '-1' and ee.GROUP_ID_ not like '%1041786072788369408%'
                   GROUP BY  executor_  order by  ee.CREATE_TIME_ asc `;
       await curdPost("sql", cssql).then((res) => {
         csData = res.variables.data;
@@ -828,9 +826,12 @@ export default {
       }
     },
     handleAllGetFunc() {
-      this.employeeInfoData();
-      this.positionsInfoData();
-      this.degreeGradeInfoData();
+      if (this.initOnLoad === 0) {
+        this.employeeInfoData();
+        this.positionsInfoData();
+        this.degreeGradeInfoData();
+        this.initOnLoad = 1
+      }
     },
     handleFunc(e) {
       this.sqlPositionsDatasIni = e.i
@@ -892,8 +893,8 @@ export default {
       "-" +
       (initendDate.getDate() > 9
         ? initendDate.getDate()
-        : "0" + initendDate.getDate());
-    this.startDate = this.preDate(this.endDate, 60);
+        : "0" + initendDate.getDate()) + ' 23:59:59';
+    this.startDate = this.preDate(this.endDate, 60) + ' 00:00:00';
     this.monthValues = [
       new Date(this.startDate),
       new Date(
@@ -925,9 +926,10 @@ export default {
   <style lang="less" scoped>
 .personView {
   width: 100%;
-  height: calc(100vh - 100px);
+  //   height: calc(100vh - 100px);
+  height: 100%;
   //   background-image: url("~@/assets/images/screen/bg.png");
-  z-index: -1;
+  z-index: 999;
   #dv-full-screen-container {
     background-image: url("~@/assets/images/screen/bg.png");
     background-size: 100% 100%;
