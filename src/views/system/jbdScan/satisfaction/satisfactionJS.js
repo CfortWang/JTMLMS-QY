@@ -3,7 +3,12 @@ import echarts from 'echarts'
 const radius = window.innerWidth > 1600 ? '55%' : '45%'
 export default {
     data () {
-
+        return {
+            show1: true,
+            show2: true,
+            show3: true,
+            show4: true
+        }
     },
     created () {
         this.id = this.generalList[0].id_
@@ -102,17 +107,30 @@ export default {
                         const accept = echarts.init(this.$refs.Echart)
                         accept.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list, titleData))))
 
-                        const accept1 = echarts.init(this.$refs.Echart1)
-                        accept1.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list1, titleData1))))
+                        this.show1 = list1.every(item => item.value !== '0')
+                        if (this.show1) {
+                            const accept1 = echarts.init(this.$refs.Echart1)
+                            accept1.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list1, titleData1))))
+                        }
 
-                        const accept2 = echarts.init(this.$refs.Echart2)
-                        accept2.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list2, titleData2))))
+                        this.show2 = list2.every(item => item.value !== '0')
+                        console.log(this.show2,list2)
+                        if (this.show2) {
+                            const accept2 = echarts.init(this.$refs.Echart2)
+                            accept2.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list2, titleData2))))
+                        }
 
-                        const accept3 = echarts.init(this.$refs.Echart3)
-                        accept3.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list3, titleData3))))
+                        this.show3 = list3.every(item => item.value !== '0')
+                        if (this.show3) {
+                            const accept3 = echarts.init(this.$refs.Echart3)
+                            accept3.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list3, titleData3))))
+                        }
 
-                        const accept4 = echarts.init(this.$refs.Echart4)
-                        accept4.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list4, titleData4))))
+                        this.show4 = list4.every(item => item.value !== '0')
+                        if (this.show4) {
+                            const accept4 = echarts.init(this.$refs.Echart4)
+                            accept4.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list4, titleData4))))
+                        }
                     } else {
                         this.close()
                         this.$message.error('统计的数据已经被清除，请检查数据是否被清除')

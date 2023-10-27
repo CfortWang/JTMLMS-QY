@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-dialog
-            :title="'满意度统计（编制时间：' + generalList[0].bian_zhi_shi_jian+'）'"
+            :title="`满意度统计（时间范围：${generalList[0].kai_shi_shi_jian_} - ${generalList[0].jie_shu_shi_jian_}）`"
             :visible.sync="generalShow"
             width="80%"
             top="0"
@@ -15,18 +15,43 @@
                 </div>
                 <div class="centerBorder">
                     <div class="cenSin" style="border-right: 1px solid #ccc">
-                        <div ref="Echart1" class="chart" />
+                        <div v-if="show1" ref="Echart1" class="chart" />
+                        <div v-else class="chart">
+                            <div class="chartName" style="color: #00c16e">住院患者</div>
+                            <div class="chartA">
+                                暂无数据
+                            </div>
+                        </div>
+
                     </div>
                     <div class="cenSin">
-                        <div ref="Echart2" class="chart" />
+                        <div v-if="show2" ref="Echart2" class="chart" />
+                        <div v-else class="chart">
+                            <div class="chartName" style="color: #d20962">门诊患者</div>
+                            <div class="chartA">
+                                暂无数据
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="centerBorder">
                     <div class="cenSin" style="border-right: 1px solid #ccc">
-                        <div ref="Echart3" class="chart" />
+                        <div v-if="show3" ref="Echart3" class="chart" />
+                        <div v-else class="chart">
+                            <div class="chartName" style="color: #0cb9c1">医务人员</div>
+                            <div class="chartA">
+                                暂无数据
+                            </div>
+                        </div>
                     </div>
                     <div class="cenSin">
-                        <div ref="Echart4" class="chart" />
+                        <div v-if="show4" ref="Echart4" class="chart" />
+                        <div v-else class="chart">
+                            <div class="chartName" style="color: #7552cc">员工</div>
+                            <div class="chartA">
+                                暂无数据
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -96,5 +121,17 @@ export default {
     .cenSin{
         width: 48%;
     }
+}
+.chartA{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chartName{
+    text-align: center;
+    font-size: 20px;
+    padding: 15px 0;
+    font-weight: bold;
 }
 </style>

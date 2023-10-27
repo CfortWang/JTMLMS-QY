@@ -12,7 +12,7 @@
             :pagination="pagination"
             :loading="loading"
             :index-row="false"
-            :display-field="title"
+            :display-field="listTitle"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
@@ -61,7 +61,8 @@ export default {
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
 
             searchDelegatorId: '',
-            title: '事务代理记录列表',
+            listTitle: '事务代理记录列表',
+            title: '',
             loading: true,
             height: document.clientHeight,
 
