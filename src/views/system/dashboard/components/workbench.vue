@@ -405,7 +405,7 @@ export default {
                     dataResult.forEach(item => {
                         instList.push(item.bpmnInstId)
                     })
-                    const sql = `select b.bpmn_inst_id_, b.create_by_, a.name_ from ibps_bpm_inst b left join ibps_party_employee a on a.id_ = b.create_by_ where b.bpmn_inst_id_ in ('${instList.join(',')}') order by find_in_set(b.bpmn_inst_id_,'${instList.join(',')}')`
+                    const sql = `select b.bpmn_inst_id_, b.create_by_, a.name_ from ibps_bpm_inst b left join ibps_party_employee a on a.id_ = b.create_by_ where b.bpmn_inst_id_ in (${instList.length ? instList.join(',') : `''`}) order by find_in_set(b.bpmn_inst_id_,'${instList.join(',')}')`
                     const currentTime = Date.now()
                     this.$common.request('sql', sql).then(res => {
                         const data = res.variables && res.variables.data

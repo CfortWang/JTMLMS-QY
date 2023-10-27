@@ -98,6 +98,9 @@ export default {
         }
     },
     methods: {
+        indexMethod(index) {
+            return (this.currentPage - 1) * this.pageSize + index + 1
+        },
         /* 表格換颜色*/
         tableRowClassName({ row, rowIndex }) {
             if (rowIndex % 2 === 1) return "warning-row"

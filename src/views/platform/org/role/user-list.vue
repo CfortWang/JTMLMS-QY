@@ -61,8 +61,11 @@ export default {
     },
     data () {
         const { account = '', deptList = [] } = this.$store.getters
+        const { first = '', second = '' } = this.$store.getters.level
+        const level = second || first
         return {
             account,
+            level,
             deptList,
             selectorVisible: false,
             dialogLoading: false,
@@ -130,21 +133,13 @@ export default {
             this.loading = true
             queryPageList(this.getSearcFormData()).then(response => {
                 const { dataResult = [] } = response.data || {}
-                const newData = []
                 dataResult.forEach(item => {
                     if (item.positions) {
-                        const inner = this.deptList.some(i => item.positions.includes(i.positionId))
                         // 转换岗位路径
                         const path = this.getPositionsPath(item.positions)
                         this.$set(item, 'positionsPath', path)
-                        if (inner) {
-                            newData.push(item)
-                        }
                     }
                 })
-                if (this.account !== 'jinyuan') {
-                    response.data.dataResult = newData
-                }
                 ActionUtils.handleListData(this, response.data)
                 this.loading = false
             }).catch(() => {
@@ -155,9 +150,13 @@ export default {
          * 获取格式化参数
          */
         getSearcFormData () {
-            return ActionUtils.formatParams({
-                roleId: this.id
-            }, this.pagination, this.sorts)
+            const res = ActionUtils.formatParams({ roleId: this.id }, this.pagination, this.sorts)
+            if (this.account !== 'jinyuan') {
+                res.customs = {
+                    position: this.level
+                }
+            }
+            return res
         },
         /**
          * 处理分页事件

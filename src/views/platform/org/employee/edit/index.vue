@@ -145,7 +145,7 @@ export default {
             defaultEmployee: {
                 id: '',
                 account: '',
-                password: '',
+                password: 'jyk123456',
                 isSuper: 'N',
                 name: '',
                 status: 'actived',

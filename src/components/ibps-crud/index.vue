@@ -158,6 +158,7 @@
                     :label="handleAttribute(indexRow.label, $t('components.crud.index'))"
                     :width="60"
                     type="index"
+                    :index="indexMethod"
                 />
                 <slot name="prepend-column" />
                 <template v-for="(column, index) in tableColumns">
