@@ -128,6 +128,8 @@ export default {
       positionIni: [],
       // 判断是否初步加载,1：已初步加载
       initOnLoad: 0,
+      // 人员id
+      personIds: "",
       // 日期选择配置
       pickerOptions: {
         shortcuts: [
@@ -603,6 +605,7 @@ export default {
     // 人员基本信息 轮播表数据
     async employeeInfoData() {
       let data = []
+      this.optionPerson.yAxis.data = [];
       const positionsWhere = this.otherPositions.length !== 0 ? `(${this.otherPositions.join(
         " or "
       )} )` : `ee.positions_ = '没有选择部门'`
@@ -612,6 +615,14 @@ export default {
         data = res.variables.data;
       });
       this.employeeNum = data.length
+      let personIdsArr = []
+      for (let it of data) {
+        personIdsArr.push(it.parent_id_)
+        this.optionPerson.yAxis.data.push(it.name_);
+      }
+      this.personIds = personIdsArr.join(',')
+      this.getTtaskMattersData();
+
     },
     //饼图 环形图数据
     async degreeGradeInfoData() {
@@ -717,74 +728,55 @@ export default {
     // 个人任务统计
     async getTtaskMattersData() {
       let this_ = this;
-      this_.optionPerson.yAxis.data = [];
       this_.optionPerson.series[0].data = [];
       this_.optionPerson.series[1].data = [];
-      let create_by_ = "";
-      let data = [];
-      let csData = [];
-      let yibanData1 = [];
-      let yibanData2 = [];
-      let personIds = "";
-      // for (let item of this.employeeInfo) {
-      //   create_by_ += create_by_ + "," + item.id_;
-      // }
-      // create_by_ = create_by_.slice(0, create_by_.length - 1);
-      const positionsWhere = this.otherPositions.length !== 0 ? `(${this.otherPositions.join(
-        " or "
-      )} )` : `ee.positions_ = '没有选择部门'`
+      let data = []; // 待办数据
+      let yibanData = [];
+      if (!this.personIds) {
+        return
+      }
+      // 待办数据
       let sql = `select  executor_,count(executor_) as num ,ee.name_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b  
                 on a.task_id_ = b.task_id_ join ibps_party_employee as ee on b.executor_ = ee.id_ and
-                ee.STATUS_= 'actived' and ee.ID_ != '1' and ee.ID_ != '-1'  and ${positionsWhere} 
+                ee.STATUS_= 'actived' and ee.ID_ != '1' and ee.ID_ != '-1'  and b.executor_ in(${this.personIds}) 
                 and  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
-                and ee.GROUP_ID_ not like '%1041786072788369408%'   GROUP BY  executor_ order by ee.CREATE_TIME_ asc `;
+                  GROUP BY  executor_ order by FIELD(b.executor_,${this.personIds}) `;
       await curdPost("sql", sql).then((res) => {
         data = res.variables.data;
       });
-      for (let item of data) {
-        this_.optionPerson.yAxis.data.push(item.name_);
-        this_.optionPerson.series[0].data.push(item.num);
-      }
-      //超时
-      let cssql = `select  executor_ ,count(executor_) as num ,ee.name_,a.create_time_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b
-                  on a.task_id_ = b.task_id_ join ibps_party_employee as ee on b.executor_ = ee.id_
-                  where now()> SUBDATE(a.create_time_,interval - 3 day) and  ee.STATUS_= 'actived' and ${positionsWhere}
-                  and ee.ID_ != '1' and ee.ID_ != '-1' and ee.GROUP_ID_ not like '%1041786072788369408%'
-                  GROUP BY  executor_  order by  ee.CREATE_TIME_ asc `;
-      await curdPost("sql", cssql).then((res) => {
-        csData = res.variables.data;
+      let yibansql = `select task.AUDITOR_,ee.name_,COUNT(ee.name_) AS num FROM 
+                            (SELECT DISTINCT inst.* FROM
+                                ( SELECT ap.AUDITOR_,rinst.* FROM
+                                ibps_bpm_inst rinst
+                                RIGHT JOIN ibps_bpm_approval ap ON ap.PROC_INST_ID_ = rinst.ID_
+                                WHERE
+                                ap.AUDITOR_ in(${this.personIds}) 
+                                UNION ALL
+                                SELECT aphis.AUDITOR_,insthis.* FROM
+                                ibps_bpm_inst_his insthis
+                                RIGHT JOIN ibps_bpm_approval_his aphis ON aphis.PROC_INST_ID_ = insthis.ID_
+                                WHERE 
+                                aphis.AUDITOR_ in(${this.personIds})  AND insthis.id_ IS NOT NULL
+                                ) inst ) AS  task 
+                                LEFT JOIN ibps_party_employee ee ON task.AUDITOR_ = ee.id_ 
+                                GROUP BY  task.AUDITOR_ order by FIELD(task.AUDITOR_,${this.personIds})`
+      await curdPost("sql", yibansql).then((res) => {
+        yibanData = res.variables.data;
       });
-      for (let it of csData) {
-        personIds += "'" + it.executor_ + "',";
-      }
-      personIds = personIds.slice(0, personIds.length - 1);
-      if (!personIds) {
-        return
-      }
-      let yibansql1 = `select count(AUDITOR_) as num,AUDITOR_,name_,STATUS_,CREATE_TIME_ from (select a.AUDITOR_,ee.name_,
-                      a.STATUS_,ee.CREATE_TIME_ from IBPS_BPM_APPROVAL as a join ibps_party_employee as ee on a.AUDITOR_ = ee.id_
-                      where  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate
-        }' and ${positionsWhere} and
-                                    ee.id_ in(${personIds})   group by a.PROC_inst_ID_) as zz  group by AUDITOR_  order by  CREATE_TIME_ asc `;
-      await curdPost("sql", yibansql1).then((res) => {
-        yibanData1 = res.variables.data;
-      });
-      let yibansql2 = `select count(AUDITOR_) as num,AUDITOR_,name_,STATUS_,CREATE_TIME_ from (select a.PROC_inst_ID_,
-                        ee.name_,a.AUDITOR_,a.STATUS_,ee.CREATE_TIME_ from IBPS_BPM_APPROVAL_HIS as a join ibps_party_employee as ee on a.AUDITOR_ = ee.id_
-                        where  a.CREATE_TIME_  between '${this.startDate
-        }' and '${this.endDate
-        }' and ee.id_ in(${personIds}) and ${positionsWhere}   group by a.PROC_inst_ID_) as bb  group by AUDITOR_ order by  CREATE_TIME_ asc `;
-      await curdPost("sql", yibansql2).then((res) => {
-        yibanData2 = res.variables.data;
-      });
-
-      for (let items of yibanData1) {
-        for (let el of yibanData2) {
-          if (items.AUDITOR_ == el.AUDITOR_) {
-            this_.optionPerson.series[1].data.push(
-              Number(items.num) + Number(el.num)
-            );
-          }
+      for (let i of this.personIds.split(',')) {
+        // 判断已读中是否存在该人员的待办
+        let daiBan = data.filter(fil => { return fil.executor_ == i })
+        if (daiBan.length == 0) {
+          this_.optionPerson.series[0].data.push(0);
+        } else {
+          this_.optionPerson.series[0].data.push(daiBan[0].num);
+        }
+        // 判断已读中是否存在该人员的已办
+        let yiBan = yibanData.filter(fil => { return fil.AUDITOR_ == i })
+        if (yiBan.length == 0) {
+          this_.optionPerson.series[1].data.push(0);
+        } else {
+          this_.optionPerson.series[1].data.push(yiBan[0].num);
         }
       }
     },
@@ -827,19 +819,18 @@ export default {
     },
     handleAllGetFunc() {
       if (this.initOnLoad === 0) {
-        this.employeeInfoData();
         this.positionsInfoData();
         this.degreeGradeInfoData();
         this.initOnLoad = 1
       }
+      this.employeeInfoData();
+
     },
     handleFunc(e) {
       this.sqlPositionsDatasIni = e.i
       this.positionIni = e.v
       this.simplifyPosition(e.v);
       this.handleAllGetFunc();
-      this.getTtaskMattersData();
-
       clearInterval(this.interval);
       this.intervalHandle();
     },
@@ -852,23 +843,21 @@ export default {
         this.optionPersonConfig.title = `部门（${obj.NAME_}）员工任务统计`
       }
       this.simplifyPosition(e);
-      this.getTtaskMattersData();
+      this.employeeInfoData();
+
     },
     // 定时任务调用接口，一分钟一次
     intervalHandle() {
       let cishu = 0 // 记录所选择的部门个数，即需要轮询多少次
       this.interval = setInterval(() => {
-        const positionIniDatas = this.positionIni.filter((fil) => {
-          return fil[2] !== undefined
-        })
-        if (positionIniDatas.length == 0) {
+        if (this.positionIni.length == 0) {
           return
         }
-        if (cishu > positionIniDatas.length - 1) {
+        if (cishu > this.positionIni.length - 1) {
           cishu = 0
-          this.handleInt([positionIniDatas[0]])
+          this.handleInt([this.positionIni[0]])
         } else {
-          this.handleInt([positionIniDatas[cishu]])
+          this.handleInt([this.positionIni[cishu]])
           cishu++
         }
       }, 10000);

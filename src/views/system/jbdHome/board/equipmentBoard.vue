@@ -419,9 +419,9 @@ export default {
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
       this.moreBarData.data.dimensions = ['product', '设备总数', '良好数','停用数'];
-      let sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
-      let sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='使用'  GROUP BY a.bian_zhi_bu_men_`
-      let sql3 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='停用'  GROUP BY a.bian_zhi_bu_men_`
+      let sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where b.name_ not like '%检验科%' and  a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+      let sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='使用'  GROUP BY a.bian_zhi_bu_men_`
+      let sql3 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='停用'  GROUP BY a.bian_zhi_bu_men_`
       let data1,data2,data3;
       await Promise.all([curdPost('sql', sql1),curdPost('sql', sql2),curdPost('sql', sql3)]).then(([res1, res2,res3]) => {
         if (res1.state == 200) {
@@ -547,7 +547,7 @@ export default {
       let this_ = this;
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
-      let sql1 = `select a.bian_zhi_bu_men_,name_,a.zi_chan_yuan_zhi_ FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ ASC`
+      let sql1 = `select a.bian_zhi_bu_men_,name_,a.zi_chan_yuan_zhi_ FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ ASC`
       let source = [];
       let data1;
       await Promise.all([curdPost('sql', sql1)]).then(([res1, res2]) => {
@@ -588,10 +588,8 @@ export default {
         this.zichangBarData.xData.push(el.party)
       }
 
-      console.log(this.zichangBarData,111111111111)
        this.zichangBarData.data.unshift(this.formatNumber(allmony));
        this.zichangBarData.xData.unshift("检验科");
-       console.log(this.zichangBarData,22222222222)
     },
     formatNumber(num) {
       num = Number(num);

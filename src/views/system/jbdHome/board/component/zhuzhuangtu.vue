@@ -1,8 +1,11 @@
 <template>
   <div class="pieView">
     <div style="height: 10%;width: 100%;line-height: 30px;text-align: left;padding-left: 10px;">{{info.config.title}}</div>   
-    <div style="width:100%;height:90%;display: inline-block;">
+    <div style="width:100%;height:90%;display: inline-block;" v-show="showChart">
       <div :id="info.config.idSelector" style="width:100%;height:100%;"> </div>
+    </div>
+    <div style="background: #061237;width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;" v-if="!showChart">
+      <div style="color: #c7c7c7">目前无数据</div>
     </div>
   </div>
 </template>
@@ -13,6 +16,7 @@ export default {
   data() {
     return {
       yAxisNum:1,
+      showChart: true,
     };
   },
   props: {
@@ -30,7 +34,6 @@ export default {
   },
   methods: {
     getMiddleLeft() {
-      console.log(this.info.config,"asdho")
       var chartDom = document.getElementById(this.info.config.idSelector);
       var myChart = echarts.init(chartDom);
       let ay =this.info.data;
@@ -38,6 +41,15 @@ export default {
       ay[0] > ay[1]?yc=ay[0]:yc=ay[1];
       this.yAxisNum =parseInt(yc / 6) ;
       this.yAxisNum ==0? this.yAxisNum =1:'';
+      let num = 0;
+      for (let item of this.info.data) {
+        num += Number(item);
+      }
+      if (num == 0) {
+        this.showChart = false;
+      } else {
+        this.showChart = true;
+      }
       var myChart = echarts.init(chartDom);
       var option;
       option = {
