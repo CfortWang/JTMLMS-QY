@@ -114,7 +114,8 @@ export default {
             padding: 0 5%;
         }
         .footerclass{
-            width: 80%;
+            width: 100%;
+            padding: 0 5%;
         }
         .footerOutside{
             font-size: 12px;
@@ -184,7 +185,8 @@ export default {
             padding: 0 2.5%;
         }
         .footerclass{
-            width: 80%;
+            width: 100%;
+            padding: 0 2.5%;
         }
         .footerOutside{
             font-size: 12px;
@@ -257,7 +259,8 @@ export default {
             padding: 0 2.5%;
         }
         .footerclass{
-            width: 80%;
+            width: 100%;
+            padding: 0 2.5%;
         }
         .footerOutside{
             font-size: 12px;

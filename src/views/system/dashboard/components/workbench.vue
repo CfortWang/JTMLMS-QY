@@ -94,7 +94,6 @@
 import { pending, handledTask } from '@/api/platform/office/bpmReceived'
 import { myDraft, removeDraft } from '@/api/platform/office/bpmInitiated'
 import { queryPageList as newsList } from '@/api/platform/system/news'
-import { queryOrgManager } from '@/api/platform/org/employee'
 import { save } from '@/api/platform/message/innerMessage'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import ActionUtils from '@/utils/action'
@@ -396,7 +395,7 @@ export default {
         // 获取表格数据
         getData (type) {
             this.loading = true
-            const pageParams = this.pagination.page ? this.pagination : this.defaultPagination
+            const pageParams = this.pagination && this.pagination.page ? this.pagination : this.defaultPagination
             operate[this.activeTab](this.getFormatParams(null, pageParams)).then(response => {
                 const { dataResult, pageResult } = response.data
                 // 待办事宜对任务发起人做额外处理
@@ -423,7 +422,7 @@ export default {
                     this.urgeToManager()
                 } else {
                     this.dataList = dataResult
-                    this.pagination = pageResult
+                    this.pagination = pageResult || {}
                 }
                 this.loading = false
             }).catch(() => {
@@ -503,25 +502,76 @@ export default {
         handleAction (command, position, selection, data) {
             switch (command) {
                 case 'search':// 查询
-                    ActionUtils.setFirstPagination(this.pagination)
+                    ActionUtils.setFirstPagination(this.pagination || {})
                     this.search()
                     break
                 case 'remove':// 删除
-                    ActionUtils.removeRecord(selection).then((ids) => {
-                        console.log(ids)
-                        this.handleRemove(ids)
-                    }).catch(() => { })
+                    if (!data || !data.length) {
+                        this.$message.warning('请选择数据！')
+                        return
+                    }
+                    if (data.length > 20) {
+                        this.$message.warning('单次最多只能删除二十条！')
+                        return
+                    }
+                    this.handleRemove(data, selection)
                     break
                 default:
                     break
             }
         },
         // 删除暂存数据
-        handleRemove (ids) {
-            removeDraft({ ids }).then(() => {
-                ActionUtils.removeSuccessMessage()
-                this.selection = []
-                this.search()
+        handleRemove (datas, selection) {
+            this.$confirm('将删除选中暂存记录与对应数据表数据，删除之后无法恢复， 是否确定？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+                showClose: false,
+                closeOnClickModal: false
+            }).then(() => {
+                const defKeyArr = []
+                const delList = {}
+                const idList = []
+                datas.forEach(item => {
+                    const { id, bizKey, procDefKey } = item
+                    idList.push(id)
+                    if (!delList[procDefKey]) {
+                        delList[procDefKey] = []
+                        defKeyArr.push(procDefKey)
+                    }
+                    delList[procDefKey].push(bizKey)
+                })
+                console.log(idList, delList, defKeyArr)
+                const sql = `select bo_code_, def_key_ from ibps_bpm_def where find_in_set(def_key_, '${defKeyArr.join(',')}')`
+                // const sql = `select a.bo_code_, b.key_ from ibps_form_bo a, ibps_form_def b where a.form_id_ = b.id_ and find_in_set(b.key_, '${formKeyArr.join(',')}')`
+                this.$common.request('sql', sql).then(res => {
+                    const { data = [] } = res.variables || {}
+                    if (!data.length) {
+                        return
+                    }
+                    const codes = {}
+                    data.forEach(item => {
+                        const { bo_code_, def_key_ } = item
+                        codes[def_key_] = bo_code_
+                    })
+                    // 删除选中记录
+                    removeDraft({ ids: idList.join(',') }).then(() => {
+                        ActionUtils.removeSuccessMessage()
+                        this.selection = []
+                        // 循环删除对应数据表数据
+                        defKeyArr.forEach(k => {
+                            const deleteParams = {
+                                tableName: `t_${codes[k]}`,
+                                paramWhere: { id_: delList[k].join(',') }
+                            }
+                            this.$common.request('delete', deleteParams)
+                        })
+                        this.$message.success('删除成功！')
+                        this.search()
+                    })
+                }).catch(() => {
+                    this.$message.error('获取数据表key值出错，请联系开发人员！')
+                })
             })
         },
         // 数组去重

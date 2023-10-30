@@ -629,8 +629,8 @@ export default {
                         this.$message.warning('请选择数据！')
                         return
                     }
-                    if (data.length > 10) {
-                        this.$message.warning('单次最多只能删除十条！')
+                    if (data.length > 20) {
+                        this.$message.warning('单次最多只能删除二十条！')
                         return
                     }
                     this.handleDelete(data, selection)
