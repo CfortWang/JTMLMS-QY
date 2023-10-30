@@ -431,6 +431,15 @@ export default {
                 rmType: 'all',
                 clean: true
             }).then(response => {
+                const { cause = '' } = response
+                if (cause && cause.includes('存在关联请先处理关联后再删除！')) {
+                    this.$confirm(cause, '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        dangerouslyUseHTMLString: true,
+                        type: 'warning'
+                    })
+                }
                 this.loadData()
             })
         },
