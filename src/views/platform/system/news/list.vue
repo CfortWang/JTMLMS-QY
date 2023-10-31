@@ -53,6 +53,9 @@ export default {
     },
     mixins: [FixHeight],
     data () {
+        const { role = [] } = this.$store.getters.userInfo || {}
+        const roleList = ['xtgljs', 'jykfzr', 'jsfzr', 'zlfzr', 'syszr']
+        const hasRole = role.some(item => roleList.includes(item.alias))
         return {
             dialogFormVisible: false, // 弹窗
             dialogdetailVisible: false,
@@ -72,10 +75,16 @@ export default {
                         key: 'search'
                     },
                     {
-                        key: 'add'
+                        key: 'add',
+                        hidden: () => {
+                            return !hasRole
+                        }
                     },
                     {
-                        key: 'remove'
+                        key: 'remove',
+                        hidden: () => {
+                            return !hasRole
+                        }
                     }
                 ],
                 searchForm: {

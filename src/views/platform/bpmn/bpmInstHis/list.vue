@@ -289,9 +289,10 @@ export default {
     created () {
         this.loadData()
         this.getConfig()
-        const roleList = this.$store.getters.userInfo.role
-        // 系统管理角色添加删除按钮
-        const hasRole = roleList.some(item => item.name === '系统管理角色')
+        const { role = [] } = this.$store.getters.userInfo || {}
+        const roleList = ['xtgljs', 'xxglxzfzr', 'syszr']
+        // 系统管理角色、信息管理负责人、检验科主任添加删除按钮
+        const hasRole = role.some(item => roleList.includes(item.alias))
         this.listConfig.toolbars.push({
             key: 'detail',
             label: '详情',

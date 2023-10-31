@@ -11,7 +11,7 @@
         @open="getform"
         @close="closeDialog"
     >
-        <el-row style="padding: 10px; max-height: 600px;">
+        <el-row class="notice-container">
             <!-- <div style="padding-left:65px;">
                 <span class="photo-area" @click="dialogPictureVisible = !readonly">
                     <img v-if="form.picture" :src="image" class="avatar">
@@ -35,7 +35,13 @@
                 @action-event="uploaderPictureAction"
                 @close="visible => dialogPictureVisible = visible"
             /> -->
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px" @submit.native.prevent>
+            <el-form
+                ref="form"
+                :rules="rules"
+                :model="form"
+                label-width="100px"
+                @submit.native.prevent
+            >
                 <!-- <el-form-item label="发布选项：" prop="publicItem">
                     <el-radio-group v-model="form.publicItem">
                         <el-radio label="notices">发布公告</el-radio>
@@ -434,6 +440,10 @@ export default {
 }
 </script>
 <style lang="scss">
+.notice-container {
+    padding: 10px;
+    max-height: calc(80vh - 120px);
+}
 .photo-area {
     display: block;
     position: relative;
