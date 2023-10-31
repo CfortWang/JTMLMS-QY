@@ -2,7 +2,7 @@
   <div class="test-content">
     <div class="title">
       <div class="title-center" style="font-size: 26px; color: #c12530">
-        设施环境控制图
+        设施环境控制图(示例图)
       </div>
       <div class="info-right">
         <span style="color: #c12530; margin-right: 5px">采集时间:</span><span style="color: #276bcc; margin-right: 15px">{{ newTiMe }}</span>
