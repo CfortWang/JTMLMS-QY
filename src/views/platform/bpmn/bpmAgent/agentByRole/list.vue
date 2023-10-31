@@ -18,7 +18,6 @@
             @pagination-change="handlePaginationChange"
         >
             <template slot="delegatorId">
-                <!-- <ibps-employee-selector :value="searchDelegatorId" style="width: 200px" @input="getDelegatorId" /> -->
                 <ibps-user-selector
                     v-model="searchDelegatorId"
                     :type="type"
@@ -45,6 +44,8 @@ import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import { statusOptions, agentTypeOptions } from '../constants'
 import Edit from './edit'
+import { create, update, load, upEmployee } from '@/api/platform/org/employee'
+import agent from './agent'
 
 export default {
     components: {
@@ -52,7 +53,7 @@ export default {
         Edit,
         ibpsUserSelector
     },
-    mixins: [FixHeight],
+    mixins: [FixHeight, agent],
     data () {
         const { first = '', second = '' } = this.$store.getters.level
         const level = second || first
@@ -108,7 +109,9 @@ export default {
                     { prop: 'biao_ti_', label: '标题', width: 250 },
                     { prop: 'wei_tuo_ren_xing_', label: '委托人', width: 120 },
                     { prop: 'dai_li_ren_xing_m', label: '代理人', width: 120 },
-                    { prop: 'shi_fou_qi_yong_', label: '是否启用', tags: statusOptions }
+                    { prop: 'shi_fou_qi_yong_', label: '是否启用', tags: statusOptions, width: 120 },
+                    { prop: 'bei_zhu_', label: '备注' },
+                    { prop: 'name_', label: '创建人', width: 120 }
                     // { prop: 'sheng_xiao_shi_ji', label: '生效时间' },
                     // { prop: 'jie_shu_shi_jian_', label: '失效时间' }
                 ],
@@ -164,21 +167,17 @@ export default {
         getInit () {
             this.filter[0].partyId = this.$store.getters.userInfo.employee.positions || ''
         },
-        getDelegatorId (value) {
-            this.searchDelegatorId = value
-        },
         callbackAgenterInfo (value, data, type) {
             this.searchDelegatorId = value
         },
         // 加载数据
         loadData () {
             this.loading = true
-            console.log(this.pagination)
             const start = (this.pagination.page - 1) * this.pagination.limit
             const end = this.pagination.page * this.pagination.limit
             const searcFormData = this.getSearcFormData()
-            const sql1 = `select * from t_swdl where di_dian_ = '${this.level}' ${searcFormData} order by create_time_ desc limit ${start},${end}`
-            const sql2 = `select count(id_) as count from t_swdl where di_dian_ = '${this.level}' ${searcFormData}`
+            const sql1 = `select a.*,b.name_ from t_swdl a left join ibps_party_employee b on a.create_by_ = b.ID_  where a.di_dian_ = '${this.level}' ${searcFormData} order by a.create_time_ desc limit ${start},${end}`
+            const sql2 = `select count(a.id_) as count from t_swdl a where a.di_dian_ = '${this.level}' ${searcFormData}`
             Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then((res) => {
                 const list0 = res[0].variables.data
                 list0.forEach(item => {
@@ -210,7 +209,7 @@ export default {
             if (params) {
                 Object.keys(params).forEach(item => {
                     if (params[item]) {
-                        keyParams = `and ${item} like '%${params[item]}%'`
+                        keyParams = `and a.${item} like '%${params[item]}%'`
                     }
                 })
             }
@@ -241,7 +240,6 @@ export default {
          * 处理按钮事件
          */
         handleAction (command, position, selection, data) {
-            console.log(selection)
             switch (command) {
                 case 'search': // 查询
                     ActionUtils.setFirstPagination(this.pagination)
@@ -254,7 +252,6 @@ export default {
                 case 'edit': // 编辑
                     ActionUtils.selectedRecord(selection)
                         .then((id) => {
-                            console.log(selection, id)
                             this.handleEdit(id)
                             this.title = '编辑流程代理'
                         })
@@ -276,10 +273,10 @@ export default {
                         .catch(() => {})
                     break
                 case 'enabled': // 启用
-                    this.handleSetEnable(data.id, 'enabled')
+                    this.handleSetEnable(data, 'enabled')
                     break
                 case 'disabled': // 禁用
-                    this.handleSetEnable(data.id, 'disabled')
+                    this.handleSetEnable(data, 'disabled')
                     break
                 default:
                     break
@@ -297,12 +294,6 @@ export default {
          * 处理删除
          */
         handleRemove (ids) {
-            // remove({ ids: ids })
-            //     .then((response) => {
-            //         ActionUtils.removeSuccessMessage()
-            //         this.search()
-            //     })
-            //     .catch(() => {})
             const params = {
                 tableName: 't_swdl',
                 paramWhere: {
@@ -314,14 +305,15 @@ export default {
                 this.search()
             })
         },
-        handleSetEnable (id, status) {
-            const params = { id: id, isEnabled: status }
-            setEnable(params)
-                .then((response) => {
-                    ActionUtils.removeSuccessMessage(response.message)
-                    this.search()
-                })
-                .catch(() => {})
+        handleSetEnable (data, status = 'disabled') {
+            this.bpmAgent = JSON.parse(JSON.stringify(data))
+            this.bpmAgent.shi_fou_qi_yong_ = status === 'enabled' ? 'enabled' : 'disabled'
+            this.checkList1 = this.bpmAgent.wei_tuo_jiao_se_i.split(',')
+            delete this.bpmAgent.id
+            delete this.bpmAgent.name_
+            Promise.all([this.getWeiTuo(data.wei_tuo_ren_, 1, data.id_), this.getWeiTuo(data.dai_li_ren_, 2, data.id_)]).then(res => {
+                this.saveData(data.id_)
+            })
         },
         closeDialog (val) {
             this.dialogFormVisible = val

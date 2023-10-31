@@ -5,7 +5,15 @@ export default {
         return {
             typeList: ['待分配', '待核查', '待审核', '待确认', '已结束'],
             posiList: [],
-            positionList: []
+            positionList: [],
+            barLable: {
+                show: true,
+                position: 'top',
+                textStyle: { // 数值样式
+                    color: 'black',
+                    fontSize: 12
+                }
+            }
         }
     },
 
@@ -131,15 +139,29 @@ export default {
             const second = this.$store.getters.level.second
             const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' AND b.shen_he_jie_guo_ = 'N' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
             const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' AND b.shen_he_jie_guo_ = 'Y' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' AND b.shen_he_jie_guo_ = 'N/A' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql4 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
 
-            Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then(res => {
+            Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2), this.$common.request('sql', sql3), this.$common.request('sql', sql4)]).then(res => {
                 if (res.length > 0) {
                     const data1 = res[0].variables.data
                     const data2 = res[1].variables.data
-                    const list1 = data1.map(item => item.value)
-                    const list2 = data2.map(item => item.value)
+                    const data3 = res[2].variables.data
+                    const data4 = res[3].variables.data
+                    const list1 = data1.map(item => {
+                        return item.value === 0 ? '' : item.value
+                    })
+                    const list2 = data2.map(item => {
+                        return item.value === 0 ? '' : item.value
+                    })
+                    const list3 = data3.map(item => {
+                        return item.value === 0 ? '' : item.value
+                    })
+                    const list4 = data4.map(item => {
+                        return item.value === 0 ? '' : item.value
+                    })
                     const accept = echarts.init(this.$refs.Echart2)
-                    accept.setOption(JSON.parse(JSON.stringify(this.barData(list1, list2))))
+                    accept.setOption(JSON.parse(JSON.stringify(this.barData(list1, list2, list3, list4))))
                 }
             })
         },
@@ -154,9 +176,15 @@ export default {
                     const data1 = res[0].variables.data
                     const data2 = res[1].variables.data
                     const data3 = res[2].variables.data
-                    const list1 = data1.map(item => item.value)
-                    const list2 = data2.map(item => item.value)
-                    const list3 = data3.map(item => item.value)
+                    const list1 = data1.map(item => {
+                        return item.value === 0 ? '' : item.value
+                    })
+                    const list2 = data2.map(item => {
+                        return item.value === 0 ? '' : item.value
+                    })
+                    const list3 = data3.map(item => {
+                        return item.value === 0 ? '' : item.value
+                    })
                     const accept = echarts.init(this.$refs.Echart2)
                     accept.setOption(JSON.parse(JSON.stringify(this.barDataPlan(list1, list2, list3))))
                 }
@@ -233,7 +261,7 @@ export default {
             accept.setOption(JSON.parse(JSON.stringify(option)))
             // this.show1 = true
         },
-        barData (data1, data2) {
+        barData (data1, data2, data3, data4) {
             const barDataTy = {
                 // 图例设置
                 legend: {
@@ -279,13 +307,23 @@ export default {
                     }
                 },
                 series: [{
-                    name: '符合',
+                    name: '总数',
                     type: 'bar',
                     barGap: 0,
                     emphasis: {
                         focus: 'series'
                     },
-                    data: data2
+                    data: data4,
+                    label: this.barLable
+                }, {
+                    name: '通过',
+                    type: 'bar',
+                    barGap: 0,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: data2,
+                    label: this.barLable
                 },
                 {
                     name: '不符合',
@@ -294,9 +332,19 @@ export default {
                     emphasis: {
                         focus: 'series'
                     },
-                    data: data1
+                    data: data1,
+                    label: this.barLable
+                }, {
+                    name: '不适用',
+                    type: 'bar',
+                    barGap: 0,
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: data3,
+                    label: this.barLable
                 }],
-                color: ['#64C7BF', '#fd666d'],
+                color: ['#7552cc', '#00c16e', '#fd666d', '#64C7BF'],
                 tooltip: {
                     show: true,
                     trigger: 'axis'
@@ -356,7 +404,8 @@ export default {
                     emphasis: {
                         focus: 'series'
                     },
-                    data: data1
+                    data: data1,
+                    label: this.barLable
                 },
                 {
                     name: '已核查',
@@ -365,7 +414,8 @@ export default {
                     emphasis: {
                         focus: 'series'
                     },
-                    data: data2
+                    data: data2,
+                    label: this.barLable
                 }, {
                     name: '未核查',
                     type: 'bar',
@@ -373,7 +423,8 @@ export default {
                     emphasis: {
                         focus: 'series'
                     },
-                    data: data3
+                    data: data3,
+                    label: this.barLable
                 }],
                 color: ['#037ef3', '#7552cc', '#0cb9c1'],
                 tooltip: {

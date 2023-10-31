@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <!-- <div>2323</div> -->
@@ -55,7 +56,7 @@
     },
     data () {
       return {
-        title:'管理评审计划完成情况',
+        title:'管理评审完成情况',
         dialogOff:false,
       }
     },

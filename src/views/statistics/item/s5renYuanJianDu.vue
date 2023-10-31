@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -49,7 +50,7 @@
     },
     data () {
       return {
-        title:'岗前培训计划完成率',
+        title:'岗前培训完成率',
         dialogOff:false,
       }
     },

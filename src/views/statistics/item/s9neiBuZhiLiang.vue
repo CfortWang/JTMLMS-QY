@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -48,7 +49,7 @@
     },
     data () {
       return {
-        title:'内部比对实验计划完成率',
+        title:'内部比对实验完成率',
         dialogOff:false,
         measured:[]
       }

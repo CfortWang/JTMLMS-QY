@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -31,11 +32,11 @@
       },
       height:{
         type:String,
-        default: window.screen.height/4+"px"
+        default: "100%"
       },
       id:{
         type:String,
-        default:"s15tousu"
+        default:"s15tousufb"
       },
       click:{
         type:String,
@@ -48,7 +49,7 @@
     },
     data () {
       return {
-        title:'客户投诉已通知数量',
+        title:'应急预案演练各部门完成率',
         dialogOff:false,
         measured:[]
       }
@@ -70,168 +71,108 @@
 
         // let beginInof = Number(this.data.t_complaintBegin.number)
         // let endInof = Number(this.data.t_complaintEnd.number)
-        let s15tousu = echarts.init(document.getElementById(this.id))
-        // let beingDate=this.data.t_complaintBegin.date
-        // let endDate=this.data.t_complaintEnd.date
-        var option;
-        //v2
-        // let that = this
-        // for (let i = 0; i < that.data.t_complaintNum.date.length; i++) {
-        //   let result = 0
-        //   if(that.data.t_mjwtsqbNum.number[i] === 0){
-        //     result = Math.floor(that.data.t_complaintNum.number[i]/1 * 10000) / 100
-        //   }else{
-        //     result = Math.floor(that.data.t_complaintNum.number[i]/that.data.t_mjwtsqbNum.number[i] * 10000) / 100
-        //   }
-        //   that.measured.push(result)
-        //   // console.log(that.data.t_complaintNum.number[i], that.data.t_mjwtsqbNum.number[i], result, 'res')
-        // }
-        //v3
-        //  let e=[this.data.t_complaintNum.number[0],this.data.t_complaintNum.numberAll[0],this.data.t_complaintNum.res[0]]
-         let e=[this.data.t_complaintNum.numberAll,this.data.t_complaintNum.number]
-        
+        let s15tousucol = echarts.init(document.getElementById(this.id))
+        let option;
+        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barNum = []
+        for (let i = 0; i < this.data.num.title.length-1; i++) {
+          if(i==this.data.num.title.length-2){
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                show: true,
+				        formatter:function(params){ //标签内容
+                console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
+					        return  params.value[params.seriesName]+'%'
+					      },
+                position: 'top',
+                textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+              }
+            })
+          }else{
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                normal:{
+                  show:true,
+                  position:'top',
+                          
+                  textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+                }
+              }
+            })
+          }
+          
+        }  
 
         option = {
-          //v3
-              legend: {},
-            tooltip: {
-              trigger: 'axis',
-              axisPointer: {
-                type: 'shadow'
-              },
-              // formatter: function (params) {
-              //   return params[0].data[0] + '<br/>满意份数：' + params[0].data[1] + '<br/>调查总份数: ' + params[0].data[2];
-              // }
-            },
-            // dataset: {
-            //   source: barData
-            // },
-            xAxis: { 
-              type: 'category',
-              // data:['投诉总数', '委托总数', '客户投诉率']
-              data:['应急预案演练计划总数','应急预案演练计划已完成数']
-            },
-            yAxis: [
-              {
-                type: 'value',
-                scale: true,
-                name: '次数',
-                // max: this.data.t_complaintNum.number[0]>this.data.t_complaintNum.numtong[0]?this.data.t_complaintNum.number[0]+1:this.data.t_complaintNum.numtong[0]+1,
-                min: 0,
-                // boundaryGap: [0.2, 0.2]
-              },
-              // {
-              //   type: 'value',
-              //   scale: true,
-              //   name: '客户投诉率',
-              //   max: this.data.t_complaintNum.res[0],
-              //   min: 0,
-              //   axisLabel: {
-              //     formatter: '{value} %'
-              //   }
-              // }
-            ],
-            // Declare several bar series, each will be mapped
-            // to a column of dataset.source by default.
-            // series: [{ type: 'bar' }],
-            series: [
-              {
-                data: e,
-                type: 'bar',
-                barWidth: '20%',
-                itemStyle: {
-                  color: '#cccc33'
-                },
-                label: {
-                  show: true,
-                  position: 'top'
-                },
-              }
-            ],
-            grid: {
-              top: '20%',
-              left: '3%',
-              right: '4%',
-              bottom: '10%',
-              containLabel: true
-            },
             title: {
-              text: this.title,
-              textStyle:{ fontSize:14,color: this.colorw }
-
-              // subtext: "        "+beingDate+"-"+endDate
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
+          },
+          grid: {
+                top: '10%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
+          },
+          xAxis: { 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw   //这里用参数代替了
+              }
             },
-          //v2
-        //   rotate: {
-        //     min: -90,
-        //     max: 90
-        //   },
-        //   grid: {
-        //         top: '20%',
-        //         left: '3%',
-        //         right: '4%',
-        //         bottom: '10%',
-        //         containLabel: true
-        //     },
-        //   title: {
-        //      text: this.title,
-        //      subtext: '    '+this.data.t_complaintNum.date[0]+'-'+this.data.t_complaintNum.date[this.data.t_complaintNum.date.length-1],
-        //    },
-        //  xAxis: {
-        //    type: 'category',
-        //    data: this.data.t_complaintNum.date
-        //  },
-        //  yAxis: {
-        //   //  max:this.data.t_complaintBegin.number>this.data.t_complaintEnd.number?this.data.t_complaintBegin.number+1:this.data.t_complaintEnd.number+1,
-        //   // max: Math.max(...this.measured),
-        //   // min:0,
-        //   type: 'value',
-        //   axisLabel: {
-        //     show: true,
-        //     textStyle:{color:'#000'},
-        //     interval: 'auto',
-        //     formatter: '{value} %'
-        //   },
-        //  },
-        //  tooltip: {
-        //         trigger: 'axis',
-        //         axisPointer: {
-        //           type: 'shadow'
-        //         },
-        //         formatter: function (params) {
-        //           // console.log(params,'tousu ')
-        //           return params[0].axisValue + '<br/>客户投诉率：' + params[0].data;
-        //         }
-        //         // formatter: 
-        //         // function (datas) {
-        //         //     let year1 = datas[0].dataIndex==0||datas[0].dataIndex==2;
-        //         //     var res=(year1?beingDate+':':endDate+':')+datas[0].name+':'+datas[0].value
-        //         //     return res
-        //         // }
-        //  },
-        //  series: [
-        //    {
-        //      itemStyle: {
-        //             normal: {
-        //                 color: function(params) {
-        //                     var colorList = [
-        //                       '#F0805A','#B5C334','#FCCE10','#E87C25','#27727B',
-        //                        '#FE8463','#9BCA63','#FAD860','#F3A43B','#60C0DD',
-        //                        '#D7504B','#C6E579','#F4E001','#F0805A','#26C0C0'
-        //                     ];
-        //                     return colorList[params.dataIndex]
-        //                 },
-        //             }
-        //         },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          yAxis: {
+            splitLine:{show: false},
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw    //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          dataset: {
+            dimensions: this.data.num.title,
+            source: this.data.num.number
+          },
+          series: barNum,
+          dataZoom: [
+            {
+                id: 'dataZoomY',
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty'
+            }
+          ],
+       
+        };
 
-        //      data: this.measured,
-        //      type: 'bar',
-        //      barWidth:50
-        //    }
-        //  ]
-       };
-
-       option && s15tousu.setOption(option);
+       option && s15tousucol.setOption(option);
       }
     }
   }

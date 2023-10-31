@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -32,11 +33,11 @@
       },
       height:{
         type:String,
-        default: window.screen.height/5+"px"
+        default: "100%"
       },
       id:{
         type:String,
-        default:"s7sheBeiJiaoZhun"
+        default:"s7sheBeiJiaoZhunfb"
       },
       click:{
         type:String,
@@ -49,7 +50,7 @@
     },
     data () {
       return {
-        title:'设备检定/校准计划完成情况',
+        title:'设备检定/校准各部门完成情况',
         dialogOff:false,
       }
     },
@@ -67,91 +68,109 @@
        }
       },
       drawLine(){
-        let s7sheBeiJiaoZhun = echarts.init(document.getElementById(this.id))
+        let s7sheBeiJiaoZhuncol = echarts.init(document.getElementById(this.id))
 
-        // let beginInof = GetPercent(Number(this.data.t_rypxjlnkBegin.number),Number(this.data.t_ryndpxjhBegin.number))
-        // let endInof = GetPercent(Number(this.data.t_rypxjlnkEnd.number),Number(this.data.t_ryndpxjhEnd.number))
-
-        //  let data1 = [];
-        //  data1.push(this.data.t_ryndpxjhBegin.number);
-        //  data1.push(this.data.t_ryndpxjhEnd.number);
-        //  let data2 = [];
-        //  data2.push(this.data.t_rypxjlnkBegin.number);
-        //  data2.push(this.data.t_rypxjlnkEnd.number);
-        //  let data3 = [];
-        //  data3.push(this.data.t_rypxjlnkBegin.date);
-        //  data3.push(this.data.t_rypxjlnkEnd.date);
-
-
-        // let barData = []
-        // for (let i = 0; i < this.data.t_ryywpxjlNum.date.length; i++) {
-        //   let e=[this.data.t_ryywpxjlNum.date[i],this.data.t_ryywpxjlNum.number[i],this.data.t_ryywpxjlNum.numberAll[i]]
-        //   barData.push(e)
-        // }
-        //  let e=[this.data.t_ryywpxjlNum.number[0],this.data.t_ryywpxjlNum.numberAll[0],this.data.t_ryywpxjlNum.res[0]]
-
-        let e=[this.data.t_mjsbjdxzjhzbNum.numberAll,this.data.t_mjsbjdxzjhzbNum.number]
-        var option;
-        option = {
-          //v3
-          legend: {},
-            tooltip: {
-              trigger: 'axis',
-              axisPointer: {
-                type: 'shadow'
-              },
-              // formatter: function (params) {
-              //   return params[0].data[0] + '<br/>满意份数：' + params[0].data[1] + '<br/>调查总份数: ' + params[0].data[2];
-              // }
-            },
-            // dataset: {
-            //   source: barData
-            // },
-            xAxis: { 
-              type: 'category',
-              data:['设备检定/校准计划总数', '设备检定/校准计划已完成数量']
-
-            },
-            yAxis: [
-              {
-                type: 'value',
-                scale: true,
-                name: '数量',
-                // max: this.data.t_mjsbjdxzjhzbNum.valnum>this.data.t_mjsbjdxzjhzbNum.valAll?this.data.t_mjsbjdxzjhzbNum.valnum+1:this.data.t_mjsbjdxzjhzbNum.valAll+1,
-                min: 0,
-              },
-            ],
-            series: [
-              {
-                data: e,
-                type: 'bar',
-                barWidth: '20%',
-                itemStyle: {
-                  color: '#0099ff'
-                },
-                label: {
-                  show: true,
-                  position: 'top'
-                },
+        let option;
+        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barNum = []
+        for (let i = 0; i < this.data.num.title.length-1; i++) {
+          if(i==this.data.num.title.length-2){
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                show: true,
+				        formatter:function(params){ //标签内容
+					        return  params.value[params.seriesName]+'%'
+					      },
+                position: 'top',
+                textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
               }
-            ],
-            grid: {
-              top: '20%',
-              left: '3%',
-              right: '4%',
-              bottom: '10%',
-              containLabel: true
-            },
-            title: {
-              text: this.title,
-              textStyle:{ fontSize:14,color: this.colorw }
+            })
+          }else{
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                normal:{
+                  show:true,
+                  position:'top',
+                          
+                  textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+                }
+              }
+            })
+          }
+          
+        }  
 
-              // subtext: "        "+beingDate+"-"+endDate
+        option = {
+            title: {
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
+          },
+          grid: {
+                top: '20%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
+          },
+          xAxis: { 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw  //这里用参数代替了
+              }
             },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          yAxis: {
+            splitLine:{show: false},
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw   //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          dataset: {
+            dimensions: this.data.num.title,
+            source: this.data.num.number
+          },
+          series: barNum,
+          dataZoom: [
+            {
+                id: 'dataZoomY',
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty'
+            }
+          ],
+       
         };
 
 
-       option && s7sheBeiJiaoZhun.setOption(option);
+       option && s7sheBeiJiaoZhuncol.setOption(option);
       }
     }
   }

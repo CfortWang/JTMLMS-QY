@@ -49,8 +49,26 @@ export default {
                         }
                         barData.push(e)
                         return {
-                                "t_mjsbjdxzjhzbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "val": e,"nummg":this.jiaoyanMGObj},
+                                "t_mjsbjdxzjhzbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "val": e},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
+                        }
+                },
+                getJiaoYanObjNumFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.jiaoyanMGObj,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
                 gethechaObjNum(){
@@ -64,8 +82,26 @@ export default {
                         }
                         barData.push(e)
                         return {
-                                "t_sbhcjlbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "val": e,"nummg":this.hechaMGObj},
+                                "t_sbhcjlbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "val": e},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
+                        }
+                },
+                gethechaObjNumFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.hechaMGObj,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
                 getnengtliObjNum(){
@@ -81,6 +117,24 @@ export default {
                         return {
                                 "Num" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val": e},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
+                        }
+                },
+                getnengtliObjNumFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.waibuObjfb,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
                 getyangPinCaiJiObjNum(){
@@ -124,8 +178,9 @@ export default {
                 },
                 getfenzuZLZBObjNum(){
                         //生成月份
+                        let that = this
                         let d1 = this.endDate[0];
-                        let d2 = this.endDate[1];
+                        let d2 = this.endDate[2];
                         let dateArry = new Array();
                         let s1 = d1.split("-");
                         let s2 = d2.split("-");
@@ -152,44 +207,62 @@ export default {
                         //处理数据
                         let zlzbfz = []
                         let fenshuzu = []
-                        fenshuzu = this.fenzuzlmb
+                        let zongfz = []
+                        fenshuzu = that.quality
+                        for (let m = 0; m < that.quality.length; m++) {
+                                for (let n = 0; n < that.fenzuzlmb.length; n++) {
+                                        //console.log(that.quality.id_ == that.fenzuzlmb.id_,that.quality,that.fenzuzlmb)
+                                        if (that.quality[m].id_ == that.fenzuzlmb[n].id_) {
+                                                fenshuzu[m].data=that.fenzuzlmb[n].data?that.fenzuzlmb[n].data:''
+                                                continue
+                                        }
+                                }
+                                
+                        }
                         for (let j = 0; j < dateArry.length; j++) {
                                 let rq = {}
                                 rq.name_ = dateArry[j]
                                 zlzbfz.push(rq)
                                 // console.log(zlzbfz,dateArry[j],'erw232222222222222222222222222224586')
                         }
-                        
+                        console.log(fenshuzu,zlzbfz,'55353453535345')
                         let title = ['name_']
-                        for (let i = 0; i < zlzbfz.length; i++) {
-                                for (let j = 0; j < fenshuzu.length; j++) {
-                                        if(zlzbfz[i].name_ == fenshuzu[j].bzsj){
-                                                let prop = fenshuzu[j].zhi_liang_zhi_bia;
-                                                zlzbfz[i][prop] = fenshuzu[j].location
+                        for (let zn = 0; zn < fenshuzu.length; zn++) {
+                                for (let i = 0; i < zlzbfz.length; i++) {
+                                        if(fenshuzu[zn].data&&fenshuzu[zn].data.length>0){
+                                                for (let j = 0; j < fenshuzu[zn].data.length; j++) {
+                                                        if(zlzbfz[i].name_ == fenshuzu[zn].data[j].bzsj){
+                                                                let prop = fenshuzu[zn].data[j].zhi_liang_zhi_bia;
+                                                                zlzbfz[i][prop] = fenshuzu[zn].data[j].location
+                                                                console.log(zlzbfz)
+                                                        }
+                                                        //continue
+                                                }
+                                                
                                         }
+                                        //continue
                                 }
+                                zongfz.push({'id':fenshuzu[zn].id_,'name':fenshuzu[zn].name_,'data':zlzbfz})
+                                
                         }
+                        console.log(zongfz,'0000000000000000767676767676767676767676')
                         for (let t = 0; t < this.zhiliangzhibiaotitle.length; t++) {
                                 title.push(this.zhiliangzhibiaotitle[t].zhi_liang_zhi_bia)
                                 
                         }
-                        // let arr  = this.tableNum
-                        // let aa =[]
-                        // for (let j = 0; j < arr.length; j++) {
-                        //         let changeArr = ['<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].ji_suan_gong_shi_ + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_biao_xian_zhi + '</span>']
-                        //         aa.push(changeArr)
-                        // }
-                        // this.$set(this.tableData1, 'data', aa)
+                        this.zhiliangmuTitle = title
+                        this.zhiliangmuNeirong = zongfz
+
                         
                         return {
-                                "Num" :{"date": this.endDate,"number": zlzbfz,"title":title},
+                                "Num" :{"date": this.endDate,"number": zongfz,"title":title},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
                 getbzJunZhujNum(){
-                        let title = ['ping_shen_lei_xin','num','numA']
+                        let title = ['NAME_','numA','num','chu']
                         return {
-                                "Num" :{"date": this.endDate,"number": this.gaijinxiangObj,"title":title},
+                                "num" :{"date": this.endDate,"number": this.gaijinxiangObj,"title":title},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
@@ -271,6 +344,24 @@ export default {
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
+                getS1renwuFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.guanshenfbObj,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
                 getS1jianCe(){
                         return {
                                 // "t_mjjcbgNum" :{"date": this.dataScope,"number": mjjcbgNum, "numberAll": mjjcbgSNum, "res": barData},
@@ -338,6 +429,24 @@ export default {
                                 "config":this.getMyConfig("客户满意度") //返回需要的对应参数
                         }
                 },
+                getS2manYiDuFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.neishenfbObj,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
                 getS3tousu(){
                         let ryywpxjNum = this.yingjiObj
                         let barData = []
@@ -353,6 +462,24 @@ export default {
                                 "t_complaintNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e},
                                 // "t_mjwtsqbNum" :{"date": this.dataScope,"number": mjwtsqbNum},
                                 "config":this.getMyConfig("客户投诉率") //返回需要的对应参数
+                        }
+                },
+                getS3tousuFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.yingjifbObj,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
                 getS4renYuanPeiXun(){
@@ -373,6 +500,25 @@ export default {
                                 // "t_rypxjlnkBegin" :{"date": this.BeginDate,"number": this.relData['t_rypxjlnk'+this.BeginDate]},
                                 // "t_rypxjlnkEnd" :{"date": this.endDate,"number": this.relData['t_rypxjlnk'+this.endDate]},
                                 "config":this.getMyConfig("人员培训") //返回需要的对应参数
+                        }
+                },
+                getS4renYuanPeiXunFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        console.log(this.zaigangrenyuanfb,'43664564646767fghhfghg')
+                        return {
+                                "num" :{"date": this.endDate,"number": this.zaigangrenyuanfb,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
                 getS5renYuanJianDu(){
@@ -396,6 +542,24 @@ export default {
                                 // "t_zljdssBegin" :{"date": this.BeginDate,"number": this.relData['t_zljdss'+this.BeginDate]},
                                 // "t_zljdssEnd" :{"date": this.endDate,"number": this.relData['t_zljdss'+this.endDate]},
                                 "config":this.getMyConfig("人员监督") //返回需要的对应参数
+                        }
+                },
+                getS5renYuanJianDuFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.gangqianpeixunfb,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
                 getS6sheBeiWeiHu(){
@@ -431,6 +595,7 @@ export default {
                                 "config":this.getMyConfig("设备校准") //返回需要的对应参数
                         }
                 },
+                
                 getS8sheBeiHeCha(){
                         return {
                                 "t_sbhcjhBegin" :{"date": this.BeginDate,"number": this.relData['t_sbhcjh'+this.BeginDate]},
@@ -455,6 +620,24 @@ export default {
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
+                getS9neiBuZhiLiangFB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.neibuObjfb,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
                 getS12fengXian(){
                         let ryywpxjNum = this.fengxianObj
                         let barData = []
@@ -469,13 +652,13 @@ export default {
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
-                getS14bufuhexiang(){
+                getS12fengXianFB(){
                         // let zlzbfz = []
                         // zlzbfz = this.quality
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['bao_gao_lei_xing_','num','numA']
+                        let title = ['NAME_','numA','num','chu']
 
                         // for (let t = 0; t < this.bufuheObj.length; t++) {
                         //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
@@ -483,9 +666,30 @@ export default {
                         // }
                         // }
                         return {
-                                "t_bfhxbgyjzcsjlbxNum" :{"date": this.endDate,"number": this.bufuheObj,"title":title},
+                                "num" :{"date": this.endDate,"number": this.fengxianfbObj,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
+                getS14bufuhexiang(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','chu']
+
+                        // for (let t = 0; t < this.bufuheObj.length; t++) {
+                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
+                                
+                        // }
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": this.bufuheObj,"title":title},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                
+                
+
         }
 }

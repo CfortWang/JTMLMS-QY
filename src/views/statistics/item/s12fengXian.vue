@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -48,7 +49,7 @@
     },
     data () {
       return {
-        title:'实验室活动风险识别与控制',
+        title:'实验室活动风险识别与控制完成率',
         dialogOff:false,
         measured:[]
       }

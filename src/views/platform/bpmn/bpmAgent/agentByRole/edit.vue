@@ -83,14 +83,12 @@
                 </el-col>
             </el-row>
 
-
-
             <el-row>
-                <el-form-item label="权限分配：">
+                <el-form-item label="" label-position="top">
                     <el-col :span="12">
                         <div class="transferPanel">
                             <div class="header">
-                                <span>委托人</span>
+                                <span>委托人角色代理</span>
                             </div>
                             <div class="transferBody">
                                 <el-checkbox-group v-model="checkList1" class="radioBox">
@@ -100,9 +98,9 @@
                         </div>
                     </el-col>
                     <el-col :span="12">
-                        <div class="transferPanel">
+                        <div class="transferPanel" style="margin-left: 50px">
                             <div class="header">
-                                <span>代理人</span>
+                                <span>代理人角色代理</span>
                             </div>
                             <div class="transferBody">
                                 <el-checkbox-group v-model="checkList2" class="radioBox">
@@ -112,6 +110,20 @@
                         </div>
                     </el-col>
                 </el-form-item>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <el-form-item label="备注：" prop="bei_zhu_">
+                        <el-input
+                            v-if="!readonly"
+                            v-model="bpmAgent.bei_zhu_"
+                            type="textarea"
+                            :rows="2"
+                            placeholder="请输入备注"
+                        />
+                        <span v-else>{{ bpmAgent.bei_zhu_ }}</span>
+                    </el-form-item>
+                </el-col>
             </el-row>
         </el-form>
         <div slot="footer" class="el-dialog--center">
@@ -130,6 +142,7 @@ import ibpsUserSelector from '@/business/platform/org/selector'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import Condition from '../condition'
 import { create, update, load, upEmployee } from '@/api/platform/org/employee'
+import agent from './agent'
 
 export default {
     components: {
@@ -138,6 +151,7 @@ export default {
         Condition,
         ibpsUserSelector
     },
+    mixins: [agent],
     props: {
         visible: {
             type: Boolean,
@@ -151,10 +165,7 @@ export default {
         title: String
     },
     data () {
-        const { first = '', second = '' } = this.$store.getters.level
-        const level = second || first
         return {
-            level,
             formName: 'agentForm',
             formLabelWidth: '100px',
             dialogVisible: this.visible,
@@ -166,22 +177,6 @@ export default {
             defaultForm: {},
             multipleSelection: [],
             conditionSelection: [],
-            bpmAgent: {
-                biao_ti_: '',
-                wei_tuo_ren_: this.$store.getters.userId,
-                dai_li_ren_: '',
-                wei_tuo_ren_xing_: this.$store.getters.name,
-                dai_li_ren_xing_m: '',
-                shi_fou_qi_yong_: 'enabled',
-                sheng_xiao_shi_ji: '',
-                jie_shu_shi_jian_: '',
-                wei_tuo_jiao_se_i: '',
-                wei_tuo_jiao_se_m: '',
-                wei_tuo_yuan_shi_: '',
-                dai_li_yuan_shi_s: '',
-                bei_zhu_: '',
-                di_dian_: level
-            },
             rules: {
                 biao_ti_: [
                     { required: true, message: this.$t('validate.required') },
@@ -226,13 +221,6 @@ export default {
 
             transferValue: [],
             transferData: [],
-            checkList1: [],
-            checkList2: [],
-            weiTuoroleListYuan: [],
-            daiLiroleListYuan: [],
-            weiTuoroleList: [],
-            daiLiroleList: [],
-            dailiRenXinxin: null,
             options: {
                 // 时间不能大于当前时间
                 disabledDate: time => {
@@ -255,13 +243,13 @@ export default {
         },
         'bpmAgent.wei_tuo_ren_': {
             handler: function (val, oldVal) {
-                this.getWeiTuo(this.bpmAgent.wei_tuo_ren_, 1)
+                this.getWeiTuo(this.bpmAgent.wei_tuo_ren_, 1, this.formId)
             },
             immediate: true
         },
         'bpmAgent.dai_li_ren_': {
             handler: function (val, oldVal) {
-                this.getWeiTuo(this.bpmAgent.dai_li_ren_, 2)
+                this.getWeiTuo(this.bpmAgent.dai_li_ren_, 2, this.formId)
             },
             immediate: true
         }
@@ -283,26 +271,6 @@ export default {
         getInit () {
             this.filter[0].partyId = this.$store.getters.userInfo.employee.positions || ''
         },
-        handleEdit () {
-            this.rowLoading = true
-            setTimeout(() => {
-                this.rowLoading = false
-                // TODO:
-            })
-        },
-        handleRemove () {
-            this.rowLoading = true
-            setTimeout(() => {
-                this.rowLoading = false
-                // TODO:
-            })
-        },
-        handleSelectionChange (val) {
-            this.multipleSelection = val
-        },
-        handleConditionChange (val) {
-            this.conditionSelection = val
-        },
         handleActionEvent ({ key }) {
             switch (key) {
                 case 'save':
@@ -319,43 +287,14 @@ export default {
         handleSave () {
             this.$refs[this.formName].validate((valid) => {
                 if (valid) {
-                    this.saveData()
+                    if (this.bpmAgent.wei_tuo_ren_ === this.bpmAgent.dai_li_ren_) {
+                        return this.$message.warning('委托人与代理人同一个账号，请重新选择委托人或代理人')
+                    }
+                    this.saveData(this.formId)
                 } else {
                     ActionUtils.saveErrorMessage()
                 }
             })
-        },
-        // 提交保存数据
-        saveData () {
-            const list1 = []
-            const listId = []
-            const list3 = []
-            const listName = []
-            this.checkList1.forEach(item => {
-                const itemData = this.weiTuoroleList.find(it => it.id === item)
-                if (itemData) {
-                    list1.push(itemData)
-                }
-            })
-            list1.forEach(item => {
-                const itemData = this.daiLiroleList.find(it => it.id === item.id)
-                if (!itemData) {
-                    listId.push(item.id)
-                    list3.push(item)
-                    listName.push(item.name)
-                }
-            })
-            this.weiTuoroleListYuan = list3
-
-            this.bpmAgent.wei_tuo_jiao_se_i = listId.join(',')
-            this.bpmAgent.wei_tuo_jiao_se_m = listName.join(',')
-            this.bpmAgent.dai_li_yuan_shi_s = JSON.stringify(this.daiLiroleListYuan)
-            this.bpmAgent.wei_tuo_yuan_shi_ = JSON.stringify(this.weiTuoroleListYuan)
-            if (!this.formId) {
-                this.addShiWuDaiLi()
-            } else {
-                this.updateShiWuDaiLi()
-            }
         },
         addShiWuDaiLi () {
             const list = []
@@ -369,101 +308,6 @@ export default {
                     this.getUpdate()
                 }
                 this.closeDialog()
-            })
-        },
-        updateShiWuDaiLi () {
-            const list = []
-            const obj = {
-                where: {
-                    id_: this.formId
-                },
-                param: this.bpmAgent
-            }
-            delete this.bpmAgent.create_by_
-            delete this.bpmAgent.create_time_
-            list.push(obj)
-
-            const params1 = {
-                tableName: 't_swdl',
-                updList: list
-            }
-            this.$common.request('update', params1
-            ).then(response => {
-                this.getUpdate()
-                this.closeDialog()
-            })
-        },
-        getUpdate () {
-            const attrValueVoList = []
-            const partyAttrs = this.dailiRenXinxin.variables.partyAttrs
-            partyAttrs.forEach(item => {
-                if (item.values.length > 0) {
-                    const obj = {
-                        attrId: item.values[0].attrID
-                    }
-                    attrValueVoList.push(obj)
-                }
-            })
-
-            // 部门数据组装
-            const partyPositionsList = []
-            const partyPositions = this.dailiRenXinxin.variables.partyPositions
-            partyPositions.forEach(item => {
-                const obj = {
-                    id: item.id,
-                    name: item.name,
-                    isPrincipal: item.isPrincipal === 'Y',
-                    isMainPost: item.isMainPost === 'Y'
-                }
-                partyPositionsList.push(obj)
-            })
-
-            const roleVoList = []
-            this.daiLiroleListYuan.forEach(item => {
-                const obj = {
-                    id: item.id,
-                    name: item.name,
-                    subSystemName: item.subSystemName,
-                    source: item.source,
-                    canDelete: item.source === '自有'
-                }
-                roleVoList.push(obj)
-            })
-            if (this.bpmAgent.shi_fou_qi_yong_ === 'enabled') {
-                this.weiTuoroleListYuan.forEach(item => {
-                    const obj = {
-                        id: item.id,
-                        name: item.name,
-                        subSystemName: item.subSystemName,
-                        source: item.source,
-                        canDelete: item.source === '自有'
-                    }
-                    roleVoList.push(obj)
-                })
-            }
-
-            if (roleVoList.length > 0) {
-                const list = []
-                roleVoList.forEach(item => {
-                    list.push(item.id)
-                })
-                this.dailiRenXinxin.data.job = list.join(',')
-            }
-            console.log(this.dailiRenXinxin)
-            const params = {
-                attrValueVoList: attrValueVoList,
-                partyEmployeePo: this.dailiRenXinxin.data,
-                positionVoList: partyPositionsList,
-                roleVoList: roleVoList,
-                user: this.dailiRenXinxin.data,
-                userGroupPoList: []
-            }
-
-            console.log(params)
-            update(params).then(response => {
-
-            }).catch(() => {
-                this.dialogLoading = false
             })
         },
         // 关闭当前窗口
@@ -484,11 +328,9 @@ export default {
          * 获取表单数据
          */
         getFormData () {
-            console.log(this.id)
             if (this.$utils.isEmpty(this.formId)) {
                 // 重置表单
                 this.bpmAgent = JSON.parse(JSON.stringify(this.defaultForm))
-                this.formValidate()
                 return
             }
             this.dialogLoading = true
@@ -501,50 +343,11 @@ export default {
                 this.dialogLoading = false
             })
         },
-        addDef () {
-            alert('打开流程选择器')
-        },
         callbackDelegatorrInfo (value, data, type) {
             this.bpmAgent.wei_tuo_ren_xing_ = data.name
         },
         callbackAgenterInfo (value, data, type) {
             this.bpmAgent.dai_li_ren_xing_m = data.name
-        },
-        getWeiTuo (id, type = 1) {
-            if (!id) return
-            load({ employeeId: id })
-                .then((response) => {
-                    const data = response
-                    const partyRole = response.variables.partyRoles
-                    if (type === 1) {
-                        this.weiTuoroleListYuan = JSON.parse(JSON.stringify(partyRole))
-                        this.weiTuoroleList = partyRole || []
-                    }
-                    if (type === 2) {
-                        this.dailiRenXinxin = data
-                        // 新增选择代理人数据
-                        if (!this.formId) {
-                            this.daiLiroleListYuan = JSON.parse(JSON.stringify(partyRole))
-                        } else {
-                            // 修改选择代理人选择
-                            const parRoleList = []
-                            // 复原代理人 原来的角色
-                            partyRole.forEach(item => {
-                                const dataIndex = this.checkList1.findIndex(it => it === item.id)
-                                if (dataIndex < 0) {
-                                    parRoleList.push(item)
-                                }
-                            })
-                            this.daiLiroleListYuan = JSON.parse(JSON.stringify(parRoleList))
-                        }
-                        partyRole.forEach(item => {
-                            item.disabled = true
-                        })
-                        this.daiLiroleList = partyRole || []
-                    }
-                })
-                .catch(() => {
-                })
         },
 
         getImage () {
@@ -636,7 +439,9 @@ export default {
     }
 
     .transferBody {
-        height: 246px;
+        min-height: 246px;
+        max-height: 300px;
+        overflow-y:scroll;
     }
 }
 .radioBox {

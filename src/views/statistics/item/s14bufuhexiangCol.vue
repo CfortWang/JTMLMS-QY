@@ -49,7 +49,7 @@
     },
     data () {
       return {
-        title:'不符合项类型数量统计',
+        title:'不符合项各部门完成情况',
         dialogOff:false,
         measured:[]
       }
@@ -72,58 +72,54 @@
         // let beginInof = Number(this.data.t_complaintBegin.number)
         // let endInof = Number(this.data.t_complaintEnd.number)
         let s14bufuhexiang = echarts.init(document.getElementById(this.id))
-        // let beingDate=this.data.t_complaintBegin.date
-        // let endDate=this.data.t_complaintEnd.date
-        var option;
+        let option;
         let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
         let barNum = []
-        for (let i = 0; i < this.data.t_bfhxbgyjzcsjlbxNum.title.length-1; i++) {
-          barNum.push({
-            type: 'bar',
-            itemStyle: {color: barColor[i]},
-            label:{
-              normal:{
-                show:true,
-                position:'top',
-                        
+        for (let i = 0; i < this.data.num.title.length-1; i++) {
+          if(i==this.data.num.title.length-2){
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                show: true,
+				        formatter:function(params){ //标签内容
+                console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
+					        return  params.value[params.seriesName]+'%'
+					      },
+                position: 'top',
                 textStyle:{
-                  fontSize:16,
-                  color:'#B0CEFC'
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+              }
+            })
+          }else{
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                normal:{
+                  show:true,
+                  position:'top',
+                          
+                  textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
                 }
               }
-            }
-          })
+            })
+          }
           
         }  
-        //v3
-        // let e=[this.data.t_bfhxbgyjzcsjlbxNum.numberAll[0],this.data.t_bfhxbgyjzcsjlbxNum.number[0]]
-        // let e=[this.data.t_mjsyshdfxsbykzjhxbNum.number[0],this.data.t_mjsyshdfxsbykzjhxbNum.numberAll[0],this.data.t_mjsyshdfxsbykzjhxbNum.res[0]]
 
         option = {
             title: {
             text: this.title,
             textStyle:{ fontSize:14,color: this.colorw }
           },
-          // tooltip: {
-          //               trigger: 'axis',
-          //               axisPointer: {
-          //                 type: 'shadow'
-          //               },
-          //               formatter: function (datas) {
-          //                 // console.log(datas)
-          //                   var res=datas[0].name+"<BR>"+'期间核查次数:'+datas[0].data+"<BR>期间核查完成次数"+datas[1].data
-          //                   // res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
-          //                   return res
-          //               }
-          // },
-          // legend: {
-          //   textStyle: {
-          //       color: '#B0CEFC'  // 图例文字颜色
-          //   }
-
-          // },
           grid: {
-                top: '10%',
+                top: '20%',
                 left: '3%',
                 right: '4%',
                 bottom: '5%',
@@ -135,12 +131,12 @@
             axisLabel: {
               show: true,
               textStyle: {
-                color: '#fff'   //这里用参数代替了
+                color: this.colorw   //这里用参数代替了
               }
             },
             axisLine:{
               lineStyle:{
-                color:'#fff',
+                color:this.colorw,
                 width:1, //x轴线的宽度
               }
             }
@@ -150,19 +146,19 @@
             axisLabel: {
               show: true,
               textStyle: {
-                color: '#fff'    //这里用参数代替了
+                color: this.colorw    //这里用参数代替了
               }
             },
             axisLine:{
               lineStyle:{
-                color:'#fff',
+                color:this.colorw,
                 width:1, //x轴线的宽度
               }
             }
           },
           dataset: {
-            dimensions: this.data.t_bfhxbgyjzcsjlbxNum.title,
-            source: this.data.t_bfhxbgyjzcsjlbxNum.number
+            dimensions: this.data.num.title,
+            source: this.data.num.number
           },
           series: barNum,
           dataZoom: [

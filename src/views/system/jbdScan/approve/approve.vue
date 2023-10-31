@@ -35,10 +35,10 @@
                             <div v-if="activeIndex == 5" style="width: 60%;position: relative;">
                                 <div ref="Echart2" class="chart" />
                             </div> -->
-                            <div style="width:40%;position: relative;">
+                            <div style="width:30%;position: relative;">
                                 <div ref="Echart" class="chart" />
                             </div>
-                            <div style="width: 60%;position: relative;">
+                            <div style="width: 70%;position: relative;">
                                 <div ref="Echart2" class="chart" />
                             </div>
 

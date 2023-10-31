@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -31,11 +32,11 @@
       },
       height:{
         type:String,
-        default: window.screen.height/5+"px"
+        default: "100%"
       },
       id:{
         type:String,
-        default:"s9neibu"
+        default:"s9neibufb"
       },
       click:{
         type:String,
@@ -48,7 +49,7 @@
     },
     data () {
       return {
-        title:'质量控制数量',
+        title:'内部比对实验各部门完成率',
         dialogOff:false,
         measured:[]
       }
@@ -70,72 +71,108 @@
 
         // let beginInof = Number(this.data.t_complaintBegin.number)
         // let endInof = Number(this.data.t_complaintEnd.number)
-        let s9neibu = echarts.init(document.getElementById(this.id))
-        // let beingDate=this.data.t_complaintBegin.date
-        // let endDate=this.data.t_complaintEnd.date
-        var option;
-        let e=[this.data.t_mjzlkzxbNum.numberAll,this.data.t_mjzlkzxbNum.number]
-        //v3
-        // let e=[this.data.t_complaintNum.number[0],this.data.t_complaintNum.numberAll[0],this.data.t_complaintNum.res[0]]
+        let s9neibucol = echarts.init(document.getElementById(this.id))
+        let option;
+        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barNum = []
+        for (let i = 0; i < this.data.num.title.length-1; i++) {
+          if(i==this.data.num.title.length-2){
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                show: true,
+				        formatter:function(params){ //标签内容
+                console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
+					        return  params.value[params.seriesName]+'%'
+					      },
+                position: 'top',
+                textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+              }
+            })
+          }else{
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                normal:{
+                  show:true,
+                  position:'top',
+                          
+                  textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+                }
+              }
+            })
+          }
+          
+        }  
 
         option = {
-            legend: {},
-            tooltip: {
-              trigger: 'axis',
-              axisPointer: {
-                type: 'shadow'
-              },
-              // formatter: function (params) {
-              //   return params[0].data[0] + '<br/>满意份数：' + params[0].data[1] + '<br/>调查总份数: ' + params[0].data[2];
-              // }
-            },
-            // dataset: {
-            //   source: barData
-            // },
-            xAxis: { 
-              type: 'category',
-              data:['内部比对实验计划总数', '内部比对实验计划已完成数量']
-
-            },
-            yAxis: [
-              {
-                type: 'value',
-                scale: true,
-                name: '数量',
-                // max: this.data.t_sbhcjlbNum.valnum>this.data.t_sbhcjlbNum.valAll?this.data.t_sbhcjlbNum.valnum+1:this.data.t_sbhcjlbNum.valAll+1,
-                min: 0,
-              },
-            ],
-            series: [
-              {
-                data: e,
-                type: 'bar',
-                barWidth: '20%',
-                itemStyle: {
-                  color: '#0099ff'
-                },
-                label: {
-                  show: true,
-                  position: 'top'
-                },
-              }
-            ],
-            grid: {
-              top: '20%',
-              left: '3%',
-              right: '4%',
-              bottom: '10%',
-              containLabel: true
-            },
             title: {
-              text: this.title,
-              textStyle:{ fontSize:14,color: this.colorw }
-
-              // subtext: "        "+beingDate+"-"+endDate
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
+          },
+          grid: {
+                top: '20%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
+          },
+          xAxis: { 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw   //这里用参数代替了
+              }
             },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          yAxis: {
+            splitLine:{show: false},
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw   //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          dataset: {
+            dimensions: this.data.num.title,
+            source: this.data.num.number
+          },
+          series: barNum,
+          dataZoom: [
+            {
+                id: 'dataZoomY',
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty'
+            }
+          ],
+       
         };
 
-        option && s9neibu.setOption(option);
+        option && s9neibucol.setOption(option);
       }
     }
   }

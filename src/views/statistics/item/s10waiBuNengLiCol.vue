@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -31,11 +32,11 @@
       },
       height:{
         type:String,
-        default: window.screen.height/2+"px"
+        default: "100%"
       },
       id:{
         type:String,
-        default:"s10waiBuNengLi"
+        default:"s10waiBuNengLifb"
       },
       click:{
         type:String,
@@ -48,7 +49,7 @@
     },
     data () {
       return {
-        title:'能力验证计划完成情况',
+        title:'外部质量评价各部门完成情况',
         dialogOff:false,
       }
     },
@@ -66,166 +67,108 @@
        }
       },
       drawLine(){
-        let s10waiBuNengLi = echarts.init(document.getElementById(this.id))
-         
-
+        let s10waiBuNengLicol = echarts.init(document.getElementById(this.id))
+        let option;
+        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barNum = []
+        for (let i = 0; i < this.data.num.title.length-1; i++) {
+          if(i==this.data.num.title.length-2){
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                show: true,
+				        formatter:function(params){ //标签内容
+                console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
+					        return  params.value[params.seriesName]+'%'
+					      },
+                position: 'top',
+                textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+              }
+            })
+          }else{
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                normal:{
+                  show:true,
+                  position:'top',
+                          
+                  textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+                }
+              }
+            })
+          }
           
-        // let beginInof = GetPercent(Number(this.data.t_sbhcjlbBegin.number),Number(this.data.t_sbhcjhBegin.number))
-        // let endInof = GetPercent(Number(this.data.t_sbhcjlbEnd.number),Number(this.data.t_sbhcjhEnd.number))
-         
-        //  let data1 = [];
-        //  data1.push(this.data.t_sbhcjhBegin.number);
-        //  data1.push(this.data.t_sbhcjhEnd.number);
-        //  let data2 = [];
-        //  data2.push(this.data.t_sbhcjlbBegin.number);
-        //  data2.push(this.data.t_sbhcjlbEnd.number);
-        //  let data3 = [];
-        //  data3.push(this.data.t_sbhcjlbBegin.date);
-        //  data3.push(this.data.t_sbhcjlbEnd.date);
-        //  let max1=GetMax(data1)+1;
-        //  let max2=GetMax(data2)+1;
-        //  let maxVal=max1>max2?max1:max2;
-        //  console.log("max1:",max1,"max2:",max2);
-       let option = {
-           //v3
-          title: {
+        }  
+
+        option = {
+            title: {
             text: this.title,
             textStyle:{ fontSize:14,color: this.colorw }
-
-            // subtext: this.data.Num.date+"年"
           },
-          tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                          type: 'shadow'
-                        },
-                        formatter: function (datas) {
-                          console.log(datas)
-                            var res=datas[0].name+"<BR>"+'能力计划次数:'+datas[0].data+"<BR>"
-                            // res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
-                            return res
-                        }
-          },
-          legend: {},
           grid: {
-                top: '10%',
+                top: '20%',
                 left: '3%',
                 right: '4%',
                 bottom: '5%',
                 containLabel: true
-                    },
-          xAxis: {
-            type: 'value',
-            boundaryGap: [0, 0.01]
+          },
+          xAxis: { 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw   //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
           },
           yAxis: {
-            type: 'category',
-            data: this.data.Num.name,
+            splitLine:{show: false},
             axisLabel: {
-                show: true, // 是否显示X轴的内容，不包含两端的文字
-                interval: 0,
-                // rotate: '50', // 旋转50°
-                lineHeight: 18,
-                formatter: function(params) {
-                  //  console.log('formatter', params, params.length)
-                  var newParamsName = ''// 最终拼接成的字符串
-                  var paramsNameNumber = params.length// 实际标签的个数
-                  var provideNumber = 8// 每行能显示的字的个数
-                  // 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
-                  if (paramsNameNumber > provideNumber) {
-                    newParamsName = params.substring(0, 8) + '..'// 最终拼成的字符串
-                  } else { // 将旧标签的值赋给新标签
-                    newParamsName = params
-                  }
-                  // 将最终的字符串返回
-                  return newParamsName
-                }
-              },
-          },
-          series: [
-            {
-              type: 'bar',
-              data: this.data.Num.number,
-              itemStyle: {color: '#669900'},
-              label: {
-                show: true,
-                position: 'right'
-              },
+              show: true,
+              textStyle: {
+                color: this.colorw   //这里用参数代替了
+              }
             },
-            // {
-            //   type: 'bar',
-            //   data: this.data.Num.numberAll
-            // },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          dataset: {
+            dimensions: this.data.num.title,
+            source: this.data.num.number
+          },
+          series: barNum,
+          dataZoom: [
+            {
+                id: 'dataZoomY',
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty'
+            }
           ],
-                dataZoom: [
-        {
-            id: 'dataZoomY',
-            type: 'inside',
-            yAxisIndex: [0],
-            filterMode: 'empty'
-        }
-      ],
-         //v1
-        //   grid: {
-        //         top: '20%',
-        //         left: '3%',
-        //         right: '4%',
-        //         bottom: '10%',
-        //         containLabel: true
-        //     },
-        //    tooltip: {
-        //           trigger: 'axis',
-        //           axisPointer: {
-        //             type: 'shadow'
-        //           },
-        //           formatter: function (datas) {
-        //               var res='计划:'+datas[0].value+"<BR>"
-        //               res+='记录:'+datas[1].value+"<BR>"
-        //               res+='百分比:'+(datas[0].value==null||datas[0].value==0?"0.00":(datas[1].value/datas[0].value*100).toFixed(2))+"%"
-        //               return res
-        //           }
-        //    },
-        // title: {
-        //      text: this.title,
-        //      subtext: this.data.t_sbhcjlbBegin.date+"-"+this.data.t_sbhcjlbEnd.date+"年核查次数"
-        //      //subtext: this.data.t_sbhcjhBegin.date+'完成率为:' + beginInof +'\n'+this.data.t_sbhcjhEnd.date+'完成率为:'+endInof,
-        // },
-        // color: ['#003366', '#006699', '#4cabce', '#e5323e'],
-        //    legend: {
-        //      show:false
-        //  },
-        //  xAxis: [
-        //      {
-        //          type: 'category',
-        //          axisTick: {show: false},
-        //          data: data3
-        //      }
-        //  ],
-        //  yAxis:  [
-        //      {
-        //        max:maxVal,
-        //        min:0,
-        //          type: 'value'
-        //      }
-        //  ] 
-        //  ,
-        //  series: [
-        //     {
-        //          name: '计划条数',
-        //          type: 'bar',
-        //          barGap: 0,
-        //          data: data1
-        //    },
-        //     {
-        //          name: '记录条数',
-        //          type: 'bar',
-        //          barGap: 0,
-        //          data: data2
-        //    },
-        //  ]
-       };
+       
+        };
 
-       option && s10waiBuNengLi.setOption(option);
+       option && s10waiBuNengLicol.setOption(option);
       }
     }
   }

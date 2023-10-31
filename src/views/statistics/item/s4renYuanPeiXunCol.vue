@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -32,11 +33,11 @@
       },
       height:{
         type:String,
-        default: window.screen.height/5+"px"
+        default: "100%"
       },
       id:{
         type:String,
-        default:"s4renyuanPeiXun"
+        default:"s4renyuanPeiXunfb"
       },
       click:{
         type:String,
@@ -49,7 +50,7 @@
     },
     data () {
       return {
-        title:'人员培训数量',
+        title:'在岗人员培训各部门完成率',
         dialogOff:false,
       }
     },
@@ -67,217 +68,110 @@
        }
       },
       drawLine(){
-        let s4renYuanPeiXun = echarts.init(document.getElementById(this.id))
+        let s4renYuanPeiXunfb = echarts.init(document.getElementById(this.id))
 
-        // let beginInof = GetPercent(Number(this.data.t_rypxjlnkBegin.number),Number(this.data.t_ryndpxjhBegin.number))
-        // let endInof = GetPercent(Number(this.data.t_rypxjlnkEnd.number),Number(this.data.t_ryndpxjhEnd.number))
-
-        //  let data1 = [];
-        //  data1.push(this.data.t_ryndpxjhBegin.number);
-        //  data1.push(this.data.t_ryndpxjhEnd.number);
-        //  let data2 = [];
-        //  data2.push(this.data.t_rypxjlnkBegin.number);
-        //  data2.push(this.data.t_rypxjlnkEnd.number);
-        //  let data3 = [];
-        //  data3.push(this.data.t_rypxjlnkBegin.date);
-        //  data3.push(this.data.t_rypxjlnkEnd.date);
-
-
-        // let barData = []
-        // for (let i = 0; i < this.data.t_ryywpxjlNum.date.length; i++) {
-        //   let e=[this.data.t_ryywpxjlNum.date[i],this.data.t_ryywpxjlNum.number[i],this.data.t_ryywpxjlNum.numberAll[i]]
-        //   barData.push(e)
-        // }
-        //  let e=[this.data.t_ryywpxjlNum.number[0],this.data.t_ryywpxjlNum.numberAll[0],this.data.t_ryywpxjlNum.res[0]]
-         let e=[this.data.t_ryywpxjlNum.numberAll,this.data.t_ryywpxjlNum.number]
-        //  console.log(this.data.t_ryywpxjlNum.numberAll,this.data.t_ryywpxjlNum.number,'577777777777777777777777777777777')
-
-        var option;
-        option = {
-          //v3
-            legend: {},
-            tooltip: {
-              trigger: 'axis',
-              axisPointer: {
-                type: 'shadow'
-              },
-              // formatter: function (params) {
-              //   return params[0].data[0] + '<br/>满意份数：' + params[0].data[1] + '<br/>调查总份数: ' + params[0].data[2];
-              // }
-            },
-            // dataset: {
-            //   source: barData
-            // },
-            xAxis: { 
-              type: 'category',
-              // data:['已完成数量', '所有数量', '培训完成率']
-              data:['所有培训数量','已完成培训数量']
-
-            },
-            yAxis: [
-              {
-                type: 'value',
-                scale: true,
-                name: '次数',
-                // max: this.data.t_ryywpxjlNum.number[0]>this.data.t_ryywpxjlNum.numberAll[0]?this.data.t_ryywpxjlNum.number[0]+1:this.data.t_ryywpxjlNum.numberAll[0]+1,
-                min: 0,
-                // boundaryGap: [0.2, 0.2]
-              },
-              // {
-              //   type: 'value',
-              //   scale: true,
-              //   name: '培训完成率',
-              //   max: this.data.t_ryywpxjlNum.res[0],
-              //   min: 0,
-              //   axisLabel: {
-              //     formatter: '{value} %'
-              //   }
-              // }
-            ],
-            // Declare several bar series, each will be mapped
-            // to a column of dataset.source by default.
-            // series: [{ type: 'bar' }],
-            series: [
-              {
-                data: e,
-                type: 'bar',
-                barWidth: '20%',
-                itemStyle: {
-                  color: '#cc3366'
-                },
-                label: {
-                  show: true,
-                  position: 'top'
-                },
+        let option;
+        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barNum = []
+        for (let i = 0; i < this.data.num.title.length-1; i++) {
+          if(i==this.data.num.title.length-2){
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                show: true,
+				        formatter:function(params){ //标签内容
+                console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
+					        return  params.value[params.seriesName]+'%'
+					      },
+                position: 'top',
+                textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
               }
-            ],
-            grid: {
-              top: '20%',
-              left: '3%',
-              right: '4%',
-              bottom: '10%',
-              containLabel: true
-            },
+            })
+          }else{
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                normal:{
+                  show:true,
+                  position:'top',
+                          
+                  textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+                }
+              }
+            })
+          }
+          
+        }  
+
+        option = {
             title: {
-              text: this.title,
-              textStyle:{ fontSize:14,color: this.colorw }
-
-              // subtext: "        "+beingDate+"-"+endDate
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
+          },
+          grid: {
+                top: '20%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
+          },
+          xAxis: { 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw   //这里用参数代替了
+              }
             },
-          //v2
-        //     legend: {},
-        //     tooltip: {
-        //       trigger: 'axis',
-        //       axisPointer: {
-        //         type: 'shadow'
-        //       },
-        //       formatter: function (params) {
-        //         return params[0].data[0] + '<br/>已完成培训数量：' + params[0].data[1]+ '<br/>所有培训数量：' + params[0].data[2];
-        //       }
-        //     },
-        //     dataset: {
-        //       source: barData
-        //     },
-        //     xAxis: { type: 'category' },
-        //     yAxis: {
-        //       type: 'value',
-        //       axisLabel: {
-        //         show: true,
-        //         textStyle:{color:'#000'},
-        //         interval: 'auto',
-        //         // formatter: '{value} %'
-        //       },
-            
-        //     },
-        //     // Declare several bar series, each will be mapped
-        //     // to a column of dataset.source by default.
-        //     series: [{ type: 'bar'},{ type: 'bar'}],
-        //     grid: {
-        //       top: '20%',
-        //       left: '3%',
-        //       right: '4%',
-        //       bottom: '10%',
-        //       containLabel: true
-        //     },
-        //     title: {
-        //       text: this.title,
-        //       subtext: "        "+this.data.t_ryywpxjlNum.date[0]+"-"+this.data.t_ryywpxjlNum.date[this.data.t_ryywpxjlNum.date.length-1]
-        //     },
-        //v1
-          // title: {
-          //   text: this.title,
-          //   subtext: this.data.t_rypxjlnkBegin.date+"-"+this.data.t_rypxjlnkEnd.date+"年培训次数"
-          // },
-          // tooltip: {
-          //        trigger: 'axis',
-          //        axisPointer: {
-          //          type: 'shadow'
-          //        },
-          //        formatter: function (datas) {
-          //            var res='计划:'+datas[0].value+"<BR>"
-          //            res+='记录:'+datas[1].value+"<BR>"
-          //            res+='百分比:'+(datas[0].value==null||datas[0].value==0?"0.00":(datas[1].value/datas[0].value*100).toFixed(2))+"%"
-          //            return res
-          //        }
-          // },
-          // legend: {show:false},
-          //  grid: {
-          //       top: '20%',
-          //       left: '3%',
-          //       right: '4%',
-          //       bottom: '10%',
-          //       containLabel: true
-          //   },
-          // xAxis: {
-          //   type: 'category',
-          //   data: data3
-            
-          // },
-          // yAxis: {
-          //   type: 'value',
-          //   boundaryGap: [0, 0.01]
-          // },
-          // series: [
-
-          //   {
-          //     name: ['计划'],
-          //     type: 'bar',
-          //     data: data1,
-          //     itemStyle: {
-          //           normal: {
-          //               color: function(params) {
-          //                   var colorList = [
-          //                     '#FE8463','#9BCA63','#FCCE10','#E87C25','#27727B',
-          //                      '#FE8463','#9BCA63','#FAD860','#F3A43B','#60C0DD',
-          //                      '#D7504B','#C6E579','#F4E001','#F0805A','#26C0C0'
-          //                   ];
-          //                   return colorList[params.dataIndex]
-          //               },
-          //           }
-          //       },
-          //   },
-          //   {
-          //     name: ['记录'],
-          //     type: 'bar',
-          //     data: data2,
-          //     itemStyle: {
-          //           normal: {
-          //               color: function(params) {
-          //                   var colorList = [
-          //                     '#E87C25','#FAD860','#FCCE10','#E87C25','#27727B',
-          //                      '#FE8463','#9BCA63','#FAD860','#F3A43B','#60C0DD',
-          //                      '#D7504B','#C6E579','#F4E001','#F0805A','#26C0C0'
-          //                   ];
-          //                   return colorList[params.dataIndex]
-          //               },
-          //           }
-          //       },
-          //   }
-          // ]
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          yAxis: {
+            splitLine:{show: false},
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw    //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          dataset: {
+            dimensions: this.data.num.title,
+            source: this.data.num.number
+          },
+          series: barNum,
+          dataZoom: [
+            {
+                id: 'dataZoomY',
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty'
+            }
+          ],
+       
         };
 
 
-       option && s4renYuanPeiXun.setOption(option);
+       option && s4renYuanPeiXunfb.setOption(option);
       }
     }
   }

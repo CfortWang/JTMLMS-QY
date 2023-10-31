@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <!-- <div>2323</div> -->
@@ -33,11 +34,11 @@
       },
       height:{
         type:String,
-        default: window.screen.height/5+"px"
+        default: "100%"
       },
       id:{
         type:String,
-        default:"s1zhiLiangMuBiao"
+        default:"s1zhiLiangMuBiaofb"
       },
       click:{
         type:String,
@@ -50,7 +51,7 @@
     },
     data () {
       return {
-        title:'管理评审计划完成数量统计',
+        title:'管理评审各部门完成情况',
         dialogOff:false,
       }
     },
@@ -68,85 +69,107 @@
        }
       },
       drawLine(){
-        let s5zhiLiangMuBiao = echarts.init(document.getElementById(this.id))
-        let e=[]
-        e=[this.data.t_jchzbNum.numberAll,this.data.t_jchzbNum.number]
-      
-        let option = {
-          //v3
-          legend: {},
-            tooltip: {
-              trigger: 'axis',
-              axisPointer: {
-                type: 'shadow'
-              },
-            },
-            xAxis: { 
-              type: 'category',
-              data:['计划完成数', '计划未完成数量'],
-              // data:['有效检测任务总数', '及时完成的检测项目数量','未及时完成的检测项目数量','未完成的检测项目数量'],
-              axisLabel: {  
-                interval: 0,  
-                formatter:function(value){  
-                    var ret = "";//拼接加\n返回的类目项  
-                    var maxLength = 5;//每项显示文字个数  
-                    var valLength = value.length;//X轴类目项的文字个数  
-                    var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数  
-                    if (rowN > 1)//如果类目项的文字大于5,  
-                    {  
-                        for (var i = 0; i < rowN; i++) {  
-                            var temp = "";//每次截取的字符串  
-                            var start = i * maxLength;//开始截取的位置  
-                            var end = start + maxLength;//结束截取的位置  
-                      //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧  
-                            temp = value.substring(start, end) + "\n";  
-                            ret += temp; //凭借最终的字符串  
-                        }  
-                        return ret;  
-                    }  
-                    else {  
-                        return value;  
-                    }  
-                }  
-            } 
-
-            },
-            yAxis: [
-              {
-                type: 'value',
-                scale: true,
-                name: '数量',
-                min: 0,
-              },
-            ],
-            series: [
-              {
-                data: e,
-                type: 'bar',
-                barWidth: '20%',
-                itemStyle: {
-                  color: '#0099ff'
-                },
-                label: {
-                  show: true,
-                  position: 'top'
-                },
+        let s5zhiLiangMuBiaocol = echarts.init(document.getElementById(this.id))
+        let option;
+        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barNum = []
+        for (let i = 0; i < this.data.num.title.length-1; i++) {
+          if(i==this.data.num.title.length-2){
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                show: true,
+				        formatter:function(params){ //标签内容
+                console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
+					        return  params.value[params.seriesName]+'%'
+					      },
+                position: 'top',
+                textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
               }
-            ],
-            grid: {
-              top: '20%',
-              left: '3%',
-              right: '4%',
-              bottom: '10%',
-              containLabel: true
-            },
-            title: {
-              text: this.title,
-              textStyle:{ fontSize:14,color: this.colorw }
-            },
+            })
+          }else{
+            barNum.push({
+              type: 'bar',
+              itemStyle: {color: barColor[i]},
+              label:{
+                normal:{
+                  show:true,
+                  position:'top',
+                          
+                  textStyle:{
+                    fontSize:16,
+                    color:'#B0CEFC'
+                  }
+                }
+              }
+            })
+          }
           
+        }  
+
+        option = {
+            title: {
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
+          },
+          grid: {
+                top: '20%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
+          },
+          xAxis: { 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw  //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          yAxis: {
+            splitLine:{show: false},
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw    //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          },
+          dataset: {
+            dimensions: this.data.num.title,
+            source: this.data.num.number
+          },
+          series: barNum,
+          dataZoom: [
+            {
+                id: 'dataZoomY',
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty'
+            }
+          ],
+       
         };
-        option && s5zhiLiangMuBiao.setOption(option);
+        option && s5zhiLiangMuBiaocol.setOption(option);
       }
     }
   }

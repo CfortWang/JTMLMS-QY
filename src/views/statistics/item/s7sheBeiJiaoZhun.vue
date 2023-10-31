@@ -1,5 +1,6 @@
 <template>
-  <div @click="toDetailed()" class="statisticsPage" :style="{width:width}">
+  <!-- <div @click="toDetailed()" class="statisticsPage" :style="{width:width}"> -->
+  <div class="statisticsPage" :style="{width:width}">
     <div :id="id" :style="{height:height}"/>
     <!-- 打开详情弹窗-->
     <div v-if="dialogOff">
@@ -49,7 +50,7 @@
     },
     data () {
       return {
-        title:'设备检定/校准计划完成情况',
+        title:'设备检定/校准完成情况',
         dialogOff:false,
       }
     },
