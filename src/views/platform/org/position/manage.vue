@@ -22,6 +22,7 @@
                     v-if="show==='detail'"
                     :id="positionId"
                     :readonly="readonly"
+                    :depth="depth"
                 />
                 <edit
                     v-else-if="show==='edit'"
@@ -85,6 +86,7 @@ export default {
     mixins: [FixHeight],
     data () {
         return {
+            depth: 0,
             show: '',
             width: 230,
             height: document.clientHeight,
@@ -231,11 +233,12 @@ export default {
             this.positionId = id
         },
         // 树点击
-        handleNodeClick (data) {
+        handleNodeClick (data, node) {
             if (data.id === 0 || data.id === '0') {
                 this.show = 'empty'
                 return
             }
+            this.depth = data.depth || 0
             this.readonly = true
             this.positionId = data.id + ''
             this.show = 'detail'
