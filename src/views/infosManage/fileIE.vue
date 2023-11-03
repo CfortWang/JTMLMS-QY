@@ -431,23 +431,29 @@ export default {
           this.refreshData()
           break
         case 'remove':
-          if (selection.length == 0) {
+          console.log('selection', selection)
+          console.log('data', data)
+
+          if (data.length == 0) {
             this.$message({
               message: '请选择数据再进行删除',
               type: 'error'
             })
           }
-          const ids = selection.join(',')
+          let ids = []
+          for (var i of data) {
+            ids.push(i.id_)
+          }
           const deleteParams = {
             tableName: 't_ywyxjlb',
-            paramWhere: { id_: ids }
+            paramWhere: { id_: ids.join(',') }
           }
           curdPost('delete', deleteParams).then(() => {
             this.$message({
               message: '删除成功！',
               type: 'warning'
             })
-            this.search()
+            this.refreshData()
           })
 
           break

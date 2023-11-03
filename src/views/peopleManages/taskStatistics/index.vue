@@ -166,11 +166,7 @@ export default {
         //学位学历
         data: [
           {
-            name: "博士",
-            value: 0,
-          },
-          {
-            name: "硕士",
+            name: " 大专",
             value: 0,
           },
           {
@@ -178,11 +174,15 @@ export default {
             value: 0,
           },
           {
-            name: " 大专",
+            name: "硕士",
             value: 0,
           },
+          {
+            name: "博士",
+            value: 0,
+          }
         ],
-        color: ["#FFFF00", "#99CC00", "#6666FF", "#c91f37"],
+        color: ["#c91f37", "#6666FF", "#99CC00", "#FFFF00"],
         config: { title: "学历学位统计", idSelector: "degreeId" },
       },
       // 职称统计图配置
@@ -190,7 +190,7 @@ export default {
         //职称
         data: [
           {
-            name: "高级",
+            name: "初级",
             value: 0,
           },
           {
@@ -198,11 +198,13 @@ export default {
             value: 0,
           },
           {
-            name: "初级",
+            name: "高级",
             value: 0,
           },
+
+
         ],
-        color: ["#eacd76", "#896c39", "#9b4400"],
+        color: ["#9b4400", "#896c39", "#eacd76"],
         config: { title: "职称统计", idSelector: "ranksid" },
       },
       // 部门学位学历信息统计配置表
@@ -653,21 +655,22 @@ export default {
       if (data.length == 0 || data[0] == null) {
         return
       }
-      this.degreePieData.data[0].value = data[0].doctor ? data[0].doctor : 0;
-      this.degreePieData.data[1].value = data[0].Master ? data[0].Master : 0;
-      this.degreePieData.data[2].value = data[0].undergraduate
-        ? data[0].undergraduate
-        : 0;
-      this.degreePieData.data[3].value = data[0].gaoZhong
+      this.degreePieData.data[0].value = data[0].gaoZhong
         ? data[0].gaoZhong
         : 0;
-      this.ranksPieData.data[0].value = data[0].senior ? data[0].senior : 0;
+      this.degreePieData.data[1].value = data[0].undergraduate
+        ? data[0].undergraduate
+        : 0;
+      this.degreePieData.data[2].value = data[0].Master ? data[0].Master : 0;
+      this.degreePieData.data[3].value = data[0].doctor ? data[0].doctor : 0;
+
+      this.ranksPieData.data[0].value = data[0].elementary
+        ? data[0].elementary
+        : 0;
       this.ranksPieData.data[1].value = data[0].middleRank
         ? data[0].middleRank
         : 0;
-      this.ranksPieData.data[2].value = data[0].elementary
-        ? data[0].elementary
-        : 0;
+      this.ranksPieData.data[2].value = data[0].senior ? data[0].senior : 0;
     },
     // 部门信息统计
     positionsInfoData() {
@@ -717,7 +720,7 @@ export default {
               degreeSeriesDatas[i].data[t] = data[t][shuZuList[i]];
             }
             for (let i = 0; i < ranksSeriesDatas.length; i++) {
-              ranksSeriesDatas[i].data[t] = data[t][shuZuList[i]];
+              ranksSeriesDatas[i].data[t] = data[t][shuZuList[i + 4]];
             }
           }
           this.PositionsDegreeOption.series = degreeSeriesDatas;

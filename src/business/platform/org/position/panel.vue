@@ -238,19 +238,15 @@ export default {
                         const frist = this.$store.getters.level.first || ''
                         if ((type === '1' || type === '2') && this.filtrate && frist) {
                             const showBoo = arr.some((item) => item.id === frist)
-                            if (showBoo) {
-                                arrList = arr.filter((item) => item.id === frist)
-                            } else {
-                                arrList = arr
-                            }
+                            arrList = showBoo ? arr.filter(item => item.id === frist) : arr
                         } else {
                             arrList = arr
                         }
 
                         if (type === '2') {
-                            this.getPosiData(arrList, true, true)
+                            this.getPosiData(arrList, true, true, type)
                         } else if (type === '1') {
-                            this.disabledDotCount(arrList)
+                            this.disabledDotCount(arrList, type)
                         }
 
                         if (this.$utils.isEmpty(node.data)) {
@@ -279,19 +275,15 @@ export default {
                     const second = this.$store.getters.level.second || ''
                     if ((type === '1' || type === '2') && this.filtrate && second) {
                         const showBoo = arr.some((item) => item.id === second)
-                        if (showBoo) {
-                            arrList = arr.filter((item) => item.id === second)
-                        } else {
-                            arrList = arr
-                        }
+                        arrList = showBoo ? arr.filter((item) => item.id === second) : arr
                     } else {
                         arrList = arr
                     }
 
                     if (type === '2') {
-                        this.getPosiData(arrList, node.data.disabled, node.data.disabledShow)
+                        this.getPosiData(arrList, node.data.disabled, node.data.disabledShow, type)
                     } else if (type === '1') {
-                        this.disabledDotCount(arrList)
+                        this.disabledDotCount(arrList, type)
                     }
 
                     resolve(this.toTree(arrList))
@@ -301,7 +293,7 @@ export default {
                 })
             }
         },
-        getPosiData (arrList, disabled, disabledShow = false) {
+        getPosiData (arrList, disabled, disabledShow = false, type) {
             const positions = this.$store.getters.userInfo.employee.positions
             if (positions) {
                 const positionsList = positions.split(',')
@@ -331,15 +323,16 @@ export default {
                     }
                 })
             }
-            this.disabledDotCount(arrList)
+            this.disabledDotCount(arrList, type)
         },
-        disabledDotCount (arrList) {
+        disabledDotCount (arrList, type = 1) {
+            const isSuper = this.$store.getters.isSuper
             let dotCount = 0
             if (arrList && Array.isArray(arrList) && arrList.length > 0 && arrList[0].path) {
                 dotCount = arrList[0].depth
             }
             //
-            if (dotCount <= 2) {
+            if (((type === '1' && !isSuper) || (type === '2')) && dotCount <= 2) {
                 arrList.forEach(item => {
                     item.disabled = true
                 })

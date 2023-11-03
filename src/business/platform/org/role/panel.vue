@@ -86,7 +86,7 @@ export default {
         columns: [
           { prop: 'name', label: '角色名' },
           { prop: 'roleAlias', label: '角色别名' },
-          { prop: 'subSystemName', label: '子系统名称' }
+        //   { prop: 'subSystemName', label: '子系统名称111' }
         ]
       }
     }

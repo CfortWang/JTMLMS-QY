@@ -82,24 +82,24 @@ export default {
                             list.push(obj)
                             const obj1 = {
                                 name: resData[index],
-                                value: item.fen_shu_1_
+                                value: parseInt(item.fen_shu_1_)
                             }
                             list1.push(obj1)
                             const obj2 = {
                                 name: resData[index],
-                                value: item.fen_shu_2_
+                                value: parseInt(item.fen_shu_2_)
                             }
                             list2.push(obj2)
 
                             const obj3 = {
                                 name: resData[index],
-                                value: item.fen_shu_3_
+                                value: parseInt(item.fen_shu_3_)
                             }
                             list3.push(obj3)
 
                             const obj4 = {
                                 name: resData[index],
-                                value: item.fen_shu_4_
+                                value: parseInt(item.fen_shu_4_)
                             }
                             list4.push(obj4)
                         })
@@ -107,26 +107,25 @@ export default {
                         const accept = echarts.init(this.$refs.Echart)
                         accept.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list, titleData))))
 
-                        this.show1 = list1.every(item => item.value !== '0')
+                        this.show1 = list1.some(item => item.value !== 0)
                         if (this.show1) {
                             const accept1 = echarts.init(this.$refs.Echart1)
                             accept1.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list1, titleData1))))
                         }
 
-                        this.show2 = list2.every(item => item.value !== '0')
-                        console.log(this.show2,list2)
+                        this.show2 = list2.some(item => item.value !== 0)
                         if (this.show2) {
                             const accept2 = echarts.init(this.$refs.Echart2)
                             accept2.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list2, titleData2))))
                         }
 
-                        this.show3 = list3.every(item => item.value !== '0')
+                        this.show3 = list3.some(item => item.value !== 0)
                         if (this.show3) {
                             const accept3 = echarts.init(this.$refs.Echart3)
                             accept3.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list3, titleData3))))
                         }
 
-                        this.show4 = list4.every(item => item.value !== '0')
+                        this.show4 = list4.some(item => item.value !== 0)
                         if (this.show4) {
                             const accept4 = echarts.init(this.$refs.Echart4)
                             accept4.setOption(JSON.parse(JSON.stringify(this.barData(legendData, list4, titleData4))))
