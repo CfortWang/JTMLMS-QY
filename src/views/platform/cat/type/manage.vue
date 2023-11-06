@@ -171,7 +171,15 @@ export default {
         },
         // 加载具体分类数据
         loadTreeData (isEdit) {
-            findTreeData({ 'categoryKey': this.categoryKey }).then(response => {
+            //  文件分类获取文件类型需要根据地点进行数据过滤
+            let whereParams = {
+                'categoryKey': this.categoryKey
+            }
+            const {first,second}  = this.$store.getters.level
+            if(this.categoryKey=='FILE_TYPE'){
+                whereParams.diDian = second?second:first
+            }
+            findTreeData(whereParams).then(response => {
                 const data = response.data
                 this.treeData = data
                 this.show = isEdit

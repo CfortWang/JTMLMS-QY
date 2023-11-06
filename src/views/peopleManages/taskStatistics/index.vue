@@ -63,7 +63,7 @@
           <div class="viewLeft">
             <div class="middleView">
               <div class="midViewLeft">
-                <pieView :info="degreePieData" />
+                <PieView :info="degreePieData" />
               </div>
               <dv-decoration-2 :reverse="true"
                                style="width: 2%; height: 100%" />
@@ -99,7 +99,6 @@
 
 <script>
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
-import pieView from "@/views/system/jbdHome/board/component/getPieView";
 import CarouselTabl from "@/views/system/jbdHome/board/component/CarouselTabl";
 import SelectPositions from "@/views/component/selectPositions";
 import screenfull from 'screenfull'
@@ -107,11 +106,12 @@ import screenfull from 'screenfull'
 export default {
   name: "checkBoard1",
   components: {
-    pieView,
     CarouselTabl,
     SelectPositions,
     RingChart: () => import("../personComcont/RingChart"),
     BarChart: () => import("../personComcont/BarChart"),
+    PieView: () => import("../personComcont/GetPieView"),
+
   },
   data() {
     return {
@@ -271,13 +271,12 @@ export default {
             data: [],
             label: { //柱体上显示数值
               show: true,//开启显示
-              position: 'insideTop',
               textStyle: {//数值样式
                 fontSize: '6px',
                 color: 'rgba(251, 251, 251, 1)'
               },
               formatter: function (name) {
-                return name.value == 0 ? '' : '高:' + name.value;
+                return name.value == 0 ? '' : '专:' + name.value;
               }
             }
 
@@ -292,7 +291,6 @@ export default {
             data: [],
             label: { //柱体上显示数值
               show: true,//开启显示
-              position: 'insideRight ',
               textStyle: {//数值样式
                 fontSize: '6px',
                 color: 'rgba(251, 251, 251, 1)'
@@ -313,7 +311,6 @@ export default {
             data: [],
             label: { //柱体上显示数值
               show: true,//开启显示
-              position: 'insideLeft ',
               textStyle: {//数值样式
                 fontSize: '6px',
                 color: 'rgba(251, 251, 251, 1)'
@@ -334,8 +331,8 @@ export default {
             data: [],
             label: { //柱体上显示数值
               show: true,//开启显示
-              position: 'top',
               textStyle: {//数值样式
+                position: 'top',
                 fontSize: '6px',
                 color: 'rgba(251, 251, 251, 1)'
               },
@@ -415,7 +412,6 @@ export default {
             },
             label: { //柱体上显示数值
               show: true,//开启显示
-              position: 'insideRight ',
               textStyle: {//数值样式
                 fontSize: '6px',
                 color: 'rgba(251, 251, 251, 1)'
@@ -435,7 +431,6 @@ export default {
             data: [],
             label: { //柱体上显示数值
               show: true,//开启显示
-              position: 'insideLeft ',
               textStyle: {//数值样式
                 fontSize: '6px',
                 color: 'rgba(251, 251, 251, 1)'
@@ -616,7 +611,10 @@ export default {
       await curdPost("sql", sql).then((res) => {
         data = res.variables.data;
       });
-      this.employeeNum = data.length
+      if (this.initOnLoad === 0) {
+        this.employeeNum = data.length
+        this.initOnLoad = 1
+      }
       let personIdsArr = []
       for (let it of data) {
         personIdsArr.push(it.parent_id_)
@@ -640,13 +638,13 @@ export default {
         " or "
       )} )` : `ee.positions_ = '没有选择部门'`
       let sql = `select
-                sum(a.zui_gao_xue_li_x_ = '博士') as doctor,
-                sum(a.zui_gao_xue_li_x_ = '硕士') as Master,
-                sum(a.zui_gao_xue_li_x_ = '本科') as undergraduate,
-                sum(a.zui_gao_xue_li_x_ = ' 大专') as gaoZhong,
-                sum(a.zhi_cheng_deng_ji = '初级') as elementary,
-                sum(a.zhi_cheng_deng_ji = '中级') as middleRank,
-                sum(a.zhi_cheng_deng_ji = '高级') as senior,
+                sum(a.zui_gao_xue_li_x_ = '博士研究生') as boShi,
+                sum(a.zui_gao_xue_li_x_ = '硕士研究生') as shuoShi,
+                sum(a.zui_gao_xue_li_x_ = '本科') as benKe,
+                sum(a.zui_gao_xue_li_x_ = '大专') as daZhuan,
+                sum(a.zhi_cheng_deng_ji = '初级') as chuJi,
+                sum(a.zhi_cheng_deng_ji = '中级') as zhongJi,
+                sum(a.zhi_cheng_deng_ji = '高级') as gaoJi,
                 sum(a.zhi_cheng_deng_ji = '' || a.zhi_cheng_deng_ji is null) as other
                 from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where  ${positionsWhere}`;
       await curdPost("sql", sql).then((res) => {
@@ -655,22 +653,22 @@ export default {
       if (data.length == 0 || data[0] == null) {
         return
       }
-      this.degreePieData.data[0].value = data[0].gaoZhong
-        ? data[0].gaoZhong
+      this.degreePieData.data[0].value = data[0].daZhuan
+        ? data[0].daZhuan
         : 0;
-      this.degreePieData.data[1].value = data[0].undergraduate
-        ? data[0].undergraduate
+      this.degreePieData.data[1].value = data[0].benKe
+        ? data[0].benKe
         : 0;
-      this.degreePieData.data[2].value = data[0].Master ? data[0].Master : 0;
-      this.degreePieData.data[3].value = data[0].doctor ? data[0].doctor : 0;
+      this.degreePieData.data[2].value = data[0].shuoShi ? data[0].shuoShi : 0;
+      this.degreePieData.data[3].value = data[0].boShi ? data[0].boShi : 0;
 
-      this.ranksPieData.data[0].value = data[0].elementary
-        ? data[0].elementary
+      this.ranksPieData.data[0].value = data[0].chuJi
+        ? data[0].chuJi
         : 0;
-      this.ranksPieData.data[1].value = data[0].middleRank
-        ? data[0].middleRank
+      this.ranksPieData.data[1].value = data[0].zhongJi
+        ? data[0].zhongJi
         : 0;
-      this.ranksPieData.data[2].value = data[0].senior ? data[0].senior : 0;
+      this.ranksPieData.data[2].value = data[0].gaoJi ? data[0].gaoJi : 0;
     },
     // 部门信息统计
     positionsInfoData() {
@@ -678,13 +676,13 @@ export default {
         " or "
       )} )` : `en.path_ = '没有选择部门'`
       let sql = `select jh.*from (select  en.id_ ,en.name_ AS enName,  
-            sum(gy.zui_gao_xue_li_x_ = '博士') AS doctor_,
-            sum(gy.zui_gao_xue_li_x_ = '硕士') AS Master_,
-            sum(gy.zui_gao_xue_li_x_ = '本科') AS undergraduate_,
-            sum(gy.zui_gao_xue_li_x_ = ' 大专') AS senior_,
-            sum(gy.zhi_cheng_deng_ji = '初级') AS elementary_,
-            sum(gy.zhi_cheng_deng_ji = '中级') AS middleRank_,
-            sum(gy.zhi_cheng_deng_ji = '高级') AS seniorZ_ FROM (SELECT
+            sum(gy.zui_gao_xue_li_x_ = '博士研究生') as boShi,
+            sum(gy.zui_gao_xue_li_x_ = '硕士研究生') as shuoShi,
+            sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,
+            sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,
+            sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,
+            sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,
+            sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT
             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji
             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_ 
             )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where ${positionsWhere} GROUP BY enName) jh`;
@@ -705,13 +703,13 @@ export default {
         if (data.length !== 0) {
           // 跟《部门信息统计配置表》排列顺序一致
           let shuZuList = [
-            "senior_",
-            "undergraduate_",
-            "Master_",
-            "doctor_",
-            "elementary_",
-            "middleRank_",
-            "seniorZ_",
+            "daZhuan",
+            "benKe",
+            "shuoShi",
+            "boShi",
+            "chuJi",
+            "zhongJi",
+            "gaoJi",
           ];
           for (let t = 0; t < data.length; t++) {
             this.PositionsDegreeOption.xAxis[0].data.push(data[t].enName);
@@ -821,13 +819,11 @@ export default {
       }
     },
     handleAllGetFunc() {
+      this.employeeInfoData();
       if (this.initOnLoad === 0) {
         this.positionsInfoData();
         this.degreeGradeInfoData();
-        this.initOnLoad = 1
       }
-      this.employeeInfoData();
-
     },
     handleFunc(e) {
       this.sqlPositionsDatasIni = e.i

@@ -79,27 +79,32 @@ export default {
       let isAdmin = this.userInfo.role.some((so) => {
         return so.name == "系统管理角色";
       });
-      if (isAdmin) {
-        positonsSql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${this.level.first}%' 
+    //   if (isAdmin) {
+    //     positonsSql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${this.level.first}%' 
+    //       AND (
+    //             DEPTH_ not  IN (1,2) OR (
+    //             (DEPTH_=3 AND NAME_ = '检验科') OR  parent_id_ IN (SELECT id_ FROM ibps_party_entity WHERE DEPTH_=3 AND NAME_ = '检验科'  )  )
+    //             )`;
+    //   } else {
+    //     let allPositions = [];
+    //     for (var i of this.userInfo.positions) {
+    //       for (var item of i.path.split(".")) {
+    //         if (item !== "") {
+    //           allPositions.push(`id_ like '%${item}%'`);
+    //         }
+    //       }
+    //     }
+    //     allPositions = [...new Set(allPositions)];
+    //     // 如果是单纯的是普通账户登录，就只显示所属部门的信息
+    //     positonsSql = `select * from ibps_party_entity where (${allPositions.join(
+    //       " or "
+    //     )}) and DEPTH_ not  IN (1,2)`;
+    //   }
+      positonsSql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${this.level.first}%' 
           AND (
                 DEPTH_ not  IN (1,2) OR (
                 (DEPTH_=3 AND NAME_ = '检验科') OR  parent_id_ IN (SELECT id_ FROM ibps_party_entity WHERE DEPTH_=3 AND NAME_ = '检验科'  )  )
                 )`;
-      } else {
-        let allPositions = [];
-        for (var i of this.userInfo.positions) {
-          for (var item of i.path.split(".")) {
-            if (item !== "") {
-              allPositions.push(`id_ like '%${item}%'`);
-            }
-          }
-        }
-        allPositions = [...new Set(allPositions)];
-        // 如果是单纯的是普通账户登录，就只显示所属部门的信息
-        positonsSql = `select * from ibps_party_entity where ${allPositions.join(
-          " or "
-        )} and DEPTH_ not  IN (1,2)`;
-      }
       curdPost("sql", positonsSql).then((res) => {
         if (res.state === 200) {
           const datas = res.variables.data;

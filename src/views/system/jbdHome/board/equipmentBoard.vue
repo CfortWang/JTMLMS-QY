@@ -7,7 +7,7 @@
         <dv-decoration-5 class="center" />
         <dv-decoration-8 class="right" :reverse="true" />
         <div class="title">{{ titleName }}</div>
-        <div class="time">
+        <div class="time" v-show="false">
           <dv-border-box-8>
           <span >年度:</span>
           <el-date-picker v-model="month" type="year" value-format="yyyy" format="yyyy" placeholder="日期选择" style="width: 100px;" :readonly="false" :editable="true" :clearable="false" @change="updateAll" />
@@ -47,7 +47,7 @@
             </div>
             <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
             <div class="middleCardRight1" style="width:36%">
-              <CarouselTabl v-if="BaofeiBarData.data.length" :info="BaofeiBarData" title="检验科设备报废列表" />
+              <CarouselTabl v-if="BaofeiBarData.data.length" :info="BaofeiBarData" title="检验科设备停用/报废列表" />
             </div>
             <div class="middleCardRight" style="width:35%">
               <CarouselTabl v-if="config.data.length" :info="config" title="设备报废列表" />
@@ -690,8 +690,10 @@ export default {
       // const sql =`select * from t_sbdj where (she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') and  di_dian_ = '${didian}'`;
       let sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
       let data1 = [];
+      console.log(sql,"sql报废")
       await curdPost("sql", sql)
         .then((res) => {
+          this_.BaofeiBarData.data = [];
           const result = res.variables.data;
           if(result.length == 0){
             this_.BaofeiBarData.data = [999]

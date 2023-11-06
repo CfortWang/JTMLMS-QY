@@ -11,7 +11,7 @@
     </div>
     <div v-if="config.state=='100'" style="
         width: 100%;
-        height: 100%;
+        height: 95%;
         display: inline-block;
         overflow: hidden;
         box-sizing: border-box;

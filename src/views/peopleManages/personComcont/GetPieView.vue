@@ -1,17 +1,13 @@
 <template>
   <div class="pieView">
-    <div style="
-        height: 14%;
-        line-height: 30px;
-        text-align: left;
-        padding-left: 10px;
-        color: white;
-      ">
+    <div style="  height:14%;line-height:30px;text-align: left;padding-left: 10px;color: white;">
       {{ info.config.title || "" }}
     </div>
-    <div style="width: 100%; height: 86%; display: inline-block; overflow: hidden">
-      <div :id="info.config.idSelector"
-           style="width: 100%; height: 95%; overflow: hidden"></div>
+    <div style="width: 100%; height: 86%; display: inline-block; overflow: hidden" v-show="showChart">
+      <div :id="info.config.idSelector" style="width: 100%; height: 95%; overflow: hidden" ></div>
+    </div>
+    <div style="background: #061237;width: 100%;height: 70%;display: flex;justify-content: center;align-items: center;" v-if="!showChart">
+      <div style="color: #c7c7c7">目前无数据</div>
     </div>
   </div>
 </template>
@@ -20,7 +16,9 @@
 import * as echarts from "echarts";
 export default {
   data() {
-    return {};
+    return {
+      showChart: true,
+    };
   },
   props: {
     info: {
@@ -38,6 +36,17 @@ export default {
     getMiddleLeft() {
       let chartDom = document.getElementById(this.info.config.idSelector);
       var myChart = echarts.init(chartDom);
+      const radius = window.innerWidth > 1600 ? "55%" : "45%";
+      let inData = this.info.data;
+      let num = 0;
+      for (let i in inData) {
+        num += inData[i].value;
+      }
+      if (num == 0) {
+        this.showChart = false;
+      } else {
+        this.showChart = true;
+      }
       var option;
       option = {
         title: {
@@ -45,65 +54,50 @@ export default {
           left: "center",
           textStyle: {
             color: "#fff",
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: "600",
           },
         },
+        color: this.info.color,
         tooltip: {
           trigger: "item",
-          formatter: "",
+          formatter: "{d}%",
         },
-        color: this.info.color,
+        label: {
+          formatter: "{b}\n({d}%)",
+          edgeDistance: "20%",
+        },
+
         legend: {
-          left: 'center',
-          // show: true,
-          z: 2,
-          //   top: "2%",
+          show: true,
           // orient: 'vertical',
-          //   left: "",
+          itemGap: 6,
+          z: 3,
+          left: "center",
           textStyle: {
             color: "#fff",
           },
         },
-        label: {
-          formatter: "{b}:{d}%",
-        },
         series: [
           {
-            // name: "Access From",
             type: "pie",
-            radius: ["40%", "70%"],
-            top: "16%",
-            right: "5%",
-            left: "5%",
-            bottom: "2%",
-            avoidLabelOverlap: false,
-            label: {
-              show: true,
-              // fontSize: 20,
-              position: "outside",
-              fontWeight: "bold",
-              alignTo: "edge",
-              margin: "1px",
-              fontSize: 12,
-              // color:'#fff'
-            },
+            radius: radius,
+            center: ["50%", "50%"],
+            data: this.info.data,
             emphasis: {
-              // label: {
-              //   show: true,
-              //   fontSize: 40,
-              //   fontWeight: "bold",
-              // },
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
             },
             labelLine: {
-              show: false,
               distanceToLabelLine: 0,
             },
-            data: this.info.data,
           },
         ],
       };
-      option && myChart.setOption(option);
+      myChart.setOption(option);
     },
   },
   watch: {
@@ -118,9 +112,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .pieView {
-  // display: flex;
   width: 100%;
-  color: white;
   height: 100%;
   overflow: hidden;
   background-color: rgba(6, 30, 93, 0.5);
