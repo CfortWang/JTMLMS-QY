@@ -2,6 +2,7 @@ import { getUserInfo, switchUser, exitSwitchUser, getRegisterOpen } from '@/api/
 import { getToken, getUuid } from '@/utils/auth'
 import Utils from '@/utils/util'
 import common from '@/utils/common'
+import router from '@/router'
 
 export default {
     namespaced: true,
@@ -57,6 +58,8 @@ export default {
                 await dispatch('getAccount')
                 // 获取切换用户账号
                 await dispatch('getSwitchAccount')
+                // 存储许可证信息
+                await dispatch('ibps/licence/setLicence', JSON.parse(localStorage.getItem('licence')), { root: true })
 
                 // 获取注册用户账号
                 dispatch('getRegister').then((r) => {
@@ -145,10 +148,7 @@ export default {
                 resolve()
             })
         },
-        setAccount ({
-            state,
-            dispatch
-        }, account) {
+        setAccount ({ state, dispatch }, account) {
             return new Promise(async resolve => {
                 // store 赋值
                 state.account = account
@@ -218,10 +218,7 @@ export default {
          * @param {*} param0
          * @param {*} switchAccount
          */
-        setSwitchAccount ({
-            state,
-            dispatch
-        }, switchAccount) {
+        setSwitchAccount ({ state, dispatch }, switchAccount) {
             return new Promise(async resolve => {
                 // store 赋值
                 state.switchAccount = switchAccount
@@ -241,10 +238,7 @@ export default {
          * @param {*} param0
          * @param {*} username
          */
-        switchUser ({
-            state,
-            dispatch
-        }, username) {
+        switchUser ({ state, dispatch }, username) {
             return new Promise(async (resolve, reject) => {
                 const switchAccount = state.account
                 let token = getToken()
@@ -262,6 +256,7 @@ export default {
                     token: token
                 }).then(async response => {
                     const data = response.data
+                    await router.push({ name: 'dashboard' })
                     // 更新token信息
                     await dispatch('ibps/account/updataTokenInfo', data, { root: true })
                     // 更新用户信息
@@ -272,6 +267,9 @@ export default {
                     // await dispatch('ibps/system/set', null, { root: true })
                     //  清除菜单
                     await dispatch('ibps/menu/menusSet', null, { root: true })
+                    // 刷新页面重新获取信息
+                    location.reload()
+                    // await dispatch('load')
                     // 重置路由
                     // resetUrlRouter('/dashboard')
                     resolve(data)
@@ -285,10 +283,7 @@ export default {
          * 退出切换
          * @param {*} param0
          */
-        exitSwitchUser ({
-            state,
-            dispatch
-        }) {
+        exitSwitchUser ({ state, dispatch }) {
             return new Promise(async (resolve, reject) => {
                 const switchAccount = state.switchAccount
                 let token = getToken()
@@ -305,6 +300,7 @@ export default {
                     token: token
                 }).then(async response => {
                     const data = response.data
+                    await router.push({ path: '/dashboard' })
                     // 更新token信息
                     await dispatch('ibps/account/updataTokenInfo', data, { root: true })
                     // 更新用户信息
@@ -315,7 +311,8 @@ export default {
                     // await dispatch('ibps/system/set', null, { root: true })
                     //  清除菜单
                     await dispatch('ibps/menu/menusSet', null, { root: true })
-
+                    // 刷新页面重新获取信息
+                    location.reload()
                     // 重置路由
                     // resetUrlRouter('/')
                     resolve(data)
@@ -325,9 +322,7 @@ export default {
                 })
             })
         },
-        getRegister ({
-            state
-        }) {
+        getRegister ({ state }) {
             return new Promise(async (resolve, reject) => {
                 await getRegisterOpen().then(async response => {
                     const regOpen = response.data

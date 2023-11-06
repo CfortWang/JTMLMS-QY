@@ -37,5 +37,7 @@ export default {
     // 获取所有部门信息
     deptList: state => state.ibps.param && state.ibps.param.deptList ? state.ibps.param.deptList : [],
     // 获取用户最高层级
-    level: state => state.ibps.param && state.ibps.param.level ? state.ibps.param.level : []
+    level: state => state.ibps.param && state.ibps.param.level ? state.ibps.param.level : [],
+    // 获取认证信息
+    licence: state => state.ibps.licence ? state.ibps.licence.licJson : {}
 }

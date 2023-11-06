@@ -234,7 +234,7 @@ export default {
                     showClose: false
                 }).then(() => {
                     const { bizKey = '', proInstId = '' } = response.variables || {}
-                    this.createSnapshot(bizKey, proInstId)
+                    // this.createSnapshot(bizKey, proInstId)
                     this.startFlowDialogVisible = false
                     // 后置事件
                     this.afterScript(this.actionName, {
@@ -373,7 +373,7 @@ export default {
                     this.rejectDialogVisible = false
                 }
                 if (actionName === 'agree') {
-                    this.createSnapshot()
+                    // this.createSnapshot()
                 }
                 // 后置事件
                 this.afterScript(this.actionName, {

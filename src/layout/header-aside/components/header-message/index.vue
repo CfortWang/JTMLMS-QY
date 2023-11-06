@@ -144,7 +144,25 @@ export default {
         //     this.isControl=true
         //     this.loadData()
         // }, 1000)
-        // Watermark.set('线上试用版本','深圳市金源信通')
+        const { licence = {} } = this.$store.getters
+        const { isTrialVersion, notAfter, needRemind, customerInfo } = licence
+        const now = Date.now()
+        if (isTrialVersion) {
+            // 超出试用期限后登出
+            if (now > notAfter) {
+                this.$store.dispatch('ibps/account/logout', {
+                    vm: this
+                })
+                return
+            }
+            if (needRemind) {
+                this.$confirm('系统试用期即将结束，请联系开发方购买永久版或申请新的试用许可证!', '提示', {
+                    type: 'warning'
+                })
+            }
+            const limitDate = new Date(notAfter).toLocaleDateString('zh-CN')
+            Watermark.set(`${customerInfo}试用版本`, `试用日期截止至${limitDate}`)
+        }
         this.loadData()
         Bus.$on('getMessageCount', (count) => {
             this.messageCount = count

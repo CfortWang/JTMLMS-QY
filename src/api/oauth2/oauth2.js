@@ -12,31 +12,29 @@
 import { OAUTH2_URL } from '@/api/baseUrl'
 import request from '@/utils/request'
 import requestState from '@/constants/state'
-import {
-  Message
-} from 'element-ui'
+import { Message } from 'element-ui'
 
 import qs from 'qs'
 
-var AccessToken = function(data) {
-  if (!(this instanceof AccessToken)) {
-    return new AccessToken(data)
-  }
-  this.data = data
+var AccessToken = function (data) {
+    if (!(this instanceof AccessToken)) {
+        return new AccessToken(data)
+    }
+    this.data = data
 }
 /**
  * 对返回结果的一层封装，如果遇见IBPS平台返回的错误，将返回一个错误
  * 参见：IBPS返回码说明
  */
-var wrapper = function(callback) {
-  return function(err, data, res) {
-    callback = callback || function() {}
-    if (err) {
-      err.name = 'IBPSAPI' + err.name
-      return callback(err, data, res)
+var wrapper = function (callback) {
+    return function (err, data, res) {
+        callback = callback || function () {}
+        if (err) {
+            err.name = 'IBPSAPI' + err.name
+            return callback(err, data, res)
+        }
+        callback(null, data, res)
     }
-    callback(null, data, res)
-  }
 }
 
 /*!
@@ -47,26 +45,30 @@ var wrapper = function(callback) {
  * token.isValid();
  * ```
  */
-AccessToken.prototype.isValid = function() {
-  return !!this.data.access_token && (new Date().getTime()) < (this.data.create_at + this.data.expires_in * 1000)
+AccessToken.prototype.isValid = function () {
+    return !!this.data.access_token && (new Date().getTime()) < (this.data.create_at + this.data.expires_in * 1000)
 }
 
 /*!
  * 处理token，更新过期时间
  */
-var processToken = function(that, callback) {
-  var createAt = new Date().getTime()
+var processToken = function (that, callback) {
+    var createAt = new Date().getTime()
 
-  return function(err, data, res) {
-    if (err) {
-      return callback(err, data, res)
+    return function (err, data, res) {
+        if (err) {
+            return callback(err, data, res)
+        }
+        data.create_at = createAt
+        // 20231106修改，将licence信息增加到接口返回数据
+        if (res.variables && res.variables.licJson) {
+            data.licJson = JSON.parse(res.variables.licJson)
+        }
+        // 存储token
+        that.saveToken(data.uid, data, function (err) {
+            callback(err, new AccessToken(data))
+        })
     }
-    data.create_at = createAt
-    // 存储token
-    that.saveToken(data.uid, data, function(err) {
-      callback(err, new AccessToken(data))
-    })
-  }
 }
 
 /**
@@ -87,23 +89,23 @@ var processToken = function(that, callback) {
  * @param {Function} getToken 用于获取token的方法
  * @param {Function} saveToken 用于保存token的方法
  */
-var OAuth = function(clientId, clientSecret, getToken, saveToken) {
-  this.clientId = clientId
-  this.clientSecret = clientSecret
-  this.statistic =''
-  // token的获取和存储
-  this.store = {}
-  this.getToken = getToken || function(uid, callback) {
-    callback(null, this.store[uid])
-  }
-  if (!saveToken && process.env.NODE_ENV === 'production') {
-    console.warn('Please dont save oauth token into memory under production')
-  }
-  this.saveToken = saveToken || function(uid, token, callback) {
-    this.store[uid] = token
-    callback(null)
-  }
-  this.defaults = {}
+var OAuth = function (clientId, clientSecret, getToken, saveToken) {
+    this.clientId = clientId
+    this.clientSecret = clientSecret
+    this.statistic = ''
+    // token的获取和存储
+    this.store = {}
+    this.getToken = getToken || function (uid, callback) {
+        callback(null, this.store[uid])
+    }
+    if (!saveToken && process.env.NODE_ENV === 'production') {
+        console.warn('Please dont save oauth token into memory under production')
+    }
+    this.saveToken = saveToken || function (uid, token, callback) {
+        this.store[uid] = token
+        callback(null)
+    }
+    this.defaults = {}
 }
 
 /*!
@@ -113,38 +115,37 @@ var OAuth = function(clientId, clientSecret, getToken, saveToken) {
  * @param {Object} opts urllib选项
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.request = function(opts, callback) {
-  const options = {}
-  Object.assign(options, this.defaults)
-  if (typeof opts === 'function') {
-    callback = opts
-    opts = {}
-  }
-  for (const key in opts) {
-    if (key !== 'headers') {
-      options[key] = opts[key]
-    } else {
-      if (opts.headers) {
-        options.headers = options.headers || {}
-        Object.assign(options.headers, opts.headers)
-      }
+OAuth.prototype.request = function (opts, callback) {
+    const options = {}
+    Object.assign(options, this.defaults)
+    if (typeof opts === 'function') {
+        callback = opts
+        opts = {}
     }
-  }
+    for (const key in opts) {
+        if (key !== 'headers') {
+            options[key] = opts[key]
+        } else {
+            if (opts.headers) {
+                options.headers = options.headers || {}
+                Object.assign(options.headers, opts.headers)
+            }
+        }
+    }
 
-  request(options).then(response => {
-    const { state } = response
-    if (state === requestState.UNSUPORT ||
-      state === requestState.WARNING) {
-      const err = new Error(response.message)
-      err.state = state
-      err.cause = response.cause
-      callback(err)
-    } else {
-      callback(null, response.data, response)
-    }
-  }).catch(error => {
-    callback(error)
-  })
+    request(options).then(response => {
+        const { state } = response
+        if (state === requestState.UNSUPORT || state === requestState.WARNING) {
+            const err = new Error(response.message)
+            err.state = state
+            err.cause = response.cause
+            callback(err)
+        } else {
+            callback(null, response.data, response)
+        }
+    }).catch(error => {
+        callback(error)
+    })
 }
 
 /**
@@ -153,17 +154,17 @@ OAuth.prototype.request = function(opts, callback) {
  * @param {String} state 开发者可提供的数据
  * @param {String} scope 作用范围，值为snsapi_userinfo和snsapi_base，前者用于弹出，后者用于跳转
  */
-OAuth.prototype.getAuthorizeURL = function(redirect, state, scope) {
-  const url = OAUTH2_URL() + ''
-  const info = {
-    clientId: this.clientId,
-    redirect_uri: redirect,
-    response_type: 'code',
-    scope: scope || 'snsapi_base',
-    state: state || ''
-  }
+OAuth.prototype.getAuthorizeURL = function (redirect, state, scope) {
+    const url = OAUTH2_URL() + ''
+    const info = {
+        clientId: this.clientId,
+        redirect_uri: redirect,
+        response_type: 'code',
+        scope: scope || 'snsapi_base',
+        state: state || ''
+    }
 
-  return url + '?' + qs.stringify(info) + '#ibps_redirect'
+    return url + '?' + qs.stringify(info) + '#ibps_redirect'
 }
 
 /**
@@ -172,17 +173,17 @@ OAuth.prototype.getAuthorizeURL = function(redirect, state, scope) {
  * @param {String} state 开发者可提供的数据
  * @param {String} scope 作用范围，值为snsapi_login，前者用于弹出，后者用于跳转
  */
-OAuth.prototype.getAuthorizeURLForWebsite = function(redirect, state, scope) {
-  const url = OAUTH2_URL() + '/qrconnect'
-  const info = {
-    clientId: this.clientId,
-    redirect_uri: redirect,
-    response_type: 'code',
-    scope: scope || 'snsapi_login',
-    state: state || ''
-  }
+OAuth.prototype.getAuthorizeURLForWebsite = function (redirect, state, scope) {
+    const url = OAUTH2_URL() + '/qrconnect'
+    const info = {
+        clientId: this.clientId,
+        redirect_uri: redirect,
+        response_type: 'code',
+        scope: scope || 'snsapi_login',
+        state: state || ''
+    }
 
-  return url + '?' + qs.stringify(info) + '#ibps_redirect'
+    return url + '?' + qs.stringify(info) + '#ibps_redirect'
 }
 
 /**
@@ -212,18 +213,18 @@ OAuth.prototype.getAuthorizeURLForWebsite = function(redirect, state, scope) {
  * @param {String} code 授权获取到的code
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.getAccessTokenByCode = function(code, callback) {
-  const args = {
-    url: OAUTH2_URL() + '/authentication/apply',
-    data: {
-      client_id: this.clientId,
-      client_secret: this.clientSecret,
-      authorize_code: code,
-      grant_type: 'authorization_code'
-    },
-    method: 'post'
-  }
-  this.request(args, wrapper(processToken(this, callback)))
+OAuth.prototype.getAccessTokenByCode = function (code, callback) {
+    const args = {
+        url: OAUTH2_URL() + '/authentication/apply',
+        data: {
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
+            authorize_code: code,
+            grant_type: 'authorization_code'
+        },
+        method: 'post'
+    }
+    this.request(args, wrapper(processToken(this, callback)))
 }
 /**
  * 密码授权模式
@@ -255,19 +256,19 @@ OAuth.prototype.getAccessTokenByCode = function(code, callback) {
  * @param {String} password  密码
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.getAccessTokenByPassword = function({ username, password }, callback) {
-  const args = {
-    url: OAUTH2_URL() + '/authentication/apply',
-    data: {
-      client_id: this.clientId,
-      client_secret: this.clientSecret,
-      username: username,
-      password: password,
-      grant_type: 'password_credentials'
-    },
-    method: 'post'
-  }
-  this.request(args, wrapper(processToken(this, callback)))
+OAuth.prototype.getAccessTokenByPassword = function ({ username, password }, callback) {
+    const args = {
+        url: OAUTH2_URL() + '/authentication/apply',
+        data: {
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
+            username: username,
+            password: password,
+            grant_type: 'password_credentials'
+        },
+        method: 'post'
+    }
+    this.request(args, wrapper(processToken(this, callback)))
 }
 
 /**
@@ -296,19 +297,19 @@ OAuth.prototype.getAccessTokenByPassword = function({ username, password }, call
  * @param {String} refreshToken 刷新tonken
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.refreshAccessToken = function(refreshToken, callback) {
-  const args = {
-    url: OAUTH2_URL() + '/authentication/apply',
-    data: {
-      client_id: this.clientId,
-      client_secret: this.clientSecret,
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken
-    },
-    method: 'post'
+OAuth.prototype.refreshAccessToken = function (refreshToken, callback) {
+    const args = {
+        url: OAUTH2_URL() + '/authentication/apply',
+        data: {
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken
+        },
+        method: 'post'
 
-  }
-  this.request(args, wrapper(processToken(this, callback)))
+    }
+    this.request(args, wrapper(processToken(this, callback)))
 }
 /**
  * 获取用户信息 【私有方法】
@@ -316,16 +317,16 @@ OAuth.prototype.refreshAccessToken = function(refreshToken, callback) {
  * @param {*} accessToken
  * @param {*} callback
  */
-OAuth.prototype._getUser = function(options, accessToken, callback) {
-  const args = {
-    url: OAUTH2_URL() + '/user/context',
-    data: {
-      access_token: accessToken,
-      uid: options.uid,
-      lang: options.lang || 'zh_CN'
+OAuth.prototype._getUser = function (options, accessToken, callback) {
+    const args = {
+        url: OAUTH2_URL() + '/user/context',
+        data: {
+            access_token: accessToken,
+            uid: options.uid,
+            lang: options.lang || 'zh_CN'
+        }
     }
-  }
-  this.request(args, wrapper(callback))
+    this.request(args, wrapper(callback))
 }
 
 /**
@@ -369,43 +370,43 @@ OAuth.prototype._getUser = function(options, accessToken, callback) {
  * @param {Object|String} options 传入uid或者参见Options
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.getUser = function(options, callback) {
-  if (typeof options !== 'object') {
-    options = {
-      uid: options
-    }
-  }
-  const that = this
-  this.getToken(options.uid, function(err, data) {
-    if (err) {
-      return callback(err)
-    }
-    // 没有token数据
-    if (!data) {
-      const message = 'No token for ' + options.uid + ', please authorize first.'
-      Message({
-        message: `${message}`,
-        type: 'error',
-        showClose: true,
-        dangerouslyUseHTMLString: true,
-        duration: 5 * 1000
-      })
-      const error = new Error(message)
-      err.state = 'NoOAuthTokenError'
-      return callback(error)
-    }
-    const token = new AccessToken(data)
-    if (token.isValid()) {
-      that._getUser(options, token.data.access_token, callback)
-    } else {
-      that.refreshAccessToken(token.data.refresh_token, function(err, token) {
-        if (err) {
-          return callback(err)
+OAuth.prototype.getUser = function (options, callback) {
+    if (typeof options !== 'object') {
+        options = {
+            uid: options
         }
-        that._getUser(options, token.data.access_token, callback)
-      })
     }
-  })
+    const that = this
+    this.getToken(options.uid, function (err, data) {
+        if (err) {
+            return callback(err)
+        }
+        // 没有token数据
+        if (!data) {
+            const message = 'No token for ' + options.uid + ', please authorize first.'
+            Message({
+                message: `${message}`,
+                type: 'error',
+                showClose: true,
+                dangerouslyUseHTMLString: true,
+                duration: 5 * 1000
+            })
+            const error = new Error(message)
+            err.state = 'NoOAuthTokenError'
+            return callback(error)
+        }
+        const token = new AccessToken(data)
+        if (token.isValid()) {
+            that._getUser(options, token.data.access_token, callback)
+        } else {
+            that.refreshAccessToken(token.data.refresh_token, function (err, token) {
+                if (err) {
+                    return callback(err)
+                }
+                that._getUser(options, token.data.access_token, callback)
+            })
+        }
+    })
 }
 
 /**
@@ -418,16 +419,16 @@ OAuth.prototype.getUser = function(options, callback) {
  * @param {String} accessToken 待校验的access token
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.verifyToken = function(uid, accessToken, callback) {
-  const args = {
-    url: OAUTH2_URL() + '/authentication/verify',
-    params: {
-      access_token: accessToken,
-      uid: uid
-    },
-    method: 'post'
-  }
-  this.request(args, wrapper(callback))
+OAuth.prototype.verifyToken = function (uid, accessToken, callback) {
+    const args = {
+        url: OAUTH2_URL() + '/authentication/verify',
+        params: {
+            access_token: accessToken,
+            uid: uid
+        },
+        method: 'post'
+    }
+    this.request(args, wrapper(callback))
 }
 
 /**
@@ -441,13 +442,13 @@ OAuth.prototype.verifyToken = function(uid, accessToken, callback) {
  *     password : 密码
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.userLogin = function(data, callback) {
-  const args = {
-    url: OAUTH2_URL() + '/user/login/apply',
-    data: data,
-    method: 'post'
-  }
-  this.request(args, wrapper(callback))
+OAuth.prototype.userLogin = function (data, callback) {
+    const args = {
+        url: OAUTH2_URL() + '/user/login/apply',
+        data: data,
+        method: 'post'
+    }
+    this.request(args, wrapper(callback))
 }
 
 /**
@@ -460,21 +461,21 @@ OAuth.prototype.userLogin = function(data, callback) {
  * @param {Objcct} options
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.authorize = function(data, callback) {
-  const url = OAUTH2_URL() + '/authorize/apply'
-  if (typeof data !== 'object') {
-    data = {
-      login_state: data
+OAuth.prototype.authorize = function (data, callback) {
+    const url = OAUTH2_URL() + '/authorize/apply'
+    if (typeof data !== 'object') {
+        data = {
+            login_state: data
+        }
     }
-  }
-  data.client_id = this.clientId
+    data.client_id = this.clientId
 
-  const args = {
-    url,
-    data: data,
-    method: 'post'
-  }
-  this.request(args, wrapper(callback))
+    const args = {
+        url,
+        data: data,
+        method: 'post'
+    }
+    this.request(args, wrapper(callback))
 }
 
 /**
@@ -507,25 +508,25 @@ OAuth.prototype.authorize = function(data, callback) {
  * @param {Object|String} options 授权获取到的code
  * @param {Function} callback 回调函数
  */
-OAuth.prototype.getUserByCode = function(options, callback) {
-  const that = this
+OAuth.prototype.getUserByCode = function (options, callback) {
+    const that = this
 
-  let lang
-  let code
-  if (typeof options === 'string') {
-    code = options
-  } else {
-    lang = options.lang
-    code = options.code
-  }
-
-  this.getAccessTokenByCode(code, function(err, result) {
-    if (err) {
-      return callback(err)
+    let lang
+    let code
+    if (typeof options === 'string') {
+        code = options
+    } else {
+        lang = options.lang
+        code = options.code
     }
-    const uid = result.data.uid
-    that.getUser({ uid: uid, lang: lang }, callback)
-  })
+
+    this.getAccessTokenByCode(code, function (err, result) {
+        if (err) {
+            return callback(err)
+        }
+        const uid = result.data.uid
+        that.getUser({ uid: uid, lang: lang }, callback)
+    })
 }
 
 /**
@@ -533,38 +534,38 @@ OAuth.prototype.getUserByCode = function(options, callback) {
  * @param {*} options
  * @param {*} callback
  */
-OAuth.prototype.getLoginCode = function(options, callback) {
-  const that = this
-  /**
-   * 用户登录
-   */
-  this.userLogin(options, function(err, data,res) {
-    if (err) {
-      return callback(err)
-    }
-    that.statistic = res.variables.statistic //判斷是否有统计权限
-    // 没有token数据
-    if (!data) {
-      const message = '没有传回用户信息'
-      Message({
-        message: `${message}`,
-        type: 'error',
-        showClose: true,
-        dangerouslyUseHTMLString: true,
-        duration: 5 * 1000
-      })
-      const error = new Error(message)
-      err.state = 'NoOAuthTokenError'
-      return callback(error)
-    }
+OAuth.prototype.getLoginCode = function (options, callback) {
+    const that = this
+    /**
+     * 用户登录
+     */
+    this.userLogin(options, function (err, data, res) {
+        if (err) {
+            return callback(err)
+        }
+        that.statistic = res.variables.statistic // 判斷是否有统计权限
+        // 没有token数据
+        if (!data) {
+            const message = '没有传回用户信息'
+            Message({
+                message: `${message}`,
+                type: 'error',
+                showClose: true,
+                dangerouslyUseHTMLString: true,
+                duration: 5 * 1000
+            })
+            const error = new Error(message)
+            err.state = 'NoOAuthTokenError'
+            return callback(error)
+        }
 
-    that.authorize(data, function(err1, data1) {
-      if (err1) {
-        return callback(err1)
-      }
-      that.getAccessTokenByCode(data1, callback)
+        that.authorize(data, function (err1, data1) {
+            if (err1) {
+                return callback(err1)
+            }
+            that.getAccessTokenByCode(data1, callback)
+        })
     })
-  })
 }
 
 export default OAuth
