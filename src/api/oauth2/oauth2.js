@@ -93,6 +93,7 @@ var OAuth = function (clientId, clientSecret, getToken, saveToken) {
     this.clientId = clientId
     this.clientSecret = clientSecret
     this.statistic = ''
+    this.username = ''
     // token的获取和存储
     this.store = {}
     this.getToken = getToken || function (uid, callback) {
@@ -220,6 +221,7 @@ OAuth.prototype.getAccessTokenByCode = function (code, callback) {
             client_id: this.clientId,
             client_secret: this.clientSecret,
             authorize_code: code,
+            username: this.username,
             grant_type: 'authorization_code'
         },
         method: 'post'
@@ -535,6 +537,7 @@ OAuth.prototype.getUserByCode = function (options, callback) {
  * @param {*} callback
  */
 OAuth.prototype.getLoginCode = function (options, callback) {
+    this.username = options.username
     const that = this
     /**
      * 用户登录

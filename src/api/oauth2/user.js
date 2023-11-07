@@ -219,3 +219,16 @@ export function open () {
         method: 'get'
     })
 }
+
+/**
+ * 更新许可证
+ * @param {String} username 用户名
+ * @param {String} licence 许可证
+ */
+export function updateLicence (params) {
+    return request({
+        url: OAUTH2_URL() + '/authentication/updateLicense',
+        method: 'post',
+        params
+    })
+}

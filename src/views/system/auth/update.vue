@@ -40,7 +40,7 @@
 </template>
 
 <script>
-
+import { updateLicence } from '@/api/oauth2/user'
 export default {
     props: {
         visible: {
@@ -51,7 +51,10 @@ export default {
             type: String,
             default: '更新许可证'
         },
-        categoryKey: String
+        username: {
+            type: String,
+            default: ''
+        }
     },
     data () {
         return {
@@ -109,8 +112,14 @@ export default {
         },
         // 提交保存数据
         saveData () {
-            this.$message.success('更新许可证成功，请重新登录!')
-            this.closeDialog()
+            updateLicence({
+                username: this.username,
+                licence: this.formModel.licenceKey
+            }).then(res => {
+                console.log(res)
+                this.$message.success('更新许可证成功，请重新登录!')
+                this.closeDialog()
+            })
         },
         // 关闭当前窗口
         closeDialog () {

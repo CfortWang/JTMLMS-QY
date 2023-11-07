@@ -157,7 +157,10 @@ export default {
             }
             if (needRemind) {
                 this.$confirm('系统试用期即将结束，请联系开发方购买永久版或申请新的试用许可证!', '提示', {
-                    type: 'warning'
+                    type: 'warning',
+                    showCancelButton: false,
+                    showClose: false,
+                    closeOnClickModal: false
                 })
             }
             const limitDate = new Date(notAfter).toLocaleDateString('zh-CN')

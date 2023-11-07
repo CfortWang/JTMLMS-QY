@@ -112,7 +112,11 @@
             class="login-submit"
             @click.native.prevent="handleLogin"
         >{{ $t('login.logIn') }}</el-button>
-        <update-licence :visible="licenceFormVisible" @close="visible => licenceFormVisible = visible" />
+        <update-licence
+            :visible="licenceFormVisible"
+            :username="loginForm.username"
+            @close="visible => licenceFormVisible = visible"
+        />
     </el-form>
 </template>
 
@@ -373,6 +377,12 @@ export default {
                         }, 1000)
                     }
                 }).catch((err) => {
+                    if (err && err.state === 6020203) {
+                        // 许可证过期，前台登出
+                        this.$store.dispatch('ibps/account/fedLogout').then(() => {
+                            this.licenceFormVisible = true
+                        })
+                    }
                     // 验证码错误自动清空&密码输入错误5次后触发验证码填写模块
                     if (err && err.state === 6020104) {
                         this.loginForm.captcha = ''

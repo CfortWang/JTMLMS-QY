@@ -59,7 +59,7 @@ let requestCount = 0
  *
  * get请求，统一参数放在params里面，后台对应只有@RequestParam
  * `params`是即将与请求一起发送的 URL 参数，必须是一个无格式对象(plain object)或 URLSearchParams 对象
- * 
+ *
  * post请求，统一参数放在data里面——json格式，后台对应@RequestBody ,其他 后台对应@RequestParam
  * `data` 是作为请求主体被发送的数据
  * 只适用于这些请求方法 'PUT', 'POST', 和 'PATCH'
@@ -130,7 +130,7 @@ service.interceptors.request.use(async config => {
  * 响应(respone)拦截器
  */
 service.interceptors.response.use(response => {
-    //临时关闭了保存等待的取消功能
+    // 临时关闭了保存等待的取消功能
     tryHideFullScreenLoading()
 
     const dataAxios = response.data
@@ -194,9 +194,7 @@ service.interceptors.response.use(response => {
         state === requestState.OTHER_CLIENTS) {
         if (!cancelRequest) {
             cancelRequest = false
-            MessageBox.confirm(
-                I18n.t('error.logout.message'),
-                I18n.t('error.logout.title'), {
+            MessageBox.confirm(I18n.t('error.logout.message'), I18n.t('error.logout.title'), {
                 confirmButtonText: I18n.t('error.logout.confirmButtonText'),
                 cancelButtonText: I18n.t('error.logout.cancelButtonText'),
                 type: 'warning'
@@ -248,30 +246,28 @@ service.interceptors.response.use(response => {
         err.cause = cause
         return Promise.reject(err)
     }
-},
+}, error => {
     // 异常处理
-    error => {
-        tryHideFullScreenLoading()
-        // for debug
-        console.error('request-error', error)
-        if (error && error.response) {
-            error.message = I18n.t('error.status.' + error.response.status, {
-                url: error.response.config.url
-            })
-        } else {
-            error.state = 500
-            // '服务器君开小差了，请稍后再试'
-            error.message = I18n.t('error.network')
-        }
-        Message.closeAll()
-        Message({
-            message: error.message || I18n.t('error.network'),
-            type: 'error',
-            showClose: true,
-            duration: 5 * 1000
+    tryHideFullScreenLoading()
+    // for debug
+    console.error('request-error', error)
+    if (error && error.response) {
+        error.message = I18n.t('error.status.' + error.response.status, {
+            url: error.response.config.url
         })
-        return Promise.reject(error)
+    } else {
+        error.state = 500
+        // '服务器君开小差了，请稍后再试'
+        error.message = I18n.t('error.network')
     }
-)
+    Message.closeAll()
+    Message({
+        message: error.message || I18n.t('error.network'),
+        type: 'error',
+        showClose: true,
+        duration: 5 * 1000
+    })
+    return Promise.reject(error)
+})
 
 export default service
