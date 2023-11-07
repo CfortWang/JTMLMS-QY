@@ -179,7 +179,7 @@ const validateCode = (rule, value, callback) => {
 export default {
     name: 'login-form',
     components: {
-        updateLicence: () => import('@/views/system/auth/update')
+        updateLicence: () => import('@/views/system/licence/update')
     },
     data () {
         return {
