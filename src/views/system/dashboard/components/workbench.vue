@@ -144,7 +144,8 @@ export default {
             const params = parameters.reduce((acc, curr) => {
                 return `${acc} and ${curr.key} like '%${curr.value}%'`
             }, '')
-            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver from t_bdbhpzb where sn_ + 0 > 0 and di_dian_ = '${level}' ${params} order by sn_ + 0 asc`
+            // and di_dian_ = '${level}'
+            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver from t_bdbhpzb where sn_ + 0 > 0 ${params} order by sn_ + 0 asc`
             const { pageNo = 1, limit = 15 } = requestPage || {}
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {

@@ -114,7 +114,7 @@ export default {
         saveData () {
             updateLicence({
                 username: this.username,
-                licence: this.formModel.licenceKey
+                license: this.formModel.licenceKey
             }).then(res => {
                 console.log(res)
                 this.$message.success('更新许可证成功，请重新登录!')

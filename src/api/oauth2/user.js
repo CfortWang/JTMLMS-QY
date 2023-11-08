@@ -229,6 +229,6 @@ export function updateLicence (params) {
     return request({
         url: OAUTH2_URL() + '/authentication/updateLicense',
         method: 'post',
-        params
+        data: params
     })
 }

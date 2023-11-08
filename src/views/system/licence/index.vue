@@ -9,6 +9,7 @@
                 <span>许可证信息</span>
                 <span>{{ `（${licence.isTrialVersion ? '试用版' : '正式版'}）` }}</span>
                 <el-button
+                    v-if="licence.isTrialVersion"
                     type="success"
                     size="mini"
                     @click="licenceFormVisible = true"
@@ -47,7 +48,7 @@
         </div>
         <update-licence
             :visible="licenceFormVisible"
-            :username="username"
+            :username="account"
             @close="visible => licenceFormVisible = visible"
         />
     </ibps-container>
@@ -59,10 +60,10 @@ export default {
         updateLicence: () => import('@/views/system/licence/update')
     },
     data () {
-        const { username = '', licence = {}} = this.$store.getters
+        const { account = '', licence = {}} = this.$store.getters
         return {
             licenceFormVisible: false,
-            username,
+            account,
             licence,
             status: {
                 success: '正常',
@@ -101,7 +102,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .licence-container {
-    margin: 20px;
+    width: 1080px;
+    margin: 20px auto;
     height: calc(100% - 100px);
     padding: 20px;
     border: 1px solid #ccc;
@@ -121,7 +123,7 @@ export default {
         flex-wrap: wrap;
         justify-content: space-between;
         .item {
-            width: calc(60% - 10px);
+            width: 100%;
             margin-bottom: 20px;
             padding: 15px;
             border: 1px solid #ccc;
