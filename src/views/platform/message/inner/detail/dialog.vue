@@ -138,7 +138,7 @@ export default {
         // 消息确认，受控文件用
         confirmMsg () {
             // TODO
-            this.$confirm('点击确认将在系统信息管理模块查看到所通知文件的具体信息', '提示', {
+            this.$confirm('点击确认将在系统里“文件与记录”模块下的“受控文件查阅”查看到所通知文件的具体信息', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning',
@@ -206,7 +206,7 @@ export default {
                     //     console.log(response)
                     // }).catch(error => {
                     // })
-                })
+                    })
                 this.closeDialog()
             }).catch(() => { })
         },

@@ -8,11 +8,13 @@
 /* 共同调用类， 与脚本统一调用。*/
 import satisfaction from './satisfaction/satisfaction.vue'
 import approve from './approve/approve.vue'
+import orderOpen from './goods/orderOpen.vue'
 
 export default {
     components: {
         satisfaction,
-        approve
+        approve,
+        orderOpen
     },
     props: {
         currentType: {

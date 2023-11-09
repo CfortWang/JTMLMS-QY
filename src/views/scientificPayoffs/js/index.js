@@ -222,7 +222,7 @@ export const barData = {
         top: '20px'
     },
     xAxis: {
-        name: '人员姓名',
+        name: '人员',
         type: 'category',
         data: [],
         axisTick: {
@@ -278,6 +278,18 @@ export const barData = {
                 ])
             }
         }
+        // label: {
+        //     show: true,
+        //     position: 'top',
+        //     textStyle: { // 数值样式
+        //         color: '#FFFFFF',
+        //         fontSize: 12
+        //     },
+        //     formatter: function (params) {
+        //         return params.value !== '0' ? params.value : ''
+        //     }
+
+        // }
     }],
     tooltip: {
         show: true,

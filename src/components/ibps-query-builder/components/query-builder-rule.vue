@@ -238,6 +238,12 @@ export default {
     },
     watch: {
         rules (val) {
+            this.selectedFilter = this.rules.id || this.filters[0].id
+            this.filters.forEach((filter) => {
+                if (filter.id === this.selectedFilter) {
+                    this.selectedFilterObj = filter
+                }
+            })
             this.rulesData = val
         },
         rulesData: {

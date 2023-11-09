@@ -60,12 +60,12 @@
                                         {{ scope.row.nei_shen_yuan_ | emfiltes(employeeList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="ze_ren_shi_" label="责任室" width="100">
+                                <el-table-column prop="ze_ren_shi_" label="责任部门" width="100">
                                     <template slot-scope="scope">
                                         {{ scope.row.ze_ren_shi_ | partFilter(partList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="fu_ze_ren_" label="负责人" width="60">
+                                <el-table-column prop="fu_ze_ren_" label="部门负责人" width="60">
                                     <template slot-scope="scope">
                                         {{ scope.row.fu_ze_ren_ | emfiltes(employeeList) }}
                                     </template>
@@ -102,12 +102,12 @@
                                         {{ scope.row.nei_shen_yuan_ | emfiltes(employeeList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="ze_ren_shi_" label="责任室" width="100">
+                                <el-table-column prop="ze_ren_shi_" label="责任部门" width="100">
                                     <template slot-scope="scope">
                                         {{ scope.row.ze_ren_shi_ | partFilter(partList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="fu_ze_ren_" label="负责人" width="60">
+                                <el-table-column prop="fu_ze_ren_" label="部门负责人" width="60">
                                     <template slot-scope="scope">
                                         {{ scope.row.fu_ze_ren_ | emfiltes(employeeList) }}
                                     </template>

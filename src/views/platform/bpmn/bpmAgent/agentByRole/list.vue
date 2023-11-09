@@ -268,7 +268,7 @@ export default {
                 case 'remove': // 删除
                     ActionUtils.removeRecord(selection)
                         .then((ids) => {
-                            this.handleRemove(ids)
+                            this.handleRemove(ids, data)
                         })
                         .catch(() => {})
                     break
@@ -293,7 +293,13 @@ export default {
         /**
          * 处理删除
          */
-        handleRemove (ids) {
+        handleRemove (ids, data) {
+            const show = data.some(item => item.shi_fou_qi_yong_ === 'enabled')
+            if (show) {
+                this.$message.warning('请把数据禁用，才能删除')
+                return
+            }
+
             const params = {
                 tableName: 't_swdl',
                 paramWhere: {

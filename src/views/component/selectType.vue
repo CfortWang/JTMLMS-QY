@@ -9,13 +9,8 @@
 import curdPost from "@/business/platform/form/utils/custom/joinCURD.js";
 export default {
   data() {
-    let levelInfos;
     const { first, second } = this.$store.getters.level;
-    if (second) {
-      levelInfos = second
-    } else {
-      levelInfos = first
-    }
+    let levelInfos = second?second:first;
     return {
       props: {
         lazy: true,
@@ -24,7 +19,7 @@ export default {
           let sqlString1 = "";
           if (level == 0) {
             // 286814138233389367 是文件分类标识的id，在ibps_cat_category
-            sqlString1 = "select *FROM `ibps_cat_type` WHERE parent_id_='286814138233389367' ORDER BY sn_ ASC";
+            sqlString1 = `select *FROM ibps_cat_type WHERE parent_id_='286814138233389367' and authority_name like '%${levelInfos}%' ORDER BY sn_ ASC`;
           } else {
             sqlString1 = `select *FROM ibps_cat_type WHERE parent_id_ in (select id_ from ibps_cat_type where ID_= '${value}'  AND category_key_ ='FILE_TYPE') ORDER BY sn_ ASC`;
           }

@@ -87,8 +87,10 @@ export default {
     },
     mixins: [FixHeight],
     data () {
+        const {first,second}  = this.$store.getters.level
         return {
             width: 200,
+            diDian :second ? second : first,
             height: document.clientHeight,
             importFormVisible: false,
             sortFormVisible: false,
@@ -175,9 +177,8 @@ export default {
             let whereParams = {
                 'categoryKey': this.categoryKey
             }
-            const {first,second}  = this.$store.getters.level
             if(this.categoryKey=='FILE_TYPE'){
-                whereParams.diDian = second?second:first
+                whereParams.diDian = this.diDian
             }
             findTreeData(whereParams).then(response => {
                 const data = response.data
@@ -199,6 +200,14 @@ export default {
                         return
                     }
                     this.editId = null
+                    if(data.sn == 0 && data.name == "文件分类"){
+                        const object = {
+                            diDian:this.diDian,
+                            buMen:"",
+                            chaYue:"公用查阅"
+                        }
+                        data.authorityName = JSON.stringify(object)
+                    }
                     this.nodeData = data
                     this.isPrivate = false
                     this.handTreeEdit()
@@ -297,10 +306,10 @@ export default {
         },
         isSpecial (name,type) {
             const fileType = ['内部文件', '外部文件', '记录表单']
-            if (this.categoryKey === 'FILE_TYPE' && name=='文件分类' && type == '0') {
-                ActionUtils.warning('请不要操作文件分类！！如果需要更改，请联系管理员。')
-                return true
-            }
+            // if (this.categoryKey === 'FILE_TYPE' && name=='文件分类' && type == '0') {
+            //     ActionUtils.warning('请不要操作文件分类！！如果需要更改，请联系管理员。')
+            //     return true
+            // }
             if (this.categoryKey === 'FILE_TYPE' && fileType.includes(name) && type == '1') {
                 ActionUtils.warning('请不要操作内部文件、外部文件、记录表单分类！！如果需要更改，请联系管理员。')
                 return true
