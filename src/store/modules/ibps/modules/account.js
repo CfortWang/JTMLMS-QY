@@ -49,7 +49,7 @@ export default {
                     const { data = {} } = response
                     const tokenInfo = JSON.parse(JSON.stringify(data))
                     tokenInfo.licJson = undefined
-                    const licenceData = data.licJson || {}
+                    const licenceData = data.licJson || { isTrialVersion: false }
                     const { isTrialVersion, notAfter, reminderDays, notBefore } = licenceData
                     const now = Date.now()
                     // 判定是否超时

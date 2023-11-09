@@ -434,7 +434,7 @@ export default {
         updateList () {
             setTimeout(() => {
                 this.getData(this.activeTab)
-            }, 500)
+            }, 750)
         },
         // 查询
         search () {

@@ -95,7 +95,7 @@ export default {
             this.licenceFormVisible = true
         },
         transformDate (v) {
-            return new Date(v).toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+            return v ? new Date(v).toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-') : ''
         }
     }
 }
@@ -131,7 +131,7 @@ export default {
             background-color: #fff;
             transition: transform 0.2s;
             &:hover {
-                transform: scale(1.03);
+                transform: scale(1.01);
             }
             .label {
                 font-size: 16px;
