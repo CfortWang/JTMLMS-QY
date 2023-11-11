@@ -39,6 +39,7 @@ _.extend(JForm, {
         this.$import = _import
         this._ = _
         this._isInitialization = true
+        this.$loading = Vue.prototype.$loading
     },
 
     // 表单加载

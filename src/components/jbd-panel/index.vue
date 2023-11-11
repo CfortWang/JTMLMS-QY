@@ -12,7 +12,7 @@
         <span style="float: right; " class="jbd-sys-title-contact">
             <br>
             深圳市金源信通科技有限公司开发 <i style="margin-left: 10px;" class="el-icon-phone" /> 0755-2642-4403
-            <i style="margin-left: 20px;" class="el-icon-phone" /> 153 6143 5689
+            <i style="margin-left: 20px;" class="el-icon-phone" /> 181 2638 3365
         </span>
     </div>
 </template>
