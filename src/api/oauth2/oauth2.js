@@ -306,6 +306,7 @@ OAuth.prototype.refreshAccessToken = function (refreshToken, callback) {
             client_id: this.clientId,
             client_secret: this.clientSecret,
             grant_type: 'refresh_token',
+            username: this.username,
             refresh_token: refreshToken
         },
         method: 'post'

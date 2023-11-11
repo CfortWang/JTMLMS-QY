@@ -468,6 +468,12 @@
                 if (this.$utils.isEmpty(opinionData) || !this.hasFormOpinion()) {
                     return
                 }
+                // 处理审批人信息
+                const { userList = [] } = this.$store.getters || {}
+                opinionData.opinionList.forEach(item => {
+                    const userInfo = userList.find(i => i.userId === item.auditor)
+                    item.auditorName = userInfo ? userInfo.userName : ''
+                })
                 this.unComplateOpinion = opinionData.unComplateOpinion
                 const hasBindNode = opinionData.hasBindNode
                 const formOpinionConfig = opinionData.formOpinionConfig

@@ -190,8 +190,7 @@ service.interceptors.response.use(response => {
             })
         }
         // 6020201:非法的token;6020202:其他客户端登录了;6020301:Token 过期了;
-    } else if (state === requestState.ILLEGAL_TOKEN ||
-        state === requestState.OTHER_CLIENTS) {
+    } else if (state === requestState.ILLEGAL_TOKEN || state === requestState.OTHER_CLIENTS) {
         if (!cancelRequest) {
             cancelRequest = false
             MessageBox.confirm(I18n.t('error.logout.message'), I18n.t('error.logout.title'), {

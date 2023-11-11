@@ -329,7 +329,10 @@ export default {
         // 轮询刷新公告数据和任务数据
         this.timer = setInterval(() => {
             // this.getMessage()
-            this.getData(this.activeTab)
+            // 仅待办事宜自动更新数据
+            if (this.activeTab === 'wait') {
+                this.getData(this.activeTab)
+            }
         }, 30 * 1000)
     },
     beforeDestroy () {
