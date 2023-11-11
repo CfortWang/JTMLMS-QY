@@ -117,6 +117,20 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="体系审查："
+                      prop="authorityObject.shenCha"
+                      v-show="categoryKey==='FILE_TYPE'">
+          <el-radio-group v-if="!readonly"
+                          v-model="type.authorityObject.shenCha"
+                          >
+            <el-radio label="需要">需要</el-radio>
+            <el-radio label="不需要">不需要</el-radio>
+          </el-radio-group>
+          <span v-else>{{ type.authorityObject.shenCha }}</span>
+        </el-form-item>
+        <el-form-item v-show="categoryKey==='FILE_TYPE'">
+            <span >需要进行体系文件审查的文件类型请选择“需要”，子节点有需要进行文件审查的话，父节点也需要选择“需要”</span>
+        </el-form-item>
       </el-form>
     </ibps-container>
   </div>
@@ -163,7 +177,6 @@ export default {
       dialogLoading: false,
       isPrivateLocal: false,
       topKey: '',
-
       srtuOptions: srtuOptions,
       defaultForm: {},
       type: {
@@ -172,7 +185,7 @@ export default {
         typeKey: '',
         ownerId: '0',
         authorityObject: {
-          chaYue: '', buMen: ''
+          chaYue: '', buMen: '',shenCha:''
         }
       },
       rules: {
@@ -180,7 +193,8 @@ export default {
         typeKey: [{ required: true, validator: validateKey }],
         authorityObject: {
           chaYue: [{ required: false }],
-          buMen: [{ required: false }]
+          buMen: [{ required: false }],
+          shenCha: [{ required: false }]
         }
       },
       toolbars: [
@@ -269,6 +283,11 @@ export default {
         this.rules.authorityObject.chaYue = [{ required: true, message: "查阅权限不得为空！" }]
       } else {
         this.rules.authorityObject.chaYue = [{ required: false }]
+      }
+      if (!this.type.authorityObject.shneCha && this.categoryKey === 'FILE_TYPE') {
+        this.rules.authorityObject.shneCha = [{ required: true, message: "审查选择不得为空！" }]
+      } else {
+        this.rules.authorityObject.shneCha = [{ required: false }]
       }
       if (this.type.authorityObject.chaYue == '部门查阅' && (!this.type.authorityObject.buMen || this.type.authorityObject.buMen.length == 0)) {
         this.rules.authorityObject.buMen = [{ required: true, message: "部门选择不得为空！" }]

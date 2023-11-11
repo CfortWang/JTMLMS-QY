@@ -187,6 +187,16 @@ export default {
             })
         },
         handleTreeAction (command, position, selection, data) {
+            console.log('data',data)
+            if(data.sn == 0 && data.name == "文件分类"){
+                const object = {
+                    diDian:this.diDian,
+                    buMen:"",
+                    chaYue:"公用查阅",
+                    shenCha:"不需要"
+                }
+                data.authorityName = JSON.stringify(object)
+            }
             if (position === 'toolbar') {
                 if (command === 'refresh') {
                     this.loadTreeData()
@@ -200,14 +210,6 @@ export default {
                         return
                     }
                     this.editId = null
-                    if(data.sn == 0 && data.name == "文件分类"){
-                        const object = {
-                            diDian:this.diDian,
-                            buMen:"",
-                            chaYue:"公用查阅"
-                        }
-                        data.authorityName = JSON.stringify(object)
-                    }
                     this.nodeData = data
                     this.isPrivate = false
                     this.handTreeEdit()
@@ -218,6 +220,7 @@ export default {
                     if (this.isSpecial(data.name,3)) {
                         return
                     }
+                    
                     this.editId = null
                     this.isPrivate = true
                     this.nodeData = data
@@ -311,12 +314,12 @@ export default {
             //     return true
             // }
             if (this.categoryKey === 'FILE_TYPE' && fileType.includes(name) && type == '1') {
-                ActionUtils.warning('请不要操作内部文件、外部文件、记录表单分类！！如果需要更改，请联系管理员。')
-                return true
+                ActionUtils.warning('涉及系统代码逻辑，请谨慎操作内部文件、外部文件、记录表单分类！！如果需要更改，请联系管理员。')
+                return false
             }
              if (this.categoryKey === 'FILE_TYPE' && name=='记录表单' && type == '3') {
-                ActionUtils.warning('请不要操作记录表单！！如果需要更改，请联系管理员。')
-                return true
+                ActionUtils.warning('涉及系统代码逻辑，请谨慎操作记录表单！！如果需要更改，请联系管理员。')
+                return false
             }
             return false
         }

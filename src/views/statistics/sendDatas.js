@@ -61,13 +61,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.jiaoyanMGObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.jiaoyanMGObj[i].NAME_ )
+                                mid[midI].numA = this.jiaoyanMGObj[i].numA
+                                mid[midI].num = this.jiaoyanMGObj[i].num
+                                mid[midI].chu = this.jiaoyanMGObj[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.jiaoyanMGObj,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -94,13 +96,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.hechaMGObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.hechaMGObj[i].NAME_ )
+                                mid[midI].numA = this.hechaMGObj[i].numA
+                                mid[midI].num = this.hechaMGObj[i].num
+                                mid[midI].chu = this.hechaMGObj[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.hechaMGObj,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -127,13 +131,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.waibuObjfb.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.waibuObjfb[i].NAME_ )
+                                mid[midI].numA = this.waibuObjfb[i].numA
+                                mid[midI].num = this.waibuObjfb[i].num
+                                mid[midI].chu = this.waibuObjfb[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.waibuObjfb,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -159,7 +165,16 @@ export default {
                                 title.push(this.zhiliangzhibiaotitle[t].zhi_liang_zhi_bia)
                                 
                         }
-                        
+                        let zbval = []
+                        for (let t = 0; t < this.zhiliangmubiaotitle.length; t++) {
+                                if(this.zhiliangmubiaotitle[t].zhi_liang_mu_biao.match(/(\d+(\.\d+)?)/)=== null){
+                                        zbval.push(parseFloat(this.zhiliangmubiaotitle[t].zhi_biao_xian_zhi.match(/(\d+(\.\d+)?)/)))
+                                }else{
+                                        zbval.push(parseFloat(this.zhiliangmubiaotitle[t].zhi_liang_mu_biao.match(/(\d+(\.\d+)?)/)))
+                                }
+                                
+                                                
+                        }
                         // let arr  = this.tableNum
                         // let aa =[]
                         // for (let j = 0; j < arr.length; j++) {
@@ -172,7 +187,7 @@ export default {
                         // console.log(arr,this.tableData.data,'djlkddddddddddddddddddddddddddddddddd')
 
                         return {
-                                "Num" :{"date": this.endDate,"number": zlzbfz,"title":title},
+                                "Num" :{"date": this.endDate,"number": zlzbfz,"title":title,"xianzhi":zbval,"titleall":this.zhiliangmubiaotitle},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
@@ -261,8 +276,15 @@ export default {
                 },
                 getbzJunZhujNum(){
                         let title = ['NAME_','numA','num','chu']
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.gaijinxiangObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.gaijinxiangObj[i].NAME_ )
+                                mid[midI].numA = this.gaijinxiangObj[i].numA
+                                mid[midI].num = this.gaijinxiangObj[i].num
+                                mid[midI].chu = this.gaijinxiangObj[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.gaijinxiangObj,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
@@ -352,13 +374,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.guanshenfbObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.guanshenfbObj[i].NAME_ )
+                                mid[midI].numA = this.guanshenfbObj[i].numA
+                                mid[midI].num = this.guanshenfbObj[i].num
+                                mid[midI].chu = this.guanshenfbObj[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.guanshenfbObj,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -437,13 +461,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.neishenfbObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.neishenfbObj[i].NAME_ )
+                                mid[midI].numA = this.neishenfbObj[i].numA
+                                mid[midI].num = this.neishenfbObj[i].num
+                                mid[midI].chu = this.neishenfbObj[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.neishenfbObj,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -472,13 +498,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.yingjifbObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.yingjifbObj[i].NAME_ )
+                                mid[midI].numA = this.yingjifbObj[i].numA
+                                mid[midI].num = this.yingjifbObj[i].num
+                                mid[midI].chu = this.yingjifbObj[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.yingjifbObj,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -510,14 +538,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
-                        console.log(this.zaigangrenyuanfb,'43664564646767fghhfghg')
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.zaigangrenyuanfb.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.zaigangrenyuanfb[i].NAME_ )
+                                mid[midI].numA = this.zaigangrenyuanfb[i].numA
+                                mid[midI].num = this.zaigangrenyuanfb[i].num
+                                mid[midI].chu = this.zaigangrenyuanfb[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.zaigangrenyuanfb,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -552,13 +581,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.gangqianpeixunfb.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.gangqianpeixunfb[i].NAME_ )
+                                mid[midI].numA = this.gangqianpeixunfb[i].numA
+                                mid[midI].num = this.gangqianpeixunfb[i].num
+                                mid[midI].chu = this.gangqianpeixunfb[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.gangqianpeixunfb,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -628,13 +659,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.neibuObjfb.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.neibuObjfb[i].NAME_ )
+                                mid[midI].numA = this.neibuObjfb[i].numA
+                                mid[midI].num = this.neibuObjfb[i].num
+                                mid[midI].chu = this.neibuObjfb[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.neibuObjfb,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -660,13 +693,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.fengxianfbObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.fengxianfbObj[i].NAME_ )
+                                mid[midI].numA = this.fengxianfbObj[i].numA
+                                mid[midI].num = this.fengxianfbObj[i].num
+                                mid[midI].chu = this.fengxianfbObj[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.fengxianfbObj,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -678,13 +713,15 @@ export default {
                         
                         let title = ['NAME_','numA','num','chu']
 
-                        // for (let t = 0; t < this.bufuheObj.length; t++) {
-                        //         title.push(this.bufuheObj[t].bao_gao_lei_xing_)
-                                
-                        // }
-                        // }
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.bufuheObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[midI].numA = this.bufuheObj[i].numA
+                                mid[midI].num = this.bufuheObj[i].num
+                                mid[midI].chu = this.bufuheObj[i].chu
+                        }
                         return {
-                                "num" :{"date": this.endDate,"number": this.bufuheObj,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },

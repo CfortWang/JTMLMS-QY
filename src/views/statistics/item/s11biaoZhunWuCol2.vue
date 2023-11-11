@@ -67,6 +67,7 @@
        }
       },
       drawLine(){
+        let that = this
         let s11biaoZhunWu = echarts.init(document.getElementById(this.id))
         let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
         let barNum = []
@@ -80,37 +81,61 @@
                 position:'top',
                         
                 textStyle:{
-                  fontSize:16,
+                  fontSize:12,
                   color:'#B0CEFC'
                 }
               }
-            }
+            },
+            markLine: {
+                  symbol: ['none', 'none'], // 去掉箭头
+                  // label:{
+                  //   show: true,
+                  //   position: 'right',
+                  //   color: barColor[i],
+                  //   formatter: function (params) {
+                  //     return that.data.Num.titleall[i].zhi_liang_mu_biao
+                  //   },
+                  // },
+                  data: [
+                    {
+                      name: '阈值',
+                      yAxis: this.data.Num.xianzhi[i]*1
+                    }
+                  ],
+                  lineStyle: {
+                    color: barColor[i]
+                  }
+                } 
           })
           
         }  
-        console.log(this.data.Num.title,this.data.Num.number,'bnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn')
-        let that = this
+        // let that = this
         let option = {
            //v3
           title: {
             // text: this.title,
             textStyle:{ fontSize:14,color: this.colorw }
           },
-          // tooltip: {
-          //               trigger: 'axis',
-          //               axisPointer: {
-          //                 type: 'shadow'
-          //               },
-          //               formatter: function (datas) {
-          //                 // console.log(datas)
-          //                   var res=datas[0].name+"<BR>"+'期间核查次数:'+datas[0].data+"<BR>期间核查完成次数"+datas[1].data
-          //                   // res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
-          //                   return res
-          //               }
-          // },
+          tooltip: {
+                // 当trigger : axis 鼠标移入标线不会有悬浮框出现 params的值为一个数组，只会悬浮series
+                // 当trigger : item 鼠标移入标线有悬浮框出现 params的值为一个对象，会区别鼠标移入的是series还是markLine
+                // 使用axis 注释掉formatter 自己写也行 ；使用item放开formatter
+                show: true,
+                trigger: "item",//axis item
+                axisPointer: {
+                    type: "cross",
+                    label: {
+                        backgroundColor: "#6a7985",
+                    },
+                },
+                formatter: (params) => {
+                  return that.data.Num.titleall[params.seriesIndex].zhi_liang_mu_biao
+                }
+            },
           legend: {
             textStyle: {
-                color: '#B0CEFC'  // 图例文字颜色
+              fontSize: 8,
+              color: '#B0CEFC'  // 图例文字颜色
             }
 
           },
@@ -168,11 +193,6 @@
        
        };
         
-        // s11biaoZhunWu.on('click', function (params) {
-        //   console.log(params,'433333333333333333333333333333333333333333335')
-        //   that.$emit('change', params.data.id_)
-        //   // that.userInfo[1] = params.data.NAME_
-        // })
        option && s11biaoZhunWu.setOption(option);
       }
     }
