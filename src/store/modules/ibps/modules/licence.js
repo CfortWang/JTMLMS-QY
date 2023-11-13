@@ -10,7 +10,6 @@ export default {
     },
     actions: {
         setLicence ({ commit }, data) {
-            console.log(data)
             commit('updateLicJson', data)
         }
     }

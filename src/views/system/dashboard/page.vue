@@ -525,8 +525,9 @@
                 }
             },
             getPeriodTask () {
-                const { userId } = this.$store.getters
-                const sql = `select * from t_zqswtxb where shi_fou_ti_xing_ = '是' and zhi_xing_ren_yuan like '%${userId}%' order by field(zhi_xing_zhou_qi_, '1次/天', '1次/周', '1次/月', '1次/季度', '1次/半年', '1次/年')`
+                const { userId, role = [] } = this.$store.getters
+                const roles = role.map(i => i.id)
+                const sql = `select * from t_zqswtxb where shi_fou_ti_xing_ = '是' and (zhi_xing_ren_yuan like '%${userId}%' or find_in_set(zhi_xing_jiao_se_, '${roles.join(',')}')) order by field(zhi_xing_zhou_qi_, '1次/天', '1次/周', '1次/月', '1次/季度', '1次/半年', '1次/年')`
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
                     if (data.length) {

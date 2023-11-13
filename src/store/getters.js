@@ -4,6 +4,8 @@ export default {
     name: state => state.ibps.user.info && state.ibps.user.info.employee ? state.ibps.user.info.employee.name : '', // 姓名
     status: state => state.ibps.user.info && state.ibps.user.info.employee ? state.ibps.user.info.employee.status : '', // 用户状态
     org: state => state.ibps.user.info ? state.ibps.user.info.org : {}, // 用户部门信息
+    role: state => state.ibps.user.info ? state.ibps.user.info.role : [], // 用户角色信息
+    position: state => state.ibps.user.info && state.ibps.user.info.employee ? state.ibps.user.info.employee.positions : '', // 用户部门信息
     isSuper: state => state.ibps.user.info && state.ibps.user.info.user ? state.ibps.user.info.user.isSuper === 'Y' : false, // 是否超级管理员
     account: state => state.ibps.user.info && state.ibps.user.info.user ? state.ibps.user.info.user.account : '', // 用户名
     regOpen: state => state.ibps.user.regOpen, // 注册状态
