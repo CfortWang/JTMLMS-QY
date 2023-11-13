@@ -38,6 +38,7 @@ import pluginLog from '@/plugins/log'
 import pluginOpen from '@/plugins/open'
 // 平台配置文件
 import setting from '@/setting.js'
+import { BASE_SEAL_API } from '@/constant'
 import env from '@/env'
 const BASE_URL = process.env.VUE_APP_BASE_URL
 
@@ -82,7 +83,7 @@ export default {
                 // 报表路径
                 Vue.prototype.$reportPath = `${BASE_URL}demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${reportPath}/`
                 Vue.prototype.$getReportFile = downloadReport // 通过方法函数，拼接url，并将字符串格式化
-                Vue.prototype.$getSealUri = 'http://120.77.249.241:9999/no/getSealFile/' // 微签 回显获取文件地址
+                Vue.prototype.$getSealUri = `${BASE_SEAL_API}no/getSealFile/` // 微签 回显获取文件地址
                 Vue.prototype.$getFileDow = `${BASE_URL}ibps/platform/v3/file/download?attachmentId=` // 文件下载地址
                 clearInterval(timer) // 添加成功后即删除定时任务
             }

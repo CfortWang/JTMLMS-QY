@@ -127,7 +127,7 @@
           <el-row class="title">服务地址示例</el-row>
           <el-row class="content">
             <el-col :span="4" class="left">restful格式 </el-col>
-            <el-col :span="20">IP：http://192.168.3.206:5100/ibps/oauth2/v3/user/login，域名：http://cloud.bpmhome.cn:15100/ibps/oauth2/v3/user/login</el-col>
+            <el-col :span="20">IP：{{ baseUrl }}ibps/oauth2/v3/user/login，域名：http://cloud.bpmhome.cn:15100/ibps/oauth2/v3/user/login</el-col>
           </el-row>
           <el-row class="content">
             <el-col :span="4" class="left">webService格式</el-col>
@@ -175,6 +175,7 @@ export default {
   data() {
     return {
       radio: '',
+      baseUrl: process.env.VUE_APP_BASE_URL,
       formList: {
         name: '',
         key: '',

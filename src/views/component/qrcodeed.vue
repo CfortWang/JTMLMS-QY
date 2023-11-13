@@ -24,7 +24,8 @@ export default {
     },
     data () {
         return {
-            qrCode: ''
+            qrCode: '',
+            baseUrl: process.env.VUE_APP_BASE_URL
         }
     },
     watch: {
@@ -57,8 +58,8 @@ export default {
             this.qrCode = new QRCode('qrcode', {
                 width: 132,
                 height: 132,
-                text: `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxf0aecf99696061a3&redirect_uri=https%3A%2F%2Fwww.szjyxt.com%2F%23%2Fziliao&response_type=code&scope=snsapi_base&state=${this.formData.changJingId}#wechat_redirect`,
-                // text: `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxea2c214ca5d25739&redirect_uri=https%3A%2F%2Fwww.szjyxt.com%2F%23%2Fziliao&response_type=code&scope=snsapi_base&state=${this.formData.changJingId}#wechat_redirect`,
+                text: `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxf0aecf99696061a3&redirect_uri=${encodeURIComponent(`${this.baseUrl}#/ziliao`)}&response_type=code&scope=snsapi_base&state=${this.formData.changJingId}#wechat_redirect`,
+                // text: `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxea2c214ca5d25739&redirect_uri=${encodeURIComponent(`${this.baseUrl}#/ziliao`)}&response_type=code&scope=snsapi_base&state=${this.formData.changJingId}#wechat_redirect`,
                 colorDark: '#000000', // 前景色
                 colorLight: '#FFFFFF', // 背景色
                 correctLevel: QRCode.CorrectLevel.L

@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 import { FORM_URL } from '@/api/baseUrl'
+import { BASE_SEAL_API } from '@/constant'
 import axios from 'axios'
 
 const BASE_URL = process.env.VUE_APP_BASE_URL
@@ -106,7 +107,7 @@ export function sealPre (url, fileKey) {
 
 /* 手动微签：脚本对文件进行手动盖章-手动签章页面的url */
 export function getSigPageUrl (sigFile) {
-    const sigUrl = 'http://120.77.249.241:9999/manualSig/manualSigPage/?signKey=V1FTMjAyMTEyMjFkOTVjNWM=&signSecret=YWQwMmY3ZjQ4ZDJmMmYwNDA=&sigFile=' + sigFile
+    const sigUrl = `${BASE_SEAL_API}manualSig/manualSigPage/?signKey=V1FTMjAyMTEyMjFkOTVjNWM=&signSecret=YWQwMmY3ZjQ4ZDJmMmYwNDA=&sigFile=${sigFile}`
     return sigUrl
 }
 
