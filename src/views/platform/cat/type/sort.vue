@@ -1,41 +1,46 @@
 <template>
-  <el-dialog
-    :title="title"
-    :visible.sync="dialogVisible"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    append-to-body
-    class="dialog type-sort-dialog"
-    @open="getFormData"
-    @close="closeDialog"
-  >
-    <el-container
-      v-loading="dialogLoading"
-      :element-loading-text="$t('common.loading')"
-    >
+  <el-dialog :title="title"
+             :visible.sync="dialogVisible"
+             :close-on-click-modal="false"
+             :close-on-press-escape="false"
+             append-to-body
+             class="dialog type-sort-dialog"
+             @open="getFormData"
+             @close="closeDialog">
+    <el-container v-loading="dialogLoading"
+                  :element-loading-text="$t('common.loading')">
       <el-main>
-        <div v-for="option in data" :key="option.id">
-          <el-checkbox v-model="option.checked" @change="onClick(option)">
+        <div v-for="option in data"
+             :key="option.id">
+          <el-checkbox v-model="option.checked"
+                       @change="onClick(option)">
             {{ option.name }}
           </el-checkbox>
         </div>
 
       </el-main>
       <el-aside width="150px">
-        <el-button type="primary" icon="el-icon-upload2" @click="top">顶部</el-button><br>
+        <el-button type="primary"
+                   icon="el-icon-upload2"
+                   @click="top">顶部</el-button><br>
         <div class="button-padding" />
-        <el-button type="primary" icon="el-icon-top" @click="up">向上</el-button><br>
+        <el-button type="primary"
+                   icon="el-icon-top"
+                   @click="up">向上</el-button><br>
         <div class="button-padding" />
-        <el-button type="primary" icon="el-icon-bottom" @click="down">向下</el-button><br>
+        <el-button type="primary"
+                   icon="el-icon-bottom"
+                   @click="down">向下</el-button><br>
         <div class="button-padding" />
-        <el-button type="primary" icon="el-icon-download" @click="buttom">底部</el-button><br>
+        <el-button type="primary"
+                   icon="el-icon-download"
+                   @click="buttom">底部</el-button><br>
       </el-aside>
     </el-container>
-    <div slot="footer" class="el-dialog--center">
-      <ibps-toolbar
-        :actions="toolbars"
-        @action-event="handleActionEvent"
-      />
+    <div slot="footer"
+         class="el-dialog--center">
+      <ibps-toolbar :actions="toolbars"
+                    @action-event="handleActionEvent" />
     </div>
   </el-dialog>
 </template>
@@ -52,8 +57,9 @@ export default {
       default: false
     },
     id: String,
-    title: String
-
+    title: String,
+    categoryKey: String,
+    diDian: String
   },
   data() {
     return {
@@ -83,7 +89,7 @@ export default {
   },
   watch: {
     visible: {
-      handler: function(val, oldVal) {
+      handler: function (val, oldVal) {
         this.dialogVisible = this.visible
         // 关闭清除数据，刷新树
         this.data = []
@@ -109,7 +115,7 @@ export default {
     handleSave() {
       const data = this.data
       const ids = []
-      data.forEach(function(v) { ids.push(v.id) })
+      data.forEach(function (v) { ids.push(v.id) })
       this.ids = ids
 
       this.saveData()
@@ -139,9 +145,13 @@ export default {
         return
       }
       this.dialogLoading = true
-      sortList({
+      let whererParams = {
         typeId: this.formId
-      }).then(response => {
+      }
+      if (this.categoryKey == 'FILE_TYPE') {
+        whererParams.diDian = this.diDian
+      }
+      sortList(whererParams).then(response => {
         this.data = response.data
         this.dialogLoading = false
       }).catch(() => {
@@ -181,19 +191,18 @@ export default {
 }
 </script>
 <style lang="scss">
-.type-sort-dialog{
+.type-sort-dialog {
   // .el-dialog__body{
   //   height:  calc(27vh - 120px) !important;
   // }
-  .button-padding{
-  height: 5px;
+  .button-padding {
+    height: 5px;
+  }
+  .el-main {
+    border: 1px #d4d4de solid;
+  }
+  .el-aside {
+    padding-left: 20px;
+  }
 }
-.el-main{
-  border: 1px #d4d4de solid;
-}
-.el-aside{
-  padding-left: 20px;
-}
-}
-
 </style>

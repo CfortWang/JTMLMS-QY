@@ -1,4 +1,3 @@
-import dataTemplate from '@/store/modules/ibps/modules/dataTemplate'
 import echarts from 'echarts'
 export default {
     data () {
@@ -12,7 +11,12 @@ export default {
                 textStyle: { // 数值样式
                     color: 'black',
                     fontSize: 12
+                },
+                formatter: (params) => {
+                    // 这个回调函数不起作用了
+                    return params.value === '0' ? '' : params.value
                 }
+
             }
         }
     },
@@ -94,7 +98,7 @@ export default {
             })
         },
         getJiHuaZiBiaoJiSuan (id) {
-            const sql = `select * from t_rkzztkhcjhzb where parent_id_ = '${id}'`
+            const sql = `select * from t_rkzztkhcjhzb where ji_hua_de_id_ = '${id}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length > 0) {
@@ -111,7 +115,7 @@ export default {
             })
         },
         getShiShiData (id, activeIndex) {
-            const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen,h.NAME_ as yuanZuZhangBuMen,i.NAME_ as yuanZuZhangName from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_position h on a.bu_men_ = h.ID_ left join ibps_party_employee i on a.zu_chang_ = i.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.parent_id_ = '${id}' order by a.tiao_kuan_hao_`
+            const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen,h.NAME_ as yuanZuZhangBuMen,i.NAME_ as yuanZuZhangName from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_position h on a.bu_men_ = h.ID_ left join ibps_party_employee i on a.zu_chang_ = i.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.ji_hua_de_id_ = '${id}' order by a.tiao_kuan_hao_`
 
             // if (activeIndex === 1) {
             //     sql = `select * from t_rkzztkhcjhzb where parent_id_ = '${id}' order by tiao_kuan_hao_`
@@ -126,7 +130,7 @@ export default {
             })
         },
         getBuFuHeXiangMu (id) {
-            const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.parent_id_ = '${id}' and a.shen_he_jie_guo_ = 'N' order by a.tiao_kuan_hao_`
+            const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.ji_hua_de_id_ = '${id}' and a.he_cha_jie_guo_ = 'N' order by a.tiao_kuan_hao_`
 
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
@@ -137,10 +141,10 @@ export default {
         },
         getBuFuHeTuBiao (id) {
             const second = this.$store.getters.level.second
-            const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' AND b.shen_he_jie_guo_ = 'N' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' AND b.shen_he_jie_guo_ = 'Y' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' AND b.shen_he_jie_guo_ = 'N/A' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql4 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'N' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'Y' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'N/A' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql4 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
 
             Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2), this.$common.request('sql', sql3), this.$common.request('sql', sql4)]).then(res => {
                 if (res.length > 0) {
@@ -167,9 +171,9 @@ export default {
         },
         getHeChaList (id) {
             const second = this.$store.getters.level.second
-            const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待审核' or b.shi_fou_guo_shen_ = '待确认' or b.shi_fou_guo_shen_ = '已结束') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.parent_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待分配' or b.shi_fou_guo_shen_ = '待核查') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待审核' or b.shi_fou_guo_shen_ = '待确认' or b.shi_fou_guo_shen_ = '已结束') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待分配' or b.shi_fou_guo_shen_ = '待核查') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
 
             Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2), this.$common.request('sql', sql3)]).then(res => {
                 if (res.length > 0) {
@@ -426,7 +430,7 @@ export default {
                     data: data3,
                     label: this.barLable
                 }],
-                color: ['#037ef3', '#7552cc', '#0cb9c1'],
+                color: ['#7552cc', '#037ef3', '#fd666d'],
                 tooltip: {
                     show: true,
                     trigger: 'axis'

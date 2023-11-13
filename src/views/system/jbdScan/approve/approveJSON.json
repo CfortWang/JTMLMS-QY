@@ -8,7 +8,7 @@
         "value": "tiao_kuan_ming_ch",
         "width": "150"
     },{
-        "name": "状态",
+        "name": "实施状态",
         "value": "shi_fou_guo_shen_",
         "width": "100"
     }],
@@ -21,7 +21,7 @@
         "value": "tiao_kuan_ming_ch",
         "width": "150"
     },{
-        "name": "状态",
+        "name": "实施状态",
         "value": "shi_fou_guo_shen_",
         "width": "100"
     },{
@@ -44,7 +44,7 @@
         "value": "tiao_kuan_ming_ch",
         "width": "150"
     },{
-        "name": "状态",
+        "name": "实施状态",
         "value": "shi_fou_guo_shen_",
         "width": "100"
     },{
@@ -73,7 +73,7 @@
         "value": "tiao_kuan_ming_ch",
         "width": "150"
     },{
-        "name": "状态",
+        "name": "实施状态",
         "value": "shi_fou_guo_shen_",
         "width": "100"
     },{
@@ -118,12 +118,20 @@
         "value": "tiao_kuan_ming_ch",
         "width": "150"
     },{
+        "name": "核查结果",
+        "value": "he_cha_jie_guo_",
+        "width": "100"
+    },{
+        "name": "核查情况说明",
+        "value": "he_cha_qing_kuang",
+        "width": ""
+    },{
         "name": "审核结果",
         "value": "shen_he_jie_guo_",
         "width": "100"
     },{
         "name": "审核备注",
         "value": "shen_he_yi_jian_",
-        "width": "100"
+        "width": ""
     }]
 }

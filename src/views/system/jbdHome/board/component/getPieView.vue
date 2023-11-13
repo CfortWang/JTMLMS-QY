@@ -64,7 +64,7 @@ export default {
           formatter: "{d}%",
         },
         label: {
-          formatter: "{b}\n({d}%)",
+          formatter: "{b}\n{c}，{d}%",
           edgeDistance: "20%",
         },
 

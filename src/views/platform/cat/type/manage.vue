@@ -65,6 +65,8 @@
             :id="editId"
             :visible="sortFormVisible"
             title="分类排序"
+            :categoryKey="categoryKey"
+            :diDian="diDian"
             @callback="callback"
             @close="visible => sortFormVisible = visible"
         />
@@ -151,7 +153,7 @@ export default {
             nodeData: {},
             isPrivate: false,
             type: {},
-            categoryKey: 'FLOW_TYPE',
+            categoryKey: '',
             categoryOptions: [],
             show: false
         }
@@ -164,9 +166,23 @@ export default {
     // 加载下拉框 分类标识数据
         loadCategoryData () {
             this.loading = true
-            queryPageList({}).then(response => {
+            let whereParams = {} 
+            if(this.$router.currentRoute.fullPath == '/zlgl/wjkzgl/wjjflsz'){
+                this.categoryKey = 'FILE_TYPE'
+                whereParams={
+                    "parameters":[
+                    {
+                        "key": "Q^category_key_^SL",
+                        "value": "FILE_TYPE"
+                    }
+                ]}
+            }else{
+                this.categoryKey = 'FLOW_TYPE' 
+            }
+            queryPageList(whereParams).then(response => {
                 this.categoryOptions = response.data.dataResult
                 this.loading = false
+                
             }).catch(() => {
                 this.loading = false
             })
@@ -187,7 +203,6 @@ export default {
             })
         },
         handleTreeAction (command, position, selection, data) {
-            console.log('data',data)
             if(data.sn == 0 && data.name == "文件分类"){
                 const object = {
                     diDian:this.diDian,

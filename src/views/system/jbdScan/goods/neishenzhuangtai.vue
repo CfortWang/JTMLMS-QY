@@ -40,11 +40,15 @@
                     <div v-if="CNASTableData.length > 0">
                         <div class="cnas">
                             <div style="width: 90%; margin: 0 auto; line-height: 35px">
-                                内审不符合项汇总表(CNAS)
+                                内审不符合项汇总表
                             </div>
-                            <el-table :data="CNASTableData"  style="width: 90%;margin: 0 auto;">
-                                <!-- <el-table-column type="selection"  width="1" /> -->
-                                
+                            <el-table :data="CNASTableData" :border="true" style="width: 90%;margin: 0 auto;">
+                                <!-- <el-table-column type="index"  width="30" align="center"/> -->
+                                <el-table-column type="index" width="30" :align="center">            
+                                    <template slot-scope="scope">
+                                        <span>{{scope.$index+1}} </span>
+                                    </template>
+                                </el-table-column> 
                                 <el-table-column prop="miao_shu_" label="不符合描述" width="250"  :key="Math.random()">
                                     <template slot-scope="scope">
                                         {{ scope.row.miao_shu_}}
@@ -73,6 +77,11 @@
                                 <el-table-column prop="bu_fu_he_cheng_du" label="不符合程度" width="80" > 
                                     <template slot-scope="scope">
                                         {{ scope.row.bu_fu_he_cheng_du}}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="shi_fou_guo_shen_" label="状态" width="40" > 
+                                    <template slot-scope="scope">
+                                        {{ scope.row.shi_fou_guo_shen_||"未编制"}}
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -136,7 +145,7 @@
                                 </div>
                             </div>
                             <el-table :data="allCheckData" :border="true" @selection-change="handleSelectionChange" style="width: 90%; margin: 0 auto">
-                                <el-table-column type="selection"  width="30">
+                                <el-table-column type="selection"  width="30" align="center">
                                 </el-table-column>
                                 <el-table-column prop="nei_shen_yuan_" label="内审员" width="100">
                                     <template slot-scope="scope">
@@ -160,7 +169,7 @@
                                 </el-table-column>
                                 <el-table-column prop="shi_fou_guo_shen_" label="完成状态" width="70">
                                     <template slot-scope="scope">
-                                        {{ scope.row.shi_fou_guo_shen_?scope.row.shi_fou_guo_shen_:"未完成" }}
+                                        {{ scope.row.shi_fou_guo_shen_}}
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -853,7 +862,7 @@ export default {
             this.checkValue = parseInt(data[1].num / data[0].num * 100)
             let finish = []
             let noFinish = []
-            const sqsl1 = `select a.id_,a.nei_shen_yuan_,a.bei_nei_shen_bu_m,a.kai_shi_shi_jian_,a.jie_shu_shi_jian_,b.shi_fou_guo_shen_ FROM t_nsjcx AS a  LEFT JOIN  t_nsjcbxe AS b ON a.bei_nei_shen_bu_m = b.bei_nei_shen_bu_m WHERE a.parent_id_ = '${ids.id_}' AND b.ji_hua_zong_wai_j = '${ids.ji_hua_zong_wai_j}'`
+            const sqsl1 = `select a.id_,a.nei_shen_yuan_,a.bei_nei_shen_bu_m,a.kai_shi_shi_jian_,a.jie_shu_shi_jian_,b.shi_fou_guo_shen_ FROM t_nsjcx AS a  LEFT JOIN  t_nsjcbxe AS b ON a.bei_nei_shen_bu_m = b.bei_nei_shen_bu_m WHERE a.parent_id_ = '${ids.id_}' AND b.ji_hua_zong_wai_j = '${ids.ji_hua_zong_wai_j}'  ORDER BY a.create_time_,a.id_ DESC`
             await curdPost('sql', sqsl1).then((res) => {
                 finish = res.variables.data
             })
@@ -890,7 +899,8 @@ export default {
             const this_ = this
             this_.CNASTableData = []
             this_.CMAtable = []
-            const sql = "select * FROM t_nsbfhxjlhzzb WHERE parent_id_ =(SELECT id_  FROM t_nsbfhxjlhzbzc WHERE ji_hua_zong_wai_j ='" + id + "' ORDER BY create_time_ DESC LIMIT 1)"
+            // const sql = "select * FROM t_nsbfhxjlhzzb WHERE parent_id_ =(SELECT id_  FROM t_nsbfhxjlhzbzc WHERE ji_hua_zong_wai_j ='" + id + "' ORDER BY create_time_ DESC LIMIT 1)"
+            const sql = `select DISTINCT a.id_,a.shen_he_lei_xing_,a.miao_shu_,a.tiao_kuan_bian_ha,a.nei_shen_yuan_,a.ze_ren_shi_,a.fu_ze_ren_,a.bu_fu_he_cheng_du,c.shi_fou_guo_shen_ FROM t_nsbfhxjlhzzb AS a  JOIN  (select b.bei_shen_bu_men_,b.ji_hua_zong_wai_j,b.shi_fou_guo_shen_, b.lai_zi_he_chu_    FROM t_bfhhjzcsjlb AS b WHERE b.ji_hua_zong_wai_j ='${id}') AS c ON a.id_ = c.lai_zi_he_chu_   WHERE a.parent_id_ =(select d.id_  FROM t_nsbfhxjlhzbzc AS d WHERE d.ji_hua_zong_wai_j ='${id}' ORDER BY d.create_time_ DESC LIMIT 1) ORDER BY a.create_time_,a.id_ DESC `
             await curdPost('sql', sql).then((res) => {
                 const data = res.variables.data
                 data.forEach((item) => {
