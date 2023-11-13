@@ -754,10 +754,11 @@ export default {
          * 加载数据
          */
         loadData (outerKey) {
-            this.loading = true
+            // 取消loading,直接在接口处设置,避免模板加载loading与数据加载loading差异过大
+            // this.loading = true
             if (this.$utils.isEmpty(this.template)) return
             queryDataTable(this.getFormatParams(outerKey)).then((response) => {
-                this.loading = false
+                // this.loading = false
                 ActionUtils.handleListData(this, response.data)
                 this.setSelectRow()
                 if (this.$refs.crud) {
@@ -769,7 +770,7 @@ export default {
                     }, 100)()
                 }
             }).catch(() => {
-                this.loading = false
+                // this.loading = false
             })
         },
         /**

@@ -219,7 +219,8 @@ export function queryDataTable(params) {
   return request({
     url: DATA_URL() + '/data/template/queryDataTable',
     method: 'post',
-    data: params
+    data: params,
+    isLoading: true
   })
 }
 
