@@ -1031,7 +1031,7 @@
                     return
                 }
                 const template = this.dataTemplate.templates[0]
-                queryDataTable(this.getValuesourceParams(template, this.dataTemplate), this.dataTemplate.type).then(resp => {
+                queryDataTable(this.getValuesourceParams(template, this.dataTemplate)).then(resp => {
                     const data = resp.data || {}
                     const dataResult = data.dataResult || []
                     this.selectDataResult = dataResult
