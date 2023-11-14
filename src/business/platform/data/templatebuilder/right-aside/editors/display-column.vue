@@ -35,6 +35,7 @@
                 <el-radio-button label="right">右对齐</el-radio-button>
             </el-radio-group>
         </el-form-item>
+        <!-- 新增 -->
         <el-form-item label="垂直对齐" prop="vertical">
             <el-radio-group v-model="formData.vertical">
                 <el-radio-button label="top">顶部对齐</el-radio-button>
@@ -213,6 +214,17 @@
                         />
                     </el-select>
                 </el-form-item>
+                <el-form-item v-if="formData.field_options.multiple === 'Y'">
+                    <template slot="label">分隔符</template>
+                    <el-select v-model="formData.field_options.storeSeparator" style="width:100%;">
+                        <el-option
+                            v-for="item in dialogStoreSeparatorOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        />
+                    </el-select>
+                </el-form-item>
             </template>
             <!-- end -->
         </template>
@@ -222,7 +234,7 @@
 import RightsSelector from '@/business/platform/rights/config/selector'
 
 import { displayFieldTypeOptions, numberTypeOptions, numberFormatOptions } from '../constants/editor-column'
-import { datefmtTypeOptions, selectorTypeOptions, selectorStoreOptions, dialogStoreOptions } from '@/business/platform/form/constants/fieldOptions'
+import { datefmtTypeOptions, selectorTypeOptions, selectorStoreOptions, dialogStoreOptions, dialogStoreSeparatorOptions } from '@/business/platform/form/constants/fieldOptions'
 import FieldTypeMixin from '../mixins/field-type'
 import FieldOptions from '@/business/platform/data/components/field/options'
 import IbpsTypeSelect from '@/business/platform/cat/type/select'
@@ -254,7 +266,7 @@ export default {
             selectorTypeOptions,
             selectorStoreOptions,
             dialogStoreOptions,
-
+            dialogStoreSeparatorOptions,
             formName: 'form',
             formData: {
                 label: ''

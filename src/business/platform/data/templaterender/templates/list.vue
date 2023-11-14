@@ -96,6 +96,7 @@
                     :template-key="scope.column.field_options.dialog"
                     :multiple="$utils.toBoolean(scope.column.field_options.multiple, true)"
                     :store="scope.column.field_options.store"
+                    :store-separator="scope.column.field_options.storeSeparator"
                     :dynamic-params="getLinkDynamicParams(scope.column.field_options, scope.row)"
                     :icon="scope.column.field_options.icon ? 'ibps-icon-' + scope.column.field_options.icon : ''"
                     :type="scope.column.field_options.dialog_type"
