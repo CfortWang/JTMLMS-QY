@@ -1,16 +1,18 @@
 (function (global) {
-    const PUBLIC_PATH = 'https://www.szjyxt.com/'
+    const BASE_URL = 'https://www.szjyxt.com/'
     global.__IBPS_CONFIG__ = {
         // 是否启用配置
         ENABLE_CONFIG: true,
+        // 基础路径
+        BASE_URL,
         //  api
-        BASE_API: `${ PUBLIC_PATH }ibps`,
+        BASE_API: `${ BASE_URL }ibps`,
         // GATEWAY API
-        BASE_GATEWAY_API: `${ PUBLIC_PATH }ibps`,
+        BASE_GATEWAY_API: `${ BASE_URL }ibps`,
         // WEBSOCKET api
         BASE_WEBSOCKET_API: 'ws://127.0.0.1:28888',
         // report api
-        BASE_REPORT_API: `${ PUBLIC_PATH }raqsoft`,
+        BASE_REPORT_API: `${ BASE_URL }raqsoft`,
         // seal api
         BASE_SEAL_API: 'http://120.77.249.241:9999/',
 

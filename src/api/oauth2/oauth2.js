@@ -215,6 +215,7 @@ OAuth.prototype.getAuthorizeURLForWebsite = function (redirect, state, scope) {
  * @param {Function} callback 回调函数
  */
 OAuth.prototype.getAccessTokenByCode = function (code, callback) {
+    localStorage.setItem('username', this.username)
     const args = {
         url: OAUTH2_URL() + '/authentication/apply',
         data: {
@@ -300,13 +301,14 @@ OAuth.prototype.getAccessTokenByPassword = function ({ username, password }, cal
  * @param {Function} callback 回调函数
  */
 OAuth.prototype.refreshAccessToken = function (refreshToken, callback) {
+    const username = localStorage.getItem('username')
     const args = {
         url: OAUTH2_URL() + '/authentication/apply',
         data: {
             client_id: this.clientId,
             client_secret: this.clientSecret,
             grant_type: 'refresh_token',
-            username: this.username,
+            username: this.username || username,
             refresh_token: refreshToken
         },
         method: 'post'
@@ -538,7 +540,7 @@ OAuth.prototype.getUserByCode = function (options, callback) {
  * @param {*} callback
  */
 OAuth.prototype.getLoginCode = function (options, callback) {
-    this.username = options.username
+    this.username = options.username || store.getters.account
     const that = this
     /**
      * 用户登录
