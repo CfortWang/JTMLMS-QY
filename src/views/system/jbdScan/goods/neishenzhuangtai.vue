@@ -81,7 +81,7 @@
                                 </el-table-column>
                                 <el-table-column prop="shi_fou_guo_shen_" label="状态" width="40" > 
                                     <template slot-scope="scope">
-                                        {{ scope.row.shi_fou_guo_shen_||"未编制"}}
+                                        {{ scope.row.shi_fou_guo_shen_}}
                                     </template>
                                 </el-table-column>
                             </el-table>

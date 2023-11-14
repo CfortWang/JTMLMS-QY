@@ -38,9 +38,8 @@ import pluginLog from '@/plugins/log'
 import pluginOpen from '@/plugins/open'
 // 平台配置文件
 import setting from '@/setting.js'
-import { BASE_SEAL_API } from '@/constant'
+import { BASE_URL, BASE_SEAL_API } from '@/constant'
 import env from '@/env'
-const BASE_URL = process.env.VUE_APP_BASE_URL
 
 export default {
     async install (Vue, options) {

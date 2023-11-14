@@ -1,6 +1,6 @@
 <template>
   <div class="pieView">
-    <div style="height: 10%;line-height: 30px;text-align: left;padding-left: 10px;width: 100%;">
+    <div style="height: 10%;line-height: 30px;text-align: left;padding-left: 6px;width: 100%;">
       {{info.config.title}}
     </div>   
     <div style="width:100%;height:90%;display: inline-block;"  v-show="showChart">
@@ -62,6 +62,12 @@ export default {
             color: "#fff",
           },
         },
+        grid:{ // 让图表占满容器
+          top:"40px",
+          left:"40px",
+          right:"40px",
+          bottom:"40px"
+        },
         tooltip: {},
         dataset: {
         dimensions: this_.info.data.dimensions,
@@ -72,7 +78,7 @@ export default {
         axisLabel: {
           color: "#fff",
           interval:0,  
-          rotate:30 
+          rotate:20 
         }
       },
       yAxis: {

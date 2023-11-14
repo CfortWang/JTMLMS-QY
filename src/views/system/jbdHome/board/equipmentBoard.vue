@@ -17,20 +17,20 @@
           <dv-border-box-8>返回</dv-border-box-8>
         </div>
       </div>
-      <dv-border-box-1 style="height:88%;overflow: hidden;">
+      <dv-border-box-1 style="height:90%;overflow: hidden;">
         <!-- 顶部数据 -->
         <div class="topCard">
           <!-- <top-bar v-if="topBarData.length" :info="topBarData" /> -->
           <div style="width:100%;height: 100%;box-sizing: border-box;overflow: hidden;">
-            <div class="middleCardLeft" style="width:20%;height:100%">
+            <div class="middleCardLeft" style="width:24%;height:100%">
               <middleCard v-if="allSheBeiData.data.length" :info="allSheBeiData" />
             </div>
             <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
-            <div class="middleCardLeft" style="width:40%;height:100%">
+            <div class="middleCardLeft" style="width:38%;height:100%">
               <moreBar v-if="moreBarData.data.source.length > 0 " :info="moreBarData" />
             </div>
             <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
-            <div class="middleCardLeft" style="width:36%;height:100%">
+            <div class="middleCardLeft" style="width:34%;height:100%">
               <zhuzhuangtu v-if="zichangBarData.data.length" :info="zichangBarData" />
             </div>
           </div>
@@ -38,20 +38,20 @@
         <dv-decoration-10 style="height:2%;display:flex;" />
         <div class="middleCard">
           <div style="width:100%;height: 100%;box-sizing: border-box;overflow: hidden;">
-            <div class="middleCardLeft" style="width:20%">
+            <div class="middleCardLeft" style="width:24%">
               <middleCard v-if="allWeihuSheBeiData.data.length" :info="allWeihuSheBeiData" />
             </div>
             <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
-            <div class="middleCardLeft" style="width:40%">
+            <div class="middleCardLeft" style="width:38%">
               <moreBar v-if="weihuBarData.data.source.length > 0 " :info="weihuBarData" />
             </div>
             <dv-decoration-2 :reverse="true" style="width:2%;height: 100%;" />
-            <div class="middleCardRight1" style="width:36%">
+            <div class="middleCardRight1" style="width:34%">
               <CarouselTabl v-if="BaofeiBarData.data.length" :info="BaofeiBarData" title="检验科设备停用/报废列表" />
             </div>
-            <div class="middleCardRight" style="width:35%">
+            <!-- <div class="middleCardRight" style="width:35%">
               <CarouselTabl v-if="config.data.length" :info="config" title="设备报废列表" />
-            </div>
+            </div> -->
           </div>
         </div>
         <dv-decoration-10 style="height:2%;display:flex;" />
@@ -61,12 +61,12 @@
               <middleCard v-if="enTypeData.data.length" :info="enTypeData" />
             </div>
           </div>
-          <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
+          <dv-decoration-2 :reverse="true" style="width:2%;height:100%;overflow: hidden;box-sizing: border-box;" />
           <div style="width:33%">
             <middleCard v-if="allJiaozhunSheBeiData.data.length" :info="allJiaozhunSheBeiData" />
           </div>
-          <dv-decoration-2 :reverse="true" style="width:1%;height:100%;overflow: hidden;box-sizing: border-box;" />
-          <div style="width:60%;height: 100%;overflow: hidden;box-sizing: border-box;display:flex;">
+          <dv-decoration-2 :reverse="true" style="width:2%;height:100%;overflow: hidden;box-sizing: border-box;" />
+          <div style="width:58%;height: 100%;overflow: hidden;box-sizing: border-box;display:flex;">
             <div class="bottomCardLeft0">
               <moreBar v-if="jiaozhunBarData.data.source.length > 0 " :info="jiaozhunBarData" />
             </div>
@@ -861,7 +861,8 @@ export default {
 
   .topCard {
     height: 30%;
-    margin-top: 10px;
+    padding:14px 6px 0px 6px;
+    // margin-top: 10px;
     box-sizing: border-box;
     overflow: hidden;
   }
@@ -874,12 +875,13 @@ export default {
     height: 31%;
     overflow: hidden;
     box-sizing: border-box;
+    padding:0px 6px 0px 6px;
   }
   .topCard,
   .middleCard,
   .bottomCard {
-    width: 96%;
-    margin-left: 30px;
+    width: 98%;
+    margin:0 auto ;
     div {
       display: inline-block;
     }
@@ -901,7 +903,6 @@ export default {
       box-sizing: border-box;
       overflow: hidden;
     }
-    padding: 2px;
   }
   .bottomCard {
     display: flex;
@@ -930,8 +931,8 @@ export default {
   }
 }
 .dv-decoration-10 {
-  width: 95%;
-  margin: 7px 2% 0;
+  width: 96%;
+  margin: 7px 2% 0px;
   height: 5px;
 }
 </style>

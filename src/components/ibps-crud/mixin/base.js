@@ -98,36 +98,40 @@ export default {
         }
     },
     methods: {
-        indexMethod(index) {
-            return (this.currentPage - 1) * this.pageSize + index + 1
+        indexMethod (index) {
+            if (this.pagination) {
+                return (this.currentPage - 1) * this.pageSize + index + 1
+            } else {
+                return index + 1
+            }
         },
         /* 表格換颜色*/
-        tableRowClassName({ row, rowIndex }) {
-            if (rowIndex % 2 === 1) return "warning-row"
+        tableRowClassName ({ row, rowIndex }) {
+            if (rowIndex % 2 === 1) return 'warning-row'
             return 'success-row'
         },
-        setSelectionRadio(row) {
+        setSelectionRadio (row) {
             const radio = row ? this.getPkValue(row) : ''
             if (radio !== this.selectionRadio) {
                 this.$set(this, 'selectionRadio', radio)
             }
         },
-        clearSelection() {
+        clearSelection () {
             if (this.selectionType === 'radio') {
                 this.setSelectionRadio()
             } else {
                 this.$refs.elTable.clearSelection()
             }
         },
-        toggleRowSelection(row, selected) {
+        toggleRowSelection (row, selected) {
             if (this.selectionType !== 'radio') {
                 this.$refs.elTable.toggleRowSelection(row, selected)
             }
         },
-        toggleAllSelection() {
+        toggleAllSelection () {
             this.$refs.elTable.toggleAllSelection()
         },
-        toggleSelectionRow(row, selected) {
+        toggleSelectionRow (row, selected) {
             const pkValue = this.getPkValue(row)
             for (var i = 0; i < this.ibpsData.length; i++) {
                 const data = this.ibpsData[i]
@@ -139,7 +143,7 @@ export default {
         /**
          * @description 处理工具栏收缩/展开
          */
-        handleCollapseExpandToolbar() {
+        handleCollapseExpandToolbar () {
             this.showToolbar = !this.showToolbar
             this.handleTableHeight(true)
             this.$emit('collapse-expand-toolbar', this.showToolbar)
@@ -147,56 +151,56 @@ export default {
         /**
          * @description 行选中状态
          */
-        handleCurrentChange(currentRow, oldCurrentRow) {
+        handleCurrentChange (currentRow, oldCurrentRow) {
             this.$emit('current-change', currentRow, oldCurrentRow)
         },
         /**
          * @description 勾选数据时触发的事件
          */
-        handleSelect(selection, row) {
+        handleSelect (selection, row) {
             this.$emit('select', selection, row)
         },
         /**
          * @description 勾选全选时触发的事件
          */
-        handleSelectAll(selection) {
+        handleSelectAll (selection) {
             this.$emit('select-all', selection)
         },
         /**
          * @description 复选框选择项发生变化时触发的事件
          */
-        handleSelectionChange(selection) {
+        handleSelectionChange (selection) {
             this.$selections = selection
             this.$emit('selection-change', selection)
         },
         /**
          * @description 单元格 hover 进入时触发的事件
          */
-        handleCellMouseEnter(row, column, cell, event) {
+        handleCellMouseEnter (row, column, cell, event) {
             this.$emit('cell-mouse-enter', row, column, cell, event)
         },
         /**
          * @description 单元格 hover 退出时触发的事件
          */
-        handleCellMouseLeave(row, column, cell, event) {
+        handleCellMouseLeave (row, column, cell, event) {
             this.$emit('cell-mouse-leave', row, column, cell, event)
         },
         /**
          * @description 单元格点击时触发的事件
          */
-        handleCellClick(row, column, cell, event) {
+        handleCellClick (row, column, cell, event) {
             this.$emit('cell-click', row, column, cell, event)
         },
         /**
          * @description 单元格双击时触发的事件
          */
-        handleCellDblclick(row, column, cell, event) {
+        handleCellDblclick (row, column, cell, event) {
             this.$emit('cell-dblclick', row, column, cell, event)
         },
         /**
          * @description 行点击时触发的事件
          */
-        handleRowClick(row, event, column) {
+        handleRowClick (row, event, column) {
             if (this.selectionType === 'radio') {
                 this.setSelectionRadio(row)
                 this.$emit('selection-change', row)
@@ -208,25 +212,25 @@ export default {
         /**
          * @description 行右键点击时触发的事件
          */
-        handleRowContextmenu(row, event) {
+        handleRowContextmenu (row, event) {
             this.$emit('row-contextmenu', row, event)
         },
         /**
          * @description 行双击时触发的事件
          */
-        handleRowDblclick(row, event) {
+        handleRowDblclick (row, event) {
             this.$emit('row-dblclick', row, event)
         },
         /**
          * @description 表头点击时触发的事件
          */
-        handleHeaderClick(column, event) {
+        handleHeaderClick (column, event) {
             this.$emit('header-click', column, event)
         },
         /**
          * @description 当拖动表头改变了列的宽度的时候会触发该事件
          */
-        handleHeaderDragend(newWidth, oldWidth, column, event) {
+        handleHeaderDragend (newWidth, oldWidth, column, event) {
             debounce(this.handleTableHeight, 100)()
             this.$emit('header-dragend', newWidth, oldWidth, column, event)
         },
@@ -234,7 +238,7 @@ export default {
         /**
          * @description 表头右键点击时触发的事件
          */
-        handleHeaderContextmenu(column, event) {
+        handleHeaderContextmenu (column, event) {
             this.$emit('header-contextmenu', column, event)
         },
         /**
@@ -243,7 +247,7 @@ export default {
          * @param {*} position
          * @param {*} data
          */
-        handleActionEvent(action, position, data, index) {
+        handleActionEvent (action, position, data, index) {
             if (position === 'toolbar') {
                 data = this.$selections
             }
@@ -272,7 +276,7 @@ export default {
          * 用于解决key值大小写不同的问题
          * @param {Object} data 需要从中获取值的对象
          */
-        getPkValue(data, defaultValue = '') {
+        getPkValue (data, defaultValue = '') {
             const pkKey = this.pkKey || 'id'
             // 创建一个忽略大小写的正则对象
             const regx = new RegExp(`^${pkKey}$`, 'gi')
@@ -288,7 +292,7 @@ export default {
         /**
          * @description 获取选中的值
          */
-        getSelectedIds() {
+        getSelectedIds () {
             if (this.selectionType === 'radio') {
                 if (this.selectionRadio === null || this.selectionRadio === undefined) {
                     return
