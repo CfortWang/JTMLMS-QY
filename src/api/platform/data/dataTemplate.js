@@ -215,12 +215,13 @@ export function getSelectorDataByKey(params) {
  * 获取列表数据
  * @param {*} params
  */
-export function queryDataTable(params) {
+export function queryDataTable(params, type) {
   return request({
     url: DATA_URL() + '/data/template/queryDataTable',
     method: 'post',
     data: params,
-    isLoading: true
+    // 仅列表类型触发loading事件
+    isLoading: type === 'default'
   })
 }
 

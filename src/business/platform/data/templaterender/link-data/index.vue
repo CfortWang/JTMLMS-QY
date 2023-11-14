@@ -489,7 +489,7 @@
             },
             getRemoteQueryDataTableFunc(p) {
                 return new Promise((resolve, reject) => {
-                    queryDataTable(p).then(response => {
+                    queryDataTable(p, this.dataTemplate.type).then(response => {
                         resolve(response)
                     }).catch(error => {
                         reject(error)

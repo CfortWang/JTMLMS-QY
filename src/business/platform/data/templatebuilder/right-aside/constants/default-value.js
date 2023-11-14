@@ -22,6 +22,7 @@ export const displayDefaultValue = {
     rights: [{ type: 'all' }],
     noRightStyle: '',
     align: 'left',
+    vertical: 'middle',
     sortable: true,
     width: '',
     same: 'Y',

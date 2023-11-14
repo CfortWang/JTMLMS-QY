@@ -755,11 +755,11 @@ export default {
          * 加载数据
          */
         loadData (outerKey) {
-            // 取消loading,直接在接口处设置,避免模板加载loading与数据加载loading差异过大
-            // this.loading = true
+            // 仅模板类型为对话框时触发页内loading事件，其余根据接口判定触发全局loading
+            this.loading = this.dataTemplate.type === 'dialog'
             if (this.$utils.isEmpty(this.template)) return
-            queryDataTable(this.getFormatParams(outerKey)).then((response) => {
-                // this.loading = false
+            queryDataTable(this.getFormatParams(outerKey), this.dataTemplate.type).then((response) => {
+                this.loading = false
                 ActionUtils.handleListData(this, response.data)
                 this.setSelectRow()
                 if (this.$refs.crud) {
@@ -771,7 +771,7 @@ export default {
                     }, 100)()
                 }
             }).catch(() => {
-                // this.loading = false
+                this.loading = false
             })
         },
         /**

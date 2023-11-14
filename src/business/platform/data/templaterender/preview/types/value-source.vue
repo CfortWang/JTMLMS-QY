@@ -94,7 +94,7 @@ export default {
      */
     loadData() {
       this.loading = true
-      queryDataTable(this.getFormatParams()).then(response => {
+      queryDataTable(this.getFormatParams(), this.dataTemplate.type).then(response => {
         this.loading = false
         const data = response.data
         this.dataResult = data.dataResult || []
