@@ -269,7 +269,7 @@
             const today = new Date().toLocaleDateString()
             const savedDate = localStorage.getItem('doNotShowToday')
             if (savedDate !== today) {
-                this.getPeriodTask()
+                // this.getPeriodTask()
             }
             StatisticsData().then(data => {
                 // 将参数替换成对应参数

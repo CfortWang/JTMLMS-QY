@@ -97,18 +97,8 @@ import { queryPageList as newsList } from '@/api/platform/system/news'
 import { save } from '@/api/platform/message/innerMessage'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import ActionUtils from '@/utils/action'
-import { typeOptions } from '@/views/platform/system/news/constants'
 import NewsDetail from '@/views/platform/system/news/detail'
-import { tabList, taskState, stateOption, taskTypeOptions } from './workbench'
-
-const paramsType = {
-    wait: 'temp.',
-    over: '',
-    finish: 'inst.',
-    save: '',
-    news: '',
-    guide: ''
-}
+import { tabList, taskState, stateOption, listSearchForm, listColumns } from './workbench'
 
 const operate = {
     wait: pending,
@@ -135,17 +125,33 @@ export default {
         }
     },
     data () {
-        const fieldWidth = window.innerWidth > 1600 ? 150 : 120
         const { first = '', second = '' } = this.$store.getters.level || {}
         const level = second || first
-        const { userList = [], deptList = [] } = this.$store.getters || {}
+        const { userList = [], deptList = [], role = [] } = this.$store.getters || {}
+        const roleOption = role.map(i => ({ key: i.id, value: i.id, label: i.name }))
+        listSearchForm.guide.forms[3].options = roleOption
         const getGuide = ({ parameters, requestPage, sorts }) => {
+            // 获取查询角色信息
+            let roleParams = ''
+            let aboutMeParams = ''
+            const P = role.map(i => {
+                return `bian_zhi_jiao_se_ like '%${i.id}%' or shen_he_jiao_se_ like '%${i.id}%' or shen_pi_jiao_se_ like '%${i.id}%'`
+            })
+            parameters.forEach(item => {
+                if (item.key === 'range' && item.value === 'aboutMe') {
+                    aboutMeParams = ` and (${P.join(' or ')})`
+                }
+                if (item.key === 'role') {
+                    roleParams = ` and (bian_zhi_jiao_se_ like '%${item.value}%' or shen_he_jiao_se_ like '%${item.value}%' or shen_pi_jiao_se_ like '%${item.value}%')`
+                }
+            })
             // 获取查询字段
-            const params = parameters.reduce((acc, curr) => {
+            let params = parameters.filter(i => i.key !== 'role' && i.key !== 'range').reduce((acc, curr) => {
                 return `${acc} and ${curr.key} like '%${curr.value}%'`
             }, '')
+            params = params + aboutMeParams + roleParams
             // and di_dian_ = '${level}'
-            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver from t_bdbhpzb where sn_ + 0 > 0 ${params} order by sn_ + 0 asc`
+            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver, ye_mian_lu_jing_ as path from t_bdbhpzb where sn_ + 0 > 0 ${params} order by sn_ + 0 asc`
             const { pageNo = 1, limit = 15 } = requestPage || {}
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
@@ -205,48 +211,7 @@ export default {
                 createTime: ''
             },
             listConfig: {
-                searchForm: {
-                    wait: {
-                        forms: [
-                            { prop: 'Q^subject_^SL', name: 'Q^temp.subject_^SL', label: '事务名称', fieldType: 'input' },
-                            { prop: ['Q^temp.create_time_^DL', 'Q^temp.create_time_^DG'], label: '提交时间', fieldType: 'daterange' }
-                        ]
-                    },
-                    over: {
-                        forms: [
-                            { prop: 'Q^subject_^SL', label: '事务名称', fieldType: 'input' },
-                            { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '创建时间', fieldType: 'daterange' }
-                        ]
-                    },
-                    finish: {
-                        forms: [
-                            { prop: 'Q^subject_^SL', name: 'Q^inst.subject_^SL', label: '事务名称', fieldType: 'input' },
-                            { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], name: ['Q^inst.create_time_^DL', 'Q^inst.create_time_^DG'], label: '结束时间', fieldType: 'daterange' }
-                        ]
-                    },
-                    save: {
-                        forms: [
-                            { prop: 'Q^subject_^SL', label: '事务名称', fieldType: 'input' },
-                            { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '提交时间', fieldType: 'daterange' }
-                        ]
-                    },
-                    news: {
-                        forms: [
-                            { prop: 'Q^title_^SL', label: '标题', fieldType: 'input' },
-                            { prop: 'Q^dep_name_^SL', label: '发布部门', fieldType: 'input' },
-                            { prop: 'Q^user_name_^SL', label: '发布人', fieldType: 'input' },
-                            { prop: ['Q^public_date_^DL', 'Q^public_date_^DG'], label: '发布时间', fieldType: 'daterange' }
-                        ]
-                    },
-                    guide: {
-                        forms: [
-                            { prop: 'suo_shu_xi_tong_', label: '所属子系统', labelWidth: 100, fieldType: 'input' },
-                            { prop: 'gong_neng_mo_kuai', label: '所属功能模块', labelWidth: 100, fieldType: 'input' },
-                            { prop: 'biao_dan_ming_che', label: '记录表单', fieldType: 'input' },
-                            { prop: 'shi_wu_lei_xing_', label: '事务类型', fieldType: 'select', options: taskTypeOptions }
-                        ]
-                    }
-                },
+                searchForm: listSearchForm,
                 toolbars: [
                     {
                         key: 'search'
@@ -261,63 +226,7 @@ export default {
                     }
                 ],
                 // 表格字段配置
-                columns: {
-                    wait: [
-                        { prop: 'scope', label: '事务名称', slotName: 'name', width: 250 },
-                        { prop: 'scope', label: '事务说明', slotName: 'desc', minWidth: 250 },
-                        { prop: 'scope', label: '事务状态', slotName: 'waitStatus', width: 120 },
-                        { prop: 'scope', label: '办理进度', headerName: 'stateLabel', slotName: 'state', width: 120 },
-                        // { prop: 'startDept', label: '发起部门', width: 120 },
-                        { prop: 'scope', label: '发起部门', slotName: 'overDept', width: 120 },
-                        { prop: 'submitBy', label: '发起人', headerName: 'submitBy', width: 100 },
-                        { prop: 'forwardBy', label: `上节点提交人`, headerName: 'forwardBy', width: 100 },
-                        { prop: 'createTime', label: '上节点提交时间', width: 150 }
-                    ],
-                    over: [
-                        { prop: 'scope', label: '事务名称', slotName: 'name', width: 250 },
-                        { prop: 'scope', label: '事务说明', slotName: 'desc', minWidth: 250 },
-                        { prop: 'scope', label: '事务状态', slotName: 'overStatus', width: 120 },
-                        { prop: 'scope', label: '发起部门', slotName: 'overDept', width: 120 },
-                        { prop: 'scope', label: '发起人', headerName: 'submitBy', slotName: 'creator', width: 100 },
-                        { prop: 'scope', label: `提交人`, slotName: 'updateBy', width: 100 },
-                        { prop: 'scope', label: '办理时间', slotName: 'time', width: 150 }
-                    ],
-                    finish: [
-                        { prop: 'scope', label: '事务名称', slotName: 'name', width: 250 },
-                        { prop: 'scope', label: '事务说明', slotName: 'desc', minWidth: 250 },
-                        { prop: 'scope', label: '事务状态', slotName: 'overStatus', width: 120 },
-                        { prop: 'scope', label: '发起部门', slotName: 'overDept', width: 120 },
-                        { prop: 'scope', label: '发起人', headerName: 'submitBy', slotName: 'creator', width: 100 },
-                        { prop: 'scope', label: `提交人`, slotName: 'updateBy', width: 100 },
-                        { prop: 'scope', label: '结束时间', slotName: 'time', width: 150 }
-                    ],
-                    save: [
-                        { prop: 'scope', label: '事务名称', slotName: 'name', width: 250 },
-                        { prop: 'scope', label: '事务说明', slotName: 'desc', minWidth: 250 },
-                        { prop: 'createTime', label: '暂存时间', width: 150 }
-                    ],
-                    news: [
-                        { prop: 'title', label: '标题', minWidth: 250 },
-                        { prop: 'depName', label: '发布部门', sortable: 'custom', width: 120 },
-                        { prop: 'userName', label: '发布人', width: 120 },
-                        { prop: 'publicDate', label: '发布日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
-                        { prop: 'loseDate', label: '有效截至日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
-                        { prop: 'status', label: '发布状态', tags: typeOptions, width: 100 }
-                    ],
-                    guide: [
-                        { prop: 'sn', label: '序号', width: 60 },
-                        { prop: 'sysName', label: '所属子系统', width: 100 },
-                        { prop: 'module', label: '所属功能模块', width: fieldWidth },
-                        { prop: 'tableName', label: '记录表单', width: 200 },
-                        // { prop: 'tableNo', label: '表单编号', width: 100 },
-                        { prop: 'timing', label: '填写时机/记录频次', minWidth: fieldWidth },
-                        { prop: 'taskType', label: '事务类型', tags: taskTypeOptions, width: 100 },
-                        { prop: 'fileName', label: '程序文件', width: 160 },
-                        { prop: 'creator', label: '编制人', width: fieldWidth },
-                        { prop: 'reviewer', label: '审核人', width: fieldWidth },
-                        { prop: 'approver', label: '审批人', width: fieldWidth }
-                    ]
-                }
+                columns: listColumns
             }
         }
     },
@@ -454,7 +363,9 @@ export default {
             this.dataList = []
             this.selection = []
             this.pagination = { }
-            this.getData(this.activeTab)
+            this.$nextTick(() => {
+                this.getData(this.activeTab)
+            })
         },
         handleSortChange (sort) {
             console.log(sort)
@@ -487,6 +398,10 @@ export default {
         // 处理表格点击事件
         handleRowClick (data) {
             if (this.activeTab === 'guide') {
+                const { path = '' } = data
+                if (path) {
+                    this.$router.push(path)
+                }
                 return
             }
             if (this.activeTab === 'news') {

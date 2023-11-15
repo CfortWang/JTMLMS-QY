@@ -38,7 +38,7 @@
                 <el-popover
                     :ref="'popover2-' + scope.row.id"
                     placement="bottom"
-                    width="250"
+                    width="300"
                     popper-class="popverClass"
                     trigger="click"
                     @show="getReportAndFile(scope.row)"
@@ -55,16 +55,41 @@
                                 <br>
                             </div>
                         </template> -->
+                        <div v-if="record.file.length && snapshotId" class="content_item">
+                            <!-- <div class="sub_operation">快照</div> -->
+                            <ibps-attachment
+                                v-model="snapshotId"
+                                download
+                                readonly
+                                multiple
+                                upload-type="attachment"
+                                store="id"
+                                style="width: 100%;"
+                            />
+                        </div>
+                        <div v-if="record.file.length && fileId" class="content_item">
+                            <div class="sub_operation ibps-icon-folder-open-o">附件</div>
+                            <ibps-attachment
+                                v-model="fileId"
+                                download
+                                readonly
+                                multiple
+                                upload-type="attachment"
+                                store="id"
+                                style="width: 100%; height: 100%; max-height: 180px; overflow-y: auto;"
+                            />
+                        </div>
+                        <div v-if="!record.file.length || (!fileId && !snapshotId)">无快照及附件数据</div>
                         <!-- 二级菜单，内审管审特有 -->
                         <template v-if="specialType.hasOwnProperty(typeId)">
                             <el-popover
                                 :ref="'popover3-' + scope.row.id"
                                 placement="left"
                                 width="350"
-                                popper-class="popverClass"
+                                popper-class="popverClass_sub"
                                 trigger="click"
                             >
-                                <div slot="reference" class="sub_operation el-icon-s-order">{{ specialBtn[typeId].label }}</div>
+                                <div slot="reference" class="sub_operation ibps-icon-folder-o">{{ specialBtn[typeId].label }}</div>
                                 <div v-if="record.special && record.special.length" class="div_content">
                                     <div v-for="(item, index) in record.special" :key="index" class="content_item">
                                         <div class="sub_content">
@@ -113,31 +138,6 @@
                                 <div v-else>无对应数据</div>
                             </el-popover>
                         </template>
-                        <div v-if="record.file.length && snapshotId" class="content_item">
-                            <!-- <div class="sub_operation">快照</div> -->
-                            <ibps-attachment
-                                v-model="snapshotId"
-                                download
-                                readonly
-                                multiple
-                                upload-type="attachment"
-                                store="id"
-                                style="width: 100%;"
-                            />
-                        </div>
-                        <div v-if="record.file.length && fileId" class="content_item">
-                            <div class="sub_operation">附件</div>
-                            <ibps-attachment
-                                v-model="fileId"
-                                download
-                                readonly
-                                multiple
-                                upload-type="attachment"
-                                store="id"
-                                style="width: 100%;"
-                            />
-                        </div>
-                        <div v-if="!record.file.length || (!fileId && !snapshotId)">无快照及附件数据</div>
                     </div>
                 </el-popover>
             </template>
@@ -721,7 +721,7 @@ export default {
     }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
     .js-custom-dialog {
         .el-dialog__body {
             height: calc(100vh) !important;
@@ -754,6 +754,9 @@ export default {
             font-size: 18px;
             margin-right: 5px;
         }
+        // &:last-child {
+        //     margin-top: 14px;
+        // }
     }
     .sub_content {
         .title {
@@ -773,31 +776,38 @@ export default {
         }
     }
     .content_item {
+        max-height: 200px;
+        margin-bottom: 4px;
         &:first-child{
             .sub_content .title {
                 margin-top: 0px;
             }
         }
+        ::v-deep .el-upload-list__item {
+            line-height: 18px;
+        }
     }
-    .main-container .el-popover.popverClass {
+    .popverClass_sub {
         .div_content {
-            .content_checkbox {
-                .el-checkbox-group {
-                    display: flex;
-                    flex-direction: column;
-                    z-index: 999;
-                }
-                z-index: 999;
-            }
-            .content_item {
-                z-index: 999;
-                margin-top: 20px;
-                display: flex;
-                justify-content: flex-end;
-                .el-button {
-                    padding: 7px 14px;
-                }
-            }
+            max-height: 300px;
+            overflow-y: auto;
+            // .content_checkbox {
+            //     .el-checkbox-group {
+            //         display: flex;
+            //         flex-direction: column;
+            //         z-index: 999;
+            //     }
+            //     z-index: 999;
+            // }
+            // .content_item {
+            //     z-index: 999;
+            //     margin-top: 20px;
+            //     display: flex;
+            //     justify-content: flex-end;
+            //     .el-button {
+            //         padding: 7px 14px;
+            //     }
+            // }
         }
     }
 </style>
