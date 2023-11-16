@@ -41,6 +41,8 @@
                 :parent-data="nodeData"
                 :is-private="isPrivate"
                 :random-num="randomNum"
+                :firstDiDian="firstDiDian"
+                :secondDiDian="secondDiDian"
                 display-type="edit"
                 @callback="loadTreeData"
             />
@@ -93,6 +95,8 @@ export default {
         return {
             width: 200,
             diDian :second ? second : first,
+            firstDiDian:first,
+            secondDiDian:second,
             height: document.clientHeight,
             importFormVisible: false,
             sortFormVisible: false,

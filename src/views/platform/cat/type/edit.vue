@@ -121,15 +121,14 @@
                       prop="authorityObject.shenCha"
                       v-show="categoryKey==='FILE_TYPE'">
           <el-radio-group v-if="!readonly"
-                          v-model="type.authorityObject.shenCha"
-                          >
+                          v-model="type.authorityObject.shenCha">
             <el-radio label="需要">需要</el-radio>
             <el-radio label="不需要">不需要</el-radio>
           </el-radio-group>
           <span v-else>{{ type.authorityObject.shenCha }}</span>
         </el-form-item>
         <el-form-item v-show="categoryKey==='FILE_TYPE'">
-            <span >需要进行体系文件审查的文件类型请选择“需要”，子节点有需要进行文件审查的话，父节点也需要选择“需要”</span>
+          <span>需要进行体系文件审查的文件类型请选择“需要”，子节点有需要进行文件审查的话，父节点也需要选择“需要”</span>
         </el-form-item>
       </el-form>
     </ibps-container>
@@ -152,11 +151,18 @@ export default {
     categoryKey: String, // 分类标识key
     isPrivate: Boolean, // 是否是私有的
     data: Array,
+
     visible: {
       type: Boolean,
       default: false
     },
     title: {
+      type: String
+    },
+    firstDiDian: {
+      type: String
+    },
+    secondDiDian: {
       type: String
     },
     readonly: {
@@ -185,7 +191,7 @@ export default {
         typeKey: '',
         ownerId: '0',
         authorityObject: {
-          chaYue: '', buMen: '',shenCha:''
+          chaYue: '', buMen: '', shenCha: ''
         }
       },
       rules: {
@@ -294,6 +300,7 @@ export default {
       } else {
         this.rules.authorityObject.buMen = [{ required: false }]
       }
+      this.type.authorityObject.diDian = this.secondDiDian ? this.secondDiDian : this.firstDiDian
       this.$refs[this.formName].validate(valid => {
         if (valid) {
           this.saveData()
@@ -373,18 +380,17 @@ export default {
     },
     getRadioOptions() {
       this.type.authorityObject.buMen = ''
-      if (this.$store.getters.userId == '702117247933480960') {
-        let sql = `select * FROM  ibps_party_entity WHERE party_type_='position' `
-        curdPost('sql', sql).then(res => {
-          let datas = res.variables.data
-          let treeDatas = this.buildTree(datas, 'ID_', 'PARENT_ID_')
-          let tree = []
-          for (let i in treeDatas) {
-            tree.push(treeDatas[i])
-          }
-          this.cascaderOptions = tree
-        })
-      }
+      let sql = `select * FROM  ibps_party_entity WHERE party_type_='position' and (path_ like '%${this.secondDiDian}%' or path_ = '${this.firstDiDian}.')`
+      curdPost('sql', sql).then(res => {
+        let datas = res.variables.data
+        let treeDatas = this.buildTree(datas, 'ID_', 'PARENT_ID_')
+        let tree = []
+        for (let i in treeDatas) {
+          tree.push(treeDatas[i])
+        }
+        this.cascaderOptions = tree
+      })
+
     },
     radioChangeHandle(h) {
       if (h == '部门查阅') {

@@ -403,7 +403,7 @@ export default {
         pageOperation (val, oldVal) {
             let page = this.currentPage * 10 - 10
             const size = val.length
-            if (this.editFromType === 'add' && val.length > this.oldList.length && this.oldList.length > 0) {
+            if (val.length > this.oldList.length && this.oldList.length >= 0) {
                 const valBai = size % 10
                 const valChu = parseInt(size / 10)
                 if (valBai === 0) {
@@ -411,15 +411,27 @@ export default {
                 } else {
                     this.currentPage = valChu + 1
                 }
-
                 page = this.currentPage * 10 - 10
             }
-
-            if (this.dataModel < this.oldList && size >= 10 && this.pageSize % 10 === 0) {
-                // 删除了一个参数 ，如果当前总条数小于页数，则退一页。
-                if (this.currentPage > 1) this.currentPage = this.currentPage - 1
+            if (this.dataModel.length < this.oldList.length  ) {
+                const valBai = size % 10
+                const valChu = parseInt(size / 10)
+                if(this.editFromType =='remove' && this.multipleSelection.length !==0){
+                    // 指定页删除数满10条：
+                        // 删完之后，如果下一页还有数据，则页码继续不变，如果下一页没有数据那么页码减1，直至页码=0
+                        // 除去本页剩余个数 
+                        let yuShu = this.oldList.length - this.currentPage*10
+                        if(yuShu < this.multipleSelection.length &&  yuShu<0 ){
+                            this.currentPage  =this.currentPage -1
+                        }  
+                }else{
+                      if (valBai === 0) {
+                        this.currentPage = valChu
+                    } else {
+                        this.currentPage = valChu + 1
+                    }
+                }
                 page = this.currentPage * 10 - 10
-                if (page !== 0) page - 10
             }
             this.pageSize = size
             this.oldList = JSON.parse(JSON.stringify(this.dataModel))
