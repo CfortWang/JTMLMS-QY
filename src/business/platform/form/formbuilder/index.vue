@@ -198,8 +198,7 @@ export default {
                     callback(flag, '请设置表单Key')
                     return
                 }
-                if (this.widgetForm.mode === 'bo' &&
-            this.$utils.isEmpty(this.widgetForm.code)) {
+                if (this.widgetForm.mode === 'bo' && this.$utils.isEmpty(this.widgetForm.code)) {
                     callback(flag, '未绑定业务对象，请检查数据是否正确')
                     return
                 }

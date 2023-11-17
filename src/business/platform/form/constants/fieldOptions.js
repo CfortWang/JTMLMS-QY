@@ -332,8 +332,8 @@ export const defaultToolbars = [
     'forecolor', 'backcolor', 'selectall', 'cleardoc', 'fontfamily', 'fontsize'
 ]
 /**
-     * 日期格式
-     */
+ * 日期格式
+ */
 export const dateTypes = [{
     value: 'specific',
     label: '特定日期'
@@ -372,6 +372,15 @@ export const intervalTypes = [{
     value: 's',
     label: '秒'
 }]
+
+/**
+ * 子表分页大小选项
+ */
+export const defaultPageSize = 20
+/**
+ * 子表分页大小选项
+ */
+export const pageSizeOptions = [10, 15, 20, 30, 50, 100]
 
 /**
  * 数据格式【校验】

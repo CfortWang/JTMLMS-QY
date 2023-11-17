@@ -8,18 +8,46 @@
                     <!--弹窗模式对话框-->
                     <div v-if="toolbarButtons && toolbarButtons.length > 0" class="ibps-fr hidden-print">
                         <el-button-group>
-                            <el-button v-for="(button, index) in toolbarButtons" :key="index" :type="button.type" :icon="button.icon" @click="handleActionEvent(button, index)">
+                            <el-button
+                                v-for="(button, index) in toolbarButtons"
+                                :key="index"
+                                :type="button.type"
+                                :icon="button.icon"
+                                @click="handleActionEvent(button, index)"
+                            >
                                 {{ button.label }}
                             </el-button>
                         </el-button-group>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <el-table ref="elTable" :data="copDataModel" :header-cell-style="{ color: '#000', 'font-size': '14px', padding: '4px 0' }" :row-class-name="tableRowClassName" :show-summary="showSummary" :sum-text="sumText" :summary-method="hasSummaryMethod ? summaryMethod : null" border @selection-change="handleSelectionChange">
+                    <el-table
+                        ref="elTable"
+                        :data="copDataModel"
+                        :header-cell-style="{ color: '#000', 'font-size': '14px', padding: '4px 0' }"
+                        :row-class-name="tableRowClassName"
+                        :show-summary="showSummary"
+                        :sum-text="sumText"
+                        :summary-method="hasSummaryMethod ? summaryMethod : null"
+                        border
+                        @selection-change="handleSelectionChange"
+                    >
                         <el-table-column v-if="!tableReadonly" type="selection" width="50" />
-                        <el-table-column v-if="field.field_options.index" type="index" :label="field.field_options.index_name ? field.field_options.index_name : '序号'" :width="field.field_options.index_width ? field.field_options.index_width : 50" :index="indexMethod" />
+                        <el-table-column
+                            v-if="field.field_options.index"
+                            type="index"
+                            :label="field.field_options.index_name ? field.field_options.index_name : '序号'"
+                            :width="field.field_options.index_width ? field.field_options.index_width : 50"
+                            :index="indexMethod"
+                        />
                         <template v-for="(column, j) in displayColumns">
-                            <el-table-column v-if="!columnHidden(column) && column.field_type != 'desc' && column.label != ''" :key="j" show-overflow-tooltip :prop="column.name" :width="column.field_options.custom_class || null">
+                            <el-table-column
+                                v-if="!columnHidden(column) && column.field_type != 'desc' && column.label != ''"
+                                :key="j"
+                                show-overflow-tooltip
+                                :prop="column.name"
+                                :width="column.field_options.custom_class || null"
+                            >
                                 <template slot="header">
                                     {{ $utils.isNotEmpty(column.field_options.units) ? column.label + '(' + column.field_options.units + ')' : column.label }}
                                     <ibps-help v-if="column && column.desc && descPosition === 'lableIcon'" type="tooltip" :content="$utils.formatText(column.desc)" />
@@ -29,7 +57,7 @@
                                         <ibps-dynamic-form-table-item
                                             :ref="'formItem' + column.name"
                                             :key="scope.$index + j"
-                                            :models.sync="copDataModelCont[scope.$index + (currentPage * 10 - 10)]"
+                                            :models.sync="copDataModelCont[scope.$index + (currentPage - 1) * pageSize]"
                                             :rights.sync="columnsRights"
                                             :form-data="models"
                                             :field="column"
@@ -46,17 +74,37 @@
                                 </template>
                             </el-table-column>
                         </template>
-                        <el-table-column v-if="manageButtons && manageButtons.length > 0" align="center" fixed="right" class-name="hidden-print" label="操作栏目" :width="manageButtons.length == 1 ? '85' : '160'">
+                        <el-table-column
+                            v-if="manageButtons && manageButtons.length > 0"
+                            align="center"
+                            fixed="right"
+                            class-name="hidden-print"
+                            label="操作栏目"
+                            :width="manageButtons.length == 1 ? '85' : '160'"
+                        >
                             <template slot-scope="scope">
                                 <el-dropdown v-if="manageButtons.length > 3">
                                     <ibps-icon name="chevron-circle-down" size="28" class="hidden-print" />
                                     <el-dropdown-menu slot="dropdown" class="ibps-table-dropdown-menu" style="margin-top: 0.02rem">
-                                        <ibps-toolbar :actions="manageButtons" :socpe="thatSocpe" :data="scope.row" position="manage" class="hidden-print" @action-event="(action) => handleActionEvent(action, scope.$index)" />
+                                        <ibps-toolbar
+                                            :actions="manageButtons"
+                                            :socpe="thatSocpe"
+                                            :data="scope.row"
+                                            position="manage"
+                                            class="hidden-print"
+                                            @action-event="(action) => handleActionEvent(action, scope.$index)"
+                                        />
                                     </el-dropdown-menu>
                                 </el-dropdown>
                                 <template v-else>
                                     <template v-for="(button, index) in manageButtons">
-                                        <el-link :key="index" :icon="button.icon" :type="button.type" :underline="false" @click="handleActionEvent(button, scope.$index)">{{ button.label }}</el-link>
+                                        <el-link
+                                            :key="index"
+                                            :icon="button.icon"
+                                            :type="button.type"
+                                            :underline="false"
+                                            @click="handleActionEvent(button, scope.$index)"
+                                        >{{ button.label }}</el-link>
                                         <!-- <el-button plain size="mini" :key="index" :type="button.type" @click="handleActionEvent(button, scope.$index)">
                                             {{ button.label }}
                                         </el-button> -->
@@ -68,7 +116,16 @@
                         </el-table-column>
                     </el-table>
                     <!-- 分页 -->
-                    <el-pagination v-if="mode === 'dialog' || mode === 'inner'" :current-page="currentPage" :page-size="10" layout="total, prev, pager, next" :total="pageSize" @current-change="handleCurrentChange" />
+                    <el-pagination
+                        v-if="needPage !== 'N' && (mode === 'dialog' || mode === 'inner')"
+                        :current-page="currentPage"
+                        :page-size="pageSize"
+                        :page-sizes="pageSizeOptions"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="totalCount"
+                        @current-change="handleCurrentChange"
+                        @size-change="handleSizeChange"
+                    />
                 </div>
             </div>
             <!--================表内和弹窗模式end=================================-->
@@ -118,11 +175,39 @@
 
         <el-table v-else :data="[]" empty-text="您尚未创建任何字段。请在表单中添加字段。" border />
         <!--按钮支持自定义对话框-->
-        <custom-dialog :visible="customDialogVisible" :value="[]" :template-key="customDialogKey" :dynamic-params="customDialogDynamicParams" @close="(visible) => (customDialogVisible = visible)" @action-event="handleCustomDialogActionEvent" />
+        <custom-dialog
+            :visible="customDialogVisible"
+            :value="[]"
+            :template-key="customDialogKey"
+            :dynamic-params="customDialogDynamicParams"
+            @close="(visible) => (customDialogVisible = visible)"
+            @action-event="handleCustomDialogActionEvent"
+        />
 
-        <import-table :visible="importTableDialogVisible" :title="field.label" @close="(visible) => (importTableDialogVisible = visible)" @action-event="handleImportTableActionEvent" />
-        <component :is="dialogTemplate" v-if="dialogTemplate" ref="dialogTemplate" v-bind="dialogTemplateAtts" />
-        <formrender-dialog ref="jyxtEdit" :visible="formDialogVisible" :title="field.label" :form-def="dialogFormDef" :data="dialogFormData" :mode="mode" :edit-from-type="editFromType" custom-class="ibps-dialog-80" @close="(visible) => (formDialogVisible = visible)" @action-event="handleFormDialogActionEvent" />
+        <import-table
+            :visible="importTableDialogVisible"
+            :title="field.label"
+            @close="(visible) => (importTableDialogVisible = visible)"
+            @action-event="handleImportTableActionEvent"
+        />
+        <component
+            :is="dialogTemplate"
+            v-if="dialogTemplate"
+            ref="dialogTemplate"
+            v-bind="dialogTemplateAtts"
+        />
+        <formrender-dialog
+            ref="jyxtEdit"
+            :visible="formDialogVisible"
+            :title="field.label"
+            :form-def="dialogFormDef"
+            :data="dialogFormData"
+            :mode="mode"
+            :edit-from-type="editFromType"
+            custom-class="ibps-dialog-80"
+            @close="(visible) => (formDialogVisible = visible)"
+            @action-event="handleFormDialogActionEvent"
+        />
     </div>
 </template>
 <script>
@@ -135,6 +220,7 @@ import FormUtils from '../../utils/formUtil'
 import FormFieldUtil from '../../utils/formFieldUtil'
 
 import { hasPermission } from '@/business/platform/form/constants/tableButtonTypes'
+import { defaultPageSize, pageSizeOptions } from '@/business/platform/form/constants/fieldOptions'
 
 import CustomDialog from '@/business/platform/data/templaterender/custom-dialog/dialog'
 import FormrenderDialog from '@/business/platform/form/formrender/dialog'
@@ -177,24 +263,28 @@ export default {
         }
     },
     data () {
-        let val = []
-        let tableType = ''
-        let copVal = []
-        if (this.$utils.isNotEmpty(this.value)) {
-            val = this.value || []
-            copVal = tableType === 'dialog' || 'inner' ? JSON.parse(JSON.stringify(val)).slice(0, 10) : val
-        }
-        tableType = this.field.field_options.mode || 'inner'
+        // let val = []
+        // let tableType = ''
+        // let copVal = []
+        // if (this.$utils.isNotEmpty(this.value)) {
+        //     val = this.value || []
+        //     copVal = ['dialog', 'inner'].includes(tableType) ? JSON.parse(JSON.stringify(val)).slice(0, 10) : val
+        // }
+        // tableType = this.field.field_options.mode || 'inner'
         /* 由于内容遍历卡顿问题，需再建个中间对象进行渲染.*/
+        const { page, pageSize = defaultPageSize } = this.field.field_options || {}
+        console.log(page, pageSize)
         return {
+            pageSize,
+            pageSizeOptions,
             editFromType: 'add', // 列表编辑弹出框类型
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
             currentPage: 1,
             dataPage: 0, // 当前条数
-            pageSize: val.length,
-            dataModel: val,
-            copDataModel: copVal,
+            totalCount: 0,
+            dataModel: [],
+            // copDataModel: copVal,
             multipleSelection: '',
             countNumber: 0,
             fieldRights: {}, // 子表配置权限
@@ -236,7 +326,6 @@ export default {
             fieldOptions.default_value_type = fieldOptions.default_value_type || 'fixed'
             return fieldOptions
         },
-
         toolbarButtons () {
             return this.filterButtons('toolbar')
         },
@@ -263,6 +352,22 @@ export default {
         },
         columns () {
             return this.field.field_options.columns || []
+        },
+        needPage () {
+            return this.field.field_options.page || 'Y'
+        },
+        // pageSize () {
+        //     return this.field.field_options.pageSize || 10
+        // },
+        copDataModel () {
+            // 非块模式且数据不为空
+            if (this.$utils.isNotEmpty(this.value) && ['dialog', 'inner'].includes(this.mode)) {
+                console.log(this.currentPage, (this.currentPage - 1) * this.pageSize, this.pageSize)
+                return this.$utils.newData(this.value).slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+            } else {
+                console.log(2, this.value)
+                return this.value
+            }
         },
         nameColumns () {
             return FormFieldUtil.getSubDisplayColumns(this.columns)
@@ -324,7 +429,7 @@ export default {
             return this.params.responseLinkages
         },
         copDataModelCont () {
-            /* 进行参数替换，提高子表性能 */
+            // 进行参数替换，提高子表性能
             return JSON.parse(JSON.stringify(this.dataModel))
         },
         listeners () {
@@ -338,16 +443,21 @@ export default {
     watch: {
         value: {
             handler (val, oldVal) {
-                if (!val) return
+                if (!val) {
+                    this.dataModel = []
+                    return
+                }
                 this.dataModel = val
-                /*  if (!valueEquals(val, oldVal)) {
-               this.dispatch('ElFormItem', 'el.form.change', val)
-             } */
-            }
+                // if (!valueEquals(val, oldVal)) {
+                //     this.dispatch('ElFormItem', 'el.form.change', val)
+                // }
+            },
+            immediate: true
         },
         dataModel: {
             handler (val, oldVal) {
                 // 进行分页操作
+                console.log(val)
                 this.pageOperation(val, oldVal)
             },
             deep: true
@@ -392,14 +502,17 @@ export default {
     },
     methods: {
         indexMethod (index) {
-            return (this.currentPage - 1) * 10 + index + 1
+            return (this.currentPage - 1) * this.pageSize + index + 1
         },
+        /**
+         * 定义删除、增加 不做操作。修改时才做更新 ，分页修改时，根据页表修改。
+         */
         /* 更新后的参数*/ // 定义删除、增加 不做操作。修改时才做更新 ，分页修改时，根据页表修改。
         updateModel (key, val, index, page) {
-            this.dataModel[page * 10 - 10 + index][key] = val
+            this.dataModel[(page - 1) * this.pageSize + index][key] = val
             this.$emit('change-data', key, val)
         },
-        /* 分页操作及数据操作内容*/
+        // 分页操作及数据操作内容
         pageOperation (val, oldVal) {
             let page = this.currentPage * 10 - 10
             const size = val.length
@@ -413,19 +526,19 @@ export default {
                 }
                 page = this.currentPage * 10 - 10
             }
-            if (this.dataModel.length < this.oldList.length  ) {
+            if (this.dataModel.length < this.oldList.length) {
                 const valBai = size % 10
                 const valChu = parseInt(size / 10)
-                if(this.editFromType =='remove' && this.multipleSelection.length !==0){
+                if (this.editFromType === 'remove' && this.multipleSelection.length !== 0) {
                     // 指定页删除数满10条：
-                        // 删完之后，如果下一页还有数据，则页码继续不变，如果下一页没有数据那么页码减1，直至页码=0
-                        // 除去本页剩余个数 
-                        let yuShu = this.oldList.length - this.currentPage*10
-                        if(yuShu < this.multipleSelection.length &&  yuShu<0 ){
-                            this.currentPage  =this.currentPage -1
-                        }  
-                }else{
-                      if (valBai === 0) {
+                    // 删完之后，如果下一页还有数据，则页码继续不变，如果下一页没有数据那么页码减1，直至页码=0
+                    // 除去本页剩余个数
+                    const yuShu = this.oldList.length - this.currentPage * 10
+                    if (yuShu < this.multipleSelection.length && yuShu < 0) {
+                        this.currentPage = this.currentPage - 1
+                    }
+                } else {
+                    if (valBai === 0) {
                         this.currentPage = valChu
                     } else {
                         this.currentPage = valChu + 1
@@ -433,21 +546,22 @@ export default {
                 }
                 page = this.currentPage * 10 - 10
             }
-            this.pageSize = size
+            this.totalCount = size
             this.oldList = JSON.parse(JSON.stringify(this.dataModel))
             // 具体操作
-            if (this.mode === 'dialog' || this.mode === 'inner') {
-                this.copDataModel = JSON.parse(JSON.stringify(val)).slice(page, page + 10)
-            }
+            // if (this.mode === 'dialog' || this.mode === 'inner') {
+            //     this.copDataModel = JSON.parse(JSON.stringify(val)).slice(page, page + 10)
+            // }
             this.$emit('update:value', val)
         },
-
-        // 简单的分页 usnin
+        // 处理切换分页
         handleCurrentChange (val) {
-            this.dataPage = val * 10 - 10
-            // 深度克隆主要数据
-            this.copDataModel = JSON.parse(JSON.stringify(this.dataModel)).slice(this.dataPage, this.dataPage + 10)
             this.currentPage = val
+        },
+        // 处理切换分页大小
+        handleSizeChange (val) {
+            this.pageSize = val
+            this.currentPage = 1
         },
         columnHidden (column) {
             // 是否隐藏
@@ -485,7 +599,6 @@ export default {
                 return rights || {}
             }
         },
-
         tableRowClassName ({ row, rowIndex }) {
             // 把每一行的索引放进row
             row.$index = rowIndex
@@ -536,7 +649,7 @@ export default {
         },
         handleActionEvent (button, buttonIndex) {
             // 起始下标
-            const index = this.currentPage * 10 - 10 + buttonIndex
+            const index = (this.currentPage - 1) * this.pageSize + buttonIndex
             this.actionCode = button.key === 'custom' ? button.code || button.key + index : button.key
             this.actionPosition = button.position || 'toolbar'
             // 前置事件
@@ -619,7 +732,7 @@ export default {
             const selection = []
             if (position === 'toolbar' && this.mode !== 'block') {
                 if (this.multipleSelection && this.multipleSelection.length > 0) {
-                    const startIndex = this.currentPage * 10 - 10
+                    const startIndex = (this.currentPage - 1) * 10
                     this.multipleSelection.forEach((row) => {
                         selection.push(row.$index + startIndex)
                     })
@@ -632,21 +745,19 @@ export default {
         handleRemove (button, index) {
             const position = button.position
             const selection = this.getSelection(position, index)
-            ActionUtils.removeRecord(selection, '确定删除当前数据？', true)
-                .then((ids) => {
-                    for (let i = this.dataModel.length - 1; i >= 0; i--) {
-                        if (ids.indexOf(i) > -1) {
-                            this.dataModel.splice(i, 1)
-                        }
+            ActionUtils.removeRecord(selection, '确定删除当前数据？', true).then((ids) => {
+                for (let i = this.dataModel.length - 1; i >= 0; i--) {
+                    if (ids.indexOf(i) > -1) {
+                        this.dataModel.splice(i, 1)
                     }
-                    this.pageSize = this.dataModel.length
-                    // 后置事件
-                    this.afterScript(this.actionCode, position, {
-                        selection: selection,
-                        index: index
-                    })
+                }
+                this.totalCount = this.dataModel.length
+                // 后置事件
+                this.afterScript(this.actionCode, position, {
+                    selection: selection,
+                    index: index
                 })
-                .catch(() => {})
+            }).catch(() => {})
         },
         // 初始化运行公式计算
         initRunCalFormula (row) {
@@ -868,17 +979,15 @@ export default {
             this.formDialogVisible = true
             this.judgeData(index)
         },
-        /* 第一次进入时，不做更新判断。
-      并记录当前进入时的操作， index>=0 则为修改。否则为新增。
-      第二次进入时判断
-      如果上次为修改，则刷新重置添加。
-      如果上次为新增，则不做变化。
-    */
+        /**
+         * 第一次进入时：不做更新判断。并记录当前进入时的操作，index>=0 则为修改。否则为新增。
+         * 第二次进入时判断：如果上次为修改，则刷新重置添加。如果上次为新增，则不做变化。
+         */
         judgeData (index) {
             if (index >= 0 && this.handleCout) {
                 // 第一次进入时，不做更新判断。
                 this.$refs.jyxtEdit.loadFormData()
-            } else if (index == undefined && this.handleCout == '编辑') {
+            } else if (index === undefined && this.handleCout === '编辑') {
                 this.$refs.jyxtEdit.loadFormData()
             }
             this.handleCout = index >= 0 ? '编辑' : '新增' // 记录
@@ -1048,7 +1157,7 @@ export default {
     }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .dynamic-form-table {
     .panel-heading {
         color: #000;
@@ -1075,6 +1184,27 @@ export default {
         position: relative;
         display: inline-block;
     }
+
+    ::v-deep .el-table {
+        th {
+            background-color: #84d5cf !important;
+            font-size: 12px;
+            font-weight: bold;
+            border: 0px;
+        }
+        td {
+            font-size: 12px;
+            padding: 0px 0 !important;
+        }
+        .warning-row {
+            background: #e0f0ee;
+            color: #000000;
+        }
+        .success-row {
+            background: #f9ffff;
+            color: #000000;
+        }
+    }
 }
 
 .is-error {
@@ -1097,27 +1227,25 @@ export default {
     color: #999999;
 }
 
-.dynamic-form-table .el-table th {
-    background-color: #84d5cf !important;
-    font-size: 12px;
-    font-weight: bold;
-    border: 0px;
-}
+// .dynamic-form-table .el-table th {
+//     background-color: #84d5cf !important;
+//     font-size: 12px;
+//     font-weight: bold;
+//     border: 0px;
+// }
 
-.dynamic-form-table .el-table td {
-    font-size: 12px;
-    padding: 0px 0 !important;
-}
+// .dynamic-form-table .el-table td {
+//     font-size: 12px;
+//     padding: 0px 0 !important;
+// }
 
-.dynamic-form-table .el-table .warning-row {
-    background: #e0f0ee;
-    color: #000000;
-}
+// .dynamic-form-table .el-table .warning-row {
+//     background: #e0f0ee;
+//     color: #000000;
+// }
 
-.dynamic-form-table .el-table .success-row {
-    background: #f9ffff;
-    color: #000000;
-}
+// .dynamic-form-table .el-table .success-row {
+//     background: #f9ffff;
+//     color: #000000;
+// }
 </style>
-
-  </style>

@@ -37,6 +37,7 @@
                     unselectable="on"
                     :style="{ width: width }"
                     clearable
+                    v-on="$listeners"
                 />
 
                 <!-- <el-button
@@ -962,6 +963,8 @@ export default {
         },
         dataModel: {
             handler (val) {
+                console.log(val)
+                this.$emit('change-data', this.field.name, val)
                 this.$emit('update:value', val)
             },
             deep: true

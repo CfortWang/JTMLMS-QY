@@ -553,6 +553,9 @@ const fieldTypes = {
                 ],
                 columns: [],
                 summary: false,
+                page: 'Y',
+                pageSize: 20,
+                index: true,
                 sum_text: '',
                 summary_method: false
             }
