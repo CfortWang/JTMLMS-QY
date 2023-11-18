@@ -45,6 +45,10 @@
       colorw:{
         type:String,
         default:'true'
+      },
+      direction:{
+        type:String,
+        default:'y'
       }
     },
     data () {
@@ -73,7 +77,7 @@
         // let endInof = Number(this.data.t_complaintEnd.number)
         let s12fengXiancol = echarts.init(document.getElementById(this.id))
         let option;
-        let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
+        let barColor = ['#FFBF00','#33FF00','#097969','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
         let barNum = []
         for (let i = 0; i < this.data.num.title.length-1; i++) {
           if(i==this.data.num.title.length-2){
@@ -83,12 +87,12 @@
               label:{
                 show: true,
 				        formatter:function(params){ //标签内容
-                console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
+                // console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
 					        return  params.value[params.seriesName]+'%'
 					      },
-                position: 'top',
+                position: this.direction=='x'?'right':'top',
                 textStyle:{
-                    fontSize:16,
+                    fontSize:8,
                     color:'#B0CEFC'
                   }
               }
@@ -100,10 +104,10 @@
               label:{
                 normal:{
                   show:true,
-                  position:'top',
+                  position:this.direction=='x'?'right':'top',
                           
                   textStyle:{
-                    fontSize:16,
+                    fontSize:8,
                     color:'#B0CEFC'
                   }
                 }
@@ -112,27 +116,15 @@
           }
           
         }  
-
-        option = {
-            title: {
-            text: this.title,
-            textStyle:{ fontSize:14,color: this.colorw }
-          },
-          grid: {
-                top: '20%',
-                left: '3%',
-                right: '4%',
-                bottom: '5%',
-                containLabel: true
-          },
-          xAxis: { 
+        let heng = { 
             splitLine:{show: false},
             type: 'category',
             axisLabel: {
               show: true,
               textStyle: {
-                color: this.colorw  //这里用参数代替了
-              }
+                color: this.colorw   //这里用参数代替了
+              },
+              fontSize: 8
             },
             axisLine:{
               lineStyle:{
@@ -140,14 +132,15 @@
                 width:1, //x轴线的宽度
               }
             }
-          },
-          yAxis: {
+          }
+        let zong = {
             splitLine:{show: false},
             axisLabel: {
               show: true,
               textStyle: {
                 color: this.colorw    //这里用参数代替了
-              }
+              },
+              fontSize: 8
             },
             axisLine:{
               lineStyle:{
@@ -155,7 +148,39 @@
                 width:1, //x轴线的宽度
               }
             }
+          }
+        option = {
+            title: {
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
           },
+          legend: {
+                textStyle: {
+                  fontSize: 8,
+                  color: '#B0CEFC'  // 图例文字颜色
+                },
+                top:"5%",
+                formatter: function (name) {
+                  if(name === 'chu'){
+                    return '完成率（%）';
+                  }else if(name === 'num'){
+                    return '已完成数量';
+                  }else if(name === 'numA'){
+                    return '未完成数量';
+                  }
+                    
+                }
+
+          },
+          grid: {
+                top: '15%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
+          },
+          xAxis: this.direction=='x'?zong:heng,
+          yAxis: this.direction=='x'?heng:zong,
           dataset: {
             dimensions: this.data.num.title,
             source: this.data.num.number

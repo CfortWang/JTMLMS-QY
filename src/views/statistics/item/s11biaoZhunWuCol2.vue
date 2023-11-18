@@ -45,6 +45,10 @@
       colorw:{
         type:String,
         default:'true'
+      },
+      direction:{
+        type:String,
+        default:'y'
       }
     },
     data () {
@@ -78,7 +82,7 @@
             label:{
               normal:{
                 show:true,
-                position:'top',
+                position:this.direction=='x'?'right':'top',
                         
                 textStyle:{
                   fontSize:12,
@@ -110,12 +114,48 @@
           
         }  
         // let that = this
+        let heng ={ 
+            splitLine:{show: false},
+            type: 'category',
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw   //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          }
+          let zong ={
+            splitLine:{show: false},
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: this.colorw    //这里用参数代替了
+              }
+            },
+            axisLine:{
+              lineStyle:{
+                color:this.colorw,
+                width:1, //x轴线的宽度
+              }
+            }
+          }
+          let yt = {
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
+          }
+          let wt = {
+            // text: this.colorw=='#000'?this.title:"",
+            textStyle:{ fontSize:14,color: this.colorw }
+          }
         let option = {
            //v3
-          title: {
-            // text: this.title,
-            textStyle:{ fontSize:14,color: this.colorw }
-          },
+          title: this.direction=='x'?yt:wt,
           tooltip: {
                 // 当trigger : axis 鼠标移入标线不会有悬浮框出现 params的值为一个数组，只会悬浮series
                 // 当trigger : item 鼠标移入标线有悬浮框出现 params的值为一个对象，会区别鼠标移入的是series还是markLine
@@ -136,47 +176,19 @@
             textStyle: {
               fontSize: 8,
               color: '#B0CEFC'  // 图例文字颜色
-            }
+            },
+            top:"5%",
 
           },
           grid: {
-                top: '10%',
+                top: '15%',
                 left: '3%',
                 right: '4%',
                 bottom: '5%',
                 containLabel: true
           },
-          xAxis: { 
-            splitLine:{show: false},
-            type: 'category',
-            axisLabel: {
-              show: true,
-              textStyle: {
-                color: '#fff'   //这里用参数代替了
-              }
-            },
-            axisLine:{
-              lineStyle:{
-                color:'#fff',
-                width:1, //x轴线的宽度
-              }
-            }
-          },
-          yAxis: {
-            splitLine:{show: false},
-            axisLabel: {
-              show: true,
-              textStyle: {
-                color: '#fff'    //这里用参数代替了
-              }
-            },
-            axisLine:{
-              lineStyle:{
-                color:'#fff',
-                width:1, //x轴线的宽度
-              }
-            }
-          },
+          xAxis: this.direction=='x'?zong:heng,
+          yAxis: this.direction=='x'?heng:zong,
           dataset: {
             dimensions: this.data.Num.title,
             source: this.data.Num.number

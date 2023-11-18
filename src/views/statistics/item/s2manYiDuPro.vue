@@ -47,6 +47,10 @@
       colorw:{
         type:String,
         default:'true'
+      },
+      direction:{
+        type:String,
+        default:'y'
       }
     },
     data () {
@@ -82,10 +86,10 @@
               label:{
                 show: true,
 				        formatter:function(params){ //标签内容
-                console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
+                // console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
 					        return  params.value[params.seriesName]+'%'
 					      },
-                position: 'top',
+                position: this.direction=='x'?'right':'top',
                 textStyle:{
                     fontSize:8,
                     color:'#B0CEFC'
@@ -99,7 +103,7 @@
               label:{
                 normal:{
                   show:true,
-                  position:'top',
+                  position:this.direction=='x'?'right':'top',
                           
                   textStyle:{
                     fontSize:8,
@@ -111,37 +115,7 @@
           }
           
         }  
-
-        option = {
-            title: {
-            text: this.title,
-            textStyle:{ fontSize:14,color: this.colorw }
-          },
-          legend: {
-                textStyle: {
-                  fontSize: 8,
-                  color: '#B0CEFC'  // 图例文字颜色
-                },
-                formatter: function (name) {
-                  if(name === 'chu'){
-                    return '完成率（%）';
-                  }else if(name === 'num'){
-                    return '已完成数量';
-                  }else if(name === 'numA'){
-                    return '未完成数量';
-                  }
-                    
-                }
-
-          },
-          grid: {
-                top: '20%',
-                left: '3%',
-                right: '4%',
-                bottom: '5%',
-                containLabel: true
-          },
-          xAxis: { 
+        let heng = { 
             splitLine:{show: false},
             type: 'category',
             axisLabel: {
@@ -157,8 +131,8 @@
                 width:1, //x轴线的宽度
               }
             }
-          },
-          yAxis: {
+          }
+        let zong = {
             splitLine:{show: false},
             axisLabel: {
               show: true,
@@ -173,7 +147,39 @@
                 width:1, //x轴线的宽度
               }
             }
+          }
+        option = {
+            title: {
+            text: this.title,
+            textStyle:{ fontSize:14,color: this.colorw }
           },
+          legend: {
+                textStyle: {
+                  fontSize: 8,
+                  color: '#B0CEFC'  // 图例文字颜色
+                },
+                top:"5%",
+                formatter: function (name) {
+                  if(name === 'chu'){
+                    return '完成率（%）';
+                  }else if(name === 'num'){
+                    return '已完成数量';
+                  }else if(name === 'numA'){
+                    return '未完成数量';
+                  }
+                    
+                }
+
+          },
+          grid: {
+                top: '15%',
+                left: '3%',
+                right: '4%',
+                bottom: '5%',
+                containLabel: true
+          },
+          xAxis: this.direction=='x'?zong:heng,
+          yAxis: this.direction=='x'?heng:zong,
           dataset: {
             dimensions: this.data.num.title,
             source: this.data.num.number

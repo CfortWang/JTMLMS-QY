@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-dialog
-            :title="`核查计划进度情况（编号：${generalList[0].bian_hao_}）`"
+            :title="`核查计划进度情况（核查计划编号：${generalList[0].bian_hao_}）`"
             :visible.sync="generalShow"
             width="80%"
             top="0"

@@ -88,7 +88,7 @@
         //  let maxVal=max1>max2?max1:max2;
         //  console.log("max1:",max1,"max2:",max2);
         let e = 100 -this.data.Num.val
-        console.log(e,'eeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+        // console.log(e,'eeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
 
        let option = {
           //v3

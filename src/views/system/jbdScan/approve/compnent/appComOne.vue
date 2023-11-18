@@ -127,9 +127,9 @@ export default {
         },
         selectClike () {
             const statusMap = {
-                1: '待核查/待审核/已结束',
-                2: '待审核/已结束',
-                3: '已结束',
+                1: '待核查/待审核/待确认/已结束',
+                2: '待审核/待确认/已结束',
+                3: '待确认/已结束',
                 4: '已结束'
             }
             this.selectData = this.tableData.filter(item =>

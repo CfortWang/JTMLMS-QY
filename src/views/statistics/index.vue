@@ -160,12 +160,12 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
               <s4renYuanPeiXun style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="zaigangrenyuan.length>0&&(showAll || showComponents[1])" :data = "getS4renYuanPeiXun()"/>
-              <s4renYuanPeiXunCol style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw"
+              <s4renYuanPeiXunCol style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="zaigangrenyuanfb.length>0&&(showAll || showComponents[2])" :data = "getS4renYuanPeiXunFB()"/>
               <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div>
               <s5renYuanJianDu style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[3]" :data = "getS5renYuanJianDu()"/>
-              <s5renYuanJianDuCol style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw"
+              <s5renYuanJianDuCol style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="gangqianpeixunfb.length>0&&(showAll || showComponents[4])" :data = "getS5renYuanJianDuFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="gangqianpeixunfb.length<=0&&(showAll || showComponents[4])">暂无数据</div>
                 <!-- <s16bzJunZhu :height="'290%'" :width="static=='row' ? '33%': '100%'" :colorw = "colorw"
@@ -181,12 +181,12 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
               <s7sheBeiJiaoZhun style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[5]" :data = "getJiaoYanObjNum()"/>
-                <s7sheBeiJiaoZhunCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw"
+                <s7sheBeiJiaoZhunCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="jiaoyanMGObj.length>0&&(showAll || showComponents[6])" :data = "getJiaoYanObjNumFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="jiaoyanMGObj.length<=0&&(showAll || showComponents[6])">暂无数据</div>
                 <s8sheBeiHeCha style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[7]" :data = "gethechaObjNum()"/>
-                <s8sheBeiHeChaCol style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw"
+                <s8sheBeiHeChaCol style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="hechaMGObj.length>0&&(showAll || showComponents[8])" :data = "gethechaObjNumFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="hechaMGObj.length<=0&&(showAll || showComponents[8])">暂无数据</div>
                 <div class="clear"></div>
@@ -198,12 +198,12 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s9neiBuZhiLiang style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[9]" :data = "getS9neiBuZhiLiang()"/>
-                <s9neiBuZhiLiangCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw"
+                <s9neiBuZhiLiangCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="neibuObjfb.length>0&&(showAll || showComponents[10])" :data = "getS9neiBuZhiLiangFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="neibuObjfb.length<=0&&(showAll || showComponents[10])">暂无数据</div>
-                <s10waiBuNengLi style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+                <s10waiBuNengLi style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw" 
                 v-if="showAll || showComponents[11]" :data = "getnengtliObjNum()"/>
-                <s10waiBuNengLiCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw"
+                <s10waiBuNengLiCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="waibuObjfb.length>0&&(showAll || showComponents[12])" :data = "getnengtliObjNumFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="waibuObjfb.length<=0&&(showAll || showComponents[12])">暂无数据</div>
                 
@@ -216,12 +216,12 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s15tousu style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[13]" :data = "getS3tousu()"/>
-                <s15tousuCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw"
+                <s15tousuCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="yingjifbObj.length>0&&(showAll || showComponents[14])" :data = "getS3tousuFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="yingjifbObj.length<=0&&(showAll || showComponents[14])">暂无数据</div>
                 <s12fengXian style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[15]" :data = "getS12fengXian()"/>
-                <s12fengXianCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw"
+                <s12fengXianCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="fengxianfbObj.length>0&&(showAll || showComponents[16])" :data = "getS12fengXianFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="fengxianfbObj.length<=0&&(showAll || showComponents[16])">暂无数据</div>
                 
@@ -234,10 +234,10 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s2manYiDu style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw" 
                 v-if="showAll || showComponents[17]"  :data = "getS2manYiDu()"/>
-                <s2manYiDuCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" 
+                <s2manYiDuCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction" 
                 v-if="neishenfbObj.length>0&&(showAll || showComponents[18])"  :data = "getS2manYiDuFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="neishenfbObj.length<=0&&(showAll || showComponents[18])">暂无数据</div>
-                <s14bufuhexiang style="height:50%" :width="static=='row' ? '100%': '100%'" :colorw = "colorw"
+                <s14bufuhexiang style="height:50%" :width="static=='row' ? '100%': '100%'" :colorw = "colorw" :direction="direction" 
                 v-if="bufuheObj.length>0&&(showAll || showComponents[19])" :data = "getS14bufuhexiang()"/>
                 <div class="nullDate1" style="height:50%;width:100%;" v-if="bufuheObj.length<=0&&(showAll || showComponents[19])">暂无数据</div>
                 <div class="clear"></div>
@@ -249,10 +249,10 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s1zhiLiangMuBiao style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw" 
                 v-if="showAll || showComponents[21]" :data = "getS1renwu()"/>
-                <s1zhiLiangMuBiaoCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" 
+                <s1zhiLiangMuBiaoCol style="height:50%" :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="guanshenfbObj.length>0&&(showAll || showComponents[22])" :data = "getS1renwuFB()"/>
                 <div class="nullDate1" style="height:50%;width:75%;" v-if="guanshenfbObj.length<=0&&(showAll || showComponents[22])">暂无数据</div>
-                <s16bzJunZhu style="height:50%" :width="static=='row' ? '100%': '100%'" :colorw = "colorw"
+                <s16bzJunZhu style="height:50%" :width="static=='row' ? '100%': '100%'" :colorw = "colorw" :direction="direction"
                 v-if="gaijinxiangObj.length>0&&(showAll || showComponents[23])" :data = "getbzJunZhujNum()"/>
                 <div class="nullDate1" style="height:50%;width:100%;" v-if="gaijinxiangObj.length<=0&&(showAll || showComponents[23])">暂无数据</div>
                 <div class="clear"></div>
@@ -465,6 +465,7 @@
     },
     data() {
       return {
+        direction:'y',
         height:(window.screen.height-200)+"px",
         BeginDate: '',
         endDate: '',
@@ -568,7 +569,7 @@
           let a1 = response1.variables.data //结果一定存在第0个，因为只有一条数据
           this.quality = a
           this.quality1 = a1
-          console.log(a,'335345345234543534')
+          // console.log(a,'335345345234543534')
           // for (let i = 0; i < this.quality.length; i++) {
           //   let a = {}
           //   a.value = this.quality[i].id_
@@ -586,7 +587,7 @@
             let mid = {'NAME_':this.quality1[i].name_,'numA':0,'num':0,'chu':0}
             this.allBuMen.push(mid)
           }
-          console.log(this.allBuMen,'2434465565665656rterterte')
+          // console.log(this.allBuMen,'2434465565665656rterterte')
           // if(this.bumen != ''){
           //   this.getConfigData(this.endDate,this.bumen)
           // }else{
@@ -642,7 +643,7 @@
                       }
                       let qqaa = response4.variables.data
                       that.fenzuzlmb= this.sortArr(qqaa,'bzbm')
-                      console.log(that.fenzuzlmb,'qqaaqqaaqqaa')
+                      // console.log(that.fenzuzlmb,'qqaaqqaaqqaa')
                       that.zaigangrenyuan = response5.variables.data 
                       that.gangqianpeixun = response6.variables.data 
                       that.jiaoyanObj = response7.variables.data
@@ -701,7 +702,7 @@
         let m1 = nowDate.getMonth()+1
         let month1 = m1 < 10 ? "0" +m1:nowDate.getMonth()+1;
         month = month<10 ? "0"+month : ""+month;
-        console.log([nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month])
+        // console.log([nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month])
         // return [nowDate.getFullYear() - year + "-" + month1,date.getFullYear() + "-" + month];
         return [nowDate.getFullYear() - year + "-01",nowDate.getFullYear() - year + "-" + month1];
       },
@@ -809,7 +810,7 @@
                         }
                         continue
                 }
-                console.log(zlzbfz,'ghshhhsuihihuisoio878788787878778')
+                // console.log(zlzbfz,'ghshhhsuihihuisoio878788787878778')
                 if(zmIndex == 1){
                   zongfz.push({'id':fenshuzu[zn].id_,'name':fenshuzu[zn].name_,'data':zlzbfz})
                 }else{
@@ -1002,12 +1003,14 @@
       rollstop(){
         this.fadeinout = true
         clearInterval(this.timer1);
-        console.log('dfhjsdifjsojfjiofjoijdiffffjidffffff')
+        // console.log('dfhjsdifjsojfjiofjoijdiffffjidffffff')
         this.rollup=false
       },
     }
   }
 </script>
+
+
 <style lang="scss" >
   .statistics {
     height: 100%;

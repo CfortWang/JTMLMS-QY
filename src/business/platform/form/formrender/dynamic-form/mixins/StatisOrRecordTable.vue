@@ -15,6 +15,14 @@
                 <span class="el-icon-close" style="float: right;" @click.stop="closePopover" />
                 <template-statis v-if="isShow" static="line" :shows="el.show" />
             </el-popover>
+            <!-- <el-dialog
+                title="数据统计"
+                v-if="el.type =='Statis'"
+                :visible.sync="isShow"
+                :append-to-body='true'
+                width="80%">
+                <template-statis v-if="isShow" static="line" :shows="el.show" />
+            </el-dialog> -->
         </div>
     </div>
 </template>
@@ -116,4 +124,27 @@ export default {
             cursor: pointer;
         }
     }
+    /deep/ .el-popover{
+        height: 70vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    /deep/ .el-dialog__header {
+        border: none;
+        text-align: center;
+    }
+    /deep/ .el-dialog__body{
+        overflow-x: hidden;
+    }
+    /deep/ .el-dialog{
+        height: 65%;
+    }
+    // /deep/ .dj-dialog-content {
+    //     padding: 0;
+    //     overflow: unset;
+    // }
+    ::v-deep .el-range-input {
+        background-color:#fff;
+      }
 </style>
+

@@ -44,7 +44,7 @@
                             </div>
                             <el-table :data="CNASTableData" :border="true" style="width: 90%;margin: 0 auto;">
                                 <!-- <el-table-column type="index"  width="30" align="center"/> -->
-                                <el-table-column type="index" width="30" :align="center">            
+                                <el-table-column type="index" width="40" :align="center">            
                                     <template slot-scope="scope">
                                         <span>{{scope.$index+1}} </span>
                                     </template>
@@ -79,7 +79,7 @@
                                         {{ scope.row.bu_fu_he_cheng_du}}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="shi_fou_guo_shen_" label="状态" width="40" > 
+                                <el-table-column prop="shi_fou_guo_shen_" label="状态" width="65" > 
                                     <template slot-scope="scope">
                                         {{ scope.row.shi_fou_guo_shen_}}
                                     </template>
@@ -186,6 +186,7 @@
 <script>
 import * as echarts from 'echarts'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
+import height from '@/mixins/height'
 export default {
     components: {},
     filters: {
@@ -544,9 +545,17 @@ export default {
         // cnas指定数据到坐标轴的映射
         getLoadEchartsTwo () {
             var chartDom = document.getElementById('in-echarts')
+            let width,height;
+            if(window.innerWidth > 1600){
+                width = 590;
+                height = 450;
+            }else{
+                width = 480;
+                height = 400;
+            }
             const setEchartWH = {
                 // 设置控制图表大小变量
-                width: 500,
+                width: width,
                 height: this.source.length < 7 ? 350 : (this.source.length - 1) * 30 + 100
             }
             var myChart = echarts.init(chartDom, null, setEchartWH)
@@ -556,7 +565,13 @@ export default {
                 dataset: {
                     source: this.source
                 },
-                grid: { containLabel: true },
+                grid: {
+                // 让图表占满容器
+                    top:"50px",
+                    left:"45px",
+                    right:"80px",
+                    bottom:"40px"
+                },
                 xAxis: {
                     name: '  条数',
                     interval: 1,
@@ -613,7 +628,13 @@ export default {
                 dataset: {
                     source: this.cmaSuorce
                 },
-                grid: { containLabel: true },
+                grid: {
+                    // 让图表占满容器
+                    top:"40px",
+                    left:"0px",
+                    right:"40px",
+                    bottom:"40px"
+                },
                 xAxis: {
                     name: '不符合项',
                     interval: 1,
@@ -626,7 +647,7 @@ export default {
                 yAxis: { type: 'category' },
                 visualMap: {
                     orient: 'horizontal',
-                    left: 'center',
+                    left: 'left',
                     show: false,
                     min: 10,
                     max: 100,
@@ -656,10 +677,23 @@ export default {
         // cnas部门饼图
         getLoadEchartsthree () {
             var chartDom = document.getElementById('department')
+            let radius,width,height,padding;
+            if(window.innerWidth > 1600){
+                radius = "55%";
+                width = 590;
+                height = 450;
+                padding = [16, 0, 0, 0]
+            }else{
+                radius = "42%";
+                width = 500;
+                height = 400;
+                padding = [16, 0, 0, 0]
+            }
+            // const radius = window.innerWidth > 1600 ? "55%" : "42%";
             const setEchartWH = {
                 // 设置控制图表大小变量
-                width: 500,
-                height: 400
+                width: width,
+                height: height
             }
             var myChart = echarts.init(chartDom, null, setEchartWH)
             var option
@@ -667,18 +701,26 @@ export default {
                 tooltip: {
                     trigger: 'item'
                 },
+                
                 label: {
                     formatter: '{b}\n({c}项)',
                     edgeDistance: '20%'
                 },
                 legend: {
                     orient: 'vertical',
-                    left: 'left'
+                    left: 'left',
+                    padding: padding
                 },
+                grid: {
+    top: '20%',
+    bottom: '50%',
+    left: '10%',
+    right: '10%'
+},
                 series: [
                     {
                         type: 'pie',
-                        radius: '50%',
+                        radius: radius,
                         data: this.cnasPieData,
                         emphasis: {
                             itemStyle: {
@@ -926,6 +968,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+
 .bg {
   .main {
     width: 400px;
@@ -943,6 +986,9 @@ export default {
       // font-weight: bold;
     }
   }
+  ::v-deep .el-dialog__wrapper .el-dialog__body {
+    overflow-x: hidden !important;
+    }
   .nodata {
     width: 90%;
     margin: 20px auto;
@@ -1117,7 +1163,7 @@ export default {
       height: 100%;
     }
     .department {
-      margin-left: 60px;
+      margin-left: 40px;
     }
     // #department {
     //   width: 400px;

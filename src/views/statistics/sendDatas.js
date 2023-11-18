@@ -240,7 +240,7 @@ export default {
                                 zlzbfz.push(rq)
                                 // console.log(zlzbfz,dateArry[j],'erw232222222222222222222222222224586')
                         }
-                        console.log(fenshuzu,zlzbfz,'55353453535345')
+                        // console.log(fenshuzu,zlzbfz,'55353453535345')
                         let title = ['name_']
                         for (let zn = 0; zn < fenshuzu.length; zn++) {
                                 for (let i = 0; i < zlzbfz.length; i++) {
@@ -249,7 +249,7 @@ export default {
                                                         if(zlzbfz[i].name_ == fenshuzu[zn].data[j].bzsj){
                                                                 let prop = fenshuzu[zn].data[j].zhi_liang_zhi_bia;
                                                                 zlzbfz[i][prop] = fenshuzu[zn].data[j].location
-                                                                console.log(zlzbfz)
+                                                                // console.log(zlzbfz)
                                                         }
                                                         //continue
                                                 }
@@ -260,7 +260,7 @@ export default {
                                 zongfz.push({'id':fenshuzu[zn].id_,'name':fenshuzu[zn].name_,'data':zlzbfz})
                                 
                         }
-                        console.log(zongfz,'0000000000000000767676767676767676767676')
+                        // console.log(zongfz,'0000000000000000767676767676767676767676')
                         for (let t = 0; t < this.zhiliangzhibiaotitle.length; t++) {
                                 title.push(this.zhiliangzhibiaotitle[t].zhi_liang_zhi_bia)
                                 

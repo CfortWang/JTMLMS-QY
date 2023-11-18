@@ -101,7 +101,7 @@
                           type: 'shadow'
                         },
                         formatter: function (datas) {
-                          console.log(datas)
+                          // console.log(datas)
                             var res=datas[0].data.mz+"<BR>"+'完成:'+datas[0].data.wnum+"<BR>"
                             res+='计划:'+datas[0].data.num+"<BR>"
                             // res+='百分比:'+(datas[1].value==null||datas[1].value==0?"0.00":(datas[0].value/datas[1].value*100).toFixed(2))+"%"
