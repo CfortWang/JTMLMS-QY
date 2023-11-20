@@ -127,8 +127,12 @@ export default {
     data () {
         const { first = '', second = '' } = this.$store.getters.level || {}
         const level = second || first
-        const { userList = [], deptList = [], role = [] } = this.$store.getters || {}
+        const { userList = [], deptList = [], role = [], menus = [], isSuper } = this.$store.getters || {}
+        const isManager = role.some(i => i.alias === 'xtgljs') || isSuper
         const roleOption = role.map(i => ({ key: i.id, value: i.id, label: i.name }))
+        const sysOption = menus.map(i => ({ key: i.alias, value: i.title, label: i.title })).filter(i => !['xtgl', 'xnyz'].includes(i.key))
+        listSearchForm.guide.forms[0].value = isManager ? 'all' : 'aboutMe'
+        listSearchForm.guide.forms[1].options = sysOption
         listSearchForm.guide.forms[3].options = roleOption
         const getGuide = ({ parameters, requestPage, sorts }) => {
             // 获取查询角色信息
@@ -151,7 +155,7 @@ export default {
             }, '')
             params = params + aboutMeParams + roleParams
             // and di_dian_ = '${level}'
-            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver, ye_mian_lu_jing_ as path from t_bdbhpzb where sn_ + 0 > 0 ${params} order by sn_ + 0 asc`
+            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver, ye_mian_lu_jing_ as path, zi_yuan_lu_jing_ as res from t_bdbhpzb where sn_ + 0 > 0 ${params} order by sn_ + 0 asc`
             const { pageNo = 1, limit = 15 } = requestPage || {}
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
@@ -181,6 +185,7 @@ export default {
             stateOption,
             userList,
             deptList,
+            menus,
             pkKey: 'id',
             taskId: '', // 编辑dialog需要使用
             waiJian: '', // 编辑dialog需要使用
@@ -398,10 +403,13 @@ export default {
         // 处理表格点击事件
         handleRowClick (data) {
             if (this.activeTab === 'guide') {
-                const { path = '' } = data
-                if (path) {
-                    this.$router.push(path)
+                const { res = '' } = data
+                if (!res) {
+                    this.$message.warning('未配置资源菜单！')
+                    return
                 }
+                const path = '/' + this.findPagePath(res)
+                this.$router.push(path)
                 return
             }
             if (this.activeTab === 'news') {
@@ -711,6 +719,16 @@ export default {
                 }
             })
             return res[type].filter(i => i).join(',')
+        },
+        findPagePath (res) {
+            const resList = res.split('.')
+            const findAlias = (nodes, path) => {
+                const [currentId, ...rest] = path
+                const node = nodes.find(n => n.id === currentId)
+                return node && rest.length ? [node.alias, ...findAlias(node.children, rest)] : node && [node.alias]
+            }
+            this.$store.dispatch('ibps/menu/activeHeaderSet', { activeHeader: resList[0], vm: this })
+            return findAlias(this.menus, resList).join('/')
         }
     }
 }

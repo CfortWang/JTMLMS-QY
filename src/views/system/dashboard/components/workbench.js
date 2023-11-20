@@ -121,8 +121,8 @@ export const listSearchForm = {
     guide: {
         forms: [
             { prop: 'range', label: '显示范围', labelWidth: 70, fieldType: 'select', options: rangeOption, value: 'aboutMe' },
-            { prop: 'suo_shu_xi_tong_', label: '所属子系统', labelWidth: 85, fieldType: 'input' },
-            { prop: 'gong_neng_mo_kuai', label: '所属功能模块', labelWidth: 90, fieldType: 'input' },
+            { prop: 'suo_shu_xi_tong_', label: '所属子系统', labelWidth: 85, fieldType: 'select', options: [] },
+            { prop: 'gong_neng_mo_kuai', label: '所属功能模块', labelWidth: 100, fieldType: 'input' },
             { prop: 'role', label: '执行角色', labelWidth: 70, fieldType: 'select', options: [] },
             { prop: 'biao_dan_ming_che', label: '记录表单', labelWidth: 70, fieldType: 'input' },
             { prop: 'shi_wu_lei_xing_', label: '事务类型', labelWidth: 70, fieldType: 'select', options: taskTypeOption }
