@@ -433,15 +433,18 @@ export default {
             this.snapshotId = ''
             this.fileLoading = true
             const resultList = []
+            const requestOrder = []
             table.forEach((item, index) => {
                 const sql = `select ${file[index]} from ${item} where ${field.length && field[index] ? field[index] : 'id_'} = '${bizKey}'`
                 resultList.push(this.getFile(sql, file[index]))
+                requestOrder.push(index)
             })
             Promise.all(resultList).then(res => {
                 // console.log('所有附件ID：', res)
+                const sortedResults = requestOrder.map(index => res[index])
                 this.fileLoading = false
-                this.fileId = [...new Set(res.reduce((acc, cur) => acc.concat(cur.file), []))].join(',')
-                this.snapshotId = [...new Set(res.reduce((acc, cur) => acc.concat(cur.snapshot), []))].join(',')
+                this.fileId = [...new Set(sortedResults.reduce((acc, cur) => acc.concat(cur.file), []))].join(',')
+                this.snapshotId = [...new Set(sortedResults.reduce((acc, cur) => acc.concat(cur.snapshot), []))].join(',')
             }).catch(err => {
                 this.fileLoading = false
                 console.log('error', err)
