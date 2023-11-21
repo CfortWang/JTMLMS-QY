@@ -187,7 +187,7 @@
         <import-table
             :visible="importTableDialogVisible"
             :title="field.label"
-            @close="(visible) => (importTableDialogVisible = visible)"
+            @close="(visible) => importTableAction(visible)"
             @action-event="handleImportTableActionEvent"
         />
         <component
@@ -229,6 +229,11 @@ import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
 
 const JForm = window.JForm
+// 获取子表展示数据
+const getShowData = (data, current = 1, size = defaultPageSize) => {
+    return data && data.length ? JSON.parse(JSON.stringify(data)).slice((current - 1) * size, current * size) : []
+}
+
 export default {
     components: {
         FormrenderDialog,
@@ -263,28 +268,23 @@ export default {
         }
     },
     data () {
-        // let val = []
-        // let tableType = ''
-        // let copVal = []
-        // if (this.$utils.isNotEmpty(this.value)) {
-        //     val = this.value || []
-        //     copVal = ['dialog', 'inner'].includes(tableType) ? JSON.parse(JSON.stringify(val)).slice(0, 10) : val
-        // }
-        // tableType = this.field.field_options.mode || 'inner'
-        /* 由于内容遍历卡顿问题，需再建个中间对象进行渲染.*/
-        const { page, pageSize = defaultPageSize } = this.field.field_options || {}
-        console.log(page, pageSize)
+        const { page, pageSize = defaultPageSize, mode = 'inner' } = this.field.field_options || {}
+        let initData = []
+        if (page === 'N' || mode === 'block' || !this.value) {
+            initData = this.value || []
+        } else {
+            initData = getShowData(this.value, 1, pageSize)
+        }
         return {
             pageSize,
             pageSizeOptions,
-            editFromType: 'add', // 列表编辑弹出框类型
+            editFromType: '', // 列表编辑弹出框类型
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
             currentPage: 1,
-            dataPage: 0, // 当前条数
             totalCount: 0,
             dataModel: [],
-            // copDataModel: copVal,
+            copDataModel: initData,
             multipleSelection: '',
             countNumber: 0,
             fieldRights: {}, // 子表配置权限
@@ -311,7 +311,9 @@ export default {
             dialogTemplate: null,
             dialogTemplateAtts: {},
 
-            oldList: [] // 子表旧数据
+            oldList: [], // 子表旧数据
+            importList: [],
+            importValue: null
         }
     },
     computed: {
@@ -359,16 +361,15 @@ export default {
         // pageSize () {
         //     return this.field.field_options.pageSize || 10
         // },
-        copDataModel () {
-            // 非块模式且数据不为空
-            if (this.$utils.isNotEmpty(this.value) && ['dialog', 'inner'].includes(this.mode)) {
-                console.log(this.currentPage, (this.currentPage - 1) * this.pageSize, this.pageSize)
-                return this.$utils.newData(this.value).slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
-            } else {
-                console.log(2, this.value)
-                return this.value
-            }
-        },
+        // copDataModel () {
+        //     // 自动计算显示数据，缺陷：子表数据任何变化都将触发
+        //     // 非块模式且数据不为空
+        //     if (this.$utils.isNotEmpty(this.dataModel) && ['dialog', 'inner'].includes(this.mode)) {
+        //         return this.$utils.newData(this.dataModel).slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+        //     } else {
+        //         return this.dataModel
+        //     }
+        // },
         nameColumns () {
             return FormFieldUtil.getSubDisplayColumns(this.columns)
         },
@@ -451,16 +452,13 @@ export default {
                 // if (!valueEquals(val, oldVal)) {
                 //     this.dispatch('ElFormItem', 'el.form.change', val)
                 // }
-            },
-            immediate: true
+            }
         },
         dataModel: {
             handler (val, oldVal) {
                 // 进行分页操作
-                console.log(val)
-                this.pageOperation(val, oldVal)
-            },
-            deep: true
+                this.handlePagination(val)
+            }
         },
         rights: {
             handler (val, oldVal) {
@@ -501,67 +499,46 @@ export default {
         })
     },
     methods: {
+        getShowData,
         indexMethod (index) {
             return (this.currentPage - 1) * this.pageSize + index + 1
         },
         /**
          * 定义删除、增加 不做操作。修改时才做更新 ，分页修改时，根据页表修改。
          */
-        /* 更新后的参数*/ // 定义删除、增加 不做操作。修改时才做更新 ，分页修改时，根据页表修改。
         updateModel (key, val, index, page) {
             this.dataModel[(page - 1) * this.pageSize + index][key] = val
             this.$emit('change-data', key, val)
         },
-        // 分页操作及数据操作内容
-        pageOperation (val, oldVal) {
-            let page = this.currentPage * 10 - 10
-            const size = val.length
-            if (val.length > this.oldList.length && this.oldList.length >= 0) {
-                const valBai = size % 10
-                const valChu = parseInt(size / 10)
-                if (valBai === 0) {
-                    this.currentPage = valChu
-                } else {
-                    this.currentPage = valChu + 1
-                }
-                page = this.currentPage * 10 - 10
+        handlePagination (val) {
+            this.totalCount = val.length
+            // 限制最小页数为1
+            const pageCount = Math.ceil(this.totalCount / this.pageSize) || 1
+            // 逻辑：删除后当前页大于总页数，替换为总页数，否则留在当前页
+            if (this.editFromType === 'add') {
+                // 新增按钮逻辑：前往最后一页
+                this.currentPage = pageCount
+            } else if (this.editFromType === 'import') {
+                // 导入定位到第一页
+                this.currentPage = 1
+            } else {
+                // 其余逻辑（编辑、删除、整表赋值）：操作后当前页大于总页数，替换为总页数，否则留在当前页
+                this.currentPage = this.currentPage > pageCount ? pageCount : this.currentPage
             }
-            if (this.dataModel.length < this.oldList.length) {
-                const valBai = size % 10
-                const valChu = parseInt(size / 10)
-                if (this.editFromType === 'remove' && this.multipleSelection.length !== 0) {
-                    // 指定页删除数满10条：
-                    // 删完之后，如果下一页还有数据，则页码继续不变，如果下一页没有数据那么页码减1，直至页码=0
-                    // 除去本页剩余个数
-                    const yuShu = this.oldList.length - this.currentPage * 10
-                    if (yuShu < this.multipleSelection.length && yuShu < 0) {
-                        this.currentPage = this.currentPage - 1
-                    }
-                } else {
-                    if (valBai === 0) {
-                        this.currentPage = valChu
-                    } else {
-                        this.currentPage = valChu + 1
-                    }
-                }
-                page = this.currentPage * 10 - 10
-            }
-            this.totalCount = size
-            this.oldList = JSON.parse(JSON.stringify(this.dataModel))
-            // 具体操作
-            // if (this.mode === 'dialog' || this.mode === 'inner') {
-            //     this.copDataModel = JSON.parse(JSON.stringify(val)).slice(page, page + 10)
-            // }
+            this.copDataModel = this.getShowData(val, this.currentPage, this.pageSize)
+            this.editFromType = ''
             this.$emit('update:value', val)
         },
         // 处理切换分页
         handleCurrentChange (val) {
             this.currentPage = val
+            this.copDataModel = this.getShowData(this.dataModel, this.currentPage, this.pageSize)
         },
         // 处理切换分页大小
         handleSizeChange (val) {
             this.pageSize = val
             this.currentPage = 1
+            this.copDataModel = this.getShowData(this.dataModel, this.currentPage, this.pageSize)
         },
         columnHidden (column) {
             // 是否隐藏
@@ -732,7 +709,7 @@ export default {
             const selection = []
             if (position === 'toolbar' && this.mode !== 'block') {
                 if (this.multipleSelection && this.multipleSelection.length > 0) {
-                    const startIndex = (this.currentPage - 1) * 10
+                    const startIndex = (this.currentPage - 1) * this.pageSize
                     this.multipleSelection.forEach((row) => {
                         selection.push(row.$index + startIndex)
                     })
@@ -767,30 +744,79 @@ export default {
         handleImport () {
             this.importTableDialogVisible = true
         },
+        importTableAction (val) {
+            this.importTableDialogVisible = false
+            this.importList = []
+            this.importValue = null
+        },
         handleImportTableActionEvent (file, options) {
-            const formData = FormUtils.getTableDefaultColumnData(this.field)
-            IbpsImport.xlsx(file, options).then(({ header, results }) => {
-                const columnMap = {}
-                this.nameColumns.forEach((column) => {
-                    columnMap[column.label] = column
-                })
-                results.forEach((result) => {
-                    const data = JSON.parse(JSON.stringify(formData))
-                    for (const key in result) {
-                        if (columnMap[key]) {
-                            const column = columnMap[key]
-                            const name = column.name
-                            const value = this.importDataFormatter(result[key], column)
-                            data[name] = value
+            if (this.importList.length > 0) {
+                this.loading = false
+                const formData = this.setValue(this.importValue)
+                IbpsImport.xlsx(file, options).then(({ header, results }) => {
+                    results.forEach((item) => {
+                        const data = JSON.parse(JSON.stringify(formData))
+                        for (const key in item) {
+                            if (this.importValue[key]) {
+                                data[this.importValue[key]] = item[key]
+                            }
                         }
-                    }
-                    // TODO: 需要格式化的成数据库的数据
-                    // 数据添加
-                    this.dataModel.push(data)
+                        this.dataModel.push(data)
+                    })
+                    this.importTableDialogVisible = false
+                    this.importValue = null
+                    this.importList = []
+                    ActionUtils.success('导入成功')
                 })
-                this.importTableDialogVisible = false
-                ActionUtils.success('导入成功')
+            } else {
+                const formData = FormUtils.getTableDefaultColumnData(this.field)
+                IbpsImport.xlsx(file, options).then(({ header, results }) => {
+                    const columnMap = {}
+                    this.nameColumns.forEach((column) => {
+                        columnMap[column.label] = column
+                    })
+                    results.forEach((result) => {
+                        const data = JSON.parse(JSON.stringify(formData))
+                        for (const key in result) {
+                            if (columnMap[key]) {
+                                const column = columnMap[key]
+                                const name = column.name
+                                const value = this.importDataFormatter(result[key], column)
+                                data[name] = value
+                            }
+                        }
+                        // TODO: 需要格式化的成数据库的数据
+                        // 数据添加
+                        this.dataModel.push(data)
+                    })
+                    this.importTableDialogVisible = false
+                    ActionUtils.success('导入成功')
+                })
+            }
+        },
+        // 自定义导入
+        customHandleImport (data = []) {
+            this.importList = data
+            this.importValue = this.getKeys(this.importList)
+            this.importTableDialogVisible = true
+        },
+        setValue (data) {
+            const obj = {}
+            Object.values(data).forEach((item) => {
+                obj[item] = ''
             })
+            return obj
+        },
+        getKeys (data) {
+            const obj = {}
+            if (data.length > 0) {
+                data.forEach((item) => {
+                    obj[item.label] = item.name
+                })
+                return obj
+            } else {
+                return obj
+            }
         },
         // 数据导出
         getIbpsExport (columns, data, title, message, nameKey = 'name') {
@@ -1132,6 +1158,7 @@ export default {
          * 更新字段值（主表或其他子表）
          */
         updateFormData (name, value) {
+            this.editFromType = 'update'
             this.$emit('change-data', name, value)
         },
         // 设置行数据

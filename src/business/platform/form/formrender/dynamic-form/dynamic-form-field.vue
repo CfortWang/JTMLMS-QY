@@ -36,7 +36,9 @@
                     :readonly="readonly"
                     unselectable="on"
                     :style="{ width: width }"
-                    clearable
+                    :clearable="clearable && hasFocus"
+                    @focus="() => hasFocus = true"
+                    @blur="() => hasFocus = false"
                     v-on="$listeners"
                 />
 
@@ -664,7 +666,8 @@ export default {
             watchKey: false,
             inputKey: '',
             dict_add: false,
-            selectDataResult: []
+            selectDataResult: [],
+            hasFocus: false
         }
     },
     computed: {
@@ -963,8 +966,6 @@ export default {
         },
         dataModel: {
             handler (val) {
-                console.log(val)
-                this.$emit('change-data', this.field.name, val)
                 this.$emit('update:value', val)
             },
             deep: true

@@ -376,7 +376,7 @@ export const intervalTypes = [{
 /**
  * 子表分页大小选项
  */
-export const defaultPageSize = 20
+export const defaultPageSize = 10
 /**
  * 子表分页大小选项
  */
