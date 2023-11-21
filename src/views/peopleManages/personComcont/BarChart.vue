@@ -1,81 +1,99 @@
 <template>
-  <div class="pieView">
-    <div style="
+    <div class="pieView">
+        <div
+            style="
         line-height: 30px;
         text-align: left;
         padding-left: 10px;
         width: 100%;
         color: white;
-      ">
-      {{ config.title }}
-    </div>
-    <div v-if="config.state=='100'" style="
+      "
+        >
+            {{ config.title }}
+        </div>
+        <div
+            v-if="config.state=='100'"
+            style="
         width: 100%;
         height: 95%;
         display: inline-block;
         overflow: hidden;
         box-sizing: border-box;
-      ">
-      <div :id="config.id"
-           style="width: 100%; height: 100%"></div>
-    </div>
-    <div v-else style="
+      "
+        >
+            <div
+                :id="config.id"
+                style="width: 100%; height: 100%"
+            />
+        </div>
+        <div
+            v-else
+            style="
         width: 100%;
         height: 90%;
         display: inline-block;
         overflow: hidden;
         box-sizing: border-box;
         margin-top:5%;
-      ">
-      <div :id="config.id"
-           style="width: 100%; height:90%"></div>
+      "
+        >
+            <div
+                :id="config.id"
+                style="width: 100%; height:90%"
+            />
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
-import * as echarts from "echarts";
+import * as echarts from 'echarts'
 export default {
-  data() {
-    return {};
-  },
-  props: {
-    info: {
-      type: Object,
-      default: {},
+    props: {
+        info: {
+            type: Object,
+            default: function () {
+                return {
+                }
+            }
+        },
+        config: {
+            type: Object,
+            default: function () {
+                return {
+                    title: 'title',
+                    id: 'idSelector'
+                }
+            }
+
+        }
     },
-    config: {
-      type: Object,
-      default: {
-        title: "title",
-        id: "idSelector",
-      },
+    data () {
+        return {}
     },
-  },
-  mounted() {
-    let this_ = this;
-    this.$nextTick(() => {
-      this_.getMiddleLeft();
-    });
-  },
-  methods: {
-    getMiddleLeft() {
-      var chartDom = document.getElementById(this.config.id);
-      var myChart = echarts.init(chartDom);
-      setTimeout(() => {
-        this.info && myChart.setOption(this.info);
-      }, 500);
+    watch: {
+        info: {
+            handler (newVal, oldVal) {
+                this.getMiddleLeft()
+            },
+            deep: true
+        }
     },
-  },
-  watch: {
-    info: {
-      handler(newVal, oldVal) {
-        this.getMiddleLeft();
-      },
-      deep: true,
+    mounted () {
+        const this_ = this
+        this.$nextTick(() => {
+            this_.getMiddleLeft()
+        })
     },
-  },
-};
+    methods: {
+        getMiddleLeft () {
+            var chartDom = document.getElementById(this.config.id)
+            var myChart = echarts.init(chartDom)
+            setTimeout(() => {
+                this.info && myChart.setOption(this.info)
+            }, 500)
+        }
+    }
+}
 </script>
 <style lang="scss" scoped>
 .pieView {

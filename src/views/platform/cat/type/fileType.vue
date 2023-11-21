@@ -1,15 +1,15 @@
 <template>
-  <manage categoryKey="FILE_TYPE" />
+    <manage category-key="FILE_TYPE" />
 </template>
 <script>
 import Manage from './manage'
 export default {
-  components: {
-    Manage
-  },
-  data() {
-    return {
+    components: {
+        Manage
+    },
+    data () {
+        return {
+        }
     }
-  }
 }
 </script>

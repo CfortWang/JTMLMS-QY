@@ -1158,7 +1158,6 @@ export default {
          * 更新字段值（主表或其他子表）
          */
         updateFormData (name, value) {
-            this.editFromType = 'update'
             this.$emit('change-data', name, value)
         },
         // 设置行数据
@@ -1253,26 +1252,4 @@ export default {
     font-size: 12px;
     color: #999999;
 }
-
-// .dynamic-form-table .el-table th {
-//     background-color: #84d5cf !important;
-//     font-size: 12px;
-//     font-weight: bold;
-//     border: 0px;
-// }
-
-// .dynamic-form-table .el-table td {
-//     font-size: 12px;
-//     padding: 0px 0 !important;
-// }
-
-// .dynamic-form-table .el-table .warning-row {
-//     background: #e0f0ee;
-//     color: #000000;
-// }
-
-// .dynamic-form-table .el-table .success-row {
-//     background: #f9ffff;
-//     color: #000000;
-// }
 </style>

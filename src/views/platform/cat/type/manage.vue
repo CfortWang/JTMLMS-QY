@@ -41,8 +41,8 @@
                 :parent-data="nodeData"
                 :is-private="isPrivate"
                 :random-num="randomNum"
-                :firstDiDian="firstDiDian"
-                :secondDiDian="secondDiDian"
+                :first-di-dian="firstDiDian"
+                :second-di-dian="secondDiDian"
                 display-type="edit"
                 @callback="loadTreeData"
             />
@@ -67,8 +67,8 @@
             :id="editId"
             :visible="sortFormVisible"
             title="分类排序"
-            :categoryKey="categoryKey"
-            :diDian="diDian"
+            :category-key="categoryKey"
+            :di-dian="diDian"
             @callback="callback"
             @close="visible => sortFormVisible = visible"
         />
@@ -91,12 +91,12 @@ export default {
     },
     mixins: [FixHeight],
     data () {
-        const {first,second}  = this.$store.getters.level
+        const { first, second } = this.$store.getters.level
         return {
             width: 200,
-            diDian :second ? second : first,
-            firstDiDian:first,
-            secondDiDian:second,
+            diDian: second || first,
+            firstDiDian: first,
+            secondDiDian: second,
             height: document.clientHeight,
             importFormVisible: false,
             sortFormVisible: false,
@@ -132,8 +132,22 @@ export default {
                 { icon: 'edit', label: '编辑分类', value: 'edit', rights: ['node'] },
                 { icon: 'delete', label: '删除分类', value: 'remove', rights: ['node'] },
                 { type: 'divided' },
-                { icon: 'export', label: '导出', value: 'export' },
-                { icon: 'import', label: '导入', value: 'import' },
+                { icon: 'export',
+                    label: '导出',
+                    value: 'export',
+                    rights: function (menu, data, isRoot) {
+                        console.log('store.getters.isSuper', this.$store.getters.isSuper)
+                        if (!this.$store.getters.isSuper) return false // 平铺结构类型不允许添加子分类
+                        return true
+                    }
+                },
+                { icon: 'import',
+                    label: '导入',
+                    value: 'import',
+                    rights: function (menu, data, isRoot) {
+                        if (!this.$store.getters.isSuper) return false // 平铺结构类型不允许添加子分类
+                        return true
+                    } },
                 {
                     type: 'divided',
                     rights: function (menu, data, isRoot) {
@@ -170,23 +184,22 @@ export default {
     // 加载下拉框 分类标识数据
         loadCategoryData () {
             this.loading = true
-            let whereParams = {} 
-            if(this.$router.currentRoute.fullPath == '/zlgl/wjkzgl/wjjflsz'){
+            let whereParams = {}
+            if (this.$router.currentRoute.fullPath === '/zlgl/wjkzgl/wjjflsz') {
                 this.categoryKey = 'FILE_TYPE'
-                whereParams={
-                    "parameters":[
-                    {
-                        "key": "Q^category_key_^SL",
-                        "value": "FILE_TYPE"
-                    }
-                ]}
-            }else{
-                this.categoryKey = 'FLOW_TYPE' 
+                whereParams = {
+                    'parameters': [
+                        {
+                            'key': 'Q^category_key_^SL',
+                            'value': 'FILE_TYPE'
+                        }
+                    ] }
+            } else {
+                this.categoryKey = 'FLOW_TYPE'
             }
             queryPageList(whereParams).then(response => {
                 this.categoryOptions = response.data.dataResult
                 this.loading = false
-                
             }).catch(() => {
                 this.loading = false
             })
@@ -194,10 +207,10 @@ export default {
         // 加载具体分类数据
         loadTreeData (isEdit) {
             //  文件分类获取文件类型需要根据地点进行数据过滤
-            let whereParams = {
+            const whereParams = {
                 'categoryKey': this.categoryKey
             }
-            if(this.categoryKey=='FILE_TYPE'){
+            if (this.categoryKey === 'FILE_TYPE') {
                 whereParams.diDian = this.diDian
             }
             findTreeData(whereParams).then(response => {
@@ -207,12 +220,12 @@ export default {
             })
         },
         handleTreeAction (command, position, selection, data) {
-            if(data.sn == 0 && data.name == "文件分类"){
+            if (data.sn === 0 && data.name === '文件分类') {
                 const object = {
-                    diDian:this.diDian,
-                    buMen:"",
-                    chaYue:"公用查阅",
-                    shenCha:"不需要"
+                    diDian: this.diDian,
+                    buMen: '',
+                    chaYue: '公用查阅',
+                    shenCha: '不需要'
                 }
                 data.authorityName = JSON.stringify(object)
             }
@@ -222,10 +235,10 @@ export default {
                 }
             } else {
                 if (command === 'add') { // 添加
-                 if (this.isSpecial(data.name,0)) {
+                    if (this.isSpecial(data.name, 0)) {
                         return
                     }
-                    if (this.isSpecial(data.name,3)) {
+                    if (this.isSpecial(data.name, 3)) {
                         return
                     }
                     this.editId = null
@@ -233,24 +246,24 @@ export default {
                     this.isPrivate = false
                     this.handTreeEdit()
                 } else if (command === 'addPrivate') {
-                    if (this.isSpecial(data.name,0)) {
+                    if (this.isSpecial(data.name, 0)) {
                         return
                     }
-                    if (this.isSpecial(data.name,3)) {
+                    if (this.isSpecial(data.name, 3)) {
                         return
                     }
-                    
+
                     this.editId = null
                     this.isPrivate = true
                     this.nodeData = data
                     this.handTreeEdit()
                 } else if (command === 'edit') {
-                    if (this.isSpecial(data.name,1)) {
+                    if (this.isSpecial(data.name, 1)) {
                         return
                     }
                     this.handleNodeClick(data, false)
                 } else if (command === 'remove') {
-                    if (this.isSpecial(data.name,1)) {
+                    if (this.isSpecial(data.name, 1)) {
                         return
                     }
                     this.handleTreeRemove(data.id)
@@ -326,17 +339,17 @@ export default {
         callback (data) {
             this.loadTreeData()
         },
-        isSpecial (name,type) {
+        isSpecial (name, type) {
             const fileType = ['内部文件', '外部文件', '记录表单']
             // if (this.categoryKey === 'FILE_TYPE' && name=='文件分类' && type == '0') {
             //     ActionUtils.warning('请不要操作文件分类！！如果需要更改，请联系管理员。')
             //     return true
             // }
-            if (this.categoryKey === 'FILE_TYPE' && fileType.includes(name) && type == '1') {
+            if (this.categoryKey === 'FILE_TYPE' && fileType.includes(name) && type === '1') {
                 ActionUtils.warning('涉及系统代码逻辑，请谨慎操作内部文件、外部文件、记录表单分类！！如果需要更改，请联系管理员。')
                 return false
             }
-             if (this.categoryKey === 'FILE_TYPE' && name=='记录表单' && type == '3') {
+            if (this.categoryKey === 'FILE_TYPE' && name === '记录表单' && type === '3') {
                 ActionUtils.warning('涉及系统代码逻辑，请谨慎操作记录表单！！如果需要更改，请联系管理员。')
                 return false
             }
