@@ -436,7 +436,7 @@ export default {
             const requestOrder = []
             table.forEach((item, index) => {
                 const sql = `select ${file[index]} from ${item} where ${field.length && field[index] ? field[index] : 'id_'} = '${bizKey}'`
-                resultList.push(this.getFile(sql, file[index]))
+                resultList.push(this.getFile(sql, file[index], item))
                 requestOrder.push(index)
             })
             Promise.all(resultList).then(res => {
@@ -451,7 +451,7 @@ export default {
             })
         },
         // 获取单个请求中的文件
-        getFile (sql, fileField) {
+        getFile (sql, fileField, table) {
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const result = {
@@ -461,20 +461,23 @@ export default {
                     const fileList = fileField.split(',')
                     let { data = [] } = res.variables || {}
                     data = data.filter(i => i)
+                    // 若配置的附件字段中含创建时间，先将结果按时间升序排列
+                    if (fileList.includes('create_time_')) {
+                        data.sort((a, b) => a.create_time_ - b.create_time_)
+                    }
                     data.forEach(item => {
-                        // 能获取到值说明文件字段只有一个
-                        // 将快照文件单独拿出来
+                        // 能获取到值说明文件字段只有一个，将快照文件单独拿出来（内审归档中部分快照未存放在快照字段中，需单独处理）
                         if (item[fileField]) {
-                            if (fileField === 'kuai_zhao_') {
+                            if (fileField === 'kuai_zhao_' || (fileField === 'shang_chuan_fu_ji' && table === 't_nbss') || (fileField === 'bao_gao_wen_jian_' && table === 't_nbshbgb')) {
                                 result.snapshot.push(this.getFileId(item[fileField]))
                             } else {
                                 result.file.push(this.getFileId(item[fileField]))
                             }
                         } else if (fileList.length > 1) {
-                            // 否则文件字段为多个，需嵌套循环
+                            // 否则文件字段为多个，需嵌套循环，并过滤掉用于排序的创建时间字段
                             fileList.forEach(i => {
-                                if (item[i]) {
-                                    if (i === 'kuai_zhao_') {
+                                if (item[i] && i !== 'create_time_') {
+                                    if (i === 'kuai_zhao_' || (i === 'shang_chuan_fu_ji' && table === 't_nbss') || (i === 'bao_gao_wen_jian_' && table === 't_nbshbgb')) {
                                         result.snapshot.push(this.getFileId(item[i]))
                                     } else {
                                         result.file.push(this.getFileId(item[i]))

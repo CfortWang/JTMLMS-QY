@@ -6,32 +6,32 @@ export const listTypeData = {
     '747865628878045184': 'huanJing',
     '747865535110184960': 'jiLiang',
     '747865562742259712': 'heCha',
-    '848876704007979008': 'gongYing', //8.供应商
-    '848877659185217536': 'fangFa',//9.方法管理
-    '848877794631876608': "touSu",//11、投诉
-    '848877706840899584': "jieGuo",//13、结果有效性
-    '859879431471104000': "keHu",//13、结果有效性
-    '848877774067204096': 'ceLiang',//测量不确定度评定
-    '747865515833163776': 'jiuZheng',//不符合项与纠正措施
-    '859878561996079104': 'nengLiYanZheng',// 能力验证与实验室间比对
+    '848876704007979008': 'gongYing', // 8.供应商
+    '848877659185217536': 'fangFa', // 9.方法管理
+    '848877794631876608': 'touSu', // 11、投诉
+    '848877706840899584': 'jieGuo', // 13、结果有效性
+    '859879431471104000': 'keHu', // 13、结果有效性
+    '848877774067204096': 'ceLiang', // 测量不确定度评定
+    '747865515833163776': 'jiuZheng', // 不符合项与纠正措施
+    '859878561996079104': 'nengLiYanZheng', // 能力验证与实验室间比对
     '859879122875187200': 'fengXianKongZhi', // 风险控制
-    '859879582994530304': 'neiShen',//内审
-    '859879751135789056': 'guangShen', //管审
+    '859879582994530304': 'neiShen', // 内审
+    '859879751135789056': 'guangShen', // 管审
     '1069257469332553728': 'sheBeiWeiXiu', // 设备维修
     '1069257517135036416': 'sheBeiBaoFei', // 设备报废
     '1022458306758705152': 'sheBeiYanShou', // 设备验收
-    '1022458337893023744': 'sheBeiWeiHu',
+    '1022458337893023744': 'sheBeiWeiHu'
 }
 
 // 内审管审类型ID
 const neishen = '1148206659160506368'
 const guanshen = '859879751135789056'
 
-let specialType = {}
-let specialBtn = {}
-let specialParams = {}
-let specialTable = {}
-let specialField = {}
+const specialType = {}
+const specialBtn = {}
+const specialParams = {}
+const specialTable = {}
+const specialField = {}
 
 specialType[neishen] = [
     '首次会议签到',
@@ -42,7 +42,7 @@ specialType[neishen] = [
     '不符合项整改'
 ]
 specialType[guanshen] = [
-    
+
 ]
 
 specialBtn[neishen] = {
