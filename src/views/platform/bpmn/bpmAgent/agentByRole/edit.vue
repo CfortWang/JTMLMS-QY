@@ -165,7 +165,10 @@ export default {
         title: String
     },
     data () {
+        const { first = '', second = '' } = this.$store.getters.level
+        const level = second || first
         return {
+            level,
             formName: 'agentForm',
             formLabelWidth: '100px',
             dialogVisible: this.visible,
@@ -351,7 +354,7 @@ export default {
         },
 
         getImage () {
-            const sql = `select * from t_dlpz order by create_time_ desc LIMIT 1`
+            const sql = `select * from t_dlpz where di_dian_ = '${this.level}' order by create_time_ desc LIMIT 1`
             curdPost('sql', sql).then((res) => {
                 if (res.state === 200) {
                     const datas = res.variables.data

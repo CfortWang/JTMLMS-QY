@@ -430,7 +430,7 @@ export default {
                     data: data3,
                     label: this.barLable
                 }],
-                color: ['#7552cc', '#037ef3', '#fd666d'],
+                color: ['rgb(55, 162, 218)', 'rgb(103, 224, 227)', 'rgb(253, 102, 109)'],
                 tooltip: {
                     show: true,
                     trigger: 'axis'
