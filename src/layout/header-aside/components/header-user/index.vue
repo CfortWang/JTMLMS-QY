@@ -57,7 +57,7 @@
                     <ibps-icon name="sign-out" class="ibps-mr-10" />
                     {{ $t('navbar.logOut') }}
                 </el-dropdown-item>
-                <el-dropdown-item class="dropdown512" divided disabled>
+                <el-dropdown-item class="dropdown512" divided>
                     <div class="title512">
                         <i class="el-icon-location" />地点
                     </div>
@@ -232,9 +232,15 @@ export default {
 <style lang="scss" scoped>
     // .ibps-layout-header-user {
         .dropdown512 {
-            max-width: 110px;
+            max-width: 150px;
+            max-height: 300px;
+            overflow-x: hidden;
+            overflow-y: auto;
             line-height: 24px;
             padding: 0 5px 0 15px;
+            &:hover {
+                background-color: #fff !important;
+            }
             .title512 {
                 line-height: 20px;
                 font-weight: 400;
