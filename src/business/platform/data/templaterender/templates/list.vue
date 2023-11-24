@@ -759,6 +759,7 @@ export default {
             this.loading = this.dataTemplate.type === 'dialog'
             if (this.$utils.isEmpty(this.template)) return
             queryDataTable(this.getFormatParams(outerKey), this.dataTemplate.type).then((response) => {
+                // this.$emit()
                 this.loading = false
                 ActionUtils.handleListData(this, response.data)
                 this.setSelectRow()
@@ -1555,6 +1556,7 @@ export default {
                 prop: field.name,
                 label: field.label,
                 align: field.align,
+                vertical: field.vertical,
                 width: field.width,
                 hidden: field['field_type'] === 'hidden'
             }

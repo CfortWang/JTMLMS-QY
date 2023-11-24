@@ -168,6 +168,7 @@
                         :prop="handleAttribute(column.prop, null)"
                         :label="handleAttribute(column.label, '')"
                         :width="handleAttribute(column.width,null)"
+                        :class-name="'vertical-' + handleAttribute(column.vertical, 'middle')"
                         v-bind="column"
                         show-overflow-tooltip
                     >
@@ -505,5 +506,14 @@ export default {
     }
     .el-table .el-table-column--selection {
         text-align: center;
+    }
+    .el-table .vertical-top {
+        vertical-align: top;
+    }
+    .el-table .vertical-middle {
+        vertical-align: middle;
+    }
+    .el-table .vertical-bottom {
+        vertical-align: bottom;
     }
 </style>

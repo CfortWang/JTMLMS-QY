@@ -104,6 +104,7 @@ export default {
                         prop: column.name,
                         label: column.label,
                         align: column.align,
+                        vertical: column.vertical,
                         sortable: column.sortable
                     })
                 })

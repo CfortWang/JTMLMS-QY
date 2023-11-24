@@ -283,7 +283,7 @@ export default {
             defId: '', // 编辑dialog需要使用
             currentPage: 1,
             totalCount: 0,
-            dataModel: [],
+            dataModel: initData,
             copDataModel: initData,
             multipleSelection: '',
             countNumber: 0,
@@ -457,6 +457,9 @@ export default {
         dataModel: {
             handler (val, oldVal) {
                 // 进行分页操作
+                if (this.mode === 'block') {
+                    return val
+                }
                 this.handlePagination(val)
             }
         },

@@ -442,9 +442,9 @@ export default {
             Promise.all(resultList).then(res => {
                 // console.log('所有附件ID：', res)
                 const sortedResults = requestOrder.map(index => res[index])
-                this.fileLoading = false
                 this.fileId = [...new Set(sortedResults.reduce((acc, cur) => acc.concat(cur.file), []))].join(',')
                 this.snapshotId = [...new Set(sortedResults.reduce((acc, cur) => acc.concat(cur.snapshot), []))].join(',')
+                this.fileLoading = false
             }).catch(err => {
                 this.fileLoading = false
                 console.log('error', err)
