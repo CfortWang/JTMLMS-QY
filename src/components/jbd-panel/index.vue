@@ -8,7 +8,7 @@
 -->
 <template>
     <div class="jbd-sys-title">
-        <span class="jbd-sys-title-cont-center" style="margin-left: 40px;float: left;">金通医学实验室标准化数字化管理平台</span>
+        <span class="jbd-sys-title-cont-center" style="margin-left: 40px;float: left;">金通医学实验室标准化数智化管理平台</span>
         <span style="float: right; " class="jbd-sys-title-contact">
             <br>
             深圳市金源信通科技有限公司开发 <i style="margin-left: 10px;" class="el-icon-phone" /> 0755-2642-4403

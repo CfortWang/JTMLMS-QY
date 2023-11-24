@@ -9,7 +9,7 @@
                             金源信通 -->
                         <!-- <img src="~@/assets/images/login/company.png" class="logo"> -->
                         <!-- </h1> -->
-                        <h1 class="login-title">金通医学实验室标准化数字化管理平台</h1>
+                        <h1 class="login-title">金通医学实验室标准化数智化管理平台</h1>
                     </div>
 
                     <div class="jbd-login-page-main">
