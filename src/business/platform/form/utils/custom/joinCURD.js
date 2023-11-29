@@ -1,15 +1,18 @@
 import request from '@/utils/request'
 import { normal } from './requestType'
 import { encryptByAes } from '@/utils/encrypt'
+import { load } from '@/api/report/paramset'
 // 请求方式默认POST
 const post = (type, data, method = 'post', loading = false) => {
     const requestUrl = `business/v3/sys/universal/${normal[type]}`
+    // 非sql类型要关闭loading动画需传参loading:true
+    const isLoading = type === 'sql' ? loading : !loading
     return request({
         url: requestUrl,
         method,
         data: dealData(data, type),
         // 开启表单提交加载，查询接口除外
-        isLoading: ['sql'].includes(type) ? loading : true
+        isLoading
     })
 }
 

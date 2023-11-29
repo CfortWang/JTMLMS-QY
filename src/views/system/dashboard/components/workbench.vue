@@ -77,7 +77,7 @@
             :def-id="activeTab === 'save' ? defId : null"
             :pro-inst-id="activeTab === 'save' ? proInstId : null"
             :title="['wait', 'save'].includes(activeTab) ? FlowName : null"
-            @callback="updateList"
+            @callback="search"
             @close="visible => (dialogFormVisible = visible)"
         />
         <news-detail
@@ -491,7 +491,7 @@ export default {
                                 tableName: `t_${codes[k]}`,
                                 paramWhere: { id_: delList[k].join(',') }
                             }
-                            this.$common.request('delete', deleteParams)
+                            this.$common.request('delete', deleteParams, 'post', true)
                         })
                         this.$message.success('删除成功！')
                         this.search()
@@ -692,7 +692,7 @@ export default {
                     id_: deleteList.join(',')
                 }
             }
-            this.$common.request('delete', params).then(() => {}).catch(err => {
+            this.$common.request('delete', params, 'post', true).then(() => {}).catch(err => {
                 console.log(err)
             })
         },
