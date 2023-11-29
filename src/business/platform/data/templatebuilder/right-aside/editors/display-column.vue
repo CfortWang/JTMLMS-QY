@@ -11,9 +11,10 @@
         <el-form-item label="显示名称" prop="label">
             <el-input v-model="formData.label" placeholder="显示名称" />
         </el-form-item>
-        <template v-if="datasetType === 'thirdparty'">
+        <!-- 默认显示标识 -->
+        <template v-if="1 || datasetType === 'thirdparty'">
             <el-form-item label="标识（name）" prop="name">
-                <el-input v-model="formData.name" placeholder="标识（name）" />
+                <el-input v-model="formData.name" placeholder="标识（name）" readonly />
             </el-form-item>
         </template>
         <el-form-item label="权限" prop="rights">
@@ -35,7 +36,6 @@
                 <el-radio-button label="right">右对齐</el-radio-button>
             </el-radio-group>
         </el-form-item>
-        <!-- 新增 -->
         <el-form-item label="垂直对齐" prop="vertical">
             <el-radio-group v-model="formData.vertical">
                 <el-radio-button label="top">顶部对齐</el-radio-button>
@@ -280,8 +280,10 @@ export default {
     watch: {
         data: {
             handler (val) {
+                console.log(val)
                 if (val) {
                     this.formData = val
+                    console.log(this.formData)
                 }
             },
             immediate: true
