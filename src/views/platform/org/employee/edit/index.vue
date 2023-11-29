@@ -12,6 +12,7 @@
         @close="closeDialog"
     >
         <el-tabs
+            v-if="dialogVisible"
             v-model="activeName"
             v-loading="dialogLoading"
             :element-loading-text="$t('common.loading')"
@@ -26,7 +27,7 @@
                     @input="data => employee = data"
                 />
             </el-tab-pane>
-            <el-tab-pane label="扩展属性" name="ext-attr">
+            <el-tab-pane v-if="isSuper" label="扩展属性" name="ext-attr">
                 <ext-attr
                     ref="attrInfo"
                     :readonly="readonly"
@@ -136,7 +137,9 @@ export default {
         span: [Number, String]
     },
     data () {
+        const isSuper = this.$store.getters.isSuper
         return {
+            isSuper,
             info: [],
             orgId: '',
             dialogLoading: false,
@@ -257,7 +260,7 @@ export default {
             })
         },
         saveData () {
-            const attrValidator = this.$refs['attrInfo'] ? this.$refs['attrInfo'].callback() : null
+            const attrValidator = this.$refs['attrInfo'] && this.isSuper ? this.$refs['attrInfo'].callback() : null
             const vo = this.formatSubmitData()
             if (!this.$utils.isEmpty(this.formId) && !this.ceroParams) {
                 delete vo.partyEmployeePo.password
@@ -267,7 +270,7 @@ export default {
                 return
             }
             this.dialogLoading = true
-            if (!attrValidator) {
+            if (!attrValidator && this.isSuper) {
                 ActionUtils.warning('请检查扩展属性是否填写正确')
                 this.dialogLoading = false
                 return
@@ -322,7 +325,9 @@ export default {
                             this.closeDialog()
                         } else {
                             this.init()
-                            this.$refs.attrInfo.clearData()
+                            if (this.isSuper) {
+                                this.$refs.attrInfo.clearData()
+                            }
                         }
                     }
                     )
@@ -333,6 +338,7 @@ export default {
         },
         // 关闭当前窗口
         closeDialog () {
+            this.dialogVisible = false
             this.$emit('close', false)
         },
         // 初始化页面，出现之前的数据
@@ -356,9 +362,12 @@ export default {
             })
             if (this.$utils.isEmpty(this.formId)) {
                 // 清空拓展属性数据
-                this.$nextTick(() => {
-                    this.$refs.attrInfo.clearData()
-                })
+                if (this.isSuper) {
+                    this.$nextTick(() => {
+                        this.$refs.attrInfo.clearData()
+                    })
+                }
+
                 return
             }
             this.dialogLoading = true
@@ -371,9 +380,24 @@ export default {
                 this.employee.posItemList = response.variables.partyPositions || []
                 this.employee.roleItemList = response.variables.partyRoles || []
                 this.employee.userGroupItemList = response.variables.partyGroups || []
-                this.$nextTick(() => {
-                    this.$refs.attrInfo.loadAttrData()
-                })
+                if (this.isSuper) {
+                    this.$nextTick(() => {
+                        this.$refs.attrInfo.loadAttrData()
+                    })
+                } else {
+                    const list = []
+                    response.variables.partyAttrs.forEach(item => {
+                        if (item.values.length > 0) {
+                            const obj = {
+                                attrId: item.values[0].attrID,
+                                value: item.values[0].value
+                            }
+                            list.push(obj)
+                        }
+                    })
+                    this.employee.attrItemList = list
+                }
+
                 // 添加更新 t_wxyh 用于扫码签到
                 // if()
                 this.getWxyh(this.employee)

@@ -165,7 +165,7 @@ export default {
                         return item.value === 0 ? '' : item.value
                     })
                     const accept = echarts.init(this.$refs.Echart2)
-                    accept.setOption(JSON.parse(JSON.stringify(this.barData(list1, list2, list3, list4))))
+                    accept.setOption({...this.barData(list1, list2, list3, list4)})
                 }
             })
         },
@@ -190,7 +190,7 @@ export default {
                         return item.value === 0 ? '' : item.value
                     })
                     const accept = echarts.init(this.$refs.Echart2)
-                    accept.setOption(JSON.parse(JSON.stringify(this.barDataPlan(list1, list2, list3))))
+                    accept.setOption({...this.barDataPlan(list1, list2, list3)})
                 }
             })
         },
@@ -351,7 +351,18 @@ export default {
                 color: ['#7552cc', '#00c16e', '#fd666d', '#64C7BF'],
                 tooltip: {
                     show: true,
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    formatter:function(params){
+                        let val0 = params[0].value==''? 0:params[0].value
+                        let val1 = params[1].value==''? 0:params[1].value
+                        let val2 = params[2].value==''? 0:params[2].value
+                        let val3 = params[3].value==''? 0:params[3].value
+                        let str = `${params[0].name}<br>${params[0].seriesName}：${val0}
+                                                    <br>${params[1].seriesName}：${val1}
+                                                    <br>${params[2].seriesName}：${val2}
+                                                    <br>${params[3].seriesName}：${val3}`
+                        return str
+                    }
                 }
             }
             return barDataTy
@@ -433,7 +444,16 @@ export default {
                 color: ['rgb(55, 162, 218)', 'rgb(103, 224, 227)', 'rgb(253, 102, 109)'],
                 tooltip: {
                     show: true,
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    formatter:function(params){
+                        let val0 = params[0].value==''? 0:params[0].value
+                        let val1 = params[1].value==''? 0:params[1].value
+                        let val2 = params[2].value==''? 0:params[2].value
+                        let str = `${params[0].name}<br>${params[0].seriesName}：${val0}
+                                                    <br>${params[1].seriesName}：${val1}
+                                                    <br>${params[2].seriesName}：${val2}`
+                        return str
+                    }
                 }
             }
             return barDataTy

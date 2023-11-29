@@ -1,7 +1,6 @@
 import request from '@/utils/request'
 import { normal } from './requestType'
 import { encryptByAes } from '@/utils/encrypt'
-import { load } from '@/api/report/paramset'
 // 请求方式默认POST
 const post = (type, data, method = 'post', loading = false) => {
     const requestUrl = `business/v3/sys/universal/${normal[type]}`

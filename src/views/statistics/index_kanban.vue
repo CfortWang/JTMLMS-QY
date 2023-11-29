@@ -409,7 +409,7 @@
           }).join(",");
           // console.log(this.quality1,'bumnebumen')
           for (let i = 0; i < this.quality1.length; i++) {
-            let mid = {'NAME_':this.quality1[i].name_,'numA':0,'num':0,'chu':0}
+            let mid = {'NAME_':this.quality1[i].name_,'numA':0,'num':0,'wnum':0,'chu':0}
             this.allBuMen.push(mid)
           }
           // console.log(this.allBuMen,'2434465565665656rterterte')

@@ -110,36 +110,40 @@ export default {
                 // 表格字段配置
                 columns: [
                     { prop: 'title', label: '标题' },
-                    { prop: 'delegatorName', label: '委托人' },
-                    { prop: 'agenterName', label: '代理人' },
-                    { prop: 'isEnabled', label: '是否启用', tags: statusOptions },
-                    { prop: 'effectiveTime', label: '生效时间', sortable: 'custom' },
-                    { prop: 'expiryTime', label: '失效时间', sortable: 'custom' },
-                    { prop: 'agentType', label: '代理类型', tags: agentTypeOptions }
-                ]
-                // rowHandle: {
-                //   actions: [{
-                //     key: 'edit'
-                //   }, {
-                //     key: 'enabled',
-                //     label: '启用',
-                //     icon: 'ibps-icon-toggle-on',
-                //     hidden: (rowData, index) => {
-                //       return rowData.isEnabled === 'enabled'
-                //     }
-                //   }, {
-                //     key: 'disabled',
-                //     label: '禁用',
-                //     icon: 'ibps-icon-toggle-off',
-                //     hidden: (rowData, index) => {
-                //       return rowData.isEnabled === 'disabled'
-                //     }
-                //   }, {
-                //     key: 'remove'
-                //   }, {
-                //     key: 'detail'
-                //   }]
-                // }
+                    { prop: 'delegatorName', label: '委托人', width: '100' },
+                    { prop: 'agenterName', label: '代理人', width: '100' },
+                    { prop: 'isEnabled', label: '是否启用', tags: statusOptions, width: '100' },
+                    { prop: 'effectiveTime', label: '生效时间', sortable: 'custom', width: '100' },
+                    { prop: 'expiryTime', label: '失效时间', sortable: 'custom', width: '100' },
+                    { prop: 'agentType', label: '代理类型', tags: agentTypeOptions, width: '150' }
+                ],
+                rowHandle: {
+                    effect: 'display',
+                    actions: [
+                        //     {
+                        //     key: 'edit'
+                        //   }, {
+                        //     key: 'enabled',
+                        //     label: '启用',
+                        //     icon: 'ibps-icon-toggle-on',
+                        //     hidden: (rowData, index) => {
+                        //       return rowData.isEnabled === 'enabled'
+                        //     }
+                        //   }, {
+                        //     key: 'disabled',
+                        //     label: '禁用',
+                        //     icon: 'ibps-icon-toggle-off',
+                        //     hidden: (rowData, index) => {
+                        //       return rowData.isEnabled === 'disabled'
+                        //     }
+                        //   }, {
+                        //     key: 'remove'
+                        //   },
+                        {
+                            key: 'detail',
+                            label: '查阅'
+                        }]
+                }
             },
             // 委托人和代理人 选择器修改通用选择器，需要这些参数
             type: 'user',

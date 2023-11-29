@@ -77,18 +77,19 @@
         // let endInof = Number(this.data.t_complaintEnd.number)
         let s12fengXiancol = echarts.init(document.getElementById(this.id))
         let option;
+        let that = this
         let barColor = ['#FFBF00','#33FF00','#097969','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
         let barNum = []
         for (let i = 0; i < this.data.num.title.length-1; i++) {
-          if(i==this.data.num.title.length-2){
+          if(i==this.data.num.title.length-3){
             barNum.push({
               type: 'bar',
               itemStyle: {color: barColor[i]},
               label:{
                 show: true,
 				        formatter:function(params){ //标签内容
-                // console.log(params.value[params.seriesName],'paramsparamsparamsparamsparams')
-					        return  params.value[params.seriesName]+'%'
+                  let str = that.direction=='x'?params.value[params.seriesName]+' '+params.data.chu+'%':params.data.chu+'%\n'+params.value[params.seriesName]
+					        return str
 					      },
                 position: this.direction=='x'?'right':'top',
                 textStyle:{
@@ -161,12 +162,12 @@
                 },
                 top:"5%",
                 formatter: function (name) {
-                  if(name === 'chu'){
-                    return '完成率（%）';
-                  }else if(name === 'num'){
-                    return '已完成数量';
-                  }else if(name === 'numA'){
+                  if(name === 'wnum'){
                     return '未完成数量';
+                  }else if(name === 'num'){
+                    return '已完成数量（完成率）';
+                  }else if(name === 'numA'){
+                    return '计划数量';
                   }
                     
                 }

@@ -280,10 +280,8 @@ export default {
     watch: {
         data: {
             handler (val) {
-                console.log(val)
                 if (val) {
                     this.formData = val
-                    console.log(this.formData)
                 }
             },
             immediate: true

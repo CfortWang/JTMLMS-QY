@@ -136,8 +136,7 @@ export default {
                     label: '导出',
                     value: 'export',
                     rights: function (menu, data, isRoot) {
-                        console.log('store.getters.isSuper', this.$store.getters.isSuper)
-                        if (!this.$store.getters.isSuper) return false // 平铺结构类型不允许添加子分类
+                        if (!this.$store.getters.isSuper) return false
                         return true
                     }
                 },
@@ -145,7 +144,7 @@ export default {
                     label: '导入',
                     value: 'import',
                     rights: function (menu, data, isRoot) {
-                        if (!this.$store.getters.isSuper) return false // 平铺结构类型不允许添加子分类
+                        if (!this.$store.getters.isSuper) return false
                         return true
                     } },
                 {

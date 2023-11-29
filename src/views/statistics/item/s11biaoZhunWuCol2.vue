@@ -75,7 +75,7 @@
         let s11biaoZhunWu = echarts.init(document.getElementById(this.id))
         let barColor = ['#66FFCC','#FFCCCC','#33FF00','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
         let barNum = []
-        for (let i = 0; i < this.data.Num.title.length-1; i++) {
+        for (let i = 0; i < this.data.Num.titleall.length-1; i++) {
           barNum.push({
             type: 'bar',
             itemStyle: {color: barColor[i]},
@@ -146,7 +146,7 @@
             }
           }
           let yt = {
-            text: this.title,
+            text: this.titleall,
             textStyle:{ fontSize:14,color: this.colorw }
           }
           let wt = {

@@ -75,6 +75,24 @@
                 </el-col>
             </el-row>
 
+            <el-row>
+                <el-col :span="24">
+                    <el-form-item label="委托人角色:">
+                        <el-checkbox-group v-if="!readonly" v-model="checkRoleList">
+                            <el-checkbox v-for="item in roleList" :key="item.id" :label="item.id">{{ item.name }}</el-checkbox>
+                        </el-checkbox-group>
+                        <span v-else>{{ bpmAgent.roleName }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <el-form-item label="代理人角色:">
+                        <span>{{ daiRoleName }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
             <!-- 全部代理 || 部分代理 -->
             <el-row>
                 <el-col :span="12" col>
@@ -161,6 +179,7 @@ import BpmDefinitionSelector from '@/business/platform/bpmn/definition/selector'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import Condition from './condition'
+import { load } from '@/api/platform/org/employee'
 import { setTimeout } from 'timers'
 
 export default {
@@ -248,7 +267,10 @@ export default {
             filtrate: true,
             store: 'id',
             disabled: false,
-            readonlyText: 'null'
+            readonlyText: 'null',
+            roleList: [],
+            checkRoleList: [],
+            daiRoleName: ''
         }
     },
     computed: {
@@ -262,6 +284,20 @@ export default {
                 this.dialogVisible = this.visible
             },
             immediate: true
+        },
+        'bpmAgent.delegatorId': {
+            handler: function (val, oldVal) {
+                this.getWeiTuo(this.bpmAgent.delegatorId, 1)
+            },
+            immediate: true,
+            deep: true
+        },
+        'bpmAgent.agenterId': {
+            handler: function (val, oldVal) {
+                this.getWeiTuo(this.bpmAgent.agenterId, 2)
+            },
+            immediate: true,
+            deep: true
         }
     },
     created () {
@@ -296,7 +332,6 @@ export default {
             })
         },
         callbackBpmAgentConditionPoList (data) {
-            console.log(data)
         },
         handleDelete (index, arr) {
             this.rowLoading = true
@@ -372,6 +407,9 @@ export default {
                 ActionUtils.error('流程定义数据不能为空！')
                 return
             }
+            const roleNameList = this.roleList.filter(item => this.checkRoleList.includes(item.id))
+            const checkboxList = roleNameList.map(item => item.name)
+            console.log(checkboxList.join(','))
             save(this.bpmAgent)
                 .then((response) => {
                     this.$emit('callback', this)
@@ -392,6 +430,9 @@ export default {
         closeDialog () {
             this.$emit('close', false)
             this.$refs[this.formName].resetFields()
+            this.daiRoleName = ''
+            this.roleList = []
+            this.checkRoleList = []
         },
         /**
          * 表单验证
@@ -418,7 +459,6 @@ export default {
             })
                 .then((response) => {
                     this.bpmAgent = response.data
-                    console.log(this.bpmAgent)
                     this.formValidate()
                     this.dialogLoading = false
                 })
@@ -492,6 +532,27 @@ export default {
                     })
                     this.srcList = imageList
                 }
+            })
+        },
+        getWeiTuo (id, type = 1, formId = '') {
+            if (!id) return
+            return new Promise((resolve, reject) => {
+                load({ employeeId: id })
+                    .then((response) => {
+                        const data = response
+                        const partyRole = response.variables.partyRoles
+                        if (type === 1) {
+                            this.roleList = partyRole || []
+                            this.checkRoleList = []
+                        }
+                        if (type === 2) {
+                            const roleName = partyRole.map(item => item.name)
+                            this.daiRoleName = roleName.join('，')
+                        }
+                        resolve(data)
+                    })
+                    .catch(() => {
+                    })
             })
         }
     }

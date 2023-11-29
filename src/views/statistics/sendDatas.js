@@ -59,13 +59,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.jiaoyanMGObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.jiaoyanMGObj[i].NAME_ )
                                 mid[midI].numA = this.jiaoyanMGObj[i].numA
                                 mid[midI].num = this.jiaoyanMGObj[i].num
+                                mid[midI].wnum = this.jiaoyanMGObj[i].numA-this.jiaoyanMGObj[i].num
                                 mid[midI].chu = this.jiaoyanMGObj[i].chu
                         }
                         return {
@@ -94,13 +95,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.hechaMGObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.hechaMGObj[i].NAME_ )
                                 mid[midI].numA = this.hechaMGObj[i].numA
                                 mid[midI].num = this.hechaMGObj[i].num
+                                mid[midI].wnum = this.hechaMGObj[i].numA-this.hechaMGObj[i].num
                                 mid[midI].chu = this.hechaMGObj[i].chu
                         }
                         return {
@@ -129,13 +131,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.waibuObjfb.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.waibuObjfb[i].NAME_ )
                                 mid[midI].numA = this.waibuObjfb[i].numA
                                 mid[midI].num = this.waibuObjfb[i].num
+                                mid[midI].wnum = this.waibuObjfb[i].numA-this.waibuObjfb[i].num
                                 mid[midI].chu = this.waibuObjfb[i].chu
                         }
                         return {
@@ -156,13 +159,14 @@ export default {
                                 for (let j = 0; j < fenshuzu.length; j++) {
                                         // console.log(zlzbfz[i].id_ == fenshuzu[j].bzbm,zlzbfz[i].id_, fenshuzu[j].bzbm,'354345433333333333333333333333333333333333')
                                         if(zlzbfz[i].id_ == fenshuzu[j].bzbm){
-                                                let prop = fenshuzu[j].zhi_liang_zhi_bia;
+                                                let prop = fenshuzu[j].zhi_liang_mu_biao;
                                                 zlzbfz[i][prop] = fenshuzu[j].location
                                         }
                                 }
                         }
-                        for (let t = 0; t < this.zhiliangzhibiaotitle.length; t++) {
-                                title.push(this.zhiliangzhibiaotitle[t].zhi_liang_zhi_bia)
+                        // console.log(zlzbfz,'5456456456546gfhghghgf')
+                        for (let t = 0; t < this.zhiliangmubiaotitle.length; t++) {
+                                title.push(this.zhiliangmubiaotitle[t].zhi_liang_mu_biao)
                                 
                         }
                         let zbval = []
@@ -172,9 +176,8 @@ export default {
                                 }else{
                                         zbval.push(parseFloat(this.zhiliangmubiaotitle[t].zhi_liang_mu_biao.match(/(\d+(\.\d+)?)/)))
                                 }
-                                
-                                                
                         }
+                        // console.log(this.zhiliangmubiaotitle,zlzbfz,fenshuzu,'dsdsfddssf9090090')
                         // let arr  = this.tableNum
                         // let aa =[]
                         // for (let j = 0; j < arr.length; j++) {
@@ -275,12 +278,13 @@ export default {
                         }
                 },
                 getbzJunZhujNum(){
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.gaijinxiangObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.gaijinxiangObj[i].NAME_ )
                                 mid[midI].numA = this.gaijinxiangObj[i].numA
                                 mid[midI].num = this.gaijinxiangObj[i].num
+                                mid[midI].wnum = this.gaijinxiangObj[i].numA-this.gaijinxiangObj[i].num
                                 mid[midI].chu = this.gaijinxiangObj[i].chu
                         }
                         return {
@@ -372,13 +376,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.guanshenfbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.guanshenfbObj[i].NAME_ )
                                 mid[midI].numA = this.guanshenfbObj[i].numA
                                 mid[midI].num = this.guanshenfbObj[i].num
+                                mid[midI].wnum = this.guanshenfbObj[i].numA-this.guanshenfbObj[i].num
                                 mid[midI].chu = this.guanshenfbObj[i].chu
                         }
                         return {
@@ -459,13 +464,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.neishenfbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.neishenfbObj[i].NAME_ )
                                 mid[midI].numA = this.neishenfbObj[i].numA
                                 mid[midI].num = this.neishenfbObj[i].num
+                                mid[midI].wnum = this.neishenfbObj[i].numA-this.neishenfbObj[i].num
                                 mid[midI].chu = this.neishenfbObj[i].chu
                         }
                         return {
@@ -496,13 +502,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.yingjifbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.yingjifbObj[i].NAME_ )
                                 mid[midI].numA = this.yingjifbObj[i].numA
                                 mid[midI].num = this.yingjifbObj[i].num
+                                mid[midI].wnum = this.yingjifbObj[i].numA-this.yingjifbObj[i].num
                                 mid[midI].chu = this.yingjifbObj[i].chu
                         }
                         return {
@@ -536,13 +543,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.zaigangrenyuanfb.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.zaigangrenyuanfb[i].NAME_ )
                                 mid[midI].numA = this.zaigangrenyuanfb[i].numA
                                 mid[midI].num = this.zaigangrenyuanfb[i].num
+                                mid[midI].wnum = this.zaigangrenyuanfb[i].numA-this.zaigangrenyuanfb[i].num
                                 mid[midI].chu = this.zaigangrenyuanfb[i].chu
                         }
                         return {
@@ -579,13 +587,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.gangqianpeixunfb.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.gangqianpeixunfb[i].NAME_ )
                                 mid[midI].numA = this.gangqianpeixunfb[i].numA
                                 mid[midI].num = this.gangqianpeixunfb[i].num
+                                mid[midI].wnum = this.gangqianpeixunfb[i].numA-this.gangqianpeixunfb[i].num
                                 mid[midI].chu = this.gangqianpeixunfb[i].chu
                         }
                         return {
@@ -657,13 +666,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.neibuObjfb.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.neibuObjfb[i].NAME_ )
                                 mid[midI].numA = this.neibuObjfb[i].numA
                                 mid[midI].num = this.neibuObjfb[i].num
+                                mid[midI].wnum = this.neibuObjfb[i].numA-this.neibuObjfb[i].num
                                 mid[midI].chu = this.neibuObjfb[i].chu
                         }
                         return {
@@ -691,13 +701,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.fengxianfbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.fengxianfbObj[i].NAME_ )
                                 mid[midI].numA = this.fengxianfbObj[i].numA
                                 mid[midI].num = this.fengxianfbObj[i].num
+                                mid[midI].wnum = this.fengxianfbObj[i].numA-this.fengxianfbObj[i].num
                                 mid[midI].chu = this.fengxianfbObj[i].chu
                         }
                         return {
@@ -711,13 +722,14 @@ export default {
                         // let fenshuzu = []
                         // fenshuzu = this.buhegelvObj
                         
-                        let title = ['NAME_','numA','num','chu']
+                        let title = ['NAME_','numA','num','wnum']
 
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.bufuheObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
                                 mid[midI].numA = this.bufuheObj[i].numA
                                 mid[midI].num = this.bufuheObj[i].num
+                                mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
                                 mid[midI].chu = this.bufuheObj[i].chu
                         }
                         return {
