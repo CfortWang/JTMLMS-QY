@@ -60,11 +60,11 @@ export default {
         }
     },
     data () {
-        const { account = '', deptList = [] } = this.$store.getters
+        const { isSuper = false, deptList = [] } = this.$store.getters
         const { first = '', second = '' } = this.$store.getters.level
         const level = second || first
         return {
-            account,
+            isSuper,
             level,
             deptList,
             selectorVisible: false,
@@ -151,7 +151,7 @@ export default {
          */
         getSearcFormData () {
             const res = ActionUtils.formatParams({ roleId: this.id }, this.pagination, this.sorts)
-            if (this.account !== 'jinyuan') {
+            if (!this.isSuper) {
                 res.customs = {
                     position: this.level
                 }

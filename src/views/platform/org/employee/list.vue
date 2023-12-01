@@ -76,10 +76,9 @@ export default {
     mixins: [CustomDataDisplayMixin],
     data () {
         const { first = '', second = '' } = this.$store.getters.level
-        const { isSuper = '', account = '' } = this.$store.getters
-        const special = ['admin', 'jinyuan']
+        const { isSuper = false } = this.$store.getters
         let level = second || first
-        if (special.includes(account) && isSuper) {
+        if (isSuper) {
             level = null
         }
         return {
