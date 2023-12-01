@@ -49,12 +49,12 @@
                                         <span>{{scope.$index+1}} </span>
                                     </template>
                                 </el-table-column> 
-                                <el-table-column prop="miao_shu_" label="不符合描述" width="250"  :key="Math.random()">
+                                <el-table-column prop="miao_shu_" label="不符合描述" width="278"  :key="Math.random()">
                                     <template slot-scope="scope">
                                         {{ scope.row.miao_shu_}}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="70" >
+                                <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="60" >
                                     <template slot-scope="scope">
                                         {{ scope.row.tiao_kuan_bian_ha}}
                                     </template>
@@ -64,7 +64,7 @@
                                         {{ scope.row.nei_shen_yuan_ | emfiltes(employeeList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="ze_ren_shi_" label="责任部门" width="100">
+                                <el-table-column prop="ze_ren_shi_" label="责任部门" width="82">
                                     <template slot-scope="scope">
                                         {{ scope.row.ze_ren_shi_ | partFilter(partList) }}
                                     </template>
@@ -677,19 +677,21 @@ export default {
         // cnas部门饼图
         getLoadEchartsthree () {
             var chartDom = document.getElementById('department')
-            let radius,width,height,padding;
+            let radius,width,height,padding,center;
             if(window.innerWidth > 1600){
+                center = ["60%", "50%"];
                 radius = "55%";
                 width = 590;
                 height = 450;
                 padding = [16, 0, 0, 0]
             }else{
+                center = ["53%", "50%"];
                 radius = "42%";
                 width = 500;
                 height = 400;
                 padding = [16, 0, 0, 0]
             }
-            // const radius = window.innerWidth > 1600 ? "55%" : "42%";
+            // const center = window.innerWidth > 1600 ? "55%" : "42%";
             const setEchartWH = {
                 // 设置控制图表大小变量
                 width: width,
@@ -712,16 +714,17 @@ export default {
                     padding: padding
                 },
                 grid: {
-    top: '20%',
-    bottom: '50%',
-    left: '10%',
-    right: '10%'
-},
+                    top: '20%',
+                    bottom: '50%',
+                    left: '10%',
+                    right: '10%'
+                    },
                 series: [
                     {
                         type: 'pie',
                         radius: radius,
                         data: this.cnasPieData,
+                        center,
                         emphasis: {
                             itemStyle: {
                                 shadowBlur: 10,

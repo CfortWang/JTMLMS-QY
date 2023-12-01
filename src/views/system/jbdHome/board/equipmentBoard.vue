@@ -190,6 +190,7 @@ export default {
       let this_ = this;
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      didian.includes(",")?didian = didian.split(",")[0]:''
       this.MiddleLeftPieViewList = {data: [],config: { idSelector: "main" },rowNum: 7,color: [],};
       this_.sheBeiDataShow = false;
       this.eBgRateData = { data: [], config: {} };
@@ -381,6 +382,7 @@ export default {
       let this_ = this;
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      didian.includes(",")?didian = didian.split(",")[0]:''
       const sql = `select a.she_bei_shi_bie_h,a.she_bei_ming_cheng_,a.cun_fang_di_dian_,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a JOIN ibps_party_employee AS b ON a.guan_li_ren_ = b.ID_ where a.di_dian_ = '${didian}'`;
       let data1 = [];
       let res1 = [];
@@ -418,6 +420,7 @@ export default {
       this.moreBarData.data.source = [];
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      didian.includes(",")?didian = didian.split(",")[0]:''
       this.moreBarData.data.dimensions = ['product', '设备总数', '良好数','停用数'];
       let sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where b.name_ not like '%检验科%' and  a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
       let sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='使用'  GROUP BY a.bian_zhi_bu_men_`
@@ -478,6 +481,7 @@ export default {
       this.weihuBarData.data.source  =[];
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      didian.includes(",")?didian = didian.split(",")[0]:''
       let sql1 = `select DISTINCT(q.id_) ,q.name_,COUNT(*) AS total  FROM  
       (select DISTINCT(a.she_bei_bian_hao_),b.name_,b.id_ FROM t_mjsbwhjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN 
       (select id_ FROM t_mjsbwhjhb WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' OR create_time_ LIKE '%${this_.month.slice(0,4)}%') AND shi_fou_guo_shen_ = '已完成' AND di_dian_ = '${didian}') GROUP BY a.she_bei_bian_hao_) AS q  GROUP BY q.id_`
@@ -547,6 +551,7 @@ export default {
       let this_ = this;
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      didian.includes(",")?didian = didian.split(",")[0]:''
       let sql1 = `select a.bian_zhi_bu_men_,name_,a.zi_chan_yuan_zhi_ FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ ASC`
       let source = [];
       let data1;
@@ -611,6 +616,7 @@ export default {
       this.jiaozhunBarData.data.source  = [];
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      didian.includes(",")?didian = didian.split(",")[0]:''
       let sql1 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' OR create_time_ LIKE '%${this_.month.slice(0,4)}%') AND (shi_fou_guo_shen_ = '已审批' or shi_fou_guo_shen_ = '已完成')) AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
       let sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0,4)}%' OR create_time_ LIKE '%${this_.month.slice(0,4)}%') AND shi_fou_guo_shen_ = '已完成') AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
       this.jiaozhunBarData.data.dimensions = ['product', '计划数', '完成数'];
@@ -687,10 +693,10 @@ export default {
       let this_ = this;
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      didian.includes(",")?didian = didian.split(",")[0]:''
       // const sql =`select * from t_sbdj where (she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') and  di_dian_ = '${didian}'`;
       let sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
       let data1 = [];
-      console.log(sql,"sql报废")
       await curdPost("sql", sql)
         .then((res) => {
           this_.BaofeiBarData.data = [];
@@ -729,6 +735,7 @@ export default {
       let this_ = this;
       let didian = "";
       this_.$store.getters.level.second ? didian = this_.$store.getters.level.second:didian = this_.$store.getters.level.first;
+      didian.includes(",")?didian = didian.split(",")[0]:''
       let sql = `select DISTINCT(she_bei_lei_xing_),COUNT(*) AS total  FROM t_sbdj where di_dian_ = '${didian}' GROUP BY she_bei_lei_xing_`;
       let data = await curdPost("sql", sql);
       data  =  data.variables.data;
@@ -749,7 +756,6 @@ export default {
       
       let objJianding = {};
       this_.enTypeData.data = [];
-      console.log(this_.enTypeData)
       // dataTypes.forEach(item=>{
         for(let item of dataTypes){
         objJianding = {};
@@ -759,7 +765,6 @@ export default {
       }
       this_.enTypeData.color = ["#339933","#3366CC", "#FF9933", "#FFFF00"];
       this_.enTypeData.config.title = "检验科各型设备分布情况";
-      console.log(this_.enTypeData,"分布")
       this_.enTypeData.config.idSelector = "enTypeId";
     }
   },

@@ -36,7 +36,7 @@ export default {
     getMiddleLeft() {
       let chartDom = document.getElementById(this.info.config.idSelector);
       var myChart = echarts.init(chartDom);
-      const radius = window.innerWidth > 1600 ? "55%" : "45%";
+      const radius = window.innerWidth > 1600 ? "60%" : "45%";
       let inData = this.info.data;
       let num = 0;
       for (let i in inData) {
@@ -82,7 +82,7 @@ export default {
           {
             type: "pie",
             radius: radius,
-            center: ["50%", "50%"],
+            center: ["50%", "60%"],
             data: this.info.data,
             emphasis: {
               itemStyle: {

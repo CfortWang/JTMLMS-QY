@@ -1,166 +1,173 @@
 <template>
     <el-dialog :title="title" :visible.sync="dialogVisible" :close-on-click-modal="false" :close-on-press-escape="false" append-to-body class="bpmn-agent-dialog" width="60%" top="10vh" @open="getFormData" @close="closeDialog">
-        <el-form ref="agentForm" v-loading="dialogLoading" class="bpmnForm" :element-loading-text="$t('common.loading')" :model="bpmAgent" :rules="rules" :label-width="formLabelWidth" @submit.native.prevent>
-            <el-row v-if="srcList.length > 0">
-                <el-col :span="24">
-                    <el-form-item label="选择代理人参考图片：">
-                        <div class="imageListClass">
-                            <div v-for="(item,index) in srcList" :key="index">
-                                <el-image :src="item" class="sinImageList" :preview-src-list="srcList" />
+        <div style="padding: 15px">
+            <el-form ref="agentForm" v-loading="dialogLoading" class="bpmnForm" :element-loading-text="$t('common.loading')" :model="bpmAgent" :rules="rules" :label-width="formLabelWidth" label-position="left" @submit.native.prevent>
+                <el-row v-if="srcList.length > 0">
+                    <el-col :span="24">
+                        <el-form-item label="代理人参考图片：">
+                            <div class="imageListClass">
+                                <div v-for="(item,index) in srcList" :key="index">
+                                    <el-image :src="item" class="sinImageList" :preview-src-list="srcList" />
+                                </div>
                             </div>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="标题：" prop="title">
+                            <el-input v-if="!readonly" v-model="bpmAgent.title" placeholder="请输入标题" />
+                            <span v-else>{{ bpmAgent.title }}</span>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <el-row :gutter="20">
+                    <el-col :span="12">
+                        <el-form-item label="生效时间：" prop="effectiveTime">
+                            <el-date-picker v-if="!readonly" v-model="bpmAgent.effectiveTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择生效时间" />
+                            <span v-else>{{ bpmAgent.effectiveTime }}</span>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="失效时间：" prop="expiryTime">
+                            <el-date-picker v-if="!readonly" v-model="bpmAgent.expiryTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择失效时间" />
+                            <span v-else>{{ bpmAgent.expiryTime }}</span>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="12">
+                        <el-form-item label="委托人：" prop="delegatorId">
+                            <ibps-user-selector
+                                v-if="!readonly"
+                                v-model="bpmAgent.delegatorId"
+                                :type="type"
+                                :filter="filter"
+                                :multiple="multiple"
+                                :filtrate="filtrate"
+                                :store="store"
+                                :disabled="disabled"
+                                :readonly-text="readonlyText"
+                                placeholder="请选择委托人"
+                                @change-link-data="callbackDelegatorrInfo"
+                            />
+                            <span v-else>{{ bpmAgent.delegatorName }}</span>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item v-if="bpmAgent.agentType === 'all' || bpmAgent.agentType === 'part'" label="代理人：" prop="agenterId">
+                            <ibps-user-selector
+                                v-if="!readonly"
+                                v-model="bpmAgent.agenterId"
+                                :type="type"
+                                :filter="filter"
+                                :multiple="multiple"
+                                :filtrate="filtrate"
+                                :store="store"
+                                :disabled="disabled"
+                                :readonly-text="readonlyText"
+                                placeholder="请选择代理人"
+                                @change-link-data="callbackAgenterInfo"
+                            />
+                            <span v-else>{{ bpmAgent.agenterName }}</span>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item>
+                            <template slot="label">
+                                委托人角色：
+                                <help-tip :title="formAsterisk.title" :content="formAsterisk.content" />
+                            </template>
+                            <el-checkbox-group v-if="!readonly" v-model="checkRoleList">
+                                <el-checkbox v-for="item in roleList" :key="item.id" :label="item.id">{{ item.name }}</el-checkbox>
+                            </el-checkbox-group>
+                            <span v-else>{{ bpmAgent.roleName }}</span>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="代理人角色：">
+                            <span>{{ daiRoleName }}</span>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <!-- 全部代理 || 部分代理 -->
+                <el-row :gutter="20">
+                    <el-col :span="12" col>
+                        <el-form-item label="代理类型：" prop="agentType">
+                            <el-radio-group v-if="!readonly" v-model="bpmAgent.agentType">
+                                <el-radio v-for="option in agentTypeOptions" :key="option.value" :label="option.value">{{ option.label }}</el-radio>
+                            </el-radio-group>
+                            <el-tag v-else :type="bpmAgent.agentType | optionsFilter(agentTypeOptions, 'type')">{{ bpmAgent.agentType | optionsFilter(agentTypeOptions, 'label') }}</el-tag>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12" col>
+                        <el-form-item label="是否启用：" prop="isEnabled">
+                            <el-switch v-if="!readonly" v-model="bpmAgent.isEnabled" active-value="enabled" inactive-value="disabled" />
+                            <el-tag v-else :type="bpmAgent.isEnabled | optionsFilter(statusOptions, 'type')">{{ bpmAgent.isEnabled | optionsFilter(statusOptions, 'label') }}</el-tag>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <div v-if="bpmAgent.agentType === 'part'">
+                    <el-form-item label="流程定义">
+                        <div v-if="!readonly" class="dialog-right">
+                            <bpm-definition-selector button multiple @callback="updateDefine" />
+                            <el-button class="ibps-icon-remove ibps-ml-10" type="danger" @click="handleAllDelete(multipleSelection)">删除</el-button>
                         </div>
                     </el-form-item>
-                </el-col>
-            </el-row>
+                    <el-form-item v-loading="rowLoading" label-width="0px" :element-loading-text="$t('common.loading')">
+                        <el-table ref="multipleTable" border :data="bpmAgent.bpmAgentDefPoList" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+                            <el-table-column v-if="!readonly" type="selection" width="45" />
+                            <el-table-column label="流程名称">
+                                <template slot-scope="scope">{{ scope.row.procDefName ? scope.row.procDefName : scope.row.name }}</template>
+                            </el-table-column>
+                            <el-table-column v-if="!readonly" label="操作" width="55">
+                                <template slot-scope="scope">
+                                    <el-button type="danger" icon="el-icon-delete" circle @click="handleDelete(scope.$index, scope.row)" />
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-form-item>
+                </div>
 
-            <el-row>
-                <el-col :span="24">
-                    <el-form-item label="标题：" prop="title">
-                        <el-input v-if="!readonly" v-model="bpmAgent.title" placeholder="请输入标题" />
-                        <span v-else>{{ bpmAgent.title }}</span>
+                <!-- 条件代理 -->
+                <div v-if="bpmAgent.agentType === 'condition'">
+                    <el-form-item label="流程名称：">
+                        <bpm-definition-selector v-model="bpmAgent.procDefId" :disabled="readonly" />
                     </el-form-item>
-                </el-col>
-            </el-row>
+                    <el-form-item label="流程代理条件：">
+                        <div v-if="!readonly" class="dialog-right">
+                            <el-button class="ibps-icon-add" type="primary" @click="openConditionDialog">添加</el-button>
+                            <el-button class="ibps-icon-remove ibps-ml-5" type="danger">删除</el-button>
+                        </div>
+                    </el-form-item>
+                    <el-form-item v-loading="rowLoading" label-width="20px" :element-loading-text="$t('common.loading')">
+                        <el-table ref="multipleTable" :data="bpmAgent.bpmAgentConditionPoList" tooltip-effect="dark" style="width: 100%" @selection-change="handleConditionChange">
+                            <el-table-column type="selection" width="55" />
+                            <el-table-column label="代理人">
+                                <template slot-scope="scope">{{ scope.row.agenterName }}</template>
+                            </el-table-column>
+                            <el-table-column label="条件名称">
+                                <template slot-scope="scope">{{ scope.row.name }}</template>
+                            </el-table-column>
+                            <el-table-column prop="address" label="管理" width="100px" show-overflow-tooltip>
+                                <el-button type="primary" icon="el-icon-edit" circle @click="handleEdit(scope.$index, scope.row)" />
+                                <el-button type="danger" icon="el-icon-delete" circle @click="handleRemove(scope.$index, scope.row)" />
+                            </el-table-column>
+                        </el-table>
+                    </el-form-item>
+                </div>
+            </el-form>
+        </div>
 
-            <el-row>
-                <el-col :span="12">
-                    <el-form-item label="生效时间：" prop="effectiveTime">
-                        <el-date-picker v-if="!readonly" v-model="bpmAgent.effectiveTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择生效时间" />
-                        <span v-else>{{ bpmAgent.effectiveTime }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                    <el-form-item label="失效时间：" prop="expiryTime">
-                        <el-date-picker v-if="!readonly" v-model="bpmAgent.expiryTime" class="time" type="date" value-format="yyyy-MM-dd" placeholder="请选择失效时间" />
-                        <span v-else>{{ bpmAgent.expiryTime }}</span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="12">
-                    <el-form-item label="委托人：" prop="delegatorId">
-                        <ibps-user-selector
-                            v-if="!readonly"
-                            v-model="bpmAgent.delegatorId"
-                            :type="type"
-                            :filter="filter"
-                            :multiple="multiple"
-                            :filtrate="filtrate"
-                            :store="store"
-                            :disabled="disabled"
-                            :readonly-text="readonlyText"
-                            placeholder="请选择委托人"
-                            @change-link-data="callbackDelegatorrInfo"
-                        />
-                        <span v-else>{{ bpmAgent.delegatorName }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                    <el-form-item v-if="bpmAgent.agentType === 'all' || bpmAgent.agentType === 'part'" label="代理人：" prop="agenterId">
-                        <ibps-user-selector
-                            v-if="!readonly"
-                            v-model="bpmAgent.agenterId"
-                            :type="type"
-                            :filter="filter"
-                            :multiple="multiple"
-                            :filtrate="filtrate"
-                            :store="store"
-                            :disabled="disabled"
-                            :readonly-text="readonlyText"
-                            placeholder="请选择代理人"
-                            @change-link-data="callbackAgenterInfo"
-                        />
-                        <span v-else>{{ bpmAgent.agenterName }}</span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <el-row>
-                <el-col :span="24">
-                    <el-form-item label="委托人角色:">
-                        <el-checkbox-group v-if="!readonly" v-model="checkRoleList">
-                            <el-checkbox v-for="item in roleList" :key="item.id" :label="item.id">{{ item.name }}</el-checkbox>
-                        </el-checkbox-group>
-                        <span v-else>{{ bpmAgent.roleName }}</span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="24">
-                    <el-form-item label="代理人角色:">
-                        <span>{{ daiRoleName }}</span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <!-- 全部代理 || 部分代理 -->
-            <el-row>
-                <el-col :span="12" col>
-                    <el-form-item label="代理类型:" prop="agentType">
-                        <el-radio-group v-if="!readonly" v-model="bpmAgent.agentType">
-                            <el-radio v-for="option in agentTypeOptions" :key="option.value" :label="option.value">{{ option.label }}</el-radio>
-                        </el-radio-group>
-                        <el-tag v-else :type="bpmAgent.agentType | optionsFilter(agentTypeOptions, 'type')">{{ bpmAgent.agentType | optionsFilter(agentTypeOptions, 'label') }}</el-tag>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12" col>
-                    <el-form-item label="是否启用:" prop="isEnabled">
-                        <el-switch v-if="!readonly" v-model="bpmAgent.isEnabled" active-value="enabled" inactive-value="disabled" />
-                        <el-tag v-else :type="bpmAgent.isEnabled | optionsFilter(statusOptions, 'type')">{{ bpmAgent.isEnabled | optionsFilter(statusOptions, 'label') }}</el-tag>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <div v-if="bpmAgent.agentType === 'part'">
-                <el-form-item label="流程定义">
-                    <div v-if="!readonly" class="dialog-right">
-                        <bpm-definition-selector button multiple @callback="updateDefine" />
-                        <el-button class="ibps-icon-remove ibps-ml-10" type="danger" @click="handleAllDelete(multipleSelection)">删除</el-button>
-                    </div>
-                </el-form-item>
-                <el-form-item v-loading="rowLoading" label-width="20px" :element-loading-text="$t('common.loading')">
-                    <el-table ref="multipleTable" border :data="bpmAgent.bpmAgentDefPoList" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-                        <el-table-column v-if="!readonly" type="selection" width="45" />
-                        <el-table-column label="流程名称">
-                            <template slot-scope="scope">{{ scope.row.procDefName ? scope.row.procDefName : scope.row.name }}</template>
-                        </el-table-column>
-                        <el-table-column v-if="!readonly" label="操作" width="55">
-                            <template slot-scope="scope">
-                                <el-button type="danger" icon="el-icon-delete" circle @click="handleDelete(scope.$index, scope.row)" />
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </el-form-item>
-            </div>
-
-            <!-- 条件代理 -->
-            <div v-if="bpmAgent.agentType === 'condition'">
-                <el-form-item label="流程名称:">
-                    <bpm-definition-selector v-model="bpmAgent.procDefId" :disabled="readonly" />
-                </el-form-item>
-                <el-form-item label="流程代理条件">
-                    <div v-if="!readonly" class="dialog-right">
-                        <el-button class="ibps-icon-add" type="primary" @click="openConditionDialog">添加</el-button>
-                        <el-button class="ibps-icon-remove ibps-ml-5" type="danger">删除</el-button>
-                    </div>
-                </el-form-item>
-                <el-form-item v-loading="rowLoading" label-width="20px" :element-loading-text="$t('common.loading')">
-                    <el-table ref="multipleTable" :data="bpmAgent.bpmAgentConditionPoList" tooltip-effect="dark" style="width: 100%" @selection-change="handleConditionChange">
-                        <el-table-column type="selection" width="55" />
-                        <el-table-column label="代理人">
-                            <template slot-scope="scope">{{ scope.row.agenterName }}</template>
-                        </el-table-column>
-                        <el-table-column label="条件名称">
-                            <template slot-scope="scope">{{ scope.row.name }}</template>
-                        </el-table-column>
-                        <el-table-column prop="address" label="管理" width="100px" show-overflow-tooltip>
-                            <el-button type="primary" icon="el-icon-edit" circle @click="handleEdit(scope.$index, scope.row)" />
-                            <el-button type="danger" icon="el-icon-delete" circle @click="handleRemove(scope.$index, scope.row)" />
-                        </el-table-column>
-                    </el-table>
-                </el-form-item>
-            </div>
-        </el-form>
         <div slot="footer" class="el-dialog--center">
             <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
         </div>
@@ -178,6 +185,7 @@ import IbpsEmployeeSelector from '@/business/platform/org/employee/selector'
 import BpmDefinitionSelector from '@/business/platform/bpmn/definition/selector'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
+import helpTip from '@/business/platform/form/formbuilder/right-aside/components/help-tip.vue'
 import Condition from './condition'
 import { load } from '@/api/platform/org/employee'
 import { setTimeout } from 'timers'
@@ -187,7 +195,8 @@ export default {
         IbpsEmployeeSelector,
         BpmDefinitionSelector,
         Condition,
-        ibpsUserSelector
+        ibpsUserSelector,
+        helpTip
     },
     props: {
         visible: {
@@ -202,9 +211,12 @@ export default {
         title: String
     },
     data () {
+        const { first = '', second = '' } = this.$store.getters.level
+        const level = second || first
         return {
+            level,
             formName: 'agentForm',
-            formLabelWidth: '100px',
+            formLabelWidth: '110px',
             dialogVisible: this.visible,
             conditionDialogVisible: false, // 条件规则界面
             dialogLoading: false,
@@ -227,7 +239,8 @@ export default {
                 agentType: 'all',
                 isEnabled: 'enabled',
                 bpmAgentDefPoList: [],
-                bpmAgentConditionPoList: []
+                bpmAgentConditionPoList: [],
+                bpmAgentRoleList: []
             },
             rules: {
                 title: [
@@ -270,7 +283,13 @@ export default {
             readonlyText: 'null',
             roleList: [],
             checkRoleList: [],
-            daiRoleName: ''
+            daiRoleName: '',
+            yuanRoleList: [],
+            daiRoleList: [],
+            formAsterisk: {
+                title: '角色代理',
+                content: '该委托人角色代理主要用于菜单权限与编辑按钮权限'
+            }
         }
     },
     computed: {
@@ -407,9 +426,7 @@ export default {
                 ActionUtils.error('流程定义数据不能为空！')
                 return
             }
-            const roleNameList = this.roleList.filter(item => this.checkRoleList.includes(item.id))
-            const checkboxList = roleNameList.map(item => item.name)
-            console.log(checkboxList.join(','))
+            this.bpmAgent.bpmAgentRoleList = this.checkRoleList
             save(this.bpmAgent)
                 .then((response) => {
                     this.$emit('callback', this)
@@ -459,6 +476,9 @@ export default {
             })
                 .then((response) => {
                     this.bpmAgent = response.data
+                    this.checkRoleList = response.data.bpmAgentRoleList || []
+                    // this.bpmAgent.bpmAgentRoleList = response.data.bpmAgentRoleList || []
+                    console.log(this.bpmAgent)
                     this.formValidate()
                     this.dialogLoading = false
                 })
@@ -470,10 +490,14 @@ export default {
             alert('打开流程选择器')
         },
         callbackDelegatorrInfo (value, data, type) {
+            this.checkRoleList = []
             this.bpmAgent.delegatorName = data.name
+            this.getVerification()
         },
         callbackAgenterInfo (value, data, type) {
+            this.checkRoleList = []
             this.bpmAgent.agenterName = data.name
+            this.getVerification()
         },
         updateDefine (data) {
             this.rowLoading = true
@@ -504,13 +528,13 @@ export default {
         },
 
         getImage () {
-            const sql = `select * from t_dlpz order by create_time_ desc LIMIT 1`
+            const sql = `select * from t_dlpz where di_dian_ = '${this.level}' order by create_time_ desc LIMIT 1`
             curdPost('sql', sql).then((res) => {
                 if (res.state === 200) {
                     const datas = res.variables.data
                     if (datas.length > 0) {
                         const image = JSON.parse(datas[0].tu_pian_)
-                        const idList = image.map(item => {
+                        const idList = image.map((item) => {
                             return item.id
                         })
                         const ids = idList.join(',')
@@ -542,18 +566,34 @@ export default {
                         const data = response
                         const partyRole = response.variables.partyRoles
                         if (type === 1) {
-                            this.roleList = partyRole || []
-                            this.checkRoleList = []
+                            this.yuanRoleList = partyRole || []
                         }
                         if (type === 2) {
-                            const roleName = partyRole.map(item => item.name)
+                            this.daiRoleList = partyRole || []
+                            const roleName = partyRole.map((item) => item.name)
                             this.daiRoleName = roleName.join('，')
                         }
+                        this.getRoleList()
                         resolve(data)
                     })
                     .catch(() => {
                     })
             })
+        },
+        getRoleList () {
+            if (this.yuanRoleList.length > 0 && this.daiRoleList.length > 0) {
+                this.roleList = this.yuanRoleList.filter(item => {
+                    return !this.daiRoleList.some(it => it.id === item.id)
+                })
+            }
+        },
+        getVerification () {
+            if (this.bpmAgent.agenterId === this.bpmAgent.delegatorId) {
+                this.$message.error('委托人和代理人是同一个账号，请重新选择。')
+                return true
+            } else {
+                return false
+            }
         }
     }
 }

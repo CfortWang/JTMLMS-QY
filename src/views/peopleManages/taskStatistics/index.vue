@@ -1,35 +1,40 @@
 <template>
     <div class="personView">
         <dv-full-screen-container>
-            <div
-                class="topView"
-                style="width: 100%; height: 11%"
-            >
+            <div class="topView" style="width: 100%; height: 11%">
                 <div class="jbd-title">
                     <dv-decoration-8
                         style="
-            width: 20%;
-            height: 50px;
-            position: absolute;
-            left: 0px;
-            top: 0px;
-          "
+                            width: 20%;
+                            height: 50px;
+                            position: absolute;
+                            left: 0px;
+                            top: 0px;
+                        "
                     />
                     <div style="width: 100%">
-                        <div style="height: 40%; font-size: 22px; margin-top: 10px">
+                        <div
+                            style="
+                                height: 40%;
+                                font-size: 22px;
+                                margin-top: 10px;
+                            "
+                        >
                             人员管理看板
                         </div>
-                        <dv-decoration-5 style="width: 30%; height: 50%; margin: 0 auto" />
+                        <dv-decoration-5
+                            style="width: 30%; height: 50%; margin: 0 auto"
+                        />
                     </div>
                     <dv-decoration-8
                         :reverse="true"
                         style="
-            width: 20%;
-            height: 50px;
-            position: absolute;
-            right: 0px;
-            top: 0px;
-          "
+                            width: 20%;
+                            height: 50px;
+                            position: absolute;
+                            right: 0px;
+                            top: 0px;
+                        "
                     />
                 </div>
                 <div class="contain">
@@ -43,11 +48,21 @@
                         员工数量：{{ employeeNum }}人</dv-decoration-11>
                     <dv-border-box-8
                         class="date"
-                        style="margin-right: 2%; display: flex; align-items: center"
+                        style="
+                            margin-right: 2%;
+                            display: flex;
+                            align-items: center;
+                        "
                     >
                         <!-- 部门选择 -->
                         <SelectPositions @handleFunc="handleFunc" />
-                        <div style="width: 30%; display: inline-block; margin-right: 3px">
+                        <div
+                            style="
+                                width: 30%;
+                                display: inline-block;
+                                margin-right: 3px;
+                            "
+                        >
                             统计时间：
                         </div>
                         <el-date-picker
@@ -63,16 +78,18 @@
                             @change="changeDate"
                         />
 
-                        <div
-                            class="back"
-                            @click.prevent="goBack()"
-                        >
-                            返回
-                        </div>
+                        <div class="back" @click.prevent="goBack()">返回</div>
                     </dv-border-box-8>
                 </div>
             </div>
-            <dv-border-box-1 style="width: 100%; height: 89%; box-sizing: border-box; overflow: hidden">
+            <dv-border-box-1
+                style="
+                    width: 100%;
+                    height: 89%;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                "
+            >
                 <div style="height: 3%" />
                 <div class="botView">
                     <div class="viewLeft">
@@ -87,11 +104,16 @@
                             <div class="midViewRight">
                                 <BarChart
                                     :info="PositionsDegreeOption"
-                                    :config="{ title: '部门学位学历信息统计', id: 'positionsId1' }"
+                                    :config="{
+                                        title: '部门学位学历信息统计',
+                                        id: 'positionsId1',
+                                    }"
                                 />
                             </div>
                         </div>
-                        <dv-decoration-10 style="height: 2%; width: 100%; margin: 0 auto" />
+                        <dv-decoration-10
+                            style="height: 2%; width: 100%; margin: 0 auto"
+                        />
                         <div class="middleView">
                             <div class="midViewLeft">
                                 <RingChart :info="ranksPieData" />
@@ -103,7 +125,10 @@
                             <div class="midViewRight">
                                 <BarChart
                                     :info="PositionsRanksOption"
-                                    :config="{ title: '部门职称信息统计', id: 'positionsId2' }"
+                                    :config="{
+                                        title: '部门职称信息统计',
+                                        id: 'positionsId2',
+                                    }"
                                 />
                             </div>
                         </div>
@@ -138,7 +163,6 @@ export default {
         RingChart: () => import('../personComcont/RingChart'),
         BarChart: () => import('../personComcont/BarChart'),
         PieView: () => import('../personComcont/GetPieView')
-
     },
     data () {
         return {
@@ -228,7 +252,6 @@ export default {
                         name: '高级',
                         value: 0
                     }
-
                 ],
                 color: ['#9b4400', '#896c39', '#eacd76'],
                 config: { title: '职称统计', idSelector: 'ranksid' }
@@ -295,17 +318,20 @@ export default {
                         },
                         stack: 'Search Engine',
                         data: [],
-                        label: { // 柱体上显示数值
+                        label: {
+                            // 柱体上显示数值
                             show: true, // 开启显示
-                            textStyle: { // 数值样式
+                            textStyle: {
+                                // 数值样式
                                 fontSize: '6px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '专:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '专:' + name.value
                             }
                         }
-
                     },
                     {
                         name: '本科',
@@ -315,17 +341,20 @@ export default {
                             focus: 'series'
                         },
                         data: [],
-                        label: { // 柱体上显示数值
+                        label: {
+                            // 柱体上显示数值
                             show: true, // 开启显示
-                            textStyle: { // 数值样式
+                            textStyle: {
+                                // 数值样式
                                 fontSize: '6px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '本:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '本:' + name.value
                             }
                         }
-
                     },
                     {
                         name: '硕士',
@@ -335,17 +364,20 @@ export default {
                             focus: 'series'
                         },
                         data: [],
-                        label: { // 柱体上显示数值
+                        label: {
+                            // 柱体上显示数值
                             show: true, // 开启显示
-                            textStyle: { // 数值样式
+                            textStyle: {
+                                // 数值样式
                                 fontSize: '6px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '硕:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '硕:' + name.value
                             }
                         }
-
                     },
                     {
                         name: '博士',
@@ -355,18 +387,21 @@ export default {
                             focus: 'series'
                         },
                         data: [],
-                        label: { // 柱体上显示数值
+                        label: {
+                            // 柱体上显示数值
                             show: true, // 开启显示
-                            textStyle: { // 数值样式
+                            textStyle: {
+                                // 数值样式
                                 position: 'top',
                                 fontSize: '6px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '博:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '博:' + name.value
                             }
                         }
-
                     }
                 ],
                 dataZoom: [
@@ -436,14 +471,18 @@ export default {
                         emphasis: {
                             focus: 'series'
                         },
-                        label: { // 柱体上显示数值
+                        label: {
+                            // 柱体上显示数值
                             show: true, // 开启显示
-                            textStyle: { // 数值样式
+                            textStyle: {
+                                // 数值样式
                                 fontSize: '6px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '初:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '初:' + name.value
                             }
                         }
                     },
@@ -455,14 +494,18 @@ export default {
                             focus: 'series'
                         },
                         data: [],
-                        label: { // 柱体上显示数值
+                        label: {
+                            // 柱体上显示数值
                             show: true, // 开启显示
-                            textStyle: { // 数值样式
+                            textStyle: {
+                                // 数值样式
                                 fontSize: '6px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '中:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '中:' + name.value
                             }
                         }
                     },
@@ -474,15 +517,19 @@ export default {
                             focus: 'series'
                         },
                         data: [],
-                        label: { // 柱体上显示数值
+                        label: {
+                            // 柱体上显示数值
                             show: true, // 开启显示
                             position: 'top',
-                            textStyle: { // 数值样式
+                            textStyle: {
+                                // 数值样式
                                 fontSize: '6px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '高:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '高:' + name.value
                             }
                         }
                     }
@@ -516,7 +563,7 @@ export default {
                 },
                 grid: {
                     left: '2%',
-                    right: '10%',
+                    right: '15%',
                     bottom: '3%',
                     containLabel: true
                 },
@@ -555,7 +602,9 @@ export default {
                             position: 'right',
                             valueAnimation: true,
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '待办事宜数:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '待办事宜数:' + name.value
                             }
                         }
                     },
@@ -569,7 +618,9 @@ export default {
                             position: 'right',
                             valueAnimation: true,
                             formatter: function (name) {
-                                return name.value === 0 ? '' : '已办事宜数:' + name.value
+                                return name.value === 0
+                                    ? ''
+                                    : '已办事宜数:' + name.value
                             }
                         }
                     }
@@ -599,33 +650,32 @@ export default {
     created () {
         const initendDate = new Date()
         this.endDate =
-      initendDate.getFullYear() +
-      '-' +
-      (initendDate.getMonth() + 1 > 9
-          ? initendDate.getMonth() + 1
-          : '0' + (initendDate.getMonth() + 1)) +
-      '-' +
-      (initendDate.getDate() > 9
-          ? initendDate.getDate()
-          : '0' + initendDate.getDate()) + ' 23:59:59'
+            initendDate.getFullYear() +
+            '-' +
+            (initendDate.getMonth() + 1 > 9
+                ? initendDate.getMonth() + 1
+                : '0' + (initendDate.getMonth() + 1)) +
+            '-' +
+            (initendDate.getDate() > 9
+                ? initendDate.getDate()
+                : '0' + initendDate.getDate()) +
+            ' 23:59:59'
         this.startDate = this.preDate(this.endDate, 60) + ' 00:00:00'
         this.monthValues = [
             new Date(this.startDate),
             new Date(
                 initendDate.getFullYear() +
-        '-' +
-        (initendDate.getMonth() + 1) +
-        '-' +
-        initendDate.getDate()
+                    '-' +
+                    (initendDate.getMonth() + 1) +
+                    '-' +
+                    initendDate.getDate()
             )
         ]
         if (screenfull.isEnabled && !screenfull.isFullscreen) {
             this.allView()
         }
     },
-    mounted () {
-
-    },
+    mounted () {},
     beforeDestroy () {
         if (this.interval) {
             clearInterval(this.interval)
@@ -644,32 +694,35 @@ export default {
             const endDay = new Date(nextMonthFirthDay - oneDay)
             const day = endDay.getDate() // 本月最后一天
             this.endDate =
-        value[1].getFullYear() +
-        '-' +
-        (value[1].getMonth() + 1 > 9
-            ? value[1].getMonth() + 1
-            : '0' + (value[1].getMonth() + 1)) +
-        '-' +
-        (day > 9 ? day : '0' + day) + ' 23:59:59'
+                value[1].getFullYear() +
+                '-' +
+                (value[1].getMonth() + 1 > 9
+                    ? value[1].getMonth() + 1
+                    : '0' + (value[1].getMonth() + 1)) +
+                '-' +
+                (day > 9 ? day : '0' + day) +
+                ' 23:59:59'
             this.startDate =
-        value[0].getFullYear() +
-        '-' +
-        (value[0].getMonth() + 1 > 9
-            ? value[0].getMonth() + 1
-            : '0' + (value[0].getMonth() + 1)) +
-        '-' +
-        (value[0].getDate() > 9
-            ? value[0].getDate()
-            : '0' + value[0].getDate()) + ' 00:00:00'
+                value[0].getFullYear() +
+                '-' +
+                (value[0].getMonth() + 1 > 9
+                    ? value[0].getMonth() + 1
+                    : '0' + (value[0].getMonth() + 1)) +
+                '-' +
+                (value[0].getDate() > 9
+                    ? value[0].getDate()
+                    : '0' + value[0].getDate()) +
+                ' 00:00:00'
             this.getTtaskMattersData()
         },
         // 人员基本信息 轮播表数据
         async employeeInfoData () {
             let data = []
             this.optionPerson.yAxis.data = []
-            const positionsWhere = this.otherPositions.length !== 0 ? `(${this.otherPositions.join(
-                ' or '
-            )} )` : `ee.positions_ = '没有选择部门'`
+            const positionsWhere =
+                this.otherPositions.length !== 0
+                    ? `(${this.otherPositions.join(' or ')} )`
+                    : `ee.positions_ = '没有选择部门'`
             const sql = `select a.id_,a.parent_id_,ee.name_,a.zui_gao_xue_li_x_,a.zhi_cheng_deng_ji,ee.jian_ding_zi_ge_z,a.ren_zhi_shi_jian_,
       a.ru_zhi_shi_jian_ from  t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where a.id_ !='861622496187645952' and ${positionsWhere}`
             await curdPost('sql', sql).then((res) => {
@@ -697,9 +750,10 @@ export default {
             this.ranksPieData.data[1].value = 0
             this.ranksPieData.data[2].value = 0
             let data = []
-            const positionsWhere = this.otherPositions.length !== 0 ? `(${this.otherPositions.join(
-                ' or '
-            )} )` : `ee.positions_ = '没有选择部门'`
+            const positionsWhere =
+                this.otherPositions.length !== 0
+                    ? `(${this.otherPositions.join(' or ')} )`
+                    : `ee.positions_ = '没有选择部门'`
             const sql = `select
                 sum(a.zui_gao_xue_li_x_ = '博士研究生') as boShi,
                 sum(a.zui_gao_xue_li_x_ = '硕士研究生') as shuoShi,
@@ -722,12 +776,14 @@ export default {
             this.degreePieData.data[1].value = data[0].benKe
                 ? data[0].benKe
                 : 0
-            this.degreePieData.data[2].value = data[0].shuoShi ? data[0].shuoShi : 0
-            this.degreePieData.data[3].value = data[0].boShi ? data[0].boShi : 0
-
-            this.ranksPieData.data[0].value = data[0].chuJi
-                ? data[0].chuJi
+            this.degreePieData.data[2].value = data[0].shuoShi
+                ? data[0].shuoShi
                 : 0
+            this.degreePieData.data[3].value = data[0].boShi
+                ? data[0].boShi
+                : 0
+
+            this.ranksPieData.data[0].value = data[0].chuJi ? data[0].chuJi : 0
             this.ranksPieData.data[1].value = data[0].zhongJi
                 ? data[0].zhongJi
                 : 0
@@ -735,12 +791,13 @@ export default {
         },
         // 部门信息统计
         positionsInfoData () {
-            const positionsWhere = this.positions.length !== 0 ? `(${this.positions.join(
-                ' or '
-            )} )` : `en.path_ = '没有选择部门'`
+            const positionsWhere =
+                this.positions.length !== 0
+                    ? `(${this.positions.join(' or ')} )`
+                    : `en.path_ = '没有选择部门'`
             const sql = `select jh.*from (select  en.id_ ,en.name_ AS enName,  
-            sum(gy.zui_gao_xue_li_x_ = '博士研究生') as boShi,
-            sum(gy.zui_gao_xue_li_x_ = '硕士研究生') as shuoShi,
+            sum(gy.zui_gao_xue_li_x_ like '博士') as boShi,
+            sum(gy.zui_gao_xue_li_x_ like '硕士') as shuoShi,
             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,
             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,
             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,
@@ -775,13 +832,19 @@ export default {
                         'gaoJi'
                     ]
                     for (let t = 0; t < data.length; t++) {
-                        this.PositionsDegreeOption.xAxis[0].data.push(data[t].enName)
-                        this.PositionsRanksOption.xAxis[0].data.push(data[t].enName)
+                        this.PositionsDegreeOption.xAxis[0].data.push(
+                            data[t].enName
+                        )
+                        this.PositionsRanksOption.xAxis[0].data.push(
+                            data[t].enName
+                        )
                         for (let i = 0; i < degreeSeriesDatas.length; i++) {
-                            degreeSeriesDatas[i].data[t] = data[t][shuZuList[i]]
+                            degreeSeriesDatas[i].data[t] =
+                                data[t][shuZuList[i]]
                         }
                         for (let i = 0; i < ranksSeriesDatas.length; i++) {
-                            ranksSeriesDatas[i].data[t] = data[t][shuZuList[i + 4]]
+                            ranksSeriesDatas[i].data[t] =
+                                data[t][shuZuList[i + 4]]
                         }
                     }
                     this.PositionsDegreeOption.series = degreeSeriesDatas
@@ -814,7 +877,8 @@ export default {
                                 ibps_bpm_inst rinst
                                 RIGHT JOIN ibps_bpm_approval ap ON ap.PROC_INST_ID_ = rinst.ID_
                                 WHERE
-                                ap.AUDITOR_ in(${this.personIds}) 
+                                ap.AUDITOR_ in(${this.personIds}) and 
+                                ap.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
                                 UNION ALL
                                 SELECT aphis.AUDITOR_,insthis.* FROM
                                 ibps_bpm_inst_his insthis
@@ -823,20 +887,25 @@ export default {
                                 aphis.AUDITOR_ in(${this.personIds})  AND insthis.id_ IS NOT NULL
                                 ) inst ) AS  task 
                                 LEFT JOIN ibps_party_employee ee ON task.AUDITOR_ = ee.id_ 
+                                where  task.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
                                 GROUP BY  task.AUDITOR_ order by FIELD(task.AUDITOR_,${this.personIds})`
             await curdPost('sql', yibansql).then((res) => {
                 yibanData = res.variables.data
             })
             for (const i of this.personIds.split(',')) {
                 // 判断已读中是否存在该人员的待办
-                const daiBan = data.filter(fil => { return fil.executor_ === i })
+                const daiBan = data.filter((fil) => {
+                    return fil.executor_ === i
+                })
                 if (daiBan.length === 0) {
                     this_.optionPerson.series[0].data.push(0)
                 } else {
                     this_.optionPerson.series[0].data.push(daiBan[0].num)
                 }
                 // 判断已读中是否存在该人员的已办
-                const yiBan = yibanData.filter(fil => { return fil.AUDITOR_ === i })
+                const yiBan = yibanData.filter((fil) => {
+                    return fil.AUDITOR_ === i
+                })
                 if (yiBan.length === 0) {
                     this_.optionPerson.series[1].data.push(0)
                 } else {
@@ -867,7 +936,8 @@ export default {
             } else {
                 dayString = newDate.getDate().toString()
             }
-            dateString = newDate.getFullYear() + '-' + monthString + '-' + dayString
+            dateString =
+                newDate.getFullYear() + '-' + monthString + '-' + dayString
             return dateString
         },
         // 简化部门信息
@@ -875,7 +945,9 @@ export default {
             this.positions = [] // 用于sql条件查询
             this.otherPositions = []
             for (let i = 0; i < v.length; i++) {
-                this.positions.push(`en.path_ like '%${v[i][v[i].length - 1]}%'`)
+                this.positions.push(
+                    `en.path_ like '%${v[i][v[i].length - 1]}%'`
+                )
                 this.otherPositions.push(
                     `ee.positions_ like '%${v[i][v[i].length - 1]}%'`
                 )
@@ -898,7 +970,9 @@ export default {
         },
         handleInt (e) {
             // 找到对应id的部门信息
-            const obj = this.sqlPositionsDatasIni.find(item => item.ID_ === e[0][e[0].length - 1])
+            const obj = this.sqlPositionsDatasIni.find(
+                (item) => item.ID_ === e[0][e[0].length - 1]
+            )
             if (obj === undefined) {
                 this.optionPersonConfig.title = `部门（/）员工任务统计`
             } else {
@@ -932,132 +1006,131 @@ export default {
             this.$router.back(-1)
         }
     }
-
 }
 </script>
-  <style lang="less" scoped>
+<style lang="less" scoped>
 .personView {
-  width: 100%;
-  //   height: calc(100vh - 100px);
-  height: 100%;
-  //   background-image: url("~@/assets/images/screen/bg.png");
-  z-index: 999;
-  #dv-full-screen-container {
-    background-image: url("~@/assets/images/screen/bg.png");
-    background-size: 100% 100%;
-    box-shadow: 0 0 3px blue;
-    display: flex;
-    flex-direction: column;
-  }
+    width: 100%;
+    //   height: calc(100vh - 100px);
+    height: 100%;
+    //   background-image: url("~@/assets/images/screen/bg.png");
+    z-index: 999;
+    #dv-full-screen-container {
+        background-image: url("~@/assets/images/screen/bg.png");
+        background-size: 100% 100%;
+        box-shadow: 0 0 3px blue;
+        display: flex;
+        flex-direction: column;
+    }
 }
 .topView {
-  overflow: hidden;
-  box-sizing: border-box;
-  .jbd-title {
-    text-align: center;
-    font-weight: bold;
-    // background-color: rgb(249, 255, 255);
-    width: 100%;
-    color: white;
-    font-size: 18px;
-    height: 50%;
-  }
-  .contain {
-    width: 100%;
-    height: 50%;
-    display: flex;
-    justify-content: space-between;
-    border-left: 1px solid #dfdcdc;
-    color: white;
-    .personNum {
-      margin-left: 20px;
-      width: 250px;
+    overflow: hidden;
+    box-sizing: border-box;
+    .jbd-title {
+        text-align: center;
+        font-weight: bold;
+        // background-color: rgb(249, 255, 255);
+        width: 100%;
+        color: white;
+        font-size: 18px;
+        height: 50%;
     }
-    .date {
-      text-align: right;
-      // padding-right: 20px;
-      display: flex;
-      width: 750px;
-      height: 80%;
-      .dv-border-svg-container {
-        width: 750px;
-      }
-    }
-    .back {
-      width: 15%;
-      margin-right: 10px;
-    }
+    .contain {
+        width: 100%;
+        height: 50%;
+        display: flex;
+        justify-content: space-between;
+        border-left: 1px solid #dfdcdc;
+        color: white;
+        .personNum {
+            margin-left: 20px;
+            width: 250px;
+        }
+        .date {
+            text-align: right;
+            // padding-right: 20px;
+            display: flex;
+            width: 750px;
+            height: 80%;
+            .dv-border-svg-container {
+                width: 750px;
+            }
+        }
+        .back {
+            width: 15%;
+            margin-right: 10px;
+        }
 
-    /deep/.dv-border-box-8 .border-box-content {
-      display: flex;
-      align-items: center;
-      padding: 0px 2px;
+        /deep/.dv-border-box-8 .border-box-content {
+            display: flex;
+            align-items: center;
+            padding: 0px 2px;
+        }
+        /deep/ .el-range-input {
+            color: #fcfcfc;
+            background-color: #00083e;
+        }
+        /deep/ .el-range-separator {
+            color: #fcfcfc;
+        }
+        /deep/.el-input__inner {
+            background-color: #00083e;
+            border: 1px solid #4ea5d6;
+        }
     }
-    /deep/ .el-range-input {
-      color: #fcfcfc;
-      background-color: #00083e;
-    }
-    /deep/ .el-range-separator {
-      color: #fcfcfc;
-    }
-    /deep/.el-input__inner {
-      background-color: #00083e;
-      border: 1px solid #4ea5d6;
-    }
-  }
 }
 
 .botView {
-  height: 95%;
-  width: 98%;
-  margin: 0 auto;
-  display: flex;
-  justify-content: left;
-  overflow: hidden;
-  box-sizing: border-box;
-  .viewLeft {
-    width: 58%;
-    height: 100%;
+    height: 95%;
+    width: 98%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: left;
     overflow: hidden;
     box-sizing: border-box;
-  }
-  //   .viewCenter {
-  //     width: 28%;
-  //     height: 100%;
-  //     overflow: hidden;
-  //     box-sizing: border-box;
-  //   }
-  .viewRight {
-    width: 40%;
-    height: 100%;
-    overflow: hidden;
-    // padding-bottom: 10px;
-    box-sizing: border-box;
-    .taskMatters {
-      width: 49%;
-      height: 100%;
+    .viewLeft {
+        width: 58%;
+        height: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
     }
-  }
+    //   .viewCenter {
+    //     width: 28%;
+    //     height: 100%;
+    //     overflow: hidden;
+    //     box-sizing: border-box;
+    //   }
+    .viewRight {
+        width: 40%;
+        height: 100%;
+        overflow: hidden;
+        // padding-bottom: 10px;
+        box-sizing: border-box;
+        .taskMatters {
+            width: 49%;
+            height: 100%;
+        }
+    }
 }
 .middleView {
-  width: 100%;
-  margin: 0 auto;
-  height: 50%;
-  overflow: hidden;
-  box-sizing: border-box;
-  display: flex;
-  .midViewLeft {
-    width: 40%;
-    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    height: 50%;
     overflow: hidden;
     box-sizing: border-box;
-  }
-  .midViewRight {
-    width: 60%;
+    display: flex;
+    .midViewLeft {
+        width: 40%;
+        height: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+    .midViewRight {
+        width: 60%;
 
-    height: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
+        height: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
 }
 </style>
