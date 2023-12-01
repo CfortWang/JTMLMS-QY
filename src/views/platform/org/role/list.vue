@@ -80,6 +80,7 @@ export default {
     },
     mixins: [FixHeight],
     data () {
+        const { isSuper = false } = this.$store.getters
         return {
             dialogFormVisible: false, // 弹窗
             editId: '', // 编辑dialog需要使用
@@ -109,7 +110,10 @@ export default {
                     }, {
                         key: 'edit'
                     }, {
-                        key: 'remove'
+                        key: 'remove',
+                        hidden () {
+                            return !isSuper
+                        }
                     }
                 ],
                 searchForm: {
@@ -137,7 +141,10 @@ export default {
                     actions: [{
                         key: 'copy',
                         label: '复制',
-                        icon: 'ibps-icon-copy'
+                        icon: 'ibps-icon-copy',
+                        hidden () {
+                            return !isSuper
+                        }
                     }, {
                         key: 'userList',
                         label: '人员列表',
@@ -149,13 +156,22 @@ export default {
                     }, {
                         key: 'appAssignResource',
                         label: 'App资源分配',
-                        icon: 'ibps-icon-dashboard'
+                        icon: 'ibps-icon-dashboard',
+                        hidden () {
+                            return !isSuper
+                        }
                     }, {
                         key: 'authApiGrant',
                         label: '接口授权',
-                        icon: 'ibps-icon-ticket'
+                        icon: 'ibps-icon-ticket',
+                        hidden () {
+                            return !isSuper
+                        }
                     }, {
-                        key: 'remove'
+                        key: 'remove',
+                        hidden () {
+                            return !isSuper
+                        }
                     }, {
                         key: 'detail'
                     }, {
