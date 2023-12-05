@@ -191,26 +191,26 @@ service.interceptors.response.use(response => {
         }
         // 6020201:非法的token;6020202:其他客户端登录了;6020301:Token 过期了;
     } else if (state === requestState.ILLEGAL_TOKEN || state === requestState.OTHER_CLIENTS) {
-        if (!cancelRequest) {
-            cancelRequest = false
-            MessageBox.confirm(I18n.t('error.logout.message'), I18n.t('error.logout.title'), {
-                confirmButtonText: I18n.t('error.logout.confirmButtonText'),
-                cancelButtonText: I18n.t('error.logout.cancelButtonText'),
-                type: 'warning'
-            }).then(() => {
-                store.dispatch('ibps/account/fedLogout').then(() => {
-                    // 终止所有请求
-                    cancelRequest = true
-                    router.push({
-                        name: 'login'
-                    })
-                }).catch(() => {
-                    cancelRequest = false
+        // if (!cancelRequest) {
+        cancelRequest = false
+        MessageBox.confirm(I18n.t('error.logout.message'), I18n.t('error.logout.title'), {
+            confirmButtonText: I18n.t('error.logout.confirmButtonText'),
+            cancelButtonText: I18n.t('error.logout.cancelButtonText'),
+            type: 'warning'
+        }).then(() => {
+            store.dispatch('ibps/account/fedLogout').then(() => {
+                // 终止所有请求
+                cancelRequest = true
+                router.push({
+                    name: 'login'
                 })
-            }).finally(() => {
+            }).catch(() => {
                 cancelRequest = false
             })
-        }
+        }).finally(() => {
+            cancelRequest = false
+        })
+        // }
         return Promise.reject(new Error(message))
     } else { // 错误处理
         let errorMsg = ''
