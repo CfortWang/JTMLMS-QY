@@ -14,7 +14,7 @@ export default {
 
     // 科研项目
     getKyxmList (datas) {
-        const header = ['全部参与人', '项目编号', '资助单位', '项目类型', '项目名称', '开始时间', '结束时间', '立项经费（万元）']
+        const header = ['全部参与人', '项目编号', '资助单位', '项目类型', '项目名称', '开始日期', '结束日期', '立项经费（万元）']
         const data = []
         datas.forEach((item, index) => {
             const list = []
@@ -38,7 +38,7 @@ export default {
     },
     // 科研获奖成果
     getkjhjcgList (datas) {
-        const header = ['全部获奖者', '奖励项目名称', '单位排名', '奖励类型', '获奖时间']
+        const header = ['全部获奖者', '奖励项目名称', '单位排名', '奖励类型', '获奖日期']
         const data = []
         datas.forEach((item, index) => {
             const list = []
@@ -59,7 +59,7 @@ export default {
     },
     // SCI文章统计表
     getSCIwztjbList (datas) {
-        const header = ['全部作者', '论文题目', '期刊名称', 'JCR分区', '发表时间', '影响因子IF', '单位排名', 'WOS号']
+        const header = ['全部作者', '论文题目', '期刊名称', 'JCR分区', '发表日期', '影响因子IF', '单位排名', 'WOS号']
         const data = []
         datas.forEach((item, index) => {
             const list = []
@@ -84,7 +84,7 @@ export default {
     },
     // 中文论文
     getZwlwList (datas) {
-        const header = ['全部作者', '论文题目', '期刊名称', '期卷号', '发表时间', '期刊类别', '单位排名', 'ISSN号']
+        const header = ['全部作者', '论文题目', '期刊名称', '期卷号', '发表日期', '期刊类别', '单位排名', 'ISSN号']
         const data = []
         datas.forEach((item, index) => {
             const list = []
@@ -108,7 +108,7 @@ export default {
     },
     // 著作
     getZhuZuoList (datas) {
-        const header = ['全部作者', '专著名称', '出版社', '出版时间', '编撰字数']
+        const header = ['全部作者', '专著名称', '出版社', '出版日期', '编撰字数']
         const data = []
         datas.forEach((item, index) => {
             const list = []
@@ -129,7 +129,7 @@ export default {
     },
     // 专利
     getZhuanLiList (datas) {
-        const header = ['全部申请人', '专利名称', '专利权人', '类别', '申请时间', '授权时间']
+        const header = ['全部申请人', '专利名称', '专利权人', '类别', '申请日期', '授权时间']
         const data = []
         datas.forEach((item, index) => {
             const list = []
@@ -151,7 +151,7 @@ export default {
     },
     // 继续教育项目/学术活动
     getJxjyxmxshdList (datas) {
-        const header = ['全部负责人', '项目编号', '会议名称', '项目级别', '学分', '举办时间', '举办地点', '合作单位']
+        const header = ['全部负责人', '项目编号', '会议名称', '项目级别', '学分', '举办日期', '举办地点', '合作单位']
         const data = []
         datas.forEach((item, index) => {
             const list = []

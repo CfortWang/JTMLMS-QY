@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                             <el-table :data="allCheckData" :border="true" @selection-change="handleSelectionChange" style="width: 90%; margin: 0 auto">
-                                <el-table-column type="selection"  width="30" align="center">
+                                <el-table-column type="selection"  width="40" align="center">
                                 </el-table-column>
                                 <el-table-column prop="nei_shen_yuan_" label="内审员" width="100">
                                     <template slot-scope="scope">

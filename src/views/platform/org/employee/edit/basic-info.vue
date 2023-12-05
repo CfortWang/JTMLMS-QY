@@ -87,11 +87,11 @@
                         <help-tip :title="formAsterisk.title" :content="formAsterisk.content"/>
                     </template>
                     <el-radio-group v-if="!readonly" v-model="formData.jiNengZhiCheng">
-                        <el-radio label="inside">内部用户</el-radio>
-                        <el-radio label="ordinary">普通用户</el-radio>
+                        <el-radio label="inside">内部员工</el-radio>
+                        <el-radio label="ordinary">临床医护</el-radio>
                     </el-radio-group>
                     <el-tag v-else>
-                        {{ formData.jiNengZhiCheng == 'ordinary' ? '普通用户' : '内部用户'}}
+                        {{ formData.jiNengZhiCheng == 'ordinary' ? '临床医护' : '内部员工'}}
                     </el-tag>
                 </el-form-item>
                 <el-form-item label="邮箱" prop="email">

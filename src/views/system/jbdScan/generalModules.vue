@@ -9,12 +9,14 @@
 import satisfaction from './satisfaction/satisfaction.vue'
 import approve from './approve/approve.vue'
 import orderOpen from './goods/orderOpen.vue'
+import planImplementation from './planImplementation/planImplementation.vue'
 
 export default {
     components: {
         satisfaction,
         approve,
-        orderOpen
+        orderOpen,
+        planImplementation
     },
     props: {
         currentType: {

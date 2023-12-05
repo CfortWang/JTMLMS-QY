@@ -755,8 +755,8 @@ export default {
                     ? `(${this.otherPositions.join(' or ')} )`
                     : `ee.positions_ = '没有选择部门'`
             const sql = `select
-                sum(a.zui_gao_xue_li_x_ = '博士研究生') as boShi,
-                sum(a.zui_gao_xue_li_x_ = '硕士研究生') as shuoShi,
+                sum(a.zui_gao_xue_li_x_ like '%博士%') as boShi,
+                sum(a.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,
                 sum(a.zui_gao_xue_li_x_ = '本科') as benKe,
                 sum(a.zui_gao_xue_li_x_ = '大专') as daZhuan,
                 sum(a.zhi_cheng_deng_ji = '初级') as chuJi,
@@ -796,8 +796,8 @@ export default {
                     ? `(${this.positions.join(' or ')} )`
                     : `en.path_ = '没有选择部门'`
             const sql = `select jh.*from (select  en.id_ ,en.name_ AS enName,  
-            sum(gy.zui_gao_xue_li_x_ like '博士') as boShi,
-            sum(gy.zui_gao_xue_li_x_ like '硕士') as shuoShi,
+            sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,
+            sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,
             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,
             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,
             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,

@@ -313,7 +313,8 @@ export default {
 
             oldList: [], // 子表旧数据
             importList: [],
-            importValue: null
+            importValue: null,
+            actionButton: null
         }
     },
     computed: {
@@ -632,6 +633,7 @@ export default {
             const index = (this.currentPage - 1) * this.pageSize + buttonIndex
             this.actionCode = button.key === 'custom' ? button.code || button.key + index : button.key
             this.actionPosition = button.position || 'toolbar'
+            this.actionButton = button
             // 前置事件
             this.beforeScript(button, index, (result) => {
                 this.editFromType = button.key
@@ -757,6 +759,7 @@ export default {
                 this.loading = false
                 const formData = this.setValue(this.importValue)
                 IbpsImport.xlsx(file, options).then(({ header, results }) => {
+                    const list = []
                     results.forEach((item) => {
                         const data = JSON.parse(JSON.stringify(formData))
                         for (const key in item) {
@@ -764,8 +767,22 @@ export default {
                                 data[this.importValue[key]] = item[key]
                             }
                         }
-                        this.dataModel.push(data)
+                        if (this.actionCode === 'importData') {
+                            list.push(data)
+                        } else {
+                            this.dataModel.push(data)
+                        }
+                        // this.dataModel.push(data)
                     })
+                    // 后置事件
+                    if (this.actionCode === 'importData') {
+                        this.afterScript(this.actionCode, this.actionPosition, {
+                            button: this.actionButton,
+                            importList: list,
+                            fullImportList: [...this.dataModel, ...list]
+                        })
+                    }
+
                     this.importTableDialogVisible = false
                     this.importValue = null
                     this.importList = []
