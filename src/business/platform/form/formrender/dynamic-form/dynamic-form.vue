@@ -661,8 +661,8 @@
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         margin: 0 auto;
         padding: 10px;
-        min-height: 92vh;
-        width: 84%;
+        min-height: calc(100vh - 120px);
+        width: 80%;
     }
     .jbd-replce {
         height: 5px;
