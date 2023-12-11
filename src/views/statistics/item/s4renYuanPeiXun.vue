@@ -85,7 +85,8 @@
           tooltip: {
             trigger: 'item'
           },
-          color:['#CC9999','#CCFF66'],
+          color:['#66CC00','#CC0000'],
+          // color:['#CC9999','#CCFF66'],
           series: [
             {
               type: 'pie',

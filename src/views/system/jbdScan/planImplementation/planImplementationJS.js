@@ -4,7 +4,7 @@ export default {
         return {
             barLable: {
                 show: true,
-                position: 'top',
+                position: 'right',
                 textStyle: { // 数值样式
                     color: 'black',
                     fontSize: 12
@@ -14,12 +14,18 @@ export default {
                     return params.value === '0' ? '' : params.value
                 }
 
+            },
+            tooltip: {
+                show: true,
+                trigger: 'axis'
+                // axisPointer: {
+                //     type: 'none'
+                // }
             }
         }
     },
     methods: {
-        getOption (totalMs = 0) {
-            console.log(totalMs)
+        getOption (leftData) {
             const option = {
                 series: [
                     {
@@ -66,9 +72,14 @@ export default {
                             formatter: '{value} %',
                             color: 'auto',
                             top: '100%',
-                            offsetCenter: [0, '75%']
+                            offsetCenter: [0, '65%']
                         },
-                        data: [{ value: totalMs, top: '100%' }]
+                        title: {
+                            offsetCenter: [0, '-120%'],
+                            fontWeight: 'bold',
+                            fontSize: 20
+                        },
+                        data: [{ value: leftData.leftTotal <= 100 ? leftData.leftTotal : 100, name: leftData.title || '', top: '100%' }]
                     }
                 ]
             }
@@ -76,66 +87,64 @@ export default {
             accept.setOption(JSON.parse(JSON.stringify(option)))
             // this.show1 = true
         },
-        barDataPlan (data) {
-            data.series.forEach(item => {
-                item.label = this.barLable
-                item.type = 'bar'
-                item.barGap = 0
-                item.emphasis = {
-                    focus: 'series'
+        barDataPlan (data, rightShow) {
+            let barDataTy = null
+            if (!rightShow) {
+                data.series.forEach(item => {
+                    item.label = item.label || this.barLable
+                    item.type = 'bar'
+                    item.barGap = 0
+                    item.emphasis = {
+                        focus: 'series'
+                    }
+                })
+                barDataTy = {
+                    // 图例设置
+                    legend: {
+                        textStyle: {
+                            fontSize: 12,
+                            color: '#333'
+                        }
+                    },
+                    title: {
+                        show: true,
+                        text: data.title,
+                        textStyle: {
+                            // color: '#fff',
+                            fontSize: 20,
+                            fontWeight: '600'
+                        },
+                        textAlign: 'center',
+                        left: '50%',
+                        top: '20px'
+                    },
+                    xAxis: {
+                        type: 'value',
+                        name: data.xAxisName || '数量（个）',
+                        minInterval: 1,
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    },
+                    yAxis: {
+                        type: 'category',
+                        name: data.yAxisName || '部门',
+                        nameTextStyle: {
+                            fontSize: 14
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        data: data.yAxisData
+                    },
+                    series: data.series,
+                    color: data.color,
+                    tooltip: data.tooltip || this.tooltip
                 }
-            })
-            const barDataTy = {
-                // 图例设置
-                legend: {
-                    textStyle: {
-                        fontSize: 12,
-                        color: '#333'
-                    }
-                },
-                title: {
-                    show: true,
-                    text: data.title,
-                    textStyle: {
-                        // color: '#fff',
-                        fontSize: 20,
-                        fontWeight: '600'
-                    },
-                    textAlign: 'center',
-                    left: '50%',
-                    top: '20px'
-                },
-                xAxis: {
-                    name: '部门',
-                    type: 'category',
-                    data: data.xAxisData,
-                    axisTick: {
-                        alignWithLabel: true
-                    },
-                    axisLabel: {
-                        rotate: 30,
-                        interval: 0,
-                        margin: 10
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    name: '数量（个）',
-                    minInterval: 1,
-                    nameTextStyle: {
-                        fontSize: 14
-                    },
-                    splitLine: {
-                        show: false
-                    }
-                },
-                series: data.series,
-                color: data.color,
-                tooltip: {
-                    show: true,
-                    trigger: 'axis'
-                }
+            } else {
+                barDataTy = data
             }
+
             const accept = echarts.init(this.$refs.chart2)
             accept.setOption(JSON.parse(JSON.stringify(barDataTy)))
         }

@@ -86,7 +86,7 @@
                             <el-checkbox-group v-if="!readonly" v-model="checkRoleList">
                                 <el-checkbox v-for="item in roleList" :key="item.id" :label="item.id">{{ item.name }}</el-checkbox>
                             </el-checkbox-group>
-                            <span v-else>{{ bpmAgent.roleName }}</span>
+                            <span v-else>{{ getWeiTuoName(checkRoleList,roleList) }}</span>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -478,7 +478,6 @@ export default {
                     this.bpmAgent = response.data
                     this.checkRoleList = response.data.bpmAgentRoleList || []
                     // this.bpmAgent.bpmAgentRoleList = response.data.bpmAgentRoleList || []
-                    console.log(this.bpmAgent)
                     this.formValidate()
                     this.dialogLoading = false
                 })
@@ -594,6 +593,15 @@ export default {
             } else {
                 return false
             }
+        },
+        getWeiTuoName (data, list) {
+            const nameList = []
+            list.forEach((item) => {
+                if (data.includes(item.id)) {
+                    nameList.push(item.name)
+                }
+            })
+            return nameList.join(',')
         }
     }
 }

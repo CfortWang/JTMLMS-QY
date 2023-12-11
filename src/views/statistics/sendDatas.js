@@ -45,7 +45,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         barData.push(e)
                         return {
@@ -67,7 +67,7 @@ export default {
                                 mid[midI].numA = this.jiaoyanMGObj[i].numA
                                 mid[midI].num = this.jiaoyanMGObj[i].num
                                 mid[midI].wnum = this.jiaoyanMGObj[i].numA-this.jiaoyanMGObj[i].num
-                                mid[midI].chu = this.jiaoyanMGObj[i].chu
+                                mid[midI].chu = Math.floor(this.jiaoyanMGObj[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -81,7 +81,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         barData.push(e)
                         return {
@@ -103,7 +103,7 @@ export default {
                                 mid[midI].numA = this.hechaMGObj[i].numA
                                 mid[midI].num = this.hechaMGObj[i].num
                                 mid[midI].wnum = this.hechaMGObj[i].numA-this.hechaMGObj[i].num
-                                mid[midI].chu = this.hechaMGObj[i].chu
+                                mid[midI].chu = Math.floor(this.hechaMGObj[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -117,7 +117,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         barData.push(e)
                         return {
@@ -139,7 +139,7 @@ export default {
                                 mid[midI].numA = this.waibuObjfb[i].numA
                                 mid[midI].num = this.waibuObjfb[i].num
                                 mid[midI].wnum = this.waibuObjfb[i].numA-this.waibuObjfb[i].num
-                                mid[midI].chu = this.waibuObjfb[i].chu
+                                mid[midI].chu = Math.floor(this.waibuObjfb[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -285,7 +285,7 @@ export default {
                                 mid[midI].numA = this.gaijinxiangObj[i].numA
                                 mid[midI].num = this.gaijinxiangObj[i].num
                                 mid[midI].wnum = this.gaijinxiangObj[i].numA-this.gaijinxiangObj[i].num
-                                mid[midI].chu = this.gaijinxiangObj[i].chu
+                                mid[midI].chu = Math.floor(this.gaijinxiangObj[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -339,7 +339,7 @@ export default {
                         if(b===0){
                                 c=0
                         }else{
-                                c= Math.floor(b/a * 10000) / 100
+                                c= Math.floor(b/a * 1000) / 10
                         }
                         return {
                                 "Num" :{"date": this.endDate,"number": val, "name": name, "numberAll": valAll,"valnum":a,"valAll":b,"valna":c},
@@ -362,7 +362,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         barData.push(e)
                         return {
@@ -384,7 +384,7 @@ export default {
                                 mid[midI].numA = this.guanshenfbObj[i].numA
                                 mid[midI].num = this.guanshenfbObj[i].num
                                 mid[midI].wnum = this.guanshenfbObj[i].numA-this.guanshenfbObj[i].num
-                                mid[midI].chu = this.guanshenfbObj[i].chu
+                                mid[midI].chu = Math.floor(this.guanshenfbObj[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -418,7 +418,7 @@ export default {
                                 if (mjjcbgSNum[0]===0) {
                                         e =0
                                 } else {
-                                        e =Math.floor(mjjcbgNum[0]/mjjcbgSNum[0] * 10000) / 100
+                                        e =Math.floor(mjjcbgNum[0]/mjjcbgSNum[0] * 1000) / 10
                                 }
                                 barData.push(e)
                         // }
@@ -436,7 +436,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         barData.push(e)
                         return {
@@ -472,7 +472,7 @@ export default {
                                 mid[midI].numA = this.neishenfbObj[i].numA
                                 mid[midI].num = this.neishenfbObj[i].num
                                 mid[midI].wnum = this.neishenfbObj[i].numA-this.neishenfbObj[i].num
-                                mid[midI].chu = this.neishenfbObj[i].chu
+                                mid[midI].chu = Math.floor(this.neishenfbObj[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -486,7 +486,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         barData.push(e)
                         
@@ -510,7 +510,7 @@ export default {
                                 mid[midI].numA = this.yingjifbObj[i].numA
                                 mid[midI].num = this.yingjifbObj[i].num
                                 mid[midI].wnum = this.yingjifbObj[i].numA-this.yingjifbObj[i].num
-                                mid[midI].chu = this.yingjifbObj[i].chu
+                                mid[midI].chu = Math.floor(this.yingjifbObj[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -524,7 +524,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         barData.push(e)
                         
@@ -551,7 +551,7 @@ export default {
                                 mid[midI].numA = this.zaigangrenyuanfb[i].numA
                                 mid[midI].num = this.zaigangrenyuanfb[i].num
                                 mid[midI].wnum = this.zaigangrenyuanfb[i].numA-this.zaigangrenyuanfb[i].num
-                                mid[midI].chu = this.zaigangrenyuanfb[i].chu
+                                mid[midI].chu = Math.floor(this.zaigangrenyuanfb[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -567,7 +567,7 @@ export default {
                                 if (zljdNum[0].num===0) {
                                         e =0
                                 } else {
-                                        e =Math.floor(zljdNum[1].num/zljdNum[0].num * 10000) / 100
+                                        e =Math.floor(zljdNum[1].num/zljdNum[0].num * 1000) / 10
                                 }
                                 barData.push(e)
                         // }
@@ -595,7 +595,7 @@ export default {
                                 mid[midI].numA = this.gangqianpeixunfb[i].numA
                                 mid[midI].num = this.gangqianpeixunfb[i].num
                                 mid[midI].wnum = this.gangqianpeixunfb[i].numA-this.gangqianpeixunfb[i].num
-                                mid[midI].chu = this.gangqianpeixunfb[i].chu
+                                mid[midI].chu = Math.floor(this.gangqianpeixunfb[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -652,7 +652,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         barData.push(e)
                         return {
@@ -674,7 +674,7 @@ export default {
                                 mid[midI].numA = this.neibuObjfb[i].numA
                                 mid[midI].num = this.neibuObjfb[i].num
                                 mid[midI].wnum = this.neibuObjfb[i].numA-this.neibuObjfb[i].num
-                                mid[midI].chu = this.neibuObjfb[i].chu
+                                mid[midI].chu = Math.floor(this.neibuObjfb[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -688,7 +688,7 @@ export default {
                         if (ryywpxjNum[0].num===0) {
                                 e =0
                          } else {
-                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 10000) / 100
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         return {
                                 "t_mjsyshdfxsbykzjhxbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val": e},
@@ -709,7 +709,7 @@ export default {
                                 mid[midI].numA = this.fengxianfbObj[i].numA
                                 mid[midI].num = this.fengxianfbObj[i].num
                                 mid[midI].wnum = this.fengxianfbObj[i].numA-this.fengxianfbObj[i].num
-                                mid[midI].chu = this.fengxianfbObj[i].chu
+                                mid[midI].chu = Math.floor(this.fengxianfbObj[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -730,7 +730,7 @@ export default {
                                 mid[midI].numA = this.bufuheObj[i].numA
                                 mid[midI].num = this.bufuheObj[i].num
                                 mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
-                                mid[midI].chu = this.bufuheObj[i].chu
+                                mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},

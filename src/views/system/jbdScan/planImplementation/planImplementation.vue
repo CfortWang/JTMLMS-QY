@@ -6,6 +6,7 @@
             width="80%"
             top="5vh"
             append-to-body
+            :center="generalData.titleCenter || false"
             custom-class="customClass"
             @close="close"
         >
@@ -19,12 +20,15 @@
                     />
                 </div>
 
-                <el-row :gutter="20">
+                <el-row>
                     <el-col :span="6">
-                        <div ref="chart1" class="chart" />
+                        <div :style="{ height: height + 'px'}">
+                            <div ref="chart1" class="chart" />
+                        </div>
+
                     </el-col>
                     <el-col :span="18">
-                        <div ref="chart2" id="chart2" class="chart" />
+                        <div id="chart2" ref="chart2" class="chart2" :style="{ height: height + 'px'}" />
                     </el-col>
                 </el-row>
             </div>
@@ -53,23 +57,48 @@ export default {
             generalShow: this.show,
             id: '',
             generalData: {
-                title: '',
-                alertShow: false,
+                title: '', // 弹出框标题
+                titleCentr: false, // 弹出框标题是否区中
+                alertShow: false, // 提示是否显示
                 alert: {
-                    title: '',
-                    description: ''
+                    title: '', // 提示标题
+                    description: '' // 提示内容
                 },
-                leftTotal: 0,
+                leftData: {
+                    leftTotal: 0, // 左图数量
+                    title: '' // 左图标题，默认"完成率"
+                },
+                rightCustomShow: false, // 右图自定义
                 rightData: {
-                    title: '人数',
-                    xAxisData: ['金源信通'],
+                    title: '人数', // 右图标题
+                    xAxisName: '', // 右图x轴标题
+                    yAxisName: '', // 右图y轴标题
+                    yAxisData: ['金源信通'], // 右图y轴项
                     series: [{
-                        name: '总数',
-                        data: ['']
+                        name: '总数', // 右图x轴项
+                        data: [''], // 右图x轴数量
+                        label: {
+                            show: true,
+                            position: 'right',
+                            textStyle: { // 数值样式
+                                color: 'black',
+                                fontSize: 12
+                            },
+                            formatter: (params) => {
+                                // 这个回调函数不起作用了
+                                return params.value === '0' ? '' : params.value
+                            }
+
+                        }
                     }],
-                    color: ['rgb(55, 162, 218)', 'rgb(103, 224, 227)', 'rgb(253, 102, 109)']
+                    color: ['rgb(55, 162, 218)', 'rgb(103, 224, 227)', 'rgb(253, 102, 109)'], // 颜色
+                    tooltip: { // 右图弹出框
+                        show: true,
+                        trigger: 'axis'
+                    }
                 }
-            }
+            },
+            height: 300
         }
     },
     watch: {
@@ -82,12 +111,13 @@ export default {
         }
     },
     created () {
-        console.log(this.generalList)
         this.generalData = this.generalList[0]
+        const height = this.generalData.rightData.yAxisData.length * 100
+        this.height = height > 300 ? height : 300
 
         setTimeout(() => {
-            this.getOption(this.generalData.leftTotal)
-            this.barDataPlan(this.generalData.rightData)
+            this.getOption(this.generalData.leftData)
+            this.barDataPlan(this.generalData.rightData, this.generalData.rightCustomShow)
         }, 100)
     },
     methods: {
@@ -100,15 +130,21 @@ export default {
 
 <style  scoped>
 .stopCenter{
-    margin: 0 30px 20px 30px;
+    max-height: 800px;
+    margin: 20px 30px 20px 30px;
 }
 
 .tableTop{
-    margin: 10px 0;
+    margin: 0 0 10px 0;
 }
 
 .chart{
     width: 100%;
     height: 300px;
+}
+
+.chart2{
+    width: 100%;
+    min-height: 300px;
 }
 </style>
