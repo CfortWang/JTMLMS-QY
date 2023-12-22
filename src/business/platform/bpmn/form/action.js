@@ -166,9 +166,10 @@ export default {
                 text: this.$t('common.saving')
             })
             if (!formData) return
+            const replaceFormData = this.$common.replaceNullWithEmpty(formData)
             bpmTaskSave({
                 taskId: this.taskId,
-                data: JSON.stringify(formData),
+                data: JSON.stringify(replaceFormData),
                 opinion
             }).then(response => {
                 loading.close()

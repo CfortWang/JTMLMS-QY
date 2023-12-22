@@ -1,4 +1,5 @@
 // 通用工具类，定义通用函数及常用接口
+import { mapValues } from 'lodash'
 import { encryptByAes } from '@/utils/encrypt'
 import { preview } from '@/business/platform/form/utils/custom/preview'
 import request from '@/business/platform/form/utils/custom/joinCURD'
@@ -130,6 +131,27 @@ export const getFormatDate = (type, length, date = new Date()) => {
     return result.slice(0, length || result.length)
 }
 
+/**
+ * 替换对象中的null为空字符串
+ * @param  {Object} obj 目标对象
+ */
+export const replaceNullWithEmpty = obj => {
+    function replaceValue (value) {
+        if (value === null) {
+            return ''
+        } else if (typeof value === 'object') {
+            if (Array.isArray(value)) {
+                return value.map(item => replaceValue(item))
+            } else {
+                return mapValues(value, v => replaceValue(v))
+            }
+        } else {
+            return value
+        }
+    }
+    return replaceValue(obj)
+}
+
 export default {
     preview,
     request,
@@ -148,5 +170,6 @@ export default {
     onlyOfficeToPdf,
     generateUUID,
     download,
-    removeFormData
+    removeFormData,
+    replaceNullWithEmpty
 }
