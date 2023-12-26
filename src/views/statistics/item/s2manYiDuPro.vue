@@ -118,6 +118,8 @@
         let heng = { 
             splitLine:{show: false},
             type: 'category',
+            minInterval: 1,
+            min: 0,
             axisLabel: {
               show: true,
               textStyle: {
@@ -134,6 +136,8 @@
           }
         let zong = {
             splitLine:{show: false},
+            minInterval: 1,
+            min: 0,
             axisLabel: {
               show: true,
               textStyle: {

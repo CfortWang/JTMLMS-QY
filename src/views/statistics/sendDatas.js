@@ -491,7 +491,7 @@ export default {
                         barData.push(e)
                         
                         return {
-                                "t_complaintNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e},
+                                "t_complaintNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e,"title":"应急预案演练完成率"},
                                 // "t_mjwtsqbNum" :{"date": this.dataScope,"number": mjwtsqbNum},
                                 "config":this.getMyConfig("客户投诉率") //返回需要的对应参数
                         }
@@ -513,7 +513,45 @@ export default {
                                 mid[midI].chu = Math.floor(this.yingjifbObj[i].chu*10)/10
                         }
                         return {
-                                "num" :{"date": this.endDate,"number": mid,"title":title},
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"应急预案演练各部门完成率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getshijiazhipinjihua(){
+                        let ryywpxjNum = this.yingjiObj
+                        let barData = []
+                        let e=0
+                        if (ryywpxjNum[0].num===0) {
+                                e =0
+                         } else {
+                                e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        }
+                        barData.push(e)
+                        
+                        return {
+                                "t_complaintNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e,"title":"室内质控完成率"},
+                                // "t_mjwtsqbNum" :{"date": this.dataScope,"number": mjwtsqbNum},
+                                "config":this.getMyConfig("客户投诉率") //返回需要的对应参数
+                        }
+                },
+                getshijiazhipinjihuaB(){
+                        // let zlzbfz = []
+                        // zlzbfz = this.quality
+                        // let fenshuzu = []
+                        // fenshuzu = this.buhegelvObj
+                        
+                        let title = ['NAME_','numA','num','wnum']
+
+                        let mid = JSON.parse(JSON.stringify(this.allBuMen))
+                        for (let i = 0; i < this.yingjifbObj.length; i++) {
+                                let midI = mid.findIndex(v => v.NAME_ == this.yingjifbObj[i].NAME_ )
+                                mid[midI].numA = this.yingjifbObj[i].numA
+                                mid[midI].num = this.yingjifbObj[i].num
+                                mid[midI].wnum = this.yingjifbObj[i].numA-this.yingjifbObj[i].num
+                                mid[midI].chu = Math.floor(this.yingjifbObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"室内质控各部门完成率"},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -737,6 +775,414 @@ export default {
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
+                getbuhegeyangpin(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 99.8,title:"不合格样品率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getbuhegeyangpinB(){
+                        let tableData={
+                                header: ['<span></span>','<span style="font-size:14px;height:53px">临检组</span>', '<span style="font-size:14px;height:53px">生化组</span>', '<span style="font-size:14px;height:53px">免疫组</span>', '<span style="font-size:14px;height:53px">微生物组</span>', '<span style="font-size:14px;height:53px">流式组</span>', '<span style="font-size:14px;height:53px">细胞形态组</span>', '<span style="font-size:14px;height:53px">分子组</span>', '<span style="font-size:14px;height:53px">遗传组</span>'],
+                                rowNum: 13,
+                                columnWidth: [90,150,150,150,150,150,150,150,150],
+                                align: ['left','center','center','center','center','center','center','center','center'],
+                                data: [
+                                  ['1月','<span style="font-size:10px;">值:0.5%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.31%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['2月','<span style="font-size:10px;">值:0.5%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.4%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['3月','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.31%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['4月','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['5月','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.51%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['6月','<span style="font-size:10px;">值:0.52%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['7月','<span style="font-size:10px;">值:1.1%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.19%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['8月','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['9月','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.11%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['10月','<span style="font-size:10px;">值:0.5%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['11月','<span style="font-size:10px;">值:0.6%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.12%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                  ['12月','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>', '<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>','<span style="font-size:10px;">值:0.1%;限值:≤1%</span>','<span style="font-size:10px;">值:0.3%;限值:≤1%</span>','<span style="font-size:10px;">值:0.7%;限值:≤1%</span>','<span style="font-size:10px;">值:0.2%;限值:≤1%</span>'],
+                                ]
+                              }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": tableData,title:"部门不合格样品率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getbaogaobuzhengque(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 94.5,title:"报告不正确率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getbaogaobuzhengqueB(){
+                        let tableData={
+                                header: ['<span></span>','<span style="font-size:14px;height:53px">临检组</span>', '<span style="font-size:14px;height:53px">生化组</span>', '<span style="font-size:14px;height:53px">免疫组</span>', '<span style="font-size:14px;height:53px">微生物组</span>', '<span style="font-size:14px;height:53px">流式组</span>', '<span style="font-size:14px;height:53px">细胞形态组</span>', '<span style="font-size:14px;height:53px">分子组</span>', '<span style="font-size:14px;height:53px">遗传组</span>'],
+                                rowNum: 13,
+                                columnWidth: [90,150,150,150,150,150,150,150,150],
+                                align: ['left','center','center','center','center','center','center','center','center'],
+                                data: [
+                                  ['1月','<span style="font-size:10px;">值:1%;限值:=0%</span>', '<span style="font-size:10px;">值:0.31%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['2月','<span style="font-size:10px;">值:1%;限值:=0%</span>', '<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['3月','<span style="font-size:10px;">值:0%;限值:=0%</span>', '<span style="font-size:10px;">值:0.31%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['4月','<span style="font-size:10px;">值:0%;限值:=0%</span>', '<span style="font-size:10px;">值:0.6%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['5月','<span style="font-size:10px;">值:0%;限值:=0%</span>', '<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['6月','<span style="font-size:10px;">值:4%;限值:=0%</span>', '<span style="font-size:10px;">值:0.31%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['7月','<span style="font-size:10px;">值:0%;限值:=0%</span>', '<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['8月','<span style="font-size:10px;">值:0%;限值:=0%</span>', '<span style="font-size:10px;">值:0.31%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['9月','<span style="font-size:10px;">值:0%;限值:=0%</span>', '<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['10月','<span style="font-size:10px;">值:2%;限值:=0%</span>', '<span style="font-size:10px;">值:0.2%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['11月','<span style="font-size:10px;">值:3%;限值:=0%</span>', '<span style="font-size:10px;">值:0.31%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  ['12月','<span style="font-size:10px;">值:0%;限值:=0%</span>', '<span style="font-size:10px;">值:0.31%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>','<span style="font-size:10px;">值:0;限值:=0%</span>','<span style="font-size:10px;">值:3%;限值:=0%</span>','<span style="font-size:10px;">值:1.2%;限值:=0%</span>','<span style="font-size:10px;">值:0.7%;限值:=0%</span>','<span style="font-size:10px;">值:0%;限值:=0%</span>'],
+                                  
+                                ]
+                              }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": tableData,title:"部门报告不正确率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getweijizhibaogao(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 50,"title":"危急值报告率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getweijizhibaogaoB(){
+                        let title = ['NAME_','numA']
+                        let a = [91,94,100,100,100,98,99.7,100,97.3,100,93,90]
+                        let mid = JSON.parse(JSON.stringify(this.bfBuMen))
+                        for (let i = 0; i < mid.length; i++) {
+                                // let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[i].numA = a[i]
+                                // mid[midI].num = this.bufuheObj[i].num
+                                // mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                // mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"部门危急值报告率","limitVal":"100","limitValZ":"=100%"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getweijizhijishi(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 16.5,"title":"危急值报告及时率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getweijizhijishiB(){
+                        let title = ['NAME_','numA']
+                        let a = [91,98,99.7,100,97.3,100,93,94,100,100,100,100]
+                        let mid = JSON.parse(JSON.stringify(this.bfBuMen))
+                        for (let i = 0; i < mid.length; i++) {
+                                // let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[i].numA = a[i]
+                                // mid[midI].num = this.bufuheObj[i].num
+                                // mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                // mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"部门危急值报告率","limitVal":"100","limitValZ":"=100%"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getsysnzzsjfh(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 89.2,title:"实验室内周转时间符合率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getsysnzzsjfhB(){
+                        let tableData={
+                                header: ['<span></span>','<span style="font-size:14px;height:53px">临检组</span>', '<span style="font-size:14px;height:53px">生化组</span>', '<span style="font-size:14px;height:53px">免疫组</span>', '<span style="font-size:14px;height:53px">微生物组</span>', '<span style="font-size:14px;height:53px">流式组</span>', '<span style="font-size:14px;height:53px">细胞形态组</span>', '<span style="font-size:14px;height:53px">分子组</span>', '<span style="font-size:14px;height:53px">遗传组</span>'],
+                                rowNum: 13,
+                                columnWidth: [90,150,150,150,150,150,150,150,150],
+                                align: ['left','center','center','center','center','center','center','center','center'],
+                                data: [
+                                  ['1月','<span style="font-size:10px;">值:96%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:91%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>'],
+                                  ['2月','<span style="font-size:10px;">值:96%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>'],
+                                  ['3月','<span style="font-size:10px;">值:97%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>'],
+                                  ['4月','<span style="font-size:10px;">值:96%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:95%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:95%;限值:>95%</span>','<span style="font-size:10px;">值:90%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>'],
+                                  ['5月','<span style="font-size:10px;">值:98%;限值:>95%</span>', '<span style="font-size:10px;">值:95%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:90%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:90%;限值:>95%</span>'],
+                                  ['6月','<span style="font-size:10px;">值:94%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>'],
+                                  ['7月','<span style="font-size:10px;">值:92%;限值:>95%</span>', '<span style="font-size:10px;">值:95%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:95%;限值:>95%</span>','<span style="font-size:10px;">值:91%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:90%;限值:>95%</span>'],
+                                  ['8月','<span style="font-size:10px;">值:96%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:95%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:95%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>'],
+                                  ['9月','<span style="font-size:10px;">值:96%;限值:>95%</span>', '<span style="font-size:10px;">值:96%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:89%;限值:>95%</span>'],
+                                  ['10月','<span style="font-size:10px;">值:86%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:98%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:89%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>'],
+                                  ['11月','<span style="font-size:10px;">值:97%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:94%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:98%;限值:>95%</span>'],
+                                  ['12月','<span style="font-size:10px;">值:90%;限值:>95%</span>', '<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:90%;限值:>95%</span>','<span style="font-size:10px;">值:97%;限值:>95%</span>','<span style="font-size:10px;">值:93%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>','<span style="font-size:10px;">值:92%;限值:>95%</span>','<span style="font-size:10px;">值:99%;限值:>95%</span>'],
+                                  
+                                  
+                                ]
+                              }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": tableData,title:"部门实验室内周转时间符合率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getjyqzzzws(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 91.6,title:"检验前周转时间中位数"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getjyqzzzwsB(){
+                        let tableData={
+                                header: ['<span></span>','<span style="font-size:14px;height:53px">临检组</span>', '<span style="font-size:14px;height:53px">生化组</span>', '<span style="font-size:14px;height:53px">免疫组</span>', '<span style="font-size:14px;height:53px">微生物组</span>', '<span style="font-size:14px;height:53px">流式组</span>', '<span style="font-size:14px;height:53px">细胞形态组</span>', '<span style="font-size:14px;height:53px">分子组</span>', '<span style="font-size:14px;height:53px">遗传组</span>'],
+                                rowNum: 13,
+                                columnWidth: [90,150,150,150,150,150,150,150,150],
+                                align: ['left','center','center','center','center','center','center','center','center'],
+                                data: [
+                                  ['1月','<span style="font-size:10px;">值:119;限值:≤120分钟</span>', '<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:111;限值:≤120分钟</span>','<span style="font-size:10px;">值:90;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                  ['2月','<span style="font-size:10px;">值:119;限值:≤120分钟</span>', '<span style="font-size:10px;">值:123;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                  ['3月','<span style="font-size:10px;">值:126;限值:≤120分钟</span>', '<span style="font-size:10px;">值:123;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                  ['4月','<span style="font-size:10px;">值:119;限值:≤120分钟</span>', '<span style="font-size:10px;">值:123;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:120;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:128;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                  ['5月','<span style="font-size:10px;">值:119;限值:≤120分钟</span>', '<span style="font-size:10px;">值:125;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:156;限值:≤120分钟</span>'],
+                                  ['6月','<span style="font-size:10px;">值:111;限值:≤120分钟</span>', '<span style="font-size:10px;">值:123;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:111;限值:≤120分钟</span>','<span style="font-size:10px;">值:110;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                  ['7月','<span style="font-size:10px;">值:119;限值:≤120分钟</span>', '<span style="font-size:10px;">值:114;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:99;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                  ['8月','<span style="font-size:10px;">值:109;限值:≤120分钟</span>', '<span style="font-size:10px;">值:123;限值:≤120分钟</span>','<span style="font-size:10px;">值:118;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:114;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                  ['9月','<span style="font-size:10px;">值:119;限值:≤120分钟</span>', '<span style="font-size:10px;">值:123;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:140;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:156;限值:≤120分钟</span>'],
+                                  ['10月','<span style="font-size:10px;">值:119;限值:≤120分钟</span>', '<span style="font-size:10px;">值:103;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:105;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                  ['11月','<span style="font-size:10px;">值:123;限值:≤120分钟</span>', '<span style="font-size:10px;">值:123;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:121;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:106;限值:≤120分钟</span>'],
+                                  ['12月','<span style="font-size:10px;">值:119;限值:≤120分钟</span>', '<span style="font-size:10px;">值:123;限值:≤120分钟</span>','<span style="font-size:10px;">值:109;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:100;限值:≤120分钟</span>','<span style="font-size:10px;">值:135;限值:≤120分钟</span>','<span style="font-size:10px;">值:104;限值:≤120分钟</span>','<span style="font-size:10px;">值:126;限值:≤120分钟</span>'],
+                                ]
+                              }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": tableData,title:"部门检验前周转时间中位数"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getbshineizhikong(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 83.5,"title":"室内质控评达标率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getbshineizhikongB(){
+                        let title = ['NAME_','numA']
+                        let a = [91,98,99.7,100,100,100,100,97.3,67,93,94,100]
+                        let mid = JSON.parse(JSON.stringify(this.bfBuMen))
+                        for (let i = 0; i < mid.length; i++) {
+                                // let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[i].numA = a[i]
+                                // mid[midI].num = this.bufuheObj[i].num
+                                // mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                // mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"部门室内质控评达标率","limitVal":"95","limitValZ":"≥95%"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getshijianzhiping(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 33,"title":"室间质评合格率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getshijianzhipingB(){
+                        let title = ['NAME_','numA']
+                        let a = [91,67.9,99.7,89,88.8,90,87,97.3,67,93,94,100]
+                        let mid = JSON.parse(JSON.stringify(this.bfBuMen))
+                        for (let i = 0; i < mid.length; i++) {
+                                // let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[i].numA = a[i]
+                                // mid[midI].num = this.bufuheObj[i].num
+                                // mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                // mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"部门室间质评合格率","limitVal":"95","limitValZ":"≥95%"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getshiyanshibidui(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 100,"title":"实验室间比对率（无室间质评项目）"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getshiyanshibiduiB(){
+                        let title = ['NAME_','numA']
+                        let a = [91,67.9,99.7,89,88.8,90,87,97.3,67,93,94,100]
+                        let mid = JSON.parse(JSON.stringify(this.bfBuMen))
+                        for (let i = 0; i < mid.length; i++) {
+                                // let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[i].numA = a[i]
+                                // mid[midI].num = this.bufuheObj[i].num
+                                // mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                // mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"部门实验室间比对率（无室间质评项目）","limitVal":"50","limitValZ":"≥50%"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getshebeibuliang(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 16.5,"title":"设备不良事件上报时限符合率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getshebeibuliangB(){
+                        let title = ['NAME_','numA']
+                        let a = [91,67.9,99.7,89,88.8,90,87,97.3,67,93,94,100]
+                        let mid = JSON.parse(JSON.stringify(this.bfBuMen))
+                        for (let i = 0; i < mid.length; i++) {
+                                // let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[i].numA = a[i]
+                                // mid[midI].num = this.bufuheObj[i].num
+                                // mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                // mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"部门设备不良事件上报时限符合率","limitVal":"100","limitValZ":"=100%"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getkehumanyi(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 56.25,"title":"客户满意率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getkehumanyiB(){
+                        let title = ['NAME_','numA','num']
+                        let a = [91,67.9,99.7,89,88.8,90,87,97.3,67,93,94,100]
+                        let b = [87,97.3,67,93,94,100,91,67.9,99.7,89,88.8,90]
+                        let mid = JSON.parse(JSON.stringify(this.bfBuMen))
+                        for (let i = 0; i < mid.length; i++) {
+                                // let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[i].numA = a[i]
+                                mid[i].num = b[i]
+                                // mid[midI].num = this.bufuheObj[i].num
+                                // mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                // mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"部门客户满意率","limitVal":"90","limitValZ":"≥90%"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getygcjpxcsdb(){
+                        // let ryywpxjNum = this.fengxianObj
+                        // let barData = []
+                        // let e=0
+                        // if (ryywpxjNum[0].num===0) {
+                        //         e =0
+                        //  } else {
+                        //         e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
+                        // }
+                        return {
+                                "num" :{"date": this.endDate,"number": 0, "numberAll": 0, "res": [],"val": 75,"title":"员工参加培训次数达标率"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                getygcjpxcsdbB(){
+                        let title = ['NAME_','numA']
+                        let a = [67,93,94,100,91,67.9,99.7,89,88.8,90,87,97.3]
+                        let b = [91,67.9,99.7,89,88.8,90,87,97.3,67,93,94,100]
+                        let mid = JSON.parse(JSON.stringify(this.bfBuMen))
+                        for (let i = 0; i < mid.length; i++) {
+                                // let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
+                                mid[i].numA = a[i]
+                                // mid[i].num = b[i]
+                                // mid[midI].num = this.bufuheObj[i].num
+                                // mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                // mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                        }
+                        return {
+                                "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"部门员工参加培训次数达标率","limitVal":"80","limitValZ":"≧80%"},
+                                "config":this.getMyConfig("内部质量") //返回需要的对应参数
+                        }
+                },
+                
                 
                 
 

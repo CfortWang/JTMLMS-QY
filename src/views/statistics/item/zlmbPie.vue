@@ -36,7 +36,7 @@
       },
       id:{
         type:String,
-        default:"s15tousu"
+        default:"zlmbPie"
       },
       click:{
         type:String,
@@ -68,32 +68,12 @@
        }
       },
       drawLine(){
-
-        // let beginInof = Number(this.data.t_complaintBegin.number)
-        // let endInof = Number(this.data.t_complaintEnd.number)
-        let s15tousu = echarts.init(document.getElementById(this.id))
-        // let beingDate=this.data.t_complaintBegin.date
-        // let endDate=this.data.t_complaintEnd.date
+        let zlmbPie = echarts.init(document.getElementById(this.id))
         let option;
-        //v2
-        // let that = this
-        // for (let i = 0; i < that.data.t_complaintNum.date.length; i++) {
-        //   let result = 0
-        //   if(that.data.t_mjwtsqbNum.number[i] === 0){
-        //     result = Math.floor(that.data.t_complaintNum.number[i]/1 * 10000) / 100
-        //   }else{
-        //     result = Math.floor(that.data.t_complaintNum.number[i]/that.data.t_mjwtsqbNum.number[i] * 10000) / 100
-        //   }
-        //   that.measured.push(result)
-        //   // console.log(that.data.t_complaintNum.number[i], that.data.t_mjwtsqbNum.number[i], result, 'res')
-        // }
-        //v3
-        //  let e=[this.data.t_complaintNum.number[0],this.data.t_complaintNum.numberAll[0],this.data.t_complaintNum.res[0]]
-        let e = 100-this.data.t_complaintNum.val
+        let e = 100-this.data.num.val
         option = {
           title: {
-            text: this.data.t_complaintNum.title,
-            // subtext: 'Fake Data',
+            text: this.data.num.title,
             left: 'left',
             textStyle:{ fontSize:14,color: this.colorw }
           },
@@ -110,7 +90,7 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.t_complaintNum.val, name: '完成率' },
+                { value: this.data.num.val, name: '完成率' },
                 { value: e, name: '未完成率' }
               ],
               emphasis: {
@@ -124,13 +104,13 @@
           ]
        };
 
-       option && s15tousu.setOption(option);
+       option && zlmbPie.setOption(option);
       }
     }
   }
 </script>
 <style scoped>
-  #s15tousu:hover{
+  #zlmbPie:hover{
     transition: all 0.5s;
     transform:scale(1.03);
   }

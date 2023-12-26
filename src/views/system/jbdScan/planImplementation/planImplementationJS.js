@@ -33,6 +33,7 @@ export default {
                         min: 0,
                         max: 100,
                         animationDuration: 3000,
+                        center: ['50%', '65%'],
                         axisLine: {
                             lineStyle: {
                                 width: 30,
@@ -87,7 +88,7 @@ export default {
             accept.setOption(JSON.parse(JSON.stringify(option)))
             // this.show1 = true
         },
-        barDataPlan (data, rightShow) {
+        barDataPlan (data, rightShow, direction) {
             let barDataTy = null
             if (!rightShow) {
                 data.series.forEach(item => {
@@ -98,6 +99,25 @@ export default {
                         focus: 'series'
                     }
                 })
+                const xAxis = {
+                    type: 'value',
+                    name: data.xAxisName || '数量（个）',
+                    minInterval: 1,
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }
+                const yAxis = {
+                    type: 'category',
+                    name: data.yAxisName || '部门',
+                    nameTextStyle: {
+                        fontSize: 14
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                    data: data.yAxisData
+                }
                 barDataTy = {
                     // 图例设置
                     legend: {
@@ -118,25 +138,8 @@ export default {
                         left: '50%',
                         top: '20px'
                     },
-                    xAxis: {
-                        type: 'value',
-                        name: data.xAxisName || '数量（个）',
-                        minInterval: 1,
-                        axisTick: {
-                            alignWithLabel: true
-                        }
-                    },
-                    yAxis: {
-                        type: 'category',
-                        name: data.yAxisName || '部门',
-                        nameTextStyle: {
-                            fontSize: 14
-                        },
-                        splitLine: {
-                            show: false
-                        },
-                        data: data.yAxisData
-                    },
+                    xAxis: direction === 'x' ? yAxis : xAxis,
+                    yAxis: direction === 'x' ? xAxis : yAxis,
                     series: data.series,
                     color: data.color,
                     tooltip: data.tooltip || this.tooltip

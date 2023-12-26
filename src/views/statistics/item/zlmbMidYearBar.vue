@@ -16,9 +16,8 @@
 
 <script>
   import echarts from 'echarts'
+  import dialogView from '../properties/s8sheBeiHeChaPro.vue'
   import {GetPercent,GetMax} from  '../js/config.js'
-  import dialogView from '../properties/s5renYuanJianDuPro.vue'
-
   export default {
     components:{
       dialogView
@@ -37,7 +36,7 @@
       },
       id:{
         type:String,
-        default:"s5renyuanJianDufb"
+        default:"s8sheBeiHeChafb"
       },
       click:{
         type:String,
@@ -54,7 +53,7 @@
     },
     data () {
       return {
-        title:'岗前培训各部门完成率',
+        title:'',
         dialogOff:false,
       }
     },
@@ -72,33 +71,46 @@
        }
       },
       drawLine(){
-        let s5renYuanJianDucol = echarts.init(document.getElementById(this.id))
-        let that = this
+        let s8sheBeiHeChacol = echarts.init(document.getElementById(this.id))
         let option;
+        let that = this
         let barColor = ['#00CCFF','#33FF00','#FF0000','#FFBF00','#097969','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333','#FF4433','	#9F2B68','#C9A9A6','#C3B1E1','#880808','#097969','#89CFF0','#5D3FD3','	#FBCEB1','#E49B0F','#ECFFDC','#A52A2A','#D27D2D','#FFBF00','#A0522D','#FF00FF','#FFB6C1','#F89880','#D8BFD8','#5D3FD3','#770737','#DA70D6']
         let barNum = []
         for (let i = 0; i < this.data.num.title.length-1; i++) {
-          if(i==this.data.num.title.length-3){
+          // if(i==this.data.num.title.length-3){
+          //   barNum.push({
+          //     type: 'bar',
+          //     itemStyle: {color: barColor[i]},
+          //     label:{
+          //       show: true,
+				  //       formatter:function(params){ //标签内容
+          //         let str = that.direction=='x'?params.value[params.seriesName]+' '+params.data.chu+'%':params.data.chu+'%\n'+params.value[params.seriesName]
+					//         return str
+					//       },
+          //       position: this.direction=='x'?'right':'top',
+          //       textStyle:{
+          //           fontSize:8,
+          //           color:'#B0CEFC'
+          //         }
+          //     }
+          //   })
+          // }else{
             barNum.push({
               type: 'bar',
               itemStyle: {color: barColor[i]},
-              label:{
-                show: true,
-				        formatter:function(params){ //标签内容
-                  let str = that.direction=='x'?params.value[params.seriesName]+' '+params.data.chu+'%':params.data.chu+'%\n'+params.value[params.seriesName]
-					        return str
-					      },
-                position: this.direction=='x'?'right':'top',
-                textStyle:{
-                    fontSize:8,
-                    color:'#B0CEFC'
+              barWidth:40,
+              markLine: {
+                symbol: ['none', 'none'], // 去掉箭头
+                data: [
+                  {
+                    name: '阈值',
+                    yAxis: this.data.num.limitVal
                   }
-              }
-            })
-          }else{
-            barNum.push({
-              type: 'bar',
-              itemStyle: {color: barColor[i]},
+                ],
+                lineStyle: {
+                  color: barColor[i]
+                }
+              },
               label:{
                 normal:{
                   show:true,
@@ -110,8 +122,9 @@
                   }
                 }
               }
+              
             })
-          }
+          // }
           
         }  
         let heng = { 
@@ -152,8 +165,9 @@
             }
           }
         option = {
-          title: {
-            text: this.title,
+            title: {
+            text: this.data.num.tutitle,
+            subtext: '限值：'+ this.data.num.limitValZ,
             textStyle:{ fontSize:14,color: this.colorw }
           },
           legend: {
@@ -166,9 +180,9 @@
                   if(name === 'wnum'){
                     return '未完成数量';
                   }else if(name === 'num'){
-                    return '已完成数量（完成率）';
+                    return '下半年百分比';
                   }else if(name === 'numA'){
-                    return '计划数量';
+                    return '上半年百分比';
                   }
                     
                 }
@@ -198,14 +212,13 @@
           ],
        
         };
-
-        option && s5renYuanJianDucol.setOption(option);
+       option && s8sheBeiHeChacol.setOption(option);
       }
     }
   }
 </script>
 <style scoped>
-  #s5renyuanJianDu:hover{
+  #s8sheBeiHeCha:hover{
     transition: all 0.5s;
     transform:scale(1.03);
   }

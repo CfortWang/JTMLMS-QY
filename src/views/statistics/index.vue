@@ -154,9 +154,141 @@
 
             </div>
           </div> -->
-          
-          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+1">
-            <div class="ttitle" style="text-align: center;">人员培训与管理</div>
+          <div class="ttitle" style="text-align: center;height:0.8%" v-if="pageOT<7">一、质量目标</div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==1">
+            <div class="ttitle" style="text-align: center;">不合格样品率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <!-- <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+                v-if="zaigangrenyuan.length>0&&(showAll || showComponents[24])" :data = "getbuhegeyangpin()"/> -->
+              <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'bhgyp'"
+                v-if="showAll ||showComponents[24]" :data = "getbuhegeyangpin()"/>
+              <buhegeyangpinBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'bhgypb'"
+                v-if="showAll || showComponents[25]" :data = "getbuhegeyangpinB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <dv-decoration-10 style="height:0.5%;width:98%;margin-top:1%;margin-right:1%;margin-left:1%;"  v-if="pageOT==1"/>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==1">
+            <div class="ttitle" style="text-align: center;">报告不正确率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <baogaobuzhengquePie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'bgbhg'"
+                v-if="showAll ||showComponents[26]" :data = "getbaogaobuzhengque()"/>
+              <baogaobuzhengqueBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'bhgypb'"
+                v-if="showAll || showComponents[27]" :data = "getbaogaobuzhengqueB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==2">
+            <div class="ttitle" style="text-align: center;">危急值报告达标率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <weijizhibaogaoPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'wjzbg'"
+                v-if="showAll ||showComponents[28]" :data = "getweijizhibaogao()"/>
+              <weijizhibaogaoBar style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'wjzbgb'"
+                v-if="showAll || showComponents[29]" :data = "getweijizhibaogaoB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <weijizhijishiPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'wjzbgjs'"
+                v-if="showAll ||showComponents[30]" :data = "getweijizhijishi()"/>
+              <weijizhijishiBar style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'wjzbgjsb'"
+                v-if="showAll || showComponents[31]" :data = "getweijizhijishiB()"/>
+                <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="gangqianpeixunfb.length<=0&&(showAll || showComponents[4])">暂无数据</div> -->
+                <div class="clear"></div>
+            </div>
+          </div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==3">
+            <div class="ttitle" style="text-align: center;">TAT符合率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <sysnzzsjfhPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sysnzzsjfh'"
+                v-if="showAll ||showComponents[32]" :data = "getsysnzzsjfh()"/>
+              <sysnzzsjfhBar style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sysnzzsjfhb'"
+                v-if="showAll || showComponents[33]" :data = "getsysnzzsjfhB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <jyqzzzwsPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'jyqzzzws'"
+                v-if="showAll ||showComponents[34]" :data = "getjyqzzzws()"/>
+              <jyqzzzwsBar style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'jyqzzzwsb'"
+                v-if="showAll || showComponents[35]" :data = "getjyqzzzwsB()"/>
+                <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="gangqianpeixunfb.length<=0&&(showAll || showComponents[4])">暂无数据</div> -->
+                <div class="clear"></div>
+            </div>
+          </div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==4">
+            <div class="ttitle" style="text-align: center;">室内质控评达标率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <!-- <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+                v-if="zaigangrenyuan.length>0&&(showAll || showComponents[24])" :data = "getbuhegeyangpin()"/> -->
+              <bshineizhikongPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'snzk'"
+                v-if="showAll ||showComponents[36]" :data = "getbshineizhikong()"/>
+              <bshineizhikongBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'snzkb'"
+                v-if="showAll || showComponents[37]" :data = "getbshineizhikongB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <dv-decoration-10 style="height:0.5%;width:98%;margin-top:1%;margin-right:1%;margin-left:1%;"  v-if="pageOT==4"/>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==4">
+            <div class="ttitle" style="text-align: center;">室间质评合格率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <shijianzhipingPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sjzp'"
+                v-if="showAll ||showComponents[38]" :data = "getshijianzhiping()"/>
+              <shijianzhipingBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sjzpb'"
+                v-if="showAll || showComponents[39]" :data = "getshijianzhipingB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==5">
+            <div class="ttitle" style="text-align: center;">实验室间比对率（无室间质评项目）</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <!-- <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+                v-if="zaigangrenyuan.length>0&&(showAll || showComponents[24])" :data = "getbuhegeyangpin()"/> -->
+              <shiyanshibiduiPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sysjbd'"
+                v-if="showAll ||showComponents[40]" :data = "getshiyanshibidui()"/>
+              <shiyanshibiduiBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sysjbdb'"
+                v-if="showAll || showComponents[41]" :data = "getshiyanshibiduiB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <dv-decoration-10 style="height:0.5%;width:98%;margin-top:1%;margin-right:1%;margin-left:1%;"  v-if="pageOT==5"/>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==5">
+            <div class="ttitle" style="text-align: center;">设备不良事件上报时限符合率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <shebeibuliangPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sbbl'"
+                v-if="showAll ||showComponents[42]" :data = "getshebeibuliang()"/>
+              <shebeibuliangBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sbblb'"
+                v-if="showAll || showComponents[43]" :data = "getshebeibuliangB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==6">
+            <div class="ttitle" style="text-align: center;">客户满意率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <!-- <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
+                v-if="zaigangrenyuan.length>0&&(showAll || showComponents[24])" :data = "getbuhegeyangpin()"/> -->
+              <kehumanyiPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'khmy'"
+                v-if="showAll ||showComponents[44]" :data = "getkehumanyi()"/>
+              <kehumanyiBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'khmyb'"
+                v-if="showAll || showComponents[45]" :data = "getkehumanyiB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <dv-decoration-10 style="height:0.5%;width:98%;margin-top:1%;margin-right:1%;margin-left:1%;"  v-if="pageOT==6"/>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==6">
+            <div class="ttitle" style="text-align: center;">员工参加培训次数达标率</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <ygcjpxcsdbPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'ygcjpxcsdb'"
+                v-if="showAll ||showComponents[46]" :data = "getygcjpxcsdb()"/>
+              <ygcjpxcsdbBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'ygcjpxcsdbb'"
+                v-if="showAll || showComponents[47]" :data = "getygcjpxcsdbB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+7">
+            <div class="ttitle" style="text-align: center;">三、人员培训与管理</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
               <s4renYuanPeiXun style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="zaigangrenyuan.length>0&&(showAll || showComponents[1])" :data = "getS4renYuanPeiXun()"/>
@@ -176,8 +308,8 @@
             </div>
           </div>
           <!-- <dv-decoration-10 style="height:0.5%;width:98%;margin-top:1%;margin-right:1%;margin-left:1%;"  v-if="pageOT==1"/> -->
-          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+2">
-            <div class="ttitle" style="text-align: center;">设备维保</div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+8">
+            <div class="ttitle" style="text-align: center;">四、设备维保</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s7sheBeiJiaoZhun style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[5]" :data = "getJiaoYanObjNum()"/>
@@ -192,9 +324,9 @@
                 <div class="clear"></div>
             </div>
           </div>
-          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+3">
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+9">
 
-            <div class="ttitle" style="text-align: center;">质量管理</div>
+            <div class="ttitle" style="text-align: center;">五、质量管理</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s9neiBuZhiLiang style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[9]" :data = "getS9neiBuZhiLiang()"/>
@@ -210,9 +342,9 @@
                 <div class="clear"></div>
             </div>
           </div> 
-          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+4">
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+10">
 
-            <div class="ttitle" style="text-align: center;">质量管理</div>
+            <div class="ttitle" style="text-align: center;">五、质量管理</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s15tousu style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="showAll || showComponents[13]" :data = "getS3tousu()"/>
@@ -228,9 +360,20 @@
                 <div class="clear"></div>
             </div>
           </div> 
-          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+5">
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==pageAll+11">
+            <div class="ttitle" style="text-align: center;">五、质量管理</div>
+            <div class="componentsData" style="height:87%" v-if="relOf">
+              <shijiazhipinjihuaPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sjzpjh'"
+                v-if="showAll ||showComponents[46]" :data = "getshijiazhipinjihua()"/>
+              <shijiazhipinjihuaBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sjzpjhb'"
+                v-if="showAll || showComponents[47]" :data = "getshijiazhipinjihuaB()"/>
+              <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
+              <div class="clear"></div>
+            </div>
+          </div>
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+12">
 
-            <div class="ttitle" style="text-align: center;">质量管理</div>
+            <div class="ttitle" style="text-align: center;">五、质量管理</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s2manYiDu style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw" 
                 v-if="showAll || showComponents[17]"  :data = "getS2manYiDu()"/>
@@ -243,9 +386,9 @@
                 <div class="clear"></div>
             </div>
           </div> 
-          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+6">
+          <div class="congxiebox7" style="display:inline-block;width:98%;margin-top:2%;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==pageAll+13">
 
-            <div class="ttitle" style="text-align: center;">质量管理</div>
+            <div class="ttitle" style="text-align: center;">五、质量管理</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
                 <s1zhiLiangMuBiao style="height:50%" :width="static=='row' ? '25%': '100%'" :colorw = "colorw" 
                 v-if="showAll || showComponents[21]" :data = "getS1renwu()"/>
@@ -279,9 +422,10 @@
             <div  style="display:inline-block;margin:1% 1%; height:100%;width:98%;" >
               <div class="ttitle" style="text-align: center;height:3%">{{showFenZu.title}}质量指标</div>
               <div class="componentsData" style="height:90%" v-if="relOf"> -->
-          <div style="height:90%;margin-top:1%"  v-show="pageOT<pageAll+1">
+          <div style="height:90%;margin-top:1%"  v-if="pageOT>6&&pageOT<pageAll+7">
             <div  style="display:inline-block; height:100%;width:100%;" >
-              <div class="ttitle" style="text-align: center;height:0.8%">{{showFenZu.title||''}}质量指标</div>
+              <div class="ttitle" style="text-align: center;height:1.2%">二、质量指标</div>
+              <div class="ttitle" style="text-align: center;height:1.2%">{{showFenZu.title||''}}</div>
               <div class="componentsData" style="height:100%" v-if="relOf">
                   <!-- 
                   <s1jianCe :height="'290%'" :width="static=='row' ? '19.5%': '100%'" :colorw = "colorw" :mubiao = "quality[1].val"
@@ -362,6 +506,35 @@
   import s15tousuCol from './item/s15tousuCol.vue'
   import s16bzJunZhu from './item/s16bzJunZhuCol2.vue'
   import s17bzXiBao from './item/s17bzXiBao.vue'
+  import buhegeyangpinPie from './item/zlmbPie.vue'
+  import buhegeyangpinBar from './item/zlmbMonthBar.vue'
+  import baogaobuzhengqueBar from './item/zlmbMonthBar.vue'
+  import baogaobuzhengquePie from './item/zlmbPie.vue'
+  import weijizhibaogaoPie from './item/zlmbPie.vue'
+  import weijizhibaogaoBar from './item/zlmbYearBar.vue'
+  import weijizhijishiBar from './item/zlmbYearBar.vue'
+  import weijizhijishiPie from './item/zlmbPie.vue'
+  import sysnzzsjfhPie from './item/zlmbPie.vue'
+  import sysnzzsjfhBar from './item/zlmbMonthBar.vue'
+  import jyqzzzwsPie from './item/zlmbPie.vue'
+  import jyqzzzwsBar from './item/zlmbMonthBar.vue'
+  import bshineizhikongPie from './item/zlmbPie.vue'
+  import bshineizhikongBar from './item/zlmbYearBar.vue'
+  import shijianzhipingPie from './item/zlmbPie.vue'
+  import shijianzhipingBar from './item/zlmbYearBar.vue'
+  import shiyanshibiduiPie from './item/zlmbPie.vue'
+  import shiyanshibiduiBar from './item/zlmbYearBar.vue'
+  import shebeibuliangPie from './item/zlmbPie.vue'
+  import shebeibuliangBar from './item/zlmbYearBar.vue'
+  import kehumanyiPie from './item/zlmbPie.vue'
+  import kehumanyiBar from './item/zlmbMidYearBar.vue'
+  import ygcjpxcsdbPie from './item/zlmbPie.vue'
+  import ygcjpxcsdbBar from './item/zlmbYearBar.vue'
+  import shijiazhipinjihuaPie from './item/s15tousu.vue'
+  import shijiazhipinjihuaBar from './item/s15tousuCol.vue'
+  
+  
+  
 
   // import container from '@/views/system/jbdHome/qualityTarget/components/container.vue'
   // import container from './components/container.vue'
@@ -408,7 +581,33 @@
       s15tousuCol,
       s16bzJunZhu,
       s17bzXiBao,
-      s11biaoZhunWucol
+      s11biaoZhunWucol,
+      buhegeyangpinPie,
+      buhegeyangpinBar,
+      baogaobuzhengquePie,
+      baogaobuzhengqueBar,
+      weijizhibaogaoPie,
+      weijizhibaogaoBar,
+      weijizhijishiBar,
+      weijizhijishiPie,
+      sysnzzsjfhPie,
+      sysnzzsjfhBar,
+      jyqzzzwsPie,
+      jyqzzzwsBar,
+      bshineizhikongPie,
+      bshineizhikongBar,
+      shijianzhipingPie,
+      shijianzhipingBar,
+      shiyanshibiduiPie,
+      shiyanshibiduiBar,
+      shebeibuliangPie,
+      shebeibuliangBar,
+      kehumanyiPie,
+      kehumanyiBar,
+      ygcjpxcsdbPie,
+      ygcjpxcsdbBar,
+      shijiazhipinjihuaPie,
+      shijiazhipinjihuaBar
     },
     props:{
     shows:{ //传入的内容显示序号
@@ -542,6 +741,7 @@
         pageAll:0,
         fadeinout:true,
         allBuMen:[],
+        bfBuMen:[],
         showFenZu:[],
         tableData:{
           header: ['<span style="font-size:16px;height:53px">质量指标</span>', '<span style="font-size:16px;height:53px">百分比/数量</span>'],
@@ -549,7 +749,24 @@
           columnWidth: [600, 400],
           align: ['left','right'],
           data: [
-            // ['行1列1', '行1列2', '行1列3'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
+            // ['行1列1', '行1列2'],
           ]
         },
         tableData1:{
@@ -579,7 +796,7 @@
       },
       getqualityData() {
         let pos = this.$store.getters.level.second?this.$store.getters.level.second:this.$store.getters.level.first
-        let sql="select id_,name_ from ibps_party_entity where name_ like '%组' and name_ NOT LIKE '%综合%' and name_ NOT LIKE '%质量%' and name_ NOT LIKE '%科研%'  and name_ NOT LIKE '%教学%' and PATH_ like '%"+pos+"%'"
+        let sql="select id_,name_ from ibps_party_entity where name_ like '%组' and name_ NOT LIKE '%助理%' and name_ NOT LIKE '%样品%' and name_ NOT LIKE '%急诊%' and name_ NOT LIKE '%综合%' and name_ NOT LIKE '%质量%' and name_ NOT LIKE '%科研%'  and name_ NOT LIKE '%教学%' and PATH_ like '%"+pos+"%'"
         let sql1="select id_,name_ from ibps_party_entity where name_ like '%组' and PATH_ like '%"+pos+"%'"
         
         Promise.all([repostCurd('sql', sql),repostCurd('sql', sql1)]).then(([response,response1]) => {
@@ -605,6 +822,10 @@
           for (let i = 0; i < this.quality1.length; i++) {
             let mid = {'NAME_':this.quality1[i].name_,'numA':0,'num':0,'wnum':0,'chu':0}
             this.allBuMen.push(mid)
+          }
+          for (let i = 0; i < this.quality.length; i++) {
+            let mid = {'NAME_':this.quality[i].name_,'numA':0,'num':0,'wnum':0,'chu':0}
+            this.bfBuMen.push(mid)
           }
           // console.log(this.allBuMen,'2434465565665656rterterte')
           // if(this.bumen != ''){
@@ -657,8 +878,8 @@
                         let changeArr = ['<span style="font-size:14px;height:45px;line-height:45px;display:inline-block">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;line-height:45px;display:inline-block">' + arr[j].location.toFixed(2) + '</span>']
                         // aa.push(changeArr)
                         let changeArr1 = ['<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_liang_zhi_bia + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].ji_suan_gong_shi_ + '</span>','<span style="font-size:14px;height:45px;display:inline-block;">' + arr[j].zhi_biao_xian_zhi + '</span>']
-                        that.tableData.data.push(changeArr)
-                        that.tableData1.data.push(changeArr1)
+                        // that.tableData.data.push(changeArr)
+                        // that.tableData1.data.push(changeArr1)
                       }
                       let qqaa = response4.variables.data
                       that.fenzuzlmb= this.sortArr(qqaa,'bzbm')
@@ -978,27 +1199,46 @@
         // console.log(this.showFenZu,'678687678bjhjhjhk')
 
         clearInterval(this.timer1);
-        if(this.rollup == true){
-          this.fadeinout = false
-          this.timer1 = setInterval(()=>{
-            // console.log(Math.ceil(this.pageAll/2)+6,this.pageAll)
-            if(this.pageOT>=this.pageAll+6){
-              this.pageOT=1
+        this.fadeinout = false
+        this.timer1 = setInterval(()=>{
+          if(this.pageOT>=this.pageAll+13){
+            this.pageOT=1
 
-              this.showFenZu.title = this.zhiliangmuNeirong[0] !== undefined?this.zhiliangmuNeirong[0].name_:""
-              this.showFenZu.data = this.zhiliangmuNeirong[0] !== undefined?this.zhiliangmuNeirong[0].data:[]
-            }else{
-              this.pageOT = this.pageOT + 1
-              if(this.pageOT<this.pageAll){
-                // console.log(this.pageOT,this.pageOT-1,'uiououoiu')
-
-                this.showFenZu.title = this.zhiliangmuNeirong[this.pageOT-1] !== undefined?this.zhiliangmuNeirong[this.pageOT-1].name_:""
-                this.showFenZu.data = this.zhiliangmuNeirong[this.pageOT-1] !== undefined?this.zhiliangmuNeirong[this.pageOT-1].data:[]
-                
-              }
+            this.showFenZu.title = this.zhiliangmuNeirong[0] !== undefined?this.zhiliangmuNeirong[0].name_:""
+            this.showFenZu.data = this.zhiliangmuNeirong[0] !== undefined?this.zhiliangmuNeirong[0].data:[]
+          }else{
+            this.pageOT = this.pageOT + 1
+            if(this.pageOT>=7&&this.pageOT<this.pageAll+7){
+              this.showFenZu.title = this.zhiliangmuNeirong[this.pageOT-7] !== undefined?this.zhiliangmuNeirong[this.pageOT-7].name_:""
+              this.showFenZu.data = this.zhiliangmuNeirong[this.pageOT-7] !== undefined?this.zhiliangmuNeirong[this.pageOT-7].data:[]
             }
-          },4000)
-        }
+            
+          }
+          // console.log(this.showFenZu,this.showFenZu)
+        },4000)
+        this.rollup=true
+        // if(this.rollup == true){
+        //   this.fadeinout = false
+        //   this.timer1 = setInterval(()=>{
+        //     // console.log(Math.ceil(this.pageAll/2)+6,this.pageAll)
+        //     if(this.pageOT>=this.pageAll+6){
+        //       this.pageOT=1
+
+        //       this.showFenZu.title = this.zhiliangmuNeirong[0] !== undefined?this.zhiliangmuNeirong[0].name_:""
+        //       this.showFenZu.data = this.zhiliangmuNeirong[0] !== undefined?this.zhiliangmuNeirong[0].data:[]
+        //     }else{
+        //       this.pageOT = this.pageOT + 1
+        //       if(this.pageOT<this.pageAll){
+        //         // console.log(this.pageOT,this.pageOT-1,'uiououoiu')
+
+        //         this.showFenZu.title = this.zhiliangmuNeirong[this.pageOT-1] !== undefined?this.zhiliangmuNeirong[this.pageOT-1].name_:""
+        //         this.showFenZu.data = this.zhiliangmuNeirong[this.pageOT-1] !== undefined?this.zhiliangmuNeirong[this.pageOT-1].data:[]
+                
+        //       }
+        //     }
+        //     console.log(this.showFenZu,this.showFenZu)
+        //   },4000)
+        // }
         
         
       },
@@ -1177,17 +1417,19 @@
       rollcontinue(){
         this.fadeinout = false
         this.timer1 = setInterval(()=>{
-          if(this.pageOT>=this.pageAll+6){
+          if(this.pageOT>=this.pageAll+13){
             this.pageOT=1
 
             this.showFenZu.title = this.zhiliangmuNeirong[0] !== undefined?this.zhiliangmuNeirong[0].name_:""
             this.showFenZu.data = this.zhiliangmuNeirong[0] !== undefined?this.zhiliangmuNeirong[0].data:[]
           }else{
             this.pageOT = this.pageOT + 1
-
-            this.showFenZu.title = this.zhiliangmuNeirong[this.pageOT-1] !== undefined?this.zhiliangmuNeirong[this.pageOT-1].name_:""
-            this.showFenZu.data = this.zhiliangmuNeirong[this.pageOT-1] !== undefined?this.zhiliangmuNeirong[this.pageOT-1].data:[]
+            if(this.pageOT>=7&&this.pageOT<this.pageAll+7){
+              this.showFenZu.title = this.zhiliangmuNeirong[this.pageOT-7] !== undefined?this.zhiliangmuNeirong[this.pageOT-7].name_:""
+              this.showFenZu.data = this.zhiliangmuNeirong[this.pageOT-7] !== undefined?this.zhiliangmuNeirong[this.pageOT-7].data:[]
+            }
           }
+          // console.log(this.showFenZu,this.showFenZu)
         },4000)
         this.rollup=true
       },

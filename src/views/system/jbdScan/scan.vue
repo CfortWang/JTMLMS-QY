@@ -11,6 +11,7 @@ import deviceTag from './goods/deviceTag.vue'
 import deviceVerificationTag from './goods/deviceVerificationTag.vue'
 import deviceFailureTag from './goods/deviceFailureTag.vue'
 import neishenzhuangtai from './goods/neishenzhuangtai'
+import guanshenzhuangtai from './goods/guanshenzhuangtai'
 import bwTag from './goods/bwTag.vue'
 import fzrkTag from './goods/fzrkTag.vue'
 import kucuntag from './goods/kucuntag.vue'
@@ -21,6 +22,7 @@ export default {
         deviceVerificationTag,
         deviceFailureTag,
         neishenzhuangtai,
+        guanshenzhuangtai,
         bwTag,
         fzrkTag,
         kucuntag

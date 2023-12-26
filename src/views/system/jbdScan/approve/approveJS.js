@@ -257,7 +257,12 @@ export default {
                             top: '100%',
                             offsetCenter: [0, '75%']
                         },
-                        data: [{ value: totalMs, top: '100%' }]
+                        title: {
+                            offsetCenter: [0, '100%'],
+                            fontWeight: 'bold',
+                            fontSize: 20
+                        },
+                        data: [{ value: totalMs, name: '条款核查完成进度仪表盘', top: '100%' }]
                     }
                 ]
             }
@@ -301,7 +306,7 @@ export default {
                 },
                 yAxis: {
                     type: 'value',
-                    name: '数量（项目）',
+                    name: '条款核查数量',
                     minInterval: 1,
                     nameTextStyle: {
                         fontSize: 14
@@ -311,7 +316,7 @@ export default {
                     }
                 },
                 series: [{
-                    name: '总数',
+                    name: '计划条款总数',
                     type: 'bar',
                     barGap: 0,
                     emphasis: {
@@ -320,7 +325,7 @@ export default {
                     data: data4,
                     label: this.barLable
                 }, {
-                    name: '通过',
+                    name: '条款自查通过数',
                     type: 'bar',
                     barGap: 0,
                     emphasis: {
@@ -330,7 +335,7 @@ export default {
                     label: this.barLable
                 },
                 {
-                    name: '不符合',
+                    name: '自查未通过数',
                     type: 'bar',
                     barGap: 0,
                     emphasis: {

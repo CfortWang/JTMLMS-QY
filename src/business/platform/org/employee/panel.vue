@@ -150,7 +150,7 @@ export default {
             partyTypeOptions: this.$utils.isNotEmpty(this.customPartyTypeOptions) ? this.customPartyTypeOptions : partyTypeOptions,
             statusOptions: statusOptions,
             genderOptions: genderOptions,
-            partyType: this.$utils.isNotEmpty(this.customPartyTypeOptions) ? this.customPartyTypeOptions[0].value : 'org',
+            partyType: this.$utils.isNotEmpty(this.customPartyTypeOptions) ? this.customPartyTypeOptions[0].value : 'position',
             // inclueChild: true,
             partyId: '',
             treeDatas: [],
@@ -341,20 +341,27 @@ export default {
          * 获取查询条件格式化参数
          */
         getFormatParams (flag = '0') {
+            const storeGetters = this.$store.getters
             const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             const key = this.partyType === 'org' ? 'orgId' : this.partyType === 'position' ? 'positionId' : this.partyType === 'role' ? 'roleId' : this.partyType === 'group' ? 'groupId' : ''
+            const deptLists = storeGetters.deptList.map((m) => {
+                return m.positionId
+            })
             if (this.showTree) {
                 if (this.$utils.isNotEmpty(this.partyId) || this.currentOrgIdValue !== '') {
                     if (this.partyId !== 0 && this.partyId !== '0') {
                         params[key] = this.partyId === '' ? this.currentOrgIdValue : this.partyId
                     }
-
                     if (!this.partyId && this.partyTypeId === '2' && this.partyType === 'position') {
-                        const position = this.$store.getters.userInfo.employee.positions
+                        const position = storeGetters.userInfo.employee.positions
                         params.positionId = position
                     }
                 } else {
-                    params[key] = this.partyTypeId === '1' ? '' : this.partyTypeId
+                    if (this.partyType === 'position') {
+                        params[key] = this.partyTypeId ? (this.partyTypeId === '1' ? '' : this.partyTypeId) : deptLists.join(',')
+                    } else {
+                        params[key] = this.partyTypeId === '1' ? '' : this.partyTypeId
+                    }
                 }
             }
             if (this.seetingSearchPartyType === 'position') {

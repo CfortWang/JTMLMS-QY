@@ -2,10 +2,10 @@
  * 参与者属性
  */
 export const partyTypeOptions = [
-    {
-        value: 'org',
-        label: '机构'
-    },
+    // {
+    //     value: 'org',
+    //     label: '机构'
+    // },
     {
         value: 'position',
         label: '部门'
@@ -13,11 +13,11 @@ export const partyTypeOptions = [
     {
         value: 'role',
         label: '角色'
-    },
-    {
-        value: 'group',
-        label: '用户组'
     }
+    // {
+    //     value: 'group',
+    //     label: '用户组'
+    // }
 ]
 /**
  * 人员状态

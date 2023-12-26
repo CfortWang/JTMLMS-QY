@@ -19,7 +19,7 @@
                     <div>
                         <div class="tableTop">
                             <el-alert
-                                title="核查进度率"
+                                title="核查完成进度仪表"
                                 type="success"
                                 :description="description"
                                 :closable="false"

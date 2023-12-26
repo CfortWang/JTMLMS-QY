@@ -21,13 +21,16 @@
                 </div>
 
                 <el-row>
-                    <el-col :span="6">
+                    <el-col :span="5">
                         <div :style="{ height: height + 'px'}">
                             <div ref="chart1" class="chart" />
+                            <div class="leftContent">
+                                {{ generalData.leftData.leftContent || '' }}
+                            </div>
                         </div>
 
                     </el-col>
-                    <el-col :span="18">
+                    <el-col :span="19">
                         <div id="chart2" ref="chart2" class="chart2" :style="{ height: height + 'px'}" />
                     </el-col>
                 </el-row>
@@ -66,10 +69,12 @@ export default {
                 },
                 leftData: {
                     leftTotal: 0, // 左图数量
-                    title: '' // 左图标题，默认"完成率"
+                    title: '', // 左图标题，默认"完成率"
+                    leftContent: ''
                 },
                 rightCustomShow: false, // 右图自定义
                 rightData: {
+                    direction: 'x',
                     title: '人数', // 右图标题
                     xAxisName: '', // 右图x轴标题
                     yAxisName: '', // 右图y轴标题
@@ -113,11 +118,11 @@ export default {
     created () {
         this.generalData = this.generalList[0]
         const height = this.generalData.rightData.yAxisData.length * 100
-        this.height = height > 300 ? height : 300
+        this.height = this.generalData.rightData.direction === 'x' ? 400 : height > 300 ? height : 300
 
         setTimeout(() => {
             this.getOption(this.generalData.leftData)
-            this.barDataPlan(this.generalData.rightData, this.generalData.rightCustomShow)
+            this.barDataPlan(this.generalData.rightData, this.generalData.rightCustomShow, this.generalData.rightData.direction)
         }, 100)
     },
     methods: {
@@ -130,6 +135,7 @@ export default {
 
 <style  scoped>
 .stopCenter{
+    min-height: 350px;
     max-height: 800px;
     margin: 20px 30px 20px 30px;
 }
@@ -140,11 +146,17 @@ export default {
 
 .chart{
     width: 100%;
-    height: 300px;
+    height: 250px;
 }
 
 .chart2{
     width: 100%;
     min-height: 300px;
+}
+.leftContent{
+    font-size: 20px;
+    line-height: 30px;
+    padding: 10px;
+    text-align: center;
 }
 </style>

@@ -90,10 +90,13 @@
                             <div class="header">
                                 <span>委托人角色代理</span>
                             </div>
-                            <div class="transferBody">
+                            <div v-if="!readonly" class="transferBody">
                                 <el-checkbox-group v-model="checkList1" class="radioBox">
                                     <el-checkbox v-for="item in weiTuoroleList" :key="item.id" :label="item.id" :disabled="readonly" class="ridioSin">{{ item.name }}</el-checkbox>
                                 </el-checkbox-group>
+                            </div>
+                            <div v-else>
+                                <div>{{ getWeiTuoName(checkList1,weiTuoroleList) }}</div>
                             </div>
                         </div>
                     </el-col>
@@ -383,6 +386,14 @@ export default {
                     this.srcList = imageList
                 }
             })
+        },
+        getWeiTuoName (data, list) {
+            console.log(data)
+            const nameList = list.map((item) => {
+                return data.includes(item)
+            })
+            console.log(data, nameList)
+            return nameList.join(',')
         }
     }
 }

@@ -13,7 +13,7 @@
                                     <div class="one">
                                         <div class="container">
                                             <div
-                                                :class="item.deviceStatus === '使用' ? 'triangle' : item.deviceStatus === '停用' ? 'triangleRed' : 'triangleYellow'">
+                                                :class="item.deviceStatus === '合格' ? 'triangle' : item.deviceStatus === '停用' ? 'triangleRed' : 'triangleYellow'">
                                                 <div class="label" style="border: 0;">{{ item.prove }}</div>
                                             </div>
                                             <div style="position: absolute;top: 25px;width: 100%;">
@@ -188,7 +188,7 @@ export default {
         },
         switchProve(status) {
             switch (status) {
-                case '使用':
+                case '合格':
                     return "合格证"
                 case '停用':
                     return "停用证"
@@ -200,7 +200,7 @@ export default {
         },
         switchSlogan(status) {
             switch (status) {
-                case '使用':
+                case '合格':
                     return "PASS"
                 case '停用':
                     return "STOP"
