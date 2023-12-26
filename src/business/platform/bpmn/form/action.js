@@ -195,7 +195,7 @@ export default {
             if (firstNodeUserAssign) {
                 const formData = this.getFormData()
                 if (!formData) return
-                this.submitFormData = formData
+                this.submitFormData = this.$common.replaceNullWithEmpty(formData)
                 this.startFlowDialogVisible = true
             } else {
                 this.saveStartFlow()
@@ -211,7 +211,7 @@ export default {
             const jsonData = {
                 defId: this.defId,
                 version: this.version || '0',
-                data: JSON.stringify(formData)
+                data: JSON.stringify(this.$common.replaceNullWithEmpty(formData))
             }
             if (this.$utils.isNotEmpty(params.nodeUsers)) {
                 jsonData.nodeUsers = JSON.stringify(params.nodeUsers) || ''
@@ -261,7 +261,7 @@ export default {
             const jsonData = {
                 defId: this.defId,
                 version: this.version || '',
-                data: JSON.stringify(formData)
+                data: JSON.stringify(this.$common.replaceNullWithEmpty(formData))
             }
             if (this.$utils.isNotEmpty(this.proInstId) && !this.copyFlow) {
                 jsonData.proInstId = this.proInstId || ''
@@ -321,7 +321,7 @@ export default {
                 text: this.$t('common.saving')
             })
             params.taskId = this.taskId
-            params.data = JSON.stringify(formData)
+            params.data = JSON.stringify(this.$common.replaceNullWithEmpty(formData))
 
             if (actionName === 'agree') {
                 agree(params).then(response => {

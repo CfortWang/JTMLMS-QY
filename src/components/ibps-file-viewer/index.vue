@@ -135,9 +135,20 @@
                     this.fileUrl = this.url
                     this.fileType = 'image'
                 } else if(flag && pdfType.includes(this.fileExt)){
-                    this.fileType = 'pdf'
+                    // this.fileType = 'pdf'
                     this.$nextTick(() => {
-                        this.$refs.viewer.load(this.url)
+                        // this.$refs.viewer.load(this.url)
+                        const newTab = window.open()
+                        const link = newTab.document.createElement('link')
+                        link.rel = 'shortcut icon'
+                        link.type = 'image/x-icon'
+                        link.href = 'favicon.ico'
+                        // newTab.document.write('<link rel="icon" type="image/x-icon" href="favicon.ico">')
+                        newTab.document.write(`<title>文件预览页-${this.title}</title>`)
+                        newTab.document.write('<style>body { margin: 0px; }</style>')
+                        newTab.document.head.appendChild(link)
+                        newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(this.url)}" style="width:100%; height:100%;" frameborder="0";>`)
+                        this.closeDialog()
                     })
 
                 } else {
