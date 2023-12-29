@@ -184,6 +184,21 @@
                 <el-form-item v-show="categoryKey==='FILE_TYPE'">
                     <span>需要进行体系文件审查的文件类型请选择“需要”，子节点有需要进行文件审查的话，父节点也需要选择“需要”</span>
                 </el-form-item>
+                <el-form-item
+                    v-show="categoryKey==='FILE_TYPE'"
+                    label="审核审批走向："
+                    prop="authorityObject.shenHeZouXiang"
+                >
+                    <el-radio-group
+                        v-if="!readonly"
+                        v-model="type.authorityObject.shenHeZouXiang"
+                    >
+                        <el-radio label="shspgz">审核、审批、盖章</el-radio>
+                        <el-radio label="jspgz">仅审批、盖章</el-radio>
+                        <el-radio label="jspbgz">仅审批、不盖章</el-radio>
+                    </el-radio-group>
+                    <span v-else>{{ zouXiang[type.authorityObject.shenHeZouXiang] }}</span>
+                </el-form-item>
             </el-form>
         </ibps-container>
     </div>
@@ -245,7 +260,7 @@ export default {
                 typeKey: '',
                 ownerId: '0',
                 authorityObject: {
-                    chaYue: '', buMen: '', shenCha: ''
+                    chaYue: '', buMen: '', shenCha: '', shenHeZouXiang: ''
                 }
             },
             rules: {
@@ -254,7 +269,8 @@ export default {
                 authorityObject: {
                     chaYue: [{ required: false }],
                     buMen: [{ required: false }],
-                    shenCha: [{ required: false }]
+                    shenCha: [{ required: false }],
+                    shenHeZouXiang: [{ required: true, message: this.$t('validate.required') }]
                 }
             },
             toolbars: [
@@ -267,7 +283,8 @@ export default {
                 children: 'children', // 匹配响应数据中的children
                 label: 'NAME_', // 匹配响应数据中的name
                 value: 'ID_'
-            }
+            },
+            zouXiang: { shspgz: '审核、审批、盖章', jspgz: '仅审批、盖章', jspbgz: '仅审批、不盖章' }
         }
     },
     computed: {

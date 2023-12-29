@@ -208,7 +208,7 @@ export default {
         }
         if (this.$route.name == 'wjkzgl-ywyxjlsc' || this.$route.name == 'ywtxyxjl') {
             this.listConfig.searchForm.forms = [
-                { prop: 'nian_du_', label: '年度:', width: 50 },
+                { prop: 'nian_du_', label: '年度:', fieldType: 'date', dateType: 'year', width: 50 },
                 { prop: 'bian_zhi_shi_jian', label: '上传时间:', fieldType: 'daterange', width: 200 }
             ]
             this.listConfig.columns = [
@@ -242,7 +242,6 @@ export default {
             let start = ''
             //   console.log('this.$store.getters',this.$store.getters)
             const positionsDatas = this.$store.getters.userInfo.positions
-            console.log('getters', this.$store.getters)
             const needSelType = []
             if (this.$store.getters.userInfo.positions == 0) {
                 this.$message({
@@ -261,9 +260,10 @@ export default {
                     wheres3 = wheres3 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
                 }
                 if (i !== 'i' && i !== 'b') {
-                    wheres1 = wheres1 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
-                    wheres2 = wheres2 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
-                    wheres3 = wheres3 + ` and wj.${i} like '%${this.searchWhere[i]}%'`
+                    const likeWhere = i === 'nian_du_' ? this.searchWhere[i].getFullYear() : this.searchWhere[i]
+                    wheres1 = wheres1 + ` and wj.${i} like '%${likeWhere}%'`
+                    wheres2 = wheres2 + ` and wj.${i} like '%${likeWhere}%'`
+                    wheres3 = wheres3 + ` and wj.${i} like '%${likeWhere}%'`
                 }
             }
 
@@ -301,6 +301,8 @@ export default {
             //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian
             //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
             const selectSql = 'select wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,"" AS cha_yue_jie_zhi_s  from'
+            // 内外部文件查阅时候查所有文件
+            const allSql = ``
             // 共用文件
             const comSql = `${selectSql} t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' and (${this.depArrs.join(' or ')}) ${wheres1}`
             // 部门权限文件
@@ -363,12 +365,11 @@ export default {
             this.getDatas()
         },
         handleNodeClick (nodeId, nodeData, treeDatas) {
-            //   console.log('nodeData', nodeData)
             this.tableTitle = nodeData.name
             this.show = 'detail'
             this.addDataCont = { fenLei: nodeData.name, fenLeiId: nodeId }
             const fileTypes = []
-            if (this.oldorgId == nodeId) {
+            if (this.oldorgId === nodeId && (nodeData.name !== '文件分类')) {
                 return
             }
             // 判断是否存在下级菜单
@@ -378,7 +379,7 @@ export default {
                     return el.key === 'add'
                 })
                 if (chongfu.length === 0 && this.depth !== 0) {
-                    this.listConfig.toolbars.push({ key: 'add' })
+                    this.listConfig.toolbars.splice(1, 0, { key: 'add' })
                 }
             } else {
                 this.listConfig.toolbars = this.listConfig.toolbars.filter(el => {
@@ -453,9 +454,6 @@ export default {
                     this.refreshData()
                     break
                 case 'remove':
-                    console.log('selection', selection)
-                    console.log('data', data)
-
                     if (data.length == 0) {
                         this.$message({
                             message: '请选择数据再进行删除',

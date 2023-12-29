@@ -1,6 +1,7 @@
 <template>
     <div class="jbd-tree">
         <ibps-tree
+            ref="treeIndex"
             :title="title"
             :width="width"
             :height="height"
@@ -9,11 +10,10 @@
             :options="treeOptions"
             :contextmenus="hasContextmenu ? treeContextmenus : []"
             :position="position"
-            :hasPermission="hasPermission"
+            :has-permission="hasPermission"
             @action-event="handleTreeAction"
             @node-click="handleNodeClick"
             @expand-collapse="handleExpandCollapse"
-            ref="treeIndex"
         />
         <!-- 分类编辑 -->
         <type-edit
@@ -96,7 +96,7 @@ export default {
             default: false
         }
     },
-    data() {
+    data () {
         return {
             typeFormVisible: false,
             sortFormVisible: false,
@@ -118,12 +118,17 @@ export default {
             typeData: {} // 记录分类信息
         }
     },
-    created() {
+    created () {
         this.loadTreeData()
     },
     methods: {
-        loadTreeData() {
-            findTreeData({ categoryKey: this.categoryKey }).then(response => {
+        loadTreeData () {
+            const { first = '', second = '' } = this.$store.getters.level || {}
+            const params = { categoryKey: this.categoryKey }
+            if (this.categoryKey === 'FILE_TYPE') {
+                params.diDian = second || first
+            }
+            findTreeData(params).then(response => {
                 this.treeData = response.data || []
                 if (this.hasPermission) {
                     this.treeData = this.treeData.filter(i => i.isShow !== '1')
@@ -131,7 +136,7 @@ export default {
                 this.$emit('treeData', response.data)
             })
         },
-        handleTreeAction(command, position, selection, data) {
+        handleTreeAction (command, position, selection, data) {
             switch (command) {
                 case 'refresh': // 查询
                     this.loadTreeData()
@@ -171,21 +176,21 @@ export default {
                     break
             }
         },
-        handleNodeClick(data) {
+        handleNodeClick (data) {
             this.$emit('node-click', data.parentId === '-1' ? '' : data.id, data, this.treeData)
         },
-        handleExpandCollapse(isExpand) {
+        handleExpandCollapse (isExpand) {
             this.$emit('expand-collapse', isExpand)
         },
-        handTreeEdit(editId) {
+        handTreeEdit (editId) {
             this.editId = editId || ''
             this.typeFormVisible = true
         },
-        handTreeMove(editId) {
+        handTreeMove (editId) {
             this.editId = editId || ''
             this.moveFormVisible = true
         },
-        handTreeSort(data) {
+        handTreeSort (data) {
             const children = data.children
             if (children && children.length > 0) {
                 if (children.length === 1) {
@@ -198,7 +203,7 @@ export default {
                 ActionUtils.warning('无子节点排序')
             }
         },
-        handleTreeRemove(ids) {
+        handleTreeRemove (ids) {
             ActionUtils.removeRecord(ids).then((ids) => {
                 remove({ typeId: ids }).then((response) => {
                     ActionUtils.removeSuccessMessage()
@@ -208,7 +213,7 @@ export default {
                 })
             }).catch(() => { })
         },
-        showTree() {
+        showTree () {
             this.$nextTick(() => {
                 this.$refs.treeIndex.handleExpandCollapse()
             })

@@ -224,7 +224,8 @@ export default {
                     diDian: this.diDian,
                     buMen: '',
                     chaYue: '公用查阅',
-                    shenCha: '不需要'
+                    shenCha: '不需要',
+                    shenHeZouXiang: ''
                 }
                 data.authorityName = JSON.stringify(object)
             }
