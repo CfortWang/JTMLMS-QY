@@ -91,6 +91,7 @@ _.extend(JComposeTemplate, {
         this.summaryMethod = null
         this.afterSubmit = null
         this.beforeSubmit = null
+        this.customFormatter = null
         this._isInitialization = false
     }
 })
