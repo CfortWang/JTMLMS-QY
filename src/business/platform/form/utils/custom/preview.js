@@ -1,16 +1,16 @@
 import dialog from '@/utils/dialog'
 import Pdfh5 from 'pdfh5'
 import 'pdfh5/css/pdfh5.css'
-import { snapshoot } from '@/api/platform/file/attachment' // 印章，快照
-import { download } from '@/api/platform/file/attachment'
+import { snapshoot, download } from '@/api/platform/file/attachment' // 印章，快照
 import ActionUtils from '@/utils/action'
+import store from '@/store'
 
 export const preview = (tableForm, url) => {
-    var flag = true
+    let isMobile = false
     if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-        flag = false
+        isMobile = true
     }
-    if (flag) {
+    if (!isMobile) {
         dialog(
             {
                 data () {
@@ -26,13 +26,30 @@ export const preview = (tableForm, url) => {
                 dialog: {
                     appendToBody: true,
                     width: '90%',
-                    top: '1vh',
+                    top: '3vh',
                     center: true,
                     title: '',
-                    'custom-class': 'ibps-dialog-91'
-                }
-            }, (tpl) => {
+                    showClose: true,
+                    closeOnClickModal: false,
+                    'custom-class': 'ibps-dialog-91 btn-cover'
+                },
+            },
+            (tpl) => {
                 tableForm.dialogTemplate = tpl
+                const { role } = store.getters.userInfo || {}
+                // 系统管理角色、检验科主任、检验科副主任、文件管理员、技术负责人、质量负责人可下载打印
+                const hasRole = role.some(item => ['xtgljs', 'syszr', 'jykfzr', 'wjgly', 'jsfzr', 'zlfzr'].includes(item.alias))
+                if (hasRole) {
+                    return
+                }
+                setTimeout(() => {
+                    const toolbarCover = document.createElement('div')
+                    toolbarCover.classList.add('toolbar-cover')
+                    toolbarCover.addEventListener('click', () => {
+                        confirm('无权操作，请联系管理员开放相关权限！', '提示')
+                    })
+                    document.querySelector('.btn-cover').children[1].appendChild(toolbarCover)
+                }, 1000)
             }
         ).catch((_this) => {
             _this.visible = false
@@ -94,7 +111,7 @@ export const preview = (tableForm, url) => {
                         tableForm.dialogTemplate = null
                         this.visible = false
                     },
-                    download () {
+                    downloadFile () {
                         ActionUtils.exportFile(this.url, `${this.name}.pdf`)
                     }
                 },
@@ -102,7 +119,7 @@ export const preview = (tableForm, url) => {
                 `<div style="height:100%">
                     <div id="demo"></div>
                     <div style="position:absolute;right: 17px;top: 15px;" >
-                        <i class="el-icon-download" style="font-size: 24px;margin-right:15px" @click="download"></i>
+                        <i class="el-icon-download" style="font-size: 24px;margin-right:15px" @click="downloadFile"></i>
                         <i class="el-icon-close" style="font-size: 24px;" @click="close"></i>
                     </div>
                 </div>`

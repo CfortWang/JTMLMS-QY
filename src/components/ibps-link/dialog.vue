@@ -4,7 +4,7 @@
     :visible.sync="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
-    :top="dialogTop||'1vh'"
+    :top="dialogTop||'3vh'"
     :width="dialogWidth||'90%'"
     class="js-custom-dialog"
     append-to-body
@@ -89,23 +89,3 @@ export default {
   }
 }
 </script>
-<style lang="scss" >
-.js-custom-dialog{
-  .el-dialog__body{
-      height:  calc(100vh) !important;
-      margin: -9px !important;
-      padding: 0;
-	  overflow: hidden;
-  }
-  .el-dialog__header{
-    padding: 0px;
-  }
-  .el-dialog__headerbtn i {
-   font-size: 28px;
-   font-weight: bold;
-   background-color: #FFFFFF;
-   border-radius: 8px;
-   margin-top: -8px;
-  }
-}
-</style>

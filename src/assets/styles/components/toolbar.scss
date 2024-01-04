@@ -1,104 +1,118 @@
-
 .ibps-toolbar {
-  .el-button+.el-button {
-    margin-left: 5px;
-  }
-  .toolbar-box {
-    padding: 3px;
-    border: 1px solid #ebeef5;
-	float: left;
-  }
-  .buttons {
-    padding: 0;
-    margin-left: 10px;
-    margin-bottom: 5px;
-    float: left;
-  }
-  .tools {
-    padding: 0;
-    padding-right: 5px;
-    float: right;
-  }
-  .header {
-    padding: 5px 0px;
-    background-color: #FFFFFF;
-    border: 1px solid #ebeef5;
-    height: 45px;
-    .tools>a {
-      display: inline-block;
-      font-size: 14px;
-      line-height: 24px;
-      text-decoration: none;
-      color: #d7d7d7;
-      margin-right: 5px;
-      margin-top: 5px;
+    .el-button+.el-button {
+        margin-left: 5px;
     }
-  }
+    .toolbar-box {
+        padding: 3px;
+        border: 1px solid #ebeef5;
+        float: left;
+    }
+    .buttons {
+        padding: 0;
+        margin-left: 10px;
+        margin-bottom: 5px;
+        float: left;
+    }
+    .tools {
+        padding: 0;
+        padding-right: 5px;
+        float: right;
+    }
+    .header {
+        padding: 5px 0px;
+        background-color: #FFFFFF;
+        border: 1px solid #ebeef5;
+        height: 45px;
 
-  .search-label:not(.button-div) {
-    display: inline-block;
-    margin-bottom: -5px;
-    margin-right: 5px;
-    font-weight: bold;
-    width: 80px;
-    text-align: right;
-    line-height: 20px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    font-size: 13px;
-    color: #939596;
-  }
-  .inline {
-    display: inline-block;
-  }
-  .clear {
-    clear: both;
-  }
-  
-  &--medium {
-    .header {
-      height: 40px;
+        .tools>a {
+            display: inline-block;
+            font-size: 14px;
+            line-height: 24px;
+            text-decoration: none;
+            color: #d7d7d7;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
     }
-  }
-  &--small {
-    .header {
-      height: 35px;
+    .search-label:not(.button-div) {
+        display: inline-block;
+        margin-bottom: -5px;
+        margin-right: 5px;
+        font-weight: bold;
+        width: 80px;
+        text-align: right;
+        line-height: 20px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 13px;
+        color: #939596;
     }
-  }
-  &--mini {
-    .header {
-      height: 30px;
+    .inline {
+        display: inline-block;
     }
-  }
+    .clear {
+        clear: both;
+    }
+    &--medium {
+        .header {
+            height: 40px;
+        }
+    }
+    &--small {
+        .header {
+            height: 35px;
+        }
+    }
+    &--mini {
+        .header {
+            height: 30px;
+        }
+    }
 }
 
-.ibps-dialog-91{
-	.el-dialog__body{
-	    height:  calc(100vh) !important;
-	    margin: -9px !important;
-	    padding: 0;
-			
-	}
-	.el-dialog__header{
-	  padding: 0px;
-	}
-	.el-dialog__headerbtn i {
-	 font-size: 28px;
-	 font-weight: bold;
-	 background-color: #FFFFFF;
-	 border-radius: 8px;
-	 margin-top: -8px;
-	}
+.ibps-dialog-91, .js-custom-dialog {
+    .el-dialog__body {
+        height: calc(100vh) !important;
+        margin: -9px !important;
+        padding: 0;
+
+    }
+    .el-dialog__header {
+        padding: 0px;
+    }
+    .el-dialog__headerbtn i {
+        font-size: 28px;
+        font-weight: bold;
+        background-color: #FFFFFF;
+        border-radius: 8px;
+        margin-top: -8px;
+    }
 }
+.btn-cover, .js-custom-dialog {
+    height: calc(94vh) !important;
+    .el-dialog__body {
+        overflow: hidden;
+    }
+    .toolbar-cover {
+        background: rgba(255, 255, 255, 0);
+        position: absolute;
+        top: 0;
+        right: 50px;
+        width: 80px;
+        height: 45px;
+        z-index: 99;
+    }
+}
+
 .ibps-actions {
-  .action-icon + .action-icon{
-   margin-left: 2px;
- }
- .el-button+.el-button{
-     margin-left: 5px;
- }
- .el-dropdown{
-   margin:0 5px;
- }
+    .action-icon+.action-icon {
+        margin-left: 2px;
+    }
+    .el-button+.el-button {
+        margin-left: 5px;
+    }
+    .el-dropdown {
+        margin: 0 5px;
+    }
 }

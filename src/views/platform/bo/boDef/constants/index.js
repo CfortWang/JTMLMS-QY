@@ -211,6 +211,15 @@ export const defaultAttrs = [
         format: ''
     }, {
         id: uuid(),
+        name: '地点',
+        code: 'diDian',
+        fieldName: 'di_dian_',
+        dataType: 'varchar',
+        attrLength: 128,
+        precision: 0,
+        format: ''
+    }, {
+        id: uuid(),
         name: '编制人',
         code: 'bianZhiRen',
         fieldName: 'bian_zhi_ren_',

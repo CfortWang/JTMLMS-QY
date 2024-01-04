@@ -344,6 +344,10 @@ export default {
                 }
                 this.loading = false
             }).catch(() => {
+                // 请求出错清除轮询
+                if (type === 'wait') {
+                    clearInterval(this.timer)
+                }
                 this.loading = false
             })
         },

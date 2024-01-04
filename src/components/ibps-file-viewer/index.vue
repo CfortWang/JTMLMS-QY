@@ -125,7 +125,7 @@
                 return PopupManager.getZIndex()
             },
             loadViewer() {
-                var flag = true;
+                var flag = true
                 if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
                     flag = false
                 }
