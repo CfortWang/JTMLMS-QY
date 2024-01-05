@@ -37,7 +37,7 @@ export default {
         getMiddleLeft () {
             const this_ = this
             const series = []
-
+            console.log(this_.info, this_.info.config.idSelector, '12')
             if (this_.info.data.source[0] == 999) {
                 this.showChart = false
                 return
@@ -56,18 +56,35 @@ export default {
             var chartDom = document.getElementById(this.info.config.idSelector)
             var myChart = echarts.init(chartDom)
             let interval = 7
-            let max = 0
-            console.log(this_.info.data.source)
-            this_.info.data.source.forEach(item => {
-                if (item.设备总数 > max) {
-                    max = item.设备总数
-                }
-            })
-            if (max < 7) {
-                interval = 1
-            } else {
+            if (this_.info.config.idSelector === 'eqFinish') {
+                let max = 0
+                this_.info.data.source.forEach(item => {
+                    console.log(item.设备总数)
+                    if (item.设备总数 > max) {
+                        max = item.设备总数
+                    }
+                })
+                if (max < 7) {
+                    interval = 1
+                } else {
                 // interval = parseInt(max / 7)
-                interval = Math.ceil((parseInt(max / 7) / 10)) * 10
+                    interval = Math.ceil((parseInt(max / 7) / 10)) * 10
+                }
+            }
+            if (this_.info.config.idSelector === 'eqWeihu') {
+                let max = 0
+                this_.info.data.source.forEach(item => {
+                    console.log(item.计划数)
+                    if (item.计划数 > max) {
+                        max = item.计划数
+                    }
+                })
+                if (max < 7) {
+                    interval = 1
+                } else {
+                // interval = parseInt(max / 7)
+                    interval = Math.ceil((parseInt(max / 7) / 10)) * 10
+                }
             }
             const option = {
                 legend: {

@@ -76,9 +76,9 @@ export default {
                     },
                     {
                         key: 'add',
-                        hidden: () => {
-                            return !hasRole
-                        }
+                        // hidden: () => {
+                        //     return !hasRole
+                        // }
                     },
                     {
                         key: 'remove',
@@ -130,7 +130,7 @@ export default {
         this.loadData()
     },
     methods: {
-    // 加载数据
+        // 加载数据
         loadData () {
             this.loading = true
             queryPageList(this.getSearcFormData()).then(response => {
