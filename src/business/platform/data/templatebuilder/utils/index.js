@@ -173,8 +173,8 @@ const helpers = {
                     button_type: 'ok',
                     label: '确定'
                 }, {
-                    button_type: 'clean',
-                    label: '清空'
+                    button_type: 'cleanClose',
+                    label: '清空并关闭'
                 }, {
                     button_type: 'cancel',
                     label: '取消'
