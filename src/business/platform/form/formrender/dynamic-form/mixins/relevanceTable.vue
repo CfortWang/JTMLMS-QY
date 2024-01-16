@@ -53,6 +53,7 @@ export default {
                 dialog: {
                     appendToBody: true,
                     width: '70%',
+                    top: '5vh',
                     center: true,
                     title: title
                 }
