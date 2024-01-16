@@ -15,7 +15,7 @@ export default {
                             vm
                         }
                     })
-                    if (process.env.NODE_ENV !== 'development') return
+                    // if (process.env.NODE_ENV !== 'development') return
                     util.log.capsule('ibps', 'ErrorHandler', logType)
                     util.log.danger('>>>>>> 错误信息 >>>>>>')
                     console.log(info)
