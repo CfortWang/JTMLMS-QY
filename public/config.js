@@ -1,5 +1,5 @@
 (function (global) {
-    const BASE_URL = 'https://www.szjyxt.com/'
+    const BASE_URL = 'http://dev1.local/'
     global.__IBPS_CONFIG__ = {
         // 是否启用配置
         ENABLE_CONFIG: true,

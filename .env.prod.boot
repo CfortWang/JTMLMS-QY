@@ -9,7 +9,7 @@ ENV = 'prod.boot'
 VUE_APP_PUBLIC_PATH  = '/ibps3/'
 
 # ========base api======================
-VUE_APP_BASE_API = 'https://www.szjyxt.com/ibps'
+VUE_APP_BASE_API = 'http://dev1.local/ibps'
 VUE_APP_BASE_WEBSOCKET_API = ${VUE_APP_BASE_API}
 
 # ========report api======================
