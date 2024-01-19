@@ -6,7 +6,7 @@
                 :field-item="fieldItem"
                 :bo-data="boData"
                 :fields="fields"
-                types="label,name,desc"
+                types="label,name,desc,display"
             />
             <!-- 表单字段和按钮 -->
             <editor-field-table

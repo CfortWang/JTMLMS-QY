@@ -968,7 +968,7 @@ export default {
                         break
                     case 'consult': // 查阅
                         this.snapshotFile = ''
-                        if (0 && data.kuai_zhao_) {
+                        if (data.kuai_zhao_) {
                             this.snapshotFile = data.kuai_zhao_
                             setTimeout(() => {
                                 this.$refs.snapshot.handleActionEvent('preview', 0)

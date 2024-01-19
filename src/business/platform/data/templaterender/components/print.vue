@@ -19,7 +19,7 @@
                     <template v-for="(o, i) in modelList">
                         <div v-if="item[o.value]" :class="$style.item" :style="`width: ${o.width};`">
                             <span :class="$style.name">{{ o.label }}：</span>
-                            <span :class="$style.value">{{ item[o.value] }}</span>
+                            <span :class="$style.value">{{ item[o.value] | dateFormat(o) }}</span>
                         </div>
                     </template>
                     <vue-barcode
@@ -51,7 +51,7 @@
             },
             title: {
                 type: String,
-                default: '标签打印'
+                default: '标签打印（实际效果以打印页面为准）'
             },
             list: {
                 type: Array,
@@ -60,6 +60,15 @@
             type: {
                 type: String,
                 default: '物料'
+            }
+        },
+        filters: {
+            dateFormat (v, o) {
+                const s = ['daoKuRiQi', 'youXiaoQi']
+                if (s.includes(o.value)) {
+                    return v.replace(/-/g, '.')
+                }
+                return v
             }
         },
         components: {
@@ -156,11 +165,17 @@
                 }
             }
             .barcode {
+                width: 100%;
                 position: absolute;
                 text-align: center;
                 bottom: 4px;
                 left: 0;
                 right: 0;
+                :global {
+                    .vue-barcode-element {
+                        width: 100% !important;
+                    }
+                }
             }
             &:last-child {
                 margin-bottom: 0;
