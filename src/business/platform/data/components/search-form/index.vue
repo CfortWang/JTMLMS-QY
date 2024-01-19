@@ -42,6 +42,7 @@
                     :disabled="item.disabled"
                     :placeholder="item.placeholder"
                     :style="itemStyle + (item.itemWidth ? `width: ${item.itemWidth}px;` : 'width: 150px')"
+                    multiple
                     clearable
                     @keyup.enter.native.stop="handleEnter"
                 >
@@ -346,20 +347,44 @@ export default {
          */
         getSearcFormData () {
             const { params, nameParams, datePrefix, format } = this
-            const formattedForm = {}
+            const formattedForm = {
+                arg: {
+                    relation: 'AND',
+                    parameters: []
+                }
+            }
             Object.keys(params).forEach(v => {
                 if (v && v.indexOf(datePrefix) === -1) {
                     const val = format[v] ? format[v](params[v], v) : params[v]
-                    if (this.$utils.isNotEmpty(val) && !Array.isArray(val)) {
-                        let key = v
-                        if (nameParams[v]) {
-                            key = nameParams[v]
+                    if (this.$utils.isNotEmpty(val)) {
+                        const key = nameParams[v] || v
+                        if (!Array.isArray(val)) {
+                            const o = {
+                                relation: 'AND',
+                                parameters: [
+                                    {
+                                        key,
+                                        value: val,
+                                        param: this.$utils.guid()
+                                    }
+                                ]
+                            }
+                            formattedForm.arg.parameters.push(o)
+                        } else {
+                            const parameters = val.map(i => ({
+                                key,
+                                value: i,
+                                param: this.$utils.guid()
+                            }))
+                            formattedForm.arg.parameters.push({
+                                relation: 'OR',
+                                parameters
+                            })
                         }
-                        formattedForm[key] = val
                     }
                 }
             })
-            return formattedForm
+            return formattedForm.arg.parameters.length ? formattedForm : {}
         },
         /**
          *重置表单

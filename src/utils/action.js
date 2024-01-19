@@ -263,7 +263,7 @@ const action = {
         const results = {}
         if (params) {
             results.parameters = Object.keys(params).map((k) => {
-                return {
+                return k === 'arg' ? params[k] : {
                     'key': k,
                     'value': params[k]
                 }
