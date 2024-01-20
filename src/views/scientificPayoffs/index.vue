@@ -151,7 +151,7 @@ export default {
                 }
             },
             // ie.STATUS_= 'actived' and ie.ID_ != '1' and ie.ID_ != '-1' and ie.ID_ != '702117247933480960' and ie.ID_ != '1115242459127873536' and ie.ID_ != '1115242765924433920' and ie.GROUP_ID_ not like '%1041786072788369408%' GROUP BY ie.id_
-            likeParams: "ie.STATUS_= 'actived' GROUP BY ie.id_",
+            likeParams: "ie.STATUS_= 'actived' AND ie.jian_ding_zi_ge_z !='' AND ie.jian_ding_zi_ge_z IS NOT NULL GROUP BY ie.id_",
 
             likeTongJi: `lei_xing_ = '统计'`
         }
@@ -161,7 +161,7 @@ export default {
             if (this.selectData) {
                 const sqlData = `ie.POSITIONS_ like '%${this.selectData}%'`
                 const sqlData2 = `bian_zhi_bu_men_ like '%${this.selectData}%'`
-                this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
+                this.likeParams = `ie.STATUS_= 'actived' AND ie.jian_ding_zi_ge_z !='' AND ie.jian_ding_zi_ge_z IS NOT NULL and (${sqlData}) GROUP BY ie.id_`
                 this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
                 this.getInit()
                 this.getKeYanChengGuoList()

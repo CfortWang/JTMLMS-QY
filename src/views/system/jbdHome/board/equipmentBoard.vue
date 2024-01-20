@@ -483,9 +483,12 @@ export default {
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
             // 计划数，查询设备维护计划表完成数
-            const sql1 = `select DISTINCT(q.id_) ,q.name_,COUNT(*) AS total  FROM  
-      (select DISTINCT(a.she_bei_bian_hao_),b.name_,b.id_ FROM t_mjsbwhjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN 
-      (select id_ FROM t_mjsbwhjhb WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND shi_fou_guo_shen_ = '已完成' AND di_dian_ = '${didian}') GROUP BY a.she_bei_bian_hao_) AS q  GROUP BY q.id_`
+            //         const sql1 = `select DISTINCT(q.id_) ,q.name_,COUNT(*) AS total  FROM
+            //   (select DISTINCT(a.she_bei_bian_hao_),b.name_,b.id_ FROM t_mjsbwhjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN
+            //   (select id_ FROM t_mjsbwhjhb WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND shi_fou_guo_shen_ = '已完成' AND di_dian_ = '${didian}') GROUP BY a.she_bei_bian_hao_) AS q  GROUP BY q.id_`
+
+            // 计划数，查询设备维护计划表完成数
+            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE (a.bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR a.create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND a.shi_fou_guo_shen_ != '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
             //   维护记录数
             const sql2 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE (a.bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR a.create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND a.shi_fou_guo_shen_ = '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
             this.weihuBarData.data.dimensions = ['product', '计划数', '完成数']

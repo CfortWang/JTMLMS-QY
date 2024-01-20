@@ -50,7 +50,7 @@
                                 readonly
                                 allow-download
                                 multiple
-                                :download="false"
+                                :download="fileDownloadAuthority"
                             />
                         </template>
                     </ibps-crud>
@@ -106,9 +106,17 @@ export default {
     mixins: [FixHeight],
     data () {
         const depArrs = []
-        const { deptList } = this.$store.getters
+        var fileDownloadAuthority = false
+        const { deptList, role } = this.$store.getters
         for (var i of deptList) {
             depArrs.push(`wj.bian_zhi_bu_men_ like '${i.positionId}'`)
+        }
+        const roleKey = ['xtgljs', 'syszr', 'dagly', 'xxgljs']
+        for (const i of roleKey) {
+            if (role.some(so => { return so.alias === i })) {
+                fileDownloadAuthority = true
+                break
+            }
         }
         return {
             //   treeData: [],
@@ -171,7 +179,8 @@ export default {
                 buMenAuthority: [],
                 authority: []
             }, // 存放所点击列表的分类信息
-            depArrs
+            depArrs,
+            fileDownloadAuthority
         }
     },
     watch: {
@@ -215,7 +224,7 @@ export default {
                 // { prop: 'fen_lei_', label: '表单分类', width: 120 },
                 { prop: 'biao_dan_ming_che', label: '表单名称', width: 210 },
                 { prop: 'shi_wu_shuo_ming_', label: '事务说明', minWidth: 250 },
-                { prop: 'fu_jian_', label: '附件', slotName: 'wenjinachayue', width: 150 },
+                { prop: 'fu_jian_', label: '附件', slotName: 'wenjinachayue', width: 250 },
                 { prop: 'nian_du_', label: '年度', width: 60 },
                 { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 120 },
                 { prop: 'ry_name', label: '上传人', width: 70 }
