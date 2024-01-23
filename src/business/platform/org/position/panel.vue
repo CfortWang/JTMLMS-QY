@@ -35,6 +35,7 @@
                     node-key="id"
                     pid-key="parentId"
                     :default-expanded-keys="defaultExpandedKeys"
+                    :default-checked-keys="defaultCheckedKeys"
                     :default-expand-all="defaultExpandAll"
                     highlight-current
                     check-on-click-node
@@ -126,13 +127,25 @@ export default {
         }
     },
     data () {
+        let radio = ''
+        let defaultCheckedKeys = []
+        if (this.multiple) {
+            if (this.value.length !== 0) {
+                defaultCheckedKeys = this.value.map(i => i.id)
+            }
+        } else {
+            if (this.value) {
+                radio = this.value.id
+            }
+        }
         return {
             parentId: '0',
             defaultExpandAll: true,
+            defaultCheckedKeys,
             lazyTree: true,
             defaultExpandedKeys: ['0'],
             moreSearchParams: {},
-            radio: '',
+            radio,
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: false,
             dialogFormVisible: false,
@@ -285,7 +298,6 @@ export default {
                     } else if (type === '1') {
                         this.disabledDotCount(arrList, type)
                     }
-
                     resolve(this.toTree(arrList))
                 }).catch(res => {
                     this.loading = false

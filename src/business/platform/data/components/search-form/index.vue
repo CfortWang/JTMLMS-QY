@@ -86,6 +86,21 @@
                     @change="date => changeDateAddEndDate(date, item)"
                     @keyup.enter.native.stop="handleEnter"
                 />
+                <el-date-picker
+                    v-else-if="item.fieldType === 'datePicker'"
+                    v-model="params[item.modelValue]"
+                    :placeholder="item.placeholder"
+                    :size="item.size ? item.size : 'mini'"
+                    :disabled="item.disabled"
+                    :readonly="item.readonly"
+                    :editable="item.editable"
+                    :style="itemStyle + (item.itemWidth ? `width: ${item.itemWidth}px;` : 'width: 150px')"
+                    :picker-options="item.pickerOptions || {}"
+                    :type="getDateType(item.field_options.datefmt)"
+                    :value-format="item.field_options.datefmt"
+                    :format="item.field_options.datefmt"
+                    @keyup.enter.native.stop="handleEnter"
+                />
                 <!-- 日期范围-->
                 <ibps-date-range
                     v-else-if="item.fieldType === 'yearrange'"
@@ -519,6 +534,17 @@ export default {
         },
         getLinkLabelKey (fieldOptions, data) {
             return FormUtils.getLinkLabelKey(fieldOptions, data)
+        },
+        // yyyy-MM-dd HH:mm:ss
+        getDateType (datefmt) {
+            switch (datefmt) {
+                case 'yyyy':
+                    return 'year'
+                case 'yyyy-MM':
+                    return 'month'
+                default:
+                    return 'date'
+            }
         }
     }
 }
