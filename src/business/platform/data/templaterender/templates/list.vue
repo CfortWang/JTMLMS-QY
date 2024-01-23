@@ -940,7 +940,7 @@ export default {
             this.beforeScript(command, position, selection, data, () => {
                 let src = ''
                 this.readonly = false
-                const { first = '' } = this.$store.getters.level || {}
+                const { first = '', second = '' } = this.$store.getters.level || {}
                 switch (buttonType) {
                     case 'search': // 查询
                         ActionUtils.setFirstPagination(this.pagination)
@@ -1006,7 +1006,7 @@ export default {
                                 this.$message.warning('请先配置对应报表路径！')
                                 return
                             }
-                            src = `${this.$reportPath.replace('show', 'pdf')}${button.reportPath}&id_=${selection}&org_=${first}`
+                            src = `${this.$reportPath.replace('show', 'pdf')}${button.reportPath}&id_=${selection}&org_=${first}&second_=${second}`
                             // console.log(src)
                             this.$common.preview(this, src)
                         }
@@ -1017,7 +1017,7 @@ export default {
                             return
                         }
                         this.$common.snapshoot({
-                            url: this.$getReportFile(button.reportPath, `id_=${selection}&org_=${first}`),
+                            url: this.$getReportFile(button.reportPath, `id_=${selection}&org_=${first}&second_=${second}`),
                             name: selection,
                             type: 'pdf'
                         }).then((res) => {
