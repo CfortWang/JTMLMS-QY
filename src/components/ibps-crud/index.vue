@@ -317,7 +317,7 @@
                     v-if="rowHandle"
                     v-bind="rowHandle"
                     :label=" handleAttribute(rowHandle.columnHeader,'操作') "
-                    :width="handleAttribute(rowHandle.width, rowHandleDefaultWidth) < 80 ? '80' : rowHandle.actions.length !== 0 && rowHandle.actions.length <= 3 ? 90 + 60 * (rowHandle.actions.length - 1) : 90"
+                    :width="rowHandle.colWidth ? rowHandle.colWidth : (handleAttribute(rowHandle.width, rowHandleDefaultWidth) < 80 ? '80' : rowHandle.actions.length !== 0 && rowHandle.actions.length <= 3 ? 90 + 60 * (rowHandle.actions.length - 1) : 90)"
                     :fixed="handleAttribute(rowHandle.fixed, 'right')"
                     :align="handleAttribute(rowHandle.align, 'center')"
                 >

@@ -8,43 +8,38 @@
         class="template-query-column"
         @submit.native.prevent
     >
-
         <el-form-item label="显示名称" prop="label">
             <el-input v-model="formData.label" placeholder="显示名称" />
         </el-form-item>
-
         <template v-if="datasetType === 'thirdparty'">
             <!-- <el-form-item label="参数类型">
-        <el-select v-model="formData.paramType" placeholder="">
-          <el-option
-            v-for="item in paramTypeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
-      </el-form-item>
-      <template v-if="formData.paramType ==='arrayObject'">
-        <el-form-item label="绑定参数根">
-          <ibps-tree-select
-            v-model="formData.paramRoot"
-            :data="datasetData"
-            :props="{
-              children: 'children',
-              label: 'name'
-            }"
-            display-mode="path"
-            node-key="name"
-            placeholder="请选择"
-          />
-        </el-form-item>
-        <el-form-item label="绑定参数key">
-          <el-input v-model="formData.paramKey" placeholder="绑定参数key" />
-        </el-form-item>
-        <el-form-item label="绑定参数key值">
-          <el-input v-model="formData.paramValue" placeholder="绑定参数key值" />
-        </el-form-item>
-      </template> -->
+                <el-select v-model="formData.paramType" placeholder="">
+                    <el-option
+                        v-for="item in paramTypeOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    />
+                </el-select>
+            </el-form-item>
+            <template v-if="formData.paramType ==='arrayObject'">
+                <el-form-item label="绑定参数根">
+                    <ibps-tree-select
+                        v-model="formData.paramRoot"
+                        :data="datasetData"
+                        :props="{children: 'children', label: 'name'}"
+                        display-mode="path"
+                        node-key="name"
+                        placeholder="请选择"
+                    />
+                </el-form-item>
+                <el-form-item label="绑定参数key">
+                    <el-input v-model="formData.paramKey" placeholder="绑定参数key" />
+                </el-form-item>
+                <el-form-item label="绑定参数key值">
+                    <el-input v-model="formData.paramValue" placeholder="绑定参数key值" />
+                </el-form-item>
+            </template> -->
             <el-form-item label="标识（name）" prop="name">
                 <el-input v-model="formData.name" placeholder="标识（name）" />
             </el-form-item>
@@ -60,7 +55,7 @@
             <el-switch v-model="formData.same" active-value="Y" inactive-value="N" />
         </el-form-item>
         <el-form-item label="默认值">
-            <el-input v-model="formData.default_value" placeholder="默认值" />
+            <el-input v-model="formData.default_value" placeholder="请输入查询字段默认值，多值以&分割" />
         </el-form-item>
         <!--控件类型-->
         <template v-if="formData.same === 'N'">
@@ -167,7 +162,6 @@
                         type="valueSource"
                     />
                 </el-form-item>
-
                 <el-form-item>
                     <div slot="label">关联配置</div>
                     <div class="el-form-item__content">
@@ -281,9 +275,9 @@ export default {
 </script>
 
 <style lang="scss">
-.template-query-column {
-  .el-select {
-    width: 100%;
-  }
-}
+    .template-query-column {
+        .el-select {
+            width: 100%;
+        }
+    }
 </style>

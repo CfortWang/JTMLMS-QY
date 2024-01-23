@@ -71,7 +71,7 @@
                 <template slot="label">行数<help-tip prop="rows" /></template>
                 <el-input v-model="fieldOptions.rows" />
             </el-form-item>
-            <el-form-item v-if="types.includes('autosize')" label-width="110px">
+            <el-form-item v-if="types.includes('autosize')">
                 <template slot="label">自适应高度<help-tip prop="autosize" /></template>
                 <el-switch v-model="fieldOptions.autosize" />
                 <div v-if="fieldOptions.autosize">
@@ -128,11 +128,15 @@
                     />
                 </el-select>
             </el-form-item>
+            <el-form-item v-if="types.includes('colWidth')">
+                <template slot="label">操作列宽<help-tip prop="colWidth" /></template>
+                <el-input v-model="fieldOptions.colWidth" />
+            </el-form-item>
             <el-form-item v-if="types.includes('index')">
                 <template slot="label">显示序号<help-tip prop="index" /></template>
                 <el-switch v-model="fieldOptions.index" />
             </el-form-item>
-            <el-form-item v-if="types.includes('summary')" label-width="110px">
+            <el-form-item v-if="types.includes('summary')">
                 <template slot="label">表尾合计行<help-tip prop="summary" /></template>
                 <el-row>
                     <el-col :span="5">
@@ -171,10 +175,10 @@
             </el-form-item>
 
             <el-form-item v-if="types.includes('customClass')" label-width="110px">
-                <template slot="label">自定义Class(用于子表单宽度，输入数字)<help-tip prop="customClass" /></template>
-                <el-input v-model="fieldOptions.custom_class" />
+                <template slot="label">自定义Class<help-tip prop="customClass" /></template>
+                <el-input v-model="fieldOptions.custom_class" placeholder="输入数字，用于控制子表单列宽" />
             </el-form-item>
-            <el-form-item v-if="types.includes('mobile')" label-width="110px">
+            <el-form-item v-if="types.includes('mobile')">
                 <template slot="label">移动端显示<help-tip prop="mobile" /></template>
                 <el-switch v-model="isMobile" />
             </el-form-item>

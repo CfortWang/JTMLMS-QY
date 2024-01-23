@@ -438,7 +438,6 @@ export default {
         },
         previewForm () {
             this.widgetFormData = JSON.parse(JSON.stringify(this.widgetForm))
-            console.log('FormData', this.widgetFormData)
             this.formrenderDialogVisible = true
         },
         /**

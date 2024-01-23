@@ -80,7 +80,7 @@
                             fixed="right"
                             class-name="hidden-print"
                             label="操作栏目"
-                            :width="manageButtons.length == 1 ? '85' : '160'"
+                            :width="colWidth?colWidth:(manageButtons.length == 1 ? '85' : '160')"
                         >
                             <template slot-scope="scope">
                                 <el-dropdown v-if="manageButtons.length > 3">
@@ -268,7 +268,7 @@ export default {
         }
     },
     data () {
-        const { page, pageSize = defaultPageSize, mode = 'inner' } = this.field.field_options || {}
+        const { page, pageSize = defaultPageSize, mode = 'inner', colWidth } = this.field.field_options || {}
         let initData = []
         if (page === 'N' || mode === 'block' || !this.value) {
             initData = this.value || []
@@ -277,6 +277,7 @@ export default {
         }
         return {
             pageSize,
+            colWidth,
             pageSizeOptions,
             editFromType: '', // 列表编辑弹出框类型
             npmDialogFormVisible: false, // 弹窗

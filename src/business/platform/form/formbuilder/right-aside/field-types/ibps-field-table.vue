@@ -27,7 +27,7 @@
             <!-- 布局设置 -->
             <editor-layout
                 :field-item="fieldItem"
-                types="mode,page,index,summary,summaryMethod,customClass"
+                types="mode,page,index,summary,summaryMethod,customClass,colWidth"
             />
         </el-form>
     </div>

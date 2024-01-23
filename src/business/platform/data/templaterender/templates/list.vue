@@ -457,7 +457,8 @@ export default {
             grooveData: {
                 title: ''
             },
-            grooveList: []
+            grooveList: [],
+            hadDoSearch: false
         }
     },
     computed: {
@@ -779,8 +780,33 @@ export default {
          */
         getFormatParams (outerKey) {
             let formParams = {}
-            if (this.$refs['searchForm']) {
-                formParams = this.$refs['searchForm'].getSearcFormData() || {}
+            const refSerchForm = this.$refs['searchForm']
+            if (refSerchForm) {
+                // 首次查询使用模板配置的默认查询条件
+                if (!this.hadDoSearch) {
+                    const range = ['datePicker', 'dateRange', 'numberRange']
+                    const multiple = ['radio', 'checkbox', 'select']
+                    const { query_columns = [] } = this.template || {}
+                    const defaultValueField = query_columns.filter(i => i.default_value)
+                    defaultValueField.forEach(item => {
+                        const getBuildSearchForm = this.buildSearchForm(item)
+                        const val = item.default_value.split('&')
+                        if (range.includes(item.field_type)) {
+                            // 非多选，传值为数组类型控件
+                            refSerchForm.params[getBuildSearchForm.prop[0]] = val[0]
+                            refSerchForm.params[getBuildSearchForm.prop[1]] = val[1]
+                            refSerchForm.params[getBuildSearchForm.modelValue] = val
+                            refSerchForm.params['daterange-prefix4'] = val
+                        } else if (multiple.includes(item.field_type)) {
+                            // 多选，且传值为数组类型控件
+                            refSerchForm.params[getBuildSearchForm.prop] = val
+                        } else {
+                            refSerchForm.params[getBuildSearchForm.prop] = item.default_value
+                        }
+                    })
+                }
+
+                formParams = refSerchForm.getSearcFormData() || {}
             }
             if (this.$utils.isNotEmpty(this.composeParam) && outerKey === 'outside') {
                 for (var i in this.composeParam) {
@@ -812,6 +838,7 @@ export default {
         },
         // 查询数据
         search () {
+            this.hadDoSearch = true
             this.loadData()
             this.addDataCont = {}
         },
@@ -1238,24 +1265,22 @@ export default {
                 rowHandle = {
                     effect: this.manageEffect ? 'display' : 'default',
                     actions: manageButtons,
-                    columnHeader: this.template.attrs.manage_effect == 'Y' || this.template.attrs.manage_effect == 'N' ? null : this.template.attrs.manage_effect
+                    columnHeader: this.template.attrs.manage_effect === 'Y' || this.template.attrs.manage_effect === 'N' ? null : this.template.attrs.manage_effect,
+                    colWidth: this.template.attrs.col_width
                 }
             }
             // 查询字段
             const searchForms = []
             this.setQueryColumns(this.template.query_columns || [], searchForms)
-
             // 显示字段
             const columns = []
             this.setDisplayColumns(this.template.display_columns || [], columns)
-
             this.listConfig = {
                 toolbars: toolbarButtons,
                 columns: columns,
                 rowHandle: rowHandle,
                 searchForm: searchForms.length > 0 ? { forms: searchForms } : null
             }
-
             // 判断地点是否第一层级
             const position = this.$store.getters.userInfo.positions
             const first = this.$store.getters.level.first
