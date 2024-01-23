@@ -9,6 +9,7 @@
             :disabled="disabled"
             :disabled-icon="disabledIcon"
             :show-placeholder="showPlaceholder"
+            :temp-search="tempSearch"
             @click="handleSelectorClick"
             @remove="handleSelectorRemove"
         />
@@ -122,7 +123,12 @@ export default {
             type: Boolean,
             default: false
         },
-        formData: Object
+        formData: Object,
+        tempSearch: { // 是否是数据模板使用的筛选条件
+            type: Boolean,
+            default: false
+        }
+
     },
     data () {
         return {

@@ -44,6 +44,7 @@
                     :style="itemStyle + (item.itemWidth ? `width: ${item.itemWidth}px;` : 'width: 150px')"
                     multiple
                     clearable
+                    collapse-tags
                     @keyup.enter.native.stop="handleEnter"
                 >
                     <el-option
@@ -161,7 +162,7 @@
                     v-model="params[item.modelValue]"
                     :type-key="item.field_options.dictionary"
                     style="width: 150px;"
-                    :multiple="false"
+                    :multiple="true"
                     :disabled="item.disabled"
                     clearable
                 />
@@ -174,11 +175,12 @@
                     :size="item.size ? item.size : 'mini'"
                     :type="item.selectorType||'user'"
                     :placeholder="item.placeholder"
-                    :multiple="false"
+                    :multiple="true"
                     :store="'id'"
                     :disabled="item.disabled"
                     :filter="item.field_options.filter || []"
                     :filtrate="true"
+                    :temp-search="true"
                 />
                 <!--自定义对话框-->
                 <ibps-custom-dialog
@@ -188,11 +190,12 @@
                     :disabled="item.disabled"
                     :template-key="item.field_options.dialog"
                     style="width: 150px;"
-                    :multiple="false"
+                    :multiple="true"
                     :store="item.field_options.store"
                     :icon="item.field_options.icon?'ibps-icon-'+item.field_options.icon:'ibps-icon-search'"
                     :type="item.field_options.dialog_type||'dialog'"
                     :dynamic-params="getLinkDynamicParams(item.field_options,params)"
+                    :temp-search="true"
                 />
                 <!-- 关联数据-->
                 <ibps-link-data
@@ -201,7 +204,7 @@
                     :size="item.size ? item.size : 'mini'"
                     :template-key="item.field_options.linkdata"
                     style="width: 150px;"
-                    :multiple="item.field_options.multiple === 'Y'"
+                    :multiple="true"
                     :dynamic-params="getLinkDynamicParams(item.field_options,params)"
                     :value-key="getLinkValueKey(item.field_options)"
                     :label-type="getLinkLabelType(item.field_options)"
@@ -347,6 +350,8 @@ export default {
          */
         getSearcFormData () {
             const { params, nameParams, datePrefix, format } = this
+            // TODO: 过滤多余筛选条件数据
+            // const allKey = Object.keys(params)
             const formattedForm = {
                 arg: {
                     relation: 'AND',
@@ -359,17 +364,30 @@ export default {
                     if (this.$utils.isNotEmpty(val)) {
                         const key = nameParams[v] || v
                         if (!Array.isArray(val)) {
-                            const o = {
-                                relation: 'AND',
-                                parameters: [
-                                    {
-                                        key,
-                                        value: val,
-                                        param: this.$utils.guid()
-                                    }
-                                ]
+                            const valArr = val.split(',')
+                            if (valArr.length > 1) {
+                                const parameters = valArr.map(i => ({
+                                    key,
+                                    value: i,
+                                    param: this.$utils.guid()
+                                }))
+                                formattedForm.arg.parameters.push({
+                                    relation: 'OR',
+                                    parameters
+                                })
+                            } else {
+                                const o = {
+                                    relation: 'AND',
+                                    parameters: [
+                                        {
+                                            key,
+                                            value: val,
+                                            param: this.$utils.guid()
+                                        }
+                                    ]
+                                }
+                                formattedForm.arg.parameters.push(o)
                             }
-                            formattedForm.arg.parameters.push(o)
                         } else {
                             const parameters = val.map(i => ({
                                 key,
