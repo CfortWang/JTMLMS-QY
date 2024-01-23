@@ -80,7 +80,7 @@
                             fixed="right"
                             class-name="hidden-print"
                             label="操作栏目"
-                            :width="colWidth?colWidth:(manageButtons.length == 1 ? '85' : '160')"
+                            :width="colWidth ? colWidth : (manageButtons.length == 1 ? '85' : '160')"
                         >
                             <template slot-scope="scope">
                                 <el-dropdown v-if="manageButtons.length > 3">

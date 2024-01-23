@@ -138,12 +138,21 @@ export default {
             // 获取查询角色信息
             let roleParams = ''
             let aboutMeParams = ''
-            const P = role.map(i => {
-                return `bian_zhi_jiao_se_ like '%${i.id}%' or shen_he_jiao_se_ like '%${i.id}%' or shen_pi_jiao_se_ like '%${i.id}%'`
+            const range = {
+                aboutMe: [],
+                sponsor: [],
+                review: [],
+                approve: []
+            }
+            role.forEach(i => {
+                range.aboutMe.push(`bian_zhi_jiao_se_ like '%${i.id}%' or shen_he_jiao_se_ like '%${i.id}%' or shen_pi_jiao_se_ like '%${i.id}%'`)
+                range.sponsor.push(`bian_zhi_jiao_se_ like '%${i.id}%'`)
+                range.review.push(`shen_he_jiao_se_ like '%${i.id}%'`)
+                range.approve.push(`shen_pi_jiao_se_ like '%${i.id}%'`)
             })
             parameters.forEach(item => {
-                if (item.key === 'range' && item.value === 'aboutMe') {
-                    aboutMeParams = ` and (${P.join(' or ')})`
+                if (item.key === 'range' && item.value !== 'all') {
+                    aboutMeParams = ` and (${range[item.value].join(' or ')})`
                 }
                 if (item.key === 'role') {
                     roleParams = ` and (bian_zhi_jiao_se_ like '%${item.value}%' or shen_he_jiao_se_ like '%${item.value}%' or shen_pi_jiao_se_ like '%${item.value}%')`

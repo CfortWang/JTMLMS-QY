@@ -222,10 +222,12 @@ export default {
             ]
             this.listConfig.columns = [
                 // { prop: 'fen_lei_', label: '表单分类', width: 120 },
+                { prop: 'nian_du_', label: '年度', width: 100 },
+                { prop: 'org_name', label: '部门', width: 100 },
                 { prop: 'biao_dan_ming_che', label: '表单名称', width: 210 },
                 { prop: 'shi_wu_shuo_ming_', label: '事务说明', minWidth: 250 },
                 { prop: 'fu_jian_', label: '附件', slotName: 'wenjinachayue', width: 250 },
-                { prop: 'nian_du_', label: '年度', width: 60 },
+
                 { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 120 },
                 { prop: 'ry_name', label: '上传人', width: 70 }
             ]
@@ -329,7 +331,10 @@ export default {
                     for (var i of this.$store.getters.deptList) {
                         buMenWhere.push(`bian_zhi_bu_men_ like '%${i.positionId}%'`)
                     }
-                    oldRecordSql = `select wj.*,ee.name_ as ry_name FROM t_ywyxjlb wj left join ibps_party_employee ee on wj.bian_zhi_ren_ = ee.id_ where (${buMenWhere.join(' or ')}) ${wheres1}  order by bian_zhi_shi_jian desc`
+                    oldRecordSql = `select wj.*,en.name_ AS org_name,ee.name_ as ry_name FROM t_ywyxjlb wj 
+                    left join ibps_party_employee ee on wj.bian_zhi_ren_ = ee.id_ 
+                    LEFT JOIN ibps_party_entity en ON en.id_= bian_zhi_bu_men_ 
+                    where (${buMenWhere.join(' or ')}) ${wheres1}  order by bian_zhi_shi_jian desc`
                 } else {
                     console.log('没有部门组织')
                     return

@@ -79,6 +79,21 @@ export const rangeOption = [
         label: '与我相关'
     },
     {
+        key: 'sponsor',
+        value: 'sponsor',
+        label: '由我编制'
+    },
+    {
+        key: 'review',
+        value: 'review',
+        label: '由我审核'
+    },
+    {
+        key: 'approve',
+        value: 'approve',
+        label: '由我审批'
+    },
+    {
         key: 'all',
         value: 'all',
         label: '全部'
@@ -170,7 +185,7 @@ export const listColumns = {
         { prop: 'depName', label: '发布部门', sortable: 'custom', width: 120 },
         { prop: 'userName', label: '发布人', width: 120 },
         { prop: 'publicDate', label: '发布日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
-        { prop: 'loseDate', label: '有效截至日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
+       // { prop: 'loseDate', label: '有效截至日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
         { prop: 'status', label: '发布状态', tags: typeOptions, width: 100 }
     ],
     guide: [

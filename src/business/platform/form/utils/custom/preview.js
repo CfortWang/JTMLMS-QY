@@ -38,8 +38,8 @@ export const preview = (tableForm, url) => {
                 tableForm.dialogTemplate = tpl
                 const { role } = store.getters.userInfo || {}
                 // 系统管理角色、检验科主任、检验科副主任、文件管理员、技术负责人、质量负责人可下载打印
-                const hasRole = role.some(item => ['xtgljs', 'syszr', 'jykfzr', 'wjgly', 'jsfzr', 'zlfzr'].includes(item.alias))
-                if (hasRole) {
+                const hasRole = role.some(item => ['xtgljs', 'syszr', 'jykfzr', 'wjgly', 'jsfzr', 'zlfzr', 'jyy'].includes(item.alias))
+                if (1 || hasRole) {
                     return
                 }
                 setTimeout(() => {

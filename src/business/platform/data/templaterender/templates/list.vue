@@ -796,6 +796,7 @@ export default {
                             refSerchForm.params[getBuildSearchForm.prop[0]] = val[0]
                             refSerchForm.params[getBuildSearchForm.prop[1]] = val[1]
                             refSerchForm.params[getBuildSearchForm.modelValue] = val
+                            // 用于渲染查询表单值
                             refSerchForm.params['daterange-prefix4'] = val
                         } else if (multiple.includes(item.field_type)) {
                             // 多选，且传值为数组类型控件
@@ -1042,7 +1043,7 @@ export default {
                         this.exportActions(buttonType)
                         break
                     case 'exportSelected': // 导出选中
-                        ActionUtils.selectedMultiRecord(selection).then((ids) => {
+                        ActionUtils.selectedMultiRecord(this.getSelectAllIds()).then((ids) => {
                             this.selecteds = ids
                             this.exportActions(buttonType, ids)
                         }).catch(() => {})
@@ -1437,7 +1438,6 @@ export default {
             if (fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition') {
                 fieldType = 'selector'
             }
-
             column['field_type'] = fieldType
             column['field_options'] = fieldOptions
             column['data_type'] = dataType
@@ -1515,7 +1515,16 @@ export default {
                     fieldType: 'date',
                     dateType: fieldOptions.datefmt_type ? fieldOptions.datefmt_type : 'date'
                 })
-            } else if (fieldType === 'datePicker' || fieldType.toLowerCase() === 'daterange') {
+            } else if (fieldType === 'datePicker') {
+                const datefmt = fieldOptions.datefmt || ''
+                const dateDealFmt = DateFormatUtil.dealFmt(fieldOptions.datefmt)
+                searchColumn = Object.assign(searchColumn, {
+                    prop: `Q^${field.name}^SL`,
+                    modelValue: `Q^${field.name}^SL`,
+                    fieldType: 'datePicker',
+                    field_options: fieldOptions
+                })
+            } else if (fieldType.toLowerCase() === 'daterange') {
                 const datefmt = fieldOptions.datefmt || ''
                 const dateDealFmt = DateFormatUtil.dealFmt(fieldOptions.datefmt)
                 searchColumn = Object.assign(searchColumn, {
