@@ -155,7 +155,7 @@ export default {
                     aboutMeParams = ` and (${range[item.value].join(' or ')})`
                 }
                 if (item.key === 'role') {
-                    roleParams = ` and (bian_zhi_jiao_se_ like '%${item.value}%' or shen_he_jiao_se_ like '%${item.value}%' or shen_pi_jiao_se_ like '%${item.value}%')`
+                    roleParams = ` and (bian_zhi_jiao_se_ like '%${item.value}%')`
                 }
             })
             // 获取查询字段
