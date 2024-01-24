@@ -7,6 +7,20 @@
                 <dv-decoration-5 :class="$style.center" :dur="5" />
                 <dv-decoration-8 :class="$style.right" :reverse="true" />
                 <div :class="$style.title">{{ title }}</div>
+                <dv-border-box-8 :class="$style.year">
+                    <el-date-picker
+                        v-model="year"
+                        type="year"
+                        value-format="yyyy"
+                        format="yyyy"
+                        placeholder="统计年度"
+                        style="width: 80px"
+                        :readonly="false"
+                        :editable="true"
+                        :clearable="false"
+                        @change="updateAll"
+                    />
+                </dv-border-box-8>
                 <dv-decoration-7 :class="$style.dept">
                     <el-dropdown @command="changeDept">
                         <span class="el-dropdown-link" :style="`font-size: ${fontSize}px;`">{{ selectedDept }}</span>
@@ -29,7 +43,7 @@
             </div>
             <!-- 图表区域 -->
             <dv-border-box-1>
-                <container v-if="renderData.length" :info="renderData" :font-size="fontSize" />
+                <container v-if="renderData.length" :info="renderData" :font-size="fontSize" :choose-year="year" />
             </dv-border-box-1>
         </dv-full-screen-container>
     </div>
@@ -41,12 +55,14 @@ export default {
         container: () => import('./components/container.vue')
     },
     data () {
+        const d = new Date()
         return {
             deptList: [],
             // selectedDept: '',
             level: '',
             title: '质量指标统计',
-            year: '',
+            year: d.toJSON().slice(0, 4),
+            // year: '2023',
             initData: {},
             renderData: [],
             fontSize: 18,
@@ -81,12 +97,7 @@ export default {
             screenfull.request()
         }
 
-        this.initializeData()
-        this.fetchData().then(() => {
-            this.startAutoPlay()
-            this.setupTimer()
-            this.renderData = this.initData[this.selectedDept] ? this.initData[this.selectedDept].slice(this.chartIndex * 12, (this.chartIndex + 1) * 12) : []
-        })
+        this.updateAll()
     },
     beforeDestroy () {
         if (screenfull.isFullscreen) {
@@ -97,20 +108,29 @@ export default {
     methods: {
         initializeData () {
             const w = window.innerWidth
-            const d = new Date()
             const special = ['综合', '样品', '科研', '医疗', '教学', '急诊', 'test', '测试']
             const { deptList = [] } = this.$store.getters || {}
             const deptFilter = deptList.filter(item => { return !special.some(i => item.positionName.includes(i)) && item.depth === 4 }).sort(i => i.sn)
             const { first = '', second = '' } = this.$store.getters.level || {}
 
+            this.initData = {}
             this.deptList = deptFilter
             this.dept = deptFilter[0].positionName
+            this.deptIndex = 0
+            this.chartIndex = 0
             this.level = second || first
-            this.year = d.toJSON().slice(0, 4)
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
         },
+        updateAll () {
+            this.initializeData()
+            this.fetchData().then(() => {
+                this.startAutoPlay()
+                this.setupTimer()
+                this.renderData = this.initData[this.selectedDept] ? this.initData[this.selectedDept].slice(this.chartIndex * 12, (this.chartIndex + 1) * 12) : []
+            })
+        },
         async fetchData () {
-            const sql = `select a.id_ as aid, a.di_dian_ as place, a.bian_zhi_bu_men_ as dept, a.tong_ji_yue_fen_ as months, a.create_time_ as createTime, b.id_ as bid, b.zhi_liang_mu_biao as goal, b.zhi_liang_zhi_bia as target, b.zhi_biao_xian_zhi as limitValue, b.shi_ji_shu_zhi_ as result, b.yuan_shi_shu_ju_ as originalData from t_zlzbpjb a inner join (select bian_zhi_bu_men_, tong_ji_yue_fen_, max(create_time_) as max from t_zlzbpjb group by bian_zhi_bu_men_, tong_ji_yue_fen_) a_latest on a.bian_zhi_bu_men_ = a_latest.bian_zhi_bu_men_ and a.tong_ji_yue_fen_ = a_latest.tong_ji_yue_fen_ and a.create_time_ = a_latest.max left join t_zlzbpjzb b on a.id_ = b.parent_id_ where a.shi_fou_guo_shen_ = '已完成' and a.di_dian_ = '${this.level}' and a.create_time_ like '${this.year}%'`
+            const sql = `select a.id_ as aid, a.di_dian_ as place, a.bian_zhi_bu_men_ as dept, a.tong_ji_yue_fen_ as months, a.create_time_ as createTime, b.id_ as bid, b.zhi_liang_mu_biao as goal, b.zhi_liang_zhi_bia as target, b.zhi_biao_xian_zhi as limitValue, b.shi_ji_shu_zhi_ as result, b.yuan_shi_shu_ju_ as originalData from t_zlzbpjb a inner join (select bian_zhi_bu_men_, tong_ji_yue_fen_, max(create_time_) as max from t_zlzbpjb group by bian_zhi_bu_men_, tong_ji_yue_fen_) a_latest on a.bian_zhi_bu_men_ = a_latest.bian_zhi_bu_men_ and a.tong_ji_yue_fen_ = a_latest.tong_ji_yue_fen_ and a.create_time_ = a_latest.max left join t_zlzbpjzb b on a.id_ = b.parent_id_ where a.shi_fou_guo_shen_ = '已完成' and a.di_dian_ = '${this.level}' and a.tong_ji_yue_fen_ like '${this.year}%'`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -162,6 +182,10 @@ export default {
         showNextData () {
             // console.log(this.chartIndex)
             if (!this.autoPlay) {
+                return
+            }
+            if (!this.initData[this.selectedDept]) {
+                this.clenUp()
                 return
             }
             if ((this.chartIndex + 1) * 12 < this.initData[this.selectedDept].length) {
@@ -282,8 +306,9 @@ export default {
                 top: 15px;
                 transform: translateX(-50%);
             }
-            .dept, .back, .parse {
+            .year, .dept, .back, .parse {
                 width: 8%;
+                max-width: 180px;
                 cursor: pointer;
                 height: 2.825rem;
                 line-height: 2.825rem;
@@ -292,6 +317,25 @@ export default {
                 flex: 1;
                 position: absolute;
                 color: #ffffff;
+            }
+            .year {
+                width: 5%;
+                right: 83%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                :global {
+                    .el-input--small .el-input__inner {
+                        width: 100% !important;
+                        background: rgba(255, 255, 255, 0);
+                        border: none;
+                        color: #fff;
+                        font-size: 16px;
+                        cursor: pointer;
+                        // padding-left: 0;
+                        padding-right: 0;
+                    }
+                }
             }
             .dept {
                 display: flex;
@@ -306,6 +350,9 @@ export default {
                 :global {
                     .el-dropdown {
                         width: calc(100% - 52px);
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        white-space: nowrap;
                         .el-dropdown-link {
                             text-align: center;
                         }
@@ -314,27 +361,48 @@ export default {
             }
             .back {
                 width: 5%;
-                left: 75%;
+                left: calc(75% + 80px);
             }
             .parse {
                 width: 2%;
-                left: calc(80% + 40px);
+                left: 75%;
                 align-items: center;
                 padding: 5px;
                 > img {
                     height: calc(100% - 10px);
                 }
             }
-            @media only screen and (max-width: 1680px){
-                .dept, .back, .parse {
+            @media only screen and (max-width: 1680px) {
+                .year, .dept, .back, .parse {
                     height: 2.5rem;
                     line-height: 2.5rem;
                     margin-top: 2.5%;
                 }
+                .year {
+                    right: 82%;
+                }
+                .dept {
+                    width: 5%;
+                    min-width: 120px;
+                    font-size: 18px;
+                    font-weight: normal;
+                }
+                .back {
+                    left: calc(75% + 60px);
+                }
             }
-            @media only screen and (max-width: 1366px){
-                .parse {
-                    left: calc(80% + 20px);
+            @media only screen and (max-width: 1366px) {
+                .year {
+                    right: 80%;
+                }
+                .dept {
+                    right: 70%;
+                    min-width: 140px;
+                    font-size: 16px;
+                    font-weight: normal;
+                }
+                .back {
+                    left: calc(75% + 50px);
                 }
             }
         }

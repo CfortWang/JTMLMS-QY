@@ -33,12 +33,14 @@ export default {
         fontSize: {
             type: Number,
             default: 18
+        },
+        chooseYear: {
+            type: String,
+            default: ''
         }
     },
     data () {
-        return {
-            
-        }
+        return {}
     },
     computed: {
         rowData () {
@@ -63,8 +65,10 @@ export default {
     },
     methods: {
         init () {
-            const d = new Date()
-            const m = parseInt(d.toJSON().split('-')[1])
+            const D = new Date()
+            // 控制数据显示，历史数据显示整年，本年度数据显示到当前月
+            const y = parseInt(D.toJSON().slice(0, 4))
+            const m = parseInt(this.chooseYear) < y ? 12 : parseInt(D.toJSON().split('-')[1])
             const w = window.innerWidth
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
             setTimeout(() => {
