@@ -95,6 +95,14 @@ export default {
         selectionType: {
             type: String,
             default: 'checkbox'
+        },
+        /**
+     * @description 所有列表已选择的数据id
+     *
+     */
+        selection_all: {
+            type: Array,
+            default: () => []
         }
     },
     methods: {
@@ -263,7 +271,8 @@ export default {
             const buttonKey = action.key
             let selection = null// 选中数据
             if (position === 'toolbar') { // 工具栏
-                selection = this.getSelectedIds()
+                // selection = this.getSelectedIds()
+                selection = this.selection_all.map(i => i.id_) // 默认给所有已选择的数据id
             } else { // 管理列
                 selection = data ? this.getPkValue(data) : null
             }

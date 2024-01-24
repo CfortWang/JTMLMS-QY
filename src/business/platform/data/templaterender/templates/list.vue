@@ -21,6 +21,7 @@
             :dynamic-params="dynamicParams"
             :form-name="template ? template.attrs.form_name : ''"
             :class="{ 'ibps-data-template-list__preview': preview }"
+            :selection_all="selectionAll"
             @display-field-change="handleDisplayField"
             @header-dragend="handleHeaderDragend"
             @selection-change="handleSelectionChange"
@@ -724,6 +725,9 @@ export default {
          */
         getSelectAllIds () {
             const selectAllIds = []
+            if (this.$utils.isEmpty(this.selectionAll)) {
+                return
+            }
             if (this.multiple) {
                 this.selectionAll.forEach((row) => {
                     selectAllIds.push(this.getPkValue(row))
@@ -1043,6 +1047,7 @@ export default {
                         this.exportActions(buttonType)
                         break
                     case 'exportSelected': // 导出选中
+
                         ActionUtils.selectedMultiRecord(this.getSelectAllIds()).then((ids) => {
                             this.selecteds = ids
                             this.exportActions(buttonType, ids)
