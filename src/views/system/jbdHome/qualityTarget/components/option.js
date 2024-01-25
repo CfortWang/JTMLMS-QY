@@ -111,6 +111,6 @@ export const chartOption = {
     tooltip: {
         show: true,
         trigger: 'axis',
-        formatter: '任务情况<br/>{b}：{c}<br/>占比：{d}%'
+        formatter: '指标详情<br/>{b}月：{c}'
     }
 }
