@@ -128,8 +128,17 @@ export default {
         const { first = '', second = '' } = this.$store.getters.level || {}
         const level = second || first
         const { userList = [], deptList = [], role = [], menus = [], isSuper } = this.$store.getters || {}
+        const allRolesMap = new Map()
+        userList.forEach(user => {
+            user.roleId.split(',').forEach((roleId, index) => {
+                if (!allRolesMap.has(roleId)) {
+                    allRolesMap.set(roleId, user.roles.split(',')[index])
+                }
+            })
+        })
+        const allRoles = Array.from(allRolesMap, ([key, value]) => ({ key, value: key, label: value }))
         const isManager = role.some(i => i.alias === 'xtgljs') || isSuper
-        const roleOption = role.map(i => ({ key: i.id, value: i.id, label: i.name }))
+        const roleOption = isManager ? allRoles : role.map(i => ({ key: i.id, value: i.id, label: i.name }))
         const sysOption = menus.map(i => ({ key: i.alias, value: i.title, label: i.title })).filter(i => !['xtgl', 'xnyz'].includes(i.key))
         listSearchForm.guide.forms[0].value = isManager ? 'all' : 'aboutMe'
         listSearchForm.guide.forms[1].options = sysOption
@@ -143,6 +152,13 @@ export default {
                 sponsor: [],
                 review: [],
                 approve: []
+            }
+            const sortField = {
+                TABLE_NO_: 'biao_dan_bian_hao'
+            }
+            let sortParams = 'sn_ + 0 asc'
+            if (sorts && sorts.length) {
+                sortParams = sorts.map(i => `${sortField[i.field]} ${i.order}`).join(',')
             }
             role.forEach(i => {
                 range.aboutMe.push(`bian_zhi_jiao_se_ like '%${i.id}%' or shen_he_jiao_se_ like '%${i.id}%' or shen_pi_jiao_se_ like '%${i.id}%'`)
@@ -164,7 +180,7 @@ export default {
             }, '')
             params = params + aboutMeParams + roleParams
             // and di_dian_ = '${level}'
-            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver, ye_mian_lu_jing_ as path, zi_yuan_lu_jing_ as res from t_bdbhpzb where sn_ + 0 > 0 ${params} order by sn_ + 0 asc`
+            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver, ye_mian_lu_jing_ as path, zi_yuan_lu_jing_ as res from t_bdbhpzb where sn_ + 0 > 0 ${params} order by ${sortParams}`
             const { pageNo = 1, limit = 15 } = requestPage || {}
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
@@ -411,6 +427,7 @@ export default {
                 pageParams = page
             }
             // const s = this.activeTab === 'news' ? this.sorts { 'PUBLIC_DATE_': 'DESC' } : this.sorts
+            console.log(ActionUtils.formatParams(params, pageParams, this.sorts))
             return ActionUtils.formatParams(params, pageParams, this.sorts)
         },
         // 处理表格点击事件

@@ -139,7 +139,8 @@ export const listSearchForm = {
             { prop: 'suo_shu_xi_tong_', label: '所属子系统', labelWidth: 85, fieldType: 'select', options: [] },
             { prop: 'gong_neng_mo_kuai', label: '所属功能模块', labelWidth: 100, fieldType: 'input' },
             { prop: 'role', label: '编制角色', labelWidth: 70, fieldType: 'select', options: [] },
-            { prop: 'biao_dan_ming_che', label: '记录表单', labelWidth: 70, fieldType: 'input' },
+            { prop: 'biao_dan_ming_che', label: '表单名称', labelWidth: 70, fieldType: 'input' },
+            { prop: 'biao_dan_bian_hao', label: '表单编号', labelWidth: 70, fieldType: 'input' },
             { prop: 'shi_wu_lei_xing_', label: '事务类型', labelWidth: 70, fieldType: 'select', options: taskTypeOption }
         ]
     }
@@ -185,7 +186,7 @@ export const listColumns = {
         { prop: 'depName', label: '发布部门', sortable: 'custom', width: 120 },
         { prop: 'userName', label: '发布人', width: 120 },
         { prop: 'publicDate', label: '发布日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
-       // { prop: 'loseDate', label: '有效截至日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
+        // { prop: 'loseDate', label: '有效截至日期', sortable: 'custom', dateFormat: 'yyyy-MM-dd', width: 120 },
         { prop: 'status', label: '发布状态', tags: typeOptions, width: 100 }
     ],
     guide: [
@@ -193,7 +194,7 @@ export const listColumns = {
         { prop: 'sysName', label: '所属子系统', width: 100 },
         { prop: 'module', label: '所属功能模块', width: fieldWidth },
         { prop: 'tableName', label: '记录表单', width: 200 },
-        // { prop: 'tableNo', label: '表单编号', width: 100 },
+        { prop: 'tableNo', label: '表单编号', width: 150, sortable: 'custom' },
         { prop: 'timing', label: '填写时机/记录频次', minWidth: fieldWidth },
         { prop: 'taskType', label: '事务类型', tags: taskTypeOption, width: 100 },
         { prop: 'fileName', label: '程序文件', width: 160 },

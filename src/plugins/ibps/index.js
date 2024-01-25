@@ -58,6 +58,7 @@ export default {
 
         Vue.prototype.$ibpsUrl = env.VUE_APP_BASE_API_0_0_TEST
         const reportPath = '金通医学实验室管理系统'
+        Vue.prototype.$reportBasePath = reportPath
         // 格式化参数
         const getParams = (params) => {
             const parts = params.split('&')
