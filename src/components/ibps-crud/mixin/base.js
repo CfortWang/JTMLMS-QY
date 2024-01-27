@@ -101,7 +101,7 @@ export default {
          *
          */
         selectionAll: {
-            type: Object,
+            type: [Object, Array],
             default: null
         }
     },
@@ -271,7 +271,7 @@ export default {
             const buttonKey = action.key
             let selection = null// 选中数据
             if (position === 'toolbar') { // 工具栏
-                if (this.selectionAll) {
+                if (this.$utils.isArray(this.selectionAll) && this.selectionAll.length) {
                     selection = this.selectionAll.map(i => i.id_) // 默认给所有已选择的数据id
                 } else {
                     selection = this.getSelectedIds()
@@ -279,7 +279,6 @@ export default {
             } else { // 管理列
                 selection = data ? this.getPkValue(data) : null
             }
-
             this.$emit('action-event', buttonKey, position, selection, data, index, action)
         },
 

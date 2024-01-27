@@ -21,7 +21,7 @@
             :dynamic-params="dynamicParams"
             :form-name="template ? template.attrs.form_name : ''"
             :class="{ 'ibps-data-template-list__preview': preview }"
-            :selection_all="selectionAll"
+            :selection-all="selectionAll"
             @display-field-change="handleDisplayField"
             @header-dragend="handleHeaderDragend"
             @selection-change="handleSelectionChange"
@@ -1520,16 +1520,7 @@ export default {
                     fieldType: 'date',
                     dateType: fieldOptions.datefmt_type ? fieldOptions.datefmt_type : 'date'
                 })
-            } else if (fieldType === 'datePicker') {
-                const datefmt = fieldOptions.datefmt || ''
-                const dateDealFmt = DateFormatUtil.dealFmt(fieldOptions.datefmt)
-                searchColumn = Object.assign(searchColumn, {
-                    prop: `Q^${field.name}^SL`,
-                    modelValue: `Q^${field.name}^SL`,
-                    fieldType: 'datePicker',
-                    field_options: fieldOptions
-                })
-            } else if (fieldType.toLowerCase() === 'daterange') {
+            } else if (fieldType === 'datePicker' || fieldType.toLowerCase() === 'daterange') {
                 const datefmt = fieldOptions.datefmt || ''
                 const dateDealFmt = DateFormatUtil.dealFmt(fieldOptions.datefmt)
                 searchColumn = Object.assign(searchColumn, {

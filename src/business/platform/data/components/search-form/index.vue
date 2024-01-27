@@ -86,7 +86,7 @@
                     @change="date => changeDateAddEndDate(date, item)"
                     @keyup.enter.native.stop="handleEnter"
                 />
-                <el-date-picker
+                <!-- <el-date-picker
                     v-else-if="item.fieldType === 'datePicker'"
                     v-model="params[item.modelValue]"
                     :placeholder="item.placeholder"
@@ -100,7 +100,7 @@
                     :value-format="item.field_options.datefmt"
                     :format="item.field_options.datefmt"
                     @keyup.enter.native.stop="handleEnter"
-                />
+                /> -->
                 <!-- 日期范围-->
                 <ibps-date-range
                     v-else-if="item.fieldType === 'yearrange'"
