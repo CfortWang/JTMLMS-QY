@@ -351,7 +351,7 @@ const FormUtil = {
         }
     },
     getCurrentDataValue ({ selectorType, bindId, fieldName, storeType }) {
-        const userInfo = store.getters.userInfo
+        const { userInfo } = store.getters || {}
         const { level = {} } = store.getters
         // 缓存用户
         if (userInfo.employee && userInfo.employee.id) {
@@ -377,16 +377,24 @@ const FormUtil = {
         }
         // 岗位
         if (Utils.isNotEmpty(userInfo.positions)) {
-            const selectors = []
-            userInfo.positions.forEach((item) => {
-                if (Utils.isNotEmpty(item) && Utils.isNotEmpty(item.id)) {
-                    selectors.push({
-                        'id': item.id,
-                        'name': item.name
-                    })
-                }
-            })
-            this.CACHE_CURRENT_USER_DATA['position'] = selectors
+            const { mainPosition } = userInfo || {}
+            if (Utils.isNotEmpty(mainPosition)) {
+                this.CACHE_CURRENT_USER_DATA['position'] = [{
+                    id: mainPosition.id,
+                    name: mainPosition.name
+                }]
+            } else {
+                const selectors = []
+                userInfo.positions.forEach((item) => {
+                    if (Utils.isNotEmpty(item) && Utils.isNotEmpty(item.id)) {
+                        selectors.push({
+                            'id': item.id,
+                            'name': item.name
+                        })
+                    }
+                })
+                this.CACHE_CURRENT_USER_DATA['position'] = selectors
+            }
         }
         // 角色
         if (Utils.isNotEmpty(userInfo.role)) {
