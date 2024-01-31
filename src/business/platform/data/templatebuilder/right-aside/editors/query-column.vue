@@ -55,7 +55,7 @@
             <el-switch v-model="formData.same" active-value="Y" inactive-value="N" />
         </el-form-item>
         <el-form-item label="默认值">
-            <el-input v-model="formData.default_value" placeholder="请输入查询字段默认值，多值以&分割" />
+            <el-input v-model="formData.default_value" placeholder="请输入查询字段默认值，多值以&分割，日期：xxx&xxx" />
         </el-form-item>
         <!--控件类型-->
         <template v-if="formData.same === 'N'">

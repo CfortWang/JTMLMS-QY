@@ -796,17 +796,33 @@ export default {
                         const getBuildSearchForm = this.buildSearchForm(item)
                         const val = item.default_value.split('&')
                         if (range.includes(item.field_type)) {
-                            // 非多选，传值为数组类型控件
-                            refSerchForm.params[getBuildSearchForm.prop[0]] = val[0]
-                            refSerchForm.params[getBuildSearchForm.prop[1]] = val[1]
-                            refSerchForm.params[getBuildSearchForm.modelValue] = val
                             // 用于渲染查询表单值
-                            refSerchForm.params['daterange-prefix4'] = val
+                            const index = query_columns.findIndex(i => i.name === item.name)
+                            switch (item.field_options.datefmt) {
+                                case 'yyyy':
+                                // 非多选，传值为数组类型控件
+                                    refSerchForm.params[getBuildSearchForm.prop[0]] = val[0] + '-01-01'
+                                    refSerchForm.params[getBuildSearchForm.prop[1]] = val[1] + '-12-31'
+                                    refSerchForm.params['daterange-prefix' + index] = val[0]
+                                    break
+                                case 'yyyy-MM':
+                                    refSerchForm.params[getBuildSearchForm.prop[0]] = val[0] + '-01'
+                                    refSerchForm.params[getBuildSearchForm.prop[1]] = val[1] + '-31'
+                                    refSerchForm.params['daterange-prefix' + index] = val[0]
+                                    break
+                                default:
+                                    refSerchForm.params[getBuildSearchForm.prop[0]] = val[0]
+                                    refSerchForm.params[getBuildSearchForm.prop[1]] = val[1]
+                                    refSerchForm.params['daterange-prefix' + index] = [val[0], val[1]]
+
+                                    break
+                            }
+                            // refSerchForm.params[getBuildSearchForm.modelValue] = val
                         } else if (multiple.includes(item.field_type)) {
                             // 多选，且传值为数组类型控件
                             refSerchForm.params[getBuildSearchForm.prop] = val
                         } else {
-                            refSerchForm.params[getBuildSearchForm.prop] = item.default_value
+                            refSerchForm.params[getBuildSearchForm.prop] = this.replaceAll(item.default_value, '&', ',')
                         }
                     })
                 }
@@ -1000,7 +1016,7 @@ export default {
                         break
                     case 'consult': // 查阅
                         this.snapshotFile = ''
-                        if (data.kuai_zhao_) {
+                        if (0 && data.kuai_zhao_) {
                             this.snapshotFile = data.kuai_zhao_
                             setTimeout(() => {
                                 this.$refs.snapshot.handleActionEvent('preview', 0)
@@ -1839,6 +1855,13 @@ export default {
                 return
             }
             JTemplate._afterSubmit(this, action, position, selection, data, callback)
+        },
+        // 替换字符串中指定的字符
+        replaceAll (str, find, replace) {
+            if (str.indexOf(find) === -1) {
+                return str
+            }
+            return this.replaceAll(str.replace(find, replace), find, replace)
         }
     }
 }

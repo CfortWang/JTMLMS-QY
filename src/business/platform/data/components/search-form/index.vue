@@ -276,7 +276,6 @@ export default {
         const nameParams = {}
         const format = {}
         const fuzzyOps = {}
-
         forms.forEach((v, i) => {
             const propType = typeof v.prop
             if (propType === 'string') {
@@ -447,8 +446,10 @@ export default {
                 this.params[endDate] = ''
                 return
             }
-            this.params[startDate] = this.formatDate(date, 1)
-            this.params[endDate] = this.formatDate(date, 2)
+            // this.params[startDate] = this.formatDate(date, 1)
+            // this.params[endDate] = this.formatDate(date, 2)
+            this.params[startDate] = date + '-01'
+            this.params[endDate] = date + '-31'
         },
         // yyyy格式 日期增加01-01和12-31
         changeDateAddEndDate (date, item, type) {

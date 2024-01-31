@@ -31,8 +31,7 @@
                     v-for="t in positionType"
                     :key="t.value"
                     :label="t.value"
-                    >{{ t.label }}</el-radio-button
-                >
+                >{{ t.label }}</el-radio-button>
             </el-radio-group>
         </el-form-item>
         <el-form-item label="按钮颜色" prop="style">
@@ -47,13 +46,15 @@
                         :underline="false"
                         :type="item.type"
                         style="float: left;"
-                        >{{ item.label }}</el-link
-                    >
+                    >{{ item.label }}</el-link>
                 </el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="按钮图标" prop="icon">
             <ibps-icon-select v-model="formData.icon" icon="el-icon-search" />
+        </el-form-item>
+        <el-form-item label="模板归档显示">
+            <el-switch v-model="formData.show_on_record" active-value="Y" inactive-value="N" />
         </el-form-item>
         <el-form-item
             v-if="formData && formData.button_type === 'export'"
@@ -99,131 +100,131 @@
     </el-form>
 </template>
 <script>
-    import { hasPermission } from '@/business/platform/data/constants/buttons'
-    import BpmDefSelector from '@/business/platform/bpmn/definition/selector'
-    import RightsSelector from '@/business/platform/rights/config/selector'
-    import ExportColumn from '../components/export-column'
+import { hasPermission } from '@/business/platform/data/constants/buttons'
+import BpmDefSelector from '@/business/platform/bpmn/definition/selector'
+import RightsSelector from '@/business/platform/rights/config/selector'
+import ExportColumn from '../components/export-column'
 
-    export default {
-        components: {
-            RightsSelector,
-            BpmDefSelector,
-            ExportColumn
+export default {
+    components: {
+        RightsSelector,
+        BpmDefSelector,
+        ExportColumn
+    },
+    props: {
+        data: {
+            type: Object
         },
-        props: {
-            data: {
-                type: Object
+        template: {
+            type: Object
+        },
+        formKey: String,
+        type: {
+            type: String,
+            default: 'function'
+        }
+    },
+    data () {
+        return {
+            colors: [
+                { type: 'default', label: '默认' },
+                { type: 'primary', label: '主要' },
+                { type: 'success', label: '成功' },
+                { type: 'info', label: '信息' },
+                { type: 'warning', label: '警告' },
+                { type: 'danger', label: '危险' }
+            ],
+            exportFieldDialogVisible: false,
+            formName: 'form',
+            formData: {
+                style: 'primary'
             },
-            template: {
-                type: Object
-            },
-            formKey: String,
-            type: {
-                type: String,
-                default: 'function'
-            }
-        },
-        data() {
-            return {
-                colors: [
-                    { type: 'default', label: '默认' },
-                    { type: 'primary', label: '主要' },
-                    { type: 'success', label: '成功' },
-                    { type: 'info', label: '信息' },
-                    { type: 'warning', label: '警告' },
-                    { type: 'danger', label: '危险' }
-                ],
-                exportFieldDialogVisible: false,
-                formName: 'form',
-                formData: {
-                    style: 'primary'
-                },
-                rules: {
-                    label: [
-                        {
-                            required: true,
-                            message: this.$t('validate.required')
-                        }
-                    ]
-                }
-            }
-        },
-        computed: {
-            positionType() {
-                const positionType = []
-                positionType.push({
-                    value: 'all',
-                    label: '所有'
-                })
-                const buttonType = this.formData.button_type || ''
-                if (hasPermission(buttonType, 'toolbar') && this.type === 'function') {
-                    positionType.push({
-                        value: 'toolbar',
-                        label: '仅顶部'
-                    })
-                }
-                if (hasPermission(buttonType, 'manage') && this.type === 'function') {
-                    positionType.push({
-                        value: 'manage',
-                        label: '仅管理列'
-                    })
-                }
-                // if (hasPermission(buttonType, 'search') && this.type === 'function') {
-                //   positionType.push({
-                //     value: 'search',
-                //     label: '仅查询列'
-                //   })
-                // }
-                if (hasPermission(buttonType, 'edit') && this.type === 'edit') {
-                    positionType.push({
-                        value: 'edit',
-                        label: '仅编辑'
-                    })
-                }
-                return positionType
-            }
-        },
-        watch: {
-            data: {
-                handler(val) {
-                    if (val) {
-                        this.formData = val
-                        const spicialType = ['custom', 'sefStartFlow', 'openTask']
-                        if (spicialType.includes(this.formData.button_type)) {
-                            this.rules['code'] = [
-                                {
-                                    required: true,
-                                    message: this.$t('validate.required')
-                                }
-                            ]
-                        } else {
-                            this.rules['code'] = null
-                        }
+            rules: {
+                label: [
+                    {
+                        required: true,
+                        message: this.$t('validate.required')
                     }
-                },
-                immediate: true
-            }
-        },
-        methods: {
-            // 获取表单数据
-            getFormData(callback) {
-                this.$refs[this.formName].validate((valid) => {
-                    if (valid) {
-                        callback(this.formData)
-                    } else {
-                        callback()
-                    }
-                })
-            },
-            handleExportFields() {
-                this.exportFieldDialogVisible = true
-            },
-            handleExportColumn(data) {
-                this.handleData('export_columns', data)
-            },
-            handleData(key, value) {
-                this.$emit('callback', key, value)
+                ]
             }
         }
+    },
+    computed: {
+        positionType () {
+            const positionType = []
+            positionType.push({
+                value: 'all',
+                label: '所有'
+            })
+            const buttonType = this.formData.button_type || ''
+            if (hasPermission(buttonType, 'toolbar') && this.type === 'function') {
+                positionType.push({
+                    value: 'toolbar',
+                    label: '仅顶部'
+                })
+            }
+            if (hasPermission(buttonType, 'manage') && this.type === 'function') {
+                positionType.push({
+                    value: 'manage',
+                    label: '仅管理列'
+                })
+            }
+            // if (hasPermission(buttonType, 'search') && this.type === 'function') {
+            //   positionType.push({
+            //     value: 'search',
+            //     label: '仅查询列'
+            //   })
+            // }
+            if (hasPermission(buttonType, 'edit') && this.type === 'edit') {
+                positionType.push({
+                    value: 'edit',
+                    label: '仅编辑'
+                })
+            }
+            return positionType
+        }
+    },
+    watch: {
+        data: {
+            handler (val) {
+                if (val) {
+                    this.formData = val
+                    const spicialType = ['custom', 'sefStartFlow', 'openTask']
+                    if (spicialType.includes(this.formData.button_type)) {
+                        this.rules['code'] = [
+                            {
+                                required: true,
+                                message: this.$t('validate.required')
+                            }
+                        ]
+                    } else {
+                        this.rules['code'] = null
+                    }
+                }
+            },
+            immediate: true
+        }
+    },
+    methods: {
+        // 获取表单数据
+        getFormData (callback) {
+            this.$refs[this.formName].validate((valid) => {
+                if (valid) {
+                    callback(this.formData)
+                } else {
+                    callback()
+                }
+            })
+        },
+        handleExportFields () {
+            this.exportFieldDialogVisible = true
+        },
+        handleExportColumn (data) {
+            this.handleData('export_columns', data)
+        },
+        handleData (key, value) {
+            this.$emit('callback', key, value)
+        }
     }
+}
 </script>
