@@ -123,6 +123,7 @@
                     :border="fieldOptions.border"
                     :style="{ display: fieldOptions.arrangement === 'vertical' ? 'block' : null }"
                     class="ibps-pt-5"
+                    @click.native.stop.prevent="handleRadioChange(o.val)"
                 >
                     {{ o.label }}
                 </component>
@@ -996,6 +997,17 @@ export default {
         }
     },
     methods: {
+        handleRadioChange (val) {
+            if (this.dataModel === val) {
+                this.dataModel = null
+            } else {
+                this.dataModel = val
+            }
+            // 因@click.native.stop.prevent修饰符阻止了父元素的事件监听，需手动触发el-radio-group的change事件
+            this.$nextTick(() => {
+                this.$emit('change', this.dataModel)
+            })
+        },
         // 日期格式调整
         selectTime (val) {
             const date = new Date(new Date())

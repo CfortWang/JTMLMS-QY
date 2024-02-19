@@ -1601,6 +1601,11 @@ export default {
                     modelValue: `Q^${field.name}^${querySuffix}`
                 })
             }
+            if (field.item_width) {
+                searchColumn = Object.assign(searchColumn, {
+                    itemWidth: field.item_width
+                })
+            }
             return searchColumn
         },
         buildDisplayColumn (field) {

@@ -57,6 +57,9 @@
         <el-form-item label="默认值">
             <el-input v-model="formData.default_value" placeholder="请输入查询字段默认值，多值以&分割，日期：xxx&xxx" />
         </el-form-item>
+        <el-form-item label="宽度">
+            <el-input v-model="formData.item_width" placeholder="请填写数字" />
+        </el-form-item>
         <!--控件类型-->
         <template v-if="formData.same === 'N'">
             <el-form-item label="控件类型">
@@ -238,7 +241,8 @@ export default {
                 common: 'Y',
                 same: 'Y',
                 field_type: 'text',
-                default_value: ''
+                default_value: '',
+                item_width: ''
             },
             rules: {
                 name: [{ required: true, message: this.$t('validate.required') }],
