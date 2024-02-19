@@ -751,7 +751,8 @@
 					"name": "お名前",
 					"orgPath": "帰属組織パス",
 					"status": "州",
-					"wcAccount": "企業のWeChatアカウント"
+					"wcAccount": "企業のWeChatアカウント",
+					"job": "ポジションです"
 				},
 				"title": "従業員"
 			},

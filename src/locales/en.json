@@ -751,7 +751,8 @@
 					"name": "Name",
 					"orgPath": "Org path",
 					"status": "Status",
-					"wcAccount": "WeChat account"
+					"wcAccount": "WeChat account",
+					"job": "Role"
 				},
 				"title": "Staff"
 			},

@@ -751,7 +751,8 @@
 					"name": "姓名",
 					"orgPath": "归属组织路径",
 					"status": "状态",
-					"wcAccount": "企业微信账户"
+					"wcAccount": "企业微信账户",
+					"job": "角色"
 				},
 				"title": "员工"
 			},

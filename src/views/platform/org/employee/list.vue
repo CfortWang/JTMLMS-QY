@@ -19,7 +19,14 @@
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
-        />
+        >
+            <template slot="roleName" slot-scope="scope">
+                <span class="wrap">{{ scope.row.roleName }}</span>
+            </template>
+            <template slot="positionsPath" slot-scope="scope">
+                <span class="wrap">{{ scope.row.positionsPath }}</span>
+            </template>
+        </ibps-crud>
         <!-- 新增、编辑、明细 -->
         <edit
             :id="editId"
@@ -113,7 +120,7 @@ export default {
                             'platform.org.employee.button.changePassword'
                         ),
                         icon: 'el-icon-refresh'
-                    },
+                    }
                     // { key: 'more', icon: 'ibps-icon-ellipsis-h' }
                 ],
                 searchForm: {
@@ -151,6 +158,14 @@ export default {
                         //     itemWidth: 150
                         // },
                         {
+                            prop: 'Q^JOB_^SL',
+                            label: '角色',
+                            fieldType: 'select',
+                            options: this.roleList,
+                            labelWidth: 70,
+                            itemWidth: 150
+                        },
+                        {
                             prop: ['Q^CREATE_TIME_^DL', 'Q^CREATE_TIME_^DG'],
                             label: this.$t('common.field.createTime'),
                             fieldType: 'daterange',
@@ -182,7 +197,15 @@ export default {
                         prop: 'positionsPath',
                         label: this.$t('platform.org.employee.prop.orgPath'),
                         sortable: false,
-                        minWidth: 200
+                        width: 240,
+                        slotName: 'positionsPath'
+                    },
+                    {
+                        prop: 'roleName',
+                        label: this.$t('platform.org.employee.prop.job'),
+                        sortable: false,
+                        minWidth: 200,
+                        slotName: 'roleName'
                     },
                     {
                         prop: 'status',
@@ -301,16 +324,17 @@ export default {
             sorts: {},
             moreSearchParams: {},
             dialogMoreSearchVisible: false,
-            positionsList: []
+            positionsList: [],
+            roleList: []
         }
     },
     created () {
-        this.getOrg().then(res => {
+        const sql1 = 'select a.id_ as id_, a.name_ as name_, b.path_ as path_ from ibps_party_position a, ibps_party_entity b where a.id_ = b.id_'
+        const sql2 = 'select id_, name_ from ibps_party_role order by role_note_ asc'
+        Promise.all([this.getData(sql1, 'positionsList', 4), this.getData(sql2, 'roleList', 3)]).then(() => {
             this.loadData()
             this.loadDisplayField()
         })
-        // this.loadData()
-        // this.loadDisplayField()
     },
     methods: {
         ...mapMutations({
@@ -326,11 +350,17 @@ export default {
                 response.data.dataResult.forEach(item => {
                     if (item.positions) {
                         // 转换岗位名
-                        const name = this.getPositionsName(item.positions)
+                        const name = this.getTransformName(item.positions, 'positionsList')
                         this.$set(item, 'positionsName', name)
                         // 转换岗位路径
                         const path = this.getPositionsPath(item.positions)
+                        console.log(path)
                         this.$set(item, 'positionsPath', path)
+                    }
+                    if (item.job) {
+                        // 转角色名
+                        const role = this.getTransformName(item.job, 'roleList')
+                        this.$set(item, 'roleName', role)
                     }
                 })
                 ActionUtils.handleListData(this, response.data)
@@ -339,35 +369,36 @@ export default {
                 this.loading = false
             })
         },
-        getPositionsName (valueList) {
-            const postList = valueList.split(',')
-            const list = []
-            if (!postList.length) {
+        getTransformName (value, type) {
+            const dataList = value.split(',')
+            const result = []
+            if (!dataList.length) {
                 return ''
             }
-            postList.forEach((item) => {
-                const dataItem = this.positionsList.find(i => i.ID_ === item)
-                list.push(dataItem.NAME_)
+            console.log(this[type])
+            dataList.forEach(item => {
+                const dataItem = this[type].find(i => i.id_ === item)
+                result.push(dataItem.name_)
             })
-            return list.join('，')
+            return result.join('，')
         },
-        getPositionsPath (valueList) {
-            const postList = valueList.split(',')
-            const list = []
+        getPositionsPath (value) {
+            const postList = value.split(',')
+            const result = []
             if (!postList.length) {
                 return ''
             }
-            postList.forEach((item) => {
-                const temp = this.positionsList.find(i => i.ID_ === item)
-                const pathList = temp ? temp.PATH_.split('.') : []
+            postList.forEach(item => {
+                const temp = this.positionsList.find(i => i.id_ === item)
+                const pathList = temp ? temp.path_.split('.') : []
                 let p = ''
                 pathList.filter(i => i).forEach(k => {
-                    const t = this.positionsList.find(i => i.ID_ === k)
-                    p += `${t.NAME_}.`
+                    const t = this.positionsList.find(i => i.id_ === k)
+                    p += `${t.name_}.`
                 })
-                list.push(p)
+                result.push(p)
             })
-            return list.join('\r\n')
+            return result.join('\r\n')
         },
         /**
          * 获取格式化参数
@@ -556,19 +587,21 @@ export default {
                 this.$router.replace('/')
             })
         },
-        // 获取组织的数据
-        getOrg () {
+        // 获取组织/角色数据
+        getData (sql, type, index) {
             return new Promise((resolve, reject) => {
-                const sql = `select a.ID_ as ID_, a.NAME_ as NAME_, b.path_ as PATH_ FROM ibps_party_position a, ibps_party_entity b where a.id_ = b.id_`
-                this.$common.request('sql', sql).then((res) => {
-                    const datas = res.variables.data
-                    datas.forEach((item, index) => {
-                        this.$set(item, 'value', item.ID_)
-                        this.$set(item, 'label', item.NAME_)
+                this.$common.request('sql', sql).then(res => {
+                    const { data = [] } = res.variables || {}
+                    if (!data.length) {
+                        ActionUtils.errorMessage('获取数据失败！')
+                        return reject()
+                    }
+                    data.forEach(item => {
+                        this.$set(item, 'value', item.id_)
+                        this.$set(item, 'label', item.name_)
                     })
-                    this.positionsList = datas
-
-                    this.listConfig.searchForm.forms[3].options = datas
+                    this[type] = data
+                    this.listConfig.searchForm.forms[index].options = data
                     resolve()
                 })
             })
@@ -576,3 +609,8 @@ export default {
     }
 }
 </script>
+<style scoped>
+    .wrap{
+        white-space: pre-line;
+    }
+</style>
