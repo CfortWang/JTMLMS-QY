@@ -509,7 +509,7 @@ export default {
             return (this.currentPage - 1) * this.pageSize + index + 1
         },
         /**
-         * 定义删除、增加 不做操作。修改时才做更新 ，分页修改时，根据页表修改。
+         * 定义删除、增加 不做操作。修改时才做更新，分页修改时，根据页表修改。
          */
         updateModel (key, val, index, page) {
             this.dataModel[(page - 1) * this.pageSize + index][key] = val
@@ -650,6 +650,10 @@ export default {
                             this.handleAdd()
                         }
                         break
+                    case 'copy':
+                        // 复制已有数据（尾部插入）
+                        this.handleCopyData(button, index)
+                        break
                     case 'edit':
                         this.handleDialogMode(index)
                         break
@@ -707,6 +711,26 @@ export default {
             if (this.$refs.elTable) {
                 this.$refs.elTable.doLayout()
             }
+        },
+        // 复制已有数据
+        handleCopyData (button, index) {
+            const position = button.position
+            const selection = this.getSelection(position, index)
+            ActionUtils.selectedMultiRecord(selection).then((ids) => {
+                selection.forEach(i => {
+                    const obj = this.dataModel[i]
+                    delete obj.$index
+                    delete obj.id
+                    this.dataModel.push(obj)
+                })
+                // 初始化运行公式计算
+                this.initRunCalFormula(this.dataModel.length - 1)
+                // 后置事件
+                this.afterScript(this.actionCode, this.actionPosition)
+                if (this.$refs.elTable) {
+                    this.$refs.elTable.doLayout()
+                }
+            }).catch(() => {})
         },
         /**
          * 获取选择的记录

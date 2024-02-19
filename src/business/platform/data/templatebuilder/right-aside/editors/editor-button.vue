@@ -53,7 +53,7 @@
         <el-form-item label="按钮图标" prop="icon">
             <ibps-icon-select v-model="formData.icon" icon="el-icon-search" />
         </el-form-item>
-        <el-form-item label="模板归档显示">
+        <el-form-item v-if="formData.button_type=='custom'" label="模板归档显示">
             <el-switch v-model="formData.show_on_record" active-value="Y" inactive-value="N" />
         </el-form-item>
         <el-form-item

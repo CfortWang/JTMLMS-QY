@@ -22,6 +22,7 @@
             :value="selectorValue"
             :label-key="labelKey"
             :preview="false"
+            :temp-search="tempSearch"
             type="dialog"
             @close="visible=>selectorVisible =visible"
             @action-event="handleSelectorActionEvent"

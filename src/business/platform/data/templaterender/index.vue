@@ -12,6 +12,7 @@
         :height="height"
         :fields="fields"
         :preview="preview"
+        :temp-search="tempSearch"
         v-on="$listeners"
     />
 </template>
@@ -38,6 +39,10 @@ export default {
             type: [String, Number]
         },
         preview: {
+            type: Boolean,
+            default: false
+        },
+        tempSearch: { // 是否是数据模板使用的筛选条件
             type: Boolean,
             default: false
         }

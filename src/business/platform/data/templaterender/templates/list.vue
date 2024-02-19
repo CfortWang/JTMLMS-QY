@@ -216,7 +216,8 @@
             :visible="templateDialogVisible"
             :template-key="templateDialogKey"
             :dynamic-params="templateDialogDynamicParams"
-            @close="(visible) => (templateDialogVisible = visible)"
+            :previous-data-template="dataTemplate"
+            @close="handleRenderDialogClose"
             @action-event="handleTemplateDialogActionEvent"
         />
         <!-- 表单打印-->
@@ -314,6 +315,8 @@ import FormPrintTemplate from '@/business/platform/form/form-print/template'
 import importTable from '@/business/platform/form/formrender/dynamic-form/components/import-table'
 
 import JTemplate from '../utils/JTemplate' // 自定义脚本
+import JDialogTemplate from '../utils/JDialogTemplate' // 对话框自定义脚本
+
 import Scan from '@/views/system/jbdScan/scan.vue'
 
 // import BpmnFormrender from '@/vuew/business/platform/bpmn/form/dialog'//新增流程打开页面
@@ -373,7 +376,11 @@ export default {
             type: Boolean,
             default: false
         },
-        xlsxFileVisible: false
+        xlsxFileVisible: false,
+        tempSearch: { // 是否是数据模板使用的筛选条件
+            type: Boolean,
+            default: false
+        }
     },
     data () {
         return {
@@ -1016,7 +1023,7 @@ export default {
                         break
                     case 'consult': // 查阅
                         this.snapshotFile = ''
-                        if (0 && data.kuai_zhao_) {
+                        if (data.kuai_zhao_) {
                             this.snapshotFile = data.kuai_zhao_
                             setTimeout(() => {
                                 this.$refs.snapshot.handleActionEvent('preview', 0)
@@ -1511,7 +1518,7 @@ export default {
                     fieldType: 'numberRange'
                 })
             } else if (fieldType === 'radio' || fieldType === 'checkbox' || fieldType === 'select') {
-                querySuffix = fieldType !== 'checkbox' ? 'S' : 'SL'
+                querySuffix = fieldType === 'radio' ? 'S' : 'SL'
                 const prop = `Q^${field.name}^${querySuffix}`
                 searchColumn = Object.assign(searchColumn, {
                     prop: prop,
@@ -1573,7 +1580,7 @@ export default {
                     field_options: fieldOptions
                 })
             } else if (fieldType === 'linkdata') {
-                const prop = `Q^${field.name}^S`
+                const prop = `Q^${field.name}^SL`
                 searchColumn = Object.assign(searchColumn, {
                     prop: prop,
                     modelValue: prop,
@@ -1808,7 +1815,8 @@ export default {
          * 初始化脚本
          */
         initJTemplate () {
-            const id = 'JTemplate'
+            const { data_title = '' } = this.template.attrs
+            const id = data_title && !this.tempSearch ? 'JDialogTemplate' : 'JTemplate'
             let script = document.getElementById(id)
             if (script) {
                 script.parentNode.removeChild(script)
@@ -1836,7 +1844,13 @@ export default {
             if (!this.hasScript()) {
                 return
             }
-            JTemplate._onLoad(this)
+            // type:default，那么表示是一般的列表
+            // type:dialog,表示对话框列表
+            // tempSearch为true的时候是列表搜索框点击打开的对话框
+            if (this.dataTemplate.type == 'default' || this.tempSearch) {
+                // 脚本里打开的对话框列表，不需要执行本模块代码，否则会执行到底层列表的onload脚本
+                JTemplate._onLoad(this)
+            }
         },
         // 前置脚本
         beforeScript (action, position, selection, data, callback) {
@@ -1862,6 +1876,12 @@ export default {
                 return str
             }
             return this.replaceAll(str.replace(find, replace), find, replace)
+        },
+        // 数据模板打开数据模板时候，被打开的数据模板弹框关闭逻辑
+        handleRenderDialogClose (visible, previousDataTemplate) {
+            this.dataTemplate = previousDataTemplate
+            this.templateDialogVisible = visible
+            this.initJTemplate()
         }
     }
 }

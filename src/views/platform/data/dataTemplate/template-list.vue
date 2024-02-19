@@ -163,18 +163,13 @@ export default {
             return [data]
         },
         dealButtom (buttons) {
-            const keys = ['search', 'remove', 'consult']
+            const keys = ['search', 'remove', 'consult', 'detail']
             if (!buttons.length) {
                 return []
             }
-            const btn = buttons.filter(i => keys.includes(i.button_type))
-            btn.push({
-                button_type: 'detail',
-                label: '明细',
-                position: 'manage',
-                type: 'info'
-            })
-            return btn
+            const defaultBtn = buttons.filter(i => keys.includes(i.button_type))
+            const customBtn = buttons.filter(i => i.show_on_record == 'Y')
+            return [...defaultBtn, ...customBtn]
         },
         dealFilter (dataList) {
             // 1.去除原过滤条件中的编制部门在其中
