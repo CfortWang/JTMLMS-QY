@@ -165,7 +165,9 @@ module.exports = {
         }],
         'no-unreachable': 2,
         'no-unsafe-finally': 2,
+        // 校验存在定义而未使用的组件
         'vue/no-unused-components': 'off',
+        // 校验存在定义而未使用的变量
         'no-unused-vars': 'off',
         'no-useless-call': 2,
         'no-useless-computed-key': 2,
