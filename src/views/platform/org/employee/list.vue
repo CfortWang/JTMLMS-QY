@@ -329,7 +329,7 @@ export default {
         }
     },
     created () {
-        const sql1 = 'select a.id_ as id_, a.name_ as name_, b.path_ as path_ from ibps_party_position a, ibps_party_entity b where a.id_ = b.id_'
+        const sql1 = 'select a.id_ as id_, a.name_ as name_, b.path_ as path_ from ibps_party_position a, ibps_party_entity b where a.id_ = b.id_ order by depth_ asc, sn_ asc'
         const sql2 = 'select id_, name_ from ibps_party_role order by role_note_ asc'
         Promise.all([this.getData(sql1, 'positionsList', 4), this.getData(sql2, 'roleList', 3)]).then(() => {
             this.loadData()
@@ -354,7 +354,6 @@ export default {
                         this.$set(item, 'positionsName', name)
                         // 转换岗位路径
                         const path = this.getPositionsPath(item.positions)
-                        console.log(path)
                         this.$set(item, 'positionsPath', path)
                     }
                     if (item.job) {
@@ -375,12 +374,11 @@ export default {
             if (!dataList.length) {
                 return ''
             }
-            console.log(this[type])
             dataList.forEach(item => {
                 const dataItem = this[type].find(i => i.id_ === item)
-                result.push(dataItem.name_)
+                result.push(dataItem ? dataItem.name_ : '')
             })
-            return result.join('，')
+            return result.filter(i => i).join('，')
         },
         getPositionsPath (value) {
             const postList = value.split(',')
