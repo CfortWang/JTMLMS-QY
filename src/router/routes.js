@@ -22,7 +22,7 @@ const frameIn = [
                     title: '首页',
                     auth: true
                 },
-                component: _import('/system/dashboard')
+                component: _import('/system/homepage')
             },
             {
                 path: 'blank',
