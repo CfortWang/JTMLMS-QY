@@ -256,7 +256,7 @@ export default {
                     token: token
                 }).then(async response => {
                     const data = response.data
-                    await router.push({ name: 'dashboard' })
+                    await router.push({ path: '/' })
                     // 更新token信息
                     await dispatch('ibps/account/updataTokenInfo', data, { root: true })
                     // 更新用户信息
@@ -271,7 +271,7 @@ export default {
                     location.reload()
                     // await dispatch('load')
                     // 重置路由
-                    // resetUrlRouter('/dashboard')
+                    // resetUrlRouter('/')
                     resolve(data)
                 }).catch(err => {
                     console.error('switchUser-err: ', err)
@@ -300,7 +300,7 @@ export default {
                     token: token
                 }).then(async response => {
                     const data = response.data
-                    await router.push({ name: 'dashboard' })
+                    await router.push({ path: '/' })
                     // 更新token信息
                     await dispatch('ibps/account/updataTokenInfo', data, { root: true })
                     // 更新用户信息

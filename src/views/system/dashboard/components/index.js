@@ -25,33 +25,33 @@ Vue.component('ibps-marquee', IbpsMarquee)
 let init = false
 const components = []
 
-export function initColumn(systemAlias) {
-  findHashRightsColumn({
-    systemAlias: systemAlias
-  }).then(response => {
-    const dataResult = response.data
-    // 构建组件
-    dataResult.forEach(column => {
-      const name = `ibps-desktop-${column.alias}`
-      Vue.component(name, (resolve, reject) => {
-        resolve(buildComponent(name, column))
-      })
-      components.push(name)
+export function initColumn (systemAlias) {
+    findHashRightsColumn({
+        systemAlias: systemAlias
+    }).then(response => {
+        const dataResult = response.data
+        // 构建组件
+        dataResult.forEach(column => {
+            const name = `ibps-desktop-${column.alias}`
+            Vue.component(name, (resolve, reject) => {
+                resolve(buildComponent(name, column))
+            })
+            components.push(name)
+        })
+        init = true
+    }).catch((err) => {
+        init = true
+        console.error(err)
     })
-    init = true
-  }).catch((err) => {
-    init = true
-    console.error(err)
-  })
 }
 
 /**
  * 是否初始化
  */
-export function isInit() {
-  return init
+export function isInit () {
+    return init
 }
 
-export function getComponents() {
-  return components
+export function getComponents () {
+    return components
 }

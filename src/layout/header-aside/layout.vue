@@ -315,9 +315,7 @@
             /* 跳转首页*/
             goToMain() {
                 // this.sysName = "首页"
-                this.$router.push({
-                    name: 'dashboard'
-                })
+                this.$router.push({ path: '/' })
             },
             pageChange() {
                 this.sysName = ''
