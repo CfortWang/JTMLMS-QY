@@ -349,7 +349,7 @@ export default {
             }
             //   console.log('needSelType',needSelType)
             const fileSearchSql = needSelType.join('union all')
-            const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq` : oldRecordSql
+            const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq ORDER BY sq.wen_jian_bian_hao ASC` : oldRecordSql
             console.log('sql------------：', sql)
             curdPost('sql', sql).then(res => {
                 const tableDatas = res.variables.data

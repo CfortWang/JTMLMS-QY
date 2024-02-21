@@ -160,7 +160,7 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
               <!-- <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="zaigangrenyuan.length>0&&(showAll || showComponents[24])" :data = "getbuhegeyangpin()"/> -->
-              <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'bhgyp'"
+              <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'bhgyp'" :wancheng="'合格率'" :weiwancheng="'不合格率'"
                 v-if="showAll ||showComponents[24]" :data = "getbuhegeyangpin()"/>
               <buhegeyangpinBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'bhgypb'"
                 v-if="showAll || showComponents[25]" :data = "getbuhegeyangpinB()"/>
@@ -172,7 +172,7 @@
           <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==1">
             <div class="ttitle" style="text-align: center;">报告不正确率</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
-              <baogaobuzhengquePie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'bgbhg'"
+              <baogaobuzhengquePie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'bgbhg'" :wancheng="'正确率'" :weiwancheng="'不正确率'"
                 v-if="showAll ||showComponents[26]" :data = "getbaogaobuzhengque()"/>
               <baogaobuzhengqueBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'bhgypb'"
                 v-if="showAll || showComponents[27]" :data = "getbaogaobuzhengqueB()"/>
@@ -183,12 +183,12 @@
           <div class="congxiebox7" style="display:inline-block;width:98%;;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==2">
             <div class="ttitle" style="text-align: center;">危急值报告达标率</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
-              <weijizhibaogaoPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'wjzbg'"
+              <weijizhibaogaoPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'wjzbg'" :wancheng="'报告率'" :weiwancheng="'未报告率'"
                 v-if="showAll ||showComponents[28]" :data = "getweijizhibaogao()"/>
               <weijizhibaogaoBar style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'wjzbgb'"
                 v-if="showAll || showComponents[29]" :data = "getweijizhibaogaoB()"/>
               <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
-              <weijizhijishiPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'wjzbgjs'"
+              <weijizhijishiPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'wjzbgjs'" :wancheng="'及时率'" :weiwancheng="'不及时率'"
                 v-if="showAll ||showComponents[30]" :data = "getweijizhijishi()"/>
               <weijizhijishiBar style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'wjzbgjsb'"
                 v-if="showAll || showComponents[31]" :data = "getweijizhijishiB()"/>
@@ -199,12 +199,12 @@
           <div class="congxiebox7" style="display:inline-block;width:98%;;margin-right:1%;margin-left:1%;height:90%;" v-if="pageOT==3">
             <div class="ttitle" style="text-align: center;">TAT符合率</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
-              <sysnzzsjfhPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sysnzzsjfh'"
+              <sysnzzsjfhPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sysnzzsjfh'" :wancheng="'符合率'" :weiwancheng="'不符合率'"
                 v-if="showAll ||showComponents[32]" :data = "getsysnzzsjfh()"/>
               <sysnzzsjfhBar style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sysnzzsjfhb'"
                 v-if="showAll || showComponents[33]" :data = "getsysnzzsjfhB()"/>
               <!-- <div class="nullDate1" style="height:50%;width:75%;" v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])">暂无数据</div> -->
-              <jyqzzzwsPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'jyqzzzws'"
+              <jyqzzzwsPie style="height:50%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'jyqzzzws'" :wancheng="'中位数达标率'" :weiwancheng="'中位数不达标率'"
                 v-if="showAll ||showComponents[34]" :data = "getjyqzzzws()"/>
               <jyqzzzwsBar style="height:50%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'jyqzzzwsb'"
                 v-if="showAll || showComponents[35]" :data = "getjyqzzzwsB()"/>
@@ -217,7 +217,7 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
               <!-- <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="zaigangrenyuan.length>0&&(showAll || showComponents[24])" :data = "getbuhegeyangpin()"/> -->
-              <bshineizhikongPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'snzk'"
+              <bshineizhikongPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'snzk'" :wancheng="'达标率'" :weiwancheng="'不达标率'"
                 v-if="showAll ||showComponents[36]" :data = "getbshineizhikong()"/>
               <bshineizhikongBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'snzkb'"
                 v-if="showAll || showComponents[37]" :data = "getbshineizhikongB()"/>
@@ -229,7 +229,7 @@
           <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==4">
             <div class="ttitle" style="text-align: center;">室间质评合格率</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
-              <shijianzhipingPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sjzp'"
+              <shijianzhipingPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sjzp'" :wancheng="'合格率'" :weiwancheng="'不合格率'"
                 v-if="showAll ||showComponents[38]" :data = "getshijianzhiping()"/>
               <shijianzhipingBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sjzpb'"
                 v-if="showAll || showComponents[39]" :data = "getshijianzhipingB()"/>
@@ -242,7 +242,7 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
               <!-- <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="zaigangrenyuan.length>0&&(showAll || showComponents[24])" :data = "getbuhegeyangpin()"/> -->
-              <shiyanshibiduiPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sysjbd'"
+              <shiyanshibiduiPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sysjbd'" :wancheng="'对比合格率'" :weiwancheng="'对比不合格率'"
                 v-if="showAll ||showComponents[40]" :data = "getshiyanshibidui()"/>
               <shiyanshibiduiBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sysjbdb'"
                 v-if="showAll || showComponents[41]" :data = "getshiyanshibiduiB()"/>
@@ -254,7 +254,7 @@
           <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==5">
             <div class="ttitle" style="text-align: center;">设备不良事件上报时限符合率</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
-              <shebeibuliangPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sbbl'"
+              <shebeibuliangPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'sbbl'" :wancheng="'符合率'" :weiwancheng="'不符合率'"
                 v-if="showAll ||showComponents[42]" :data = "getshebeibuliang()"/>
               <shebeibuliangBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'sbblb'"
                 v-if="showAll || showComponents[43]" :data = "getshebeibuliangB()"/>
@@ -267,7 +267,7 @@
             <div class="componentsData" style="height:87%" v-if="relOf">
               <!-- <buhegeyangpinPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw"
                 v-if="zaigangrenyuan.length>0&&(showAll || showComponents[24])" :data = "getbuhegeyangpin()"/> -->
-              <kehumanyiPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'khmy'"
+              <kehumanyiPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'khmy'" :wancheng="'满意率'" :weiwancheng="'不满意率'"
                 v-if="showAll ||showComponents[44]" :data = "getkehumanyi()"/>
               <kehumanyiBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'khmyb'"
                 v-if="showAll || showComponents[45]" :data = "getkehumanyiB()"/>
@@ -279,7 +279,7 @@
           <div class="congxiebox7" style="display:inline-block;width:98%;margin-right:1%;margin-left:1%;height:43%;" v-if="pageOT==6">
             <div class="ttitle" style="text-align: center;">员工参加培训次数达标率</div>
             <div class="componentsData" style="height:87%" v-if="relOf">
-              <ygcjpxcsdbPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'ygcjpxcsdb'"
+              <ygcjpxcsdbPie style="height:100%"  :width="static=='row' ? '25%': '100%'" :colorw = "colorw" :id="'ygcjpxcsdb'" :wancheng="'达标率'" :weiwancheng="'不达标率'"
                 v-if="showAll ||showComponents[46]" :data = "getygcjpxcsdb()"/>
               <ygcjpxcsdbBar style="height:100%"  :width="static=='row' ? '75%': '100%'" :colorw = "colorw" :id="'ygcjpxcsdbb'"
                 v-if="showAll || showComponents[47]" :data = "getygcjpxcsdbB()"/>

@@ -45,6 +45,14 @@
       colorw:{
         type:String,
         default:'true'
+      },
+      wancheng:{
+        type:String,
+        default:'完成率'
+      },
+      weiwancheng:{
+        type:String,
+        default:'未完成率'
       }
     },
     data () {
@@ -90,8 +98,8 @@
                 formatter: '{b}: {d}%'
               },
               data: [
-                { value: this.data.num.val, name: '完成率' },
-                { value: e, name: '未完成率' }
+                { value: this.data.num.val, name: this.wancheng },
+                { value: e, name: this.weiwancheng }
               ],
               emphasis: {
                 itemStyle: {
