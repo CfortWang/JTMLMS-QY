@@ -13,7 +13,6 @@ const frameIn = [
         redirect: { name: 'dashboard' },
         component: layoutHeaderAside,
         children: [
-
             // 首页
             {
                 path: 'dashboard',
@@ -76,6 +75,15 @@ const frameIn = [
                 component: _import('/system/function/redirect')
             },
             {
+                path: '/notice',
+                name: 'notice',
+                meta: {
+                    title: '公告管理',
+                    auth: true
+                },
+                component: _import('/platform/system/news/list')
+            },
+            {
                 path: '/message',
                 name: 'message',
                 meta: {
@@ -83,6 +91,151 @@ const frameIn = [
                     auth: true
                 },
                 component: _import('/platform/message/inner/receive')
+            },
+            {
+                path: '/receiveMessage',
+                name: 'receiveMessage',
+                meta: {
+                    title: '未读消息',
+                    auth: true
+                },
+                component: _import('/platform/message/inner/receive')
+            },
+            // 办公管理
+            {
+                path: 'myFavorites',
+                name: 'myFavorites',
+                meta: {
+                    title: '我的收藏',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmInitiatedProcess/favorites')
+            },
+            {
+                path: 'myCompleted',
+                name: 'myCompleted',
+                meta: {
+                    title: '我的办结',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmInitiatedProcess/myCompleted')
+            },
+            {
+                path: 'myDrafts',
+                name: 'myDrafts',
+                meta: {
+                    title: '我的暂存',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmInitiatedProcess/myDraft')
+            },
+            {
+                path: 'myRequest',
+                name: 'myRequest',
+                meta: {
+                    title: '我的请求',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmInitiatedProcess/myRequest')
+            },
+            {
+                path: 'newProcess',
+                name: 'newProcess',
+                meta: {
+                    title: '新建流程',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmInitiatedProcess/newProcess')
+            },
+            {
+                path: 'delegateMatters',
+                name: 'delegateMatters',
+                meta: {
+                    title: '转办代理',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedProcess/pendingManage/delegateMatters')
+            },
+            {
+                path: 'pendingMatters',
+                name: 'pendingMatters',
+                meta: {
+                    title: '待办事宜',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedProcess/pendingManage/pending')
+            },
+            {
+                path: 'pendingYuan',
+                name: 'pendingYuan',
+                meta: {
+                    title: '原待办',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedProcess/pendingManage/pendingYuan')
+            },
+            {
+                path: 'transferOffice',
+                name: 'transferOffice',
+                meta: {
+                    title: '转办事宜',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedProcess/pendingManage/transferOffice')
+            },
+            {
+                path: 'completedMatters',
+                name: 'completedMatters',
+                meta: {
+                    title: '办结事宜',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedProcess/completed')
+            },
+            {
+                path: 'handledTasks',
+                name: 'handledTasks',
+                meta: {
+                    title: '已办事宜',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedProcess/handled')
+            },
+            {
+                path: 'pending',
+                name: 'pending',
+                meta: {
+                    title: '待办',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedProcess/pending')
+            },
+            {
+                path: 'revoke',
+                name: 'revoke',
+                meta: {
+                    title: '废除',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedProcess/revoke')
+            },
+            {
+                path: 'handled1',
+                name: 'handled1',
+                meta: {
+                    title: '已办1',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedTask/handled')
+            },
+            {
+                path: 'handled2',
+                name: 'handled2',
+                meta: {
+                    title: '已办2',
+                    auth: true
+                },
+                component: _import('/platform/office/bpmReceivedTask/handled2')
             }
         ]
     }
@@ -184,12 +337,12 @@ const frameOut = [
         component: _import('/system/iframe')
     },
     {
-      path: '/sealCompleted',
-      name: 'sealCompleted',
-      meta: {
-        title: 'sealCompleted'
-      },
-      component: _import('/remindPage/sealCompleted')
+        path: '/sealCompleted',
+        name: 'sealCompleted',
+        meta: {
+            title: 'sealCompleted'
+        },
+        component: _import('/remindPage/sealCompleted')
     }
 ]
 
@@ -205,7 +358,7 @@ const ziliao = [
             title: ' 医学实验室标准化智慧管理平台'
         },
         // component: _import('/system/ziliao'),
-        component: _import('/component/ziliao'),
+        component: _import('/component/ziliao')
         // requireAuth: false
     }
 ]

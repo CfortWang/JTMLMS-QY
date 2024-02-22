@@ -223,7 +223,7 @@ export function buildComponent (name, column) {
                     })
                 },
                 openPlate (url) {
-                    this.$router.push(defaultRouterAlias + url)
+                    this.$router.push(`/${url}`)
                 },
                 /**
                  * 处理更多
@@ -236,7 +236,7 @@ export function buildComponent (name, column) {
                         })
                         return
                     }
-                    this.$router.push(defaultRouterAlias + this.attrs.colUrl)
+                    this.$router.push(`/${this.attrs.colUrl}`)
                 },
                 // 未读消息
                 handleClick (option) {

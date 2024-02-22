@@ -19,7 +19,7 @@
                             <p>{{ item.dataContent }}</p>
                         </div>
                         <div class="item-body">
-                            <h2><count-to :end-val="parseInt(item.dataText,10)" :duration="4000" /></h2>
+                            <h2><count-to :end-val="parseInt(item.dataText,10)" :duration="2000" /></h2>
                         </div>
                         <p class="item-tip">{{ item.dataContent | firstStr }}</p>
                     </div>

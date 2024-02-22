@@ -15,7 +15,7 @@
             >
                 <ibps-list v-if="data && data.length >0" class="ibps-pr-10">
                     <ibps-list-item
-                        v-for="(d,index) in data"
+                        v-for="(d,index) in data[0].data"
                         :key="index"
                         @click.native="handleFlowClick({defId:d.id})"
                     >
@@ -37,5 +37,4 @@
             </el-scrollbar>
         </div>
     </el-card>
-
 </template>
