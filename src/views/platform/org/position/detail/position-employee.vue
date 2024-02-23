@@ -34,6 +34,7 @@
 import IbpsEmployeeSelectorDialog from '@/business/platform/org/employee/dialog'
 import { queryWithOrg as queryPageList, addPositionUser, removePositionUser } from '@/api/platform/org/employee'
 import ActionUtils from '@/utils/action'
+import AtilUtils from '@/utils/util'
 import { statusOptions, genderOptions } from '../../employee/constants'
 import { queryPageList as queryUserList } from '@/api/platform/org/employee'
 
@@ -228,15 +229,17 @@ export default {
             }
         },
         handleConfirm (data) {
+            const userIdsStr = data.map((d) => { return d.id }).join(',')
             this.selectorVisible = false
             addPositionUser({
                 positionId: this.id,
-                userIds: data.map((d) => { return d.id }).join(',')
+                userIds: userIdsStr
             }).then(response => {
                 this.selectorVisible = false
                 ActionUtils.success('加入人员成功!')
                 this.search()
             })
+            this.handleUpemployee('add', userIdsStr)
         },
         handleRemove (ids) {
             removePositionUser({
@@ -246,6 +249,7 @@ export default {
                 ActionUtils.removeSuccessMessage()
                 this.search()
             })
+            this.handleUpemployee('remove', ids)
         },
         // 获取组织的数据
         getOrg () {
@@ -259,6 +263,37 @@ export default {
                     })
                     this.positionsList = datas
                     resolve()
+                })
+            })
+        },
+        /**
+         * 根据所选择的人员信息，修改对应人员的job_信息
+         */
+        handleUpemployee (type, ids) {
+            const tableName = 'ibps_party_employee'
+            // 更新ibps_party_employee里job_信息
+            const sql = `select ID_, POSITIONS_ from ${tableName} where find_in_set(id_,'${ids}')`
+            this.$common.request('sql', sql).then((res) => {
+                const resDatas = res.variables.data
+                const updListDatas = []
+                for (const i of resDatas) {
+                    const updListData = {
+                        where: {
+                            id_: i.ID_
+                        },
+                        param: {
+                            positions_: AtilUtils.addOrDelString(type, i.POSITIONS_, this.id)
+                        }
+                    }
+
+                    updListDatas.push(updListData)
+                }
+                const updateParams = {
+                    tableName,
+                    updList: updListDatas
+                }
+                this.$common.request('update', updateParams).then(() => {
+                    console.log('更新数据成功')
                 })
             })
         }

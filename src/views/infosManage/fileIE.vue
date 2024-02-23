@@ -19,7 +19,7 @@
                 <el-alert
                     v-if="!show"
                     :closable="false"
-                    title="请选择左边菜单右键进行操作！"
+                    title="请选择点击记录分类菜单进行操作！"
                     type="warning"
                     show-icon
                     style="height:50px;"

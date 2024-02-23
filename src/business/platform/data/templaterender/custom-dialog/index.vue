@@ -24,7 +24,7 @@
             :preview="false"
             :temp-search="tempSearch"
             type="dialog"
-            @close="visible=>selectorVisible =visible"
+            @close="handleClose"
             @action-event="handleSelectorActionEvent"
         />
     </div>
@@ -104,6 +104,9 @@ export default {
         tempSearch: { // 是否是数据模板使用的筛选条件
             type: Boolean,
             default: false
+        },
+        previousDataTemplate: {
+            type: Object
         }
     },
     data () {
@@ -472,6 +475,10 @@ export default {
         handleInput (val) {
             this.$emit('input', val, this.selectorValue)
             this.$emit('change-link-attr', val, this.selectorValue)
+        },
+        handleClose (visible) {
+            this.selectorVisible = visible
+            this.$emit('close', visible, this.previousDataTemplate)
         }
     }
 }

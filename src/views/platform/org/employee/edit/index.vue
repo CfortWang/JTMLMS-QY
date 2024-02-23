@@ -288,14 +288,44 @@ export default {
                 this.dialogLoading = false
                 return
             }
-
+            // 部门信息
+            if (vo.positionVoList.length > 0) {
+                const list = []
+                vo.positionVoList.forEach(item => {
+                    list.push(item.id)
+                })
+                vo.user.positions = list.join(',')
+            } else {
+                vo.user.positions = ''
+            }
+            // 角色信息
             if (vo.roleVoList.length > 0) {
                 const list = []
                 vo.roleVoList.forEach(item => {
                     list.push(item.id)
                 })
                 vo.user.job = list.join(',')
+            } else {
+                vo.user.job = ''
             }
+            // 更新该表的job_字段
+            const updateParams = {
+                tableName: 'ibps_party_employee',
+                updList: [
+                    {
+                        where: {
+                            id_: vo.user.id
+                        },
+                        param: {
+                            positions_: vo.user.positions,
+                            job_: vo.user.job
+                        }
+                    }
+                ]
+            }
+            this.$common.request('update', updateParams).then(() => {
+                console.log('更新数据成功')
+            })
 
             if (this.formId) {
                 update(vo).then(response => {

@@ -211,6 +211,8 @@
                     :type="item.field_options.dialog_type||'dialog'"
                     :dynamic-params="getLinkDynamicParams(item.field_options,params)"
                     :temp-search="true"
+                    :previous-data-template="previousDataTemplate"
+                    @close="handleRenderDialogClose"
                 />
                 <!-- 关联数据-->
                 <ibps-link-data
@@ -546,6 +548,9 @@ export default {
                 default:
                     return 'date'
             }
+        },
+        handleRenderDialogClose (visible, previousDataTemplate) {
+            this.$emit('close', visible, previousDataTemplate)
         }
     }
 }

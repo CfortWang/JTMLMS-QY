@@ -276,6 +276,28 @@ const util = {
             }
         }
         return result
+    },
+    /**
+     * 在字符串oldIds里增加或者剔除fixId
+     * @param {*} type
+     * @param {*} oldIds
+     * @param {*} fixId
+     * @returns
+     */
+    addOrDelString (type, oldIds, fixId) {
+        const oldIdsArr = oldIds.split(',')
+        if (type === 'remove') {
+            oldIdsArr.splice(oldIdsArr.indexOf(fixId), 1)
+            oldIds = oldIdsArr.join(',')
+        } else {
+            if (oldIds && oldIds.indexOf(fixId) < 0) {
+                oldIdsArr.push(fixId)
+                oldIds = oldIdsArr.join(',')
+            } else if (!oldIds) {
+                oldIds = fixId
+            }
+        }
+        return oldIds
     }
 }
 

@@ -140,6 +140,9 @@ export default {
                 if (this.field.field_type === 'selector' || this.field.field_type === 'select' || this.field.field_type === 'customDialog' || this.field.field_type === 'linkdata') {
                     this.handleModels(this.field.name, val)
                 }
+                if (this.field.field_type === 'checkbox') {
+                    this.handleModels(this.field.name, Array.isArray(val) ? val.join(',') : val)
+                }
                 this.$nextTick(() => {
                     // 值改变进行公式计算
                     this.runCalFormula()

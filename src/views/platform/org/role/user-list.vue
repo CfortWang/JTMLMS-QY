@@ -44,6 +44,7 @@ import { queryByRoleId as queryPageList, addRoleUser, removeRoleUser } from '@/a
 import { statusOptions, genderOptions } from '../employee/constants'
 import { sourceOptions } from './constants'
 import ActionUtils from '@/utils/action'
+import AtilUtils from '@/utils/util'
 export default {
     components: {
         IbpsEmployeeSelectorDialog
@@ -211,14 +212,16 @@ export default {
         },
         handleConfirm (data) {
             this.selectorVisible = false
+            const userIdArr = data.map((d) => { return d.id })
             addRoleUser({
                 roleId: this.id,
-                userIds: data.map((d) => { return d.id }).join(',')
+                userIds: userIdArr.join(',')
             }).then(response => {
                 this.selectorVisible = false
                 ActionUtils.success('加入人员成功!')
                 this.search()
             })
+            this.handleUpemployee('add', userIdArr.join(','))
         },
         /**
          * 处理删除
@@ -241,6 +244,38 @@ export default {
                 ActionUtils.removeSuccessMessage()
                 this.search()
             }).catch(() => {})
+            this.handleUpemployee('remove', ids)
+        },
+        /**
+         * 根据所选择的人员信息，修改对应人员的job_信息
+         */
+        handleUpemployee (type, ids) {
+            const tableName = 'ibps_party_employee'
+            // 更新ibps_party_employee里job_信息
+            const sql = `select ID_,JOB_ from ${tableName} where find_in_set(id_,'${ids}')`
+            this.$common.request('sql', sql).then((res) => {
+                const resDatas = res.variables.data
+                const updListDatas = []
+                for (const i of resDatas) {
+                    const updListData = {
+                        where: {
+                            id_: i.ID_
+                        },
+                        param: {
+                            JOB_: AtilUtils.addOrDelString(type, i.JOB_, this.id)
+                        }
+                    }
+
+                    updListDatas.push(updListData)
+                }
+                const updateParams = {
+                    tableName,
+                    updList: updListDatas
+                }
+                this.$common.request('update', updateParams).then(() => {
+                    console.log('更新数据成功')
+                })
+            })
         }
     }
 }
