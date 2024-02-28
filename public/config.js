@@ -60,7 +60,9 @@
         I18N_FALLBACK_LOCALE: 'zh-CN',
 
         //element 颜色
-        ELEMENT_COLOR: '#409EFF'
+        ELEMENT_COLOR: '#409EFF',
+        // 系统版本
+        VERSION: '1.0.0'
     }
 
 })(window)

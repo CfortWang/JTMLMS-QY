@@ -1,5 +1,6 @@
 import util from '@/utils/util.js'
 import setting from '@/setting.js'
+const __IBPS_CONFIG__ = window.__IBPS_CONFIG__ || {}
 
 export default {
     namespaced: true,
@@ -9,7 +10,7 @@ export default {
          * @param {Object} state state
          */
         versionShow () {
-            util.log.capsule('ibps', `v${setting.releases.version}`)
+            util.log.capsule('ibps', `v${__IBPS_CONFIG__.VERSION}`)
         }
     }
 }
