@@ -47,3 +47,30 @@ export const rateType = {
     '填空题': '手动',
     '简答题': '手动'
 }
+
+export const defaultOptions = [
+    {
+        value: 'A',
+        radio: 'A',
+        checkbox: [],
+        content: ''
+    },
+    {
+        value: 'B',
+        radio: '',
+        checkbox: [],
+        content: ''
+    },
+    {
+        value: 'C',
+        radio: '',
+        checkbox: [],
+        content: ''
+    },
+    {
+        value: 'D',
+        radio: '',
+        checkbox: [],
+        content: ''
+    }
+]
