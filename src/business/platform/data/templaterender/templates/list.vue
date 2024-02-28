@@ -1369,7 +1369,7 @@ export default {
                         col.label = '部门'
                         break
                     case 'bian_zhi_shi_jian':
-                        col.width = '120'
+                        // col.width = '120'
                         break
                     case 'bian_zhi_ren_':
                         col.width = '100'
