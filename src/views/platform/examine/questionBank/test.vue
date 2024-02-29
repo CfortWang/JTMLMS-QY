@@ -67,6 +67,7 @@
                             v-model="item.answer"
                             type="textarea"
                             :autosize="{ minRows: 4, maxRows: 8}"
+                            placeholder="请输入您的答案"
                         />
                     </div>
                 </div>
@@ -172,7 +173,6 @@ export default {
                 const temp = this.questionList[oldVal - 1]
                 if (temp.questionType === '填空题') {
                     temp.answer = temp.options.map(item => item.answer)
-                    console.log(temp)
                 }
             }
         }
@@ -197,7 +197,7 @@ export default {
                 return
             }
             this.questionList = await this.getQuestionData()
-            console.log(this.questionList)
+            // console.log(this.questionList)
         },
         handleActionEvent ({ key }) {
             switch (key) {
@@ -218,7 +218,7 @@ export default {
             }
         },
         getQuestionData () {
-            const sql = `select ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score from t_questions where parent_id_ = '${this.parentId}' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score from t_questions where parent_id_ = '${this.parentId}' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -253,9 +253,17 @@ export default {
             })
         },
         getProgress () {
-            const finished = this.questionList.filter(item => item.answer).length
-            const total = this.questionList.length
-            return parseInt(finished / total * 100)
+            const finished = []
+            this.questionList.forEach(item => {
+                if (item.questionType === '填空题') {
+                    finished.push(item.answer && !item.answer.some(i => i === '' || i === null))
+                } else {
+                    finished.push(item.answer && 1)
+                }
+            })
+            // const finished = this.questionList.filter(item => (item.questionType !== '填空题' && item.answer) || (item.questionType === '填空题' && item.answer && !item.answer.some(i => i === '' || i === null))).length
+            const finishedCount = finished.filter(i => i).length
+            return parseInt(finishedCount / this.questionList.length * 100)
         },
         setClassName (item, index) {
             const result = []
@@ -291,10 +299,49 @@ export default {
         },
         handleSubmit () {
             console.log(this.questionList)
-            
+            let incompleteList = []
+            this.questionList.forEach((item, index) => {
+                if (item.questionType === '填空题') {
+                    const t = item.answer && item.answer.some(i => i === '' || i === null)
+                    incompleteList.push(!t ? index + 1 : '')
+                } else {
+                    incompleteList.push(!item.answer ? index + 1 : '')
+                }
+            })
+            incompleteList = incompleteList.filter(i => i)
+            if (incompleteList.length) {
+                this.$confirm(`还有第${incompleteList.join('、')}题未作答，您确定要直接交卷吗？`, '提示', {
+                    type: 'warning',
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false
+                }).then(() => {
+                    this.submitForm()
+                }).catch(() => {})
+                return
+            }
+            this.$confirm('确定要交卷吗？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+                showClose: false,
+                closeOnClickModal: false
+            })
+            const submitData = []
+            this.questionList.forEach((item, index) => {
+                submitData.push({
+                    parent_id_: this.parentId,
+                    ti_mu_id_: item.questionId,
+                    hui_da_: '',
+                    pan_ding_jie_guo_: '',
+                    de_fen_: ''
+                })
+            })
+            this.submitForm()
         },
         submitForm () {
-            console.log(this.questionList)
+            console.log('顶内锅肺啊')
             return
             const addParams = {
                 tableName: 't_question_bank',
