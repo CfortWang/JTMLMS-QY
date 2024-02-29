@@ -263,6 +263,7 @@ export default {
                 fu_tu_: '',
                 xuan_xiang_lei_xi: '文本',
                 da_an_: '',
+                xuan_xiang_shu_: '',
                 zheng_que_da_an_: '',
                 ping_fen_fang_shi: rateType[defaultType] || '',
                 ping_fen_ren_: userId,
@@ -435,6 +436,7 @@ export default {
                 }
                 a3.push(item.content)
             })
+            this.form.ping_fen_fang_shi = this.questionRateType
             switch (this.form.ti_xing_) {
                 case '单选题':
                     this.form.ping_fen_ren_ = ''
@@ -449,6 +451,7 @@ export default {
                 case '填空题':
                     this.form.xuan_xiang_lei_xi = ''
                     this.form.da_an_ = ''
+                    this.form.xuan_xiang_shu_ = a3.length
                     this.form.zheng_que_da_an_ = JSON.stringify(a3)
                     break
                 case '判断题':
