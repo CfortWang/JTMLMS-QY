@@ -9,7 +9,7 @@
                             金源信通 -->
                         <!-- <img src="~@/assets/images/login/company.png" class="logo"> -->
                         <!-- </h1> -->
-                        <h1 class="login-title">金通医学实验室标准化数智化管理平台</h1>
+                        <h1 class="login-title">{{ systemName }}</h1>
                     </div>
 
                     <div class="jbd-login-page-main">
@@ -43,7 +43,7 @@ import LoginBottom from './login-bottom'
 import UserLogin from './user-login'
 // import IbpsPluginLanguage from '@/plugins/language'
 import IbpsApiBaseUrlController from '@/plugins/api-base-url'
-
+const __IBPS_CONFIG__ = window.__IBPS_CONFIG__ || {}
 export default {
     name: 'login',
     components: {
@@ -54,7 +54,8 @@ export default {
     },
     data () {
         return {
-            activeName: 'user'
+            activeName: 'user',
+            systemName: __IBPS_CONFIG__.SYSTEM_NAME
         }
     },
     methods: {

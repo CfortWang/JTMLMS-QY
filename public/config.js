@@ -62,7 +62,9 @@
         //element 颜色
         ELEMENT_COLOR: '#409EFF',
         // 系统版本
-        VERSION: '1.0.0'
+        VERSION: '1.0.0',
+        // 系统名称
+        SYSTEM_NAME: '金通医学实验室标准化数智化管理平台'
     }
 
 })(window)
