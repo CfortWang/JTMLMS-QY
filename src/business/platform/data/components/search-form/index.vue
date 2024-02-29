@@ -366,8 +366,15 @@ export default {
          */
         getSearcFormData () {
             const { params, nameParams, datePrefix, format } = this
-            // TODO: 过滤多余筛选条件数据
-            // const allKey = Object.keys(params)
+            // 剔除params里相同字段既有日期的筛选条件，又有重复的模糊查询条件，只保留日期的
+            for (const i of Object.keys(params)) {
+                const slic = i.slice(2)
+                const name = slic.substring(0, slic.indexOf('^'))
+                const hadName = Object.keys(params).filter(item => { return item.indexOf(name) > -1 })
+                if (name && hadName.length > 2) {
+                    delete params[`Q^${name}^SL`]
+                }
+            }
             const formattedForm = {
                 arg: {
                     relation: 'AND',
@@ -466,6 +473,7 @@ export default {
             }
             this.params[startDate] = date[0] + '-01-01'
             this.params[endDate] = date[0] + '-12-31'
+
             return
         },
         changeDate (date, startDate, endDate) {
