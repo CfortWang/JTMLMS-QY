@@ -218,7 +218,7 @@ export default {
             }
         },
         getQuestionData () {
-            const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score from t_questions where parent_id_ = '${this.parentId}' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey from t_questions where parent_id_ = '${this.parentId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -297,6 +297,14 @@ export default {
                 this.showIndex++
             }
         },
+        getScore ({ questionType, answer, rightKey, score }) {
+            if (questionType === '多选题') {
+                const temp = JSON.parse(rightKey)
+                return answer.length === temp.length && answer.every(i => temp.includes(i)) ? score : 0
+            } else {
+                return answer === rightKey ? score : 0
+            }
+        },
         handleSubmit () {
             console.log(this.questionList)
             let incompleteList = []
@@ -309,60 +317,66 @@ export default {
                 }
             })
             incompleteList = incompleteList.filter(i => i)
-            if (incompleteList.length) {
-                this.$confirm(`还有第${incompleteList.join('、')}题未作答，您确定要直接交卷吗？`, '提示', {
-                    type: 'warning',
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    showClose: false,
-                    closeOnClickModal: false
-                }).then(() => {
-                    this.submitForm()
-                }).catch(() => {})
-                return
-            }
-            this.$confirm('确定要交卷吗？', '提示', {
+            const tip = incompleteList.length ? `还有第${incompleteList.join('、')}题未作答，您确定要直接交卷吗？` : '您已完成作答，确定要交卷吗？'
+            this.$confirm(tip, '提示', {
+                type: incompleteList.length ? 'warning' : 'info',
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
-                type: 'warning',
                 showClose: false,
                 closeOnClickModal: false
-            })
-            const submitData = []
-            this.questionList.forEach((item, index) => {
-                submitData.push({
-                    parent_id_: this.parentId,
-                    ti_mu_id_: item.questionId,
-                    hui_da_: '',
-                    pan_ding_jie_guo_: '',
-                    de_fen_: ''
+            }).then(() => {
+                const submitData = []
+                this.questionList.forEach((item, index) => {
+                    const autoType = ['单选题', '多选题', '判断题'].includes(item.questionType)
+                    const multipleType = ['多选题', '填空题'].includes(item.questionType)
+                    submitData.push({
+                        parent_id_: this.parentId,
+                        ti_mu_id_: item.questionId,
+                        ti_gan_: item.stem,
+                        ti_xing_: item.questionType,
+                        fen_zhi_: item.score,
+                        fu_tu_: item.img,
+                        xuan_xiang_lei_xi: item.optionType,
+                        xuan_xiang_: item.options,
+                        can_kao_da_an_: item.rightKey,
+                        ping_fen_fang_shi: item.rateType,
+                        ping_fen_ren_: item.rater,
+                        hui_da_: multipleType ? JSON.stringify(item.answer) : item.answer,
+                        shi_fou_yi_yue_: autoType ? '是' : '否',
+                        de_fen_: autoType ? this.getScore(item) : '',
+                        jie_xi_: ''
+                    })
                 })
-            })
-            this.submitForm()
+                this.submitForm(submitData)
+            }).catch(() => {})
         },
-        submitForm () {
-            console.log('顶内锅肺啊')
-            return
+        submitForm (data) {
             const addParams = {
-                tableName: 't_question_bank',
-                paramWhere: [this.form]
+                tableName: 't_examination_detail',
+                paramWhere: data
             }
             const updateParams = {
-                tableName: 't_question_bank',
+                tableName: 't_examination',
                 updList: [
                     {
                         where: {
                             id_: this.id
                         },
-                        param: this.form
+                        param: {
+                            jie_shu_shi_jian_: this.$common.getDateNow(19),
+                            ti_ku_zong_fen_: data.reduce((sum, item) => sum + parseInt(item.fen_zhi_), 0),
+                            zhuang_tai_: '已完成',
+                            // sheng_yu_shi_chan: ''
+                        }
                     }
                 ]
             }
-            const type = this.id ? 'update' : 'add'
-            const params = type === 'add' ? addParams : updateParams
-            this.$common.request(type, params).then(() => {
-                this.$message.success(this.id ? '保存题库成功' : '新增题库成功')
-                this.closeDialog()
+            console.log(addParams, updateParams)
+            this.$common.request('add', addParams).then(() => {
+                this.$common.request('update', updateParams).then(() => {
+                    this.$message.success('提交成功！')
+                    this.closeDialog()
+                })
             })
         },
         // 关闭当前窗口

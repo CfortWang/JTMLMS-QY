@@ -269,7 +269,7 @@ export default {
                 ping_fen_ren_: userId,
                 fen_zhi_: '',
                 bei_zhu_: '',
-                zhuang_tai_: ''
+                zhuang_tai_: '启用'
             },
             toolbars: [
                 {
