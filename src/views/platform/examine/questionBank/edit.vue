@@ -22,25 +22,6 @@
             <el-form-item label="题库名称：" prop="ti_ku_ming_cheng_">
                 <el-input v-model="form.ti_ku_ming_cheng_" type="text" :maxlength="128" />
             </el-form-item>
-            <el-form-item label="所属范围：" prop="suo_shu_fan_wei_">
-                <el-radio-group v-model="form.suo_shu_fan_wei_">
-                    <el-radio label="科级">科级</el-radio>
-                    <el-radio label="组级">组级</el-radio>
-                </el-radio-group>
-                <el-select
-                    v-if="form.suo_shu_fan_wei_ === '组级'"
-                    v-model="form.bian_zhi_bu_men_"
-                    width="100%"
-                    placeholder="请选择专业组"
-                >
-                    <el-option
-                        v-for="item in deptList"
-                        :key="item.positionId"
-                        :label="item.positionName"
-                        :value="item.positionId"
-                    />
-                </el-select>
-            </el-form-item>
             <el-form-item label="题库分类：" prop="ti_ku_fen_lei_">
                 <el-select
                     v-model="form.ti_ku_fen_lei_"
@@ -63,19 +44,75 @@
                     <el-radio label="不可用">不可用</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="限考次数：" prop="xian_kao_ci_shu_" :maxlength="16">
-                <el-radio-group v-model="form.isLimit" @change="changeLimit">
-                    <el-radio :label="0">不限</el-radio>
-                    <el-radio :label="1">限制</el-radio>
+            <el-form-item label="所属范围：" prop="suo_shu_fan_wei_" class="inline-item">
+                <el-radio-group v-model="form.suo_shu_fan_wei_">
+                    <el-radio label="科级">科级</el-radio>
+                    <el-radio label="组级">组级</el-radio>
                 </el-radio-group>
+                <el-select
+                    v-if="form.suo_shu_fan_wei_ === '组级'"
+                    v-model="form.bian_zhi_bu_men_"
+                    width="100%"
+                    placeholder="请选择专业组"
+                >
+                    <el-option
+                        v-for="item in deptList"
+                        :key="item.positionId"
+                        :label="item.positionName"
+                        :value="item.positionId"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="限考次数：" prop="isLimit" class="inline-item">
+                <el-radio-group v-model="form.isLimit">
+                    <el-radio label="0">不限</el-radio>
+                    <el-radio label="1">限制</el-radio>
+                </el-radio-group>
+                <div v-if="form.isLimit === '1'" class="time">
+                    <el-input-number
+                        v-model="form.xian_kao_ci_shu_"
+                        :min="1"
+                        :precision="0"
+                        placeholder="请输入单个用户最大限考次数"
+                    />
+                    <div class="unit">次</div>
+                </div>
+            </el-form-item>
+            <el-form-item label="考试时长：" prop="kao_shi_shi_chang" class="inline-item">
+                <el-radio-group v-model="form.limitTime">
+                    <el-radio label="0">不限</el-radio>
+                    <el-radio label="1">限制</el-radio>
+                </el-radio-group>
+                <template v-if="form.limitTime === '1'">
+                    <div class="time">
+                        <el-input-number
+                            v-model="form.hours"
+                            :min="0"
+                            :max="72"
+                            :precision="0"
+                        />
+                        <div class="unit">小时</div>
+                    </div>
+                    <div class="time">
+                        <el-input-number
+                            v-model="form.minutes"
+                            :min="0"
+                            :max="59"
+                            :precision="0"
+                        />
+                        <div class="unit">分钟</div>
+                    </div>
+                </template>
+            </el-form-item>
+            <el-form-item label="达标分值占比：" prop="da_biao_zhan_bi_">
                 <el-input-number
-                    v-if="form.isLimit"
-                    v-model="form.xian_kao_ci_shu_"
-                    :min="1"
+                    v-model="form.da_biao_zhan_bi_"
+                    :min="50"
+                    :max="100"
                     :precision="0"
-                    type="number"
-                    placeholder="请输入单个用户最大限考次数"
+                    placeholder="请输入达标分值占比"
                 />
+                <div class="unit">%</div>
             </el-form-item>
             <el-form-item label="默认评分人：" prop="ping_fen_ren_">
                 <!-- <el-cascader v-model="form.ping_fen_ren_" :options="getRaterOptions(userList)" :show-all-levels="false" /> -->
@@ -140,9 +177,13 @@ export default {
                 ti_ku_zhuang_tai_: '可用',
                 xian_kao_ci_shu_: '不限',
                 ping_fen_ren_: '',
+                da_biao_zhan_bi_: 60,
                 miao_shu_: '',
                 ti_shu_: 0,
-                isLimit: 0
+                isLimit: '0',
+                limitTime: '0',
+                hours: null,
+                minutes: null
             },
             toolbars: [
                 {
@@ -161,7 +202,9 @@ export default {
                 bian_zhi_bu_men_: [{ required: true, message: this.$t('validate.required') }],
                 ti_ku_fen_lei_: [{ required: true, message: this.$t('validate.required') }],
                 ti_ku_zhuang_tai_: [{ required: true, message: this.$t('validate.required') }],
-                xian_kao_ci_shu_: [{ required: true, message: this.$t('validate.required') }]
+                xian_kao_ci_shu_: [{ required: true, message: this.$t('validate.required') }],
+                kao_shi_shi_chang: [{ required: true, message: this.$t('validate.required') }],
+                da_biao_zhan_bi_: [{ required: true, message: this.$t('validate.required') }]
             }
 
         }
@@ -239,15 +282,24 @@ export default {
             if (this.$utils.isEmpty(this.formId)) {
                 return
             }
-            const sql = `select id_, bian_zhi_ren_, bian_zhi_bu_men_, bian_zhi_shi_jian, ti_ku_ming_cheng_, ti_ku_fen_lei_, ti_ku_zhuang_tai_, xian_kao_ci_shu_, ping_fen_ren_, miao_shu_, suo_shu_fan_wei_ from t_question_bank where id_ = '${this.formId}'`
+            const sql = `select id_, bian_zhi_ren_, bian_zhi_bu_men_, bian_zhi_shi_jian, ti_ku_ming_cheng_, ti_ku_fen_lei_, ti_ku_zhuang_tai_, xian_kao_ci_shu_, ping_fen_ren_, miao_shu_, suo_shu_fan_wei_, kao_shi_shi_chang, da_biao_zhan_bi_ from t_question_bank where id_ = '${this.formId}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     this.$message.error('数据不存在')
                     return
                 }
+                data[0].isLimit = data[0].xian_kao_ci_shu_ === '不限' ? '0' : '1'
+                if (data[0].kao_shi_shi_chang === '不限') {
+                    data[0].limitTime = '0'
+                    data[0].hours = null
+                    data[0].minutes = null
+                } else {
+                    data[0].limitTime = '1'
+                    data[0].hours = Math.floor(data[0].kao_shi_shi_chang / (1000 * 60 * 60))
+                    data[0].minutes = (data[0].kao_shi_shi_chang % (1000 * 60 * 60)) / (60 * 1000)
+                }
                 this.form = data[0]
-                this.form.isLimit = data[0].xian_kao_ci_shu_ === '不限' ? 0 : 1
             })
         },
         handleSubmit () {
@@ -261,10 +313,22 @@ export default {
             })
         },
         submitForm () {
+            if (this.form.limitTime === '0') {
+                this.form.kao_shi_shi_chang = '不限'
+            } else {
+                this.form.kao_shi_shi_chang = (this.form.hours * 60 + this.form.minutes) * 60 * 1000
+            }
             delete this.form.isLimit
+            delete this.form.limitTime
+            delete this.form.hours
+            delete this.form.minutes
             const addParams = {
                 tableName: 't_question_bank',
-                paramWhere: [this.form]
+                paramWhere: [{
+                    ...this.form,
+                    ti_shu_: 0,
+                    zong_fen_: 0
+                }]
             }
             const updateParams = {
                 tableName: 't_question_bank',
@@ -304,6 +368,20 @@ export default {
             .el-form-item--small .el-form-item__error {
                 padding-top: 6px;
             }
+        }
+        .inline-item {
+            ::v-deep {
+                .el-radio-group {
+                    margin-right: 20px;
+                }
+            }
+            .time {
+                display: inline-block;
+            }
+        }
+        .unit {
+            display: inline-block;
+            margin: 0 20px 0 5px;
         }
     }
 </style>

@@ -268,7 +268,8 @@ export default {
                 ping_fen_fang_shi: rateType[defaultType] || '',
                 ping_fen_ren_: userId,
                 fen_zhi_: '',
-                bei_zhu_: ''
+                bei_zhu_: '',
+                zhuang_tai_: ''
             },
             toolbars: [
                 {
