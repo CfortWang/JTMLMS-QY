@@ -13,7 +13,7 @@
                 :placeholder="placeholder"
                 style="width: 100%"
                 allow-create
-                collapse-tags
+                :collapse-tags="tempSearch"
                 @focus="focusData"
                 @change="changeData"
                 @clear="clearData"
@@ -177,6 +177,10 @@ export default {
             // 只读样式
             type: String,
             default: 'original'
+        },
+        tempSearch: { // 是否是数据模板使用的筛选条件
+            type: Boolean,
+            default: false
         }
     },
     data () {

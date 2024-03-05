@@ -130,6 +130,7 @@
                     :label-key="getLinkLabelKey(scope.column.field_options)"
                     :structure="getLinkStructure(scope.column.field_options)"
                     :config="getLinkConfig(scope.column.field_options)"
+                    :temp-search="true"
                     readonly
                     readonly-text="text"
                     allow-empty-dynamic-params

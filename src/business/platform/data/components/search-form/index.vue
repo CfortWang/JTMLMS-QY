@@ -226,6 +226,7 @@
                     :value-key="getLinkValueKey(item.field_options)"
                     :label-type="getLinkLabelType(item.field_options)"
                     :label-key="getLinkLabelKey(item.field_options)"
+                    :temp-search="true"
                 />
                 <!-- 地址-->
                 <ibps-address
