@@ -4,6 +4,7 @@
         :visible.sync="dialogVisible"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :show-close="false"
         append-to-body
         fullscreen
         class="dialog test-dialog"
@@ -35,21 +36,21 @@
                         />
                     </div>
                     <div class="answer">
-                        <el-radio-group v-if="item.questionType === '单选题'" v-model="item.answer">
+                        <el-radio-group v-if="item.questionType === '单选题'" v-model="item.answer" @change="goNext">
                             <el-radio
                                 v-for="(o, i) in item.options"
                                 :key="`${index}${i}`"
                                 :label="o.label"
                             >{{ `${o.label}.${o.value}` }}</el-radio>
                         </el-radio-group>
-                        <el-checkbox-group v-else-if="item.questionType === '多选题'" v-model="item.answer">
+                        <el-checkbox-group v-else-if="item.questionType === '多选题'" v-model="item.answer" @change="changeOptions">
                             <el-checkbox
                                 v-for="(o, i) in item.options"
                                 :key="`${index}${i}`"
                                 :label="o.label"
-                            >{{ o.value }}</el-checkbox>
+                            >{{ `${o.label}.${o.value}` }}</el-checkbox>
                         </el-checkbox-group>
-                        <el-radio-group v-else-if="item.questionType === '判断题'" v-model="item.answer">
+                        <el-radio-group v-else-if="item.questionType === '判断题'" v-model="item.answer" @change="goNext">
                             <el-radio-button label="√">√</el-radio-button>
                             <el-radio-button label="×">×</el-radio-button>
                         </el-radio-group>
@@ -99,8 +100,6 @@
 </template>
 
 <script>
-import ActionUtils from '@/utils/action'
-import { paperTypeOptions } from '../constants'
 export default {
     components: {
         IbpsImage: () => import('@/business/platform/file/image')
@@ -122,7 +121,6 @@ export default {
     data () {
         const { userId } = this.$store.getters || {}
         return {
-            paperTypeOptions,
             title: '参加考试',
             dialogVisible: this.visible,
             toolbars: [
@@ -153,7 +151,8 @@ export default {
                 { key: 'cancel', label: '退出' }
             ],
             questionList: [],
-            showIndex: 1
+            showIndex: 1,
+            userId
         }
     },
     computed: {
@@ -171,14 +170,11 @@ export default {
         showIndex: {
             handler (val, oldVal) {
                 const temp = this.questionList[oldVal - 1]
-                if (temp.questionType === '填空题') {
+                if (['填空题'].includes(temp.questionType)) {
                     temp.answer = temp.options.map(item => item.answer)
                 }
             }
         }
-    },
-    created () {
-        // this.getQuestionData()
     },
     mounted () {
         this.loadData()
@@ -244,7 +240,7 @@ export default {
                             })
                         }
                         item.img = item.img ? JSON.parse(item.img) : ''
-                        item.answer = null
+                        item.answer = item.questionType === '多选题' ? [] : null
                     })
                     resolve(data)
                 }).catch(error => {
@@ -265,11 +261,16 @@ export default {
             const finishedCount = finished.filter(i => i).length
             return parseInt(finishedCount / this.questionList.length * 100)
         },
+        changeOptions (val) {
+            this.questionList[this.showIndex - 1].answer = val
+        },
         setClassName (item, index) {
             const result = []
             if (item.answer) {
                 // 填空题且未填写所有答案
-                if (item.questionType === '填空题' && (item.options.every(i => !i.answer))) {
+                if (['填空题'].includes(item.questionType) && (item.options.every(i => !i.answer))) {
+                    result.push('')
+                } else if (['多选题'].includes(item.questionType) && !item.answer.length) {
                     result.push('')
                 } else if (item.questionType === '填空题' && (item.options.some(i => !i.answer))) {
                     result.push('incomplete')
@@ -297,20 +298,28 @@ export default {
                 this.showIndex++
             }
         },
+        goNext () {
+            if (this.showIndex === this.questionList.length) {
+                return
+            }
+            this.showIndex++
+        },
         getScore ({ questionType, answer, rightKey, score }) {
             if (questionType === '多选题') {
-                const temp = JSON.parse(rightKey)
+                const temp = rightKey.split(',')
                 return answer.length === temp.length && answer.every(i => temp.includes(i)) ? score : 0
             } else {
                 return answer === rightKey ? score : 0
             }
         },
         handleSubmit () {
-            console.log(this.questionList)
             let incompleteList = []
             this.questionList.forEach((item, index) => {
                 if (item.questionType === '填空题') {
-                    const t = item.answer && item.answer.some(i => i === '' || i === null)
+                    const t = item.answer && !item.answer.some(i => i === '' || i === null)
+                    incompleteList.push(!t ? index + 1 : '')
+                } else if (item.questionType === '多选题') {
+                    const t = item.answer && item.answer.length
                     incompleteList.push(!t ? index + 1 : '')
                 } else {
                     incompleteList.push(!item.answer ? index + 1 : '')
@@ -326,27 +335,31 @@ export default {
                 closeOnClickModal: false
             }).then(() => {
                 const submitData = []
+                const time = this.$common.getDateNow(19)
                 this.questionList.forEach((item, index) => {
                     const autoType = ['单选题', '多选题', '判断题'].includes(item.questionType)
                     const multipleType = ['多选题', '填空题'].includes(item.questionType)
+                    const selectType = ['多选题', '单选题'].includes(item.questionType)
                     submitData.push({
-                        parent_id_: this.parentId,
+                        parent_id_: this.id,
                         ti_mu_id_: item.questionId,
                         ti_gan_: item.stem,
                         ti_xing_: item.questionType,
                         fen_zhi_: item.score,
                         fu_tu_: item.img,
                         xuan_xiang_lei_xi: item.optionType,
-                        xuan_xiang_: item.options,
+                        xuan_xiang_: selectType ? JSON.stringify(item.options) : '',
                         can_kao_da_an_: item.rightKey,
                         ping_fen_fang_shi: item.rateType,
                         ping_fen_ren_: item.rater,
-                        hui_da_: multipleType ? JSON.stringify(item.answer) : item.answer,
+                        hui_da_: multipleType && item.answer && item.answer.length ? JSON.stringify(item.answer) : item.answer,
                         shi_fou_yi_yue_: autoType ? '是' : '否',
+                        ping_yue_shi_jian: autoType ? time : '',
                         de_fen_: autoType ? this.getScore(item) : '',
                         jie_xi_: ''
                     })
                 })
+                // console.log(submitData)
                 this.submitForm(submitData)
             }).catch(() => {})
         },
@@ -355,6 +368,7 @@ export default {
                 tableName: 't_examination_detail',
                 paramWhere: data
             }
+            const isAllReviewed = !data.some(i => i.shi_fou_yi_yue_ === '否')
             const updateParams = {
                 tableName: 't_examination',
                 updList: [
@@ -365,7 +379,8 @@ export default {
                         param: {
                             jie_shu_shi_jian_: this.$common.getDateNow(19),
                             ti_ku_zong_fen_: data.reduce((sum, item) => sum + parseInt(item.fen_zhi_), 0),
-                            zhuang_tai_: '已完成',
+                            zhuang_tai_: isAllReviewed ? '已完成' : '已交卷',
+                            de_fen_: isAllReviewed ? data.reduce((sum, item) => sum + parseInt(item.de_fen_), 0) : '',
                             // sheng_yu_shi_chan: ''
                         }
                     }
@@ -394,7 +409,7 @@ export default {
                 width: 1080px;
                 margin: 0 auto;
                 box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-                .el-radio {
+                .el-radio, .el-checkbox {
                     display: block;
                     margin-bottom: 10px;
                 }
@@ -489,36 +504,6 @@ export default {
                         }
                     }
                 }
-                // .active {
-                //     background-color: #409EFF;
-                //     color: #fff;
-                //     border-color: #409EFF;
-                //     &:hover {
-                //         background-color: #66b1ff;
-                //         color: #fff;
-                //         border-color: #66b1ff;
-                //     }
-                // }
-                // .incomplete {
-                //     background-color: #E6A23C;
-                //     color: #fff;
-                //     border-color: #E6A23C;
-                //     &:hover {
-                //         background-color: #E6A23C;
-                //         color: #fff;
-                //         border-color: #E6A23C;
-                //     }
-                // }
-                // .finished {
-                //     background-color: #67C23A;
-                //     color: #fff;
-                //     border-color: #67C23A;
-                //     &:hover {
-                //         background-color: #85ce61;
-                //         color: #fff;
-                //         border-color: #85ce61;
-                //     }
-                // }
             }
         }
     }

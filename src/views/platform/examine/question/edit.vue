@@ -460,7 +460,7 @@ export default {
                     this.form.xuan_xiang_lei_xi = ''
                     this.form.da_an_ = ''
                     break
-                case '问答题':
+                case '简答题':
                     this.form.xuan_xiang_lei_xi = ''
                     this.form.da_an_ = ''
                     break

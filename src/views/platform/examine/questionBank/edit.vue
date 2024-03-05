@@ -64,7 +64,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="限考次数：" prop="isLimit" class="inline-item">
-                <el-radio-group v-model="form.isLimit">
+                <el-radio-group v-model="form.isLimit" @change="changeLimit">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
                 </el-radio-group>
@@ -78,7 +78,7 @@
                     <div class="unit">次</div>
                 </div>
             </el-form-item>
-            <el-form-item label="考试时长：" prop="kao_shi_shi_chang" class="inline-item">
+            <el-form-item label="考试时长：" prop="limitTime" class="inline-item">
                 <el-radio-group v-model="form.limitTime">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
@@ -182,8 +182,8 @@ export default {
                 ti_shu_: 0,
                 isLimit: '0',
                 limitTime: '0',
-                hours: null,
-                minutes: null
+                hours: 2,
+                minutes: 30
             },
             toolbars: [
                 {
@@ -230,7 +230,7 @@ export default {
     },
     methods: {
         changeLimit (e) {
-            this.form.xian_kao_ci_shu_ = e ? 1 : '不限'
+            this.form.xian_kao_ci_shu_ = e === '1' ? 1 : '不限'
         },
         getRaterOptions (list) {
             const data = [
