@@ -232,8 +232,8 @@ export default {
             this.handleInput()
         },
         /**
-             * 初始化数据
-             */
+         * 初始化数据
+         */
         initData () {
             const data = this.getArrayValue(this.value)
             this.selectorValue = this.multiple ? [] : {}
@@ -274,8 +274,8 @@ export default {
             }
         },
         /**
-             * 获得数组数据
-             */
+         * 获得数组数据
+         */
         getArrayValue (value, bindId) {
             if (this.$utils.isEmpty(value)) {
                 return []
@@ -377,8 +377,8 @@ export default {
             }
         },
         /**
-             * 通过ID获取数据
-             */
+         * 通过ID获取数据
+         */
         getDataInfo (id) {
             if (TRANSFER_DATA === 'transfer') {
                 this.getTransferData(id)
@@ -492,8 +492,8 @@ export default {
             }
         },
         /**
-             * 处理删除
-             */
+         * 处理删除
+         */
         handleRemove (index) {
             if (this.multiple) {
                 this.selectorValue.splice(index, 1)
@@ -503,17 +503,33 @@ export default {
             this.handleInput()
         },
         /**
-             * 处理下载
-             */
+         * 处理下载
+         */
         handleDownload (index) {
             downloadFile(this.multiple ? this.selectorValue[index] : this.selectorValue)
         },
         /**
-             * 处理预览
-             */
+         * 处理预览
+         */
         handlePreview (index) {
             this.attachment = this.multiple ? this.selectorValue[index] : this.selectorValue
-            if (supportFileTypes.includes(this.attachment.ext)) {
+            if (this.attachment.ext === 'pdf') {
+                this.$nextTick(() => {
+                    // this.$refs.viewer.load(this.url)
+                    const newTab = window.open()
+                    const link = newTab.document.createElement('link')
+                    const url = BASE_API() + SYSTEM_URL() + '/file/download?attachmentId=' + this.attachment.id
+                    link.rel = 'shortcut icon'
+                    link.type = 'image/x-icon'
+                    link.href = 'favicon.ico'
+                    // newTab.document.write('<link rel="icon" type="image/x-icon" href="favicon.ico">')
+                    newTab.document.write(`<title>文件预览页-${this.attachment.fileName}</title>`)
+                    newTab.document.write('<style>body { margin: 0px; }</style>')
+                    newTab.document.head.appendChild(link)
+                    newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(url)}" style="width:100%; height:100%;" frameborder="0";>`)
+                    // this.closeDialog()
+                })
+            } else if (supportFileTypes.includes(this.attachment.ext)) {
                 this.getPreview(index)
             } else {
                 this.$message.closeAll()
@@ -521,8 +537,8 @@ export default {
             }
         },
         /**
-             * 处理预览
-             */
+         * 处理预览
+         */
         getPreview (index) {
             // 1、获取文件数据 及下载流接口
             // 下载地址
@@ -536,8 +552,8 @@ export default {
             this.filePreviewVisible = true
         },
         /**
-             *  确定
-             */
+         *  确定
+         */
         handleSelectorActionEvent (buttonKey, data) {
             if (this.uploadType === 'default' && this.$utils.isNotEmpty(this.limit) && this.multiple && this.limit < data.length) {
                 this.$message({
@@ -569,8 +585,8 @@ export default {
             this.$emit('callback', this.selectorValue)
         },
         /**
-             * 文件上传
-             */
+         * 文件上传
+         */
         httpRequest (options) {
             return uploadFile(options.file, {})
         },
