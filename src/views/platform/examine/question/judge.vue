@@ -69,7 +69,9 @@
                                 <i class="el-icon-question" />
                             </el-tooltip>
                         </div>
-                        <el-button type="danger" icon="el-icon-close" circle @click="changeScore(index, 0)" />
+                        <el-tooltip effect="dark" content="错误，该题计0分" placement="top">
+                            <el-button type="danger" icon="el-icon-close" circle @click="changeScore(index, 0)" />
+                        </el-tooltip>
                         <el-input-number
                             v-model="item.resultScore"
                             :min="0"
@@ -78,7 +80,12 @@
                             class="score-input"
                             placeholder=""
                         />
-                        <el-button type="success" icon="el-icon-check" circle @click="changeScore(index, item.score)" />
+                        <el-tooltip effect="dark" content="正确，该题计满分" placement="top">
+                            <el-button type="success" icon="el-icon-check" circle @click="changeScore(index, item.score)" />
+                        </el-tooltip>
+                        <el-tooltip effect="dark" content="取消已有评分，未评分的题目不会被提交" placement="top">
+                            <el-button type="warning" icon="el-icon-delete" @click="changeScore(index, undefined)">取消评分</el-button>
+                        </el-tooltip>
                     </div>
                 </div>
             </div>
@@ -111,11 +118,11 @@ export default {
             type: Boolean,
             default: false
         },
-        id: {
+        paperId: {
             type: String,
             default: ''
         },
-        parentId: {
+        id: {
             type: String,
             default: ''
         }
@@ -214,8 +221,7 @@ export default {
                     const { data = [] } = res.variables || {}
                     if (!data.length) {
                         this.$message.error('获取题目信息失败！')
-                        this.closeDialog()
-                        return
+                        return this.closeDialog()
                     }
                     data.map(item => {
                         if (item.questionType === '填空题') {
@@ -320,8 +326,8 @@ export default {
             console.log(updateParams)
             this.$common.request('update', updateParams).then(() => {
                 this.$message.success('提交成功！')
-                this.closeDialog()
                 this.updatePaperInfo(paperIdList.join(','))
+                this.closeDialog()
             })
         },
         updatePaperInfo (ids) {
