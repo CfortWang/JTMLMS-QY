@@ -6,7 +6,7 @@
         :close-on-press-escape="false"
         append-to-body
         width="60%"
-        class="dialog question-detail-dialog"
+        class="dialog question-dialog"
         top="6vh"
         @close="closeDialog"
         @open="getQuestionData"
@@ -236,9 +236,14 @@ export default {
             type: Boolean,
             default: false
         },
-        id: String,
-        parentId: String,
-        data: [Object, String]
+        paperId: {
+            type: String,
+            default: ''
+        },
+        id: {
+            type: String,
+            default: ''
+        }
     },
     data () {
         const { userList = [], deptList = [], userId } = this.$store.getters || {}
@@ -255,7 +260,7 @@ export default {
             filePreviewVisible: false,
             form: {
                 // bu_men_: '',
-                parent_id_: this.parentId,
+                parent_id_: this.paperId,
                 chu_ti_ren_: userId,
                 chu_ti_shi_jian_: this.$common.getDateNow(19),
                 ti_gan_: '',
@@ -493,7 +498,7 @@ export default {
             })
         },
         updatePaper () {
-            const sql = `select fen_zhi_ from t_questions where parent_id_ = '${this.parentId}'`
+            const sql = `select fen_zhi_ from t_questions where parent_id_ = '${this.paperId}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 const params = {
@@ -501,7 +506,7 @@ export default {
                     updList: [
                         {
                             where: {
-                                id_: this.parentId
+                                id_: this.paperId
                             },
                             param: {
                                 ti_shu_: data.length,
@@ -523,7 +528,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    .question-detail-dialog {
+    .question-dialog {
         ::v-deep {
             .el-dialog__body {
                 height: calc(88vh - 200px);

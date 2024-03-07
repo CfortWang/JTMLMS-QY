@@ -6,7 +6,7 @@
         :close-on-press-escape="false"
         append-to-body
         width="60%"
-        class="dialog question-detail-dialog"
+        class="dialog paper-dialog"
         top="6vh"
         @close="closeDialog"
         @open="getQuestionData"
@@ -153,8 +153,10 @@ export default {
             type: Boolean,
             default: false
         },
-        id: String,
-        data: [Object, String]
+        id: {
+            type: String,
+            default: ''
+        }
     },
     data () {
         const { userList = [], deptList = [], userId } = this.$store.getters || {}
@@ -356,7 +358,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    .question-detail-dialog {
+    .paper-dialog {
         ::v-deep {
             .el-dialog__body {
                 height: calc(88vh - 200px);

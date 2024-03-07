@@ -7,7 +7,7 @@
         :show-close="false"
         append-to-body
         fullscreen
-        class="dialog test-dialog"
+        class="dialog paper-test-dialog"
         top="0"
         @open="loadData"
         @close="closeDialog"
@@ -109,11 +109,11 @@ export default {
             type: Boolean,
             default: false
         },
-        id: {
+        paperId: {
             type: String,
             default: ''
         },
-        parentId: {
+        id: {
             type: String,
             default: ''
         }
@@ -187,7 +187,7 @@ export default {
     methods: {
         // 获取题库数据
         async loadData () {
-            if (!this.parentId) {
+            if (!this.paperId) {
                 this.$message.error('获取题目信息失败，请重试！')
                 this.closeDialog()
                 return
@@ -214,7 +214,7 @@ export default {
             }
         },
         getQuestionData () {
-            const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey from t_questions where parent_id_ = '${this.parentId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey from t_questions where parent_id_ = '${this.paperId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -378,9 +378,9 @@ export default {
                         },
                         param: {
                             jie_shu_shi_jian_: this.$common.getDateNow(19),
-                            ti_ku_zong_fen_: data.reduce((sum, item) => sum + parseInt(item.fen_zhi_), 0),
+                            ti_ku_zong_fen_: data.reduce((sum, item) => sum + parseFloat(item.fen_zhi_), 0),
                             zhuang_tai_: isAllReviewed ? '已完成' : '已交卷',
-                            de_fen_: isAllReviewed ? data.reduce((sum, item) => sum + parseInt(item.de_fen_), 0) : '',
+                            de_fen_: isAllReviewed ? data.reduce((sum, item) => sum + parseFloat(item.de_fen_), 0) : '',
                             // sheng_yu_shi_chan: ''
                         }
                     }
@@ -402,7 +402,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    .test-dialog {
+    .paper-test-dialog {
         ::v-deep {
             .el-dialog__body {
                 height: calc(100vh - 55px);

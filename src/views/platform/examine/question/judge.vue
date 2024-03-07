@@ -7,7 +7,7 @@
         :show-close="false"
         append-to-body
         fullscreen
-        class="dialog test-dialog"
+        class="dialog paper-judge-dialog"
         top="0"
         @open="loadData"
         @close="closeDialog"
@@ -353,7 +353,7 @@ export default {
                             where: { id_: key },
                             param: {
                                 zhuang_tai_: '已完成',
-                                de_fen_: temp[key].reduce((sum, item) => sum + parseInt(item.score), 0)
+                                de_fen_: temp[key].reduce((sum, item) => sum + parseFloat(item.score), 0)
                             }
                         }]
                     }
@@ -377,7 +377,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    .test-dialog {
+    .paper-judge-dialog {
         ::v-deep {
             .el-dialog__body {
                 height: calc(100vh - 55px);
