@@ -7,7 +7,7 @@
         :show-close="false"
         append-to-body
         fullscreen
-        class="dialog paper-test-dialog"
+        class="dialog test-dialog"
         top="0"
         @open="loadData"
         @close="closeDialog"
@@ -296,6 +296,8 @@ export default {
                     return
                 }
                 this.showIndex++
+            } else if (event.keyCode === 27 || event.key === 'Esc') {
+                this.closeDialog()
             }
         },
         goNext () {
@@ -402,7 +404,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    .paper-test-dialog {
+    .test-dialog {
         ::v-deep {
             .el-dialog__body {
                 height: calc(100vh - 55px);

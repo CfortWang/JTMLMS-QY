@@ -24,11 +24,11 @@
                 </div>
                 <div class="info-item">
                     <span class="label">总分</span>
-                    <span class="value">{{ paperData.totalScore }}</span>
+                    <span class="value">{{ paperData.totalScore }}分</span>
                 </div>
                 <div class="info-item">
                     <span class="label">达标分数占比：</span>
-                    <span class="value">{{ paperData.qualifiedRadio }}</span>
+                    <span class="value">{{ paperData.qualifiedRadio }}%</span>
                 </div>
                 <div class="info-item">
                     <span class="label">计分方式：</span>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="info-item">
                     <span class="label">得分：</span>
-                    <span class="value">{{ paperData.resultScore }}</span>
+                    <span class="value">{{ paperData.status !== '已完成' ? '未评分' : `${paperData.resultScore}分` }}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">报考时间：</span>
@@ -87,7 +87,7 @@
                         </div>
                         <div class="answer">
                             <div class="mine">
-                                <div class="title">考生答案：<el-tag type="success" size="small" class="score">{{ `得${q.score}分` }}</el-tag></div>
+                                <div class="title">考生答案：<el-tag type="success" size="small" class="score">{{ !q.score && q.score !== '0' ? '未评分' : `得${q.score}分` }}</el-tag></div>
                                 <div class="answer-content">
                                     <el-radio-group v-if="q.questionType === '单选题'" :value="q.answer">
                                         <el-radio
@@ -163,23 +163,31 @@
                     v-for="(paper, index) in paperList"
                     :key="index"
                     :timestamp="paper.applyTime"
-
-                    @click="changePaper(paper.dataId)"
+                    :icon="paper.status === '已完成' ? 'el-icon-success' : 'el-icon-view'"
+                    :type="paper.status === '已完成' ? 'success' : 'primary'"
+                    placement="top"
+                    size="large"
                 >
-                    <el-card class="timeline-card">
+                    <el-card class="timeline-card" :class="paper.dataId === showPaperId ? 'active-card' : ''" @click.native="changePaper(paper.dataId)">
                         <div class="card-item">{{ `开始时间：${paper.startTime}` }}</div>
                         <div class="card-item">{{ `结束时间：${paper.endTime}` }}</div>
-                        <div class="card-item">
+                        <div v-if="paper.status === '已完成'" class="card-item">
                             <span>{{ `得分：${paper.resultScore}` }}</span>
-                            <el-tag type="danger" size="mini" class="score">{{ `未达标` }}</el-tag>
-                            <el-tag type="success" size="mini" class="score">{{ `最高分` }}</el-tag>
-                            <el-tag type="warning" size="mini" class="score">{{ `最低分` }}</el-tag>
+                            <el-tag :type="paper.isQualified ? 'success' : 'danger'" size="mini" class="score">{{ paper.isQualified ? `达标` : '未达标' }}</el-tag>
+                            <el-tag v-if="paper.resultScore === maxScore" type="success" size="mini" class="score">{{ `最高分` }}</el-tag>
+                            <el-tag v-if="paper.resultScore === minScore" type="warning" size="mini" class="score">{{ `最低分` }}</el-tag>
                         </div>
                     </el-card>
                 </el-timeline-item>
             </el-timeline>
         </div>
         <div slot="footer" class="el-dialog--center">
+            <ibps-toolbar
+                :actions="toolbars"
+                @action-event="handleActionEvent"
+            />
+        </div>
+        <div slot="header" class="el-dialog--right">
             <ibps-toolbar
                 :actions="toolbars"
                 @action-event="handleActionEvent"
@@ -217,6 +225,8 @@ export default {
             ],
             paperList: [],
             paperData: [],
+            maxScore: '',
+            minScore: '',
             showPaperId: '',
             userId
         }
@@ -235,6 +245,11 @@ export default {
     },
     mounted () {
         this.loadData()
+        // 监听键盘事件
+        window.addEventListener('keyup', this.handleKeyPress)
+    },
+    beforeDestroy () {
+        window.removeEventListener('keyup', this.handleKeyPress)
     },
     methods: {
         // 获取题库数据
@@ -258,13 +273,18 @@ export default {
                     break
             }
         },
+        handleKeyPress (event) {
+            if (event.keyCode === 27 || event.key === 'Esc') {
+                this.closeDialog()
+            }
+        },
         transformUser (userId) {
             const { userList = [] } = this.$store.getters
             const user = userList.find(u => u.userId === userId) || {}
             return user.userName || '-'
         },
         getQuestionData () {
-            const sql = `select e.id_ as dataId, e.kao_shi_ren_ as examinee, e.bu_men_ as dept,  e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime, e.ti_ku_zong_fen_ as totalScore, e.da_biao_zhan_bi_ as qualifiedRadio, e.de_fen_ as resultScore, ed.ti_mu_id_ as questionId, ed.ti_gan_ as stem, ed.ti_xing_ as questionType, ed.fen_zhi_ as questionScore, ed.fu_tu_ as img, ed.xuan_xiang_lei_xi as optionsType, ed.xuan_xiang_ as options, ed.can_kao_da_an_ as rightKey, ed.ping_fen_fang_shi as rateType, ed.ping_fen_ren_ as rater, ed.hui_da_ as answer, ed.ping_yue_shi_jian as rateTime, ed.de_fen_ as score, ed.jie_xi_ as analysis, q.ti_ku_ming_cheng_ as paperName, q.ji_fen_fang_shi_ as scoringType from t_examination e, t_examination_detail ed, t_question_bank q where e.id_ = ed.parent_id_ and e.ti_ku_id_ = q.id_ and e.ti_ku_id_ = '${this.paperId}' order by field(ed.ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            const sql = `select e.id_ as dataId, e.kao_shi_ren_ as examinee, e.bu_men_ as dept, e.zhuang_tai_ as status, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime, e.ti_ku_zong_fen_ as totalScore, e.da_biao_zhan_bi_ as qualifiedRadio, e.de_fen_ as resultScore, ed.ti_mu_id_ as questionId, ed.ti_gan_ as stem, ed.ti_xing_ as questionType, ed.fen_zhi_ as questionScore, ed.fu_tu_ as img, ed.xuan_xiang_lei_xi as optionsType, ed.xuan_xiang_ as options, ed.can_kao_da_an_ as rightKey, ed.ping_fen_fang_shi as rateType, ed.ping_fen_ren_ as rater, ed.hui_da_ as answer, ed.ping_yue_shi_jian as rateTime, ed.de_fen_ as score, ed.jie_xi_ as analysis, q.ti_ku_ming_cheng_ as paperName, q.ji_fen_fang_shi_ as scoringType from t_examination e, t_examination_detail ed, t_question_bank q where e.id_ = ed.parent_id_ and e.ti_ku_id_ = q.id_ and e.ti_ku_id_ = '${this.paperId}' and (e.zhuang_tai_ = '已完成' or e.zhuang_tai_ = '已交卷') order by field(ed.ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -292,15 +312,17 @@ export default {
                         // 数据分组
                         const index = result.findIndex(i => i.dataId === item.dataId)
                         if (index === -1) {
-                            const { dataId, examinee, dept, applyTime, startTime, endTime, qualifiedRadio, paperName, totalScore, resultScore, scoringType } = item || {}
+                            const { dataId, examinee, dept, status, applyTime, startTime, endTime, qualifiedRadio, paperName, totalScore, resultScore, scoringType } = item || {}
                             result.push({
                                 dataId,
                                 examinee,
                                 dept,
+                                status,
                                 applyTime,
                                 startTime,
                                 endTime,
                                 qualifiedRadio,
+                                isQualified: status === '已完成' ? parseFloat(resultScore) >= (parseFloat(qualifiedRadio) / 100 * parseFloat(totalScore)) : '',
                                 paperName,
                                 totalScore,
                                 resultScore,
@@ -328,6 +350,18 @@ export default {
                             i.totalScore = i.questions.reduce((a, b) => a + parseFloat(b.questionScore), 0)
                         })
                     })
+                    // 获取最高分最低分
+                    const { maxScore, minScore } = result.filter(i => i.status === '已完成').reduce((acc, curr) => {
+                        if (curr.score > acc.maxScore) {
+                            acc.maxScore = curr.score
+                        }
+                        if (curr.score < acc.minScore) {
+                            acc.minScore = curr.score
+                        }
+                        return acc
+                    }, { maxScore: -Infinity, minScore: Infinity })
+                    this.maxScore = maxScore
+                    this.minScore = minScore
                     resolve(result)
                 }).catch(error => {
                     reject(error)
@@ -336,7 +370,8 @@ export default {
         },
         changePaper (id) {
             this.showPaperId = id
-            this.paperList.find(i => i.dataId === id)
+            this.paperData = this.paperList.find(i => i.dataId === id)
+            console.log(id)
         },
         // 关闭当前窗口
         closeDialog () {
@@ -487,7 +522,7 @@ export default {
         }
         .date-line {
             position: fixed;
-            width: 300px;
+            width: 280px;
             top: 60px;
             left: calc(50vw + 540px);
             ::v-deep {
@@ -503,9 +538,39 @@ export default {
             }
             .timeline-card {
                 cursor: pointer;
-                >div {
+                .card-item {
                     margin-bottom: 10px;
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
                 }
+            }
+            .active-card {
+                box-shadow: 0 2px 12px 0 rgba(64, 158, 255, 1);
+            }
+        }
+    }
+    @media screen and (max-width: 1600px) {
+        .paper-detail-dialog {
+            ::v-deep {
+                .el-dialog__body {
+                    width: 880px;
+                }
+            }
+            .date-line {
+                left: calc(50vw + 440px);
+            }
+        }
+    }
+    @media screen and (max-width: 1400px) {
+        .paper-detail-dialog {
+            ::v-deep {
+                .el-dialog__body {
+                    width: 800px;
+                }
+            }
+            .date-line {
+                left: calc(50vw + 400px);
             }
         }
     }
