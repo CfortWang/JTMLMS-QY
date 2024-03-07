@@ -78,22 +78,22 @@
                 </el-form-item>
 
                 <el-form-item>
-                    <template slot="label">管理列主题名:</template>
-                    <!-- <el-switch
+                    <template slot="label">管理列主题:</template>
+                    <el-switch
                         v-model="attrs.manage_effect"
                         active-value="Y"
                         inactive-value="N"
                         active-text="按钮"
                         inactive-text="默认"
                         @change="(value)=>handleData('manage_effect',value)"
-                    /> -->
-                    <el-input
+                    />
+                    <!-- <el-input
                         v-model="attrs.manage_effect"
                         placeholder="输入管理主题"
                         size="mini"
                         clearable
                         @change="(value)=>handleData('manage_effect',value)"
-                    />
+                    /> -->
                 </el-form-item>
                 <el-form-item>
                     <template slot="label">管理列宽:</template>

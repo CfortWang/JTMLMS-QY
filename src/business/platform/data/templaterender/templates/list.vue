@@ -1255,8 +1255,7 @@ export default {
             // 打印模版
             this.printTemplateId = this.getPrintTemplateId()
             // 管理主题
-            this.manageEffect = true
-            // this.template.attrs ? this.$utils.toBoolean(this.template.attrs.manage_effect) : false
+            this.manageEffect = this.template.attrs ? this.$utils.toBoolean(this.template.attrs.manage_effect) : false
 
             const functionButtons = this.template.buttons ? this.template.buttons.function_buttons || [] : []
             // 工具栏
@@ -1295,7 +1294,8 @@ export default {
 
             if (this.$utils.isNotEmpty(manageButtons)) {
                 rowHandle = {
-                    effect: this.manageEffect ? 'display' : 'default',
+                    // effect: this.manageEffect ? 'display' : 'default',
+                    effect: this.template.attrs.manage_effect === 'Y' ? 'display' : 'default',
                     actions: manageButtons,
                     columnHeader: this.template.attrs.manage_effect === 'Y' || this.template.attrs.manage_effect === 'N' ? null : this.template.attrs.manage_effect,
                     colWidth: this.template.attrs.col_width

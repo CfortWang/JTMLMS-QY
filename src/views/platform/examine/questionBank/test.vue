@@ -253,13 +253,16 @@ export default {
             this.questionList.forEach(item => {
                 if (item.questionType === '填空题') {
                     finished.push(item.answer && !item.answer.some(i => i === '' || i === null))
+                } else if (item.questionType === '多选题') {
+                    finished.push(item.answer.some(i => i) && true)
                 } else {
-                    finished.push(item.answer && 1)
+                    finished.push(item.answer && true)
                 }
             })
             // const finished = this.questionList.filter(item => (item.questionType !== '填空题' && item.answer) || (item.questionType === '填空题' && item.answer && !item.answer.some(i => i === '' || i === null))).length
             const finishedCount = finished.filter(i => i).length
-            return parseInt(finishedCount / this.questionList.length * 100)
+            const progress = parseFloat(finishedCount / this.questionList.length * 100)
+            return progress ? progress > 100 ? 100 : progress : 0
         },
         changeOptions (val) {
             this.questionList[this.showIndex - 1].answer = val

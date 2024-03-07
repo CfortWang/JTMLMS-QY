@@ -163,7 +163,7 @@
                     v-for="(paper, index) in paperList"
                     :key="index"
                     :timestamp="paper.applyTime"
-                    :icon="paper.status === '已完成' ? 'el-icon-success' : 'el-icon-view'"
+                    :icon="paper.status === '已完成' ? 'el-icon-circle-check' : 'el-icon-view'"
                     :type="paper.status === '已完成' ? 'success' : 'primary'"
                     placement="top"
                     size="large"
@@ -182,12 +182,6 @@
             </el-timeline>
         </div>
         <div slot="footer" class="el-dialog--center">
-            <ibps-toolbar
-                :actions="toolbars"
-                @action-event="handleActionEvent"
-            />
-        </div>
-        <div slot="header" class="el-dialog--right">
             <ibps-toolbar
                 :actions="toolbars"
                 @action-event="handleActionEvent"
@@ -324,8 +318,8 @@ export default {
                                 qualifiedRadio,
                                 isQualified: status === '已完成' ? parseFloat(resultScore) >= (parseFloat(qualifiedRadio) / 100 * parseFloat(totalScore)) : '',
                                 paperName,
-                                totalScore,
-                                resultScore,
+                                totalScore: parseFloat(resultScore),
+                                resultScore: parseFloat(resultScore),
                                 totalCount: data.length,
                                 scoringType,
                                 list: [{
@@ -352,11 +346,11 @@ export default {
                     })
                     // 获取最高分最低分
                     const { maxScore, minScore } = result.filter(i => i.status === '已完成').reduce((acc, curr) => {
-                        if (curr.score > acc.maxScore) {
-                            acc.maxScore = curr.score
+                        if (curr.resultScore > acc.maxScore) {
+                            acc.maxScore = curr.resultScore
                         }
-                        if (curr.score < acc.minScore) {
-                            acc.minScore = curr.score
+                        if (curr.resultScore < acc.minScore) {
+                            acc.minScore = curr.resultScore
                         }
                         return acc
                     }, { maxScore: -Infinity, minScore: Infinity })
@@ -523,6 +517,8 @@ export default {
         .date-line {
             position: fixed;
             width: 280px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
             top: 60px;
             left: calc(50vw + 540px);
             ::v-deep {
