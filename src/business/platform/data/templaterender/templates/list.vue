@@ -1022,6 +1022,7 @@ export default {
                             return
                         }
                         this.defId = button.deflow
+                        this.addDataCont = button.initAddDataCont
                         this.npmDialogFormVisible = true
                         break
                     case 'consult': // 查阅
@@ -1266,8 +1267,18 @@ export default {
             // 功能按钮
             functionButtons.forEach((rf, i) => {
                 const btn = this.buildButton(rf, i)
+
                 if (rf.button_type === 'openTask') {
+                    const obj = {}
+                    if (rf.initAddDataCont) {
+                        const arr1 = rf.initAddDataCont.split('&')
+                        for (const i of arr1) {
+                            const arr = i.split(':')
+                            obj[arr[0]] = arr[1]
+                        }
+                    }
                     this.defId = rf.deflow
+                    this.addDataCont = rf.initAddDataCont ? obj : {}
                 }
                 // 查询列默认是顶部
                 if (hasSearchPermission(rf.button_type) && !rf.position) {
@@ -1419,6 +1430,14 @@ export default {
                     return JTemplate._onLoadActions(this, key, rf, 'disabled', row, data)
                 }
             }
+            const obj = {}
+            if (rf.initAddDataCont) {
+                const arr1 = rf.initAddDataCont.split('&')
+                for (const i of arr1) {
+                    const arr = i.split(':')
+                    obj[arr[0]] = arr[1]
+                }
+            }
             return {
                 $index: i,
                 key: key,
@@ -1428,6 +1447,8 @@ export default {
                 icon: rf.icon ? 'ibps-icon-' + rf.icon : defaultButton.icon,
                 type: rf.style || defaultButton.type,
                 deflow: rf.deflow || null,
+                // eslint-disable-next-line no-eval
+                initAddDataCont: rf.initAddDataCont ? obj : null,
                 reportPath: rf.reportPath,
                 mode: mode,
                 rightIcon: rightIcon,
@@ -1618,6 +1639,7 @@ export default {
                 align: field.align,
                 vertical: field.vertical,
                 width: field.width,
+                minWidth: field.minWidth,
                 hidden: field['field_type'] === 'hidden'
             }
             if (field.type !== 'clob') {

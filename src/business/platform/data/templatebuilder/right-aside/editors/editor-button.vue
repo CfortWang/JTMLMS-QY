@@ -91,6 +91,13 @@
                 :is-data-template-use="formData.button_type === 'sefStartFlow'"
             />
         </el-form-item>
+        <el-form-item
+            v-if="formData && ['sefStartFlow', 'openTask'].includes(formData.button_type)"
+            label="编制参数"
+            prop="initAddDataCont"
+        >
+            <el-input v-model="formData.initAddDataCont" placeholder="a:1&b:2（原template.addDataCont.a = '1'）" />
+        </el-form-item>
         <export-column
             :visible="exportFieldDialogVisible"
             :data="template"

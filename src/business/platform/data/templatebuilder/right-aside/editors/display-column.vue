@@ -43,6 +43,9 @@
                 <el-radio-button label="bottom">底部对齐</el-radio-button>
             </el-radio-group>
         </el-form-item>
+        <el-form-item label="最小宽度" prop="minWidth">
+            <el-input v-model="formData.minWidth" type="number" />
+        </el-form-item>
         <el-form-item label="宽度" prop="width">
             <el-input v-model="formData.width" type="number" />
         </el-form-item>

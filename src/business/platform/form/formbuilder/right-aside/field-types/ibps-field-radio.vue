@@ -16,6 +16,7 @@
       <!-- 校验规则 -->
       <editor-rules
         :field-item="fieldItem"
+        types="uncheck,required"
       />
       <!-- 字段权限 -->
       <editor-rights

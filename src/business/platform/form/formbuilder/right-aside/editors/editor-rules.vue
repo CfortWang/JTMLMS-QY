@@ -7,6 +7,9 @@
         <div v-if="types.includes('required')" class="el-form-item__content">
           <el-checkbox v-model="fieldOptions.required">必填</el-checkbox><help-tip prop="required" />
         </div>
+        <div v-if="types.includes('uncheck')" class="el-form-item__content">
+          <el-checkbox v-model="fieldOptions.uncheck">是否可取消勾选</el-checkbox><help-tip prop="uncheck" />
+        </div>
         <!-- // - 数字类型 -->
         <template v-if="types.includes('number')">
           <div class="el-form-item__content">

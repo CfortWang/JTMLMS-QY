@@ -45,15 +45,17 @@ export default {
             const xilei = []
             const authorityBuMen = []
             const authority = JSON.parse(nodesInfo.data.authority)
-            for (var i of nodesInfo.pathNodes) {
-                xilei.push(i.label)
-            }
-            // this.$emit(
-            //     'change-data',
-            //     'wenJianLeiXing',
-            //     nodesInfo.pathNodes[0].label
-            // )
-            this.$emit('change-data', 'wenJianXiLei', xilei.join(' / '))
+            const wenJianXiLeiArrs = nodesInfo.pathNodes.map((item) => item.label)
+            this.$emit(
+                'change-data',
+                'guiDangLuJingXinX',
+                JSON.stringify({
+                    wenJianXiLei: wenJianXiLeiArrs.join(' / '),
+                    xiLeiId: nodesInfo.value,
+                    quanXianLeiXing: authority.chaYue })
+
+            )
+            this.$emit('change-data', 'wenJianXiLei', wenJianXiLeiArrs.join(' / '))
             this.$emit('change-data', 'xiLeiId', nodesInfo.value)
             this.$emit('change-data', 'quanXianLeiXing', authority.chaYue)
             // eslint-disable-next-line no-redeclare

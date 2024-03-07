@@ -168,6 +168,7 @@
                         :prop="handleAttribute(column.prop, null)"
                         :label="handleAttribute(column.label, '')"
                         :width="handleAttribute(column.width,null)"
+                        :min-width="handleAttribute(column.minWidth,null)"
                         :class-name="'vertical-' + handleAttribute(column.vertical, 'middle')"
                         v-bind="column"
                         show-overflow-tooltip

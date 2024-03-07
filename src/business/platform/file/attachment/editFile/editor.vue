@@ -17,6 +17,10 @@ export default {
             default: () => {
                 return {}
             }
+        },
+        operation_status: {
+            type: String,
+            default: ''
         }
     },
     data () {
@@ -77,14 +81,14 @@ export default {
                     key: option.key,
                     title: option.title,
                     permissions: {
-                        comment: true,
-                        download: true,
-                        modifyContentControl: true,
-                        modifyFilter: true,
-                        print: true,
-                        edit: true,
-                        fillForms: true,
-                        review: true
+                        comment: this.operation_status !== 'fileTraining',
+                        download: this.operation_status !== 'fileTraining',
+                        modifyContentControl: this.operation_status !== 'fileTraining',
+                        modifyFilter: this.operation_status !== 'fileTraining',
+                        print: this.operation_status !== 'fileTraining',
+                        edit: this.operation_status !== 'fileTraining',
+                        fillForms: this.operation_status !== 'fileTraining',
+                        review: this.operation_status !== 'fileTraining'
                     },
                     url: option.url
                 },
@@ -128,6 +132,7 @@ export default {
                     // },
                     onDocumentReady: () => {
                         console.log('文件加载完成~')
+                        this.hadLoadedFile(0)
                     }
                 },
                 width: '100%',
@@ -153,6 +158,9 @@ export default {
                     })
                 }
             }, 2000)
+        },
+        hadLoadedFile (v) {
+            this.$emit('hadLoadedFile', v)
         }
     }
 }

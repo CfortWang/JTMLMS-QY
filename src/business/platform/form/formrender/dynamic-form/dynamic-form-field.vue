@@ -998,7 +998,7 @@ export default {
     },
     methods: {
         handleRadioChange (val) {
-            if (this.dataModel === val) {
+            if (this.dataModel === val && this.fieldOptions.uncheck === true) {
                 this.dataModel = null
             } else {
                 this.dataModel = val

@@ -1004,9 +1004,11 @@ export default {
          */
         formatterOptions (value, options, valueKey = 'value', labelKey = 'label') {
             const optionObj = {}
-            options.map((option) => {
-                optionObj[option[valueKey]] = option[labelKey]
-            })
+            if (options) {
+                options.map((option) => {
+                    optionObj[option[valueKey]] = option[labelKey]
+                })
+            }
             const aryValue = value.split(',')
             const res = aryValue.map((v) => {
                 return optionObj[v] || v
