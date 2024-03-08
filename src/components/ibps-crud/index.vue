@@ -318,7 +318,7 @@
                     v-if="rowHandle"
                     v-bind="rowHandle"
                     :label=" handleAttribute(rowHandle.columnHeader,'操作') "
-                    :width="rowHandle.colWidth ? rowHandle.colWidth : (handleAttribute(rowHandle.width, rowHandleDefaultWidth) < 80 ? '80' : rowHandle.actions.length !== 0 && rowHandle.actions.length <= 3 ? 90 + 60 * (rowHandle.actions.length - 1) : 90)"
+                    :width="rowHandle.colWidth ? rowHandle.colWidth : (handleAttribute(rowHandle.width, rowHandleDefaultWidth) < 80 ? '80' : rowHandle.actions.length !== 0 && rowHandle.actions.length <= 3 ? 90 + 60 * (rowHandle.actions.length - 1) : 90 + 60 * 2)"
                     :fixed="handleAttribute(rowHandle.fixed, 'right')"
                     :align="handleAttribute(rowHandle.align, 'center')"
                 >
@@ -327,7 +327,6 @@
                         <template v-if="hasRowHandleActions(scope.row)">
                             <template v-if="rowHandle.effect ==='display'">
                                 <ibps-toolbar
-                                    v-if="!rowHandleMoreActions || rowHandleMoreActions.length <=1"
                                     :actions="rowHandleActions"
                                     :socpe="thatSocpe"
                                     :data="scope.row"
@@ -335,7 +334,7 @@
                                     type="link"
                                     @action-event="handleActionEvent"
                                 />
-                                <template v-if="rowHandleMoreActions && rowHandleMoreActions.length ==1">
+                                <template v-if="rowHandleMoreActions && rowHandleMoreActions.length === 1">
                                     <div class="el-divider el-divider--vertical" />
                                     <ibps-toolbar
                                         :actions="rowHandleMoreActions"
@@ -346,12 +345,14 @@
                                         @action-event="handleActionEvent"
                                     />
                                 </template>
-                                <template v-if="rowHandleMoreActions && rowHandleMoreActions.length >1">
+                                <template v-if="rowHandleMoreActions && rowHandleMoreActions.length > 1">
+                                    <div class="el-divider el-divider--vertical" />
                                     <el-dropdown>
-                                        <i class="el-icon-caret-bottom el-dropdown-link" style="font-size:14px;">更多</i>
+                                        <!-- <i class="el-icon-caret-bottom el-dropdown-link" style="font-size:14px;">更多</i> -->
+                                        <i class="ibps-icon ibps-icon-chevron-down" style="font-size:12px; color: #409eff; cursor: pointer;"> 更多</i>
                                         <el-dropdown-menu slot="dropdown" class="ibps-table-dropdown-menu">
                                             <ibps-toolbar
-                                                :actions="rowHandleMoreActions.concat(rowHandleActions)"
+                                                :actions="rowHandleMoreActions"
                                                 :socpe="thatSocpe"
                                                 :data="scope.row"
                                                 position="manage"
@@ -376,7 +377,6 @@
                                         />
                                     </el-dropdown-menu>
                                 </el-dropdown>
-
                                 <span>&nbsp;</span>
                             </template>
                         </template>

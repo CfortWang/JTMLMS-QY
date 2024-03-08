@@ -15,7 +15,6 @@ import { removeFormData } from '@/api/platform/data/dataTemplate'
 // 引入工具类
 import Utils from '@/utils/util'
 import ActionUtils from '@/utils/action'
-import AuthUtils from '@/utils/auth'
 
 // base64解码
 const decode = str => decodeURIComponent(window.atob(str).split('').map(c => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`).join(''))
@@ -177,6 +176,5 @@ export default {
     removeFormData,
     replaceNullWithEmpty,
     Utils,
-    ActionUtils,
-    AuthUtils
+    ActionUtils
 }

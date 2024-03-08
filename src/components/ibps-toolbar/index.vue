@@ -42,7 +42,7 @@
                 />
             </template>
             <template v-else-if="type==='linkHide'">
-                <p>
+                <div :key="button.key+index" style="margin-top: 5px;">
                     <el-link
                         v-if="handleActionHidden(button.hidden)"
                         :key="button.key+index"
@@ -54,7 +54,7 @@
                     >
                         {{ `&nbsp;${button.label}` }}
                     </el-link>
-                </p>
+                </div>
             </template>
             <template v-else>
                 <!--下拉-->
@@ -76,7 +76,7 @@
                                 :key="menu.key"
                                 :command="menu"
                                 :icon="getIcon(menu)"
-                            >{{ getLabel(menu) }}</el-dropdown-item>
+                            >{{ `&nbsp;${getLabel(menu)}` }}</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
@@ -93,7 +93,7 @@
                         :disabled="handleActionDisabled(button.disabled)"
                         :autofocus="false"
                         @click="emitEventHandler('action-event',button,position,data,index)"
-                    >{{ getLabel(button) }}</el-button>
+                    >{{ `&nbsp;${getLabel(button)}` }}</el-button>
                 </template>
             </template>
         </template>

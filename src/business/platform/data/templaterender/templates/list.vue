@@ -1306,7 +1306,7 @@ export default {
             if (this.$utils.isNotEmpty(manageButtons)) {
                 rowHandle = {
                     // effect: this.manageEffect ? 'display' : 'default',
-                    effect: this.template.attrs.manage_effect === 'Y' ? 'display' : 'default',
+                    effect: this.template.attrs.manage_effect !== 'Y' ? 'display' : 'default',
                     actions: manageButtons,
                     columnHeader: this.template.attrs.manage_effect === 'Y' || this.template.attrs.manage_effect === 'N' ? null : this.template.attrs.manage_effect,
                     colWidth: this.template.attrs.col_width
