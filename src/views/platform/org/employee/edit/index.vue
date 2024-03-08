@@ -137,7 +137,7 @@ export default {
         span: [Number, String]
     },
     data () {
-        const isSuper = this.$store.getters.isSuper
+        const { isSuper, level } = this.$store.getters
         return {
             isSuper,
             info: [],
@@ -170,7 +170,7 @@ export default {
             toolbars: [
                 {
                     key: 'save',
-                    hidden: () => { return this.readonly && this.formType == 'detail' }
+                    hidden: () => { return this.readonly && this.formType === 'detail' }
                 },
                 { key: 'cancel' }
             ]
@@ -249,15 +249,48 @@ export default {
                 account: this.employee.account
             }
             upEmployee(params).then(res => {
-                if (res.state == 200) {
+                if (res.state === 200) {
                     const data = res.variables.data
-                    if (data == 'Y') {
+                    if (data === 'Y') {
                         this.saveData()
                     } else {
                         ActionUtils.warning(res.message)
                     }
                 }
             })
+        },
+        createTrain (id) {
+            console.log(id)
+            const { isTrain, trainType, teacher, jianDingZiGeZ } = this.employee || {}
+            console.log(isTrain, trainType, teacher, jianDingZiGeZ)
+            const { first, second } = this.$store.getters.level || {}
+            console.log(first, second)
+            const { userList } = this.$store.getters || {}
+            console.log(userList)
+            if (isTrain !== 'Y') {
+                return
+            }
+            const time = this.$common.getDateNow(19)
+            const userInfo = userList.find(item => item.userId === teacher) || {}
+            const addTrainData = {
+                tableName: 't_lhgqpxjh',
+                paramWhere: [{
+                    di_dian_: second || first,
+                    nian_du_: time.slice(4),
+                    bian_zhi_bu_men_: userInfo ? userInfo.positionId.split(',').pop() : '',
+                    bian_zhi_ren_: teacher,
+                    bian_zhi_shi_jian: time,
+                    shi_fou_guo_shen_: '已编制',
+                    bu_men_: '',
+                    pei_xun_lei_xing_: trainType,
+                    ru_zhi_zhuan_gang: time,
+                    yuan_gong_xing_mi: id,
+                    gong_hao_: jianDingZiGeZ
+                }],
+                formKey: 'lhgqpxypjb',
+                defKey: 'Process_1a66tzk'
+            }
+            this.$common.request('add', addTrainData)
         },
         saveData () {
             const attrValidator = this.$refs['attrInfo'] && this.isSuper ? this.$refs['attrInfo'].callback() : null
@@ -288,26 +321,19 @@ export default {
                 this.dialogLoading = false
                 return
             }
+            const { isTrain, trainType, teacher } = this.employee || {}
+            if (isTrain === 'Y' && !trainType) {
+                this.dialogLoading = false
+                return ActionUtils.warning('请选择培训类型')
+            }
+            if (isTrain === 'Y' && !teacher) {
+                this.dialogLoading = false
+                return ActionUtils.warning('请选择带教老师')
+            }
             // 部门信息
-            if (vo.positionVoList.length > 0) {
-                const list = []
-                vo.positionVoList.forEach(item => {
-                    list.push(item.id)
-                })
-                vo.user.positions = list.join(',')
-            } else {
-                vo.user.positions = ''
-            }
+            vo.user.positions = vo.positionVoList.length ? vo.positionVoList.map(i => i.id).join(',') : ''
             // 角色信息
-            if (vo.roleVoList.length > 0) {
-                const list = []
-                vo.roleVoList.forEach(item => {
-                    list.push(item.id)
-                })
-                vo.user.job = list.join(',')
-            } else {
-                vo.user.job = ''
-            }
+            vo.user.job = vo.roleVoList.length ? vo.roleVoList.map(i => i.id).join(',') : ''
             // 更新该表的job_字段
             const updateParams = {
                 tableName: 'ibps_party_employee',
@@ -323,9 +349,6 @@ export default {
                     }
                 ]
             }
-            this.$common.request('update', updateParams).then(() => {
-                console.log('更新数据成功')
-            })
 
             if (this.formId) {
                 update(vo).then(response => {
@@ -333,6 +356,10 @@ export default {
                     if (this.wxyhId) {
                         this.updateWxyh()
                     }
+                    // 更新部门、岗位数据
+                    this.$common.request('update', updateParams)
+                    // 启动培训
+                    this.createTrain(response.variables.id)
                     this.$emit('dialog-callback', this)
                     ActionUtils.saveSuccessMessage(response.message, r => {
                         // if (this.$utils.isEmpty(this.formId)) {
@@ -349,6 +376,8 @@ export default {
             } else {
                 create(vo).then(response => {
                     this.dialogLoading = false
+                    // 启动培训
+                    this.createTrain(response.variables.id)
                     this.$emit('dialog-callback', this)
                     ActionUtils.saveSuccessMessage(response.message, r => {
                         if (r) {
@@ -359,8 +388,7 @@ export default {
                                 this.$refs.attrInfo.clearData()
                             }
                         }
-                    }
-                    )
+                    })
                 }).catch(() => {
                     this.dialogLoading = false
                 })

@@ -8,11 +8,7 @@
                     <div
                         v-if="!readonly"
                         :class="formData.photo !== '' ? 'handle-photo-buttons' : null"
-                        @click.stop="
-                            () => {
-                                dialogFormVisible = false
-                            }
-                        "
+                        @click.stop="() => { dialogFormVisible = false }"
                     >
                         <div v-if="formData.photo !== ''">
                             <i class="el-icon-edit" @click.stop="dialogFormVisible = !readonly" />
@@ -22,31 +18,50 @@
                 </span>
             </div>
             <span v-if="!readonly" class="operation">点击上方进行头像操作</span>
-            <ibps-uploader :visible="dialogFormVisible" :limit="limit" :accept="accept" @action-event="uploaderAction" @close="(visible) => (dialogFormVisible = visible)" />
+            <ibps-uploader
+                :visible="dialogFormVisible"
+                :limit="limit"
+                :accept="accept"
+                @action-event="uploaderAction"
+                @close="(visible) => (dialogFormVisible = visible)"
+            />
         </el-col>
         <el-col :span="16">
-            <el-form ref="employeeForm" :rules="rules" :model="formData" label-width="130px" @submit.native.prevent>
+            <el-form
+                ref="employeeForm"
+                :rules="rules"
+                :model="formData"
+                label-width="130px"
+                @submit.native.prevent
+            >
                 <input type="password" style="width: 0; height: 0; line-height: 0; padding: 0; border-width: 0">
                 <el-form-item label="账号" prop="account">
                     <el-input v-if="!readonly" v-model="formData.account" autocomplete="off" clearable />
                     <span v-else>{{ formData.account }}</span>
                 </el-form-item>
                 <el-form-item v-show="!formData.id" label="密码" :prop="!formData.id ? 'password' : ''">
-                    <el-input v-if="!readonly" v-model="formData.password" autocomplete="off" type="password" show-password clearable />
+                    <el-input
+                        v-if="!readonly"
+                        v-model="formData.password"
+                        autocomplete="off"
+                        type="password"
+                        show-password
+                        clearable
+                    />
                     <span v-else>{{ formData.password }}</span>
                 </el-form-item>
                 <!-- <el-form-item label="是否管理员" prop="isSuper">
-          <el-switch
-            v-if="!readonly"
-            v-model="formData.isSuper"
-            :disabled="isSuper?false:formData.id===''&&isSuper?false:true"
-            active-value="Y"
-            inactive-value="N"
-          />
-          <el-tag v-else :type="formData.isSuper|optionsFilter(isSuperOptions,'type')">
-            {{ formData.isSuper|optionsFilter(isSuperOptions,'label') }}
-          </el-tag>
-        </el-form-item> -->
+                    <el-switch
+                        v-if="!readonly"
+                        v-model="formData.isSuper"
+                        :disabled="isSuper?false:formData.id===''&&isSuper?false:true"
+                        active-value="Y"
+                        inactive-value="N"
+                    />
+                    <el-tag v-else :type="formData.isSuper|optionsFilter(isSuperOptions,'type')">
+                        {{ formData.isSuper|optionsFilter(isSuperOptions,'label') }}
+                    </el-tag>
+                </el-form-item> -->
                 <el-form-item label="单位名称">
                     <el-input v-if="!readonly" v-model="formData.qq" clearable />
                     <span v-else>{{ formData.qq }}</span>
@@ -84,14 +99,14 @@
                 <el-form-item>
                     <template slot="label">
                         用户类型
-                        <help-tip :title="formAsterisk.title" :content="formAsterisk.content"/>
+                        <help-tip :title="formAsterisk.title" :content="formAsterisk.content" />
                     </template>
                     <el-radio-group v-if="!readonly" v-model="formData.jiNengZhiCheng">
                         <el-radio label="inside">内部员工</el-radio>
                         <el-radio label="ordinary">临床医护</el-radio>
                     </el-radio-group>
                     <el-tag v-else>
-                        {{ formData.jiNengZhiCheng == 'ordinary' ? '临床医护' : '内部员工'}}
+                        {{ formData.jiNengZhiCheng == 'ordinary' ? '临床医护' : '内部员工' }}
                     </el-tag>
                 </el-form-item>
                 <el-form-item label="邮箱" prop="email">
@@ -107,22 +122,53 @@
                     <el-input v-if="!readonly || formType== 'part'" v-model="formData.mobile" clearable />
                     <span v-else>{{ formData.mobile }}</span>
                 </el-form-item>
+                <el-form-item v-if="!readonly">
+                    <template slot="label">
+                        入职/转岗培训
+                        <help-tip title="" content="开启时，保存数据后将为当前用户开启入职/转岗培训" />
+                    </template>
+                    <el-switch
+                        v-model="formData.isTrain"
+                        active-value="Y"
+                        active-text="开启"
+                        inactive-value="N"
+                        inactive-text="关闭"
+                        @change="value => { formData.isTrain = value }"
+                    />
+                </el-form-item>
+                <el-form-item v-if="!readonly && formData.isTrain === 'Y'" label="培训类型" required>
+                    <el-select v-model="formData.trainType" clearable placeholder="请选择" style="width: 100%">
+                        <el-option label="新员工" value="新员工" />
+                        <el-option label="转岗人员" value="转岗人员" />
+                        <el-option label="教学实习人员" value="教学实习人员" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-if="!readonly && formData.isTrain === 'Y'" label="带教老师" required>
+                    <ibps-custom-dialog
+                        v-model="formData.teacher"
+                        size="mini"
+                        template-key="gjxcxryk"
+                        style="width: 200px;"
+                        :multiple="false"
+                        type="dialog"
+                        placeholder="请选择培训人员带教老师"
+                    />
+                </el-form-item>
             </el-form>
         </el-col>
     </el-row>
 </template>
 <script>
-import helpTip from '@/business/platform/form/formbuilder/right-aside/components/help-tip.vue'
 import { fileUrl } from '@/api/platform/file/attachment'
 import { getDefaultUserSecurity } from '@/api/platform/auth/userSecurity'
-import IbpsUploader from '@/business/platform/file/uploader'
 import { genderOptions, statusOptions, isSuperOptions, userSecurityTextObj, regx } from '../constants'
 import { getFile } from '@/utils/avatar'
 import { validateEmpty } from '@/utils/validate'
 export default {
     components: {
-        IbpsUploader,
-        helpTip
+        IbpsUploader: () => import('@/business/platform/file/uploader'),
+        helpTip: () => import('@/business/platform/form/formbuilder/right-aside/components/help-tip.vue'),
+        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
     },
     props: {
         data: Object,
@@ -171,10 +217,11 @@ export default {
             if (value !== undefined) {
                 if (this.userSecurity.complexity.length === 0) {
                     // if (!re.test(value)) {
-                    //   callback(new Error('密码必须是由数字字母组成，至少1位'))
+                    //     callback(new Error('密码必须是由数字字母组成，至少1位'))
                     // } else {
-                    callback()
+                    //     callback()
                     // }
+                    callback()
                 } else {
                     const flag = []
                     for (var l in complexityRegular) {
@@ -244,11 +291,11 @@ export default {
                 ],
                 status: [{ required: true, message: this.$t('validate.required') }],
                 gender: [{ required: true, message: this.$t('validate.required') }]
-                /* email: [
-          { required: true, message: this.$t('validate.required') },
-          { type: 'email', message: '请输入正确的邮箱地址', min: 3, max: 18, trigger: ['blur', 'change'] },
-          { validator: validateEmail, trigger: 'blur' }
-        ] */
+                // email: [
+                //     { required: true, message: this.$t('validate.required') },
+                //     { type: 'email', message: '请输入正确的邮箱地址', min: 3, max: 18, trigger: ['blur', 'change'] },
+                //     { validator: validateEmail, trigger: 'blur' }
+                // ]
             }
         }
     },
@@ -284,22 +331,20 @@ export default {
     },
     methods: {
         handleGetDefaultUserSecurity () {
-            getDefaultUserSecurity()
-                .then((response) => {
-                    const userSecurityTextObj = this.userSecurityTextObj
-                    const complexityArr = response.data.complexity.split(',').sort()
-                    const arr = []
-                    complexityArr.forEach((i) => {
-                        arr.push(userSecurityTextObj[parseInt(i)])
-                    })
-                    this.userSecurity.complexity = complexityArr
-                    this.userSecurity.complexityText = arr.join(',')
-                    this.userSecurity.maxLength = response.data.maxLength
-                    this.userSecurity.maxLengthText = '最大长度' + response.data.maxLength
-                    this.userSecurity.minLength = response.data.minLength
-                    this.userSecurity.minLengthText = '最小长度' + response.data.minLength
+            getDefaultUserSecurity().then((response) => {
+                const userSecurityTextObj = this.userSecurityTextObj
+                const complexityArr = response.data.complexity.split(',').sort()
+                const arr = []
+                complexityArr.forEach((i) => {
+                    arr.push(userSecurityTextObj[parseInt(i)])
                 })
-                .catch(() => {})
+                this.userSecurity.complexity = complexityArr
+                this.userSecurity.complexityText = arr.join(',')
+                this.userSecurity.maxLength = response.data.maxLength
+                this.userSecurity.maxLengthText = '最大长度' + response.data.maxLength
+                this.userSecurity.minLength = response.data.minLength
+                this.userSecurity.minLengthText = '最小长度' + response.data.minLength
+            }).catch(() => {})
         },
         /**
          * 表单验证
