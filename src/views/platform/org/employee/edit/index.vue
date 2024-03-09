@@ -137,7 +137,7 @@ export default {
         span: [Number, String]
     },
     data () {
-        const { isSuper, level } = this.$store.getters
+        const { isSuper } = this.$store.getters
         return {
             isSuper,
             info: [],
@@ -260,13 +260,9 @@ export default {
             })
         },
         createTrain (id) {
-            console.log(id)
             const { isTrain, trainType, teacher, jianDingZiGeZ } = this.employee || {}
-            console.log(isTrain, trainType, teacher, jianDingZiGeZ)
             const { first, second } = this.$store.getters.level || {}
-            console.log(first, second)
             const { userList } = this.$store.getters || {}
-            console.log(userList)
             if (isTrain !== 'Y') {
                 return
             }
@@ -376,6 +372,8 @@ export default {
             } else {
                 create(vo).then(response => {
                     this.dialogLoading = false
+                    // 更新部门、岗位数据
+                    this.$common.request('update', updateParams)
                     // 启动培训
                     this.createTrain(response.variables.id)
                     this.$emit('dialog-callback', this)

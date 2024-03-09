@@ -16,7 +16,7 @@
             :label-width="formLabelWidth"
             :model="form"
             :rules="rules"
-            class="question-form"
+            class="paper-form"
             @submit.native.prevent
         >
             <el-form-item label="题库名称：" prop="ti_ku_ming_cheng_">
@@ -168,7 +168,6 @@ export default {
             formLabelWidth: '120px',
             dialogVisible: this.visible,
             dialogLoading: false,
-            filePreviewVisible: false,
             form: {
                 bian_zhi_bu_men_: '',
                 bian_zhi_ren_: userId,
@@ -360,16 +359,24 @@ export default {
 <style lang="scss" scoped>
     .paper-dialog {
         ::v-deep {
+            .el-dialog {
+                max-width: 1080px;
+            }
             .el-dialog__body {
                 height: calc(88vh - 200px);
             }
             .el-form-item {
                 margin-bottom: 14px !important;
-                padding: 0 20px;
+                &:last-child {
+                    margin-bottom: 0 !important;
+                }
             }
             .el-form-item--small .el-form-item__error {
                 padding-top: 6px;
             }
+        }
+        .paper-form {
+            padding: 20px;
         }
         .inline-item {
             ::v-deep {

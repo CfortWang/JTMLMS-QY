@@ -257,7 +257,6 @@ export default {
             formLabelWidth: '120px',
             dialogVisible: this.visible,
             dialogLoading: false,
-            filePreviewVisible: false,
             form: {
                 // bu_men_: '',
                 parent_id_: this.paperId,
@@ -530,15 +529,17 @@ export default {
 <style lang="scss" scoped>
     .question-dialog {
         ::v-deep {
+            .el-dialog {
+                max-width: 1080px;
+            }
             .el-dialog__body {
                 height: calc(88vh - 200px);
             }
-            .question-form > .el-form-item:first-child {
-                margin-top: 20px;
-            }
             .el-form-item {
                 margin-bottom: 14px !important;
-                padding: 0 20px;
+                &:last-child {
+                    margin-bottom: 0 !important;
+                }
             }
             .el-form-item--small .el-form-item__error {
                 padding-top: 6px;
@@ -552,6 +553,9 @@ export default {
                     background-color: #409EFF;
                 }
             }
+        }
+        .question-form {
+            padding: 20px;
         }
         .ibps-image {
             font-size: 0;
