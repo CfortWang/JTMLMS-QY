@@ -55,7 +55,7 @@
                     </el-select>
                 </el-form-item>
             </div>
-            <div class="inline-item">
+            <div class="inline-item" :class="['单选题', '多选题', '判断题'].includes(form.ti_xing_) ? 'mb-20' : ''">
                 <el-form-item label="评分方式：" prop="ping_fen_fang_shi">
                     <el-radio-group v-model="questionRateType" disabled>
                         <el-radio-button label="自动">自动</el-radio-button>
@@ -101,7 +101,7 @@
                     :disabled="false"
                 />
             </el-form-item>
-            <div class="inline-item">
+            <div class="inline-item" :class="['单选题', '多选题'].includes(form.ti_xing_) ? '' : 'mb-20'">
                 <el-form-item label="分值：" prop="fen_zhi_" :maxlength="8">
                     <el-input-number
                         v-model="form.fen_zhi_"
@@ -333,17 +333,10 @@ export default {
             this.optionList.map(i => (i.radio = null))
             this.optionList[index].radio = value
         },
-        changeCheckbox (index, value) {
-            console.log(value)
-            // if (this.optionList[index].checkbox) {
-
-            // }
-            // this.optionList[index].checkbox = [value]
-        },
         changeQuestionType (value) {
             if (value === '填空题') {
                 this.optionList = [{
-                    value: 'A',
+                    value: '',
                     radio: null,
                     checkbox: [],
                     content: ''
@@ -405,15 +398,49 @@ export default {
             if (this.$utils.isEmpty(this.id)) {
                 return
             }
-            const sql = `select id_, bian_zhi_ren_, bian_zhi_bu_men_, bian_zhi_shi_jian, ti_gan_, ti_xing_, xuan_xiang_lei_xi, xian_kao_ci_shu_, ping_fen_ren_, bei_zhu_, suo_shu_fan_wei_ from t_question where id_ = '${this.id}'`
+            const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, biao_qian_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_ from t_questions where id_ = '${this.id}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
-                    this.$message.error('数据不存在')
-                    return
+                    return this.$message.error('获取题目数据失败！')
                 }
-                this.form = data[0]
-                this.form.isLimit = data[0].xian_kao_ci_shu_ === '不限' ? 0 : 1
+                const item = data[0]
+                if (item.ti_xing_ === '填空题') {
+                    const rightKey = item.zheng_que_da_an_ ? JSON.parse(item.zheng_que_da_an_) : []
+                    this.optionList = rightKey.map(i => ({
+                        value: '',
+                        radio: null,
+                        checkbox: [],
+                        content: i
+                    }))
+                } else if (item.ti_xing_ === '单选题') {
+                    const rightKey = item.zheng_que_da_an_ || ''
+                    const options = item.da_an_ ? JSON.parse(item.da_an_) : {}
+                    this.optionList = []
+                    Object.keys(options).forEach(key => {
+                        this.optionList.push({
+                            value: key,
+                            radio: key === rightKey ? key : null,
+                            checkbox: [],
+                            content: options[key]
+                        })
+                    })
+                } else if (item.ti_xing_ === '多选题') {
+                    const rightKey = item.zheng_que_da_an_ ? item.zheng_que_da_an_.split(',') : []
+                    const options = item.da_an_ ? JSON.parse(item.da_an_) : {}
+                    this.optionList = []
+                    Object.keys(options).forEach(key => {
+                        this.optionList.push({
+                            value: key,
+                            radio: null,
+                            checkbox: rightKey,
+                            content: options[key]
+                        })
+                    })
+                }
+                item.fen_zhi_ = parseInt(item.fen_zhi_)
+                item.fu_tu_ = item.fu_tu_ ? JSON.parse(item.fu_tu_) : ''
+                this.form = item
             })
         },
         handleSubmit () {
@@ -573,6 +600,9 @@ export default {
                     width: 100%;
                 }
             }
+        }
+        .mb-20 {
+            margin-bottom: 20px;
         }
         .option-item {
             ::v-deep {

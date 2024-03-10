@@ -17,6 +17,36 @@ export const paperTypeOptions = [
     }
 ]
 
+export const examTypeOptions = [
+    {
+        label: '培训',
+        value: '培训'
+    },
+    {
+        label: '发布',
+        value: '发布'
+    },
+    {
+        label: '自主',
+        value: '自主'
+    }
+]
+
+export const scoringType = [
+    {
+        label: '平均分',
+        value: '平均分'
+    },
+    {
+        label: '最高分',
+        value: '最高分'
+    },
+    {
+        label: '最近得分',
+        value: '最近得分'
+    }
+]
+
 export const questionType = [
     {
         label: '单选题',

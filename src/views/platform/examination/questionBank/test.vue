@@ -225,7 +225,7 @@ export default {
                     }
                     data.map(item => {
                         if (item.options) {
-                            const temp = item.options ? JSON.parse(item.options) : {}
+                            const temp = JSON.parse(item.options) || {}
                             const o = []
                             Object.keys(temp).forEach(key => {
                                 o.push({
