@@ -236,7 +236,7 @@ export default {
             type: Boolean,
             default: false
         },
-        paperId: {
+        bankId: {
             type: String,
             default: ''
         },
@@ -259,7 +259,7 @@ export default {
             dialogLoading: false,
             form: {
                 // bu_men_: '',
-                parent_id_: this.paperId,
+                parent_id_: this.bankId,
                 chu_ti_ren_: userId,
                 chu_ti_shi_jian_: this.$common.getDateNow(19),
                 ti_gan_: '',
@@ -524,7 +524,7 @@ export default {
             })
         },
         updatePaper () {
-            const sql = `select fen_zhi_ from t_questions where parent_id_ = '${this.paperId}'`
+            const sql = `select fen_zhi_ from t_questions where parent_id_ = '${this.bankId}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 const params = {
@@ -532,7 +532,7 @@ export default {
                     updList: [
                         {
                             where: {
-                                id_: this.paperId
+                                id_: this.bankId
                             },
                             param: {
                                 ti_shu_: data.length,

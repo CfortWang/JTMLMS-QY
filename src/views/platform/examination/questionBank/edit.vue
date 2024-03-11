@@ -213,9 +213,6 @@ export default {
     computed: {
         formId () {
             return this.id
-        },
-        formData () {
-            return this.data
         }
     },
     watch: {

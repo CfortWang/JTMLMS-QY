@@ -22,7 +22,7 @@
             <el-form-item label="考试名称：" prop="kao_shi_ming_chen">
                 <el-input v-model="form.kao_shi_ming_chen" type="text" :maxlength="256" placeholder="请输入考试名称" />
             </el-form-item>
-            <el-form-item label="考试类型：" prop="kao_shi_lei_xing_">
+            <!-- <el-form-item label="考试类型：" prop="kao_shi_lei_xing_">
                 <el-select
                     v-model="form.kao_shi_lei_xing_"
                     filterable
@@ -37,7 +37,7 @@
                         :value="item.value"
                     />
                 </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="考试题库：" prop="ti_ku_id_">
                 <ibps-custom-dialog
                     v-model="form.ti_ku_id_"
@@ -146,6 +146,35 @@
                 />
                 <div class="unit">%</div>
             </el-form-item>
+            <el-form-item prop="yun_xu_bao_ming_">
+                <template slot="label">
+                    允许自主报名
+                    <el-tooltip effect="dark" content="限制非参考人员是否可报名参加该考试" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
+                <el-radio-group v-model="form.yun_xu_bao_ming_">
+                    <el-radio label="是">否</el-radio>
+                    <el-radio label="否">否</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item prop="guan_lian_id_">
+                <template slot="label">
+                    关联培训记录
+                    <el-tooltip effect="dark" content="关联培训记录" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
+                <ibps-custom-dialog
+                    v-model="form.guan_lian_id_"
+                    size="small"
+                    template-key="pxjldhk"
+                    :multiple="false"
+                    type="dialog"
+                    class="custom-dialog"
+                    placeholder="请选择培训记录"
+                />
+            </el-form-item>
             <el-form-item label="考试描述：" prop="kao_shi_miao_shu_">
                 <el-input v-model="form.kao_shi_miao_shu_" type="textarea" :rows="4" placeholder="请输入描述内容" />
             </el-form-item>
@@ -183,7 +212,7 @@ export default {
             examTypeOptions,
             deptList: deptList.filter(i => i.depth === 4),
             title: '新建考试',
-            formLabelWidth: '120px',
+            formLabelWidth: '135px',
             dialogVisible: this.visible,
             dialogLoading: false,
             form: {
@@ -192,6 +221,7 @@ export default {
                 kao_shi_ming_chen: '',
                 kao_shi_lei_xing_: '发布',
                 ti_ku_id_: '',
+                guan_lian_id_: '',
                 xian_kao_shi_jian: '不限',
                 xian_kao_ci_shu_: '不限',
                 can_kao_ren_yuan_: '',
@@ -200,6 +230,7 @@ export default {
                 da_biao_zhan_bi_: 60,
                 ji_fen_fang_shi_: scoringType.length ? scoringType[0].value : '',
                 kao_shi_miao_shu_: '',
+                yun_xu_bao_ming_: '否',
                 isCountLimit: '0',
                 isTimeLimit: '0',
                 isDateLimit: '0',
@@ -225,7 +256,7 @@ export default {
             ],
             rules: {
                 kao_shi_ming_chen: [{ required: true, message: this.$t('validate.required') }],
-                kao_shi_lei_xing_: [{ required: true, message: this.$t('validate.required') }],
+                // kao_shi_lei_xing_: [{ required: true, message: this.$t('validate.required') }],
                 ti_ku_id_: [{ required: true, message: this.$t('validate.required') }],
                 xian_kao_shi_jian: [{ required: true, message: this.$t('validate.required') }],
                 xian_kao_ci_shu_: [{ required: true, message: this.$t('validate.required') }],
@@ -268,7 +299,7 @@ export default {
             if (this.$utils.isEmpty(this.id)) {
                 return
             }
-            const sql = `select id_, bian_zhi_ren_, bian_zhi_bu_men_, bian_zhi_shi_jian, kao_shi_ming_chen, kao_shi_lei_xing_, ti_ku_id_, xian_kao_ci_shu_, ping_fen_ren_, kao_shi_miao_shu_, suo_shu_fan_wei_, kao_shi_shi_chang, da_biao_zhan_bi_ from t_question_bank where id_ = '${this.id}'`
+            const sql = `select id_, create_by_, ti_ku_id_, guan_lian_id_, kao_shi_ming_chen, kao_shi_lei_xing_, chuang_jian_shi_j, fa_bu_shi_jian_, fa_bu_ren_, xian_kao_shi_jian, xian_kao_ci_shu_, kao_shi_shi_chang, can_kao_ren_yuan_, zhuang_tai_, da_biao_zhan_bi_, ji_fen_fang_shi_, kao_shi_miao_shu_ from t_exams where id_ = '${this.id}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
@@ -283,7 +314,7 @@ export default {
                     data[0].minutes = null
                 } else {
                     data[0].isTimeLimit = '1'
-                    data[0].hours = Math.floor(data[0].kao_shi_shi_chang / (1000 * 60 * 60)) 
+                    data[0].hours = Math.floor(data[0].kao_shi_shi_chang / (1000 * 60 * 60))
                     data[0].minutes = (data[0].kao_shi_shi_chang % (1000 * 60 * 60)) / (60 * 1000)
                 }
                 this.form = data[0]
@@ -292,8 +323,9 @@ export default {
         handleSubmit () {
             this.$refs.form.validate((valid) => {
                 if (valid) {
+                    const { isTimeLimit, xian_kao_shi_jian } = this.form || {}
                     // 转换考试时长
-                    if (this.form.isTimeLimit === '0') {
+                    if (isTimeLimit === '0') {
                         this.form.kao_shi_shi_chang = '不限'
                     } else {
                         this.form.kao_shi_shi_chang = (this.form.hours * 60 + this.form.minutes) * 60 * 1000
@@ -304,7 +336,7 @@ export default {
                     delete this.form.hours
                     delete this.form.minutes
                     this.form.chuang_jian_shi_j = this.$common.getDateNow(19)
-                    this.form.xian_kao_shi_jian = this.$common.getFormatDate('string', 19, this.form.xian_kao_shi_jian)
+                    this.form.xian_kao_shi_jian = xian_kao_shi_jian === '不限' ? this.$common.getFormatDate('string', 16, xian_kao_shi_jian) : xian_kao_shi_jian
                     // 表单验证通过，提交表单
                     this.submitForm()
                 } else {
@@ -368,7 +400,7 @@ export default {
             padding: 20px;
             .question-icon {
                 font-size: 13px;
-                color: #cacad3;
+                color: #606060;
             }
             .date-picker {
                 margin-left: 20px;

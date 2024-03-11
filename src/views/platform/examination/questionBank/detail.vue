@@ -200,7 +200,7 @@ export default {
             type: Boolean,
             default: false
         },
-        paperId: {
+        bankId: {
             type: String,
             default: ''
         },
@@ -248,7 +248,7 @@ export default {
     methods: {
         // 获取题库数据
         async loadData () {
-            if (!this.paperId) {
+            if (!this.bankId) {
                 this.$message.error('获取题目信息失败，请重试！')
                 this.closeDialog()
                 return
@@ -278,7 +278,7 @@ export default {
             return user.userName || '-'
         },
         getQuestionData () {
-            const sql = `select e.id_ as dataId, e.kao_shi_ren_ as examinee, e.bu_men_ as dept, e.zhuang_tai_ as status, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime, e.ti_ku_zong_fen_ as totalScore, e.da_biao_zhan_bi_ as qualifiedRadio, e.de_fen_ as resultScore, ed.ti_mu_id_ as questionId, ed.ti_gan_ as stem, ed.ti_xing_ as questionType, ed.fen_zhi_ as questionScore, ed.fu_tu_ as img, ed.xuan_xiang_lei_xi as optionsType, ed.xuan_xiang_ as options, ed.can_kao_da_an_ as rightKey, ed.ping_fen_fang_shi as rateType, ed.ping_fen_ren_ as rater, ed.hui_da_ as answer, ed.ping_yue_shi_jian as rateTime, ed.de_fen_ as score, ed.jie_xi_ as analysis, q.ti_ku_ming_cheng_ as paperName, q.ji_fen_fang_shi_ as scoringType from t_examination e, t_examination_detail ed, t_question_bank q where e.id_ = ed.parent_id_ and e.ti_ku_id_ = q.id_ and e.ti_ku_id_ = '${this.paperId}' and (e.zhuang_tai_ = '已完成' or e.zhuang_tai_ = '已交卷') order by field(ed.ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            const sql = `select e.id_ as dataId, e.kao_shi_ren_ as examinee, e.bu_men_ as dept, e.zhuang_tai_ as status, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime, e.ti_ku_zong_fen_ as totalScore, e.da_biao_zhan_bi_ as qualifiedRadio, e.de_fen_ as resultScore, ed.ti_mu_id_ as questionId, ed.ti_gan_ as stem, ed.ti_xing_ as questionType, ed.fen_zhi_ as questionScore, ed.fu_tu_ as img, ed.xuan_xiang_lei_xi as optionsType, ed.xuan_xiang_ as options, ed.can_kao_da_an_ as rightKey, ed.ping_fen_fang_shi as rateType, ed.ping_fen_ren_ as rater, ed.hui_da_ as answer, ed.ping_yue_shi_jian as rateTime, ed.de_fen_ as score, ed.jie_xi_ as analysis, q.ti_ku_ming_cheng_ as paperName, q.ji_fen_fang_shi_ as scoringType from t_examination e, t_examination_detail ed, t_question_bank q where e.id_ = ed.parent_id_ and e.ti_ku_id_ = q.id_ and e.ti_ku_id_ = '${this.bankId}' and (e.zhuang_tai_ = '已完成' or e.zhuang_tai_ = '已交卷') order by field(ed.ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
