@@ -23,11 +23,11 @@
                     <span class="value">{{ paperData.totalCount }}</span>
                 </div>
                 <div class="info-item">
-                    <span class="label">总分</span>
+                    <span class="label">总分：</span>
                     <span class="value">{{ paperData.totalScore }}分</span>
                 </div>
                 <div class="info-item">
-                    <span class="label">达标分数占比：</span>
+                    <span class="label">达标占比：</span>
                     <span class="value">{{ paperData.qualifiedRadio }}%</span>
                 </div>
                 <div class="info-item">
@@ -204,6 +204,10 @@ export default {
             type: String,
             default: ''
         },
+        examId: {
+            type: String,
+            default: ''
+        },
         id: {
             type: String,
             default: ''
@@ -254,9 +258,8 @@ export default {
                 return
             }
             this.paperList = await this.getQuestionData()
-            this.paperData = this.paperList.find(i => i.dataId === this.id)
-            this.showPaperId = this.id
-            console.log(this.paperData)
+            this.paperData = this.paperList.find(i => i.dataId === this.id) || this.paperList[0]
+            this.showPaperId = this.paperData.dataId
         },
         handleActionEvent ({ key }) {
             switch (key) {
@@ -278,12 +281,13 @@ export default {
             return user.userName || '-'
         },
         getQuestionData () {
-            const sql = `select e.id_ as dataId, e.kao_shi_ren_ as examinee, e.bu_men_ as dept, e.zhuang_tai_ as status, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime, e.ti_ku_zong_fen_ as totalScore, e.da_biao_zhan_bi_ as qualifiedRadio, e.de_fen_ as resultScore, ed.ti_mu_id_ as questionId, ed.ti_gan_ as stem, ed.ti_xing_ as questionType, ed.fen_zhi_ as questionScore, ed.fu_tu_ as img, ed.xuan_xiang_lei_xi as optionsType, ed.xuan_xiang_ as options, ed.can_kao_da_an_ as rightKey, ed.ping_fen_fang_shi as rateType, ed.ping_fen_ren_ as rater, ed.hui_da_ as answer, ed.ping_yue_shi_jian as rateTime, ed.de_fen_ as score, ed.jie_xi_ as analysis, q.ti_ku_ming_cheng_ as paperName, q.ji_fen_fang_shi_ as scoringType from t_examination e, t_examination_detail ed, t_question_bank q where e.id_ = ed.parent_id_ and e.ti_ku_id_ = q.id_ and e.ti_ku_id_ = '${this.bankId}' and (e.zhuang_tai_ = '已完成' or e.zhuang_tai_ = '已交卷') order by field(ed.ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            const param = this.examId ? `and e.exam_id_ = '${this.examId}'` : 'and e.exam_id_ is null'
+            const sql = `select e.id_ as dataId, e.exam_id_ as examId, e.kao_shi_ren_ as examinee, e.bu_men_ as dept, e.zhuang_tai_ as status, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime, e.ti_ku_zong_fen_ as totalScore, e.de_fen_ as resultScore, ed.ti_mu_id_ as questionId, ed.ti_gan_ as stem, ed.ti_xing_ as questionType, ed.fen_zhi_ as questionScore, ed.fu_tu_ as img, ed.xuan_xiang_lei_xi as optionsType, ed.xuan_xiang_ as options, ed.can_kao_da_an_ as rightKey, ed.ping_fen_fang_shi as rateType, ed.ping_fen_ren_ as rater, ed.hui_da_ as answer, ed.ping_yue_shi_jian as rateTime, ed.de_fen_ as score, ed.jie_xi_ as analysis, q.ti_ku_ming_cheng_ as paperName, case when e.exam_id_ is not null then ex.da_biao_zhan_bi_ else q.da_biao_zhan_bi_ end as qualifiedRadio, case when e.exam_id_ is not null then ex.ji_fen_fang_shi_ else q.ji_fen_fang_shi_ end as scoringType, case when e.exam_id_ is not null then ex.kao_shi_ming_chen else '自主考核' end as examName, case when e.exam_id_ is not null then ex.xian_kao_shi_jian else '不限' end as limitDate from t_examination e left join t_examination_detail ed on e.id_ = ed.parent_id_ left join  t_question_bank q on e.ti_ku_id_ = q.id_ left join  t_exams ex on e.exam_id_ = ex.id_ where e.ti_ku_id_ = '${this.bankId}' ${param} and e.kao_shi_ren_ = '${this.userId}' and (e.zhuang_tai_ = '已完成' or e.zhuang_tai_ = '已交卷') order by field(ed.ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
                     if (!data.length) {
-                        this.$message.error('获取题目信息失败！')
+                        this.$message.error('未查询到已提交的考试记录，请先完成考试！')
                         this.closeDialog()
                         return
                     }
@@ -318,7 +322,7 @@ export default {
                                 qualifiedRadio,
                                 isQualified: status === '已完成' ? parseFloat(resultScore) >= (parseFloat(qualifiedRadio) / 100 * parseFloat(totalScore)) : '',
                                 paperName,
-                                totalScore: parseFloat(resultScore),
+                                totalScore: parseFloat(totalScore),
                                 resultScore: parseFloat(resultScore),
                                 totalCount: data.length,
                                 scoringType,
@@ -441,7 +445,7 @@ export default {
                 display: flex;
                 align-items: center;
                 .label {
-                    width: 120px;
+                    width: 100px;
                     font-weight: bold;
                     color: #333;
                 }

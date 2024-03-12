@@ -41,10 +41,10 @@ const dealData = (args, type) => {
             sql: args.replace(/\n/g, ' ')
         }
     }
-    const data = typeof args === 'object' ? JSON.stringify(replaceNullWithEmpty(args)) : args
+    const data = typeof args === 'object' ? replaceNullWithEmpty(args) : args
     const res = {
         ciphertext: encryptByAes(data),
-        plaintext: args
+        plaintext: data
     }
     return JSON.stringify(res)
 }

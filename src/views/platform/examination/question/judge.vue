@@ -118,10 +118,6 @@ export default {
             type: Boolean,
             default: false
         },
-        paperId: {
-            type: String,
-            default: ''
-        },
         id: {
             type: String,
             default: ''
