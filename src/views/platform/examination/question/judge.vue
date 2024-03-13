@@ -471,6 +471,8 @@ export default {
                 position: absolute;
                 width: calc(100% - 40px);
                 bottom: 20px;
+                height: 80px;
+                overflow-y: auto;
                 .el-progress {
                     width: 100%;
                     margin-bottom: 10px;

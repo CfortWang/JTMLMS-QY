@@ -154,7 +154,7 @@
                     </el-tooltip>
                 </template>
                 <el-radio-group v-model="form.yun_xu_bao_ming_">
-                    <el-radio label="是">否</el-radio>
+                    <el-radio label="是">是</el-radio>
                     <el-radio label="否">否</el-radio>
                 </el-radio-group>
             </el-form-item>
@@ -323,7 +323,7 @@ export default {
         handleSubmit () {
             this.$refs.form.validate((valid) => {
                 if (valid) {
-                    const { isTimeLimit, xian_kao_shi_jian } = this.form || {}
+                    const { isTimeLimit, xian_kao_shi_jian = '' } = this.form || {}
                     // 转换考试时长
                     if (isTimeLimit === '0') {
                         this.form.kao_shi_shi_chang = '不限'
@@ -336,7 +336,7 @@ export default {
                     delete this.form.hours
                     delete this.form.minutes
                     this.form.chuang_jian_shi_j = this.$common.getDateNow(19)
-                    this.form.xian_kao_shi_jian = xian_kao_shi_jian === '不限' ? this.$common.getFormatDate('string', 16, xian_kao_shi_jian) : xian_kao_shi_jian
+                    this.form.xian_kao_shi_jian = xian_kao_shi_jian !== '不限' ? this.$common.getFormatDate('string', 16, xian_kao_shi_jian) : xian_kao_shi_jian
                     // 表单验证通过，提交表单
                     this.submitForm()
                 } else {

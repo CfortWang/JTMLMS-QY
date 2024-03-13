@@ -100,6 +100,7 @@
 </template>
 
 <script>
+// import Watermark from '@/layout/header-aside/components/header-message/watermark/watermark-cont'
 export default {
     components: {
         IbpsImage: () => import('@/business/platform/file/image')
@@ -178,11 +179,13 @@ export default {
     },
     mounted () {
         this.loadData()
+        // Watermark.set(`123`, `123123`)
         // 监听键盘事件
         window.addEventListener('keyup', this.handleKeyPress)
     },
     beforeDestroy () {
         window.removeEventListener('keyup', this.handleKeyPress)
+        // Watermark.set('', '')
     },
     methods: {
         // 获取题库数据
@@ -357,7 +360,7 @@ export default {
                         can_kao_da_an_: item.rightKey,
                         ping_fen_fang_shi: item.rateType,
                         ping_fen_ren_: item.rater,
-                        hui_da_: multipleType && item.answer && item.answer.length ? JSON.stringify(item.answer) : item.answer,
+                        hui_da_: multipleType && item.answer ? JSON.stringify(item.answer) : item.answer,
                         shi_fou_yi_yue_: autoType ? '是' : '否',
                         ping_yue_shi_jian: autoType ? time : '',
                         de_fen_: autoType ? this.getScore(item) : '',
