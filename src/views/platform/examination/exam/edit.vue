@@ -211,7 +211,7 @@ export default {
             userList,
             examTypeOptions,
             deptList: deptList.filter(i => i.depth === 4),
-            title: '新建考试',
+            title: this.id ? '编辑考试' : '新建考试',
             formLabelWidth: '135px',
             dialogVisible: this.visible,
             dialogLoading: false,

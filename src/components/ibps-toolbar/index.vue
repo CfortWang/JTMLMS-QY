@@ -42,7 +42,7 @@
                 />
             </template>
             <template v-else-if="type==='linkHide'">
-                <div :key="button.key+index" style="margin-top: 10px;">
+                <div :key="button.key+index" class="more-btn">
                     <el-link
                         v-if="handleActionHidden(button.hidden)"
                         :key="button.key+index"

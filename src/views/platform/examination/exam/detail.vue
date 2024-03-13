@@ -95,7 +95,7 @@
                     header-row-class-name="exam-table-header"
                     style="width: 100%"
                     class="exam-table"
-                    @row-click="handleRowClick"
+                    @row-dbclick="handleRowDblclick"
                 >
                     <el-table-column label="序号" type="index" width="50" />
                     <el-table-column
@@ -140,7 +140,7 @@
                     />
                     <el-table-column prop="isQualified" label="是否达标">
                         <template slot-scope="scope">
-                            <el-tag :type="getTagType(scope.row)" size="middle" class="score">{{ scope.row.isQualified }}</el-tag>
+                            <el-tag :type="getTagType(scope.row)" size="medium" class="score">{{ scope.row.isQualified }}</el-tag>
                         </template>
                     </el-table-column>
                     <!-- <el-table-column
@@ -149,7 +149,7 @@
                         width="60"
                     >
                         <template slot-scope="scope">
-                            <el-button type="text" size="small" @click="handleRowClick(scope.row)">详情</el-button>
+                            <el-button type="text" size="small" @click="handleRowDblclick(scope.row)">详情</el-button>
                         </template>
                     </el-table-column> -->
                 </el-table>
@@ -342,8 +342,7 @@ export default {
                 })
             })
         },
-        handleRowClick (row) {
-            console.log(row)
+        handleRowDblclick (row) {
             this.paperId = row.paperId
             this.examineeId = row.examineeId
             this.paperDialogVisible = true

@@ -347,7 +347,7 @@
                                 </template>
                                 <template v-if="rowHandleMoreActions && rowHandleMoreActions.length > 1">
                                     <div class="el-divider el-divider--vertical" />
-                                    <el-dropdown>
+                                    <el-dropdown placement="top">
                                         <!-- <i class="el-icon-caret-bottom el-dropdown-link" style="font-size:14px;">更多</i> -->
                                         <i class="ibps-icon ibps-icon-chevron-down" style="font-size:12px; color: #409eff; cursor: pointer;"> 更多</i>
                                         <el-dropdown-menu slot="dropdown" class="ibps-table-dropdown-menu">

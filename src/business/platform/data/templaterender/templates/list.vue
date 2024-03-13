@@ -1214,7 +1214,7 @@ export default {
                 if (!response) {
                     return
                 }
-                ActionUtils.exportFile(response.data, this.dataTemplate.name + '_' + fecha.formatDate('yyyyMMddHHmmss') + '.xls')
+                ActionUtils.exportFile(response.data, this.dataTemplate.name + '_' + fecha.formatDate('yyyyMMddHHmmss') + '.xlsx')
             })
         },
         callbackExtFields (data) {

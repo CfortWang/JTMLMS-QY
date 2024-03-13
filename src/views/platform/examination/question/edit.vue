@@ -89,6 +89,28 @@
                     placeholder="请输入题干内容"
                 />
             </el-form-item>
+            <el-form-item label="标签：" prop="biao_qian_">
+                <el-tag
+                    v-for="tag in questionTags"
+                    :key="tag"
+                    closable
+                    size="medium"
+                    :disable-transitions="false"
+                    @close="handleTagDelete(tag)"
+                >
+                    {{ tag }}
+                </el-tag>
+                <el-input
+                    v-if="tagInputVisible"
+                    ref="saveTagInput"
+                    v-model="tagValue"
+                    class="input-new-tag"
+                    size="small"
+                    @keyup.enter.native="handleTagConfirm"
+                    @blur="handleTagConfirm"
+                />
+                <el-button v-else class="button-new-tag" size="small" @click="showTagEdit">+ 添 加</el-button>
+            </el-form-item>
             <el-form-item label="附图：" prop="fu_tu_">
                 <ibps-image
                     v-model="form.fu_tu_"
@@ -253,10 +275,12 @@ export default {
             questionType,
             rateType,
             deptList: deptList.filter(i => i.depth === 4),
-            title: '添加题目',
+            title: this.id ? '编辑题目' : '添加题目',
             formLabelWidth: '120px',
             dialogVisible: this.visible,
             dialogLoading: false,
+            tagInputVisible: false,
+            tagValue: '',
             form: {
                 // bu_men_: '',
                 parent_id_: this.bankId,
@@ -275,6 +299,7 @@ export default {
                 bei_zhu_: '',
                 zhuang_tai_: '启用'
             },
+            questionTags: [],
             toolbars: [
                 {
                     key: 'submit',
@@ -381,6 +406,22 @@ export default {
             ]
             return this.userList
         },
+        handleTagDelete (tag) {
+            this.questionTags.splice(this.questionTags.indexOf(tag), 1)
+        },
+        showTagEdit () {
+            this.tagInputVisible = true
+            this.$nextTick(_ => {
+                this.$refs.saveTagInput.$refs.input.focus()
+            })
+        },
+        handleTagConfirm () {
+            if (this.tagValue) {
+                this.questionTags.push(this.tagValue)
+            }
+            this.tagInputVisible = false
+            this.tagValue = ''
+        },
         handleActionEvent ({ key }) {
             switch (key) {
                 case 'submit':
@@ -398,7 +439,7 @@ export default {
             if (this.$utils.isEmpty(this.id)) {
                 return
             }
-            const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, biao_qian_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_ from t_questions where id_ = '${this.id}'`
+            const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, biao_qian_, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_ from t_questions where id_ = '${this.id}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
@@ -440,6 +481,7 @@ export default {
                 }
                 item.fen_zhi_ = parseInt(item.fen_zhi_)
                 item.fu_tu_ = item.fu_tu_ ? JSON.parse(item.fu_tu_) : ''
+                this.questionTags = item.biao_qian_ ? item.biao_qian_.split(',') : []
                 this.form = item
             })
         },
@@ -468,6 +510,7 @@ export default {
                 }
                 a3.push(item.content)
             })
+            this.form.biao_qian_ = this.questionTags.join(',')
             this.form.ping_fen_fang_shi = this.questionRateType
             switch (this.form.ti_xing_) {
                 case '单选题':
@@ -557,7 +600,7 @@ export default {
     .question-dialog {
         ::v-deep {
             .el-dialog {
-                max-width: 1080px;
+                min-width: 1080px;
             }
             .el-dialog__body {
                 height: calc(88vh - 200px);
@@ -566,6 +609,9 @@ export default {
                 margin-bottom: 14px !important;
                 &:last-child {
                     margin-bottom: 0 !important;
+                }
+                .el-form-item__label {
+                    font-size: 14px !important;
                 }
             }
             .el-form-item--small .el-form-item__error {
@@ -580,6 +626,24 @@ export default {
                     background-color: #409EFF;
                 }
             }
+            .el-tag {
+                margin-right: 10px;
+                height: 32px;
+                line-height: 30px;
+                .el-icon-close {
+                    top: 0px;
+                }
+            }
+        }
+        .button-new-tag {
+            height: 32px;
+            line-height: 30px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .input-new-tag {
+            width: 100px;
+            vertical-align: bottom;
         }
         .question-form {
             padding: 20px;
