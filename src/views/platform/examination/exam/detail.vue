@@ -95,7 +95,7 @@
                     header-row-class-name="exam-table-header"
                     style="width: 100%"
                     class="exam-table"
-                    @row-dbclick="handleRowDblclick"
+                    @row-dblclick="handleRowDblclick"
                 >
                     <el-table-column label="序号" type="index" width="50" />
                     <el-table-column
@@ -343,6 +343,7 @@ export default {
             })
         },
         handleRowDblclick (row) {
+            console.log('???')
             this.paperId = row.paperId
             this.examineeId = row.examineeId
             this.paperDialogVisible = true

@@ -1,5 +1,6 @@
 <template>
     <el-dialog
+        v-loading="loading"
         :title="title"
         :visible.sync="dialogVisible"
         :close-on-click-modal="false"
@@ -101,6 +102,7 @@
 
 <script>
 // import Watermark from '@/layout/header-aside/components/header-message/watermark/watermark-cont'
+import { round } from 'lodash'
 export default {
     components: {
         IbpsImage: () => import('@/business/platform/file/image')
@@ -124,6 +126,7 @@ export default {
         return {
             title: '参加考试',
             dialogVisible: this.visible,
+            loading: false,
             toolbars: [
                 {
                     key: 'prev',
@@ -217,6 +220,7 @@ export default {
             }
         },
         getQuestionData () {
+            this.loading = true
             const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey from t_questions where parent_id_ = '${this.bankId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
@@ -245,8 +249,10 @@ export default {
                         item.img = item.img ? JSON.parse(item.img) : ''
                         item.answer = item.questionType === '多选题' ? [] : null
                     })
+                    this.loading = false
                     resolve(data)
                 }).catch(error => {
+                    this.loading = false
                     reject(error)
                 })
             })
@@ -264,7 +270,7 @@ export default {
             })
             // const finished = this.questionList.filter(item => (item.questionType !== '填空题' && item.answer) || (item.questionType === '填空题' && item.answer && !item.answer.some(i => i === '' || i === null))).length
             const finishedCount = finished.filter(i => i).length
-            const progress = parseFloat(finishedCount / this.questionList.length * 100)
+            const progress = round(parseFloat(finishedCount / this.questionList.length * 100), 2)
             return progress ? progress > 100 ? 100 : progress : 0
         },
         changeOptions (val) {
@@ -388,7 +394,7 @@ export default {
                             jie_shu_shi_jian_: this.$common.getDateNow(19),
                             ti_ku_zong_fen_: data.reduce((sum, item) => sum + parseFloat(item.fen_zhi_), 0),
                             zhuang_tai_: isAllReviewed ? '已完成' : '已交卷',
-                            de_fen_: isAllReviewed ? data.reduce((sum, item) => sum + parseFloat(item.de_fen_), 0) : '',
+                            de_fen_: isAllReviewed ? data.reduce((sum, item) => sum + parseFloat(item.de_fen_), 0) : ''
                             // sheng_yu_shi_chan: ''
                         }
                     }
@@ -478,9 +484,12 @@ export default {
                 position: absolute;
                 width: calc(100% - 40px);
                 bottom: 20px;
-                .el-progress {
+                .progress {
                     width: 100%;
                     margin-bottom: 10px;
+                    ::v-deep .el-progress-bar__innerText {
+                        color: #fff !important;
+                    }
                 }
                 .link-item {
                     width: 32px;

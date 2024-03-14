@@ -1,5 +1,6 @@
 <template>
     <el-dialog
+        v-loading="loading"
         :title="title"
         :visible.sync="dialogVisible"
         :close-on-click-modal="false"
@@ -128,6 +129,7 @@ export default {
         return {
             title: '试题评阅',
             dialogVisible: this.visible,
+            loading: false,
             toolbars: [
                 {
                     key: 'prev',
@@ -211,7 +213,8 @@ export default {
             }
         },
         getQuestionData () {
-            const param = this.id ? ` and find_in_set(id_, '${this.id}')` : ''
+            this.loading = true
+            const param = this.id ? ` and find_in_set(exam_id_, '${this.id}')` : ''
             const sql = `select id_ as dataId, parent_id_ as paperId, ti_mu_id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, hui_da_ as answer, can_kao_da_an_ as rightKey, shi_fou_yi_yue_ as isRate from t_examination_detail where ping_fen_ren_ = '${this.userId}' and shi_fou_yi_yue_ = '否' and parent_id_ in (select id_ from t_examination where zhuang_tai_ = '已交卷'${param}) order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
@@ -232,8 +235,10 @@ export default {
                         item.img = item.img ? JSON.parse(item.img) : ''
                         item.resultScore = undefined
                     })
+                    this.loading = false
                     resolve(data)
                 }).catch(error => {
+                    this.loading = false
                     reject(error)
                 })
             })

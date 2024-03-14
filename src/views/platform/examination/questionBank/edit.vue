@@ -484,10 +484,34 @@ export default {
                 }
             })
         },
+        updatePaper (bankId) {
+            const sql = `select fen_zhi_ from t_questions where parent_id_ = '${bankId}'`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                const params = {
+                    tableName: 't_question_bank',
+                    updList: [
+                        {
+                            where: {
+                                id_: bankId
+                            },
+                            param: {
+                                ti_shu_: data.length,
+                                zong_fen_: data.reduce((sum, item) => sum + parseInt(item.fen_zhi_), 0)
+                            }
+                        }
+                    ]
+                }
+                this.$common.request('update', params).then(() => {
+                    console.log('更新题库信息成功')
+                    this.closeDialog()
+                })
+            })
+        },
         createQuestion (bankId) {
             const newQues = this.questionData.filter(i => this.quesIdList.includes(i.quesId))
             if (!newQues.length) {
-                return
+                return this.closeDialog()
             }
             const paramWhere = newQues.map(item => ({
                 parent_id_: bankId,
@@ -512,6 +536,12 @@ export default {
             this.$common.request('add', {
                 tableName: 't_questions',
                 paramWhere
+            }).then(res => {
+                const { cont = [] } = res.variables || {}
+                if (!cont.length) {
+                    return this.closeDialog()
+                }
+                this.updatePaper(bankId)
             })
         },
         submitForm () {
@@ -553,7 +583,6 @@ export default {
                 }
                 this.createQuestion(dataId)
                 this.$message.success(this.formId ? '保存题库信息成功' : '新增题库成功')
-                this.closeDialog()
             })
         },
         // 关闭当前窗口

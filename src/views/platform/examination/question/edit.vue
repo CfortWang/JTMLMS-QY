@@ -95,6 +95,7 @@
                     :key="tag"
                     closable
                     size="medium"
+                    class="qustion-tag"
                     :disable-transitions="false"
                     @close="handleTagDelete(tag)"
                 >
@@ -662,10 +663,12 @@ export default {
                     background-color: #409EFF;
                 }
             }
-            .el-tag {
-                margin-right: 10px;
-                height: 32px;
-                line-height: 30px;
+        }
+        .qustion-tag {
+            margin-right: 10px;
+            height: 32px;
+            line-height: 30px;
+            ::v-deep {
                 .el-icon-close {
                     top: 0px;
                 }
