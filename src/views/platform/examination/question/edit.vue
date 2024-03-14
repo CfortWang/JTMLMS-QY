@@ -309,11 +309,31 @@ export default {
                         return this.readonly
                     }
                 },
+                {
+                    key: 'submitAndContinue',
+                    icon: 'ibps-icon-send',
+                    label: '保存并继续',
+                    type: 'warning',
+                    hidden: () => {
+                        return this.readonly
+                    }
+                },
+                {
+                    key: 'reset',
+                    icon: 'ibps-icon-refresh',
+                    label: '重置',
+                    type: 'info',
+                    hidden: () => {
+                        return this.readonly
+                    }
+                },
                 { key: 'cancel', label: '关闭' }
             ],
             rules: {
                 ti_gan_: [{ required: true, message: this.$t('validate.required') }],
                 ti_xing_: [{ required: true, message: this.$t('validate.required') }],
+                da_an_: [{ required: true, message: this.$t('validate.required') }],
+                zheng_que_da_an_: [{ required: true, message: this.$t('validate.required') }],
                 xuan_xiang_lei_xi: [{ required: true, message: this.$t('validate.required') }],
                 ping_fen_fang_shi: [{ required: true, message: this.$t('validate.required') }],
                 ping_fen_ren_: [{ required: true, message: this.$t('validate.required') }],
@@ -371,7 +391,7 @@ export default {
             }
             this.form.da_an_ = ''
             this.form.zheng_que_da_an_ = ''
-            console.log(this.optionList)
+            this.questionTags = []
         },
         getRaterOptions (list) {
             const data = [
@@ -425,7 +445,13 @@ export default {
         handleActionEvent ({ key }) {
             switch (key) {
                 case 'submit':
-                    this.handleSubmit()
+                    this.handleSubmit(key)
+                    break
+                case 'submitAndContinue':
+                    this.handleSubmit(key)
+                    break
+                case 'reset':
+                    this.resetForm()
                     break
                 case 'cancel':
                     this.closeDialog()
@@ -485,11 +511,11 @@ export default {
                 this.form = item
             })
         },
-        handleSubmit () {
+        handleSubmit (action) {
             this.$refs.form.validate((valid) => {
                 if (valid) {
                     // 表单验证通过，提交表单
-                    this.submitForm()
+                    this.submitForm(action)
                 } else {
                     ActionUtils.saveErrorMessage()
                 }
@@ -540,7 +566,7 @@ export default {
                     break
             }
         },
-        submitForm () {
+        submitForm (action) {
             this.getSubmitData()
             console.log(this.form)
             const addParams = {
@@ -563,8 +589,18 @@ export default {
             this.$common.request(type, params).then(() => {
                 this.$message.success(this.id ? '保存题目成功' : '添加题目成功')
                 this.updatePaper()
-                this.closeDialog()
+                if (action === 'submit') {
+                    this.closeDialog()
+                } else {
+                    this.resetForm()
+                }
             })
+        },
+        resetForm () {
+            this.id = ''
+            const quesType = this.form.ti_xing_
+            this.$refs.form.resetFields()
+            this.changeQuestionType(quesType)
         },
         updatePaper () {
             const sql = `select fen_zhi_ from t_questions where parent_id_ = '${this.bankId}'`

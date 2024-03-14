@@ -148,6 +148,19 @@
             </el-form-item>
         </el-form>
         <div class="question-table">
+            <div class="question-select">
+                <div class="label">选择试题：</div>
+                <ibps-custom-dialog
+                    v-model="quesIdList"
+                    size="small"
+                    template-key="tmlb"
+                    :dynamic-params="{parent_id_: ''}"
+                    multiple
+                    type="dialog"
+                    class="custom-dialog"
+                    placeholder="请选择需要关联的题目信息"
+                />
+            </div>
             <el-table
                 ref="elTable"
                 :data="questionData"
@@ -182,7 +195,7 @@
                                 </div>
                                 <div class="question-info-item">
                                     <div class="label">评分人</div>
-                                    <div class="value">{{ scope.row.rater || '—' }}</div>
+                                    <div class="value">{{ transformUser(scope.row.rater) }}</div>
                                 </div>
                                 <div class="question-info-item">
                                     <div class="label">标签</div>
@@ -239,7 +252,7 @@
                 <el-table-column
                     prop="createTime"
                     label="出题时间"
-                    width="150"
+                    width="160"
                     sortable
                 />
                 <el-table-column
@@ -273,7 +286,8 @@ import ActionUtils from '@/utils/action'
 import { paperTypeOptions } from '../constants'
 export default {
     components: {
-        QuesEdit: () => import('../question/edit')
+        QuesEdit: () => import('../question/edit'),
+        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
     },
     props: {
         visible: {
@@ -298,6 +312,7 @@ export default {
             questionData: [],
             questionDialogVisible: false,
             quesId: '',
+            quesIdList: '',
             form: {
                 bian_zhi_bu_men_: '',
                 bian_zhi_ren_: userId,
@@ -349,10 +364,15 @@ export default {
     },
     watch: {
         visible: {
-            handler: function (val, oldVal) {
+            handler (val, oldVal) {
                 this.dialogVisible = this.visible
             }
             // immediate: true
+        },
+        quesIdList: {
+            handler (val, oldVal) {
+                this.addSelectQuestion(val)
+            }
         }
     },
     created () {
@@ -422,7 +442,7 @@ export default {
                 return
             }
             const sql1 = `select id_, bian_zhi_ren_, bian_zhi_bu_men_, bian_zhi_shi_jian, ti_ku_ming_cheng_, ti_ku_fen_lei_, ti_ku_zhuang_tai_, shi_fou_gong_kai_, xian_kao_ci_shu_, ping_fen_ren_, miao_shu_, suo_shu_fan_wei_, kao_shi_shi_chang, da_biao_zhan_bi_ from t_question_bank where id_ = '${this.formId}'`
-            const sql2 = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, xuan_xiang_lei_xi as optionType, zheng_que_da_an_ as answer, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, biao_qian_ as quesTag, zhuang_tai_ as quesState from t_questions where parent_id_ = '${this.formId}'`
+            const sql2 = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, zhuang_tai_ as status, biao_qian_ as quesTag, zhuang_tai_ as quesState from t_questions where parent_id_ = '${this.formId}'`
             Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then(([res1, res2]) => {
                 const { data: bankData = [] } = res1.variables || {}
                 const { data: questionData = [] } = res2.variables || {}
@@ -441,9 +461,17 @@ export default {
                     bank.hours = Math.floor(bank.kao_shi_shi_chang / (1000 * 60 * 60))
                     bank.minutes = (bank.kao_shi_shi_chang % (1000 * 60 * 60)) / (60 * 1000)
                 }
-                console.log(questionData)
+                // console.log(questionData)
                 this.questionData = questionData
+                // this.quesIdList = this.questionData.map(item => item.quesId).join(',')
                 this.form = bank
+            })
+        },
+        addSelectQuestion () {
+            const sql = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, zhuang_tai_ as status, biao_qian_ as quesTag, zhuang_tai_ as quesState from t_questions where find_in_set(id_, '${this.quesIdList}')`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                this.questionData = this.questionData.concat(data)
             })
         },
         handleSubmit () {
@@ -454,6 +482,36 @@ export default {
                 } else {
                     ActionUtils.saveErrorMessage()
                 }
+            })
+        },
+        createQuestion (bankId) {
+            const newQues = this.questionData.filter(i => this.quesIdList.includes(i.quesId))
+            if (!newQues.length) {
+                return
+            }
+            const paramWhere = newQues.map(item => ({
+                parent_id_: bankId,
+                bu_men_: item.createDept || '',
+                chu_ti_ren_: item.creator,
+                chu_ti_shi_jian_: item.createTime,
+                xu_hao_: item.sn || '',
+                ti_gan_: item.content,
+                ti_xing_: item.quesType,
+                fu_tu_: item.img,
+                xuan_xiang_lei_xi: item.optionType || '',
+                da_an_: item.answer || '',
+                fen_zhi_: item.score,
+                xuan_xiang_shu_: item.optionCount || '',
+                zheng_que_da_an_: item.rightKey,
+                ping_fen_fang_shi: item.rateType || '',
+                ping_fen_ren_: item.rater || '',
+                bei_zhu_: item.note || '',
+                zhuang_tai_: item.status,
+                biao_qian_: item.quesTag || ''
+            }))
+            this.$common.request('add', {
+                tableName: 't_questions',
+                paramWhere
             })
         },
         submitForm () {
@@ -487,8 +545,14 @@ export default {
             }
             const type = this.formId ? 'update' : 'add'
             const params = type === 'add' ? addParams : updateParams
-            this.$common.request(type, params).then(() => {
-                this.$message.success(this.formId ? '保存题库成功' : '新增题库成功')
+            this.$common.request(type, params).then(res => {
+                const { cont = [] } = res.variables || {}
+                let dataId = this.id
+                if (cont.length) {
+                    dataId = cont[0].id_
+                }
+                this.createQuestion(dataId)
+                this.$message.success(this.formId ? '保存题库信息成功' : '新增题库成功')
                 this.closeDialog()
             })
         },
@@ -555,6 +619,19 @@ export default {
                     }
                 }
             }
+            .question-select {
+                display: flex;
+                align-items: center;
+                .label {
+                    width: 108px;
+                    padding-right: 12px;
+                    text-align: right;
+                }
+                .custom-dialog {
+                    flex: 1;
+                }
+                margin-bottom: 10px;
+            }
         }
     }
     .question-info {
@@ -562,12 +639,12 @@ export default {
             display: flex;
             margin-bottom: 10px;
             max-width: 200px;
+            font-size: 14px;
             .label {
                 width: 100px;
                 font-size: 14px;
                 color: #606266;
-                text-align: right;
-                margin-right: 10px;
+                text-align: left;
             }
             .value {
                 font-weight: 600;
