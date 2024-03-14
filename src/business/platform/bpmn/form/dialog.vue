@@ -64,7 +64,10 @@ export default {
         },
         waiJian: { // 新增参数
             type: String
-        }
+        },
+        previousDataTemplate: {
+          type: Object
+        }
     },
     data () {
         return {
@@ -98,7 +101,7 @@ export default {
         },
         // 关闭当前窗口
         closeDialog () {
-            this.$emit('close', false)
+            this.$emit('close', false , this.previousDataTemplate)
         }
     }
 }

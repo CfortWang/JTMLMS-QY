@@ -41,7 +41,8 @@ export default {
     data () {
         return {
             qrCode: '',
-            dialogVisible: this.visible
+            dialogVisible: this.visible,
+            url:'http://192.168.2.16:8080/',
         }
     },
     mounted () {
@@ -64,7 +65,8 @@ export default {
             this.qrCode = new QRCode('qrcode', {
                 width: 200,
                 height: 200,
-                text: `${BASE_URL}h5/#/pages/login/login?qrcodeId=${this.codeId}`,
+                // text: `${this.url}h5/#/pages/signin/signin?codeId=${this.codeId}`,
+                text: `${BASE_URL}h5/#/pages/signin/signin?codeId=${this.codeId}`,
                 colorDark: '#000000', // 前景色
                 colorLight: '#FFFFFF', // 背景色
                 correctLevel: QRCode.CorrectLevel.L

@@ -183,8 +183,9 @@
             :readonly="readonly"
             :template-key="dataTemplate.key"
             :add-data-cont="addDataCont"
+            :previous-data-template="dataTemplate"
             @callback="search"
-            @close="(visible) => (dialogFormVisible = visible)"
+            @close="closeDataTemplateFormrenderDialog"
         />
         <!-- 流程定义选择器 -->
         <bpm-def-dialog
@@ -242,6 +243,7 @@
             :instance-id="instanceId"
             :task-id="taskId"
             :add-data-cont="addDataCont"
+            :previous-data-template="dataTemplate"
             @callback="search"
             @close="loadFlowFData"
         />
@@ -874,9 +876,11 @@ export default {
             this.addDataCont = {}
         },
         /* 流程页面关闭，刷新当前页面*/
-        loadFlowFData () {
+        loadFlowFData (v,temp) {
             this.npmDialogFormVisible = false
             this.addDataCont = {}
+            this.dataTemplate = temp
+            this.initJTemplate()
         },
         /* 扫码操作*/
         scanHandler (val) {
@@ -1911,6 +1915,11 @@ export default {
         handleRenderDialogClose (visible, previousDataTemplate) {
             this.dataTemplate = previousDataTemplate
             this.templateDialogVisible = visible
+            this.initJTemplate()
+        },
+        closeDataTemplateFormrenderDialog(visible,temp){
+            this.dialogFormVisible = visible
+            this.dataTemplate = temp
             this.initJTemplate()
         }
     }

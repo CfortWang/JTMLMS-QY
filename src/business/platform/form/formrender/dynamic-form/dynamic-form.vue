@@ -359,7 +359,7 @@
                         // 不是只读字段
                         if (!FormOptions.t.NON_MODEL_FIELD_TYPES.includes(fieldType)) {
                             // 空值默认
-                            const defaultValueEmpty = this.$utils.toBoolean(fieldOptions.default_value_empty, true)
+                            const defaultValueEmpty = fieldOptions.uncheck ? '' : this.$utils.toBoolean(fieldOptions.default_value_empty, true)
                             if (this.value && Object.keys(this.value).indexOf(fieldName) >= 0) {
                                 // 有值
                                 const data = this.value[fieldName]

@@ -62,7 +62,10 @@ export default {
     },
     defaultData: { // 默认数据
       type: Object
-    }
+    },
+    previousDataTemplate: {
+      type: Object
+    }
   },
   data() {
     return {
@@ -88,7 +91,7 @@ export default {
     },
     // 关闭当前窗口
     closeDialog() {
-      this.$emit('close', false)
+      this.$emit('close', false , this.previousDataTemplate)
     }
   }
 }
