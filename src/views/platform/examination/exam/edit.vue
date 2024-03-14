@@ -275,7 +275,7 @@ export default {
             // immediate: true
         }
     },
-    created () {
+    mounted () {
         this.getExamData()
     },
     methods: {

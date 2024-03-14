@@ -17,6 +17,7 @@
             :model="form"
             :rules="rules"
             class="paper-form"
+            :class="readonly ? 'readonly-form' : ''"
             @submit.native.prevent
         >
             <el-form-item label="题库名称：" prop="ti_ku_ming_cheng_">
@@ -148,7 +149,7 @@
             </el-form-item>
         </el-form>
         <div class="question-table">
-            <div class="question-select">
+            <div v-if="!readonly" class="question-select">
                 <div class="label">选择试题：</div>
                 <ibps-custom-dialog
                     v-model="quesIdList"
@@ -258,10 +259,29 @@
                 <el-table-column
                     fixed="right"
                     label="操作"
-                    width="60"
+                    width="100"
                 >
                     <template slot-scope="scope">
-                        <el-button type="text" size="small" @click="handleRowDblclick(scope.row)">修改</el-button>
+                        <el-button
+                            v-if="!readonly"
+                            type="text"
+                            size="medium"
+                            @click="handleRowDblclick(scope.row, false)"
+                        >修改</el-button>
+                        <el-button
+                            v-if="!readonly"
+                            type="text"
+                            style="color: #f56c6c;"
+                            size="medium"
+                            @click="handleRemove(scope.row)"
+                        >删除</el-button>
+                        <el-button
+                            v-if="readonly"
+                            type="text"
+                            style="color: #909399;"
+                            size="medium"
+                            @click="handleRowDblclick(scope.row)"
+                        >详情</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -276,6 +296,9 @@
             v-if="questionDialogVisible"
             :id="quesId"
             :visible.sync="questionDialogVisible"
+            :is-copy="isCopy"
+            :ques-id-list="quesIdList"
+            :readonly="quesReadonly"
             @close="questionDialogVisible = false"
         />
     </el-dialog>
@@ -297,6 +320,10 @@ export default {
         id: {
             type: String,
             default: ''
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -305,14 +332,17 @@ export default {
             userList,
             paperTypeOptions,
             deptList: deptList.filter(i => i.depth === 4),
-            title: this.id ? '编辑题库' : '创建题库',
+            title: this.readonly ? '题库明细' : this.id ? '编辑题库' : '创建题库',
             formLabelWidth: '120px',
             dialogVisible: this.visible,
             dialogLoading: false,
             questionData: [],
+            initialData: [],
             questionDialogVisible: false,
             quesId: '',
             quesIdList: '',
+            isCopy: false,
+            quesReadonly: false,
             form: {
                 bian_zhi_bu_men_: '',
                 bian_zhi_ren_: userId,
@@ -375,7 +405,7 @@ export default {
             }
         }
     },
-    created () {
+    mounted () {
         this.getQuestionData()
     },
     methods: {
@@ -420,9 +450,20 @@ export default {
             const user = userList.find(u => u.userId === userId) || {}
             return user.userName || '-'
         },
-        handleRowDblclick (row) {
+        handleRowDblclick (row, readonly = true) {
             this.quesId = row.quesId
+            this.quesReadonly = readonly
+            this.isCopy = this.quesIdList.includes(this.quesId)
             this.questionDialogVisible = true
+        },
+        handleRemove (row) {
+            this.$confirm('确定要删除该题目吗？删除操作将在题库信息保存后生效', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.questionData = this.questionData.filter(item => item.quesId !== row.quesId)
+            })
         },
         handleActionEvent ({ key }) {
             switch (key) {
@@ -463,6 +504,7 @@ export default {
                 }
                 // console.log(questionData)
                 this.questionData = questionData
+                this.initialData = JSON.parse(JSON.stringify(questionData))
                 // this.quesIdList = this.questionData.map(item => item.quesId).join(',')
                 this.form = bank
             })
@@ -484,7 +526,7 @@ export default {
                 }
             })
         },
-        updatePaper (bankId) {
+        async updatePaper (bankId) {
             const sql = `select fen_zhi_ from t_questions where parent_id_ = '${bankId}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
@@ -508,12 +550,8 @@ export default {
                 })
             })
         },
-        createQuestion (bankId) {
-            const newQues = this.questionData.filter(i => this.quesIdList.includes(i.quesId))
-            if (!newQues.length) {
-                return this.closeDialog()
-            }
-            const paramWhere = newQues.map(item => ({
+        async createQuestion (list, bankId) {
+            const paramWhere = list.map(item => ({
                 parent_id_: bankId,
                 bu_men_: item.createDept || '',
                 chu_ti_ren_: item.creator,
@@ -533,15 +571,28 @@ export default {
                 zhuang_tai_: item.status,
                 biao_qian_: item.quesTag || ''
             }))
-            this.$common.request('add', {
+            await this.$common.request('add', {
                 tableName: 't_questions',
                 paramWhere
-            }).then(res => {
-                const { cont = [] } = res.variables || {}
-                if (!cont.length) {
-                    return this.closeDialog()
+            }).then(() => {
+                console.log(2)
+            })
+        },
+        // 软删除，删除关联关系
+        async deleteQuestion (list) {
+            const updList = list.map(item => ({
+                where: {
+                    id_: item.quesId
+                },
+                param: {
+                    parent_id_: ''
                 }
-                this.updatePaper(bankId)
+            }))
+            await this.$common.request('update', {
+                tableName: 't_questions',
+                updList
+            }).then(() => {
+                console.log(1)
             })
         },
         submitForm () {
@@ -550,6 +601,7 @@ export default {
             } else {
                 this.form.kao_shi_shi_chang = (this.form.hours * 60 + this.form.minutes) * 60 * 1000
             }
+            this.form.bian_zhi_bu_men_ = this.form.suo_shu_fan_wei_ === '科级' ? '' : this.form.bian_zhi_bu_men_
             delete this.form.isLimit
             delete this.form.limitTime
             delete this.form.hours
@@ -575,13 +627,25 @@ export default {
             }
             const type = this.formId ? 'update' : 'add'
             const params = type === 'add' ? addParams : updateParams
-            this.$common.request(type, params).then(res => {
+            const temp = this.questionData.filter(i => !this.quesIdList.includes(i.quesId)).map(i => i.quesId)
+            const deleteList = this.initialData.filter(item => !temp.includes(item.quesId))
+            const createList = this.questionData.filter(i => this.quesIdList.includes(i.quesId))
+            this.$common.request(type, params).then(async res => {
                 const { cont = [] } = res.variables || {}
                 let dataId = this.id
                 if (cont.length) {
                     dataId = cont[0].id_
                 }
-                this.createQuestion(dataId)
+                const PromiseList = []
+                if (createList.length) {
+                    PromiseList.push(this.createQuestion(createList, dataId))
+                }
+                if (deleteList.length) {
+                    PromiseList.push(this.deleteQuestion(deleteList))
+                }
+                Promise.all(PromiseList).then(() => {
+                    this.updatePaper(dataId)
+                })
                 this.$message.success(this.formId ? '保存题库信息成功' : '新增题库成功')
             })
         },
@@ -612,6 +676,13 @@ export default {
             }
             .el-form-item--small .el-form-item__error {
                 padding-top: 6px;
+            }
+        }
+        .readonly-form {
+            ::v-deep {
+                .el-radio, .el-checkbox, .el-radio-button, .el-input, .el-select, .el-textarea, .el-input-number {
+                    pointer-events: none;
+                }
             }
         }
         .paper-form {

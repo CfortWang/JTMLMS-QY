@@ -17,6 +17,7 @@
             :model="form"
             :rules="rules"
             class="question-form"
+            :class="readonly ? 'readonly-form' : ''"
             @submit.native.prevent
         >
             <div class="inline-item">
@@ -121,7 +122,6 @@
                     multiple
                     download
                     size=""
-                    :disabled="false"
                 />
             </el-form-item>
             <div class="inline-item" :class="['单选题', '多选题'].includes(form.ti_xing_) ? '' : 'mb-20'">
@@ -196,7 +196,7 @@
                         :rows="1"
                         placeholder="请输入答案内容，最多可配置20个答案"
                     />
-                    <div class="operate-btn">
+                    <div v-if="!readonly" class="operate-btn">
                         <el-button
                             v-if="index === 0 && optionList.length < 20"
                             type="primary"
@@ -266,6 +266,20 @@ export default {
         id: {
             type: String,
             default: ''
+        },
+        // 是否复制题目
+        isCopy: {
+            type: Boolean,
+            default: false
+        },
+        // 题库题目ID
+        quesIdList: {
+            type: String,
+            default: ''
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -276,7 +290,7 @@ export default {
             questionType,
             rateType,
             deptList: deptList.filter(i => i.depth === 4),
-            title: this.id ? '编辑题目' : '添加题目',
+            title: this.readonly ? '题目详情' : this.id ? '编辑题目' : '添加题目',
             formLabelWidth: '120px',
             dialogVisible: this.visible,
             dialogLoading: false,
@@ -316,7 +330,7 @@ export default {
                     label: '保存并继续',
                     type: 'warning',
                     hidden: () => {
-                        return this.readonly
+                        return this.readonly || this.id
                     }
                 },
                 {
@@ -325,7 +339,7 @@ export default {
                     label: '重置',
                     type: 'info',
                     hidden: () => {
-                        return this.readonly
+                        return this.readonly || this.id
                     }
                 },
                 { key: 'cancel', label: '关闭' }
@@ -333,8 +347,8 @@ export default {
             rules: {
                 ti_gan_: [{ required: true, message: this.$t('validate.required') }],
                 ti_xing_: [{ required: true, message: this.$t('validate.required') }],
-                da_an_: [{ required: true, message: this.$t('validate.required') }],
-                zheng_que_da_an_: [{ required: true, message: this.$t('validate.required') }],
+                // da_an_: [{ required: true, message: this.$t('validate.required') }],
+                // zheng_que_da_an_: [{ required: true, message: this.$t('validate.required') }],
                 xuan_xiang_lei_xi: [{ required: true, message: this.$t('validate.required') }],
                 ping_fen_fang_shi: [{ required: true, message: this.$t('validate.required') }],
                 ping_fen_ren_: [{ required: true, message: this.$t('validate.required') }],
@@ -360,7 +374,7 @@ export default {
             // immediate: true
         }
     },
-    created () {
+    mounted () {
         this.getQuestionData()
     },
     methods: {
@@ -585,7 +599,7 @@ export default {
                     }
                 ]
             }
-            const type = this.id ? 'update' : 'add'
+            const type = this.id && !this.isCopy ? 'update' : 'add'
             const params = type === 'add' ? addParams : updateParams
             this.$common.request(type, params).then(() => {
                 this.$message.success(this.id ? '保存题目成功' : '添加题目成功')
@@ -661,6 +675,13 @@ export default {
                 &:disabled:checked + .el-radio-button__inner {
                     color: #fff;
                     background-color: #409EFF;
+                }
+            }
+        }
+        .readonly-form {
+            ::v-deep {
+                .el-radio, .el-checkbox, .el-radio-button, .el-input, .el-select, .el-textarea, .el-input-number, .el-button, .el-upload {
+                    pointer-events: none;
                 }
             }
         }
