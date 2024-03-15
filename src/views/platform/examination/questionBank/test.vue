@@ -91,6 +91,9 @@
                 >{{ index + 1 }}</div>
             </div>
         </div>
+        <div class="tips">
+            <div>温馨提示：最下方题序方块无背景颜色时，表示该题还未作答；<br>题序方块背景颜色为<span style="background: #409EFF;">蓝色</span>时，表示题序对应题母为当前显示的题目；<br>题序方块背景颜色为<span style="background: #E6A23C;">黄色</span>时，表示该题已作答但是未完全答完（如填空题）；<br>题序方块背景颜色为<span style="background: #67C23A;">绿色</span>时，表示该题已作答完成。</div>
+        </div>
         <div slot="footer" class="el-dialog--center">
             <ibps-toolbar
                 :actions="toolbars"
@@ -520,6 +523,28 @@ export default {
                             border-color: lighten(nth($colors, 1), 10%);
                         }
                     }
+                }
+            }
+        }
+        .tips {
+            position: fixed;
+            font-size: 12px;
+            right: calc(1100px + (100% - 1080px) / 2);
+            top: 50%;
+            width: auto;
+            max-width: 200px;
+            transform: translate(0, -50%);
+            background-color: rgba(0, 0, 0, .6);
+            color: #DCDFE6;
+            margin-left: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            > div {
+                line-height: 20px;
+                > span {
+                    border-radius: 2px;
+                    padding: 2px 5px;
+                    margin: 0 2px;
                 }
             }
         }
