@@ -146,10 +146,11 @@
                 <el-form-item
                     v-for="(item, index) in optionList"
                     :key="`${item.value}${index}`"
-                    prop="da_an_"
-                    :label="`选项${item.value}：`"
                     class="option-item"
                 >
+                    <template slot="label">
+                        <div class="custom-label">{{ `选项${item.value}：` }}</div>
+                    </template>
                     <el-input
                         v-model="item.content"
                         type="textarea"
@@ -186,10 +187,11 @@
                 <el-form-item
                     v-for="(item, index) in optionList"
                     :key="`${item.value}${index}`"
-                    prop=""
-                    :label="`答案${index + 1}：`"
                     class="option-item"
                 >
+                    <template slot="label">
+                        <div class="custom-label">{{ `答案${index + 1}：` }}</div>
+                    </template>
                     <el-input
                         v-model="item.content"
                         type="textarea"
@@ -217,7 +219,7 @@
                 </el-form-item>
             </template>
             <template v-else-if="form.ti_xing_ === '判断题'">
-                <el-form-item prop="zheng_que_da_an_" label="答案：" required error="请选择正确答案">
+                <el-form-item prop="zheng_que_da_an_" label="答案：">
                     <el-radio-group v-model="form.zheng_que_da_an_">
                         <el-radio-button label="√">√</el-radio-button>
                         <el-radio-button label="×">×</el-radio-button>
@@ -225,7 +227,7 @@
                 </el-form-item>
             </template>
             <template v-else-if="form.ti_xing_ === '简答题'">
-                <el-form-item prop="zheng_que_da_an_" label="答案：" required error="请输入答案内容">
+                <el-form-item prop="zheng_que_da_an_" label="答案：">
                     <el-input
                         v-model="form.zheng_que_da_an_"
                         type="textarea"
@@ -347,8 +349,8 @@ export default {
             rules: {
                 ti_gan_: [{ required: true, message: this.$t('validate.required') }],
                 ti_xing_: [{ required: true, message: this.$t('validate.required') }],
-                // da_an_: [{ required: true, message: this.$t('validate.required') }],
-                // zheng_que_da_an_: [{ required: true, message: this.$t('validate.required') }],
+                da_an_: [{ required: true, message: this.$t('validate.required') }],
+                zheng_que_da_an_: [{ required: true, message: this.$t('validate.required') }],
                 xuan_xiang_lei_xi: [{ required: true, message: this.$t('validate.required') }],
                 ping_fen_fang_shi: [{ required: true, message: this.$t('validate.required') }],
                 ping_fen_ren_: [{ required: true, message: this.$t('validate.required') }],
@@ -368,7 +370,7 @@ export default {
     },
     watch: {
         visible: {
-            handler: function (val, oldVal) {
+            handler (val, oldVal) {
                 this.dialogVisible = this.visible
             }
             // immediate: true
@@ -528,12 +530,30 @@ export default {
         },
         handleSubmit (action) {
             this.$refs.form.validate((valid) => {
-                if (valid) {
-                    // 表单验证通过，提交表单
-                    this.submitForm(action)
-                } else {
-                    ActionUtils.saveErrorMessage()
+                if (!valid) {
+                    return ActionUtils.saveErrorMessage()
                 }
+                // 验证选项、答案内容（未被表单校验）
+                const { ti_xing_: questionType } = this.form
+                if (['单选题', '多选题', '填空题'].includes(questionType)) {
+                    const emptyIndex = this.optionList.findIndex(item => !item.content)
+                    if (emptyIndex !== -1) {
+                        const tip1 = `答案${(emptyIndex + 1)}内容为空，请填写后再保存！`
+                        const tip2 = `选项${(String.fromCharCode('A'.charCodeAt(0) + emptyIndex))}内容为空，请填写后再保存！`
+                        return ActionUtils.saveErrorMessage(questionType === '填空题' ? tip1 : tip2)
+                    }
+                    const hasRadioKey = this.optionList.some(item => item.radio)
+                    const hasMultipleKey = this.optionList.some(item => item.checkbox && item.checkbox.length)
+                    const hasKey = {
+                        '单选题': hasRadioKey,
+                        '多选题': hasMultipleKey
+                    }
+                    if (['单选题', '多选题'].includes(questionType) && !hasKey[questionType]) {
+                        return ActionUtils.saveErrorMessage('请至少选择一个正确答案！')
+                    }
+                }
+                // 表单验证通过，提交表单
+                this.submitForm(action)
             })
         },
         getSubmitData () {
@@ -551,6 +571,8 @@ export default {
                 }
                 a3.push(item.content)
             })
+            const { first, second } = this.$store.getters.level || {}
+            this.form.di_dian_ = second || first
             this.form.biao_qian_ = this.questionTags.join(',')
             this.form.ping_fen_fang_shi = this.questionRateType
             switch (this.form.ti_xing_) {
@@ -579,11 +601,12 @@ export default {
                     this.form.xuan_xiang_lei_xi = ''
                     this.form.da_an_ = ''
                     break
+                default:
+                    break
             }
         },
         submitForm (action) {
             this.getSubmitData()
-            console.log(this.form)
             const addParams = {
                 tableName: 't_questions',
                 paramWhere: [this.form]
@@ -601,6 +624,7 @@ export default {
             }
             const type = this.id && !this.isCopy ? 'update' : 'add'
             const params = type === 'add' ? addParams : updateParams
+            // console.log(params)
             this.$common.request(type, params).then(() => {
                 this.$message.success(this.id ? '保存题目成功' : '添加题目成功')
                 this.updatePaper()
@@ -749,6 +773,13 @@ export default {
                         margin-left: 10px;
                         line-height: 30px;
                     }
+                }
+            }
+            .custom-label {
+                &::before {
+                    content: '*';
+                    color: #F56C6C;
+                    margin-right: 4px;
                 }
             }
         }

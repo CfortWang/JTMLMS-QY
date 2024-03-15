@@ -527,6 +527,7 @@ export default {
             overflow-y: auto;
             top: 60px;
             left: calc(50vw + 540px);
+            padding-right: 8px;
             ::v-deep {
                 .el-timeline {
                     padding-left: 10px;

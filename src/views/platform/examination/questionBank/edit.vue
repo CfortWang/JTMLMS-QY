@@ -602,6 +602,8 @@ export default {
                 this.form.kao_shi_shi_chang = (this.form.hours * 60 + this.form.minutes) * 60 * 1000
             }
             this.form.bian_zhi_bu_men_ = this.form.suo_shu_fan_wei_ === '科级' ? '' : this.form.bian_zhi_bu_men_
+            const { first, second } = this.$store.getters.level || {}
+            this.form.di_dian_ = second || first
             delete this.form.isLimit
             delete this.form.limitTime
             delete this.form.hours

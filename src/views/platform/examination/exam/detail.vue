@@ -291,7 +291,7 @@ export default {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
                     if (!data.length) {
-                        this.$message.error('未查询到已提交的考试记录，请先完成考试！')
+                        this.$message.warning('未查询到已提交的考试记录，请先完成考试！')
                         this.closeDialog()
                         return
                     }
