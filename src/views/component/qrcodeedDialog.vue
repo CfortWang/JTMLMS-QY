@@ -45,10 +45,23 @@ export default {
             url:'http://192.168.2.16:8080/',
         }
     },
-    mounted () {
-        this.$nextTick(() => {
-            this.qrcodeRender()
-        })
+    // mounted () {
+    //     this.$nextTick(() => {
+    //         this.qrcodeRender()
+    //     })
+    // },
+    watch:{
+        dialogVisible: {
+            handler: function(val, oldVal) {
+                if(val == true){
+                    this.$nextTick(() => {
+                        this.qrcodeRender()
+                    })
+                }
+            },
+            deep:true,
+            immediate:true
+        },
     },
     methods: {
         downloadCode () {

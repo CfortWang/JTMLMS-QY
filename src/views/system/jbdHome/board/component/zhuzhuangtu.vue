@@ -81,8 +81,8 @@ export default {
                 // },
                 grid: { // 让图表占满容器
                     top: '40px',
-                    left: '40px',
-                    right: '40px',
+                    left: '65px',
+                    right: '60px',
                     bottom: '40px'
                 },
                 xAxis: [

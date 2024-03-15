@@ -18,6 +18,7 @@ export default {
     props: {
         info: {
             type: Object,
+            // eslint-disable-next-line vue/require-valid-default-prop
             default: {}
         }
     },
@@ -38,7 +39,7 @@ export default {
             const this_ = this
             const series = []
             console.log(this_.info, this_.info.config.idSelector, '12')
-            if (this_.info.data.source[0] == 999) {
+            if (this_.info.data.source[0] === 999) {
                 this.showChart = false
                 return
             }
@@ -67,23 +68,31 @@ export default {
                 if (max < 7) {
                     interval = 1
                 } else {
-                // interval = parseInt(max / 7)
                     interval = Math.ceil((parseInt(max / 7) / 10)) * 10
                 }
             }
             if (this_.info.config.idSelector === 'eqWeihu') {
+                let jihuamax = 0
+                let wanchengmax = 0
                 let max = 0
                 this_.info.data.source.forEach(item => {
                     console.log(item.计划数)
                     if (item.计划数 > max) {
-                        max = item.计划数
+                        jihuamax = item.计划数
                     }
                 })
+                this_.info.data.source.forEach(item => {
+                    console.log(item.完成数)
+                    if (item.完成数 > wanchengmax) {
+                        wanchengmax = item.完成数
+                    }
+                })
+                max = wanchengmax > jihuamax ? wanchengmax : jihuamax
                 if (max < 7) {
                     interval = 1
                 } else {
                 // interval = parseInt(max / 7)
-                    interval = Math.ceil((parseInt(max / 7) / 10)) * 10
+                    interval = Math.ceil((parseInt(max / 7)))
                 }
             }
             const option = {
@@ -95,8 +104,8 @@ export default {
                 },
                 grid: { // 让图表占满容器
                     top: '40px',
-                    left: '40px',
-                    right: '40px',
+                    left: '65px',
+                    right: '60px',
                     bottom: '40px'
                 },
                 tooltip: {},

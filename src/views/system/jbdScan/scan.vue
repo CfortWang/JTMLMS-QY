@@ -11,6 +11,7 @@ import deviceTag from './goods/deviceTag.vue'
 import deviceVerificationTag from './goods/deviceVerificationTag.vue'
 import deviceFailureTag from './goods/deviceFailureTag.vue'
 import neishenzhuangtai from './goods/neishenzhuangtai'
+import fengxiangkongzhi from './goods/fengxiangkongzhi'
 import guanshenzhuangtai from './goods/guanshenzhuangtai'
 import bwTag from './goods/bwTag.vue'
 import fzrkTag from './goods/fzrkTag.vue'
@@ -22,6 +23,7 @@ export default {
         deviceVerificationTag,
         deviceFailureTag,
         neishenzhuangtai,
+        fengxiangkongzhi,
         guanshenzhuangtai,
         bwTag,
         fzrkTag,
@@ -35,6 +37,7 @@ export default {
 
     methods: {
         scanOff (val) {
+            console.log(val);
             this.$emit('scanOff', val)
         }
     }
