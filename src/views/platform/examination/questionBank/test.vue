@@ -126,8 +126,10 @@ export default {
     },
     data () {
         const { userId } = this.$store.getters || {}
+        const { first, second } = this.$store.getters.level || {}
         return {
             title: '参加考试',
+            level: second || first,
             dialogVisible: this.visible,
             loading: false,
             toolbars: [
@@ -358,6 +360,7 @@ export default {
                     const multipleType = ['多选题', '填空题'].includes(item.questionType)
                     const selectType = ['多选题', '单选题'].includes(item.questionType)
                     submitData.push({
+                        di_dian_: this.level,
                         parent_id_: this.id,
                         ti_mu_id_: item.questionId,
                         ti_gan_: item.stem,
@@ -432,6 +435,8 @@ export default {
                 }
                 .el-radio__label, .el-checkbox__label {
                     font-size: 16px;
+                    white-space: normal;
+                    line-height: 1.5;
                 }
                 .el-input {
                     margin-bottom: 10px;
@@ -474,9 +479,6 @@ export default {
                         position: relative;
                         width: 100%;
                         margin-bottom: 10px;
-                    }
-                    .answer {
-
                     }
                 }
             }

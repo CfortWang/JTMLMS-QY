@@ -87,6 +87,7 @@
                     type="textarea"
                     :maxlength="512"
                     :rows="2"
+                    :autosize="readonly"
                     placeholder="请输入题干内容"
                 />
             </el-form-item>
@@ -155,6 +156,7 @@
                         v-model="item.content"
                         type="textarea"
                         :rows="1"
+                        :autosize="readonly"
                         placeholder="请输入选项内容，最多可配置8个选项"
                     />
                     <el-radio-group v-if="form.ti_xing_ === '单选题'" v-model="item.radio">
@@ -196,6 +198,7 @@
                         v-model="item.content"
                         type="textarea"
                         :rows="1"
+                        :autosize="readonly"
                         placeholder="请输入答案内容，最多可配置20个答案"
                     />
                     <div v-if="!readonly" class="operate-btn">
@@ -232,12 +235,19 @@
                         v-model="form.zheng_que_da_an_"
                         type="textarea"
                         :rows="4"
+                        :autosize="readonly"
                         placeholder="请输入答案内容"
                     />
                 </el-form-item>
             </template>
             <el-form-item label="备注：" prop="bei_zhu_">
-                <el-input v-model="form.bei_zhu_" type="textarea" :rows="2" placeholder="请输入题目备注信息" />
+                <el-input
+                    v-model="form.bei_zhu_"
+                    type="textarea"
+                    :rows="2"
+                    :autosize="readonly"
+                    placeholder="请输入题目备注信息"
+                />
             </el-form-item>
         </el-form>
         <div slot="footer" class="el-dialog--center">

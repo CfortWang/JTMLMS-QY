@@ -145,7 +145,13 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="题库描述：" prop="miao_shu_">
-                <el-input v-model="form.miao_shu_" type="textarea" :rows="4" placeholder="请输入描述内容" />
+                <el-input
+                    v-model="form.miao_shu_"
+                    type="textarea"
+                    :autosize="readonly"
+                    :rows="4"
+                    placeholder="请输入描述内容"
+                />
             </el-form-item>
         </el-form>
         <div class="question-table">
@@ -327,10 +333,11 @@ export default {
         }
     },
     data () {
-        const { userList = [], deptList = [], userId } = this.$store.getters || {}
+        const { userList = [], deptList = [], userId, level = {} } = this.$store.getters || {}
         return {
             userList,
             paperTypeOptions,
+            level: level.second || level.first,
             deptList: deptList.filter(i => i.depth === 4),
             title: this.readonly ? '题库明细' : this.id ? '编辑题库' : '创建题库',
             formLabelWidth: '120px',
@@ -552,6 +559,7 @@ export default {
         },
         async createQuestion (list, bankId) {
             const paramWhere = list.map(item => ({
+                di_dian_: this.level,
                 parent_id_: bankId,
                 bu_men_: item.createDept || '',
                 chu_ti_ren_: item.creator,
@@ -602,8 +610,7 @@ export default {
                 this.form.kao_shi_shi_chang = (this.form.hours * 60 + this.form.minutes) * 60 * 1000
             }
             this.form.bian_zhi_bu_men_ = this.form.suo_shu_fan_wei_ === '科级' ? '' : this.form.bian_zhi_bu_men_
-            const { first, second } = this.$store.getters.level || {}
-            this.form.di_dian_ = second || first
+            this.form.di_dian_ = this.level
             delete this.form.isLimit
             delete this.form.limitTime
             delete this.form.hours

@@ -377,6 +377,8 @@ export default {
                 }
                 .el-radio__label, .el-checkbox__label {
                     font-size: 16px;
+                    white-space: normal;
+                    line-height: 1.5;
                 }
                 .el-input {
                     margin-bottom: 10px;
