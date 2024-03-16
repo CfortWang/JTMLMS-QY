@@ -57,7 +57,13 @@
                 </el-form-item>
             </div>
             <div class="inline-item" :class="['单选题', '多选题', '判断题'].includes(form.ti_xing_) ? 'mb-20' : ''">
-                <el-form-item label="评分方式：" prop="ping_fen_fang_shi">
+                <el-form-item prop="ping_fen_fang_shi">
+                    <template slot="label">
+                        评分方式
+                        <el-tooltip effect="dark" content="单选、多选和判断题为系统自动评分，其余为手动评分类型，需选择评分人。" placement="top">
+                            <i class="el-icon-question question-icon">：</i>
+                        </el-tooltip>
+                    </template>
                     <el-radio-group v-model="questionRateType" disabled>
                         <el-radio-button label="自动">自动</el-radio-button>
                         <el-radio-button label="手动">手动</el-radio-button>
@@ -91,7 +97,13 @@
                     placeholder="请输入题干内容"
                 />
             </el-form-item>
-            <el-form-item label="标签：" prop="biao_qian_">
+            <el-form-item prop="biao_qian_">
+                <template slot="label">
+                    标签
+                    <el-tooltip effect="dark" content="可为题目设置标签便于后续检索。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-tag
                     v-for="tag in questionTags"
                     :key="tag"
@@ -125,7 +137,17 @@
                     size=""
                 />
             </el-form-item>
-            <div class="inline-item" :class="['单选题', '多选题'].includes(form.ti_xing_) ? '' : 'mb-20'">
+            <el-form-item label="分值：" prop="fen_zhi_" :maxlength="8">
+                <el-input-number
+                    v-model="form.fen_zhi_"
+                    :min="1"
+                    :max="100"
+                    :precision="0"
+                    type="number"
+                    placeholder="请输入题目分值"
+                />
+            </el-form-item>
+            <!-- <div class="inline-item" :class="['单选题', '多选题'].includes(form.ti_xing_) ? '' : 'mb-20'">
                 <el-form-item label="分值：" prop="fen_zhi_" :maxlength="8">
                     <el-input-number
                         v-model="form.fen_zhi_"
@@ -142,7 +164,7 @@
                         <el-radio-button label="图片">图片</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
-            </div>
+            </div> -->
             <template v-if="['单选题', '多选题'].includes(form.ti_xing_)">
                 <el-form-item
                     v-for="(item, index) in optionList"
@@ -581,6 +603,10 @@ export default {
                 }
                 a3.push(item.content)
             })
+            // console.log(options)
+            // console.log(JSON.stringify(options))
+            // console.log(JSON.parse(JSON.stringify(options)))
+            // return
             const { first, second } = this.$store.getters.level || {}
             this.form.di_dian_ = second || first
             this.form.biao_qian_ = this.questionTags.join(',')

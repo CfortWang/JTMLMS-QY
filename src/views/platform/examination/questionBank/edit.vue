@@ -39,7 +39,13 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item label="题库状态：" prop="ti_ku_zhuang_tai_">
+            <el-form-item prop="ti_ku_zhuang_tai_">
+                <template slot="label">
+                    题库状态
+                    <el-tooltip effect="dark" content="限制该题库是否可用于创建考试及自主考核。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-radio-group v-model="form.ti_ku_zhuang_tai_">
                     <el-radio label="可用">可用</el-radio>
                     <el-radio label="不可用">不可用</el-radio>
@@ -48,16 +54,22 @@
             <el-form-item prop="shi_fou_gong_kai_">
                 <template slot="label">
                     是否公开
-                    <el-tooltip effect="dark" content="限制该题库是否可自主考核。若您希望该题库仅用于考试中，则需要设置为“否" placement="top">
+                    <el-tooltip effect="dark" content="限制该题库是否可自主考核。若您希望该题库仅用于考试中，则需要设置为“否”。" placement="top">
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
                 <el-radio-group v-model="form.shi_fou_gong_kai_">
-                    <el-radio label="是">是</el-radio>
+                    <el-radio label="是">是&nbsp;&nbsp;&nbsp;&nbsp;</el-radio>
                     <el-radio label="否">否</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="所属范围：" prop="suo_shu_fan_wei_" class="inline-item">
+            <el-form-item prop="suo_shu_fan_wei_" class="inline-item">
+                <template slot="label">
+                    所属范围
+                    <el-tooltip effect="dark" content="设置题库的所属范围，组级则需要选择具体的专业组。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-radio-group v-model="form.suo_shu_fan_wei_">
                     <el-radio label="科级">科级</el-radio>
                     <el-radio label="组级">组级</el-radio>
@@ -76,7 +88,13 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item label="限考次数：" prop="isLimit" class="inline-item">
+            <el-form-item prop="isLimit" class="inline-item">
+                <template slot="label">
+                    限考次数
+                    <el-tooltip effect="dark" content="限制是否可重复考核，以及可自主考核的最大次数。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-radio-group v-model="form.isLimit" @change="changeLimit">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
@@ -91,7 +109,13 @@
                     <div class="unit">次</div>
                 </div>
             </el-form-item>
-            <el-form-item label="考试时长：" prop="limitTime" class="inline-item">
+            <el-form-item prop="limitTime" class="inline-item">
+                <template slot="label">
+                    考试时长
+                    <el-tooltip effect="dark" content="设置该题库对于单次用户自主考核的最大考试时长。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-radio-group v-model="form.limitTime">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
@@ -117,7 +141,13 @@
                     </div>
                 </template>
             </el-form-item>
-            <el-form-item label="达标分值占比：" prop="da_biao_zhan_bi_">
+            <el-form-item prop="da_biao_zhan_bi_">
+                <template slot="label">
+                    达标分值占比
+                    <el-tooltip effect="dark" content="设置该题库的达标分数线占题库总分的百分比。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-input-number
                     v-model="form.da_biao_zhan_bi_"
                     :min="50"
@@ -127,7 +157,13 @@
                 />
                 <div class="unit">%</div>
             </el-form-item>
-            <el-form-item label="默认评分人：" prop="ping_fen_ren_">
+            <el-form-item prop="ping_fen_ren_">
+                <template slot="label">
+                    默认评分人
+                    <el-tooltip effect="dark" content="设置该题库试题的默认评分人，该题库下所有未设置评分人的题目都以该评分人为准。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <!-- <el-cascader v-model="form.ping_fen_ren_" :options="getRaterOptions(userList)" :show-all-levels="false" /> -->
                 <el-select
                     v-model="form.ping_fen_ren_"
@@ -161,12 +197,14 @@
                     v-model="quesIdList"
                     size="small"
                     template-key="tmlb"
-                    :dynamic-params="{parent_id_: ''}"
                     multiple
                     type="dialog"
                     class="custom-dialog"
                     placeholder="请选择需要关联的题目信息"
                 />
+            </div>
+            <div class="table-title">
+                题库试题信息
             </div>
             <el-table
                 ref="elTable"
@@ -272,7 +310,7 @@
                             v-if="!readonly"
                             type="text"
                             size="medium"
-                            @click="handleRowDblclick(scope.row, false)"
+                            @click="handleColumnAction(scope.row, false)"
                         >修改</el-button>
                         <el-button
                             v-if="!readonly"
@@ -286,7 +324,7 @@
                             type="text"
                             style="color: #909399;"
                             size="medium"
-                            @click="handleRowDblclick(scope.row)"
+                            @click="handleColumnAction(scope.row, true)"
                         >详情</el-button>
                     </template>
                 </el-table-column>
@@ -340,7 +378,7 @@ export default {
             level: level.second || level.first,
             deptList: deptList.filter(i => i.depth === 4),
             title: this.readonly ? '题库明细' : this.id ? '编辑题库' : '创建题库',
-            formLabelWidth: '120px',
+            formLabelWidth: '150px',
             dialogVisible: this.visible,
             dialogLoading: false,
             questionData: [],
@@ -457,7 +495,10 @@ export default {
             const user = userList.find(u => u.userId === userId) || {}
             return user.userName || '-'
         },
-        handleRowDblclick (row, readonly = true) {
+        handleRowDblclick (row) {
+            this.handleColumnAction(row, true)
+        },
+        handleColumnAction (row, readonly) {
             this.quesId = row.quesId
             this.quesReadonly = readonly
             this.isCopy = this.quesIdList.includes(this.quesId)
@@ -520,7 +561,7 @@ export default {
             const sql = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, zhuang_tai_ as status, biao_qian_ as quesTag, zhuang_tai_ as quesState from t_questions where find_in_set(id_, '${this.quesIdList}')`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
-                this.questionData = this.questionData.concat(data)
+                this.questionData = data.concat(this.questionData)
             })
         },
         handleSubmit () {
@@ -695,7 +736,7 @@ export default {
             }
         }
         .paper-form {
-            padding: 20px;
+            padding: 20px 20px 14px 20px;
         }
         .inline-item {
             ::v-deep {
@@ -732,7 +773,7 @@ export default {
                 display: flex;
                 align-items: center;
                 .label {
-                    width: 108px;
+                    width: 138px;
                     padding-right: 12px;
                     text-align: right;
                 }
@@ -740,6 +781,11 @@ export default {
                     flex: 1;
                 }
                 margin-bottom: 10px;
+            }
+            .table-title {
+                font-size: 16px;
+                font-weight: 600;
+                margin: 20px 0 10px;
             }
         }
     }

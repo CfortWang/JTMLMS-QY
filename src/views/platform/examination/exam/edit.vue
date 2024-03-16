@@ -49,7 +49,13 @@
                     placeholder="请选择考试题库"
                 />
             </el-form-item>
-            <el-form-item label="限考时间：" prop="xian_kao_shi_jian">
+            <el-form-item prop="xian_kao_shi_jian">
+                <template slot="label">
+                    限考时间
+                    <el-tooltip effect="dark" content="设置该考试的提交截至时间。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-radio-group v-model="form.isDateLimit" @change="changeLimit(form.isDateLimit, 'xian_kao_shi_jian', null)">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
@@ -79,7 +85,7 @@
             <el-form-item prop="isCountLimit" class="inline-item">
                 <template slot="label">
                     限考次数
-                    <el-tooltip effect="dark" content="限制是否可重复参加，以及可参加考试的最大次数" placement="top">
+                    <el-tooltip effect="dark" content="限制是否可重复参加，以及可参加考试的最大次数。" placement="top">
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -100,7 +106,7 @@
             <el-form-item v-if="form.isCountLimit === '0' || form.isCountLimit === '1' && form.xian_kao_ci_shu_ > 1" prop="ji_fen_fang_shi_">
                 <template slot="label">
                     计分方式
-                    <el-tooltip effect="dark" content="仅限考次数大于1时有效" placement="top">
+                    <el-tooltip effect="dark" content="设置对于可重复参加的考试，最终得分的计算方式（仅限考次数大于1时有效）。" placement="top">
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -110,7 +116,13 @@
                     <el-radio label="最近得分">最近得分</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="考试时长：" prop="isTimeLimit" class="inline-item">
+            <el-form-item prop="isTimeLimit" class="inline-item">
+                <template slot="label">
+                    考试时长
+                    <el-tooltip effect="dark" content="设置该考试单次作答的最大时长。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-radio-group v-model="form.isTimeLimit">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
@@ -136,7 +148,13 @@
                     </div>
                 </template>
             </el-form-item>
-            <el-form-item label="达标分值占比：" prop="da_biao_zhan_bi_">
+            <el-form-item prop="da_biao_zhan_bi_">
+                <template slot="label">
+                    达标分值占比
+                    <el-tooltip effect="dark" content="设置该考试的达标分数线占试题总分的百分比。" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
                 <el-input-number
                     v-model="form.da_biao_zhan_bi_"
                     :min="50"
@@ -149,7 +167,7 @@
             <el-form-item prop="yun_xu_bao_ming_">
                 <template slot="label">
                     允许自主报名
-                    <el-tooltip effect="dark" content="限制非参考人员是否可报名参加该考试" placement="top">
+                    <el-tooltip effect="dark" content="限制非本考试的参考人员是否可报名参加该考试。" placement="top">
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -161,7 +179,7 @@
             <el-form-item prop="guan_lian_id_">
                 <template slot="label">
                     关联培训记录
-                    <el-tooltip effect="dark" content="关联培训记录" placement="top">
+                    <el-tooltip effect="dark" content="关联培训记录。" placement="top">
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -212,7 +230,7 @@ export default {
             examTypeOptions,
             deptList: deptList.filter(i => i.depth === 4),
             title: this.id ? '编辑考试' : '新建考试',
-            formLabelWidth: '135px',
+            formLabelWidth: '150px',
             dialogVisible: this.visible,
             dialogLoading: false,
             form: {
