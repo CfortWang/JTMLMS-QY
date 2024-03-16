@@ -94,6 +94,16 @@
         <div class="tips">
             <div>温馨提示：最下方题序方块无背景颜色时，表示该题还未作答；<br>题序方块背景颜色为<span style="background: #409EFF;">蓝色</span>时，表示题序对应题母为当前显示的题目；<br>题序方块背景颜色为<span style="background: #E6A23C;">黄色</span>时，表示该题已作答但是未完全答完（如填空题）；<br>题序方块背景颜色为<span style="background: #67C23A;">绿色</span>时，表示该题已作答完成。</div>
         </div>
+        <div slot="title" class="custom-title">
+            <div class="dialog-title">{{ title }}</div>
+            <el-statistic
+                v-if="examData.duration && examData.duration !== '不限'"
+                format="HH时mm分ss妙"
+                :value="countdown"
+                time-indices
+                title="🚩距离考试结束还有："
+            />
+        </div>
         <div slot="footer" class="el-dialog--center">
             <ibps-toolbar
                 :actions="toolbars"
@@ -122,13 +132,20 @@ export default {
         id: {
             type: String,
             default: ''
+        },
+        examData: {
+            type: Object,
+            default: () => {}
         }
     },
     data () {
         const { userId } = this.$store.getters || {}
         const { first, second } = this.$store.getters.level || {}
+        const { duration } = this.examData || {}
+        const countdown = duration === '不限' ? 0 : Date.now() + parseInt(duration)
         return {
-            title: '参加考试',
+            countdown,
+            title: this.examData.examName || '参加考试',
             level: second || first,
             dialogVisible: this.visible,
             loading: false,
@@ -548,6 +565,21 @@ export default {
                     padding: 2px 5px;
                     margin: 0 2px;
                 }
+            }
+        }
+        .custom-title {
+            display: flex;
+            position: relative;
+            justify-content: center;
+            .dialog-title {
+                font-size: 18px;
+                line-height: 24px;
+            }
+            .el-statistic {
+                position: absolute;
+                width: 200px;
+                right: 0;
+                top: -16px;
             }
         }
     }

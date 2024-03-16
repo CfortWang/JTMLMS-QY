@@ -73,7 +73,7 @@
                     >
                         <div class="stem">
                             <span>{{ `【${qIndex + 1}】${q.stem}` }}</span>
-                            <el-tag type="info" size="small">{{ `${q.questionScore}分` }}</el-tag>
+                            <el-tag type="primary" size="small">{{ `${q.questionScore}分` }}</el-tag>
                         </div>
                         <div v-if="q.img && q.img.length" class="img">
                             <ibps-image
@@ -87,7 +87,7 @@
                         </div>
                         <div class="answer">
                             <div class="mine">
-                                <div class="title">考生答案：<el-tag type="success" size="small" class="score">{{ !q.score && q.score !== '0' ? '未评分' : `得${q.score}分` }}</el-tag></div>
+                                <div class="title">考生答案：<el-tag :type="!q.score && q.score !== '0' ? 'warning' : 'success'" size="small" class="score">{{ !q.score && q.score !== '0' ? '未评分' : `得${q.score}分` }}</el-tag></div>
                                 <div class="answer-content">
                                     <el-radio-group v-if="q.questionType === '单选题'" :value="q.answer">
                                         <el-radio
@@ -219,7 +219,7 @@ export default {
     },
     data () {
         return {
-            title: '试卷详情',
+            title: '考试详情',
             dialogVisible: this.visible,
             toolbars: [
                 { key: 'cancel', label: '退出' }
