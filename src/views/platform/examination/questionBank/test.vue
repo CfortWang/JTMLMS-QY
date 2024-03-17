@@ -96,13 +96,10 @@
         </div>
         <div slot="title" class="custom-title">
             <div class="dialog-title">{{ title }}</div>
-            <el-statistic
-                v-if="examData.duration && examData.duration !== '不限'"
-                format="HH时mm分ss妙"
-                :value="countdown"
-                time-indices
-                title="🚩距离考试结束还有："
-            />
+            <div class="countdown">
+                <div class="desc">⏲距离考试结束还有：{{ formattedCountdown }}</div>
+                <div class="countdown-tips">超时将自动提交, 请注意考试时间！</div>
+            </div>
         </div>
         <div slot="footer" class="el-dialog--center">
             <ibps-toolbar
@@ -140,13 +137,11 @@ export default {
     },
     data () {
         const { userId } = this.$store.getters || {}
-        const { first, second } = this.$store.getters.level || {}
         const { duration } = this.examData || {}
-        const countdown = duration === '不限' ? 0 : Date.now() + parseInt(duration)
+        const countdown = duration === '不限' ? 0 : parseInt(duration / 1000)
         return {
             countdown,
             title: this.examData.examName || '参加考试',
-            level: second || first,
             dialogVisible: this.visible,
             loading: false,
             toolbars: [
@@ -178,12 +173,19 @@ export default {
             ],
             questionList: [],
             showIndex: 1,
-            userId
+            userId,
+            countdownNotify: false
         }
     },
     computed: {
         formData () {
             return this.data
+        },
+        formattedCountdown () {
+            const h = this.formatNum(parseInt(this.countdown / 60 / 60))
+            const m = this.formatNum(parseInt(this.countdown / 60 % 60))
+            const s = this.formatNum(parseInt(this.countdown % 60))
+            return `${h}时${m}分${s}妙`
         }
     },
     watch: {
@@ -204,12 +206,16 @@ export default {
     },
     mounted () {
         this.loadData()
+        this.startCountdown()
         // Watermark.set(`123`, `123123`)
         // 监听键盘事件
         window.addEventListener('keyup', this.handleKeyPress)
+        window.addEventListener('beforeunload', this.handleBeforeUnload)
     },
     beforeDestroy () {
         window.removeEventListener('keyup', this.handleKeyPress)
+        window.removeEventListener('beforeunload', this.handleBeforeUnload)
+        clearInterval(this.timer)
         // Watermark.set('', '')
     },
     methods: {
@@ -223,6 +229,26 @@ export default {
             this.questionList = await this.getQuestionData()
             // console.log(this.questionList)
         },
+        startCountdown () {
+            const timer = setInterval(() => {
+                if (this.countdown > 0) {
+                    this.countdown--
+                    // 判断是否到达指定时间
+                    if (this.countdown <= 60 && !this.countdownNotify) {
+                        this.$notify({
+                            title: '温馨提示',
+                            message: `距离自动提交还有${this.countdown}秒，如有未完成的试题，请尽快填写答案！`,
+                            type: 'warning'
+                        })
+                        this.countdownNotify = true
+                    }
+                    if (this.countdown === 0) {
+                        this.submitForm(this.dealFormData())
+                        clearInterval(timer)
+                    }
+                }
+            }, 1000)
+        },
         handleActionEvent ({ key }) {
             switch (key) {
                 case 'prev':
@@ -235,11 +261,14 @@ export default {
                     this.handleSubmit()
                     break
                 case 'cancel':
-                    this.closeDialog()
+                    this.handleCancel()
                     break
                 default:
                     break
             }
+        },
+        formatNum (num) {
+            return num < 10 ? `0${num}` : num
         },
         getQuestionData () {
             this.loading = true
@@ -331,8 +360,19 @@ export default {
                 }
                 this.showIndex++
             } else if (event.keyCode === 27 || event.key === 'Esc') {
-                this.closeDialog()
+                this.handleCancel()
             }
+        },
+        handleBeforeUnload (event) {
+            const confirmationMessage = '离开将自动提交当前数据，确定要离开吗？';
+            (event || window.event).returnValue = confirmationMessage
+            window.addEventListener('unload', this.submitDataAfterConfirmation)
+            return confirmationMessage
+        },
+        submitDataAfterConfirmation () {
+            this.submitData(this.dealFormData())
+            // 移除事件监听器，避免重复触发提交逻辑
+            window.removeEventListener('unload', this.submitDataAfterConfirmation)
         },
         goNext () {
             if (this.showIndex === this.questionList.length) {
@@ -370,35 +410,36 @@ export default {
                 showClose: false,
                 closeOnClickModal: false
             }).then(() => {
-                const submitData = []
-                const time = this.$common.getDateNow(19)
-                this.questionList.forEach((item, index) => {
-                    const autoType = ['单选题', '多选题', '判断题'].includes(item.questionType)
-                    const multipleType = ['多选题', '填空题'].includes(item.questionType)
-                    const selectType = ['多选题', '单选题'].includes(item.questionType)
-                    submitData.push({
-                        di_dian_: this.level,
-                        parent_id_: this.id,
-                        ti_mu_id_: item.questionId,
-                        ti_gan_: item.stem,
-                        ti_xing_: item.questionType,
-                        fen_zhi_: item.score,
-                        fu_tu_: item.img,
-                        xuan_xiang_lei_xi: item.optionType,
-                        xuan_xiang_: selectType ? JSON.stringify(item.options) : '',
-                        can_kao_da_an_: item.rightKey,
-                        ping_fen_fang_shi: item.rateType,
-                        ping_fen_ren_: item.rater,
-                        hui_da_: multipleType && item.answer ? JSON.stringify(item.answer) : item.answer,
-                        shi_fou_yi_yue_: autoType ? '是' : '否',
-                        ping_yue_shi_jian: autoType ? time : '',
-                        de_fen_: autoType ? this.getScore(item) : '',
-                        jie_xi_: ''
-                    })
-                })
-                // console.log(submitData)
-                this.submitForm(submitData)
+                this.submitForm(this.dealFormData())
             }).catch(() => {})
+        },
+        dealFormData () {
+            const submitData = []
+            const time = this.$common.getDateNow(19)
+            this.questionList.forEach((item, index) => {
+                const autoType = ['单选题', '多选题', '判断题'].includes(item.questionType)
+                const multipleType = ['多选题', '填空题'].includes(item.questionType)
+                const selectType = ['多选题', '单选题'].includes(item.questionType)
+                submitData.push({
+                    parent_id_: this.id,
+                    ti_mu_id_: item.questionId,
+                    ti_gan_: item.stem,
+                    ti_xing_: item.questionType,
+                    fen_zhi_: item.score,
+                    fu_tu_: item.img,
+                    xuan_xiang_lei_xi: item.optionType,
+                    xuan_xiang_: selectType ? JSON.stringify(item.options) : '',
+                    can_kao_da_an_: item.rightKey,
+                    ping_fen_fang_shi: item.rateType,
+                    ping_fen_ren_: item.rater,
+                    hui_da_: multipleType && item.answer ? JSON.stringify(item.answer) : item.answer,
+                    shi_fou_yi_yue_: autoType ? '是' : '否',
+                    ping_yue_shi_jian: autoType ? time : '',
+                    de_fen_: autoType ? this.getScore(item) : '',
+                    jie_xi_: ''
+                })
+            })
+            return submitData
         },
         submitForm (data) {
             const addParams = {
@@ -429,6 +470,25 @@ export default {
                     this.$message.success('提交成功！')
                     this.closeDialog()
                 })
+            })
+        },
+        handleCancel () {
+            this.$confirm('中途退出将自动提交考试数据，是否确认操作？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+                showClose: false,
+                closeOnClickModal: false,
+                closeOnPressEscape: false
+            }).then(() => {
+                this.submitForm(this.dealFormData())
+            })
+        },
+        hilarity () {
+            this.$notify({
+                title: '提示',
+                message: '考试时间已到，即将自动交卷，请勿关闭页面防止数据丢失！',
+                duration: 0
             })
         },
         // 关闭当前窗口
@@ -575,11 +635,11 @@ export default {
                 font-size: 18px;
                 line-height: 24px;
             }
-            .el-statistic {
+            .countdown {
                 position: absolute;
-                width: 200px;
+                // width: 200px;
                 right: 0;
-                top: -16px;
+                top: -10px;
             }
         }
     }
