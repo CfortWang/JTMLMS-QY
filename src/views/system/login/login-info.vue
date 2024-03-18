@@ -1,6 +1,6 @@
 <template>
     <div class="login-info text-white animated fadeInLeft">
-        <el-divider content-position="center"> <h1 class="login-info-title">医学实验室标准化智慧管理平台</h1></el-divider>
+        <el-divider content-position="center"> <h1 class="login-info-title">{{ systemName }}</h1></el-divider>
         <!-- <ul class="login-info-list">
             <li class="login-info-item">
                 <i class="el-icon-check" /> 集成实验室资源管理、质量管理、检测流程管理等子系统
@@ -17,3 +17,13 @@
         </ul> -->
     </div>
 </template>
+<script>
+import { SYSTEM_NAME } from '@/constant'
+export default {
+    data () {
+        return {
+            systemName: SYSTEM_NAME
+        }
+    }
+}
+</script>

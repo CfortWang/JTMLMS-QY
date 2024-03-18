@@ -3,6 +3,7 @@ import layoutCustom from '@/layout/custom-layout'
 
 // 由于懒加载页面太多的话会造成webpack热更新太慢，所以开发环境不使用懒加载，只有生产环境使用懒加载
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
+import { SYSTEM_NAME } from '@/constant'
 
 /**
  * 在主框架内显示
@@ -355,7 +356,7 @@ const ziliao = [
         path: '/ziliao',
         name: 'ziliao',
         meta: {
-            title: ' 医学实验室标准化智慧管理平台'
+            title: SYSTEM_NAME
         },
         // component: _import('/system/ziliao'),
         component: _import('/component/ziliao')

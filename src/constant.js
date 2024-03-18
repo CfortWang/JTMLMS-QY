@@ -57,3 +57,5 @@ export const I18N_LOCALE = __IBPS_CONFIG__.I18N_LOCALE || 'zh-CN'
 export const I18N_FALLBACK_LOCALE = __IBPS_CONFIG__.I18N_FALLBACK_LOCALE || 'zh-CN'
 
 export const ELEMENT_COLOR = __IBPS_CONFIG__.ELEMENT_COLOR || '#409EFF'
+
+export const SYSTEM_NAME = __IBPS_CONFIG__.SYSTEM_NAME || '金通医学实验室标准化数智化管理平台'

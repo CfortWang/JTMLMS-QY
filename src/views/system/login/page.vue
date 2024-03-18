@@ -43,7 +43,7 @@ import LoginBottom from './login-bottom'
 import UserLogin from './user-login'
 // import IbpsPluginLanguage from '@/plugins/language'
 import IbpsApiBaseUrlController from '@/plugins/api-base-url'
-const __IBPS_CONFIG__ = window.__IBPS_CONFIG__ || {}
+import { SYSTEM_NAME } from '@/constant'
 export default {
     name: 'login',
     components: {
@@ -55,7 +55,7 @@ export default {
     data () {
         return {
             activeName: 'user',
-            systemName: __IBPS_CONFIG__.SYSTEM_NAME
+            systemName: SYSTEM_NAME
         }
     },
     methods: {

@@ -17,14 +17,14 @@
     </div>
 </template>
 <script>
-const __IBPS_CONFIG__ = window.__IBPS_CONFIG__ || {}
+import { SYSTEM_NAME } from '@/constant'
 export default {
     data () {
         const { first = '' } = this.$store.getters.level || {}
         const { deptList = [] } = this.$store.getters || {}
         const dept = deptList.find(i => i.positionId === first)
         return {
-            systemName: __IBPS_CONFIG__.SYSTEM_NAME,
+            systemName: SYSTEM_NAME,
             deptName: dept ? dept.positionName : ''
         }
     }
