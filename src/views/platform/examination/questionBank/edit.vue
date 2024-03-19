@@ -48,7 +48,7 @@
                 </template>
                 <el-radio-group v-model="form.ti_ku_zhuang_tai_">
                     <el-radio label="可用">可用</el-radio>
-                    <el-radio label="不可用">不可用</el-radio>
+                    <el-radio label="禁用">禁用</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item prop="shi_fou_gong_kai_">

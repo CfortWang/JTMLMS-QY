@@ -603,10 +603,6 @@ export default {
                 }
                 a3.push(item.content)
             })
-            // console.log(options)
-            // console.log(JSON.stringify(options))
-            // console.log(JSON.parse(JSON.stringify(options)))
-            // return
             const { first, second } = this.$store.getters.level || {}
             this.form.di_dian_ = second || first
             this.form.biao_qian_ = this.questionTags.join(',')
@@ -658,9 +654,10 @@ export default {
                     }
                 ]
             }
+            // console.log(this.form, addParams)
+            // return
             const type = this.id && !this.isCopy ? 'update' : 'add'
             const params = type === 'add' ? addParams : updateParams
-            // console.log(params)
             this.$common.request(type, params).then(() => {
                 this.$message.success(this.id ? '保存题目成功' : '添加题目成功')
                 this.updatePaper()

@@ -11,10 +11,10 @@ export const paperTypeOptions = [
         label: 'ISO15189相关考试',
         value: 'ISO15189相关考试'
     },
-    {
-        label: '数学题库',
-        value: '数学题库'
-    }
+    // {
+    //     label: '数学题库',
+    //     value: '数学题库'
+    // }
 ]
 
 export const examTypeOptions = [

@@ -54,10 +54,10 @@
                     <span class="label">考生姓名：</span>
                     <span class="value">{{ transformUser(paperData.examinee) }}</span>
                 </div>
-                <div class="info-item">
+                <!-- <div class="info-item">
                     <span class="label">部门：</span>
                     <span class="value">{{ paperData.dept }}</span>
-                </div>
+                </div> -->
             </div>
             <div class="question">
                 <div

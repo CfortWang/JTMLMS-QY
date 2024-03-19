@@ -92,11 +92,18 @@
             </div>
         </div>
         <div class="tips">
-            <div>温馨提示：最下方题序方块无背景颜色时，表示该题还未作答；<br>题序方块背景颜色为<span style="background: #409EFF;">蓝色</span>时，表示题序对应题母为当前显示的题目；<br>题序方块背景颜色为<span style="background: #E6A23C;">黄色</span>时，表示该题已作答但是未完全答完（如填空题）；<br>题序方块背景颜色为<span style="background: #67C23A;">绿色</span>时，表示该题已作答完成。</div>
+            <div>
+                <div class="tips-title">温馨提示：</div>
+                <div class="tips-content">最下方题序方块无背景颜色时，表示该题还未作答；</div>
+                <div class="tips-content">题序方块背景颜色为<span style="background: #409EFF;">蓝色</span>时，表示题序对应题母为当前显示的题目；</div>
+                <div class="tips-content">题序方块背景颜色为<span style="background: #E6A23C;">黄色</span>时，表示该题已作答但是未完全答完（如填空题）；</div>
+                <div class="tips-content">题序方块背景颜色为<span style="background: #67C23A;">绿色</span>时，表示该题已作答完成。</div>
+                <div class="tips-content">祝愿您获得满意的成绩🎉</div>
+            </div>
         </div>
         <div slot="title" class="custom-title">
             <div class="dialog-title">{{ title }}</div>
-            <div class="countdown">
+            <div v-if="examData.duration !== '不限'" class="countdown">
                 <div class="desc">⏲距离考试结束还有：{{ formattedCountdown }}</div>
                 <div class="countdown-tips">超时将自动提交, 请注意考试时间！</div>
             </div>
@@ -618,8 +625,15 @@ export default {
             margin-left: 20px;
             padding: 10px;
             border-radius: 5px;
-            > div {
+            .tips-title {
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 10px;
+            }
+            .tips-content {
+                font-size: 14px;
                 line-height: 20px;
+                margin-bottom: 8px;
                 > span {
                     border-radius: 2px;
                     padding: 2px 5px;
