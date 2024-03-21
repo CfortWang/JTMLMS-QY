@@ -22,6 +22,7 @@
             :form-name="template ? template.attrs.form_name : ''"
             :class="{ 'ibps-data-template-list__preview': preview }"
             :selection-all="selectionAll"
+            :default-sort-type="dataTemplate && dataTemplate.datasetType === 'view' ? 'none' : 'underline'"
             @display-field-change="handleDisplayField"
             @header-dragend="handleHeaderDragend"
             @selection-change="handleSelectionChange"
