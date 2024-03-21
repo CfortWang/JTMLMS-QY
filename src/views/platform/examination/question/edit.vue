@@ -39,7 +39,6 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="出题人：" prop="chu_ti_ren_">
-                    <!-- <el-cascader v-model="form.chu_ti_ren_" :options="getRaterOptions(userList)" :show-all-levels="false" /> -->
                     <el-select
                         v-model="form.chu_ti_ren_"
                         filterable
@@ -48,7 +47,7 @@
                         placeholder="请选择出题人"
                     >
                         <el-option
-                            v-for="item in getRaterOptions(userList)"
+                            v-for="item in userList"
                             :key="item.userId"
                             :label="item.userName"
                             :value="item.userId"
@@ -70,7 +69,6 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item v-if="questionRateType === '手动'" label="评分人：" prop="ping_fen_ren_">
-                    <!-- <el-cascader v-model="form.ping_fen_ren_" :options="getRaterOptions(userList)" :show-all-levels="false" /> -->
                     <el-select
                         v-model="form.ping_fen_ren_"
                         filterable
@@ -79,7 +77,7 @@
                         placeholder="请选择评分人"
                     >
                         <el-option
-                            v-for="item in getRaterOptions(userList)"
+                            v-for="item in userList"
                             :key="item.userId"
                             :label="item.userName"
                             :value="item.userId"
@@ -306,10 +304,10 @@ export default {
             type: Boolean,
             default: false
         },
-        // 题库题目ID
-        quesIdList: {
-            type: String,
-            default: ''
+        // 题库题目数据
+        quesData: {
+            type: Array,
+            default: () => []
         },
         readonly: {
             type: Boolean,
@@ -320,6 +318,7 @@ export default {
         const { userList = [], deptList = [], userId } = this.$store.getters || {}
         const defaultType = questionType.length ? questionType[0].value : ''
         return {
+            userId,
             userList,
             questionType,
             rateType,
@@ -442,39 +441,6 @@ export default {
             this.form.zheng_que_da_an_ = ''
             this.questionTags = []
         },
-        getRaterOptions (list) {
-            const data = [
-                {
-                    value: '',
-                    label: '',
-                    children: [
-                        {
-                            value: '',
-                            label: ''
-                        },
-                        {
-                            value: '',
-                            label: ''
-                        }
-                    ]
-                },
-                {
-                    value: '',
-                    label: '',
-                    children: [
-                        {
-                            value: '',
-                            label: ''
-                        },
-                        {
-                            value: '',
-                            label: ''
-                        }
-                    ]
-                }
-            ]
-            return this.userList
-        },
         handleTagDelete (tag) {
             this.questionTags.splice(this.questionTags.indexOf(tag), 1)
         },
@@ -584,7 +550,11 @@ export default {
                         return ActionUtils.saveErrorMessage('请至少选择一个正确答案！')
                     }
                 }
-                // 表单验证通过，提交表单
+                this.getSubmitData()
+                // 复制题目保存时不经过接口提交
+                if (this.isCopy) {
+                    return this.updateQuesData()
+                }
                 this.submitForm(action)
             })
         },
@@ -637,8 +607,37 @@ export default {
                     break
             }
         },
+        updateQuesData () {
+            const newData = {
+                quesId: this.id,
+                creator: this.userId,
+                createDept: '',
+                createTime: this.$common.getDateNow(19),
+                sn: '',
+                content: this.form.ti_gan_,
+                quesType: this.form.ti_xing_,
+                img: this.form.fu_tu_,
+                optionType: this.form.xuan_xiang_lei_xi,
+                answer: this.form.da_an_,
+                rightKey: this.form.zheng_que_da_an_,
+                rateType: this.form.ping_fen_fang_shi,
+                rater: this.form.ping_fen_ren_,
+                score: this.form.fen_zhi_,
+                note: this.form.bei_zhu_,
+                optionCount: this.form.xuan_xiang_shu_,
+                quesTag: this.form.biao_qian_,
+                quesState: this.form.zhuang_tai_
+            }
+            const temp = JSON.parse(JSON.stringify(this.quesData))
+            temp.forEach((item, index) => {
+                if (item.quesId === this.id) {
+                    temp[index] = newData
+                }
+            })
+            this.$emit('update', temp)
+            this.closeDialog()
+        },
         submitForm (action) {
-            this.getSubmitData()
             const addParams = {
                 tableName: 't_questions',
                 paramWhere: [this.form]
@@ -661,6 +660,10 @@ export default {
             this.$common.request(type, params).then(() => {
                 this.$message.success(this.id ? '保存题目成功' : '添加题目成功')
                 this.updatePaper()
+                // 题库中编辑后更新题库处显示的题目信息
+                if (this.id && !this.isCopy) {
+                    return this.updateQuesData()
+                }
                 if (action === 'submit') {
                     this.closeDialog()
                 } else {

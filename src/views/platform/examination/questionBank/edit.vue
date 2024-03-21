@@ -164,7 +164,18 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <!-- <el-cascader v-model="form.ping_fen_ren_" :options="getRaterOptions(userList)" :show-all-levels="false" /> -->
+                <!-- <el-cascader
+                    v-model="form.ping_fen_ren_"
+                    :options="getRaterOptions()"
+                    :show-all-levels="false"
+                    collapse-tags
+                    :props="{
+                        value: 'value',
+                        label: 'label',
+                        multiple: true,
+                        checkStrictly: false
+                    }"
+                /> -->
                 <el-select
                     v-model="form.ping_fen_ren_"
                     filterable
@@ -173,7 +184,7 @@
                     placeholder="请选择默认评分人"
                 >
                     <el-option
-                        v-for="item in getRaterOptions(userList)"
+                        v-for="item in userList"
                         :key="item.userId"
                         :label="item.userName"
                         :value="item.userId"
@@ -260,40 +271,12 @@
                     label="题型"
                     width="70"
                 />
-                <!-- <el-table-column
-                    prop="optionType"
-                    label="选项类型"
-                    width="70"
-                />
-                <el-table-column
-                    prop="rateType"
-                    label="评分方式"
-                    width="70"
-                />
-                <el-table-column
-                    prop="rater"
-                    label="评分人"
-                    width="70"
-                >
-                    <template slot-scope="scope">
-                        <div>{{ transformUser(scope.row.rater) }}</div>
-                    </template>
-                </el-table-column> -->
                 <el-table-column
                     prop="score"
                     label="分值"
                     width="75"
                     sortable
                 />
-                <!-- <el-table-column
-                    prop="creator"
-                    label="出题人"
-                    width="70"
-                >
-                    <template slot-scope="scope">
-                        <div>{{ transformUser(scope.row.creator) }}</div>
-                    </template>
-                </el-table-column> -->
                 <el-table-column
                     prop="createTime"
                     label="出题时间"
@@ -341,8 +324,9 @@
             :id="quesId"
             :visible.sync="questionDialogVisible"
             :is-copy="isCopy"
-            :ques-id-list="quesIdList"
+            :ques-data="questionData"
             :readonly="quesReadonly"
+            @update="updateData"
             @close="questionDialogVisible = false"
         />
     </el-dialog>
@@ -371,7 +355,7 @@ export default {
         }
     },
     data () {
-        const { userList = [], deptList = [], userId, level = {} } = this.$store.getters || {}
+        const { userList = [], deptList = [], userId, level = {}} = this.$store.getters || {}
         return {
             userList,
             paperTypeOptions,
@@ -457,43 +441,39 @@ export default {
         changeLimit (e) {
             this.form.xian_kao_ci_shu_ = e === '1' ? 1 : '不限'
         },
-        getRaterOptions (list) {
-            const data = [
-                {
-                    value: '',
-                    label: '',
-                    children: [
-                        {
-                            value: '',
-                            label: ''
-                        },
-                        {
-                            value: '',
-                            label: ''
-                        }
-                    ]
-                },
-                {
-                    value: '',
-                    label: '',
-                    children: [
-                        {
-                            value: '',
-                            label: ''
-                        },
-                        {
-                            value: '',
-                            label: ''
-                        }
-                    ]
+        getRaterOptions () {
+            const { userList = [], deptList = [] } = this.$store.getters || {}
+            const depts = deptList.filter(i => i.depth > 2)
+            const temp = depts.map(item => {
+                item.value = item.positionId
+                item.label = item.positionName
+                item.children = userList.map(i => {
+                    if (i.positionId.includes(item.positionId)) {
+                        i.value = i.userId
+                        i.label = i.userName
+                        return i
+                    }
+                }).filter(i => i)
+                return item
+            })
+            const res = []
+            temp.forEach(item => {
+                const index = res.findIndex(i => item.path === `${i.path}${item.value}.`)
+                if (index !== -1) {
+                    res[index].children.unshift(item)
+                } else {
+                    res.push(item)
                 }
-            ]
-            return this.userList
+            })
+            return res
         },
         transformUser (userId) {
             const { userList = [] } = this.$store.getters
             const user = userList.find(u => u.userId === userId) || {}
             return user.userName || '-'
+        },
+        formatNum (num) {
+            return num === null || num === undefined || num === '' ? 0 : num
         },
         handleRowDblclick (row) {
             this.handleColumnAction(row, true)
@@ -531,7 +511,7 @@ export default {
                 return
             }
             const sql1 = `select id_, bian_zhi_ren_, bian_zhi_bu_men_, bian_zhi_shi_jian, ti_ku_ming_cheng_, ti_ku_fen_lei_, ti_ku_zhuang_tai_, shi_fou_gong_kai_, xian_kao_ci_shu_, ping_fen_ren_, miao_shu_, suo_shu_fan_wei_, kao_shi_shi_chang, da_biao_zhan_bi_ from t_question_bank where id_ = '${this.formId}'`
-            const sql2 = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, zhuang_tai_ as status, biao_qian_ as quesTag, zhuang_tai_ as quesState from t_questions where parent_id_ = '${this.formId}'`
+            const sql2 = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, biao_qian_ as quesTag, zhuang_tai_ as quesState from t_questions where parent_id_ = '${this.formId}' order by chu_ti_shi_jian_ desc`
             Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then(([res1, res2]) => {
                 const { data: bankData = [] } = res1.variables || {}
                 const { data: questionData = [] } = res2.variables || {}
@@ -553,12 +533,11 @@ export default {
                 // console.log(questionData)
                 this.questionData = questionData
                 this.initialData = JSON.parse(JSON.stringify(questionData))
-                // this.quesIdList = this.questionData.map(item => item.quesId).join(',')
                 this.form = bank
             })
         },
         addSelectQuestion () {
-            const sql = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, zhuang_tai_ as status, biao_qian_ as quesTag, zhuang_tai_ as quesState from t_questions where find_in_set(id_, '${this.quesIdList}')`
+            const sql = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, biao_qian_ as quesTag, zhuang_tai_ as quesState from t_questions where find_in_set(id_, '${this.quesIdList}')`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 this.questionData = data.concat(this.questionData)
@@ -617,14 +596,12 @@ export default {
                 ping_fen_fang_shi: item.rateType || '',
                 ping_fen_ren_: item.rater || '',
                 bei_zhu_: item.note || '',
-                zhuang_tai_: item.status,
+                zhuang_tai_: item.quesState,
                 biao_qian_: item.quesTag || ''
             }))
             await this.$common.request('add', {
                 tableName: 't_questions',
                 paramWhere
-            }).then(() => {
-                console.log(2)
             })
         },
         // 软删除，删除关联关系
@@ -640,15 +617,13 @@ export default {
             await this.$common.request('update', {
                 tableName: 't_questions',
                 updList
-            }).then(() => {
-                console.log(1)
             })
         },
         submitForm () {
             if (this.form.limitTime === '0') {
                 this.form.kao_shi_shi_chang = '不限'
             } else {
-                this.form.kao_shi_shi_chang = (this.form.hours * 60 + this.form.minutes) * 60 * 1000
+                this.form.kao_shi_shi_chang = (this.formatNum(this.form.hours) * 60 + this.formatNum(this.form.minutes)) * 60 * 1000
             }
             this.form.bian_zhi_bu_men_ = this.form.suo_shu_fan_wei_ === '科级' ? '' : this.form.bian_zhi_bu_men_
             this.form.di_dian_ = this.level
@@ -702,6 +677,9 @@ export default {
         // 关闭当前窗口
         closeDialog () {
             this.$emit('close', false)
+        },
+        updateData (data) {
+            this.questionData = data
         }
     }
 }
