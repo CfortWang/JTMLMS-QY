@@ -500,6 +500,9 @@ export default {
         },
         // 关闭当前窗口
         closeDialog () {
+            window.removeEventListener('keyup', this.handleKeyPress)
+            window.removeEventListener('beforeunload', this.handleBeforeUnload)
+            clearInterval(this.timer)
             this.$emit('close', false)
         }
     }

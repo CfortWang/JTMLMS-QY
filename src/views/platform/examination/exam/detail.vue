@@ -350,6 +350,7 @@ export default {
         },
         // 关闭当前窗口
         closeDialog () {
+            window.removeEventListener('keyup', this.handleKeyPress)
             this.$emit('close', false)
         }
     }
