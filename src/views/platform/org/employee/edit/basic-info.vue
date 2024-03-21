@@ -191,9 +191,10 @@ export default {
             }
         }
         const validateAccount = (rule, value, callback) => {
-            const re = /^[a-zA-Z][0-9a-zA-Z]{1,192}$/
+            // const re = /^[a-zA-Z][0-9a-zA-Z]{1,192}$/
+            const re = /^[\w-]{4,16}$/
             if (!re.test(value)) {
-                callback(new Error('账号必须是由数字字母组成，以字母开头，至少3位'))
+                callback(new Error('由数字、字母、下划线及减号组成，长度最少4位最多16位'))
             } else {
                 callback()
             }
@@ -272,7 +273,7 @@ export default {
             rules: {
                 account: [
                     { required: true, message: this.$t('validate.required') },
-                    { type: 'string', min: 3, max: 128, message: '帐号长度至少3位,至多128位', trigger: 'blur' },
+                    { type: 'string', min: 4, max: 16, message: '帐号长度至少4位,至多16位', trigger: 'blur' },
                     { validator: validateAccount, trigger: 'blur' }
                 ],
                 wcAccount: [
