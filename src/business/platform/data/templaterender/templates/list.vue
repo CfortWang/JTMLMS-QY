@@ -104,6 +104,7 @@
                     :dynamic-params="getLinkDynamicParams(scope.column.field_options, scope.row)"
                     :icon="scope.column.field_options.icon ? 'ibps-icon-' + scope.column.field_options.icon : ''"
                     :type="scope.column.field_options.dialog_type"
+                    :temp-search="true"
                     readonly-text="text"
                     disabled
                 />
@@ -1879,11 +1880,14 @@ export default {
             if (!this.hasScript()) {
                 return
             }
-            // type:default，那么表示是一般的列表
-            // type:dialog,表示对话框列表
-            // tempSearch为true的时候是列表搜索框点击打开的对话框
-            if (this.dataTemplate.type == 'default' || this.tempSearch) {
-                // 脚本里打开的对话框列表，不需要执行本模块代码，否则会执行到底层列表的onload脚本
+            /**
+             * type:default，那么表示是一般的列表
+             * type:dialog,表示对话框列表
+             * tempSearch为true的时候是列表搜索框点击打开的对话框
+             * 数据模板脚本里打开的对话框列表，不需要执行本模块代码，否则会执行到底层列表的onload脚本：洗眼器
+             * 但是在表单页面打开对话框的时候需要执行本模块代码：考试管理对话框
+             */
+            if (this.dataTemplate.type == 'default' || (this.dataTemplate.type == 'dialog'&& !this.tempSearch) || this.tempSearch) {
                 JTemplate._onLoad(this)
             }
         },

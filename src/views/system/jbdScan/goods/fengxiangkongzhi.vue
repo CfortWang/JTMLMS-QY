@@ -38,8 +38,25 @@
                             </div>
                             <div v-show="RiskLevelList.length" class="change" @click="changeFn('first')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
-                        <el-tab-pane label="涉及条款统计表" name="second"><tableCom :table-prop="[]" :table-list="[]" :table-with="50" /></el-tab-pane>
-                        <el-tab-pane label="责任部门统计表统计表" name="third"><tableCom :table-prop="[]" :table-list="[]" /></el-tab-pane>
+                        <el-tab-pane label="涉及条款统计表" name="second">
+                            <div v-show="termChange" style="width: 50%;">
+                                <tableCom :table-prop="termProp" :table-list="termList" />
+                            </div>
+                            <div v-show="!termChange" style="width: 45%; height:350px">
+                                <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
+                                <PieView ref="termPieView" :info="termPieView" />
+                            </div>
+                            <div v-show="termList.length" class="change" @click="changeFn('fourth')">切换 <i class="el-icon-refresh" /></div>
+                        </el-tab-pane>
+                        <el-tab-pane label="责任部门统计表" name="third">
+                            <div v-show="departChange" style="width: 50%;">
+                                <tableCom :table-prop="departProp" :table-list="departList" />
+                            </div>
+                            <div v-show="!departChange" style="width: 45%; height:350px">
+                                <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
+                                <PieView ref="departPieView" :info="departPieView" />
+                            </div>
+                            <div v-show="departList.length" class="change" @click="changeFn('fourth')">切换 <i class="el-icon-refresh" /></div></el-tab-pane>
                         <el-tab-pane label="风险应对措施统计表" name="fourth">
                             <div v-show="riskReChange" style="width: 50%;">
                                 <tableCom :table-prop="riskReProp" :table-list="riskReList" />
@@ -51,36 +68,34 @@
                             <div v-show="riskReList.length" class="change" @click="changeFn('fourth')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="剩余风险等级统计表" name="fine">
-                            <div v-show="riskReChange" style="width: 50%;">
-                                <tableCom :table-prop="riskReProp" :table-list="riskReList" />
+                            <div v-show="residueChange" style="width: 50%;">
+                                <tableCom :table-prop="residueProp" :table-list="residueList" />
                             </div>
-                            <div v-show="!riskReChange" style="width: 45%; height:350px">
+                            <div v-show="!residueChange" style="width: 45%; height:350px">
                                 <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
-                                <PieView :info="riskRePieView" />
+                                <PieView :info="residuePieView" />
                             </div>
                             <div v-show="riskReList.length" class="change" @click="changeFn('fine')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
-                        <el-tab-pane label="降低风险登记表表" name="six"><tableCom :table-prop="[]" :table-list="[]" :table-with="50" /></el-tab-pane>
+                        <el-tab-pane label="降低风险登记表" name="six">
+                            <div v-show="reduceChange" style="width: 50%;">
+                                <tableCom :table-prop="reduceeProp" :table-list="reduceList" />
+                            </div>
+                            <div v-show="!reduceChange" style="width: 45%; height:350px">
+                                <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
+                                <PieView ref="reducePieView" :info="reducePieView" />
+                            </div>
+                            <div v-show="reduceList.length" class="change" @click="changeFn('fourth')">切换 <i class="el-icon-refresh" /></div>
+                        </el-tab-pane>
                     </el-tabs>
                 </template>
                 <div>
                     <div class="tableTitle">风险识别评估</div>
-                    <tableCom :table-prop="RiskIdenProp" :table-list="RiskIdenList" :page-show="true" />
-                    <div v-if="pageShow" class="block">
-                        <el-pagination
-                            :current-page="currentPage"
-                            :page-sizes="[15, 20, 50, 100]"
-                            :page-size="15"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="400"
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                        />
-                    </div>
+                    <tableCom :table-prop="RiskIdenProp" :table-list="RiskIdenList" :page-show="true" :page-total="rickLength" @handleSizeChange="riskIdenHandleSizeChange" @handleCurrentChange="riskIdenhandleCurrentChange" />
                 </div>
                 <div>
                     <div class="tableTitle">部门风险改进记录</div>
-                    <tableCom :table-prop="ImproRecordsProp" :table-list="ImproRecordsList " :control-schedule="true" :page-show="true" />
+                    <tableCom :table-prop="ImproRecordsProp" :table-list="ImproRecordsList " :control-schedule="true" />
                 </div>
 
             </div>
@@ -150,21 +165,39 @@ export default {
             tableList: [],
             RiskIdenList: [],
             RiskIdenProp: [],
+            rickLength: 0,
             ImproRecordsList: [],
             ImproRecordsProp: [],
-            RiskLevelList: [],
+            RiskLevelList: [], // 风险等级
             RiskLevelProp: [],
             riskLevePieView: {},
             riskLeveChange: true,
-            riskReList: [],
+            termList: [], // 条款统计表
+            termProp: [],
+            termPieView: {},
+            termChange: true,
+            departList: [], // 责任部门统计
+            departProp: [],
+            departPieView: {},
+            departChange: true,
+            riskReList: [], // 风险应对措施统计
             riskReProp: [],
             riskRePieView: {},
-            riskReChange: true
+            riskReChange: true,
+            residueList: [], // 剩余风险等级统计
+            residueProp: [],
+            residuePieView: {},
+            residueChange: true,
+            reduceList: [], // 降低风险登记表
+            reduceeProp: [],
+            reducePieView: {},
+            reduceChange: true,
+            page: 1,
+            pagesize: 2
         }
     },
     watch: {
         obj (newVal, oldVal) {
-            alert('obj')
             this.zongid = newVal[0].id_
             this.getInits()
         },
@@ -182,7 +215,6 @@ export default {
     },
     created () {
         this.zongid = this.obj[0].id_
-        alert('created')
         this.getInits()
     },
     mounted () {
@@ -231,7 +263,15 @@ export default {
             this.deptList = this.$store.getters.deptList
         },
         handleClick (tab, event) {
-            // console.log(tab, event)
+            // if (tab === 'first') {
+            //     this.getRiskLevel()
+            // } else if (tab === 'second') {
+            //     this.getClauseStatistics()
+            // } else if (tab === 'third') {
+            //     this.getDepartmentStatistics()
+            // } else if (tab === 'fourth') {
+            //     this.getRiskResponse()
+            // }
         },
         // 风险等级
         async getRiskLevel () {
@@ -244,7 +284,6 @@ export default {
                 list2 = res[0].variables.data[0]
                 list3 = res[0].variables.data[0]
             })
-            console.log(list1, 111)
             const total = parseInt(list1.total) + parseInt(list2.total) + parseInt(list3.total)
             const gao = list1.total
             const gao_zhan_bi_ = parseFloat(gao / total * 100).toFixed(2) + '%'
@@ -268,7 +307,6 @@ export default {
                 idSelector: 'adhjaodh',
                 color: ['#FF0033', '#3870e0', '#339933']
             }
-            console.log(this.riskLevePieView, 'this.riskLevePieView')
         },
         // 涉及条款统计表
         getClauseStatistics () {
@@ -276,9 +314,28 @@ export default {
             this.tableList = []
         },
         // 责任部门统计表统计表
-        getDepartmentStatistics () {
-            this.tableProp = []
-            this.tableList = []
+        async getDepartmentStatistics () {
+            console.log(this.zongid)
+            const this_ = this
+            this.departList = []
+            const sql = `select * from  t_hyrybfxssb WHERE parent_id_ = (select id_ from t_fxssb where  zong_id_ = '${this.zongid}')`
+            let departS = []
+            await curdPost('sql', sql).then((res) => {
+                departS = res.variables.data
+            })
+            for (const item of departS) {
+                const riskSql = `select count(*) as count  from  t_hyrybfxssb where parent_id_ = (select id_ from t_fxsbpgb where guan_lian_id_ = '${item.liu_shui_hao_}')`
+                let countData = []
+                await curdPost('sql', riskSql).then((res) => {
+                    countData = res.variables.data
+                })
+                this.departList.push({ 'bian_zhi_bu_men_': item.bian_zhi_bu_men_, shu_liang_: countData[0].count, zhan_bi_: 0 })
+            }
+            this.departProp = [
+                { prop: 'bian_zhi_bu_men_', label: '部门' },
+                { prop: 'shu_liang_', label: '数量' },
+                { prop: 'zhan_bi_', label: '占比' }
+            ]
         },
         // 风险应对措施统计表
         async getRiskResponse () {
@@ -313,12 +370,17 @@ export default {
                 config: { title: '', idSelector: 'riskResponse222' },
                 color: ['#339933', '#3870e0', '#FF0033']
             }
-            console.log(this.riskRePieView, 1231231)
         },
         // 风险识别评估表
         async getRiskIdentification () {
             const this_ = this
-            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}'`
+            const riskCountSql = `select COUNT(*) as count from t_fxsbpgb where zong_id_ = '1214889836008177664'`
+            let riskCount = []
+            await curdPost('sql', riskCountSql).then((res) => {
+                riskCount = res.variables.data
+            })
+            this.rickLength = riskCount[0].count
+            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '1214889836008177664' order by shi_fou_guo_shen_ desc LIMIT ${(this.page - 1) * this.pagesize},${this.pagesize}`
             await curdPost('sql', sql).then((res) => {
                 this_.RiskIdenList = res.variables.data
             })
@@ -359,8 +421,16 @@ export default {
 
             ]
             // this.tableList = []
+        },
+        riskIdenHandleSizeChange (val) {
+            this.page = 1
+            this.pagesize = val
+            this.getRiskIdentification()
+        },
+        riskIdenhandleCurrentChange (val) {
+            this.page = val
+            this.getRiskIdentification()
         }
-
     }
 }
 </script>

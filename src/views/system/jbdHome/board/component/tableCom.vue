@@ -20,7 +20,17 @@
             </el-table-column>
 
         </el-table>
-
+        <div v-if="pageShow" class="block">
+            <el-pagination
+                :current-page="currentPage"
+                :page-sizes="[2, 5, 8, 10]"
+                :page-size="2"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pageTotal"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+            />
+        </div>
     </div>
 </template>
 
@@ -57,6 +67,10 @@ export default {
         pageShow: {
             type: Boolean,
             default: false
+        },
+        pageTotal: {
+            type: Number,
+            default: 0
         }
     },
     data () {
@@ -91,9 +105,11 @@ export default {
         },
         handleSizeChange (val) {
             console.log(`每页 ${val} 条`)
+            this.$emit('handleSizeChange', val)
         },
         handleCurrentChange (val) {
             console.log(`当前页: ${val}`)
+            this.$emit('handleCurrentChange', val)
         }
     }
 }

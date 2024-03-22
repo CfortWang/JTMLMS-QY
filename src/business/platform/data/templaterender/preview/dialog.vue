@@ -3,6 +3,7 @@
         :visible="dialogVisible"
         :data="dataTemplate"
         :dynamic-params="dynamicParams"
+        :temp-search="true"
         @close="handleClose"
         @action-event="handleActionEvent"
     />

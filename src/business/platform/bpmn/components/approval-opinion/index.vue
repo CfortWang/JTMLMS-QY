@@ -148,7 +148,7 @@ export default {
         },
         unCompleteOpinion: {
             type: String,
-            default: '同意'
+            default: '退回修改'
         }
     },
     inject: {
