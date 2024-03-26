@@ -569,6 +569,9 @@
             margin-top: -50px;
         }
         .form-container {
+            // min-width: 1080px;
+            // width: 1080px;
+            // margin: 0 auto;
             margin: 0 10px 10px 10px;
             ::v-deep .el-form--label-left {
                 font-size: 18px;
