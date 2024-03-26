@@ -89,13 +89,13 @@
                         </el-tab-pane>
                     </el-tabs>
                 </template>
-                <div>
+                <div v-if="obj[0].zhuang_tai_ ==='已识别'">
                     <div class="tableTitle">风险识别评估</div>
-                    <tableCom :table-prop="RiskIdenProp" :table-list="RiskIdenList" :page-show="true" :page-total="rickLength" @handleSizeChange="riskIdenHandleSizeChange" @handleCurrentChange="riskIdenhandleCurrentChange" />
+                    <tableCom :table-prop="RiskIdenProp" :table-list="RiskIdenList" :page-show="true" :page-total="pageTotal" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange" />
                 </div>
-                <div>
+                <div v-if="obj[0].zhuang_tai_ ==='改进中'">
                     <div class="tableTitle">部门风险改进记录</div>
-                    <tableCom :table-prop="ImproRecordsProp" :table-list="ImproRecordsList " :control-schedule="true" />
+                    <tableCom :table-prop="ImproRecordsProp" :table-list="ImproRecordsList " :control-schedule="true" :page-show="true" :page-total="pageTotal" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange" />
                 </div>
 
             </div>
@@ -133,22 +133,22 @@ export default {
             // 步骤条步数
             stepList: [
                 {
-                    stepIndex: 20,
+                    stepIndex: 0,
                     title: '评估计划'
                     // post: '质量负责人'
                 },
                 {
-                    stepIndex: 40,
+                    stepIndex: 25,
                     title: '实施计划'
                     // post: '内审组长'
                 },
                 {
-                    stepIndex: 60,
-                    title: '项目登记'
+                    stepIndex: 50,
+                    title: '风险识别'
                     // post: '内审员'
                 },
                 {
-                    stepIndex: 80,
+                    stepIndex: 75,
                     title: '风险改进'
                     // post: '内审组长'
                 },
@@ -165,7 +165,7 @@ export default {
             tableList: [],
             RiskIdenList: [],
             RiskIdenProp: [],
-            rickLength: 0,
+            pageTotal: 0,
             ImproRecordsList: [],
             ImproRecordsProp: [],
             RiskLevelList: [], // 风险等级
@@ -196,6 +196,21 @@ export default {
             pagesize: 2
         }
     },
+    computed: {
+        findSchedule: function (guo_shen_) { // 进度返回值
+            if (guo_shen_ === '未编制' || guo_shen_ === '') {
+                return 25
+            } else if (guo_shen_ === '识别中') {
+                return 50
+            } else if (guo_shen_ === '改进中') {
+                return 75
+            } else if (guo_shen_ === '已完成') {
+                return 100
+            } else {
+                return ''
+            }
+        }
+    },
     watch: {
         obj (newVal, oldVal) {
             this.zongid = newVal[0].id_
@@ -216,9 +231,6 @@ export default {
     created () {
         this.zongid = this.obj[0].id_
         this.getInits()
-    },
-    mounted () {
-        const this_ = this
     },
     destroyed () {
         this.$destroy()
@@ -241,26 +253,27 @@ export default {
             const user = this.userList.find(i => i.userId === userId)
             return user.userName
         },
-        FindImprovementRecords (guo_shen_) {
-            if (guo_shen_ === '未编制') {
-                return 0
-            } else if (guo_shen_ === '已编制') {
-                return 25
-            } else if (guo_shen_ === '已评估') {
-                return 50
-            } else if (guo_shen_ === '已审核') {
-                return 75
-            } else if (guo_shen_ === '已完成') {
-                return 100
-            }
-        },
         getInits () {
             this.getRiskLevel() // 风险等级
             this.getRiskIdentification()// 风险识别评估表
             this.getImprovementRecords()// 风险改进记录
+            this.getSchedule(this.obj[0].zhuang_tai_)
             this.scan = this.scanVisible
             this.userList = this.$store.getters.userList
             this.deptList = this.$store.getters.deptList
+        },
+        getSchedule (guo_shen_) {
+            if (guo_shen_ === '未编制' || guo_shen_ === '') {
+                this.activeIndex = 25
+            } else if (guo_shen_ === '识别中') {
+                this.activeIndex = 50
+            } else if (guo_shen_ === '改进中') {
+                this.activeIndex = 75
+            } else if (guo_shen_ === '已完成') {
+                this.activeIndex = 100
+            } else {
+                this.activeIndex = 25
+            }
         },
         handleClick (tab, event) {
             // if (tab === 'first') {
@@ -379,8 +392,8 @@ export default {
             await curdPost('sql', riskCountSql).then((res) => {
                 riskCount = res.variables.data
             })
-            this.rickLength = riskCount[0].count
-            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '1214889836008177664' order by shi_fou_guo_shen_ desc LIMIT ${(this.page - 1) * this.pagesize},${this.pagesize}`
+            this.pageTotal = riskCount[0].count
+            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '1214889836008177664' order by shi_fou_guo_shen_ desc limit ${(this.page - 1) * this.pagesize},${this.pagesize}`
             await curdPost('sql', sql).then((res) => {
                 this_.RiskIdenList = res.variables.data
             })
@@ -400,36 +413,69 @@ export default {
         // 风险改进记录
         async getImprovementRecords () {
             const this_ = this
-            const sql = `select * from t_bmfxgjjl where zong_id_ = '${this.zongid}' `
-            await curdPost('sql', sql).then((res) => {
-                this_.ImproRecordsList = res.variables.data
+            // const sql = `select * from t_bmfxgjjl where zong_id_ = '${this.zongid}' `
+            const sql1 = `select * from t_bmfxgjjl limit ${(this.page - 1) * this.pagesize},${this.pagesize}`
+            const sql2 = `select count(*) as count from t_bmfxgjjl`
+            await Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then((res) => {
+                this_.ImproRecordsList = res[0].variables.data
+                this_.pageTotal = res[1].variables.data[0].count
             })
             for (const item of this_.ImproRecordsList) {
-                item.bian_zhi_ren_ = this.findUser(item.bian_zhi_ren_)
-                item.bian_zhi_bu_men_ = this.findDept(item.bian_zhi_bu_men_)
-                item.bian_zhi_shi_jian = item.bian_zhi_shi_jian || '/'
+                item.bian_zhi_ren_ = item.bian_zhi_ren_ ? this.findUser(item.bian_zhi_ren_) : '/'
+                item.ping_gu_ren_ = item.ping_gu_ren_ ? this.findUser(item.ping_gu_ren_) : '/'
+                item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'
+                item.bian_zhi_shi_jian = item.bian_zhi_shi_jian.split(' ')[0] || '/'
                 item.shi_fou_guo_shen_ = item.shi_fou_guo_shen_ || '未编制'
-                item.percentage = this.FindImprovementRecords(item.shi_fou_guo_shen_)
+                item.yao_su_tiao_kuan_ = item.yao_su_tiao_kuan_ || '/'
+                item.gai_jin_bian_hao_ = item.gai_jin_bian_hao_ || '/'
+                item.zheng_gai_qi_xian = item.zheng_gai_qi_xian || '/'
+                item.wan_cheng_shi_jia = item.wan_cheng_shi_jia || '/'
+                item.yan_zhong_cheng_d = item.yan_zhong_cheng_d || '/'
+                item.percentage = this.getImpRecordsSchedule(item.shi_fou_guo_shen_)
             }
             this.ImproRecordsProp = [
                 { prop: 'bian_zhi_bu_men_', label: '编制部门' },
                 { prop: 'bian_zhi_shi_jian', label: '编制时间' },
                 { prop: 'bian_zhi_ren_', label: '编制人' },
+                { prop: 'ping_gu_ren_', label: '评估人' },
                 { prop: 'shi_fou_guo_shen_', label: '状态' },
-                { prop: 'yao_su_tiao_kuan_', label: '要素条款' },
+                { prop: 'yao_su_tiao_kuan_', label: '要素条款', width: 120 },
+                { prop: 'gai_jin_bian_hao_', label: '改进编号', width: 120 },
+                { prop: 'zheng_gai_qi_xian', label: '整改期限' },
+                { prop: 'wan_cheng_shi_jia', label: '完成日期' },
                 { prop: 'yan_zhong_cheng_d', label: '严重程度' }
-
             ]
             // this.tableList = []
         },
-        riskIdenHandleSizeChange (val) {
+        getImpRecordsSchedule (value) {
+            if (value === '已改进') {
+                return 25
+            } else if (value === '已评估') {
+                return 50
+            } else if (value === '已审核') {
+                return 75
+            } else if (value === '已完成') {
+                return 100
+            } else {
+                return 0
+            }
+        },
+        handleSizeChange (val) {
             this.page = 1
             this.pagesize = val
-            this.getRiskIdentification()
+            this.turnPage()
         },
-        riskIdenhandleCurrentChange (val) {
+        handleCurrentChange (val) {
             this.page = val
-            this.getRiskIdentification()
+            this.turnPage()
+        },
+        turnPage () {
+            const zhuang_tai_ = this.obj[0].zhuang_tai_
+            if (zhuang_tai_ === '识别中') {
+                this.getRiskIdentification()
+            } else if (zhuang_tai_ === '改进中') {
+                this.getImprovementRecords()
+            }
         }
     }
 }

@@ -92,7 +92,7 @@
             />
         </el-form-item>
         <el-form-item
-            v-if="formData && ['sefStartFlow', 'openTask'].includes(formData.button_type)"
+            v-if="formData && ['sefStartFlow', 'openTask', 'add'].includes(formData.button_type)"
             label="编制参数"
             prop="initAddDataCont"
         >

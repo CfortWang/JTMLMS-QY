@@ -989,6 +989,7 @@ export default {
                         break
                     case 'add': // 添加
                         this.handleEdit(null, command, position, selection, data)
+                        this.addDataCont = button.initAddDataCont
                         break
                     case 'edit': // 编辑
                     case 'detail': // 明细

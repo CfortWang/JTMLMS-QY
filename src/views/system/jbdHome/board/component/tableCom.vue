@@ -11,11 +11,11 @@
                 :key="item.prop"
                 :prop="item.prop"
                 :label="item.label"
-                width="150"
+                :width="item.width?item.width:100"
             />
             <el-table-column v-if="controlSchedule" key="schedule" prop="schedule" label="进度">
                 <template slot-scope="scope">
-                    <el-progress :percentage="scope.row.percentage" :color="customColorMethod(percentage)" />
+                    <el-progress :percentage="scope.row.percentage" :color="customColorMethod(scope.row.percentage)" />
                 </template>
             </el-table-column>
 
@@ -95,12 +95,14 @@ export default {
             this.tableData = this.tableList
         },
         customColorMethod (percentage) {
-            if (percentage < 30) {
-                return '#909399'
-            } else if (percentage < 70) {
-                return '#e6a23c'
-            } else {
-                return '#67c23a'
+            if (percentage == 25) {
+                return '#555555'
+            } else if (percentage == 50) {
+                return '#9999CC'
+            } else if (percentage == 75) {
+                return '#6666FF'
+            } else if (percentage == 100) {
+                return '#99FF66'
             }
         },
         handleSizeChange (val) {
