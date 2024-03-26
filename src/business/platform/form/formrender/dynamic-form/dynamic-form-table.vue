@@ -454,7 +454,9 @@ export default {
                 // if (!valueEquals(val, oldVal)) {
                 //     this.dispatch('ElFormItem', 'el.form.change', val)
                 // }
-            }
+            },
+            deep: true,
+            immediate: true
         },
         dataModel: {
             handler (val, oldVal) {
