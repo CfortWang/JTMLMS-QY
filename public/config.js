@@ -59,12 +59,15 @@
         I18N_LOCALE: 'zh-CN',
         I18N_FALLBACK_LOCALE: 'zh-CN',
 
-                //element 颜色
+        //================其他配置=====================
+        //element 颜色
         ELEMENT_COLOR: '#409EFF',
         // 系统版本
         VERSION: '1.0.0',
         // 系统名称
-        SYSTEM_NAME: '金通医学实验室标准化数智化管理平台'
+        SYSTEM_NAME: '金通医学实验室标准化数智化管理平台',
+        // 润乾报表根目录
+        REPORT_PATH: '金通医学实验室管理系统'
     }
 
 })(window)

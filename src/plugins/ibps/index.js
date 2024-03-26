@@ -38,7 +38,7 @@ import pluginLog from '@/plugins/log'
 import pluginOpen from '@/plugins/open'
 // 平台配置文件
 import setting from '@/setting.js'
-import { BASE_URL, BASE_SEAL_API } from '@/constant'
+import { BASE_URL, BASE_SEAL_API, REPORT_PATH } from '@/constant'
 import env from '@/env'
 
 export default {
@@ -57,8 +57,7 @@ export default {
         Vue.prototype.$buildTime = env.VUE_APP_BUILD_TIME
 
         Vue.prototype.$ibpsUrl = env.VUE_APP_BASE_API_0_0_TEST
-        const reportPath = '金通医学实验室管理系统'
-        Vue.prototype.$reportFilePath = reportPath
+        Vue.prototype.$reportFilePath = REPORT_PATH
         // 格式化参数
         const getParams = (params) => {
             const parts = params.split('&')
@@ -76,12 +75,12 @@ export default {
         }
         const downloadReport = (src, where, type = 6) => {
             // 目前可用type    6:生成报表的pdf文件【默认】   7:生成报表的word文件   3:生成报表的excel文件
-            return `${BASE_URL}demo/reportServlet?action=${type}&file=${encodeURIComponent(reportPath + '/' + src)}&print=1&srcType=file&paramString=${getParams(where)}`
+            return `${BASE_URL}demo/reportServlet?action=${type}&file=${encodeURIComponent(REPORT_PATH + '/' + src)}&print=1&srcType=file&paramString=${getParams(where)}`
         }
         const timer = setInterval(() => { // 定时循环添加参数
             if (getToken()) {
                 // 报表路径
-                Vue.prototype.$reportPath = `${BASE_URL}demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${reportPath}/`
+                Vue.prototype.$reportPath = `${BASE_URL}demo/reportJsp/showReport.jsp?access_token=${getToken()}&rpx=${REPORT_PATH}/`
                 Vue.prototype.$getReportFile = downloadReport // 通过方法函数，拼接url，并将字符串格式化
                 Vue.prototype.$getSealUri = `${BASE_SEAL_API}no/getSealFile/` // 微签 回显获取文件地址
                 Vue.prototype.$getFileDow = `${BASE_URL}ibps/platform/v3/file/download?attachmentId=` // 文件下载地址
