@@ -878,7 +878,7 @@ export default {
             this.addDataCont = {}
         },
         /* 流程页面关闭，刷新当前页面*/
-        loadFlowFData (v,temp) {
+        loadFlowFData (v, temp) {
             this.npmDialogFormVisible = false
             this.addDataCont = {}
             this.dataTemplate = temp
@@ -1887,7 +1887,7 @@ export default {
              * 数据模板脚本里打开的对话框列表，不需要执行本模块代码，否则会执行到底层列表的onload脚本：洗眼器
              * 但是在表单页面打开对话框的时候需要执行本模块代码：考试管理对话框
              */
-            if (this.dataTemplate.type == 'default' || (this.dataTemplate.type == 'dialog'&& !this.tempSearch) || this.tempSearch) {
+            if (this.dataTemplate.type === 'default' || (this.dataTemplate.type === 'dialog' && !this.tempSearch) || this.tempSearch) {
                 JTemplate._onLoad(this)
             }
         },
@@ -1922,7 +1922,7 @@ export default {
             this.templateDialogVisible = visible
             this.initJTemplate()
         },
-        closeDataTemplateFormrenderDialog(visible,temp){
+        closeDataTemplateFormrenderDialog (visible, temp) {
             this.dialogFormVisible = visible
             this.dataTemplate = temp
             this.initJTemplate()

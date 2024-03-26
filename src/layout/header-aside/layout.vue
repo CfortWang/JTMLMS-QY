@@ -17,7 +17,7 @@
         <!-- 半透明遮罩 -->
         <div class="ibps-layout-header-aside-mask" />
         <!-- websocket -->
-        <!-- <ibps-notify-monitor /> -->
+        <ibps-notify-monitor />
         <!-- 主体内容 -->
         <div class="ibps-layout-header-aside-content" flex="dir:top">
             <panle />
@@ -104,7 +104,7 @@
                     <ibps-header-message />
                     <!-- 消息中心 -->
                     <span style="margin: 0 10px;">|</span>
-                    <ibps-header-user style="margin-right: 15px;"/>
+                    <ibps-header-user style="margin-right: 15px;" />
                     <!-- <span style="margin-left: 10px;">|</span>
                     <ibps-header-setting /> -->
                 </div>
@@ -144,7 +144,7 @@
                             class="ibps-theme-container-main-layer"
                             flex
                         >
-                            <ibps-panel-search ref="panelSearch" @close="searchPanelClose"/>
+                            <ibps-panel-search ref="panelSearch" @close="searchPanelClose" />
                         </div>
                     </transition>
                     <!-- 内容 -->
@@ -177,162 +177,161 @@
 </template>
 
 <script>
-    import IbpsLogo from './components/logo'
-    import IbpsMenuSide from './components/menu-side/index.js'
-    import IbpsMenuHeader from './components/menu-header/index.js'
-    import IbpsTabs from './components/tabs'
-    import IbpsHeaderSearch from './components/header-search'
-    import FloatBall from './components/components/float-ball'
-    import IbpsHeaderFullscreen from './components/header-fullscreen'
-    // import IbpsHeaderLocking from './components/header-locking'
-    // import IbpsHeaderLanguage from './components/header-language'
-    // import IbpsHeaderSize from './components/header-size'
-    // import IbpsHeaderTheme from './components/header-theme'
-    // import IbpsHeaderToolbar from './components/header-toolbar'
+import IbpsLogo from './components/logo'
+import IbpsMenuSide from './components/menu-side/index.js'
+import IbpsMenuHeader from './components/menu-header/index.js'
+import IbpsTabs from './components/tabs'
+import IbpsHeaderSearch from './components/header-search'
+import FloatBall from './components/components/float-ball'
+import IbpsHeaderFullscreen from './components/header-fullscreen'
+// import IbpsHeaderLocking from './components/header-locking'
+// import IbpsHeaderLanguage from './components/header-language'
+// import IbpsHeaderSize from './components/header-size'
+// import IbpsHeaderTheme from './components/header-theme'
+// import IbpsHeaderToolbar from './components/header-toolbar'
 
-    // import IbpsHeaderTenant from './components/header-tenant'
-    import IbpsHeaderSetting from './components/header-setting'
-    import IbpsHeaderMessage from './components/header-message'
-    import panle from '@/components/jbd-panel'
-    import IbpsHeaderUser from './components/header-user'
-    import IbpsHeaderErrorLog from './components/header-error-log'
-    import IbpsHeaderBaseUrl from './components/header-base-url'
-    import IbpsHeaderCleanCache from './components/header-clean-cache'
-    // import IbpsHeaderDownload from './components/header-download'
-    // import IbpsNotifyMonitor from '@/business/platform/socket/notify-monitor'
-    import { mapState, mapGetters, mapActions } from 'vuex'
-    import mixinSearch from './mixins/search'
-    import mixinLock from './mixins/lock'
+// import IbpsHeaderTenant from './components/header-tenant'
+import IbpsHeaderSetting from './components/header-setting'
+import IbpsHeaderMessage from './components/header-message'
+import panle from '@/components/jbd-panel'
+import IbpsHeaderUser from './components/header-user'
+import IbpsHeaderErrorLog from './components/header-error-log'
+import IbpsHeaderBaseUrl from './components/header-base-url'
+import IbpsHeaderCleanCache from './components/header-clean-cache'
+// import IbpsHeaderDownload from './components/header-download'
+import IbpsNotifyMonitor from '@/business/platform/socket/notify-monitor'
+import { mapState, mapGetters, mapActions } from 'vuex'
+import mixinSearch from './mixins/search'
+import mixinLock from './mixins/lock'
 
-    import setting from '@/setting.js'
-    export default {
-        name: 'ibps-layout-header-aside',
-        components: {
-            IbpsLogo,
-            IbpsMenuSide,
-            IbpsMenuHeader,
-            IbpsTabs,
-            IbpsHeaderSearch,
-            FloatBall,
-            panle,
-            IbpsHeaderFullscreen,
-            // IbpsHeaderLocking,
-            // IbpsHeaderLanguage,
-            // IbpsHeaderSize,
-            // IbpsHeaderTheme,
-            // IbpsHeaderToolbar,
-            // IbpsHeaderTenant,
-            IbpsHeaderSetting,
-            IbpsHeaderMessage,
-            IbpsHeaderUser,
-            IbpsHeaderErrorLog,
-            IbpsHeaderBaseUrl,
-            IbpsHeaderCleanCache
-            // IbpsHeaderDownload,
-            // IbpsNotifyMonitor
+import setting from '@/setting.js'
+export default {
+    name: 'ibps-layout-header-aside',
+    components: {
+        IbpsLogo,
+        IbpsMenuSide,
+        IbpsMenuHeader,
+        IbpsTabs,
+        IbpsHeaderSearch,
+        FloatBall,
+        panle,
+        IbpsHeaderFullscreen,
+        // IbpsHeaderLocking,
+        // IbpsHeaderLanguage,
+        // IbpsHeaderSize,
+        // IbpsHeaderTheme,
+        // IbpsHeaderToolbar,
+        // IbpsHeaderTenant,
+        IbpsHeaderSetting,
+        IbpsHeaderMessage,
+        IbpsHeaderUser,
+        IbpsHeaderErrorLog,
+        IbpsHeaderBaseUrl,
+        IbpsHeaderCleanCache,
+        // IbpsHeaderDownload,
+        IbpsNotifyMonitor
+    },
+    mixins: [mixinSearch, mixinLock],
+    data () {
+        const { isSuper, account } = this.$store.getters
+        return {
+            // [侧边栏宽度] 正常状态
+            asideWidth: '200px',
+            // [侧边栏宽度] 折叠状态
+            asideWidthCollapse: '65px',
+            isSuper,
+            account
+        }
+    },
+    // watch: {
+    //     getSystemName(value) {
+    //         this.sysName = ''
+    //     }
+    // },
+    computed: {
+        ...mapState('ibps', {
+            // sysName:state=>state.menu.sysName,
+            keepAlive: state => state.page.keepAlive,
+            grayActive: state => state.gray.active,
+            transitionActive: state => state.transition.active,
+            asideCollapse: state => state.menu.asideCollapse,
+            asideTransition: state => state.menu.asideTransition,
+            system: state => state.system.system,
+            subsystemList: state => state.system.subsystemList
+        }),
+        ...mapGetters('ibps', {
+            themeActiveSetting: 'theme/activeSetting'
+        }),
+        getSystemName () {
+            return this.header().filter(name => { return name.id === this.activeHeader() })
         },
-        mixins: [mixinSearch, mixinLock],
-        data() {
-            const {isSuper, account} = this.$store.getters
-            return {
-                // [侧边栏宽度] 正常状态
-                asideWidth: '200px',
-                // [侧边栏宽度] 折叠状态
-                asideWidthCollapse: '65px',
-                isSuper,
-                account
-            }
-        },
-        // watch: {
-        //     getSystemName(value) {
-        //         this.sysName = ''
-        //     }
-        // },
-        mounted() {
-            // window.performance.navigation.type === 1
-            if (this.$route.name === 'dashboard') {
-                this.sysName = '首页'
-            }
-        },
-        computed: {
-            ...mapState('ibps', {
-                // sysName:state=>state.menu.sysName,
-                keepAlive: state => state.page.keepAlive,
-                grayActive: state => state.gray.active,
-                transitionActive: state => state.transition.active,
-                asideCollapse: state => state.menu.asideCollapse,
-                asideTransition: state => state.menu.asideTransition,
-                system: state => state.system.system,
-                subsystemList: state => state.system.subsystemList
-            }),
-            ...mapGetters('ibps', {
-                themeActiveSetting: 'theme/activeSetting'
-            }),
-            getSystemName() {
-                return this.header().filter(name => { return name.id === this.activeHeader() })
-            },
-            /**
-             * @description 用来实现带参路由的缓存
-             */
-            sysName: {
-                get() {
-                    if (this.$route.name === 'dashboard') {
-                        return '首页'
-                    } else {
-                        return ''
-                    }
-                },
-                set() {
-                    if (this.$route.name === 'dashboard') {
-                        return '首页'
-                    } else {
-                        return ''
-                    }
+        /**
+         * @description 用来实现带参路由的缓存
+         */
+        sysName: {
+            get () {
+                if (this.$route.name === 'dashboard') {
+                    return '首页'
+                } else {
+                    return ''
                 }
             },
-            routerViewKey() {
-                // 默认情况下 key 类似 __transition-n-/foo
-                // 这里的字符串操作是为了最终 key 的格式和原来相同 类似 __transition-n-__stamp-time-/foo
-                const stamp = this.$route.meta[`__stamp-${this.$route.path}`] || ''
-                return `${stamp ? `__stamp-${stamp}-` : ''}${this.$route.path}`
-            },
-            /**
-             * @description 最外层容器的背景图片样式
-             */
-            styleLayoutMainGroup() {
-                return { ...(this.themeActiveSetting.backgroundImage ? {backgroundImage: `url('${this.$baseUrl}${this.themeActiveSetting.backgroundImage}')`} : {})}
-            },
-            logoIconAll() {
-                return `${this.$baseUrl}images/theme/${this.themeActiveSetting.name}/all.png`
-            },
-            logoIconOnly() {
-                return `${this.$baseUrl}images/theme/${this.themeActiveSetting.name}/only.png`
+            set () {
+                if (this.$route.name === 'dashboard') {
+                    return '首页'
+                } else {
+                    return ''
+                }
             }
         },
-        methods: {
-            ...mapActions('ibps/menu', ['asideCollapseToggle']),
-            ...mapState('ibps/menu', ['activeHeader', 'header', 'activeName']),
-            /* 跳转首页*/
-            goToMain() {
-                // this.sysName = "首页"
-                this.$router.push({ path: '/' })
-            },
-            pageChange() {
-                this.sysName = ''
-            },
-            /**
-             * 接收点击切换侧边栏的按钮
-             */
-            handleToggleAside() {
-                this.asideCollapseToggle()
-            },
-            handleSubsystemClick(system) {
-                this.$store.dispatch('ibps/system/set', system)
-                window.location.href = this.$baseUrl
-                // location.reload() // 为了重新实例化vue-router对象 避免bug
-            }
+        routerViewKey () {
+            // 默认情况下 key 类似 __transition-n-/foo
+            // 这里的字符串操作是为了最终 key 的格式和原来相同 类似 __transition-n-__stamp-time-/foo
+            const stamp = this.$route.meta[`__stamp-${this.$route.path}`] || ''
+            return `${stamp ? `__stamp-${stamp}-` : ''}${this.$route.path}`
+        },
+        /**
+         * @description 最外层容器的背景图片样式
+         */
+        styleLayoutMainGroup () {
+            return { ...(this.themeActiveSetting.backgroundImage ? { backgroundImage: `url('${this.$baseUrl}${this.themeActiveSetting.backgroundImage}')` } : {}) }
+        },
+        logoIconAll () {
+            return `${this.$baseUrl}images/theme/${this.themeActiveSetting.name}/all.png`
+        },
+        logoIconOnly () {
+            return `${this.$baseUrl}images/theme/${this.themeActiveSetting.name}/only.png`
+        }
+    },
+    mounted () {
+        // window.performance.navigation.type === 1
+        if (this.$route.name === 'dashboard') {
+            this.sysName = '首页'
+        }
+    },
+    methods: {
+        ...mapActions('ibps/menu', ['asideCollapseToggle']),
+        ...mapState('ibps/menu', ['activeHeader', 'header', 'activeName']),
+        goToMain () {
+            // this.sysName = "首页"
+            this.$router.push({ path: '/' })
+        },
+        pageChange () {
+            this.sysName = ''
+        },
+        /**
+         * 接收点击切换侧边栏的按钮
+         */
+        handleToggleAside () {
+            this.asideCollapseToggle()
+        },
+        handleSubsystemClick (system) {
+            this.$store.dispatch('ibps/system/set', system)
+            window.location.href = this.$baseUrl
+            // location.reload() // 为了重新实例化vue-router对象 避免bug
         }
     }
+}
 </script>
 
 <style lang="scss">

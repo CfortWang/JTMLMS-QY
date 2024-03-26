@@ -427,7 +427,6 @@ export default {
                 pageParams = page
             }
             // const s = this.activeTab === 'news' ? this.sorts { 'PUBLIC_DATE_': 'DESC' } : this.sorts
-            console.log(ActionUtils.formatParams(params, pageParams, this.sorts))
             return ActionUtils.formatParams(params, pageParams, this.sorts)
         },
         // 处理表格点击事件

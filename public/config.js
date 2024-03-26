@@ -10,7 +10,7 @@
         // GATEWAY API
         BASE_GATEWAY_API: `${ BASE_URL }ibps`,
         // WEBSOCKET api
-        BASE_WEBSOCKET_API: 'ws://127.0.0.1:28888',
+        BASE_WEBSOCKET_API: 'ws://192.168.2.161:28888',
         // report api
         BASE_REPORT_API: `${ BASE_URL }raqsoft`,
         // seal api
@@ -59,7 +59,7 @@
         I18N_LOCALE: 'zh-CN',
         I18N_FALLBACK_LOCALE: 'zh-CN',
 
-        //element 颜色
+                //element 颜色
         ELEMENT_COLOR: '#409EFF',
         // 系统版本
         VERSION: '1.0.0',
