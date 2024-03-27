@@ -23,7 +23,7 @@
         <div v-if="pageShow" class="block">
             <el-pagination
                 :current-page="currentPage"
-                :page-sizes="[2, 5, 8, 10]"
+                :page-sizes="[2, 5]"
                 :page-size="2"
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="pageTotal"
@@ -33,7 +33,6 @@
         </div>
     </div>
 </template>
-
 <script>
 export default {
     props: {
@@ -67,25 +66,25 @@ export default {
         pageShow: {
             type: Boolean,
             default: false
-        },
-        pageTotal: {
-            type: Number,
-            default: 0
         }
+        // currentPage: {
+        //     type: Number,
+        //     default: 2
+        // }
     },
     data () {
         return {
             tableData: [],
             // 步骤条步数
             activeIndex: 20,
-            currentPage: 1
+            currentPage: 2,
+            pageTotal: 0
         }
     },
-    computed: {
-
-    },
     watch: {
-
+        currentPage (newv, oldv) {
+            console.log(newv, 2222222222222222333333333333)
+        }
     },
     created () {
         this.getInit()
@@ -95,13 +94,13 @@ export default {
             this.tableData = this.tableList
         },
         customColorMethod (percentage) {
-            if (percentage == 25) {
+            if (percentage === 25) {
                 return '#555555'
-            } else if (percentage == 50) {
+            } else if (percentage === 50) {
                 return '#9999CC'
-            } else if (percentage == 75) {
+            } else if (percentage === 75) {
                 return '#6666FF'
-            } else if (percentage == 100) {
+            } else if (percentage === 100) {
                 return '#99FF66'
             }
         },
@@ -110,8 +109,11 @@ export default {
             this.$emit('handleSizeChange', val)
         },
         handleCurrentChange (val) {
-            console.log(`当前页: ${val}`)
             this.$emit('handleCurrentChange', val)
+        },
+        curreFn (val) {
+            console.log(this.currentPage, 222222222)
+            this.pageTotal = val
         }
     }
 }

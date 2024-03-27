@@ -51,7 +51,7 @@ export default {
                     orient: 'vertical',
                     itemGap: 6,
                     z: 3,
-                    left: 'left',
+                    left: '20',
                     textStyle: {
                         color: '#1f1f1f'
                     }

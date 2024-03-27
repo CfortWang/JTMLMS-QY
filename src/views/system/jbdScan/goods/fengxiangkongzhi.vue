@@ -2,7 +2,7 @@
     <div class="bg">
         <el-dialog width="70vw" height="50vh" :modal-append-to-body="false" title="风险评估进度查询" :visible.sync="scan">
             <!-- 表单是否显示 -->
-            <div style="height: 75vh; width: 98%">
+            <div ref="childComponent" style="height: 75vh; width: 98%">
                 <div id="box">
                     <div class="overall">
                         <!-- 步骤条盒子 -->
@@ -29,43 +29,44 @@
                 <template>
                     <el-tabs v-model="activeName" class="count" @tab-click="handleClick">
                         <el-tab-pane label="风险等级统计表" name="first">
-                            <div v-show="riskLeveChange" style="width: 50%;">
-                                <tableCom :table-prop="RiskLevelProp" :table-list="RiskLevelList" />
+                            <div v-show="riskLeveChange" style="width: 50%;height:320px">
+                                <tableCom :table-prop="RiskLevelProp" :table-list="riskLevelList" />
                             </div>
-                            <div v-show="!riskLeveChange" style="width: 45%; height:350px">
-                                <div id="idSelector1" style="width: 300px; height: 300px; margin:0 auto" />
-                                <PieView ref="firstPieView" :info="riskLevePieView" />
+                            <div v-show="!riskLeveChange" style="width: 45%; height:320px">
+                                <div id="riskLevePieView" style="width: 500px; height: 300px; margin:0 auto" />
+                                <PieView ref="riskLevePieView" :info="riskLevePieView" />
                             </div>
-                            <div v-show="RiskLevelList.length" class="change" @click="changeFn('first')">切换 <i class="el-icon-refresh" /></div>
+                            <div v-show="riskLevelList.length" class="change" @click="changeFn('first')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="涉及条款统计表" name="second">
                             <div v-show="termChange" style="width: 50%;">
                                 <tableCom :table-prop="termProp" :table-list="termList" />
                             </div>
-                            <div v-show="!termChange" style="width: 45%; height:350px">
-                                <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
+                            <div v-show="!termChange" style="width: 60%; height:320px;">
+                                <div id="termPieView" style="width: 850px; height: 300px; margin:0 auto" />
                                 <PieView ref="termPieView" :info="termPieView" />
                             </div>
-                            <div v-show="termList.length" class="change" @click="changeFn('fourth')">切换 <i class="el-icon-refresh" /></div>
+                            <div v-show="termList.length" class="change" @click="changeFn('second','termPieView')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="责任部门统计表" name="third">
                             <div v-show="departChange" style="width: 50%;">
                                 <tableCom :table-prop="departProp" :table-list="departList" />
                             </div>
                             <div v-show="!departChange" style="width: 45%; height:350px">
-                                <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
+                                <div id="departPieView" style="width: 500px; height: 300px; margin:0 auto" />
                                 <PieView ref="departPieView" :info="departPieView" />
                             </div>
-                            <div v-show="departList.length" class="change" @click="changeFn('fourth')">切换 <i class="el-icon-refresh" /></div></el-tab-pane>
+                            <div v-show="departList.length" class="change" @click="changeFn('third','departPieView')">切换 <i class="el-icon-refresh" /></div>
+                        </el-tab-pane>
                         <el-tab-pane label="风险应对措施统计表" name="fourth">
                             <div v-show="riskReChange" style="width: 50%;">
                                 <tableCom :table-prop="riskReProp" :table-list="riskReList" />
                             </div>
                             <div v-show="!riskReChange" style="width: 45%; height:350px">
-                                <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
+                                <div id="riskRePieView" style="width: 500px; height: 300px; margin:0 auto" />
                                 <PieView ref="riskRePieView" :info="riskRePieView" />
                             </div>
-                            <div v-show="riskReList.length" class="change" @click="changeFn('fourth')">切换 <i class="el-icon-refresh" /></div>
+                            <div v-show="riskReList.length" class="change" @click="changeFn('fourth','riskRePieView')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="剩余风险等级统计表" name="fine">
                             <div v-show="residueChange" style="width: 50%;">
@@ -89,13 +90,13 @@
                         </el-tab-pane>
                     </el-tabs>
                 </template>
-                <div v-if="obj[0].zhuang_tai_ ==='已识别'">
+                <div v-if="obj[0].zhuang_tai_ ==='识别中'">
                     <div class="tableTitle">风险识别评估</div>
-                    <tableCom :table-prop="RiskIdenProp" :table-list="RiskIdenList" :page-show="true" :page-total="pageTotal" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange" />
+                    <tableCom ref="RiskIdenList" :table-prop="RiskIdenProp" :table-list="RiskIdenList" :page-show="true" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange" />
                 </div>
                 <div v-if="obj[0].zhuang_tai_ ==='改进中'">
                     <div class="tableTitle">部门风险改进记录</div>
-                    <tableCom :table-prop="ImproRecordsProp" :table-list="ImproRecordsList " :control-schedule="true" :page-show="true" :page-total="pageTotal" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange" />
+                    <tableCom ref="ImproRecords" :table-prop="ImproRecordsProp" :table-list="ImproRecordsList " :control-schedule="true" :page-show="true" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange" />
                 </div>
 
             </div>
@@ -105,9 +106,11 @@
 </template>
 <script>
 import * as echarts from 'echarts'
+import request from '@/utils/request'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import tableCom from '../../jbdHome/board/component/tableCom.vue'
 import PieView from '../../jbdHome/board/component/fengxianPie.vue'
+import js from '@/views/scientificPayoffs/js'
 export default {
     components: { tableCom, PieView },
     filters: {
@@ -123,6 +126,7 @@ export default {
     data () {
         return {
             value: '',
+            id: '',
             zongid: '',
             deptList: [],
             userList: [],
@@ -168,7 +172,7 @@ export default {
             pageTotal: 0,
             ImproRecordsList: [],
             ImproRecordsProp: [],
-            RiskLevelList: [], // 风险等级
+            riskLevelList: [], // 风险等级
             RiskLevelProp: [],
             riskLevePieView: {},
             riskLeveChange: true,
@@ -192,7 +196,7 @@ export default {
             reduceeProp: [],
             reducePieView: {},
             reduceChange: true,
-            page: 1,
+            currentPage: 1,
             pagesize: 2
         }
     },
@@ -212,25 +216,12 @@ export default {
         }
     },
     watch: {
+
         obj (newVal, oldVal) {
-            this.zongid = newVal[0].id_
+            this.id = newVal[0].id_
+            this.zongid = newVal[0].zong_id_
             this.getInits()
-        },
-        activeName (newVal, oldVal) {
-            if (newVal === 'first') {
-                this.getRiskLevel()
-            } else if (newVal === 'second') {
-                this.getClauseStatistics()
-            } else if (newVal === 'third') {
-                this.getDepartmentStatistics()
-            } else if (newVal === 'fourth') {
-                this.getRiskResponse()
-            }
         }
-    },
-    created () {
-        this.zongid = this.obj[0].id_
-        this.getInits()
     },
     destroyed () {
         this.$destroy()
@@ -239,10 +230,16 @@ export default {
         changeFn (type) {
             if (type === 'first') {
                 this.riskLeveChange = !this.riskLeveChange
-                this.$refs.firstPieView.getMiddleLeft('idSelector1')
+                this.$refs.riskLevePieView.getMiddleLeft('riskLevePieView')
+            } else if (type === 'second') {
+                this.termChange = !this.termChange
+                this.$refs.termPieView.getMiddleLeft('termPieView')
+            } else if (type === 'third') {
+                this.departChange = !this.departChange
+                this.$refs.departPieView.getMiddleLeft('departPieView')
             } else if (type === 'fourth') {
                 this.riskReChange = !this.riskReChange
-                this.$refs.riskRePieView.getMiddleLeft('idSelector2')
+                this.$refs.riskRePieView.getMiddleLeft('riskRePieView')
             }
         },
         findDept (depId) {
@@ -251,16 +248,23 @@ export default {
         },
         findUser (userId) {
             const user = this.userList.find(i => i.userId === userId)
-            return user.userName
+            return user.userName || '/'
         },
         getInits () {
             this.getRiskLevel() // 风险等级
             this.getRiskIdentification()// 风险识别评估表
             this.getImprovementRecords()// 风险改进记录
             this.getSchedule(this.obj[0].zhuang_tai_)
+            this.currentPage = 1
+            this.pagesize = 2
             this.scan = this.scanVisible
+            this.activeName = 'first'
             this.userList = this.$store.getters.userList
             this.deptList = this.$store.getters.deptList
+            this.riskLeveChange = true
+            this.termChange = true
+            this.departChange = true
+            this.riskReChange = true
         },
         getSchedule (guo_shen_) {
             if (guo_shen_ === '未编制' || guo_shen_ === '') {
@@ -275,75 +279,91 @@ export default {
                 this.activeIndex = 25
             }
         },
-        handleClick (tab, event) {
-            // if (tab === 'first') {
-            //     this.getRiskLevel()
-            // } else if (tab === 'second') {
-            //     this.getClauseStatistics()
-            // } else if (tab === 'third') {
-            //     this.getDepartmentStatistics()
-            // } else if (tab === 'fourth') {
-            //     this.getRiskResponse()
-            // }
+        handleClick () {
+            if (this.activeName === 'first') {
+                this.getRiskLevel()
+            } else if (this.activeName === 'second') {
+                this.getClauseStatistics()
+            } else if (this.activeName === 'third') {
+                this.getDepartmentStatistics()
+            } else if (this.activeName === 'fourth') {
+                this.getRiskResponse()
+            }
+        },
+        async countApi (riskId, type) {
+            const res = await request({
+                // 接口地址
+                url: '/business/v3/report/statistic/risk',
+                // 接口方法
+                method: 'get',
+                // 接口参数，data、params
+                params: {
+                    riskId: riskId,
+                    type: type
+                }
+            })
+            return res.data
         },
         // 风险等级
         async getRiskLevel () {
-            const sql1 = `select COUNT(a.feng_xian_deng_ji) AS total FROM t_fxsbpgbzb AS a,t_fxsbpgb AS b WHERE a.parent_id_ = b.id_ AND a.feng_xian_deng_ji = '低风险'`
-            const sql2 = `select COUNT(a.feng_xian_deng_ji) AS total FROM t_fxsbpgbzb AS a,t_fxsbpgb AS b WHERE a.parent_id_ = b.id_ AND a.feng_xian_deng_ji = '中风险'`
-            const sql3 = `select COUNT(a.feng_xian_deng_ji) AS total FROM t_fxsbpgbzb AS a,t_fxsbpgb AS b WHERE a.parent_id_ = b.id_ AND a.feng_xian_deng_ji = '高风险'`
-            let list1, list2, list3
-            await Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2), this.$common.request('sql', sql3)]).then((res) => {
-                list1 = res[0].variables.data[0]
-                list2 = res[0].variables.data[0]
-                list3 = res[0].variables.data[0]
-            })
-            const total = parseInt(list1.total) + parseInt(list2.total) + parseInt(list3.total)
-            const gao = list1.total
-            const gao_zhan_bi_ = parseFloat(gao / total * 100).toFixed(2) + '%'
-            const zhong = list2.total
-            const zhong_zhan_bi_ = parseFloat(zhong / total * 100).toFixed(2) + '%'
-            const di = list3.total
-            const di_zhan_bi_ = parseFloat(di / total * 100).toFixed(2) + '%'
-            this.RiskLevelList = [
-                { deng_ji_: '高风险', shu_liang_: gao, zhan_bi_: gao_zhan_bi_ },
-                { deng_ji_: '中风险', shu_liang_: zhong, zhan_bi_: zhong_zhan_bi_ },
-                { deng_ji_: '低风险', shu_liang_: di, zhan_bi_: di_zhan_bi_ },
-                { deng_ji_: '合计', shu_liang_: total, zhan_bi_: '' }
-            ]
+            const res = await this.countApi(this.zongid, 'FXDJ')
+            this.riskLevePieView = {
+                data: [],
+                idSelector: 'adhjaodh',
+                color: ['#FF0033', '#3870e0', '#339933']
+            }
+            this.riskLevePieView.data = []
+            this.riskLevelList = []
+            const addCount = res.reduce((acc, item) => acc + item.total, 0)
+            for (const item of res) {
+                this.riskLevelList.push({ deng_ji_: item.feng_xian_deng_ji, shu_liang_: item.total, zhan_bi_: parseFloat(Number(item.total) / Number(addCount) * 100).toFixed(1) + '%' })
+                this.riskLevePieView.data.push({ name: item.feng_xian_deng_ji, value: item.total })
+            }
+            this.riskLevelList.push({ deng_ji_: '合计', shu_liang_: addCount, zhan_bi_: '/' })
             this.RiskLevelProp = [
                 { prop: 'deng_ji_', label: '风险等级' },
                 { prop: 'shu_liang_', label: '数量' },
                 { prop: 'zhan_bi_', label: '占比' }
             ]
-            this.riskLevePieView = {
-                data: [{ name: '高风险', value: gao }, { name: '中风险', value: zhong }, { name: '低风险', value: di }],
-                idSelector: 'adhjaodh',
-                color: ['#FF0033', '#3870e0', '#339933']
-            }
         },
         // 涉及条款统计表
-        getClauseStatistics () {
-            this.tableProp = []
-            this.tableList = []
+        async getClauseStatistics () {
+            const res = await this.countApi(this.zongid, 'SJTK')
+            this.termPieView = {
+                data: [],
+                idSelector: 'termPieView',
+                color: ['#FF0033', '#3870e0', '#339933']
+            }
+            this.termPieView.data = []
+            this.termList = []
+            const addCount = res.reduce((acc, item) => acc + item.total, 0)
+            for (const item of res) {
+                this.termList.push({ yao_su_tiao_kuan_: item.yao_su_tiao_kuan_, shu_liang_: item.total, zhan_bi_: parseFloat(Number(item.total) / Number(addCount) * 100).toFixed(1) + '%' })
+                this.termPieView.data.push({ name: item.yao_su_tiao_kuan_, value: item.total })
+            }
+            this.termList.push({ yao_su_tiao_kuan_: '合计', shu_liang_: addCount, zhan_bi_: '/' })
+            this.termProp = [
+                { prop: 'yao_su_tiao_kuan_', label: '条款' },
+                { prop: 'shu_liang_', label: '数量' },
+                { prop: 'zhan_bi_', label: '占比' }
+            ]
         },
         // 责任部门统计表统计表
         async getDepartmentStatistics () {
-            console.log(this.zongid)
-            const this_ = this
-            this.departList = []
-            const sql = `select * from  t_hyrybfxssb WHERE parent_id_ = (select id_ from t_fxssb where  zong_id_ = '${this.zongid}')`
-            let departS = []
-            await curdPost('sql', sql).then((res) => {
-                departS = res.variables.data
-            })
-            for (const item of departS) {
-                const riskSql = `select count(*) as count  from  t_hyrybfxssb where parent_id_ = (select id_ from t_fxsbpgb where guan_lian_id_ = '${item.liu_shui_hao_}')`
-                let countData = []
-                await curdPost('sql', riskSql).then((res) => {
-                    countData = res.variables.data
-                })
-                this.departList.push({ 'bian_zhi_bu_men_': item.bian_zhi_bu_men_, shu_liang_: countData[0].count, zhan_bi_: 0 })
+            const res = await this.countApi(this.zongid, 'ZRBM')
+            this.departPieView = {
+                data: [],
+                idSelector: 'departPieView',
+                color: ['#FF0033', '#3870e0', '#339933']
             }
+            this.departPieView.data = []
+            this.departList = []
+            const addCount = res.reduce((acc, item) => acc + item.total, 0)
+            for (const item of res) {
+                this.departList.push({ bian_zhi_bu_men_: item.name_, shu_liang_: item.total, zhan_bi_: parseFloat(Number(item.total) / Number(addCount) * 100).toFixed(1) + '%' })
+                this.departPieView.data.push({ name: item.name_, value: item.total })
+            }
+            this.riskLevelList.push({ bian_zhi_bu_men_: '合计', shu_liang_: addCount, zhan_bi_: '/' })
             this.departProp = [
                 { prop: 'bian_zhi_bu_men_', label: '部门' },
                 { prop: 'shu_liang_', label: '数量' },
@@ -352,54 +372,47 @@ export default {
         },
         // 风险应对措施统计表
         async getRiskResponse () {
-            const sql1 = `select COUNT(a.feng_xian_ying_du) AS total FROM t_fxsbpgbzb AS a,t_fxsbpgb AS b WHERE a.parent_id_ = b.id_ AND a.feng_xian_ying_du = '风险降低'`
-            const sql2 = `select COUNT(a.feng_xian_ying_du) AS total FROM t_fxsbpgbzb AS a,t_fxsbpgb AS b WHERE a.parent_id_ = b.id_ AND a.feng_xian_ying_du = '风险接受'`
-            const sql3 = `select COUNT(a.feng_xian_ying_du) AS total FROM t_fxsbpgbzb AS a,t_fxsbpgb AS b WHERE a.parent_id_ = b.id_ AND a.feng_xian_ying_du = '风险回避'`
-            let list1, list2, list3
-            await Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2), this.$common.request('sql', sql3)]).then((res) => {
-                list1 = res[0].variables.data[0]
-                list2 = res[0].variables.data[0]
-                list3 = res[0].variables.data[0]
-            })
-            const total = parseInt(list1.total) + parseInt(list2.total) + parseInt(list3.total)
-            const jiang_di_ = list1.total
-            const jiang_di_zhan_bi_ = parseFloat(jiang_di_ / total * 100).toFixed(2) + '%'
-            const jie_shou_ = list2.total
-            const jie_shou_zhan_bi_ = parseFloat(jie_shou_ / total * 100).toFixed(2) + '%'
-            const hui_bi_ = list3.total
-            const hui_bi_zhan_bi_ = parseFloat(hui_bi_ / total * 100).toFixed(2) + '%'
-            this.riskReList = [
-                { cuo_shi_: '风险降低', shu_liang_: jiang_di_, zhan_bi_: jiang_di_zhan_bi_ },
-                { cuo_shi_: '风险接受', shu_liang_: jie_shou_, zhan_bi_: jie_shou_zhan_bi_ },
-                { cuo_shi_: '风险回避', shu_liang_: hui_bi_, zhan_bi_: hui_bi_zhan_bi_ }
-            ]
+            const res = await this.countApi(this.zongid, 'YDCS')
+            this.riskRePieView = {
+                data: [],
+                idSelector: 'riskRePieView',
+                color: ['#FF0033', '#3870e0', '#339933']
+            }
+            this.riskRePieView.data = []
+            this.riskReList = []
+            const addCount = res.reduce((acc, item) => acc + item.total, 0)
+            for (const item of res) {
+                this.riskReList.push({ cuo_shi_: item.feng_xian_ying_du, shu_liang_: item.total, zhan_bi_: parseFloat(Number(item.total) / Number(addCount) * 100).toFixed(1) + '%' })
+                this.riskRePieView.data.push({ name: item.feng_xian_ying_du, value: item.total })
+            }
+            this.riskReList.push({ cuo_shi_: '合计', shu_liang_: addCount, zhan_bi_: '/' })
             this.riskReProp = [
                 { prop: 'cuo_shi_', label: '应对措施' },
                 { prop: 'shu_liang_', label: '数量' },
                 { prop: 'zhan_bi_', label: '占比' }
             ]
-            this.riskRePieView = {
-                data: [{ name: '风险降低', value: jiang_di_ }, { name: '风险接受', value: jie_shou_ }, { name: '风险回避', value: hui_bi_ }],
-                config: { title: '', idSelector: 'riskResponse222' },
-                color: ['#339933', '#3870e0', '#FF0033']
-            }
+            console.log(this.riskRePieView, 'this.riskRePieView')
         },
         // 风险识别评估表
         async getRiskIdentification () {
             const this_ = this
-            const riskCountSql = `select COUNT(*) as count from t_fxsbpgb where zong_id_ = '1214889836008177664'`
+            const riskCountSql = `select COUNT(*) as count from t_fxsbpgb where zong_id_ = '${this.zongid}'`
             let riskCount = []
             await curdPost('sql', riskCountSql).then((res) => {
                 riskCount = res.variables.data
             })
-            this.pageTotal = riskCount[0].count
-            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '1214889836008177664' order by shi_fou_guo_shen_ desc limit ${(this.page - 1) * this.pagesize},${this.pagesize}`
+            if (riskCount === 0) {
+                return
+            }
+            this.pageTotal = Number(riskCount[0].count)
+
+            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
             await curdPost('sql', sql).then((res) => {
                 this_.RiskIdenList = res.variables.data
             })
             for (const item of this_.RiskIdenList) {
-                item.bian_zhi_ren_ = this.findUser(item.bian_zhi_ren_)
-                item.bian_zhi_bu_men_ = this.findDept(item.bian_zhi_bu_men_)
+                item.bian_zhi_ren_ = item.bian_zhi_ren ? this.findUser(item.bian_zhi_ren_) : '/'
+                item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'
                 item.bian_zhi_shi_jian = item.bian_zhi_shi_jian || '/'
                 item.shi_fou_guo_shen_ = item.shi_fou_guo_shen_ || '未编制'
             }
@@ -413,12 +426,18 @@ export default {
         // 风险改进记录
         async getImprovementRecords () {
             const this_ = this
-            // const sql = `select * from t_bmfxgjjl where zong_id_ = '${this.zongid}' `
-            const sql1 = `select * from t_bmfxgjjl limit ${(this.page - 1) * this.pagesize},${this.pagesize}`
-            const sql2 = `select count(*) as count from t_bmfxgjjl`
+            this_.pageTotal = 0
+            const sql1 = `select * from t_bmfxgjjl where zong_id_ = '${this.zongid}' limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
+            const sql2 = `select count(*) as count from t_bmfxgjjl where zong_id_ = '${this.zongid}'`
             await Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then((res) => {
                 this_.ImproRecordsList = res[0].variables.data
+                if (this_.ImproRecordsList === 0) {
+                    return
+                }
                 this_.pageTotal = res[1].variables.data[0].count
+                if (this_.pageTotal !== 0) {
+                    this_.$refs.ImproRecords.curreFn(res[1].variables.data[0].count)
+                }
             })
             for (const item of this_.ImproRecordsList) {
                 item.bian_zhi_ren_ = item.bian_zhi_ren_ ? this.findUser(item.bian_zhi_ren_) : '/'
@@ -445,7 +464,6 @@ export default {
                 { prop: 'wan_cheng_shi_jia', label: '完成日期' },
                 { prop: 'yan_zhong_cheng_d', label: '严重程度' }
             ]
-            // this.tableList = []
         },
         getImpRecordsSchedule (value) {
             if (value === '已改进') {
@@ -461,12 +479,12 @@ export default {
             }
         },
         handleSizeChange (val) {
-            this.page = 1
+            this.currentPage = 1
             this.pagesize = val
             this.turnPage()
         },
         handleCurrentChange (val) {
-            this.page = val
+            this.currentPage = val
             this.turnPage()
         },
         turnPage () {
