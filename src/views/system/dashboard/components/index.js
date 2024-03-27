@@ -34,7 +34,7 @@ export function initColumn (systemAlias) {
         dataResult.forEach(column => {
             const name = `ibps-desktop-${column.alias}`
             Vue.component(name, (resolve, reject) => {
-                resolve(buildComponent(name, column))
+                resolve(buildComponent(name, column, false))
             })
             components.push(name)
         })

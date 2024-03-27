@@ -109,7 +109,7 @@ export default {
                 const column = this.desktopColumn = response.data
                 const name = this.getComponentAlias(column.alias)
                 Vue.component(name, (resolve, reject) => {
-                    resolve(buildComponent(name, column))
+                    resolve(buildComponent(name, column, true))
                 })
                 this.init = true
                 this.dialogLoading = false

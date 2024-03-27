@@ -113,7 +113,7 @@
             <div class="ibps-theme-container" flex-box="1" flex>
                 <!-- 主体 侧边栏 -->
                 <div
-                    v-if="sysName != '首页'"
+                    v-if="!hiddenAsideMenu"
                     ref="aside"
                     flex-box="0"
                     :class="{'ibps-theme-container-aside': true, 'ibps-theme-container-transition': asideTransition}"
@@ -205,6 +205,7 @@ import mixinSearch from './mixins/search'
 import mixinLock from './mixins/lock'
 
 import setting from '@/setting.js'
+import { f } from 'vue-grid-layout'
 export default {
     name: 'ibps-layout-header-aside',
     components: {
@@ -234,23 +235,19 @@ export default {
     mixins: [mixinSearch, mixinLock],
     data () {
         const { isSuper, account } = this.$store.getters
+        const { hiddenAsideMenu = false } = this.$route.meta || {}
         return {
             // [侧边栏宽度] 正常状态
             asideWidth: '200px',
             // [侧边栏宽度] 折叠状态
             asideWidthCollapse: '65px',
             isSuper,
-            account
+            account,
+            hiddenAsideMenu
         }
     },
-    // watch: {
-    //     getSystemName(value) {
-    //         this.sysName = ''
-    //     }
-    // },
     computed: {
         ...mapState('ibps', {
-            // sysName:state=>state.menu.sysName,
             keepAlive: state => state.page.keepAlive,
             grayActive: state => state.gray.active,
             transitionActive: state => state.transition.active,
@@ -268,22 +265,6 @@ export default {
         /**
          * @description 用来实现带参路由的缓存
          */
-        sysName: {
-            get () {
-                if (this.$route.name === 'dashboard') {
-                    return '首页'
-                } else {
-                    return ''
-                }
-            },
-            set () {
-                if (this.$route.name === 'dashboard') {
-                    return '首页'
-                } else {
-                    return ''
-                }
-            }
-        },
         routerViewKey () {
             // 默认情况下 key 类似 __transition-n-/foo
             // 这里的字符串操作是为了最终 key 的格式和原来相同 类似 __transition-n-__stamp-time-/foo
@@ -303,21 +284,22 @@ export default {
             return `${this.$baseUrl}images/theme/${this.themeActiveSetting.name}/only.png`
         }
     },
+    watch: {
+        $route (v) {
+            this.hiddenAsideMenu = v.meta ? v.meta.hiddenAsideMenu : false
+        }
+    },
     mounted () {
         // window.performance.navigation.type === 1
-        if (this.$route.name === 'dashboard') {
-            this.sysName = '首页'
-        }
     },
     methods: {
         ...mapActions('ibps/menu', ['asideCollapseToggle']),
-        ...mapState('ibps/menu', ['activeHeader', 'header', 'activeName']),
+        ...mapState('ibps/menu', ['routers', 'activeHeader', 'header', 'activeName']),
         goToMain () {
-            // this.sysName = "首页"
             this.$router.push({ path: '/' })
         },
         pageChange () {
-            this.sysName = ''
+            
         },
         /**
          * 接收点击切换侧边栏的按钮

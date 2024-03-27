@@ -3,6 +3,7 @@
         :visible.sync="dialogVisible"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :show-close="false"
         fullscreen
         class="desktop-manage-dialog"
         @close="closeDialog"
@@ -56,9 +57,11 @@
                         <el-input v-model="desktopManage.memo" type="textarea" />
                     </el-form-item>
 
-                    <el-form-item label="所属组织" prop="groupId">
-                        <ibps-org-selector
+                    <el-form-item label="所属部门" prop="groupId">
+                        <ibps-position-selector
                             v-model="desktopManage.groupId"
+                            :placeholder="'请选择部门'"
+                            :filtrate="true"
                         />
                     </el-form-item>
                     <el-form-item label="是否默认:" prop="isDef">
@@ -90,13 +93,13 @@
 import { save, get } from '@/api/platform/desktop/manage'
 import ActionUtils from '@/utils/action'
 import DesktopLayout from '../myLayout/layout'
-import IbpsOrgSelector from '@/business/platform/org/org/selector'
+import IbpsPositionSelector from '@/business/platform/org/position/selector'
 import DesktopPreview from './preview'
 
 export default {
     components: {
         DesktopLayout,
-        IbpsOrgSelector,
+        IbpsPositionSelector,
         DesktopPreview
     },
     props: {
@@ -204,8 +207,8 @@ export default {
             })
         },
         /**
-     * 表单验证
-     */
+         * 表单验证
+         */
         formValidate () {
             if (this.readonly) return
             this.$nextTick(() => {
@@ -217,8 +220,8 @@ export default {
             this.$emit('close', false)
         },
         /**
-     * 获取表单数据
-     */
+         * 获取表单数据
+         */
         loadData () {
             if (this.$utils.isEmpty(this.formId)) {
                 // 重置表单
@@ -262,11 +265,17 @@ export default {
 
 }
 </script>
-<style lang="scss">
-    .desktop-manage-dialog{
-        .el-dialog__body{
-            height:  calc(100vh - 110px) !important;
-            padding: 0;
+<style lang="scss" scoped>
+    .desktop-manage-dialog {
+        ::v-deep {
+            .el-dialog__header {
+                padding: 15px 20px;
+                line-height: 20px;
+            }
+            .el-dialog__body {
+                height: calc(100vh - 55px) !important;
+                padding: 0;
+            }
         }
     }
 </style>

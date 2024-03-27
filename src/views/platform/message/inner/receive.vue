@@ -12,7 +12,7 @@
             :pagination="pagination"
             :loading="loading"
             :index-row="false"
-            display-field="未读消息"
+            display-field="我的消息"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @column-link-click="handleLinkClick"
@@ -77,10 +77,10 @@
 </template>
 
 <script>
-import { queryReceivePageList, getMyMsgList, remove, markRead } from '@/api/platform/message/innerMessage'
+import { queryReceivePageList, getMyMsgAllList, getMyMsgList, remove, markRead } from '@/api/platform/message/innerMessage'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
-import { typeOptions, renderHeader } from './constants'
+import { typeOptions, renderHeader, typeMsg } from './constants'
 import Detail from './detail/dialog'
 import Reply from './reply'
 import Bus from '@/utils/EventBus'
@@ -133,6 +133,13 @@ export default {
                             options: typeOptions
                         },
                         {
+                            prop: 'Q^isRead^SN',
+                            label: '消息状态',
+                            fieldType: 'select',
+                            options: typeMsg,
+                            value: '0'
+                        },
+                        {
                             prop: ['Q^beginreceiveTime^DL', 'Q^endreceiveTime^DG'],
                             label: '发送时间',
                             fieldType: 'daterange'
@@ -158,6 +165,8 @@ export default {
                     },
                     { prop: 'ownerName', label: '发送人', width: '90' },
                     { prop: 'messageType', label: '消息类型', tags: typeOptions, width: '100' },
+                    // 接口未返回消息状态，仅增加了状态的
+                    // { prop: 'isRead', label: '消息状态', tags: typeMsg, width: '100' },
                     { prop: 'content', label: '消息描述', minWidth: '200' },
                     { prop: 'fileMsg', label: '有无附件', slotName: 'file', width: '90' },
                     { prop: 'createTime', label: '发送时间', sortable: 'custom', dateFormat: 'yyyy-MM-dd HH:mm:ss', width: '150' }
@@ -179,32 +188,35 @@ export default {
                             }
                         },
                         {
-                            key: 'detail',
-                            hidden: function (row, index) {
-                                return (row.subject === '文件发放通知')
-                            }
+                            key: 'detail'
                         }
                     ]
                 }
             }
         }
     },
-    created () {
+    mounted () {
+        this.listConfig.searchForm.forms[3].value = 0
         this.loadData()
     },
+    // mounted () {
+    //     console.log(this.searchForm)
+    //     this.listConfig.searchForm.forms[3].value = 0
+    //     this.loadData()
+    // },
     methods: {
-    // 加载数据
+        // 加载数据
         loadData () {
             this.loading = true
             // queryReceivePageList({
-            //     parameters:[
-            //         {key: "Q^subject^SL", value: "提醒"},
-            //         {key: "Q^messageType^SL", value: "system"}
+            //     parameters: [
+            //         { key: 'Q^subject^SL', value: '提醒' },
+            //         { key: 'Q^messageType^SL', value: 'system' }
             //     ],
-            //     requestPage:{limit: 10,pageNo: 1,totalCount: 0},
+            //     requestPage: { limit: 10, pageNo: 1, totalCount: 0 },
             //     sorts: []
-            // }).then(response => {
-            getMyMsgList(this.getSearcFormData()).then(response => {
+            // }).then(response => {})
+            getMyMsgList(this.getFormatParams()).then(response => {
                 const data = response.data
                 const { pageResult = {}} = data
                 ActionUtils.handleListData(this, data)
@@ -213,16 +225,6 @@ export default {
             }).catch(() => {
                 this.loading = false
             })
-        },
-        /**
-         * 获取格式化参数
-         */
-        getSearcFormData () {
-            return ActionUtils.formatParams(
-                this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
-                this.pagination,
-                this.sorts
-            )
         },
         /**
          * 处理分页事件
@@ -264,25 +266,28 @@ export default {
                     //     this.handleAlreadyRead(id)
                     //     // this.isEnvelope = false
                     // }).catch(() => { })
+                    if (!data || !data.length) {
+                        return ActionUtils.warning('请选择消息！')
+                    }
                     try {
-                        if (data === undefined) {
-                            throw new Error('请选择数据再标记已读。')
+                        const readableData = data.filter(i => i.subject !== '文件发放通知').map(i => i.id)
+                        if (!readableData.length) {
+                            return ActionUtils.warning('文件发放通知不可直接标记为已读！')
                         }
-                        const fitDatas = []
-                        data.forEach(el => {
-                            if (el.subject !== '文件发放通知') {
-                                fitDatas.push(el.id)
-                            }
-                        })
-                        if (fitDatas.length !== data.length) {
-                            const comfirm = confirm('文件发放通知并不会被标记为已读')
-                            if (comfirm) {
-                                ActionUtils.selectedMultiRecord(fitDatas).then(id => {
+                        if (readableData.length !== data.length) {
+                            this.$confirm('您选中的消息中含有文件发放通知，该类型消息无法直接标记为已读，是否确认将所选的其他消息标记为已读？', '提示', {
+                                confirmButtonText: '确认',
+                                cancelButtonText: '取消',
+                                type: 'warning',
+                                showClose: false,
+                                closeOnClickModal: false
+                            }).then(() => {
+                                ActionUtils.selectedMultiRecord(readableData).then(id => {
                                     this.handleAlreadyRead(id)
                                 }).catch(() => { })
-                            }
+                            })
                         } else {
-                            ActionUtils.selectedMultiRecord(fitDatas).then(id => {
+                            ActionUtils.selectedMultiRecord(readableData).then(id => {
                                 this.handleAlreadyRead(id)
                             }).catch(() => { })
                         }
@@ -319,6 +324,19 @@ export default {
                 ActionUtils.success('标记已读成功')
                 this.search()
             }).catch(() => { })
+        },
+        /**
+         * 获取格式化参数
+         */
+        getFormatParams () {
+            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            if (params.hasOwnProperty('Q^isRead^SN')) {
+                params.isRead = parseInt(params.isRead)
+            }
+            return ActionUtils.formatParams(
+                params,
+                this.pagination,
+                this.sorts)
         },
         /**
          * 处理回复

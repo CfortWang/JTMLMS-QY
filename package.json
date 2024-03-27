@@ -21,12 +21,13 @@
     "report": "vue-cli-service build --report"
   },
   "dependencies": {
-    "@fullcalendar/bootstrap": "^5.3.0",
-    "@fullcalendar/core": "^5.3.0",
-    "@fullcalendar/daygrid": "^5.3.0",
-    "@fullcalendar/list": "^5.3.0",
-    "@fullcalendar/timegrid": "^5.3.0",
-    "@fullcalendar/vue": "^5.3.0",
+    "@fullcalendar/bootstrap": "^5.9.0",
+    "@fullcalendar/core": "^5.9.0",
+    "@fullcalendar/daygrid": "^5.9.0",
+    "@fullcalendar/interaction": "^5.9.0",
+    "@fullcalendar/list": "^5.9.0",
+    "@fullcalendar/timegrid": "^5.9.0",
+    "@fullcalendar/vue": "^5.9.0",
     "@handsontable/vue": "^4.1.1",
     "@jiaminghi/data-view": "^2.10.0",
     "animate.css": "^4.1.0",
@@ -109,6 +110,7 @@
   },
   "devDependencies": {
     "@kazupon/vue-i18n-loader": "^0.5.0",
+    "@types/echarts": "^4.9.18",
     "@vue/cli-plugin-babel": "^4.5.4",
     "@vue/cli-plugin-eslint": "^4.5.4",
     "@vue/cli-plugin-router": "^4.5.4",

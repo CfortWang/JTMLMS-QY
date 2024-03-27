@@ -75,6 +75,9 @@
                             :ref="item.alias"
                             :alias="item.alias"
                             :height="getHeight(item.h)"
+                            :add-component-datas="addComponentDatas"
+                            @open="handleOpen"
+                            @close="handleClose"
                             @action-event="(command,data)=> handleActionEvent(command,data,index)"
                         />
                     </ibps-grid-item>
@@ -107,6 +110,13 @@
                 />
             </template>
         </div>
+        <schedule-add
+            :visible="calendarDialogVisible"
+            :form="calendarDialogForm"
+            @close="handleClose"
+            @saveData="handleSaveData"
+            @delData="handleDelData"
+        />
     </ibps-container>
 
 </template>
@@ -122,12 +132,13 @@ import IbpsBackToTop from '@/components/ibps-back-to-top'
 import Preview from '@/views/platform/desktop/column/preview'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 
-import IbpsNewsDialog from '@/views/platform/system/news/cms'
+import IbpsNewsDialog from '@/views/platform/system/news/detail'
 import IbpsMessageDialog from '@/views/platform/message/inner/detail/dialog'
 import { StatisticsData, StatisticsSign } from '@/api/platform/system/jbdHome'
 import { getToken } from '@/utils/auth'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import param from '@/store/modules/ibps/modules/param'
+import ScheduleAdd from '@/views/system/dashboard/templates/scheduleAdd'
 
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
 let cronTask = null
@@ -139,7 +150,8 @@ export default {
         Preview,
         BpmnFormrender,
         'ibps-grid-layout': GridLayout,
-        'ibps-grid-item': GridItem
+        'ibps-grid-item': GridItem,
+        ScheduleAdd
     },
     data () {
         return {
@@ -185,7 +197,10 @@ export default {
             headers: {
                 'X-Authorization-access_token': getToken()
             },
-            scheduledTask: false
+            scheduledTask: false,
+            calendarDialogVisible: false,
+            calendarDialogForm: {},
+            addComponentDatas: {}
         }
     },
     computed: {
@@ -299,28 +314,28 @@ export default {
             }, 100)
         },
         // 抓取数据
-        fetchData() {
-          initColumn(this.systemAlias)
-          this.loading = true
-           const interval = setInterval(() => {
-           if (isInit()) {
-              getMyDesktop({
-                systemAlias: this.systemAlias
-              }).then(response => {
-                try {
-                  this.layout = this.$utils.parseData(response.data)
-                  this.defaultData = this.$utils.parseData(response.data)
-                } catch (error) {
-                  this.layout = []
-                  this.defaultData = []
+        fetchData () {
+            initColumn(this.systemAlias)
+            this.loading = true
+            const interval = setInterval(() => {
+                if (isInit()) {
+                    getMyDesktop({
+                        systemAlias: this.systemAlias
+                    }).then(response => {
+                        try {
+                            this.layout = this.$utils.parseData(response.data)
+                            this.defaultData = this.$utils.parseData(response.data)
+                        } catch (error) {
+                            this.layout = []
+                            this.defaultData = []
+                        }
+                        this.loading = false
+                    }).catch(() => {
+                        this.loading = false
+                    })
+                    clearInterval(interval)
                 }
-                this.loading = false
-              }).catch(() => {
-                this.loading = false
-              })
-              clearInterval(interval)
-           }
-           }, 100)
+            }, 100)
         },
         getHeight (h) {
             return (h - 1) * (this.rowHeight + this.margin[1]) + this.margin[1]
@@ -591,6 +606,67 @@ export default {
             const today = new Date().toLocaleDateString()
             localStorage.setItem('doNotShowToday', today)
             this.infoMessage.close()
+        },
+        // 关闭指定弹框
+        handleClose (state) {
+            switch (state) {
+                case 'calendar':
+                    this.calendarDialogVisible = false
+                    break
+                default:
+                    break
+            }
+        },
+        // 打开指定弹框
+        handleOpen (state, dateArr, events) {
+            const status = ['急', '重', '轻', '缓']
+            const eventTrees = []
+            switch (state) {
+                case 'calendar':
+                    this.calendarDialogVisible = true
+                    for (const i of events) {
+                        // 根据指定日期A获取A在时间区间内的数据
+                        if (!((this.compareDates(i.start, dateArr[1]) > 0) || (this.compareDates(i.jieShuShiJian, dateArr[0]) < 0))) {
+                            i.label = `（${status[Number(i.zhuangTai) - 1] ? status[Number(i.zhuangTai) - 1] : ''}）` + i.title
+                            eventTrees.push(i)
+                        }
+                    }
+                    if (eventTrees.length) {
+                        this.calendarDialogForm = {
+                            eventTrees
+                        }
+                    } else {
+                        this.calendarDialogForm = {
+                            eventTrees: []
+                        }
+                    }
+                    this.calendarDialogForm.clickedDate = dateArr[0]
+                    break
+                default:
+                    break
+            }
+        },
+        /**
+         * date1(2024-01-01) 大于 date2(2023-01-01) 返回 1
+         * date1 小于 date2 返回 -1
+         * date1 等于 date2 返回 0
+         */
+        compareDates (date1, date2) {
+            var time1 = new Date(date1).getTime()
+            var time2 = new Date(date2).getTime()
+            return Math.sign(time1 - time2) // 使用Math.sign()函数返回值为 -1, 0, 1
+        },
+        // 日历弹框组件保存时候的回调
+        handleSaveData (param) {
+            if (param.state === 'calendar') {
+                this.$refs.myCalendar[0].setCalendarEvents(param)
+            }
+        },
+        // 日历弹框组件删除日程时候的回调
+        handleDelData (param) {
+            if (param.state === 'calendar') {
+                this.$refs.myCalendar[0].hanldeCalendardel(param)
+            }
         }
     }
 }
@@ -677,5 +753,10 @@ export default {
             transform: rotate(-40deg);
             opacity: 0.1;
         }
+    }
+    .fc .fc-toolbar.fc-header-toolbar{
+        margin-top: -1em;
+        margin-bottom: 0em;
+        font-size: 10px;
     }
 </style>

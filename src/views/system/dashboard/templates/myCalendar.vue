@@ -1,7 +1,7 @@
 <template>
-    <el-card :style="{height:cardHeight}" class="box-card">
+    <el-card :style="{height:cardHeight}" class="box-card changeShadow">
         <div slot="header" class="clearfix">
-            <span>{{ title }}</span>
+            <span>{{  }}</span>
             <ibps-desktop-toolbar
                 ref="toolbar"
                 :actions="[{key:'refresh'},{key:'fullscreen'},{key:'collapse'}]"
@@ -14,5 +14,4 @@
             </div>
         </transition>
     </el-card>
-
 </template>

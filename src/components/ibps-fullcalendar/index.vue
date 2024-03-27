@@ -1,9 +1,9 @@
 
 <template>
-  <full-calendar
-    ref="fullCalendar"
-    :options="fullCalendarOptions"
-  />
+    <full-calendar
+        ref="fullCalendar"
+        :options="fullCalendarOptions"
+    />
 </template>
 
 <script>
@@ -12,7 +12,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
-// import listPlugin from '@fullcalendar/list'
+import interactionPlugin from '@fullcalendar/interaction'
 import lang from '@/locales/fullcalendar'
 import I18n from '@/utils/i18n'
 
@@ -21,36 +21,34 @@ import '@fullcalendar/common/main.css'
 import '@fullcalendar/daygrid/main.css'
 
 export default {
-  components: {
-    FullCalendar
-  },
-  props: {
-    options: {
-      type: Object,
-      default: function() {
-        return {}
-      }
-    }
-  },
-  data() {
-    return {
-      calendarOptions: {
-        plugins: [dayGridPlugin, timeGridPlugin, listPlugin, bootstrapPlugin],
-        initialView: 'dayGridMonth'
-      }
-    }
-  },
-  computed: {
-    fullCalendarOptions() {
-      const options = Object.assign({
-        locales: lang.locales,
-        locale: this.locale
-      }, this.calendarOptions, this.options)
-      return options
+    components: {
+        FullCalendar
     },
-    locale() {
-      return lang.localeMap[I18n.getLanguage()]
+    props: {
+        options: {
+            type: Object,
+            default: () => {}
+        }
+    },
+    data () {
+        return {
+            calendarOptions: {
+                plugins: [dayGridPlugin, timeGridPlugin, listPlugin, bootstrapPlugin, interactionPlugin],
+                initialView: 'dayGridMonth'
+            }
+        }
+    },
+    computed: {
+        fullCalendarOptions () {
+            const options = Object.assign({
+                // locales: lang.locales,
+                // locale: this.locale
+            }, this.calendarOptions, this.options)
+            return options
+        },
+        locale () {
+            return lang.localeMap[I18n.getLanguage()]
+        }
     }
-  }
 }
 </script>

@@ -20,7 +20,8 @@ const frameIn = [
                 name: 'dashboard',
                 meta: {
                     title: '首页',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/system/homepage')
             },
@@ -48,7 +49,8 @@ const frameIn = [
                 name: 'log',
                 meta: {
                     title: '前端日志',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/system/log')
             },
@@ -89,7 +91,8 @@ const frameIn = [
                 name: 'message',
                 meta: {
                     title: '消息中心',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/message/inner/receive')
             },
@@ -98,7 +101,8 @@ const frameIn = [
                 name: 'receiveMessage',
                 meta: {
                     title: '未读消息',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/message/inner/receive')
             },
@@ -108,7 +112,8 @@ const frameIn = [
                 name: 'myFavorites',
                 meta: {
                     title: '我的收藏',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmInitiatedProcess/favorites')
             },
@@ -117,7 +122,8 @@ const frameIn = [
                 name: 'myCompleted',
                 meta: {
                     title: '我的办结',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmInitiatedProcess/myCompleted')
             },
@@ -126,7 +132,8 @@ const frameIn = [
                 name: 'myDrafts',
                 meta: {
                     title: '我的暂存',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmInitiatedProcess/myDraft')
             },
@@ -135,7 +142,8 @@ const frameIn = [
                 name: 'myRequest',
                 meta: {
                     title: '我的请求',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmInitiatedProcess/myRequest')
             },
@@ -144,7 +152,8 @@ const frameIn = [
                 name: 'newProcess',
                 meta: {
                     title: '新建流程',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmInitiatedProcess/newProcess')
             },
@@ -153,7 +162,8 @@ const frameIn = [
                 name: 'delegateMatters',
                 meta: {
                     title: '转办代理',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedProcess/pendingManage/delegateMatters')
             },
@@ -162,7 +172,8 @@ const frameIn = [
                 name: 'pendingMatters',
                 meta: {
                     title: '待办事宜',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedProcess/pendingManage/pending')
             },
@@ -189,7 +200,8 @@ const frameIn = [
                 name: 'completedMatters',
                 meta: {
                     title: '办结事宜',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedProcess/completed')
             },
@@ -198,7 +210,8 @@ const frameIn = [
                 name: 'handledTasks',
                 meta: {
                     title: '已办事宜',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedProcess/handled')
             },
@@ -207,7 +220,8 @@ const frameIn = [
                 name: 'pending',
                 meta: {
                     title: '待办',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedProcess/pending')
             },
@@ -216,7 +230,8 @@ const frameIn = [
                 name: 'revoke',
                 meta: {
                     title: '废除',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedProcess/revoke')
             },
@@ -225,7 +240,8 @@ const frameIn = [
                 name: 'handled1',
                 meta: {
                     title: '已办1',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedTask/handled')
             },
@@ -234,7 +250,8 @@ const frameIn = [
                 name: 'handled2',
                 meta: {
                     title: '已办2',
-                    auth: true
+                    auth: true,
+                    hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedTask/handled2')
             }

@@ -131,10 +131,17 @@ export default {
 
 }
 </script>
-<style lang="scss">
-    .desktop-manage-preview-dialog{
-        .el-dialog__body{
-            height:  calc(100vh - 110px) !important;
+<style lang="scss" scoped>
+    .desktop-manage-preview-dialog {
+        ::v-deep {
+            .el-dialog__header {
+                padding: 0;
+                height: 52px;
+            }
+            .el-dialog__body {
+                height: calc(100vh - 52px) !important;
+                padding: 0;
+            }
         }
     }
 </style>

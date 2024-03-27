@@ -19,6 +19,22 @@ export const typeOptions = [
     //     type: 'yellow'
     // }
 ]
+export const typeMsg = [
+    {
+        value: '0',
+        label: '未读',
+        type: 'primary'
+    },
+    {
+        value: '1',
+        label: '已读',
+        type: 'success'
+    },
+    {
+        value: '2',
+        label: '所有'
+    }
+]
 export const renderHeader = function (h, { column, $index }) {
     return h('span', [
         h('el-tooltip', {

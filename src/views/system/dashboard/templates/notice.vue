@@ -1,16 +1,15 @@
 <template>
-
-    <el-card class="box-card">
+    <el-card class="box-card changeShadow">
         <div slot="header" class="clearfix">
             <ibps-icon name="commenting" />
             <span>{{ title }}</span>
             <ibps-desktop-toolbar
                 ref="toolbar"
-                :actions="[{ key: 'refresh' }, { key: 'more' }, { key: 'fullscreen' }, { key: 'collapse' }]"
+                :actions="[{ key: 'refresh' }, { key: 'more' }, { key: 'collapse' }]"
                 @action-event="handleActionEvent"
             />
         </div>
-        <div ref="body" :style="{height:showHeight,width:'100%'}">
+        <div ref="body" :style="{height:getAddHeight(-20),width:'100%'}">
             <el-scrollbar
                 style="height: 100%;width:100%;"
                 wrap-class="ibps-scrollbar-wrapper"
@@ -23,11 +22,13 @@
                             @click.native="handleApprove(d.id)"
                         >
                             <ibps-list-item-meta>
-                                <div slot="avatar"><ibps-icon name="bolt" style="color:#5cb85c;margin: 5px 0 0 5px;" /></div>
-                                <el-link slot="title" type="primary" :underline="false">{{ d.title }}</el-link>
+                                <!-- <div slot="avatar"><ibps-icon name="bolt" style="color:#5cb85c;margin: 5px 0 0 5px;" /></div> -->
+                                <el-link slot="title" type="primary" :underline="false">{{ d.title }}
+                                    <img :src="newPng" style="vertical-align: middle;height: 32px">
+                                </el-link>
                             </ibps-list-item-meta>
                             <div slot="extra">
-                                <ibps-icon name="dot-circle-o" style="color:#36c6d3" />{{ d.userName }}
+                                <ibps-icon name="dot-circle-o" style="color:#36c6d3" />{{ getNewsDate(d.publicDate,10) }}
                             </div>
                         </ibps-list-item>
                     </ibps-list>

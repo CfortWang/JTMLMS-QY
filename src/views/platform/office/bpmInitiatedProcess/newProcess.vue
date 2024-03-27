@@ -21,6 +21,7 @@
             :pagination="pagination"
             :loading="loading"
             :index-row="false"
+            :display-field="title"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @column-link-click="handleLinkClick"
@@ -97,7 +98,6 @@
                 <template slot="item-detail-status">
                     <span />
                 </template>
-
             </ibps-card-list>
             <bpmn-formrender
                 :visible="dialogFormVisible"
@@ -113,44 +113,14 @@ import { newProcess, saveFavorites, removeFavorites } from '@/api/platform/offic
 import { findBpmDefinitionState } from '@/api/platform/bpmn/bpmInfo'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
-import IbpsTypeTree from '@/business/platform/cat/type/tree'
-import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
+import CommonData from '../mixin/utils'
 
 export default {
-    components: {
-        IbpsTypeTree,
-        BpmnFormrender,
-        'ibps-type-tree': () => import('@/business/platform/cat/type/tree'),
-        'ibps-card-list': () => import('@/components/ibps-card-list/list'),
-        'form-builder': () => import('@/business/platform/form/formbuilder/dialog'),
-        'formrender-preview': () => import('@/business/platform/form/formrender/preview/index')
-    },
-    mixins: [FixHeight],
+    mixins: [FixHeight, CommonData],
     data () {
         return {
-            width: 220,
-            height: 500,
-            title: '启动工作流程',
-            createText: '创建表单',
-            query: '',
-            typeId: '',
-            pkKey: 'id', // 主键  如果主键不是pk需要传主键
-            loading: false,
-            dialogFormVisible: false,
-            copyDialogFormVisible: false,
-            rightsDialogFormVisible: false,
-            formbuilderDialogVisible: false,
-            formrenderDialogVisible: false,
-            importFormVisible: false,
-            formPrintDialogVisible: false,
-            defId: '', // 编辑dialog需要使用
+            title: '新建流程',
             statusOptions: [],
-            editId: '',
-            formKey: '',
-            name: '',
-            searchField: '',
-            searchName: 'Q^name_^SL',
-            listData: [],
             listConfig: {
                 // 工具栏
                 toolbars: [
@@ -174,15 +144,13 @@ export default {
                 // 表格字段配置.
                 columns: [
                     { prop: 'favorites', label: '收藏', slotName: 'favoritesIcon', width: '60' },
-                    { prop: 'name', label: '任务名称', link: 'dialog' },
+                    { prop: 'name', label: '流程名称', link: 'dialog' },
                     // { prop: 'createTime', label: '创建时间', width: 140 },
                     { prop: 'typeName', label: '所属分类', width: 180 },
                     { prop: 'status', label: '状态', slotName: 'statusCloum', width: 150 },
                     { prop: 'version', label: '版本号', width: 80 }
                 ]
-            },
-            pagination: {},
-            sorts: {}
+            }
         }
     },
     created () {
@@ -208,60 +176,12 @@ export default {
         loadData () {
             this.loading = true
             newProcess(this.getFormatParams()).then(response => {
-                // debugger
                 this.listData = response.data.dataResult
-                this.name = response.data.dataResult.name
                 ActionUtils.handleListData(this, response.data)
-
-                // this.name = this.$refs['layout'].data.name
                 this.loading = false
             }).catch(() => {
                 this.loading = false
             })
-        },
-        /**
-         * 获取格式化参数
-         */
-        getFormatParams () {
-            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-            if (this.$utils.isNotEmpty(this.typeId)) {
-                params['Q^TYPE_ID_^S'] = this.typeId
-            }
-            return ActionUtils.formatParams(
-                params,
-                this.pagination,
-                this.sorts)
-        },
-        /**
-         * 处理分页事件
-         */
-        handlePaginationChange (page) {
-            ActionUtils.setPagination(this.pagination, page)
-            this.loadData()
-        },
-        /**
-         * 处理排序
-         */
-        handleSortChange (sort) {
-            ActionUtils.setSorts(this.sorts, sort)
-            this.loadData()
-        },
-        search () {
-            this.loadData()
-        },
-        /**
-         * 重置查询条件
-         */
-        reset () {
-            this.$refs['crud'].handleReset()
-        },
-        /**
-         * 点击表格
-         */
-        handleLinkClick (data) {
-            debugger
-            this.defId = data.id || ''
-            this.dialogFormVisible = true
         },
         /**
          * 处理按钮事件
@@ -317,24 +237,19 @@ export default {
                     })
                 }
             }).catch(() => {})
-        },
-        handleNodeClick (typeId) {
-            this.typeId = typeId
-            this.loadData()
-        },
-        handleExpandCollapse (isExpand) {
-            this.width = isExpand ? 230 : 30
         }
-
     }
 }
 </script>
-<style scoped>
-    .ibps-layout >>>  .container-component{
+<style lang="scss" scoped>
+    .ibps-layout .container-component {
         position: absolute;
         top: 0px;
         right: 0;
         bottom: 0px;
-        left: 220px!important;}
-    .ibps-card-list-container >>> .ibps-card-list--picture-card{display: block;}
+        left: 220px !important;
+    }
+    .ibps-card-list-container .ibps-card-list--picture-card {
+        display: block;
+    }
 </style>

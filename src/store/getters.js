@@ -6,6 +6,7 @@ export default {
     org: state => state.ibps.user.info ? state.ibps.user.info.org : {}, // 用户部门信息
     role: state => state.ibps.user.info ? state.ibps.user.info.role : [], // 用户角色信息
     position: state => state.ibps.user.info && state.ibps.user.info.employee ? state.ibps.user.info.employee.positions : '', // 用户部门信息
+    mainPosition: state => state.ibps.user.info && state.ibps.user.info.employee ? state.ibps.user.info.mainPosition : {}, // 用户部门信息
     isSuper: state => state.ibps.user.info && state.ibps.user.info.user ? state.ibps.user.info.user.isSuper === 'Y' : false, // 是否超级管理员
     account: state => state.ibps.user.info && state.ibps.user.info.user ? state.ibps.user.info.user.account : '', // 用户名
     regOpen: state => state.ibps.user.regOpen, // 注册状态
@@ -31,7 +32,7 @@ export default {
     // =========== 子系统
     system: state => state.ibps.system.system, // 子系统
     systemid: state => state.ibps.system.system ? state.ibps.system.system.id : '', // 子系统id
-
+    pitchDept: state => state.ibps.param && state.ibps.param.pitchDept ? state.ibps.param.pitchDept : [], // 首页自选主部门
     permissions: state => state.ibps.menu.permissions, //  拥有的权限
     myform: state => state.ibps.myform ? state.ibps.myform : '',
     // 获取所有用户信息
