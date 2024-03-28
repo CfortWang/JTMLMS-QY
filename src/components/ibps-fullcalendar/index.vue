@@ -1,4 +1,3 @@
-
 <template>
     <full-calendar
         ref="fullCalendar"

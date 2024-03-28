@@ -283,7 +283,7 @@ export default {
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
             currentPage: 1,
-            totalCount: 0,
+            totalCount: this.value && this.value.length ? this.value.length : 0,
             dataModel: initData,
             copDataModel: initData,
             multipleSelection: '',

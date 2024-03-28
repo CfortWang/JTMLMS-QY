@@ -197,7 +197,7 @@ export default {
             reducePieView: {},
             reduceChange: true,
             currentPage: 1,
-            pagesize: 2
+            pagesize: 5
         }
     },
     computed: {
@@ -216,12 +216,16 @@ export default {
         }
     },
     watch: {
-
         obj (newVal, oldVal) {
             this.id = newVal[0].id_
             this.zongid = newVal[0].zong_id_
             this.getInits()
         }
+    },
+    created () {
+        this.id = this.obj[0].id_
+        this.zongid = this.obj[0].zong_id_
+        this.getInits()
     },
     destroyed () {
         this.$destroy()
@@ -248,7 +252,7 @@ export default {
         },
         findUser (userId) {
             const user = this.userList.find(i => i.userId === userId)
-            return user.userName || '/'
+            return user.userName
         },
         getInits () {
             this.getRiskLevel() // 风险等级
@@ -256,7 +260,7 @@ export default {
             this.getImprovementRecords()// 风险改进记录
             this.getSchedule(this.obj[0].zhuang_tai_)
             this.currentPage = 1
-            this.pagesize = 2
+            this.pagesize = 5
             this.scan = this.scanVisible
             this.activeName = 'first'
             this.userList = this.$store.getters.userList
@@ -401,9 +405,10 @@ export default {
             await curdPost('sql', riskCountSql).then((res) => {
                 riskCount = res.variables.data
             })
-            if (riskCount === 0) {
-                return
-            }
+            // if (riskCount !== 0) {
+            //     return
+            // }
+            this_.$refs.RiskIdenList.curreFn(riskCount[0].count)
             this.pageTotal = Number(riskCount[0].count)
 
             const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
@@ -411,7 +416,7 @@ export default {
                 this_.RiskIdenList = res.variables.data
             })
             for (const item of this_.RiskIdenList) {
-                item.bian_zhi_ren_ = item.bian_zhi_ren ? this.findUser(item.bian_zhi_ren_) : '/'
+                item.bian_zhi_ren_ = item.bian_zhi_ren_ ? this.findUser(item.bian_zhi_ren_) : '/'
                 item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'
                 item.bian_zhi_shi_jian = item.bian_zhi_shi_jian || '/'
                 item.shi_fou_guo_shen_ = item.shi_fou_guo_shen_ || '未编制'

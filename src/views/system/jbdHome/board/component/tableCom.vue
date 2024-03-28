@@ -23,8 +23,8 @@
         <div v-if="pageShow" class="block">
             <el-pagination
                 :current-page="currentPage"
-                :page-sizes="[2, 5]"
-                :page-size="2"
+                :page-sizes="[1, 5,10]"
+                :page-size="5"
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="pageTotal"
                 @size-change="handleSizeChange"
@@ -77,7 +77,7 @@ export default {
             tableData: [],
             // 步骤条步数
             activeIndex: 20,
-            currentPage: 2,
+            currentPage: 1,
             pageTotal: 0
         }
     },
