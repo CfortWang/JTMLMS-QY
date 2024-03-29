@@ -107,7 +107,7 @@
     <!-- 无选项卡版本 -->
     <el-card :style="{height: cardHeight}" class="home-card changeShadow">
         <div slot="header" class="clearfix">
-            <ibps-icon name="commenting" />
+            <i class="el-icon-message" />
             <div style="width: 50%; display: inline-flex; align-items: center;">
                 <span>{{ title }}</span>
                 <span class="totalityClass">{{ totality ? totality.totalCount > 999 ? '999+' : totality.totalCount : '0' }}</span>

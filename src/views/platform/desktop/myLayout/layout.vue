@@ -240,7 +240,7 @@ export default {
     .ibps-desktop-page {
         .vue-grid-layout {
             border-radius: 4px;
-            margin: -10px;
+            // margin: -10px;
             .page_card {
                 height: 100%;
                 @extend %unable-select;

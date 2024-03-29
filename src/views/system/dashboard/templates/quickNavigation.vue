@@ -11,15 +11,31 @@
         </div>
         <div ref="body" :style="{height: showHeight, width: '100%'}">
             <div :style="{height: showHeight, width: '100%'}" class="nav-content">
-                <el-tag
-                    v-for="(tag, i) in quickNavigationData"
-                    :key="i"
-                    closable
-                    :disable-transitions="false"
-                    @close="handleNavRemove(tag.id, i)"
+                <vue-draggable
+                    v-if="quickNavigationData && quickNavigationData.length"
+                    v-model="quickNavigationData"
+                    v-bind="draggableOptions"
+                    class="list-group"
+                    @start="isDragging = true"
+                    @end="()=>{ isDragging = false }"
                 >
-                    <a :href="tag.urlAddr" :target="tag.display">{{ tag.urlName }}</a>
-                </el-tag>
+                    <el-tag
+                        v-for="(tag, i) in quickNavigationData"
+                        :key="i"
+                        closable
+                        :disable-transitions="false"
+                        class="draggable"
+                        @close="handleNavRemove(tag.id, i)"
+                    >
+                        <el-tooltip
+                            :disabled="tag.urlName.length <= 8"
+                            :content="tag.urlName"
+                            placement="top"
+                        >
+                            <a :href="tag.urlAddr" :target="tag.display">{{ handleOverflow(tag.urlName, 8) }}</a>
+                        </el-tooltip>
+                    </el-tag>
+                </vue-draggable>
             </div>
         </div>
         <el-dialog
@@ -29,14 +45,32 @@
             title="添加快捷导航"
             append-to-body
         >
-            <el-form ref="form" :model="quickNavform" :rules="rules" :label-width="formLabelWidth" @submit.native.prevent>
-                <el-form-item label="名称:" prop="label">
-                    <el-input v-model="quickNavform.urlName" autocomplete="off" />
+            <el-form
+                ref="quickNavform"
+                :model="quickNavform"
+                :rules="rules"
+                :label-width="formLabelWidth"
+                @submit.native.prevent
+            >
+                <el-form-item label="名称:" prop="urlName">
+                    <el-input
+                        v-model="quickNavform.urlName"
+                        type="text"
+                        autocomplete="off"
+                        :maxlength="64"
+                        show-word-limit
+                    />
                 </el-form-item>
-                <el-form-item label="url地址:" prop="url">
-                    <el-input v-model="quickNavform.urlAddr" autocomplete="off" placeholder="请填写完整的URL地址，如https://www.szjyxt.com" />
+                <el-form-item label="url地址:" prop="urlAddr">
+                    <el-input
+                        v-model="quickNavform.urlAddr"
+                        type="textarea"
+                        :autosize="{ minRows: 4, maxRows: 8 }"
+                        autocomplete="off"
+                        placeholder="请填写完整的URL地址，如https://www.szjyxt.com"
+                    />
                 </el-form-item>
-                <el-form-item label="打开方式:" prop="target">
+                <el-form-item label="打开方式:" prop="display">
                     <el-select v-model="quickNavform.display" placeholder="请选择" style="width:100%">
                         <el-option label="新页面打开" value="_blank" />
                         <el-option label="当前页面打开" value="_self" />

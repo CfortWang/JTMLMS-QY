@@ -270,11 +270,15 @@ export default {
         ::v-deep {
             .el-dialog__header {
                 padding: 15px 20px;
-                line-height: 20px;
+                height: 25px;
             }
             .el-dialog__body {
-                height: calc(100vh - 90px) !important;
+                height: calc(100vh - 55px) !important;
                 padding: 0;
+                .ibps-container-full__body {
+                    // 与头高度相加为90，即首页头部高度
+                    padding-top: 30px !important;
+                }
             }
         }
     }

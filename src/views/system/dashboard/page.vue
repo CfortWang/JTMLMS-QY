@@ -272,42 +272,43 @@ export default {
         if (savedDate !== today) {
             // this.getPeriodTask()
         }
-        StatisticsData().then(data => {
-            this.scheduledTask = true
-            // 将参数替换成对应参数
-            // if (data.state === 200 && data.variables.data.length > 0) {
-            //     const h = this.$createElement
-            //     const cont = data.variables.data
-            //     for (let i = 0; i < cont.length; i++) {
-            //         window.setTimeout(() => {
-            //             this.infoMessage[i] = this.$notify.info({
-            //                 title: '定时任务:' + cont[i].ren_wu_biao_ti_,
-            //                 message: h('p', null, [
-            //                     h('span', null, '任务时间: ' + cont[i].ren_wu_shi_jian_),
-            //                     h('br'),
-            //                     h('span', null, '任务内容: '),
-            //                     h('span', { style: 'color: #FF8C00;font-size:12px;' }, cont[i].ding_shi_ren_wu_n),
-            //                     h('br'),
-            //                     h('el-button', {
-            //                         attrs: {
-            //                             size: 'mini',
-            //                             plain: true
-            //                         },
-            //                         on: {
-            //                             click: () => {
-            //                                 this.infoMessage[i].close()
-            //                             } // 路由加载之后，调用关闭消息弹窗的方法
-            //                         }
-            //                     }, '忽略关闭')
-            //                 ]),
-            //                 duration: 0
-            //             })
-            //         }, 0)
-            //     }
-            // }
-        }).catch(() => {
-            this.scheduledTask = true
-        })
+        // 定时任务通过后端job启动
+        // StatisticsData().then(data => {
+        //     this.scheduledTask = true
+        //     // 将参数替换成对应参数
+        //     // if (data.state === 200 && data.variables.data.length > 0) {
+        //     //     const h = this.$createElement
+        //     //     const cont = data.variables.data
+        //     //     for (let i = 0; i < cont.length; i++) {
+        //     //         window.setTimeout(() => {
+        //     //             this.infoMessage[i] = this.$notify.info({
+        //     //                 title: '定时任务:' + cont[i].ren_wu_biao_ti_,
+        //     //                 message: h('p', null, [
+        //     //                     h('span', null, '任务时间: ' + cont[i].ren_wu_shi_jian_),
+        //     //                     h('br'),
+        //     //                     h('span', null, '任务内容: '),
+        //     //                     h('span', { style: 'color: #FF8C00;font-size:12px;' }, cont[i].ding_shi_ren_wu_n),
+        //     //                     h('br'),
+        //     //                     h('el-button', {
+        //     //                         attrs: {
+        //     //                             size: 'mini',
+        //     //                             plain: true
+        //     //                         },
+        //     //                         on: {
+        //     //                             click: () => {
+        //     //                                 this.infoMessage[i].close()
+        //     //                             } // 路由加载之后，调用关闭消息弹窗的方法
+        //     //                         }
+        //     //                     }, '忽略关闭')
+        //     //                 ]),
+        //     //                 duration: 0
+        //     //             })
+        //     //         }, 0)
+        //     //     }
+        //     // }
+        // }).catch(() => {
+        //     this.scheduledTask = true
+        // })
     },
     beforeDestroy () {
         for (let i = 0; i < this.infoMessage.length; i++) {

@@ -28,6 +28,7 @@ export default {
             importFormVisible: false,
             formPrintDialogVisible: false,
             defId: '',
+            taskId: '',
             editId: '',
             proInstId: '',
             instanceId: '',

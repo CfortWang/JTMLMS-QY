@@ -484,6 +484,12 @@ export function buildComponent (name, column, preview) {
                     const nowDate = new Date().getTime()
                     const targetDate = new Date(date).getTime()
                     return targetDate + days * 24 * 60 * 60 * 1000 > nowDate
+                },
+                handleOverflow (val, length) {
+                    if (val.length > length) {
+                        return val.slice(0, length - 2) + '...'
+                    }
+                    return val
                 }
             },
             template: column.templateHtml !== '' ? `${column.templateHtml}` : `<div></div>`

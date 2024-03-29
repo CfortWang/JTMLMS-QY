@@ -1,7 +1,7 @@
 <template>
     <el-card class="home-card changeShadow">
         <div slot="header" class="clearfix">
-            <ibps-icon name="logo" />
+            <ibps-icon name="star" />
             <span>{{ title }}</span>
             <ibps-desktop-toolbar
                 ref="toolbar"
