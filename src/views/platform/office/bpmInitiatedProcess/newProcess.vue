@@ -4,7 +4,7 @@
             <ibps-type-tree
                 :width="width"
                 :height="height"
-                title="流程分类"
+                title="事务分类"
                 category-key="FLOW_TYPE"
                 @node-click="handleNodeClick"
                 @expand-collapse="handleExpandCollapse"
@@ -211,6 +211,13 @@ export default {
                 default:
                     break
             }
+        },
+        /**
+         * 点击表格
+         */
+        handleLinkClick (data) {
+            this.defId = data.id || ''
+            this.dialogFormVisible = true
         },
         /**
          * 编辑

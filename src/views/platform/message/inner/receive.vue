@@ -177,13 +177,14 @@ export default {
                             key: 'reply',
                             icon: 'ibps-icon-reply-all',
                             label: '回复',
-                            hidden: function (row, index) {
-                                return (row.canreply === 0 || row.messageType === 'system' || row.messageType === 'bulletin' || row.subject === '文件发放通知')
+                            hidden (row, index) {
+                                return true
+                                // return (row.canreply === 0 || row.messageType === 'system' || row.messageType === 'bulletin' || row.subject === '文件发放通知')
                             }
                         },
                         {
                             key: 'remove',
-                            hidden: function (row, index) {
+                            hidden (row, index) {
                                 return (row.subject === '文件发放通知')
                             }
                         },

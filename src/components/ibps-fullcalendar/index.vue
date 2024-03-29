@@ -10,8 +10,9 @@ import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list'
+// 依赖引入不生效，需要手动引入对应依赖的js文件
+import interactionPlugin from './interaction'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
-import interactionPlugin from '@fullcalendar/interaction'
 import lang from '@/locales/fullcalendar'
 import I18n from '@/utils/i18n'
 

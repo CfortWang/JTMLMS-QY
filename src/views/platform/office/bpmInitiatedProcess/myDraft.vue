@@ -4,7 +4,7 @@
             <ibps-type-tree
                 :width="width"
                 :height="height"
-                title="任务分类"
+                title="事务分类"
                 category-key="FLOW_TYPE"
                 @node-click="handleNodeClick"
                 @expand-collapse="handleExpandCollapse"

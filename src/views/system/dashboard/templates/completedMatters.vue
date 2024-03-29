@@ -1,5 +1,5 @@
 <template>
-    <el-card class="box-card">
+    <el-card class="home-card">
         <div slot="header" class="clearfix">
             <span>{{ title }}</span>
             <ibps-desktop-toolbar ref="toolbar" :actions="[{ key: 'refresh' }, { key: 'more' }, { key: 'fullscreen' }, { key: 'collapse' }]" @action-event="handleActionEvent" />

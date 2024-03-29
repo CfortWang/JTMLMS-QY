@@ -1,5 +1,5 @@
 <template>
-    <el-card :style="{height:cardHeight}" class="box-card changeShadow">
+    <el-card :style="{height:cardHeight}" class="home-card changeShadow">
         <div slot="header" class="clearfix">
             <span>{{  }}</span>
             <ibps-desktop-toolbar

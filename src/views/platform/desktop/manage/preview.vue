@@ -135,11 +135,11 @@ export default {
     .desktop-manage-preview-dialog {
         ::v-deep {
             .el-dialog__header {
-                padding: 0;
-                height: 52px;
+                padding: 15px 20px;
+                line-height: 20px;
             }
             .el-dialog__body {
-                height: calc(100vh - 52px) !important;
+                height: calc(100vh - 90px) !important;
                 padding: 0;
             }
         }

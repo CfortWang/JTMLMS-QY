@@ -1,5 +1,5 @@
 <template>
-    <el-card :style="{height:cardHeight}" class="box-card">
+    <el-card :style="{height:cardHeight}" class="home-card">
         <div slot="header" class="clearfix">
             <span>{{ title }}</span>
             <ibps-desktop-toolbar

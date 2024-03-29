@@ -1,7 +1,7 @@
 <template>
     <el-card
         v-loading.fullscreen.lock="loading"
-        class="box-card pending-business"
+        class="home-card pending-business"
         :element-loading-text="$t('common.loading')"
         element-loading-background="transparent"
     >

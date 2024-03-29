@@ -273,7 +273,7 @@ export default {
                 line-height: 20px;
             }
             .el-dialog__body {
-                height: calc(100vh - 55px) !important;
+                height: calc(100vh - 90px) !important;
                 padding: 0;
             }
         }
