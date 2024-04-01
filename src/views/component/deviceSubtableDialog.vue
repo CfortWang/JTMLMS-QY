@@ -391,7 +391,7 @@ export default {
                         str = str+element+','
                     }
                 });
-                return str=='每周1,2,3,4,5,6,7'?'日保养':str
+                return str=='每周1,2,3,4,5,6,7'?'每天':str
             }else if(content == '月保养'){
 
                 return '每月'+that.monthDateValue
@@ -451,7 +451,7 @@ export default {
             let that = this
             if(content.weiHuLeiXing == '日保养'){
                 let strArr = []
-                let str = content.weiHuRiQi=='日保养'?'1,2,3,4,5,6,7':content.weiHuRiQi.slice(2)
+                let str = content.weiHuRiQi=='每天'?'1,2,3,4,5,6,7':content.weiHuRiQi.slice(2)
                 let partArr = str.split(",")
                 // console.log(partArr)
                 partArr.forEach((e,i)=>{

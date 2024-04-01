@@ -635,7 +635,7 @@ export default {
                 this.selectionAll = this.selection ? JSON.parse(JSON.stringify(this.selection)) : []
                 return
             }
-
+            // 总选择里面的key集合
             // 标识当前行的唯一键的名称
             const { listData } = this
             // 总选择里面的key集合
@@ -661,7 +661,7 @@ export default {
             } else {
                 if (this.$utils.isNotEmpty(this.selection)) {
                     const pkValue = this.getPkValue(this.selection)
-                    selectIds.push(pkValue)
+                    // selectIds.push(pkValue)
                     if (selectAllIds.indexOf(pkValue) < 0) {
                         selectionAll = []
                         selectionAll.push(this.selection)
@@ -970,8 +970,8 @@ export default {
             const buttonType = button.button_type || button.key
             this.action = buttonType
             this.position = position
-            this.selection = selection
-
+            // this.selection = selection
+            this.selection = data
             // 前置事件
             this.beforeScript(command, position, selection, data, () => {
                 let src = ''

@@ -143,6 +143,7 @@ export default {
             const pkValue = this.getPkValue(row)
             for (var i = 0; i < this.ibpsData.length; i++) {
                 const data = this.ibpsData[i]
+
                 if (this.getPkValue(data) === pkValue) {
                     this.$refs.elTable.toggleRowSelection(data, selected)
                 }
@@ -279,7 +280,8 @@ export default {
             } else { // 管理列
                 selection = data ? this.getPkValue(data) : null
             }
-            this.$emit('action-event', buttonKey, position, selection, data, index, action)
+            this.$emit('action-event', buttonKey, position, selection, this.selectionAll, index, action)
+            // this.$emit('action-event', buttonKey, position, selection, data, index, action)
         },
 
         /**

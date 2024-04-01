@@ -283,7 +283,7 @@ export default {
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
             currentPage: 1,
-            totalCount: this.value && this.value.length ? this.value.length : 0,
+            totalCount:  0,
             dataModel: initData,
             copDataModel: initData,
             multipleSelection: '',
@@ -465,7 +465,9 @@ export default {
                     return val
                 }
                 this.handlePagination(val)
-            }
+            },
+            deep: true,
+            immediate: true
         },
         rights: {
             handler (val, oldVal) {
