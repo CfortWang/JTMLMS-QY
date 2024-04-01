@@ -236,6 +236,9 @@ export default {
                     let num = this.weekList.findIndex(e=>e==item)+1
                     weekNum.push(num)
                 })
+                weekNum.sort(function(a,b){
+                    return a-b;
+                })
                 let num = weekNum.findIndex(e=>e>dayOfWeekNumber)
                 if(val.length>0&&num!=-1){
                     this.periodDayDate = this.getDayDate(weekNum[num],0)
