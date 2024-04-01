@@ -139,6 +139,7 @@ export default {
                             options: typeMsg,
                             value: '0'
                         },
+                        { prop: 'Q^content^SL', label: '消息内容' },
                         {
                             prop: ['Q^beginreceiveTime^DL', 'Q^endreceiveTime^DG'],
                             label: '发送时间',
@@ -166,8 +167,8 @@ export default {
                     { prop: 'ownerName', label: '发送人', width: '90' },
                     { prop: 'messageType', label: '消息类型', tags: typeOptions, width: '100' },
                     // 接口未返回消息状态，仅增加了状态的
-                    // { prop: 'isRead', label: '消息状态', tags: typeMsg, width: '100' },
-                    { prop: 'content', label: '消息描述', minWidth: '200' },
+                    { prop: 'isRead', label: '消息状态', tags: typeMsg, width: '100' },
+                    { prop: 'content', label: '消息内容', minWidth: '200' },
                     { prop: 'fileMsg', label: '有无附件', slotName: 'file', width: '90' },
                     { prop: 'createTime', label: '发送时间', sortable: 'custom', dateFormat: 'yyyy-MM-dd HH:mm:ss', width: '150' }
                 ],
@@ -218,7 +219,10 @@ export default {
             //     sorts: []
             // }).then(response => {})
             getMyMsgList(this.getFormatParams()).then(response => {
-                const data = response.data
+                const { data } = response || {}
+                data.dataResult.forEach((item, i) => {
+                    item.isRead = item.receiverTime ? '1' : '0'
+                })
                 const { pageResult = {}} = data
                 ActionUtils.handleListData(this, data)
                 Bus.$emit('getMessageCount', pageResult.totalCount ? pageResult.totalCount : 0)

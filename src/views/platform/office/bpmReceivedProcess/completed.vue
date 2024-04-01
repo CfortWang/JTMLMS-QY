@@ -169,7 +169,7 @@ export default {
          */
         loadData () {
             this.loading = true
-            handled(this.getFormatParams()).then(response => {
+            handled(this.getFormatParams({ 'Q^status_^NE': 'running' })).then(response => {
                 const { data } = response || {}
                 data.dataResult.forEach((item, i) => {
                     item.createDept = this.getTaskInfo(item.subject)

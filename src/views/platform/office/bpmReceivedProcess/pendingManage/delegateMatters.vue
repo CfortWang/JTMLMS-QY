@@ -82,35 +82,24 @@ import { pending4Assignee } from '@/api/platform/office/bpmReceived'
 import { batchSuspendProcess, batchRecoverProcess } from '@/api/platform/bpmn/bpmTask'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
-import IbpsTypeTree from '@/business/platform/cat/type/tree'
+import CommonData from '../../mixin/utils'
 import BpmDefinitionSelector from '@/business/platform/bpmn/definition/selector'
-import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import Delegate from '@/business/platform/bpmn/task-change/edit'
 import ApproveDialog from '@/business/platform/bpmn/form-ext/approve'
 
 export default {
     components: {
-        IbpsTypeTree,
         BpmDefinitionSelector,
         Delegate,
-        ApproveDialog,
-        BpmnFormrender
+        ApproveDialog
     },
-    mixins: [FixHeight],
+    mixins: [FixHeight, CommonData],
     data () {
         return {
-            width: 200,
-            height: document.clientHeight,
-            dialogFormVisible: false, // 弹窗
             approveDialogVisible: false, // 批量审批
             delegateVisible: false,
             action: '',
-            taskId: '', // 编辑dialog需要使用
             title: '',
-            pkKey: 'id', // 主键  如果主键不是pk需要传主键
-            typeId: '',
-            loading: false,
-            listData: [],
             listConfig: {
                 // 工具栏
                 toolbars: [
@@ -160,8 +149,6 @@ export default {
                     { prop: 'ownerName', label: '所属人', width: 300 }
                 ]
             },
-            pagination: {},
-            sorts: {},
             procDefIdSelect: ''
         }
     },
@@ -185,7 +172,11 @@ export default {
          */
         loadData () {
             this.loading = true
-            pending4Assignee(this.getFormatParams()).then(response => {
+            const params = {}
+            if (this.$utils.isNotEmpty(this.procDefIdSelect)) {
+                params['Q^temp.proc_def_key_^S'] = this.procDefIdSelect
+            }
+            pending4Assignee(this.getFormatParams(params)).then(response => {
                 const { dataResult = [] } = response.data || {}
                 dataResult.forEach(i => {
                     i.subject = this.removeDesc(i.subject)
@@ -195,52 +186,6 @@ export default {
             }).catch(() => {
                 this.loading = false
             })
-        },
-        /**
-         * 获取格式化参数
-         */
-        getFormatParams () {
-            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-            if (this.$utils.isNotEmpty(this.procDefIdSelect)) {
-                params['Q^temp.proc_def_key_^S'] = this.procDefIdSelect
-            }
-            if (this.$utils.isNotEmpty(this.typeId)) {
-                params['Q^temp.TYPE_ID_^S'] = this.typeId
-            }
-            return ActionUtils.formatParams(
-                params,
-                this.pagination,
-                this.sorts)
-        },
-        /**
-         * 处理分页事件
-         */
-        handlePaginationChange (page) {
-            ActionUtils.setPagination(this.pagination, page)
-            this.loadData()
-        },
-        /**
-         * 处理排序
-         */
-        handleSortChange (sort) {
-            ActionUtils.setSorts(this.sorts, sort)
-            this.loadData()
-        },
-        search () {
-            this.loadData()
-        },
-        /**
-         * 重置查询条件
-         */
-        reset () {
-            this.$refs['crud'].handleReset()
-        },
-        /**
-         * 点击表格
-         */
-        handleLinkClick (data, columns) {
-            this.taskId = data.taskId || ''
-            this.dialogFormVisible = true
         },
         /**
          * 处理按钮事件
@@ -283,10 +228,6 @@ export default {
                     break
             }
         },
-        handleNodeClick (typeId) {
-            this.typeId = typeId
-            this.loadData()
-        },
         /**
          * 处理批量审批
          */
@@ -309,7 +250,7 @@ export default {
             })
         },
         /**
-         * 批量挂起任务
+         * 批量恢复任务
          */
         handleRecover (ids) {
             this.$confirm('确认批量恢复流程任务？', '信息').then(() => {
@@ -324,25 +265,22 @@ export default {
         handleDelegate (id) {
             this.taskId = id
             this.delegateVisible = true
-        },
-        handleExpandCollapse (isExpand) {
-            this.width = isExpand ? 230 : 30
         }
     }
 }
 </script>
 <style lang="scss">
-.pendingManage-module{
-  .cell{
-    overflow:initial !important;
-  }
-  .el-badge{
-    margin:10px 0 0 10px;
-  }
-  .el-badge__content.is-fixed{
-    top: 0;
-    left: -40px;
-    right: auto;
-  }
-}
+    .pendingManage-module{
+        .cell{
+            overflow:initial !important;
+        }
+        .el-badge{
+            margin:10px 0 0 10px;
+        }
+        .el-badge__content.is-fixed{
+            top: 0;
+            left: -40px;
+            right: auto;
+        }
+    }
 </style>

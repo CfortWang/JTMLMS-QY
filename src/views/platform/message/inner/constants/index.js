@@ -23,7 +23,7 @@ export const typeMsg = [
     {
         value: '0',
         label: '未读',
-        type: 'primary'
+        type: 'info'
     },
     {
         value: '1',

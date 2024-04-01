@@ -204,7 +204,11 @@ export default {
          */
         loadData () {
             this.loading = true
-            pending(this.getFormatParams()).then(response => {
+            const params = {}
+            if (this.$utils.isNotEmpty(this.procDefIdSelect)) {
+                params['Q^temp.proc_def_key_^S'] = this.procDefIdSelect
+            }
+            pending(this.getFormatParams(params)).then(response => {
                 const { data } = response || {}
                 data.dataResult.forEach((item, i) => {
                     item.createDept = this.getTaskInfo(item.subject)
@@ -215,19 +219,6 @@ export default {
             }).catch(() => {
                 this.loading = false
             })
-        },
-        /**
-         * 获取格式化参数
-         */
-        getFormatParams (id) {
-            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-            if (this.$utils.isNotEmpty(this.procDefIdSelect)) {
-                params['Q^temp.proc_def_key_^S'] = this.procDefIdSelect
-            }
-            if (this.$utils.isNotEmpty(this.typeId)) {
-                params['Q^temp.TYPE_ID_^S'] = this.typeId
-            }
-            return ActionUtils.formatParams(params, this.pagination, this.sorts)
         },
         /**
          * 点击表格

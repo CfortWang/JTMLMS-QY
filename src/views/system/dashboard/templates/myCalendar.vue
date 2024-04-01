@@ -10,8 +10,12 @@
             />
         </div>
         <transition name="draw" mode="in-out" appear>
-            <div ref="body" :style="{height: showHeight, width:'100%'}" class="text item">
-                <v-full-calendar :options="getFullCalendarConfig(data)" :style="{height:getHeight(),width:'100%'}" />
+            <div ref="body" :style="{height: showHeight, width: '100%'}" class="text item">
+                <v-full-calendar
+                    ref="calendar"
+                    :options="getFullCalendarConfig(data)"
+                    :style="{height: getHeight(), width: '100%'}"
+                />
             </div>
         </transition>
     </el-card>

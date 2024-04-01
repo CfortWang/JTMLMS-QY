@@ -45,10 +45,14 @@ export default {
         /**
          * 获取格式化参数
          */
-        getFormatParams () {
-            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+        getFormatParams (args) {
+            let params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             if (this.$utils.isNotEmpty(this.typeId)) {
                 params['Q^TYPE_ID_^S'] = this.typeId
+            }
+            params = {
+                ...params,
+                ...args
             }
             return ActionUtils.formatParams(params, this.pagination, this.sorts)
         },

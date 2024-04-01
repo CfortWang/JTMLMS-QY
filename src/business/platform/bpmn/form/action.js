@@ -282,7 +282,7 @@ export default {
                         variables: response.variables
                     }, () => {
                         // 回调上个页面
-                        this.callbackPage()
+                        // this.callbackPage()
                     })
                 }).catch(() => { })
             }).catch(() => {
