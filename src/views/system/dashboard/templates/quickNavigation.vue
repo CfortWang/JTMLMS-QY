@@ -5,7 +5,7 @@
             <span>快捷导航</span>
             <ibps-desktop-toolbar
                 ref="toolbar"
-                :actions="[{ key: 'add' }]"
+                :actions="[{ key: 'add' }, { key: 'collapse' }]"
                 @action-event="handleActionEvent"
             />
         </div>
@@ -17,7 +17,7 @@
                     v-bind="draggableOptions"
                     class="list-group"
                     @start="isDragging = true"
-                    @end="()=>{ isDragging = false }"
+                    @end="handleSortChange"
                 >
                     <el-tag
                         v-for="(tag, i) in quickNavigationData"

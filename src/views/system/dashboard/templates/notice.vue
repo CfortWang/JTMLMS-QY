@@ -11,7 +11,7 @@
         </div>
         <div ref="body" :style="{height: getHeight(-20), width: '100%'}">
             <el-scrollbar
-                style="height: 100%;width:100%;"
+                style="height: 100%; width:100%;"
                 wrap-class="ibps-scrollbar-wrapper"
             >
                 <ibps-marquee
@@ -27,9 +27,9 @@
                         >
                             <ibps-list-item-meta>
                                 <!-- <div slot="avatar"><ibps-icon name="bolt" style="color:#5cb85c;margin: 5px 0 0 5px;" /></div> -->
-                                <el-link slot="title" type="primary" :underline="false">{{ n.title }}
+                                <el-link slot="title" type="primary" :underline="false" class="list-content">{{ n.title }}
                                     <img
-                                        v-if="showNewIcon(n.publicDate, 7)"
+                                        v-if="showNewIcon(n.publicDate, 3)"
                                         :src="newPng"
                                         style="vertical-align: middle; height: 20px;"
                                     >

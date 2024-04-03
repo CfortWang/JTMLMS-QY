@@ -26,6 +26,16 @@ const frameIn = [
                 component: _import('/system/homepage')
             },
             {
+                path: 'temp',
+                name: 'temp',
+                meta: {
+                    title: '旧版首页',
+                    auth: true,
+                    hiddenAsideMenu: true
+                },
+                component: _import('/system/dashboard')
+            },
+            {
                 path: 'blank',
                 name: 'blank',
                 meta: {
@@ -136,6 +146,16 @@ const frameIn = [
                     hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmInitiatedProcess/myDraft')
+            },
+            {
+                path: 'mySysGuide',
+                name: 'mySysGuide',
+                meta: {
+                    title: '系统指引',
+                    auth: true,
+                    hiddenAsideMenu: true
+                },
+                component: _import('/system/dashboard/templates/systemGuide')
             },
             {
                 path: 'myRequest',

@@ -16,16 +16,36 @@ $transition: all .5s;
     .changeShadow {
         .pendingAssigneeClass {
             margin: 12px 0 !important;
-        }
-        
-        .item-headerH {
-            height: 21px;
+            cursor: pointer;
+            .item-header > p {
+                font-size: 18px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .item-body {
+                margin-top: 15px;
+                & > span {
+                    font-size: 32px;
+                    font-weight: bold;
+                }
+            }
         }
         
         // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .2) !important;
         
         .el-card__header {
             padding: 14px 20px 6px;
+            .title {
+                font-size: 16px;
+                color: #000;
+            }
+            .badge {
+                .el-badge__content.is-fixed {
+                    top: 8px;
+                    right: -5px;
+                }
+            }
         }
         
         .el-card__body {
@@ -100,8 +120,7 @@ $transition: all .5s;
                 }
             }
             
-            .draw-enter-to,
-            .draw-leave {
+            .draw-enter-to, .draw-leave {
                 height: 200px;
             }
             

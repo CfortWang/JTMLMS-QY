@@ -8,10 +8,11 @@
                 <el-col v-for="item in data" :key="item.id" :span="24" :sm="6" :md="6" :lg="6" :xl="6">
                     <div :class="'bg-'+item.color" class="item pendingAssigneeClass" @click="openPlate(item.url)">
                         <div class="item-header">
-                            <p class="item-headerH">{{ item.dataContent }}</p>
+                            <p>{{ item.dataContent }}</p>
                         </div>
                         <div class="item-body">
-                            <h2><count-to :end-val="parseInt(item.dataText,10)" :duration="2000" /></h2>
+                            <count-to :end-val="parseInt(item.dataText, 10)" :duration="2000" />
+                            <!-- <h2><count-to :end-val="parseInt(item.dataText, 10)" :duration="2000" /></h2> -->
                         </div>
                         <p class="item-tip">{{ item.dataContent | firstStr }}</p>
                     </div>

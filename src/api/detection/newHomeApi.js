@@ -93,3 +93,47 @@ export function removeCalendarInfos (params) {
         params: params
     })
 }
+
+/**
+ * 添加快捷导航，带参数
+ * @param {*} params
+ */
+export function addNavigation (params) {
+    return request({
+        url: NEWHOME_URL + '/desktop/facade/navigate/save',
+        method: 'post',
+        data: params
+    })
+}
+/**
+ * 查找快捷导航
+ */
+export function getNavigation () {
+    return request({
+        url: NEWHOME_URL + '/desktop/facade/navigate/findAllByCurrUserId',
+        method: 'get'
+    })
+}
+/**
+ * 删除快捷导航，带参数
+ * @param {*} params
+ */
+export function delNavigation (params) {
+    return request({
+        url: NEWHOME_URL + '/desktop/facade/navigate/remove',
+        method: 'post',
+        params: params
+    })
+}
+
+/**
+ * 保存用户导航排序
+ * @param {*} params
+ */
+export function sortNavigation (params) {
+    return request({
+        url: NEWHOME_URL + '/desktop/facade/navigate/order',
+        method: 'post',
+        params: params
+    })
+}

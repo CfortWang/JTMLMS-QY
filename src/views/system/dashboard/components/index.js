@@ -25,7 +25,7 @@ Vue.component('ibps-marquee', IbpsMarquee)
 let init = false
 const components = []
 
-export function initColumn (systemAlias) {
+export function initColumn (systemAlias, vm) {
     findHashRightsColumn({
         systemAlias: systemAlias
     }).then(response => {
@@ -34,7 +34,7 @@ export function initColumn (systemAlias) {
         dataResult.forEach(column => {
             const name = `ibps-desktop-${column.alias}`
             Vue.component(name, (resolve, reject) => {
-                resolve(buildComponent(name, column, false))
+                resolve(buildComponent(name, column, false, vm))
             })
             components.push(name)
         })

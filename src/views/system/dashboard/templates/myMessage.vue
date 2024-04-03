@@ -108,10 +108,9 @@
     <el-card :style="{height: cardHeight}" class="home-card changeShadow">
         <div slot="header" class="clearfix">
             <i class="el-icon-message" />
-            <div style="width: 50%; display: inline-flex; align-items: center;">
-                <span>{{ title }}</span>
-                <span class="totalityClass">{{ totality ? totality.totalCount > 999 ? '999+' : totality.totalCount : '0' }}</span>
-            </div>
+            <el-badge :value="totalCount" :max="99" class="badge">
+                <span class="title">{{ title }}</span>
+            </el-badge>
             <ibps-desktop-toolbar
                 ref="toolbar"
                 :actions="[{ key: 'refresh' }, { key: 'more' }, { key: 'collapse' }]"

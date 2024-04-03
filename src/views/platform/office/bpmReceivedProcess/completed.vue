@@ -169,7 +169,7 @@ export default {
          */
         loadData () {
             this.loading = true
-            handled(this.getFormatParams({ 'Q^status_^NE': 'running' })).then(response => {
+            handled(this.getFormatParams()).then(response => {
                 const { data } = response || {}
                 data.dataResult.forEach((item, i) => {
                     item.createDept = this.getTaskInfo(item.subject)
@@ -181,6 +181,13 @@ export default {
             }).catch(() => {
                 this.loading = false
             })
+        },
+        getFormatParams () {
+            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            if (!params.hasOwnProperty('Q^inst.status_^S')) {
+                params['Q^inst.status_^NE'] = 'running'
+            }
+            return ActionUtils.formatParams(params, this.pagination, this.sorts)
         },
         /**
          * 处理按钮事件

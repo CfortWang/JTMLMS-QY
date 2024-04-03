@@ -4,17 +4,18 @@ import { mapState } from 'vuex'
 import { taskTypeOptions, dashboardStatus, genderOptions, favoritesOptions, noticeOptions, unreadMessageOptions, imgOptionsData } from '@/business/platform/bpmn/constants'
 import ActionUtils from '@/utils/action'
 import Utils from '@/utils/util'
-import { findAllByCurrUserId, saveCalendarInfos, removeCalendarInfos } from '@/api/detection/newHomeApi'
-import { delQuickNavigation, addQuickNavigation, getQuickNavigation } from '@/api/platform/message/innerMessage'
+import { findAllByCurrUserId, saveCalendarInfos, removeCalendarInfos, delNavigation, addNavigation, getNavigation, sortNavigation } from '@/api/detection/newHomeApi'
+import { isEqual } from 'lodash'
+import Bus from '@/utils/EventBus'
 import newPng from '@/assets/images/homepage/new.png'
 
 /**
  * 创建组件
  */
-export function buildComponent (name, column, preview) {
+export function buildComponent (name, column, preview, vm) {
     try {
         return {
-            name: name,
+            name,
             components: {
                 VueDraggable: () => import('vuedraggable')
             },
@@ -28,6 +29,10 @@ export function buildComponent (name, column, preview) {
                     default: column.height || 300
                 },
                 visible: {
+                    type: Boolean,
+                    default: false
+                },
+                fullScreen: {
                     type: Boolean,
                     default: false
                 }
@@ -72,8 +77,9 @@ export function buildComponent (name, column, preview) {
                     attrs: this.getAttrs(),
                     variables: {}, // 一些变量，比如分页信息
                     data: null,
-                    totality: null,
+                    totalCount: 0,
                     quickNavigationData: [],
+                    navigationList: [],
                     stautusOptions: [],
                     bpmnFormrenderDialogVisible: false, // 表单
                     editId: '',
@@ -136,7 +142,8 @@ export function buildComponent (name, column, preview) {
                         disabled: false,
                         animation: 200,
                         axis: 'y'
-                    }
+                    },
+                    calendarToolbar: this.fullScreen ? [{ key: 'refresh' }] : [{ key: 'refresh' }, { key: 'fullscreen' }, { key: 'collapse' }]
                 }
             },
             computed: {
@@ -177,7 +184,7 @@ export function buildComponent (name, column, preview) {
                             this.$message.error('获取日历日程失败！')
                         })
                     } else if (param.alias === 'quickNavigation') {
-                        getQuickNavigation().then(res => {
+                        getNavigation().then(res => {
                             this.quickNavigationData = res.data || []
                         })
                     } else {
@@ -187,7 +194,7 @@ export function buildComponent (name, column, preview) {
                                 data = Utils.parseData(res.data)
                             }
                             this.data = data && data.dataResult ? data.dataResult : data
-                            this.totality = data && data.dataResult ? data.pageResult : data
+                            this.totalCount = data && data.pageResult ? data.pageResult.totalCount : 0
                             // 公告栏目对数据过滤
                             if (param.alias === 'notice') {
                                 const deptIds = this.deptList.map(i => i.positionId)
@@ -272,6 +279,7 @@ export function buildComponent (name, column, preview) {
                         dayMaxEvents: 1, // 最多显示3个日程
                         locale: this.$i18n.locale ? this.$i18n.locale.toLowerCase() : 'zh-cn',
                         events: events,
+                        // headerToolbar: false,
                         buttonText: {
                             today: '今天',
                             dayGridMonth: '月',
@@ -288,12 +296,17 @@ export function buildComponent (name, column, preview) {
                         config.headerToolbar = {
                             start: '',
                             center: 'title',
-                            end: 'prev,next,today,dayGridMonth,listMonth'
+                            end: 'prev,next,today'
                             //  end: 'prev,next,today,month,agendaWeek,agendaDay,listWeek'
                         }
                         delete config['dayMaxEvents']
                     }
                     return config
+                },
+                getCalendar () {
+                    console.log(vm.$refs.myCalendar[0].$refs.calendar.$refs.fullCalendar)
+                    const calendar = vm.$refs.myCalendar[0].$refs.calendar.$refs.fullCalendar.getApi()
+                    console.log(calendar)
                 },
                 handleDateClick (param) {
                     this.$emit(
@@ -308,7 +321,8 @@ export function buildComponent (name, column, preview) {
                         'open',
                         'calendar',
                         [param.event.startStr, param.event._def.extendedProps.jieShuShiJian],
-                        this.data
+                        this.data,
+                        param.event.id
                     )
                 },
                 refreshData () {
@@ -424,7 +438,7 @@ export function buildComponent (name, column, preview) {
                         showClose: false,
                         closeOnClickModal: false
                     }).then(() => {
-                        delQuickNavigation({ navigateIds: navId }).then(() => {
+                        delNavigation({ navigateIds: navId }).then(() => {
                             this.$message.success('删除成功')
                             this.quickNavigationData.splice(i, 1)
                         })
@@ -442,15 +456,26 @@ export function buildComponent (name, column, preview) {
                 saveQuickNav () {
                     this.$refs[this.formName].validate(valid => {
                         if (valid) {
-                            addQuickNavigation({ id: '', ...this.quickNavform }).then(res => {
+                            addNavigation({ id: '', ...this.quickNavform }).then(res => {
                                 this.$message.success('添加成功！')
                                 const { id } = res.variables || {}
-                                this.quickNavigationData.push({ id, ...this.quickNavform })
+                                this.quickNavigationData.unshift({ id, ...this.quickNavform })
                                 this.dialogFormVisible = false
                             })
                         } else {
                             ActionUtils.saveErrorMessage()
                         }
+                    })
+                },
+                handleSortChange () {
+                    this.isDragging = false
+                    const newSort = this.quickNavigationData.map(i => i.id)
+                    if (isEqual(this.navigationList, newSort)) {
+                        return
+                    }
+                    this.navigationList = newSort
+                    sortNavigation({ orders: this.navigationList.join(',') }).then(() => {
+                        this.$message.success('排序成功！')
                     })
                 },
                 // 父组件调用该方法给日程添加数据

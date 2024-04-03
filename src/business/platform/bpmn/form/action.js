@@ -258,6 +258,10 @@ export default {
             const formData = this.getFormData()
             if (!formData) return
 
+            if (this.$utils.isNotEmpty(this.bizKey)) {
+                formData.id = this.bizKey || ''
+            }
+
             const jsonData = {
                 defId: this.defId,
                 version: this.version || '',
@@ -273,6 +277,9 @@ export default {
             })
             saveDraft(jsonData).then(response => {
                 loading.close()
+                const { proInstId, bizKey } = response.variables || {}
+                this.proInstId = proInstId
+                this.bizKey = bizKey
                 this.$alert(`保存成功！`, {
                     showClose: false
                 }).then(() => {

@@ -1,9 +1,10 @@
 <template>
-    <el-card class="box-card changeShadow">
+    <el-card class="home-card changeShadow">
         <div slot="header" class="clearfix">
-            <ibps-icon name="pending" />
-            <span style="font-size: 16px;">{{ title }}</span>
-            <!-- <span class="totalityClass">{{totality.totalCount>999?'999+':totality.totalCount}}</span> -->
+            <ibps-icon name="list-ul" />
+            <el-badge :value="totalCount" :max="99" class="badge">
+                <span class="title">{{ title }}</span>
+            </el-badge>
             <ibps-desktop-toolbar
                 ref="toolbar"
                 :actions="[{ key: 'refresh' }, { key: 'more' }, { key: 'collapse' }]"

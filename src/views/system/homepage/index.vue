@@ -43,6 +43,7 @@
             title="消息明细"
             :readonly="true"
             :visible="ibpsMessageDialogVisible"
+            @callback="handleMessageCallback"
             @close="visible => (ibpsMessageDialogVisible = visible)"
         />
         <div v-if="initLoading">
@@ -134,14 +135,10 @@ import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 
 import IbpsNewsDialog from '@/views/platform/system/news/detail'
 import IbpsMessageDialog from '@/views/platform/message/inner/detail/dialog'
-import { StatisticsData, StatisticsSign } from '@/api/platform/system/jbdHome'
 import { getToken } from '@/utils/auth'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import param from '@/store/modules/ibps/modules/param'
 import ScheduleAdd from '@/views/system/dashboard/templates/scheduleAdd'
 
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
-let cronTask = null
 export default {
     components: {
         'ibps-news-dialog': IbpsNewsDialog,
@@ -155,7 +152,6 @@ export default {
     },
     data () {
         return {
-            cronTask,
             infoMessage: [],
             uloadPath: BASE_API() + BUSINESS_BASE_URL() + '/ck/task/importExcel',
             reportPath: BASE_API() + BUSINESS_BASE_URL() + '/sys/SysDataContext/replaceReportFile',
@@ -214,18 +210,6 @@ export default {
             return this.system.isLocal
         }
     },
-    beforeRouteEnter (to, from, next) {
-        const { first = '', second = '' } = param.state.level
-        const sql = `select * from t_jhswpzb where di_dian_ = '${second || first}'`
-        curdPost('sql', sql).then(res => {
-            const { data = [] } = res.variables || {}
-            cronTask = data.map(i => i.liu_cheng_key_)
-            next()
-        }).catch(error => {
-            alert('获取计划事务配置表信息失败，请刷新页面重试！')
-            console.log(error)
-        })
-    },
     mounted () {
         if (localStorage.getItem('statistic') === 'isNormal') {
             this.showRepost = false
@@ -239,42 +223,6 @@ export default {
         if (savedDate !== today) {
             // this.getPeriodTask()
         }
-        StatisticsData().then(data => {
-            this.scheduledTask = true
-            // 将参数替换成对应参数
-            // if (data.state === 200 && data.variables.data.length > 0) {
-            //     const h = this.$createElement
-            //     const cont = data.variables.data
-            //     for (let i = 0; i < cont.length; i++) {
-            //         window.setTimeout(() => {
-            //             this.infoMessage[i] = this.$notify.info({
-            //                 title: '定时任务:' + cont[i].ren_wu_biao_ti_,
-            //                 message: h('p', null, [
-            //                     h('span', null, '任务时间: ' + cont[i].ren_wu_shi_jian_),
-            //                     h('br'),
-            //                     h('span', null, '任务内容: '),
-            //                     h('span', { style: 'color: #FF8C00;font-size:12px;' }, cont[i].ding_shi_ren_wu_n),
-            //                     h('br'),
-            //                     h('el-button', {
-            //                         attrs: {
-            //                             size: 'mini',
-            //                             plain: true
-            //                         },
-            //                         on: {
-            //                             click: () => {
-            //                                 this.infoMessage[i].close()
-            //                             } // 路由加载之后，调用关闭消息弹窗的方法
-            //                         }
-            //                     }, '忽略关闭')
-            //                 ]),
-            //                 duration: 0
-            //             })
-            //         }, 0)
-            //     }
-            // }
-        }).catch(() => {
-            this.scheduledTask = true
-        })
     },
     beforeDestroy () {
         for (let i = 0; i < this.infoMessage.length; i++) {
@@ -315,7 +263,7 @@ export default {
         },
         // 抓取数据
         fetchData () {
-            initColumn(this.systemAlias)
+            initColumn(this.systemAlias, this)
             this.loading = true
             const interval = setInterval(() => {
                 if (isInit()) {
@@ -338,6 +286,15 @@ export default {
             }, 100)
         },
         getHeight (h) {
+            // if (document.body.clientWidth > 1366 && document.body.clientWidth < 1920) {
+            //     const mH = (1920 - 1366) / (33 - 23)
+            //     this.rowHeight = ((document.body.clientWidth - 1366) / mH) + 23
+            //     // let mH = (1925-768)/(33-23)
+            //     // this.rowHeight=((document.body.clientWidth-768)/mH)+17
+            //     // console.log(this.rowHeight)
+            // } else if (document.body.clientWidth <= 1366) {
+            //     this.rowHeight = 23
+            // }
             return (h - 1) * (this.rowHeight + this.margin[1]) + this.margin[1]
         },
         hasComponent (alias) {
@@ -387,8 +344,8 @@ export default {
             }
         },
         /**
-             * 全屏展示切换
-             */
+         * 全屏展示切换
+         */
         handleFullscreen (id) {
             this.dialogPreviewVisible = true
             this.id = id
@@ -400,31 +357,27 @@ export default {
             const deleteIndex = this.layout.findIndex(item => item.i === '0')
             this.layout.splice(deleteIndex, 1)
         },
-
         handleApprove (id) {
             this.ibpsNewsDialogVisible = true
             this.newsEditId = id
         },
-
         handleUnreadMessage (id) {
             this.ibpsMessageDialogVisible = true
             this.messageEditId = id
-        },
-        fileErr (err, file, fileList) {
-            this.$message.error('文件上传失败，请检查格式！')
         },
         handleFlow (params) {
             this.defId = params.defId || null
             this.taskId = params.taskId || null
             this.instanceId = params.instanceId || null
-
-            this.instanceId = params.instanceId || null
-            this.instanceId = params.instanceId || null
-
             this.bpmnFormrenderDialogVisible = true
         },
         handleFlowCallback () {
             this.$refs[this.alias] ? this.$refs[this.alias][0].refreshData() : null
+        },
+        handleMessageCallback (isRead) {
+            if (isRead && this.$refs.unreadMessage) {
+                this.$refs.unreadMessage[0].refreshData()
+            }
         },
         initSystemUrl (url) {
             if (url.startsWith('http')) {
@@ -607,6 +560,9 @@ export default {
             localStorage.setItem('doNotShowToday', today)
             this.infoMessage.close()
         },
+        /**
+         * 关于预览日历日程组件的方法及属性，在预览处也有相同的逻辑
+         */
         // 关闭指定弹框
         handleClose (state) {
             switch (state) {
@@ -618,7 +574,7 @@ export default {
             }
         },
         // 打开指定弹框
-        handleOpen (state, dateArr, events) {
+        handleOpen (state, dateArr, events, clickId) {
             const status = ['急', '重', '轻', '缓']
             const eventTrees = []
             switch (state) {
@@ -627,20 +583,15 @@ export default {
                     for (const i of events) {
                         // 根据指定日期A获取A在时间区间内的数据
                         if (!((this.compareDates(i.start, dateArr[1]) > 0) || (this.compareDates(i.jieShuShiJian, dateArr[0]) < 0))) {
-                            i.label = `（${status[Number(i.zhuangTai) - 1] ? status[Number(i.zhuangTai) - 1] : ''}）` + i.title
+                            i.label = i.zhuangTai ? `【${status[Number(i.zhuangTai) - 1] ? status[Number(i.zhuangTai) - 1] : ''}】` + i.title : i.title
                             eventTrees.push(i)
                         }
                     }
-                    if (eventTrees.length) {
-                        this.calendarDialogForm = {
-                            eventTrees
-                        }
-                    } else {
-                        this.calendarDialogForm = {
-                            eventTrees: []
-                        }
+                    this.calendarDialogForm = {
+                        eventTrees: eventTrees.length ? eventTrees : []
                     }
                     this.calendarDialogForm.clickedDate = dateArr[0]
+                    this.calendarDialogForm.clickId = clickId
                     break
                 default:
                     break

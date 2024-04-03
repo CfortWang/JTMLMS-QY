@@ -48,7 +48,6 @@
             </template>
         </newHome> -->
         <workbench
-            v-if="cronTask && scheduledTask"
             :plan="cronTask"
             @handleApprove="handleApprove"
             @handleUnreadMessage="handleUnreadMessage"

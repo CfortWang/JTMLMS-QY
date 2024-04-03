@@ -138,35 +138,3 @@ export function getMyMsgAllList (params) {
         params
     })
 }
-
-/**
- * 添加快捷导航，带参数
- * @param {*} params
- */
-export function addQuickNavigation (params) {
-    return request({
-        url: MSG_URL() + '/desktop/facade/navigate/save',
-        method: 'post',
-        data: params
-    })
-}
-/**
- * 查找快捷导航
- */
-export function getQuickNavigation () {
-    return request({
-        url: MSG_URL() + '/desktop/facade/navigate/findAllByCurrUserId',
-        method: 'get'
-    })
-}
-/**
- * 删除快捷导航，带参数
- * @param {*} params
- */
-export function delQuickNavigation (params) {
-    return request({
-        url: MSG_URL() + '/desktop/facade/navigate/remove',
-        method: 'post',
-        params: params
-    })
-}

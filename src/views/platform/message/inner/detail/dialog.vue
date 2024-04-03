@@ -32,7 +32,6 @@
 </template>
 <script>
 import InnerMessage from './index'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import {
     generateUUID
 } from '@/api/platform/file/attachment'
@@ -99,7 +98,6 @@ export default {
                 } else {
                     this.toolbars = btn2
                     this.type = ''
-
                 }
             }
         }
@@ -125,7 +123,7 @@ export default {
         getFormData () {
             this.$nextTick(() => {
                 this.$refs.innerMessage.getFormData()
-                this.handleCallback(true)
+                // this.handleCallback(true)
             })
         },
         // getId (arr) {
@@ -145,25 +143,17 @@ export default {
                 showClose: false,
                 closeOnClickModal: false
             }).then(() => {
-                console.log('userInfo', this.$store.getters.userInfo)
                 // TODO 受控文件逻辑处理
-                const perInfosId = this.$store.getters.userInfo.user.id
-                const perInfosName = this.$store.getters.userInfo.user.name
-                let positionsIds = []
-                let positionsArr = this.$store.getters.userInfo.positions
-                if (positionsArr.length == 0|| !positionsArr) {
-                    alert('系统所登录的账户并没有所属部门，请先在系统设置完再进行确认！')
-                    return
-                }   
-                for(let i of positionsArr){
-                    positionsIds.push(i.id)
+                const { positions = [], userId, name } = this.$store.getters || {}
+                const positionsIds = positions.map(item => item.id)
+                if (!positions.length) {
+                    return this.$message.warning('系统所登录的账户并没有所属部门，请先在系统设置完再进行确认！')
                 }
-                const sql = "select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '" + perInfosId + "'"
-                curdPost('sql', sql).then((ryjbqkRes) => {
+                const sql = `select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '${userId}'`
+                this.$common.request('sql', sql).then((ryjbqkRes) => {
                     const ryjbqkDatas = ryjbqkRes.variables.data
-                    if (ryjbqkDatas.length == 0) {
-                        alert('系统所登录的账户并没有签字图文在系统，请先上传系统再进行确认！')
-                        return
+                    if (!ryjbqkDatas.length) {
+                        return this.$message.warning('系统所登录的账户并没有签字图文在系统，请先上传系统再进行确认！')
                     }
                     const tempObj = {
                         id_: generateUUID(),
@@ -174,7 +164,7 @@ export default {
                             fileName: '确认签名'
                         }]),
                         que_ren_ri_qi_: this.$common.getDateNow(10),
-                        que_ren_ren_xing_: perInfosName
+                        que_ren_ren_xing_: name
                     }
                     const returnParams = {
                         tableName: this.tableName.slice(0, this.tableName.indexOf('（')), // 字符串 "表名（发放时间）"
@@ -193,20 +183,11 @@ export default {
                     //     }
                     //     addwjcysqbs.push(addwjcysqb)
                     // })
-                     curdPost('add', JSON.stringify(returnParams)).then(() => { console.log('确认接收到发放文件') }).then(
-                        () => {
+                    this.$common.request('add', returnParams).then(() => { console.log('确认接收到发放文件') }).then(() => {
                         this.type = ''
                         this.getFormData()
-                        }
-                    )
-
-                    // curdPost('add',
-                    //     '{"tableName": "t_wjcysqb","paramWhere":' + JSON.stringify(addwjcysqbs) + '}'
-                    // ).then(response => {
-                    //     console.log(response)
-                    // }).catch(error => {
-                    // })
                     })
+                })
                 this.closeDialog()
             }).catch(() => { })
         },
