@@ -168,7 +168,7 @@ export default {
                 // 查询条件
                 searchForm: {
                     forms: [
-                        { prop: 'Q^proc_def_name_^SL', label: '事务名称' },
+                        // { prop: 'Q^proc_def_name_^SL', name: 'Q^temp.proc_def_name_^SL', label: '事务名称' },
                         { prop: 'Q^subject_^SL', name: 'Q^temp.subject_^SL', label: '事务说明' },
                         {
                             prop: ['Q^create_time_^DL', 'Q^create_time_^DG'],

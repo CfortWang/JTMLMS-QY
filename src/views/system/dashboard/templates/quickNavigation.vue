@@ -66,6 +66,7 @@
                         v-model="quickNavform.urlAddr"
                         type="textarea"
                         :autosize="{ minRows: 4, maxRows: 8 }"
+                        :maxlength="512"
                         autocomplete="off"
                         placeholder="请填写完整的URL地址，如https://www.szjyxt.com"
                     />

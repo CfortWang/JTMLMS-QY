@@ -14,34 +14,34 @@
                 style="height: 100%; width:100%;"
                 wrap-class="ibps-scrollbar-wrapper"
             >
-                <ibps-marquee
+                <!-- <ibps-marquee
                     v-if="data && data.length"
                     :auto="false"
                     :speed="0"
-                >
-                    <ibps-list class="ibps-pr-10">
-                        <ibps-list-item
-                            v-for="(n, index) in data"
-                            :key="index"
-                            @click.native="handleApprove(n.id)"
-                        >
-                            <ibps-list-item-meta>
-                                <!-- <div slot="avatar"><ibps-icon name="bolt" style="color:#5cb85c;margin: 5px 0 0 5px;" /></div> -->
-                                <el-link slot="title" type="primary" :underline="false" class="list-content">{{ n.title }}
-                                    <img
-                                        v-if="showNewIcon(n.publicDate, 3)"
-                                        :src="newPng"
-                                        style="vertical-align: middle; height: 20px;"
-                                    >
-                                </el-link>
-                            </ibps-list-item-meta>
-                            <div slot="extra">
-                                <!-- <ibps-icon name="dot-circle-o" style="color:#36c6d3" /> -->
-                                {{ n.publicDate.slice(0, 10) }}
-                            </div>
-                        </ibps-list-item>
-                    </ibps-list>
-                </ibps-marquee>
+                > -->
+                <ibps-list v-if="data && data.length" class="ibps-pr-10">
+                    <ibps-list-item
+                        v-for="(n, index) in data"
+                        :key="index"
+                        @click.native="handleApprove(n.id)"
+                    >
+                        <ibps-list-item-meta>
+                            <!-- <div slot="avatar"><ibps-icon name="bolt" style="color:#5cb85c;margin: 5px 0 0 5px;" /></div> -->
+                            <el-link slot="title" type="primary" :underline="false" class="list-content">{{ n.title }}
+                                <img
+                                    v-if="showNewIcon(n.publicDate, 3)"
+                                    :src="newPng"
+                                    style="vertical-align: middle; height: 20px;"
+                                >
+                            </el-link>
+                        </ibps-list-item-meta>
+                        <div slot="extra">
+                            <!-- <ibps-icon name="dot-circle-o" style="color:#36c6d3" /> -->
+                            {{ n.publicDate.slice(0, 10) }}
+                        </div>
+                    </ibps-list-item>
+                </ibps-list>
+                <!-- </ibps-marquee> -->
                 <el-alert
                     v-else
                     :closable="false"

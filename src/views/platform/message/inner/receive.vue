@@ -166,7 +166,6 @@ export default {
                     },
                     { prop: 'ownerName', label: '发送人', width: '90' },
                     { prop: 'messageType', label: '消息类型', tags: typeOptions, width: '100' },
-                    // 接口未返回消息状态，仅增加了状态的
                     { prop: 'isRead', label: '消息状态', tags: typeMsg, width: '100' },
                     { prop: 'content', label: '消息内容', minWidth: '200' },
                     { prop: 'fileMsg', label: '有无附件', slotName: 'file', width: '90' },
@@ -336,12 +335,9 @@ export default {
         getFormatParams () {
             const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             if (params.hasOwnProperty('Q^isRead^SN')) {
-                params.isRead = parseInt(params.isRead)
+                params['Q^isRead^SN'] = parseInt(params['Q^isRead^SN'])
             }
-            return ActionUtils.formatParams(
-                params,
-                this.pagination,
-                this.sorts)
+            return ActionUtils.formatParams(params, this.pagination, this.sorts)
         },
         /**
          * 处理回复
