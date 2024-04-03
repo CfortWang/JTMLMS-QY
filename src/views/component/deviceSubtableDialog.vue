@@ -54,12 +54,12 @@
                             :value="item.value">
                         </el-option>
                     </el-select>
-                    <div v-if="periodDayDate!=''&&judgeShow==1" class="describe">最近一次维护日期为 <span class="fontColor">{{periodDayDate}}</span></div>
-                    <div v-if="periodWeekDate!=''&&judgeShow==3" class="describe">最近一次维护日期为 <span class="fontColor">{{periodWeekDate}}</span></div>
-                    <div v-if="periodMonthDate!=''&&judgeShow==2" class="describe">最近一次维护日期为 <span class="fontColor">{{periodMonthDate}}</span></div>
-                    <div v-if="periodQuarterDate!=''&&judgeShow==4" class="describe">最近一次维护日期为 <span class="fontColor">{{periodQuarterDate}}</span></div>
-                    <div v-if="periodMidYearDate!=''&&judgeShow==5" class="describe">最近一次维护日期为 <span class="fontColor">{{periodMidYearDate}}</span></div>
-                    <div v-if="periodYearDate!=''&&judgeShow==6" class="describe">最近一次维护日期为 <span class="fontColor">{{periodYearDate}}</span></div>
+                    <div v-if="periodDayDate!=''&&judgeShow==1" class="describe">下次维护日期为 <span class="fontColor">{{periodDayDate}}</span></div>
+                    <div v-if="periodWeekDate!=''&&judgeShow==3" class="describe">下次维护日期为 <span class="fontColor">{{periodWeekDate}}</span></div>
+                    <div v-if="periodMonthDate!=''&&judgeShow==2" class="describe">下次维护日期为 <span class="fontColor">{{periodMonthDate}}</span></div>
+                    <div v-if="periodQuarterDate!=''&&judgeShow==4" class="describe">下次维护日期为 <span class="fontColor">{{periodQuarterDate}}</span></div>
+                    <div v-if="periodMidYearDate!=''&&judgeShow==5" class="describe">下次维护日期为 <span class="fontColor">{{periodMidYearDate}}</span></div>
+                    <div v-if="periodYearDate!=''&&judgeShow==6" class="describe">下次维护日期为 <span class="fontColor">{{periodYearDate}}</span></div>
                 </div>
             </div>
             <div class="maintenanceCycle" style="align-items: normal;">
@@ -178,7 +178,7 @@ export default {
             weekList:['周一','周二','周三','周四','周五','周六','周日'],
             quarterList:[[1,2,3],[4,5,6],[7,8,9],[10,11,12]],
             midList:[[1,2,3,4,5,6],[7,8,9,10,11,12]],
-            dayCheckList:[],
+            dayCheckList:['周一','周二','周三','周四','周五','周六','周日'],
             maintenanceTextarea:'',
             toolbars: [
                 { key: 'confirm', label: '确定'},
