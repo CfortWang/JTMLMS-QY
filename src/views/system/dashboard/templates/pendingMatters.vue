@@ -32,7 +32,7 @@
                         v-for="(item, index) in data"
                         :key="index"
                         style="padding: 6px 0;"
-                        @click.native="handleFlowClick({ taskId: item.taskId })"
+                        @click.native="handleFlowClick({ taskId: item.taskId, flowName: item.name })"
                     >
                         <ibps-list-item-meta>
                             <template slot="avatar">

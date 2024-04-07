@@ -26,6 +26,7 @@
             :def-id="defId"
             :task-id="taskId"
             :instance-id="instanceId"
+            :title="flowName"
             @close="visible => (bpmnFormrenderDialogVisible = visible)"
             @callback="handleFlowCallback"
         />
@@ -165,6 +166,7 @@ export default {
             margin: [15, 15],
             useCssTransforms: true,
             taskId: '',
+            flowName: '',
             ibpsNewsDialogVisible: false,
             newsEditId: '',
             newsTitle: '公告明细',
@@ -371,6 +373,7 @@ export default {
             this.defId = params.defId || null
             this.taskId = params.taskId || null
             this.instanceId = params.instanceId || null
+            this.flowName = params.flowName || null
             this.bpmnFormrenderDialogVisible = true
         },
         handleFlowCallback () {
