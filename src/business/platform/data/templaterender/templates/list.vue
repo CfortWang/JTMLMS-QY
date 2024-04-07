@@ -242,6 +242,7 @@
         <bpmn-formrender
             :visible="npmDialogFormVisible"
             :def-id="defId"
+            :pro-inst-id="proInstId"
             :instance-id="instanceId"
             :task-id="taskId"
             :add-data-cont="addDataCont"
@@ -393,6 +394,7 @@ export default {
         return {
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
+            proInstId: '', // 编制暂存数据
             instanceId: '', // 流程查看办理详情
             taskId: '', // 流程进入当前任务
 
@@ -965,6 +967,29 @@ export default {
                 callback(true)
             }
         },
+        /**
+         * 根据defId获取当前流程最新的已暂存数据
+         * @param {String} defId 流程ID
+         * @param {Boolean} isOpen 是否开启编制暂存数据功能
+         */
+        getProInstId (defId, isOpen) {
+            if (!isOpen) {
+                return null
+            }
+            const sql = `select proc_inst_id_, businesskey_ from ibps_bpm_bus_rel where def_id_ = '${defId}' order by create_date_ desc limit 1`
+            return new Promise((resolve, reject) => {
+                this.$common.request('sql', sql).then(res => {
+                    const { data = [] } = res.variables || {}
+                    if (data.length) {
+                        resolve(data[0].proc_inst_id_)
+                    } else {
+                        resolve(null)
+                    }
+                }).catch(error => {
+                    reject(error)
+                })
+            })
+        },
         handleAction (command, position, selection, data, index, button) {
             const buttonType = button.button_type || button.key
             this.action = buttonType
@@ -972,7 +997,7 @@ export default {
             // this.selection = selection
             this.selection = data
             // 前置事件
-            this.beforeScript(command, position, selection, data, () => {
+            this.beforeScript(command, position, selection, data, async () => {
                 let src = ''
                 this.readonly = false
                 const { first = '', second = '' } = this.$store.getters.level || {}
@@ -1028,6 +1053,8 @@ export default {
                             return
                         }
                         this.defId = button.deflow
+                        // 补充逻辑，带入已有暂存数据
+                        this.proInstId = await this.getProInstId(button.deflow, button.isEditOnHis)
                         this.addDataCont = button.initAddDataCont
                         this.npmDialogFormVisible = true
                         break
@@ -1453,6 +1480,7 @@ export default {
                 icon: rf.icon ? 'ibps-icon-' + rf.icon : defaultButton.icon,
                 type: rf.style || defaultButton.type,
                 deflow: rf.deflow || null,
+                isEditOnHis: rf.isEditOnHis === 'Y',
                 // eslint-disable-next-line no-eval
                 initAddDataCont: rf.initAddDataCont ? obj : null,
                 reportPath: rf.reportPath,

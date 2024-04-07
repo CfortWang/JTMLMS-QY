@@ -98,6 +98,19 @@
         >
             <el-input v-model="formData.initAddDataCont" placeholder="a:1&b:2（原template.addDataCont.a = '1'）" />
         </el-form-item>
+        <el-form-item v-if="formData && ['openTask'].includes(formData.button_type)" prop="isEditOnHis">
+            <template slot="label">
+                编制暂存
+                <el-tooltip effect="dark" content="如开启，在点击编制按钮时将带出当前用户最新已暂存的数据" placement="top">
+                    <i class="el-icon-question question-icon" />
+                </el-tooltip>
+            </template>
+            <el-switch
+                v-model="formData.isEditOnHis"
+                active-value="Y"
+                inactive-value="N"
+            />
+        </el-form-item>
         <export-column
             :visible="exportFieldDialogVisible"
             :data="template"
