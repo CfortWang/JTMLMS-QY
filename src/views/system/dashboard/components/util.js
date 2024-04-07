@@ -361,8 +361,10 @@ export function buildComponent (name, column, preview, vm) {
                     this.$emit('action-event', command, ...Array.from(arguments).slice(1))
                 },
                 // 公告栏目点击事件
-                handleApprove (id) {
-                    this.$emit('action-event', 'approve', id)
+                handleApprove (id, title) {
+                    this.$emit('action-event', 'approve', {
+                        id, title
+                    })
                 },
                 handleUnreadMessage (id) {
                     this.$emit('action-event', 'unRead', id)

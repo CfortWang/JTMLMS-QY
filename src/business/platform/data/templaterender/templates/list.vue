@@ -630,6 +630,7 @@ export default {
          * 记忆选择核心方法
          */
         changePageCoreRecordData () {
+            // 如果是单选，则将总选择清空
             // 如果总记忆中还没有选择的数据，那么就直接取当前页选中的数据，不需要后面一系列计算
             if (this.$utils.isEmpty(this.selectionAll)) {
                 this.selectionAll = this.selection ? JSON.parse(JSON.stringify(this.selection)) : []
@@ -646,7 +647,6 @@ export default {
             } else {
                 selectionAll.push(this.selectionAll)
             }
-
             // 获取当前页选中的id
             const selectIds = []
             if (this.multiple) {
@@ -661,7 +661,7 @@ export default {
             } else {
                 if (this.$utils.isNotEmpty(this.selection)) {
                     const pkValue = this.getPkValue(this.selection)
-                    // selectIds.push(pkValue)
+                    selectIds.push(pkValue)
                     if (selectAllIds.indexOf(pkValue) < 0) {
                         selectionAll = []
                         selectionAll.push(this.selection)
@@ -673,7 +673,6 @@ export default {
                     }
                 }
             }
-
             const noSelectIds = []
             // 得到当前页没有选中的id
             listData.forEach((row) => {

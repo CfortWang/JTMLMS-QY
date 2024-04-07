@@ -64,7 +64,7 @@
                     <span v-else>/</span>
                 </el-form-item>
                 <el-form-item label="内容：" prop="content">
-                    <ibps-ueditor v-model="form.content" :readonly="readonly" destroy />
+                    <ibps-ueditor v-model="form.content" :readonly="readonly" :word-limit="!readonly" destroy />
                 </el-form-item>
             </el-form>
         </el-row>

@@ -280,12 +280,12 @@ export default {
             } else { // 管理列
                 selection = data ? this.getPkValue(data) : null
             }
-            this.$emit('action-event', buttonKey, position, selection, data, index, action)
-            // if(this.$utils.isArray(data)){
-            //     this.$emit('action-event', buttonKey, position, selection, this.selectionAll, index, action)
-            // }else{
-            //     this.$emit('action-event', buttonKey, position, selection, data, index, action)
-            // }
+            // this.$emit('action-event', buttonKey, position, selection, data, index, action)
+            if (this.$utils.isArray(data) && this.selectionAll !== null) {
+                this.$emit('action-event', buttonKey, position, selection, this.selectionAll, index, action)
+            } else {
+                this.$emit('action-event', buttonKey, position, selection, data, index, action)
+            }
         },
 
         /**

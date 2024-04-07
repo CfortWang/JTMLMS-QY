@@ -32,7 +32,7 @@
 
         <ibps-news-dialog
             :id="newsEditId"
-            title="公告栏目明细"
+            :title="newsTitle"
             :visible="ibpsNewsDialogVisible"
             :readonly="true"
             @close="visible => (ibpsNewsDialogVisible = visible)"
@@ -167,6 +167,7 @@ export default {
             taskId: '',
             ibpsNewsDialogVisible: false,
             newsEditId: '',
+            newsTitle: '公告明细',
             showRepost: true,
 
             ibpsMessageDialogVisible: false,
@@ -357,9 +358,10 @@ export default {
             const deleteIndex = this.layout.findIndex(item => item.i === '0')
             this.layout.splice(deleteIndex, 1)
         },
-        handleApprove (id) {
+        handleApprove (params) {
             this.ibpsNewsDialogVisible = true
-            this.newsEditId = id
+            this.newsEditId = params.id || params
+            this.newsTitle = params.title || this.newsTitle
         },
         handleUnreadMessage (id) {
             this.ibpsMessageDialogVisible = true

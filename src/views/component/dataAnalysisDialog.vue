@@ -297,9 +297,12 @@ export default {
                     this.dynamicParams.formObj.$message.error('验证方法的{重复次数}未填写')  
                     return
                 }
+                // if(!exday){
+                //     this.dynamicParams.formObj.$message.error('验证方法的{实验天数}未填写')  
+                //     return
+                // }
                 if(!exday){
-                    this.dynamicParams.formObj.$message.error('验证方法的{实验天数}未填写')  
-                    return
+                    resuArr.push('{实验天数:1}')
                 }
                 if(!parameter){
                     this.dynamicParams.formObj.$message.error('判断标准的{判断参数}未填写')  
