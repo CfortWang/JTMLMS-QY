@@ -57,7 +57,7 @@
                                 <div style="display: flex; justify-content: space-between; width: 100%;">
                                     <span style="font-size: 14px; width: 70%;">{{ item.procDefName }}</span>
                                     <div style="font-size:14px">
-                                        <el-tag size="mini" type="success" disable-transitions>{{ item.name.length > 3 ? `待${item.name.slice(0, 3)}...` : `待${item.name}` }}</el-tag>
+                                        <el-tag size="mini" type="success" disable-transitions>{{ item.name.length > 5 ? `待${item.name.slice(0, 4)}...` : `待${item.name}` }}</el-tag>
                                         <el-tag v-if="item.expired === '即将超时'" size="mini" type="warning">{{ item.expired }}</el-tag>
                                         <el-tag v-else-if="item.expired === '已超时'" size="mini" type="danger">{{ item.expired }}</el-tag>
                                     </div>

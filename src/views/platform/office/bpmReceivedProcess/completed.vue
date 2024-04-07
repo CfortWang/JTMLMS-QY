@@ -119,7 +119,7 @@ export default {
     mixins: [FixHeight, CommonData],
     data () {
         return {
-            title: '办结事务',
+            title: '我的办结',
             statusOptions,
             listConfig: {
                 // 工具栏

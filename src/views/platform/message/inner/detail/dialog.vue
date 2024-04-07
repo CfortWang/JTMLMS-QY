@@ -144,9 +144,9 @@ export default {
                 closeOnClickModal: false
             }).then(() => {
                 // TODO 受控文件逻辑处理
-                const { positions = [], userId, name } = this.$store.getters || {}
-                const positionsIds = positions.map(item => item.id)
-                if (!positions.length) {
+                const { position = [], userId, name } = this.$store.getters || {}
+                const positionsIds = position.map(item => item.id)
+                if (!position.length) {
                     return this.$message.warning('系统所登录的账户并没有所属部门，请先在系统设置完再进行确认！')
                 }
                 const sql = `select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '${userId}'`

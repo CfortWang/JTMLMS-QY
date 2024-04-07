@@ -116,7 +116,7 @@ export default {
                     break
                 case 'remove':// 删除
                     ActionUtils.removeRecord(selection).then((ids) => {
-                        this.handleRemove(ids)
+                        this.handleRemove(data)
                     }).catch(() => { })
                     break
                 default:
@@ -126,12 +126,63 @@ export default {
         /**
          * 处理删除
          */
-        handleRemove (ids) {
-            removeDraft({ ids: ids }).then(response => {
-                ActionUtils.removeSuccessMessage()
-                this.search()
-            }).catch(() => {
-
+        // handleRemove (ids) {
+        //     removeDraft({ ids: ids }).then(response => {
+        //         ActionUtils.removeSuccessMessage()
+        //         this.search()
+        //     })
+        // },
+        handleRemove (datas, selection) {
+            this.$confirm('将删除选中暂存记录与对应数据表数据，删除之后无法恢复， 是否确定？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+                showClose: false,
+                closeOnClickModal: false
+            }).then(() => {
+                const defKeyArr = []
+                const delList = {}
+                const idList = []
+                datas.forEach(item => {
+                    const { id, bizKey, procDefKey } = item
+                    idList.push(id)
+                    if (!delList[procDefKey]) {
+                        delList[procDefKey] = []
+                        defKeyArr.push(procDefKey)
+                    }
+                    delList[procDefKey].push(bizKey)
+                })
+                console.log(idList, delList, defKeyArr)
+                const sql = `select bo_code_, def_key_ from ibps_bpm_def where find_in_set(def_key_, '${defKeyArr.join(',')}')`
+                // const sql = `select a.bo_code_, b.key_ from ibps_form_bo a, ibps_form_def b where a.form_id_ = b.id_ and find_in_set(b.key_, '${formKeyArr.join(',')}')`
+                this.$common.request('sql', sql).then(res => {
+                    const { data = [] } = res.variables || {}
+                    if (!data.length) {
+                        return
+                    }
+                    const codes = {}
+                    data.forEach(item => {
+                        const { bo_code_, def_key_ } = item
+                        codes[def_key_] = bo_code_
+                    })
+                    // 删除选中记录
+                    removeDraft({ ids: idList.join(',') }).then(() => {
+                        ActionUtils.removeSuccessMessage()
+                        this.selection = []
+                        // 循环删除对应数据表数据
+                        defKeyArr.forEach(k => {
+                            const deleteParams = {
+                                tableName: `t_${codes[k]}`,
+                                paramWhere: { id_: delList[k].join(',') }
+                            }
+                            this.$common.request('delete', deleteParams, 'post', true)
+                        })
+                        this.$message.success('删除成功！')
+                        this.search()
+                    })
+                }).catch(() => {
+                    this.$message.error('获取数据表key值出错，请联系开发人员！')
+                })
             })
         }
     }

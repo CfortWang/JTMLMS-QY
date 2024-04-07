@@ -23,7 +23,7 @@
                     <ibps-list-item
                         v-for="(n, index) in data"
                         :key="index"
-                        @click.native="handleApprove(n.id)"
+                        @click.native="handleApprove(n.id, n.title)"
                     >
                         <ibps-list-item-meta>
                             <!-- <div slot="avatar"><ibps-icon name="bolt" style="color:#5cb85c;margin: 5px 0 0 5px;" /></div> -->

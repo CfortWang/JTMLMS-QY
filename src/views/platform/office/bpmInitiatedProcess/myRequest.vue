@@ -130,7 +130,7 @@ export default {
     mixins: [FixHeight, CommonData],
     data () {
         return {
-            title: '我启动的流程',
+            title: '我的发起',
             statusOptions: [],
             copyFlow: false,
             listConfig: {
