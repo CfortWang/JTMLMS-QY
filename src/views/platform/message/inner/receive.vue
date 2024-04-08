@@ -62,7 +62,7 @@
             :visible="dialogFormVisible"
             :table-id="tableId"
             :table-name="tableName"
-            @callback="search"
+            @callback="handleRead"
             @close="visible => closeDetail(visible)"
         />
         <!-- 回复 -->
@@ -222,9 +222,7 @@ export default {
                 data.dataResult.forEach((item, i) => {
                     item.isRead = item.receiverTime ? '1' : '0'
                 })
-                const { pageResult = {}} = data
                 ActionUtils.handleListData(this, data)
-                Bus.$emit('getMessageCount', pageResult.totalCount ? pageResult.totalCount : 0)
                 this.loading = false
             }).catch(() => {
                 this.loading = false
@@ -249,6 +247,13 @@ export default {
          */
         search () {
             this.loadData()
+        },
+        handleRead () {
+            getMyMsgList(this.getFormatParams(0)).then(response => {
+                const { data } = response || {}
+                const { pageResult = {}} = data
+                Bus.$emit('getMessageCount', pageResult.totalCount ? pageResult.totalCount : 0)
+            })
         },
         handleLinkClick (data, columns) {
             this.handleEdit(data.id, true)
@@ -332,8 +337,12 @@ export default {
         /**
          * 获取格式化参数
          */
-        getFormatParams () {
+        getFormatParams (type) {
             const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            if (type === 0) {
+                // 固定获取未读数据
+                return ActionUtils.formatParams({ 'Q^isRead^SN': 0 }, this.pagination, this.sorts)
+            }
             if (params.hasOwnProperty('Q^isRead^SN')) {
                 params['Q^isRead^SN'] = parseInt(params['Q^isRead^SN'])
             }

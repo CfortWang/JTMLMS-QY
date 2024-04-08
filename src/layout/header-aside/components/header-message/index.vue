@@ -167,7 +167,10 @@ export default {
             Watermark.set(`${customerInfo}试用版本`, `试用日期截止至${limitDate}`)
         }
         this.loadData()
-        Bus.$on('getMessageCount', (count) => {
+        Bus.$on('getMessageCount', count => {
+            if (count === null) {
+                return
+            }
             this.messageCount = count
         })
     },

@@ -200,6 +200,10 @@ export function buildComponent (name, column, preview, vm) {
                                 const deptIds = this.deptList.map(i => i.positionId)
                                 this.data = data.filter(i => deptIds.includes(i.depId))
                             }
+                            // 更新小铃铛消息数量
+                            if (param.alias === 'unreadMessage') {
+                                Bus.$emit('getMessageCount', this.totalCount)
+                            }
                             this.variables = res.variables
                             this.loading = false
                         }).catch((e) => {
