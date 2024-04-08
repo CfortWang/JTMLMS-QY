@@ -381,7 +381,8 @@ export function buildComponent (name, column, preview, vm) {
                     const menuMap = {
                         myTraining: 'rygl/rypx/wdpx',
                         myTesting: 'rygl/kszx/wdks',
-                        myDevices: 'sbgls/mywh'
+                        myDevices: 'sbgls/mywh',
+                        notice: 'tygl/tzgg'
                     }
                     if (menuMap[url]) {
                         const alias = menuMap[url].split('/')[0]
@@ -397,7 +398,7 @@ export function buildComponent (name, column, preview, vm) {
                     if (this.attrs.colUrl === '') {
                         return this.$message.warning('未设置更多路径的url')
                     }
-                    this.$router.push(`/${this.attrs.colUrl}`)
+                    this.openPlate(this.attrs.colUrl)
                 },
                 // 未读消息
                 handleClick (option) {
