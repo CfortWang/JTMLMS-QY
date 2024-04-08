@@ -972,11 +972,11 @@ export default {
          * @param {String} defId 流程ID
          * @param {Boolean} isOpen 是否开启编制暂存数据功能
          */
-        getProInstId (defId, isOpen) {
+        getProInstId (defId, userId, isOpen) {
             if (!isOpen) {
                 return null
             }
-            const sql = `select proc_inst_id_, businesskey_ from ibps_bpm_bus_rel where def_id_ = '${defId}' order by create_date_ desc limit 1`
+            const sql = `select proc_inst_id_, businesskey_ from ibps_bpm_bus_rel where def_id_ = '${defId}' and start_id_ = '${userId}' order by create_date_ desc limit 1`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -1001,6 +1001,7 @@ export default {
                 let src = ''
                 this.readonly = false
                 const { first = '', second = '' } = this.$store.getters.level || {}
+                const { userId } = this.$store.getters || {}
                 switch (buttonType) {
                     case 'search': // 查询
                         ActionUtils.setFirstPagination(this.pagination)
@@ -1054,7 +1055,7 @@ export default {
                         }
                         this.defId = button.deflow
                         // 补充逻辑，带入已有暂存数据
-                        this.proInstId = await this.getProInstId(button.deflow, button.isEditOnHis)
+                        this.proInstId = await this.getProInstId(button.deflow, userId, button.isEditOnHis)
                         this.addDataCont = button.initAddDataCont
                         this.npmDialogFormVisible = true
                         break
