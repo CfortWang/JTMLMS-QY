@@ -20,7 +20,13 @@
             @submit.native.prevent
         >
             <el-form-item label="考试名称：" prop="kao_shi_ming_chen">
-                <el-input v-model="form.kao_shi_ming_chen" type="text" :maxlength="256" placeholder="请输入考试名称" />
+                <el-input
+                    v-model="form.kao_shi_ming_chen"
+                    type="text"
+                    :maxlength="256"
+                    placeholder="请输入考试名称"
+                    :disabled="isDisabled"
+                />
             </el-form-item>
             <!-- <el-form-item label="考试类型：" prop="kao_shi_lei_xing_">
                 <el-select
@@ -44,6 +50,7 @@
                     size="small"
                     template-key="tkdhk"
                     :multiple="false"
+                    :disabled="isDisabled"
                     type="dialog"
                     class="custom-dialog"
                     placeholder="请选择考试题库"
@@ -77,6 +84,7 @@
                     size="small"
                     template-key="gjxcxryk"
                     multiple
+                    :disabled="isDisabled"
                     type="dialog"
                     class="custom-dialog"
                     placeholder="请选择需参加考试的人员"
@@ -89,7 +97,11 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.isCountLimit" @change="changeLimit(form.isCountLimit, 'xian_kao_ci_shu_', 1)">
+                <el-radio-group
+                    v-model="form.isCountLimit"
+                    :disabled="isDisabled"
+                    @change="changeLimit(form.isCountLimit, 'xian_kao_ci_shu_', 1)"
+                >
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
                 </el-radio-group>
@@ -98,6 +110,7 @@
                         v-model="form.xian_kao_ci_shu_"
                         :min="1"
                         :precision="0"
+                        :disabled="isDisabled"
                         placeholder="请输入单个用户最大限考次数"
                     />
                     <div class="unit">次</div>
@@ -110,7 +123,7 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.ji_fen_fang_shi_">
+                <el-radio-group v-model="form.ji_fen_fang_shi_" :disabled="isDisabled">
                     <el-radio label="平均分">平均分</el-radio>
                     <el-radio label="最高分">最高分</el-radio>
                     <el-radio label="最近得分">最近得分</el-radio>
@@ -123,7 +136,7 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.isTimeLimit">
+                <el-radio-group v-model="form.isTimeLimit" :disabled="isDisabled">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
                 </el-radio-group>
@@ -134,6 +147,7 @@
                             :min="0"
                             :max="72"
                             :precision="0"
+                            :disabled="isDisabled"
                         />
                         <div class="unit">小时</div>
                     </div>
@@ -143,6 +157,7 @@
                             :min="0"
                             :max="59"
                             :precision="0"
+                            :disabled="isDisabled"
                         />
                         <div class="unit">分钟</div>
                     </div>
@@ -160,6 +175,7 @@
                     :min="50"
                     :max="100"
                     :precision="0"
+                    :disabled="isDisabled"
                     placeholder="请输入达标分值占比"
                 />
                 <div class="unit">%</div>
@@ -171,12 +187,12 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.yun_xu_bao_ming_">
+                <el-radio-group v-model="form.yun_xu_bao_ming_" :disabled="isDisabled">
                     <el-radio label="是">是</el-radio>
                     <el-radio label="否">否</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item prop="guan_lian_id_">
+            <el-form-item v-if="!isDisabled || form.guan_lian_id_" prop="guan_lian_id_">
                 <template slot="label">
                     关联培训记录
                     <el-tooltip effect="dark" content="关联培训记录。" placement="top">
@@ -188,13 +204,20 @@
                     size="small"
                     template-key="pxjldhk"
                     :multiple="false"
+                    :disabled="isDisabled"
                     type="dialog"
                     class="custom-dialog"
                     placeholder="请选择培训记录"
                 />
             </el-form-item>
-            <el-form-item label="考试描述：" prop="kao_shi_miao_shu_">
-                <el-input v-model="form.kao_shi_miao_shu_" type="textarea" :rows="4" placeholder="请输入描述内容" />
+            <el-form-item v-if="!isDisabled || form.kao_shi_miao_shu_" label="考试描述：" prop="kao_shi_miao_shu_">
+                <el-input
+                    v-model="form.kao_shi_miao_shu_"
+                    type="textarea"
+                    :rows="4"
+                    placeholder="请输入描述内容"
+                    :disabled="isDisabled"
+                />
             </el-form-item>
         </el-form>
         <div slot="footer" class="el-dialog--center">
@@ -221,6 +244,10 @@ export default {
         id: {
             type: String,
             default: ''
+        },
+        isDisabled: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
