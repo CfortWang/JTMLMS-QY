@@ -28,6 +28,7 @@
                 <el-input
                     style="width:50%;"
                     type="textarea"
+                    :rows="5"
                     placeholder="请输入内容"
                     v-model="verificationMethodTextarea"
                     maxlength="500"
@@ -41,6 +42,7 @@
                 <el-input
                     style="width:50%;"
                     type="textarea"
+                    :rows="5"
                     placeholder="请输入内容"
                     v-model="criteriaTextarea"
                     maxlength="500"
@@ -54,6 +56,7 @@
                 <el-input
                     style="width:50%;"
                     type="textarea"
+                    :rows="5"
                     placeholder="请输入内容"
                     v-model="maintenanceTextarea"
                     maxlength="500"
@@ -66,6 +69,7 @@
                 <el-input
                     style="width:50%;"
                     type="textarea"
+                    :rows="5"
                     placeholder="请输入内容"
                     v-model="dataStoreTextarea"
                     maxlength="500"
@@ -104,7 +108,7 @@ export default {
         },
         top: {
             type: String,
-            default: '10%'
+            default: '0%'
         },
         editFromType: {
             type: String,
@@ -122,13 +126,13 @@ export default {
         
         const subtableConfiguration = ()=> {
             let zbTable = this.dynamicParams.formObj.formDefData.fields.find(i => i.field_name == "t_sjfxzb").field_options.columns
-            let zblbTable = zbTable.find(i => i.field_name == "zhiBiaoId").field_options.options
+            let zblbTable = zbTable.find(i => i.name == "zhiBiaoId").field_options.options
             
             return zblbTable;
         }
         const subtableTypeConfiguration = ()=> {
             let zbTable = this.dynamicParams.formObj.formDefData.fields.find(i => i.field_name == "t_sjfxzb").field_options.columns
-            let zblbTable = zbTable.find(i => i.field_name == "leiXing").field_options.options
+            let zblbTable = zbTable.find(i => i.name == "leiXing").field_options.options
             // console.log(zblbTable)
             return zblbTable;
         }
@@ -355,6 +359,7 @@ export default {
 <style lang="scss" >
 .form-renderer-dialog {
     .el-dialog__body {
+        margin: 0 10px 10px 10px;
         padding: 10px 0 5px 0;
     }
     .el-dialog__headerbtn {
@@ -373,10 +378,11 @@ export default {
 .maintenanceCycle{
     display: flex;
     align-items: center;
-    margin: 2%;
+    // margin: 2%;
+    margin-bottom: 6px !important;
 }
 .maintenanceFont{
-    width: 10%;
+    width: 8%;
 }
 .marginNone{
     margin: 0;
