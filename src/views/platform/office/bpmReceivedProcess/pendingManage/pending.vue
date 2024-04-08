@@ -169,7 +169,7 @@ export default {
                 // 查询条件
                 searchForm: {
                     forms: [
-                        // { prop: 'Q^proc_def_name_^SL', name: 'Q^temp.proc_def_name_^SL', label: '事务名称' },
+                        { prop: 'Q^proc_def_name_^SL', name: 'Q^temp.proc_def_name_^SL', label: '事务名称' },
                         { prop: 'Q^subject_^SL', name: 'Q^temp.subject_^SL', label: '事务说明' },
                         {
                             prop: ['Q^create_time_^DL', 'Q^create_time_^DG'],
@@ -205,11 +205,7 @@ export default {
          */
         loadData () {
             this.loading = true
-            const params = {}
-            if (this.$utils.isNotEmpty(this.procDefIdSelect)) {
-                params['Q^temp.proc_def_key_^S'] = this.procDefIdSelect
-            }
-            pending(this.getFormatParams(params)).then(response => {
+            pending(this.getFormatParams()).then(response => {
                 const { data } = response || {}
                 data.dataResult.forEach((item, i) => {
                     item.createDept = this.getTaskInfo(item.subject)
@@ -220,6 +216,27 @@ export default {
             }).catch(() => {
                 this.loading = false
             })
+        },
+        /**
+         * 获取格式化参数
+         */
+        getFormatParams () {
+            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            if (this.$utils.isNotEmpty(this.procDefIdSelect)) {
+                params['Q^temp.proc_def_key_^S'] = this.procDefIdSelect
+            }
+            let res = {}
+            if (params.hasOwnProperty('Q^temp.proc_def_name_^SL')) {
+                const temp = params['Q^temp.proc_def_name_^SL']
+                delete params['Q^temp.proc_def_name_^SL']
+                res = ActionUtils.formatParams(params, this.pagination, this.sorts)
+                res.customs = {
+                    procDefName: temp
+                }
+            } else {
+                res = ActionUtils.formatParams(params, this.pagination, this.sorts)
+            }
+            return res
         },
         /**
          * 点击表格
