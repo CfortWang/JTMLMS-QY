@@ -122,6 +122,26 @@ export default {
             })
         },
         /**
+         * 获取格式化参数
+         */
+        getFormatParams () {
+            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            delete params['Q^inst.status_^SL']
+            delete params['Q^inst.status_^NE']
+            switch (params.end) {
+                case 'true':
+                    params['Q^inst.status_^SL'] = 'end'
+                    break
+                case 'false':
+                    params['Q^inst.status_^NE'] = 'end'
+                    break
+                default:
+                    break
+            }
+            delete params.end
+            return ActionUtils.formatParams(params, this.pagination, this.sorts)
+        },
+        /**
          * 处理按钮事件
          */
         handleAction (command, position, selection, data) {
