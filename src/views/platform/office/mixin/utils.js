@@ -10,10 +10,12 @@ export default {
     },
     data () {
         const { userList = [], deptList = [] } = this.$store.getters
+        const defaultWidth = 225
         return {
             userList,
             deptList,
-            width: 220,
+            defaultWidth,
+            width: defaultWidth,
             height: document.clientHeight,
             createText: '创建表单',
             query: '',
@@ -84,7 +86,7 @@ export default {
             this.loadData()
         },
         handleExpandCollapse (isExpand) {
-            this.width = isExpand ? 230 : 30
+            this.width = isExpand ? this.defaultWidth : 30
         },
         getTaskDesc (v) {
             if (!v.includes('#')) {

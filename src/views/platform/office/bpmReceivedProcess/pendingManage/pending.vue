@@ -15,6 +15,7 @@
             <ibps-crud
                 ref="crud"
                 :height="height"
+                :style="{ marginLeft: width + 'px' }"
                 :data="listData"
                 :toolbars="listConfig.toolbars"
                 :search-form="listConfig.searchForm"
@@ -342,16 +343,6 @@ export default {
     // }
     .page .ibps-container-full__body {
         padding: 0 0 10px 0!important;
-    }
-    .ibps-layout .container-component {
-        position: absolute;
-        top: 0px;
-        right: 0;
-        bottom: 0px;
-        left: 220px!important;
-    }
-    .ibps-card-list-containe .ibps-card-list--picture-card {
-        display: block;
     }
     .ibps-card-list-containe .ibps-card-list {
         padding-top: 10px!important;

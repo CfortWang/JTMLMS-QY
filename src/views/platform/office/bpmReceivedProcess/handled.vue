@@ -10,10 +10,10 @@
                 @expand-collapse="handleExpandCollapse"
             />
         </div>
-        <!-- :style="{ marginLeft: width+'px' }" -->
         <ibps-crud
             ref="crud"
             :height="height"
+            :style="{ marginLeft: width + 'px' }"
             :data="listData"
             :toolbars="listConfig.toolbars"
             :search-form="listConfig.searchForm"
@@ -158,14 +158,14 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    .ibps-layout .container-component {
-        position: absolute;
-        top: 0px;
-        right: 0;
-        bottom: 0px;
-        left: 220px!important;
-    }
-    .ibps-card-list-container .ibps-card-list--picture-card {
-        display: block;
-    }
+    // .ibps-layout .container-component {
+    //     position: absolute;
+    //     top: 0px;
+    //     right: 0;
+    //     bottom: 0px;
+    //     left: 220px!important;
+    // }
+    // .ibps-card-list-container .ibps-card-list--picture-card {
+    //     display: block;
+    // }
 </style>
