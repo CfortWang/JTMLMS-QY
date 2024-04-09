@@ -281,7 +281,7 @@ export default {
             return user.userName || '-'
         },
         transformTime (timeStamp) {
-            if (timeStamp === '不限') return timeStamp
+            if (timeStamp === '不限' || !timeStamp) return '不限'
             const hours = Math.floor(parseInt(timeStamp) / 3600000)
             const minutes = Math.floor((parseInt(timeStamp) % 3600000) / 60000)
             return hours + '小时' + minutes + '分钟'
