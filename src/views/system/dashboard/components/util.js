@@ -195,11 +195,6 @@ export function buildComponent (name, column, preview, vm) {
                             }
                             this.data = data && data.dataResult ? data.dataResult : data
                             this.totalCount = data && data.pageResult ? data.pageResult.totalCount : 0
-                            // 公告栏目对数据过滤
-                            if (param.alias === 'notice') {
-                                const deptIds = this.deptList.map(i => i.positionId)
-                                this.data = data.filter(i => deptIds.includes(i.depId))
-                            }
                             // 更新小铃铛消息数量
                             if (param.alias === 'unreadMessage') {
                                 Bus.$emit('getMessageCount', this.totalCount)

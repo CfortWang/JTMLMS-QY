@@ -6,6 +6,7 @@
                 :height="height"
                 title="事务分类"
                 category-key="FLOW_TYPE"
+                :has-permission="true"
                 @node-click="handleNodeClick"
                 @expand-collapse="handleExpandCollapse"
             />

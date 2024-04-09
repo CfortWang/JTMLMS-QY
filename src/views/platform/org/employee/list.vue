@@ -61,12 +61,7 @@
 </template>
 
 <script>
-import {
-    queryPageList,
-    remove,
-    active,
-    disable
-} from '@/api/platform/org/employee'
+import { queryPageList, remove, active, disable } from '@/api/platform/org/employee'
 import ActionUtils from '@/utils/action'
 import { statusOptions, genderOptions, typeOptions } from './constants'
 import { mapActions, mapMutations } from 'vuex'

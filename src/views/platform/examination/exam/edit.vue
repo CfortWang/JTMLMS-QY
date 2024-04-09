@@ -215,6 +215,7 @@
                     v-model="form.kao_shi_miao_shu_"
                     type="textarea"
                     :rows="4"
+                    :maxlength="512"
                     placeholder="请输入描述内容"
                     :disabled="isDisabled"
                 />
