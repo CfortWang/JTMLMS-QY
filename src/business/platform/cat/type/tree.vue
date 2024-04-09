@@ -93,7 +93,7 @@ export default {
         hasPermission: {
             // 是否有权限控制
             type: Boolean,
-            default: false
+            default: true
         }
     },
     data () {
