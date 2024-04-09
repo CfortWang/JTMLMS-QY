@@ -1,5 +1,5 @@
 <template>
-    <ibps-container type="full" class="page">
+    <div class="main-container">
         <ibps-crud
             ref="crud"
             style="width: 100%"
@@ -57,7 +57,7 @@
             @close="(visible) => (dialogMoreSearchVisible = visible)"
             @action-event="handleMoreSearchAction"
         />
-    </ibps-container>
+    </div>
 </template>
 
 <script>

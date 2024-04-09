@@ -25,7 +25,6 @@
                     <el-select
                         v-model="form.ti_xing_"
                         filterable
-                        allow-create
                         width="100%"
                         placeholder="请选择题型"
                         @change="changeQuestionType"
@@ -42,7 +41,6 @@
                     <el-select
                         v-model="form.chu_ti_ren_"
                         filterable
-                        allow-create
                         width="100%"
                         placeholder="请选择出题人"
                     >
@@ -72,7 +70,6 @@
                     <el-select
                         v-model="form.ping_fen_ren_"
                         filterable
-                        allow-create
                         width="100%"
                         placeholder="请选择评分人"
                     >

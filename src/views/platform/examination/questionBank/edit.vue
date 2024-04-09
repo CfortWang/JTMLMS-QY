@@ -179,7 +179,6 @@
                 <el-select
                     v-model="form.ping_fen_ren_"
                     filterable
-                    allow-create
                     width="100%"
                     placeholder="请选择默认评分人"
                 >

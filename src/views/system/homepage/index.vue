@@ -355,7 +355,7 @@ export default {
         },
         // 处理收缩/展开
         handleCollapseExpansion (index, isCollapse) {
-            this.layout[index].h = isCollapse ? 2 : this.defaultData[index].h
+            this.layout[index].h = isCollapse ? 1.34 : this.defaultData[index].h
             this.layout.push({ i: '0' })
             const deleteIndex = this.layout.findIndex(item => item.i === '0')
             this.layout.splice(deleteIndex, 1)
