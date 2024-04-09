@@ -322,7 +322,7 @@ export default {
                             result[index].statusList.push(item.paperState)
                         }
                     })
-                    const nodatadesc = '无已完成考试'
+                    const nodatadesc = '/'
                     result.forEach((item, index) => {
                         const finishScore = item.scoreList.filter(i => i !== -1)
                         item.userName = this.transformUser(item.examineeId)
