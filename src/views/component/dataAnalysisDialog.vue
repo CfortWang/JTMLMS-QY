@@ -25,7 +25,8 @@
             </div>
             <div class="maintenanceCycle" style="align-items: normal;">
                 <div class="maintenanceFont">验证方法：</div>
-                <el-input
+                <ibps-ueditor style="width:49.8%;font-size:10px" :config="myConfig" v-model="verificationMethodTextarea"   destroy />
+                <!-- <el-input
                     style="width:50%;"
                     type="textarea"
                     :rows="5"
@@ -34,12 +35,13 @@
                     maxlength="500"
                     show-word-limit
                 >
-                </el-input>
+                </el-input> -->
                 
             </div>
             <div class="maintenanceCycle" style="align-items: normal;">
                 <div class="maintenanceFont">判断标准：</div>
-                <el-input
+                <ibps-ueditor style="width:49.8%;" :config="myConfig" v-model="criteriaTextarea"   destroy />
+                <!-- <el-input
                     style="width:50%;"
                     type="textarea"
                     :rows="5"
@@ -48,7 +50,7 @@
                     maxlength="500"
                     show-word-limit
                 >
-                </el-input>
+                </el-input> -->
                 
             </div>
             <div class="maintenanceCycle" style="align-items: normal;">
@@ -83,6 +85,7 @@
     </el-dialog>
 </template>
 <script>
+import IbpsUeditor from '@/components/ibps-ueditor'
 import ActionUtils from '@/utils/action'
 import { queryDataTable } from '@/api/platform/data/dataTemplate'
 import { getBuildDataById } from '@/api/platform/data/dataTemplate'
@@ -91,6 +94,9 @@ import Vue from 'vue'
 // Vue.component('ibps-formrender', () => import('@/business/platform/form/formrender/index.vue'))
 
 export default {
+    components:{
+        IbpsUeditor
+    },
     props: {
         visible: {
             type: Boolean,
@@ -155,7 +161,23 @@ export default {
             bringOut:[],
             toolbarsConsult: [{ key: 'cancel' }],
             dataTemplate:[],
-            nameCycle:''
+            nameCycle:'',
+            myConfig: {
+                // 编辑器不自动被内容撑高
+                autoHeightEnabled: false,
+                // 初始容器高度
+                initialFrameHeight: 100,
+                // 初始容器宽度
+                initialFrameWidth: '100%',
+                toolbars:[],
+                elementPathEnabled : false,　　//是否启用元素路径，默认是true显示
+                wordCount:false,          //是否开启字数统计
+                // fontSize:10
+                // // 上传文件接口（这个地址是我为了方便各位体验文件上传功能搭建的临时接口，请勿在生产环境使用！！！）
+                // serverUrl: 'http://127.0.0.1:8080/ueditor',
+                // // UEditor 资源文件的存放路径，如果你使用的是 vue-cli 生成的项目，通常不需要设置该选项，vue-ueditor-wrap 会自动处理常见的情况，如果需要特殊配置，参考下方的常见问题2
+                // UEDITOR_HOME_URL: '/static/UEditor/'
+            }
         }
     },
     watch: {
@@ -251,7 +273,7 @@ export default {
                 this.dynamicParams.formObj.setData(this.templateKey,a)
                 // })
                 
-                // this.closeDialog()
+                this.closeDialog()
             }else if(this.cycleValue!=''&&this.verificationMethodTextarea!=''&&this.criteriaTextarea!=''&&this.maintenanceTextarea!=''){
 
             }else{
@@ -318,7 +340,7 @@ export default {
                 }
                 let ojb = this.getJson(resuArr)
                 this.dataStoreTextarea = JSON.stringify(ojb)
-                this.closeDialog()
+                // this.closeDialog()
             }
         },
         //自定义方法处理数据转为json格式
