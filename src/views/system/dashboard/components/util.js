@@ -365,8 +365,8 @@ export function buildComponent (name, column, preview, vm) {
                         id, title
                     })
                 },
-                handleUnreadMessage (id) {
-                    this.$emit('action-event', 'unRead', id)
+                handleUnreadMessage (id, tableId, tableName) {
+                    this.$emit('action-event', 'unRead', { id, tableId, tableName })
                 },
                 // 处理全屏
                 handleFullscreen () {

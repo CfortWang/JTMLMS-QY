@@ -127,7 +127,7 @@
                         <ibps-list-item
                             v-for="(item, index) in data"
                             :key="index"
-                            @click.native="handleUnreadMessage(item.id)"
+                            @click.native="handleUnreadMessage(item.id, item.tableId, item.tableName)"
                         >
                             <ibps-list-item-meta>
                                 <ibps-icon slot="avatar" name="bolt" style="color: #5cb85c; margin: 5px 0 0 5px;" />

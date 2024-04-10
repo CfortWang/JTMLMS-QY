@@ -42,6 +42,8 @@
         <ibps-message-dialog
             :id="messageEditId"
             title="消息明细"
+            :table-id="messageTableId"
+            :table-name="messageTableName"
             :readonly="true"
             :visible="ibpsMessageDialogVisible"
             @callback="handleMessageCallback"
@@ -174,6 +176,8 @@ export default {
 
             ibpsMessageDialogVisible: false,
             messageEditId: '',
+            messageTableId: '',
+            messageTableName: '',
 
             scrollDelay: 0,
             scrollTop: 0,
@@ -365,9 +369,11 @@ export default {
             this.newsEditId = params.id || params
             this.newsTitle = params.title || this.newsTitle
         },
-        handleUnreadMessage (id) {
+        handleUnreadMessage (params) {
+            this.messageEditId = params.id || params
+            this.messageTableId = params.tableId || ''
+            this.messageTableName = params.tableName || ''
             this.ibpsMessageDialogVisible = true
-            this.messageEditId = id
         },
         handleFlow (params) {
             this.defId = params.defId || null

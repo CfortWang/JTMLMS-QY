@@ -144,9 +144,8 @@ export default {
                 closeOnClickModal: false
             }).then(() => {
                 // TODO 受控文件逻辑处理
-                const { position = [], userId, name } = this.$store.getters || {}
-                const positionsIds = position.map(item => item.id)
-                if (!position.length) {
+                const { position, userId, name } = this.$store.getters || {}
+                if (!position) {
                     return this.$message.warning('系统所登录的账户并没有所属部门，请先在系统设置完再进行确认！')
                 }
                 const sql = `select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '${userId}'`
@@ -158,7 +157,7 @@ export default {
                     const tempObj = {
                         id_: generateUUID(),
                         parent_id_: this.tableId,
-                        tong_zhi_bu_men_: positionsIds.join(','),
+                        tong_zhi_bu_men_: position,
                         que_ren_qian_ming: JSON.stringify([{
                             id: ryjbqkDatas[0].qian_zi_tu_wen_,
                             fileName: '确认签名'
