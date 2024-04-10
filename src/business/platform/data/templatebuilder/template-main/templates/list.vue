@@ -138,7 +138,7 @@ export default {
 
                 this.showPagination = this.template.attrs ? this.template.attrs.need_page === 'Y' : true
                 // 分页
-                this.pagination.limit = this.template.attrs ? parseInt(this.template.attrs.page_size, 10) || 100 : 20
+                this.pagination.limit = this.template.attrs ? parseInt(this.template.attrs.page_size, 10) || 20 : 20
 
                 this.indexRow = this.template.attrs ? this.template.attrs.indexRow || false : false
             },

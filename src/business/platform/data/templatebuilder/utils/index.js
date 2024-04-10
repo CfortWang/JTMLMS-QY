@@ -31,7 +31,7 @@ const helpers = {
         const attrs = {
             'init_query': 'Y',
             'need_page': 'Y',
-            'page_size': 100
+            'page_size': 20
         }
         if (type === 'dialog') {
             attrs['data_title'] = {
