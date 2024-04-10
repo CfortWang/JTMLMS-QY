@@ -193,8 +193,7 @@ export default {
                             label: '同步表结构',
                             icon: 'ibps-icon-exchange',
                             hidden: (row, index) => {
-                                return true
-                                // return row.boType === 'out'
+                                return row.boType !== 'out'
                             }
                         },
                         {
