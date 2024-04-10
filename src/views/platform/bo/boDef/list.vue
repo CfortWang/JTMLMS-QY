@@ -191,10 +191,11 @@ export default {
                         {
                             key: 'synBoTable',
                             label: '同步表结构',
-                            icon: 'ibps-icon-exchange'
-                            //   hidden: (row, index) => {
-                            //     return row.boType === 'out'
-                            //   }
+                            icon: 'ibps-icon-exchange',
+                            hidden: (row, index) => {
+                                return true
+                                // return row.boType === 'out'
+                            }
                         },
                         {
                             key: 'copy',
