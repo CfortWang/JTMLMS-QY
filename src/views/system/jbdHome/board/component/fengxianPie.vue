@@ -20,7 +20,7 @@ export default {
     mounted () {
     },
     methods: {
-        getMiddleLeft (idSelector) {
+        getMiddleLeft (idSelector, orient) {
             const chartDom = document.getElementById(idSelector)
             var myChart = echarts.init(chartDom)
             const radius = '50%'
@@ -45,10 +45,9 @@ export default {
                     formatter: '{b}\n{d}%',
                     edgeDistance: '20%'
                 },
-
                 legend: {
                     show: true,
-                    orient: 'vertical',
+                    orient: orient || 'vertical',
                     itemGap: 6,
                     z: 3,
                     left: '20',
@@ -71,7 +70,8 @@ export default {
                         },
                         labelLine: {
                             distanceToLabelLine: 0
-                        }
+                        },
+                        left: '50px'
                     }
                 ]
             }
@@ -80,10 +80,4 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
-.pieView {
-width: 100%;
-height: 100%;
-overflow: hidden;
-}
-</style>
+

@@ -69,24 +69,19 @@
                             <div v-show="riskReList.length" class="change" @click="changeFn('fourth','riskRePieView')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="剩余风险等级统计表" name="fine">
-                            <div v-show="residueChange" style="width: 50%;">
-                                <tableCom :table-prop="residueProp" :table-list="residueList" />
+                            <div style="width: 100%; height:350px;display: flex;justify-content: space-around">
+                                <div id="remainingRiskCD" style="width: 400px; height: 300px; " />
+                                <PieView ref="remainingRiskCD" :info="remainingRiskCD" />
+                                <div id="remainingRiskDJ" style="width: 350px; height: 300px; " />
+                                <PieView ref="remainingRiskDJ" :info="remainingRiskDJ" />
+                                <div id="remainingRiskYD" style="width: 350px; height: 300px; " />
+                                <PieView ref="remainingRiskYD" :info="remainingRiskYD" />
                             </div>
-                            <div v-show="!residueChange" style="width: 45%; height:350px">
-                                <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
-                                <PieView :info="residuePieView" />
-                            </div>
-                            <div v-show="riskReList.length" class="change" @click="changeFn('fine')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="降低风险登记表" name="six">
-                            <div v-show="reduceChange" style="width: 50%;">
+                            <div style="width: 100%;">
                                 <tableCom :table-prop="reduceeProp" :table-list="reduceList" />
                             </div>
-                            <div v-show="!reduceChange" style="width: 45%; height:350px">
-                                <div id="idSelector2" style="width: 300px; height: 300px; margin:0 auto" />
-                                <PieView ref="reducePieView" :info="reducePieView" />
-                            </div>
-                            <div v-show="reduceList.length" class="change" @click="changeFn('fourth')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                     </el-tabs>
                 </template>
@@ -190,7 +185,9 @@ export default {
             riskReChange: true,
             residueList: [], // 剩余风险等级统计
             residueProp: [],
-            residuePieView: {},
+            remainingRiskDJ: {},
+            remainingRiskYD: {},
+            remainingRiskCD: {},
             residueChange: true,
             reduceList: [], // 降低风险登记表
             reduceeProp: [],
@@ -258,6 +255,8 @@ export default {
             this.getRiskLevel() // 风险等级
             this.getRiskIdentification()// 风险识别评估表
             this.getImprovementRecords()// 风险改进记录
+            this.remainingRisk()
+            this.getReduceChange()
             this.getSchedule(this.obj[0].zhuang_tai_)
             this.currentPage = 1
             this.pagesize = 5
@@ -292,6 +291,13 @@ export default {
                 this.getDepartmentStatistics()
             } else if (this.activeName === 'fourth') {
                 this.getRiskResponse()
+            } else if (this.activeName === 'fine') {
+                this.remainingRisk()
+                this.$refs.remainingRiskCD.getMiddleLeft('remainingRiskCD')
+                this.$refs.remainingRiskDJ.getMiddleLeft('remainingRiskDJ')
+                this.$refs.remainingRiskYD.getMiddleLeft('remainingRiskYD')
+            } else if (this.activeName === 'six') {
+                this.getReduceChange()
             }
         },
         async countApi (riskId, type) {
@@ -395,7 +401,39 @@ export default {
                 { prop: 'shu_liang_', label: '数量' },
                 { prop: 'zhan_bi_', label: '占比' }
             ]
-            console.log(this.riskRePieView, 'this.riskRePieView')
+        },
+        // 剩余风险统计表
+        async remainingRisk () {
+            const riskCD = await this.countApi(this.zongid, 'SYFX_CD')
+            const cdData = []
+            for (const item of riskCD) {
+                cdData.push({ name: item.yan_zhong_cheng_d, value: item.total })
+            }
+            this.remainingRiskCD = {
+                data: cdData,
+                idSelector: 'remainingRiskCD',
+                color: ['#FF0033', '#3870e0', '#339933', '#9900CC', '#99CCFF']
+            }
+            const riskDJ = await this.countApi(this.zongid, 'SYFX_DJ')
+            const djData = []
+            for (const item of riskDJ) {
+                djData.push({ name: item.feng_xian_deng_ji, value: item.total })
+            }
+            this.remainingRiskDJ = {
+                data: djData,
+                idSelector: 'remainingRiskDJ',
+                color: ['#FF0033', '#3870e0', '#339933']
+            }
+            const riskYD = await this.countApi(this.zongid, 'SYFX_YD')
+            const ydData = []
+            for (const item of riskYD) {
+                ydData.push({ name: item.feng_xian_ying_du, value: item.total })
+            }
+            this.remainingRiskYD = {
+                data: ydData,
+                idSelector: 'remainingRiskYD',
+                color: ['#FF0033', '#3870e0', '#339933']
+            }
         },
         // 风险识别评估表
         async getRiskIdentification () {
@@ -405,10 +443,8 @@ export default {
             await curdPost('sql', riskCountSql).then((res) => {
                 riskCount = res.variables.data
             })
-            // if (riskCount !== 0) {
-            //     return
-            // }
-            this_.$refs.RiskIdenList.curreFn(riskCount[0].count)
+
+            // this_.$refs.RiskIdenList.curreFn(riskCount[0].count)
             this.pageTotal = Number(riskCount[0].count)
 
             const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
@@ -418,7 +454,7 @@ export default {
             for (const item of this_.RiskIdenList) {
                 item.bian_zhi_ren_ = item.bian_zhi_ren_ ? this.findUser(item.bian_zhi_ren_) : '/'
                 item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'
-                item.bian_zhi_shi_jian = item.bian_zhi_shi_jian || '/'
+                item.bian_zhi_shi_jian = item.bian_zhi_shi_jian.split(' ')[0] || '/'
                 item.shi_fou_guo_shen_ = item.shi_fou_guo_shen_ || '未编制'
             }
             this.RiskIdenProp = [
@@ -426,6 +462,40 @@ export default {
                 { prop: 'bian_zhi_shi_jian', label: '编制时间' },
                 { prop: 'bian_zhi_ren_', label: '编制人' },
                 { prop: 'shi_fou_guo_shen_', label: '状态' }
+            ]
+        },
+        // 降低风险等记表
+        async getReduceChange () {
+            const this_ = this
+            const riskCountSql = `select COUNT(*) as count from t_djbzb where zong_id_ = '${this.zongid}'`
+            let riskCount = []
+            await curdPost('sql', riskCountSql).then((res) => {
+                riskCount = res.variables.data
+            })
+            this.pageTotal = Number(riskCount[0].count)
+
+            const sql = `select * from t_djbzb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
+            await curdPost('sql', sql).then((res) => {
+                this_.reduceList = res.variables.data
+            })
+            for (const item of this_.reduceList) {
+                item.bian_zhi_ren_ = item.bian_zhi_ren_ ? this.findUser(item.bian_zhi_ren_) : '/'
+                item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'
+                item.bian_zhi_shi_jian = item.bian_zhi_shi_jian.split(' ')[0] || '/'
+                item.yao_su_tiao_kuan_ = item.yao_su_tiao_kuan_ || '/'
+                item.feng_xian_zhi_shu = item.feng_xian_zhi_shu || '/'
+                item.gong_zuo_huan_jie = item.gong_zuo_huan_jie || '/'
+                item.gong_zuo_miao_shu = item.gong_zuo_miao_shu || '/'
+                item.feng_xian_miao_sh = item.feng_xian_miao_sh || '/'
+            }
+            this.reduceeProp = [
+                { prop: 'bian_zhi_bu_men_', label: '编制部门' },
+                { prop: 'bian_zhi_shi_jian', label: '编制时间' },
+                { prop: 'yao_su_tiao_kuan_', label: '要素条款' },
+                { prop: 'feng_xian_zhi_shu', label: '初评风险指数' },
+                { prop: 'gong_zuo_huan_jie', label: '工作环节', width: 120 },
+                { prop: 'gong_zuo_miao_shu', label: '工作描述', width: 300 },
+                { prop: 'feng_xian_miao_sh', label: '风险描述', width: 250 }
             ]
         },
         // 风险改进记录

@@ -24,6 +24,19 @@
                 
             </div>
             <div class="maintenanceCycle" style="align-items: normal;">
+                <div class="maintenanceFont">指标定义：</div>
+                <el-input
+                    style="width:50%;"
+                    type="textarea"
+                    :rows="5"
+                    placeholder="请输入内容"
+                    v-model="definitionTextarea"
+                    maxlength="500"
+                    show-word-limit
+                >
+                </el-input>
+            </div>
+            <div class="maintenanceCycle" style="align-items: normal;">
                 <div class="maintenanceFont">验证方法：</div>
                 <ibps-ueditor style="width:49.8%;font-size:10px" :config="myConfig" v-model="verificationMethodTextarea"   destroy />
                 <!-- <el-input
@@ -66,7 +79,7 @@
                 >
                 </el-input>
             </div>
-            <div class="maintenanceCycle" style="align-items: normal;">
+            <div class="maintenanceCycle" style="align-items: normal;display:none">
                 <div class="maintenanceFont">数据存储：</div>
                 <el-input
                     style="width:50%;"
@@ -154,6 +167,7 @@ export default {
             verificationMethodTextarea:'',
             criteriaTextarea:'',
             dataStoreTextarea:'',
+            definitionTextarea:'',
             toolbars: [
                 { key: 'confirm', label: '确定'},
                 { key: 'cancel'}
@@ -201,6 +215,7 @@ export default {
                 let text = this.bringOut.find(i=>i.id_ == val)
                 if (typeof text != 'undefined') {
                     this.tyepRadio = text.lei_xing_
+                    this.definitionTextarea = text.ding_yi_
                     this.nameCycle = text.zhi_biao_ming_che
                     this.verificationMethodTextarea = text.yan_zheng_fang_fa
                     this.criteriaTextarea = text.pan_duan_biao_zhu
@@ -238,7 +253,7 @@ export default {
                     // console.log(data.dataResult,'111111111111')
                     this.bringOut = data.dataResult
                     data.dataResult.forEach(element => {
-                        let newVal = {val:element.id_ || '',label:element.zhi_biao_ming_che || '',yanzheng:element.yan_zheng_fang_fa || '',panduan:element.pan_duan_biao_zhu || '',leixing:element.lei_xing_ || ''}
+                        let newVal = {val:element.id_ || '',label:element.zhi_biao_ming_che || '',yanzheng:element.yan_zheng_fang_fa || '',panduan:element.pan_duan_biao_zhu || '',leixing:element.lei_xing_ || '',definition:element.ding_yi_}
                         this.cycleOptions.push(newVal)
                     });
                 }).catch(() => {
@@ -262,19 +277,19 @@ export default {
         handleConfirm(key) {
             let a=this.dynamicParams.formObj.getData(this.templateKey)
             this.afterSubButton(this.verificationMethodTextarea,this.criteriaTextarea)
-            if(this.cycleValue!=''&&this.verificationMethodTextarea!=''&&this.criteriaTextarea!=''&&this.maintenanceTextarea!=''&&this.dataStoreTextarea!=''){
+            if(this.cycleValue!=''&&this.verificationMethodTextarea!=''&&this.criteriaTextarea!=''&&this.dataStoreTextarea!=''){
                 
                 if(this.dynamicParams.position == 'manage'){
-                    this.$set(a,this.dynamicParams.params.index,{zhiBiaoMingCheng:this.nameCycle,zhiBiaoId:this.cycleValue,leiXing:this.tyepRadio,yanZhengFangFa:this.verificationMethodTextarea,panDuanBiaoZhun:this.criteriaTextarea,pingJiaJieGuo:this.maintenanceTextarea,shuJuCunChu:this.dataStoreTextarea})
+                    this.$set(a,this.dynamicParams.params.index,{zhiBiaoMingCheng:this.nameCycle,zhiBiaoId:this.cycleValue,leiXing:this.tyepRadio,yanZhengFangFa:this.verificationMethodTextarea,panDuanBiaoZhun:this.criteriaTextarea,pingJiaJieGuo:this.maintenanceTextarea,shuJuCunChu:this.dataStoreTextarea,dingYi:this.definitionTextarea})
                 }else{
-                    a.push({zhiBiaoMingCheng:this.nameCycle,zhiBiaoId:this.cycleValue,leiXing:this.tyepRadio,yanZhengFangFa:this.verificationMethodTextarea,panDuanBiaoZhun:this.criteriaTextarea,pingJiaJieGuo:this.maintenanceTextarea,shuJuCunChu:this.dataStoreTextarea})
+                    a.push({zhiBiaoMingCheng:this.nameCycle,zhiBiaoId:this.cycleValue,leiXing:this.tyepRadio,yanZhengFangFa:this.verificationMethodTextarea,panDuanBiaoZhun:this.criteriaTextarea,pingJiaJieGuo:this.maintenanceTextarea,shuJuCunChu:this.dataStoreTextarea,dingYi:this.definitionTextarea})
                 }
                 // this.$nextTick(function(){
                 this.dynamicParams.formObj.setData(this.templateKey,a)
                 // })
                 
                 this.closeDialog()
-            }else if(this.cycleValue!=''&&this.verificationMethodTextarea!=''&&this.criteriaTextarea!=''&&this.maintenanceTextarea!=''){
+            }else if(this.cycleValue!=''&&this.verificationMethodTextarea!=''&&this.criteriaTextarea!=''){
 
             }else{
                 this.dynamicParams.formObj.$message.warning("请保证所有信息都已填写") 
@@ -288,6 +303,7 @@ export default {
         loadFormData() {
            if(this.dynamicParams.position == 'manage'){
                 let a=this.dynamicParams.formObj.getData(this.templateKey)[this.dynamicParams.params.index]
+                // console.log(a)
                 this.cycleValue = a.zhiBiaoId
                 this.nameCycle = a.zhiBiaoMingCheng
                 this.tyepRadio = a.leiXing
@@ -295,6 +311,7 @@ export default {
                 this.criteriaTextarea = a.panDuanBiaoZhun
                 this.maintenanceTextarea = a.pingJiaJieGuo
                 this.dataStoreTextarea = a.shuJuCunChu
+                this.definitionTextarea = a.dingYi
            }
         },
         afterSubButton (val1,val2) {
@@ -420,4 +437,5 @@ export default {
 .fontColor{
     color: #409EFF;
 }
+
 </style>

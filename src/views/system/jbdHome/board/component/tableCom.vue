@@ -112,7 +112,6 @@ export default {
             this.$emit('handleCurrentChange', val)
         },
         curreFn (val) {
-            console.log(this.currentPage, 222222222)
             this.pageTotal = val
         }
     }
