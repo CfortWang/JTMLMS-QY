@@ -208,6 +208,10 @@ export default {
         saveStartFlow (params = {}) {
             const formData = this.getFormData()
             if (!formData) return
+            // 暂存后直接提交，已有数据ID
+            if (this.$utils.isNotEmpty(this.bizKey)) {
+                formData.id = this.bizKey || ''
+            }
             const jsonData = {
                 defId: this.defId,
                 version: this.version || '0',
