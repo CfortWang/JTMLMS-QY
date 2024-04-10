@@ -8,7 +8,7 @@
                     :icon="data.photo ? null : 'ibps-icon-user-circle'"
                     :src="getPhoto()"
                     :size="85"
-                    style="font-size: 100px; color: #c0c4cc; background: #fff;"
+                    style="font-size: 85px; color: #c0c4cc; background: #fff;"
                 >
                     <img :src="getPhoto(data.photo)" class="photo-img" @error="errorAvatarHandler(data)">
                 </el-avatar>

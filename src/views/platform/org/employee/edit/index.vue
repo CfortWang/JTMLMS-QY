@@ -92,6 +92,7 @@
         </el-tabs>
         <div slot="footer" class="el-dialog--center">
             <ibps-toolbar
+                v-if="!readonly || formType === 'part'"
                 :actions="toolbars"
                 @action-event="handleActionEvent"
             />
@@ -357,6 +358,11 @@ export default {
                     // 启动培训
                     this.createTrain(response.variables.id)
                     this.$emit('dialog-callback', this)
+                    console.log(this.$router.currentRoute)
+                    if (this.formType === 'part') {
+                        this.closeDialog()
+                        return this.$router.currentRoute.path === '/dashboard' ? location.reload() : this.$router.push('/')
+                    }
                     ActionUtils.saveSuccessMessage(response.message, r => {
                         // if (this.$utils.isEmpty(this.formId)) {
                         //     this.$refs[this.formName].resetFields()

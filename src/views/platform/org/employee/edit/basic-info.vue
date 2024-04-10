@@ -2,22 +2,22 @@
     <el-row style="height: 500px">
         <el-col :span="6">
             <div style="padding-left: 55px">
-                <span class="photo-area" @click="dialogFormVisible = !readonly">
+                <span class="photo-area" @click="dialogFormVisible = canEdit">
                     <img v-if="formData.photo" :src="image" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon" />
                     <div
-                        v-if="!readonly"
+                        v-if="canEdit"
                         :class="formData.photo !== '' ? 'handle-photo-buttons' : null"
                         @click.stop="() => { dialogFormVisible = false }"
                     >
                         <div v-if="formData.photo !== ''">
-                            <i class="el-icon-edit" @click.stop="dialogFormVisible = !readonly" />
+                            <i class="el-icon-edit" @click.stop="dialogFormVisible = canEdit" />
                             <i class="el-icon-delete" @click.stop="formData.photo = ''" />
                         </div>
                     </div>
                 </span>
             </div>
-            <span v-if="!readonly" class="operation">点击上方进行头像操作</span>
+            <span v-if="canEdit" class="operation">点击上方进行头像操作</span>
             <ibps-uploader
                 :visible="dialogFormVisible"
                 :limit="limit"
@@ -36,12 +36,12 @@
             >
                 <input type="password" style="width: 0; height: 0; line-height: 0; padding: 0; border-width: 0">
                 <el-form-item label="账号" prop="account">
-                    <el-input v-if="!readonly" v-model="formData.account" autocomplete="off" clearable />
+                    <el-input v-if="canEdit" v-model="formData.account" autocomplete="off" clearable />
                     <span v-else>{{ formData.account }}</span>
                 </el-form-item>
                 <el-form-item v-show="!formData.id" label="密码" :prop="!formData.id ? 'password' : ''">
                     <el-input
-                        v-if="!readonly"
+                        v-if="canEdit"
                         v-model="formData.password"
                         autocomplete="off"
                         type="password"
@@ -67,11 +67,11 @@
                     <span v-else>{{ formData.qq }}</span>
                 </el-form-item>
                 <el-form-item label="员工编号">
-                    <el-input v-if="!readonly" v-model="formData.jianDingZiGeZ" clearable />
+                    <el-input v-if="canEdit" v-model="formData.jianDingZiGeZ" clearable />
                     <span v-else>{{ formData.jianDingZiGeZ }}</span>
                 </el-form-item>
                 <el-form-item label="员工姓名" prop="name">
-                    <el-input v-if="!readonly" v-model="formData.name" clearable />
+                    <el-input v-if="canEdit" v-model="formData.name" clearable />
                     <span v-else>{{ formData.name }}</span>
                 </el-form-item>
                 <el-form-item label="员工状态" prop="status">
@@ -111,15 +111,15 @@
                 </el-form-item>
                 <el-form-item label="邮箱" prop="email">
                     <!-- <el-input v-model="formData.email" clearable /> -->
-                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.email" clearable />
+                    <el-input v-if="canEdit" v-model="formData.email" clearable />
                     <span v-else>{{ formData.email }}</span>
                 </el-form-item>
                 <el-form-item label="地址">
-                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.address" clearable />
+                    <el-input v-if="canEdit" v-model="formData.address" clearable />
                     <span v-else>{{ formData.address }}</span>
                 </el-form-item>
                 <el-form-item label="手机号码">
-                    <el-input v-if="!readonly || formType== 'part'" v-model="formData.mobile" clearable />
+                    <el-input v-if="canEdit" v-model="formData.mobile" clearable />
                     <span v-else>{{ formData.mobile }}</span>
                 </el-form-item>
                 <el-form-item v-if="!readonly">
@@ -244,7 +244,9 @@ export default {
                 callback()
             }
         }
+        const canEdit = !this.readonly || this.formType === 'part'
         return {
+            canEdit,
             formAsterisk: {
                 title: '关于用户类型',
                 content: `此属性用于设置用户端展示的功能`
