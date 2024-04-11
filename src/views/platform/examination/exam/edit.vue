@@ -345,6 +345,9 @@ export default {
             if (this.$utils.isEmpty(this.id)) {
                 return
             }
+            if (this.isDisabled) {
+                this.$message.info('非未发布状态的考试仅可修改限考时间！')
+            }
             const sql = `select id_, create_by_, ti_ku_id_, guan_lian_id_, kao_shi_ming_chen, kao_shi_lei_xing_, chuang_jian_shi_j, fa_bu_shi_jian_, fa_bu_ren_, xian_kao_shi_jian, xian_kao_ci_shu_, kao_shi_shi_chang, can_kao_ren_yuan_, zhuang_tai_, da_biao_zhan_bi_, ji_fen_fang_shi_, kao_shi_miao_shu_, yun_xu_bao_ming_ from t_exams where id_ = '${this.id}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}

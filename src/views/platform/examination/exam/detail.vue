@@ -52,7 +52,7 @@
                 </div>
                 <div class="info-item">
                     <span class="label">题目数量：</span>
-                    <span class="value">{{ paperData.totalCount }}</span>
+                    <span class="value">{{ paperData.questionCount }}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">总分：</span>

@@ -358,7 +358,6 @@ export default {
                     // 启动培训
                     this.createTrain(response.variables.id)
                     this.$emit('dialog-callback', this)
-                    console.log(this.$router.currentRoute)
                     if (this.formType === 'part') {
                         this.closeDialog()
                         return this.$router.currentRoute.path === '/dashboard' ? location.reload() : this.$router.push('/')

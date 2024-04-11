@@ -27,6 +27,7 @@
                         filterable
                         width="100%"
                         placeholder="请选择题型"
+                        :disabled="readonly"
                         @change="changeQuestionType"
                     >
                         <el-option
@@ -42,6 +43,7 @@
                         v-model="form.chu_ti_ren_"
                         filterable
                         width="100%"
+                        :disabled="readonly"
                         placeholder="请选择出题人"
                     >
                         <el-option
@@ -71,6 +73,11 @@
                         v-model="form.ping_fen_ren_"
                         filterable
                         width="100%"
+                        clearable
+                        multiple
+                        collapse-tags
+                        :multiple-limit="16"
+                        :disabled="readonly"
                         placeholder="请选择评分人"
                     >
                         <el-option
@@ -89,6 +96,7 @@
                     :maxlength="512"
                     :rows="2"
                     :autosize="readonly"
+                    :disabled="readonly"
                     placeholder="请输入题干内容"
                 />
             </el-form-item>
@@ -106,6 +114,7 @@
                     size="medium"
                     class="qustion-tag"
                     :disable-transitions="false"
+                    :disabled="readonly"
                     @close="handleTagDelete(tag)"
                 >
                     {{ tag }}
@@ -116,6 +125,7 @@
                     v-model="tagValue"
                     class="input-new-tag"
                     size="small"
+                    :disabled="readonly"
                     @keyup.enter.native="handleTagConfirm"
                     @blur="handleTagConfirm"
                 />
@@ -129,6 +139,7 @@
                     accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
                     multiple
                     download
+                    :disabled="readonly"
                     size=""
                 />
             </el-form-item>
@@ -139,6 +150,7 @@
                     :max="100"
                     :precision="0"
                     type="number"
+                    :disabled="readonly"
                     placeholder="请输入题目分值"
                 />
             </el-form-item>
@@ -174,6 +186,7 @@
                         type="textarea"
                         :rows="1"
                         :autosize="readonly"
+                        :disabled="readonly"
                         placeholder="请输入选项内容，最多可配置8个选项"
                     />
                     <el-radio-group v-if="form.ti_xing_ === '单选题'" v-model="item.radio">
@@ -216,6 +229,7 @@
                         type="textarea"
                         :rows="1"
                         :autosize="readonly"
+                        :disabled="readonly"
                         placeholder="请输入答案内容，最多可配置20个答案"
                     />
                     <div v-if="!readonly" class="operate-btn">
@@ -253,6 +267,7 @@
                         type="textarea"
                         :rows="4"
                         :autosize="readonly"
+                        :disabled="readonly"
                         placeholder="请输入答案内容"
                     />
                 </el-form-item>
@@ -263,6 +278,7 @@
                     type="textarea"
                     :rows="2"
                     :autosize="readonly"
+                    :disabled="readonly"
                     placeholder="请输入题目备注信息"
                 />
             </el-form-item>
@@ -339,7 +355,7 @@ export default {
                 xuan_xiang_shu_: '',
                 zheng_que_da_an_: '',
                 ping_fen_fang_shi: rateType[defaultType] || '',
-                ping_fen_ren_: userId,
+                ping_fen_ren_: [userId],
                 fen_zhi_: '',
                 bei_zhu_: '',
                 zhuang_tai_: '启用'
@@ -519,6 +535,7 @@ export default {
                 }
                 item.fen_zhi_ = parseInt(item.fen_zhi_)
                 item.fu_tu_ = item.fu_tu_ ? JSON.parse(item.fu_tu_) : ''
+                item.ping_fen_ren_ = item.ping_fen_ren_ ? item.ping_fen_ren_.split(',') : []
                 this.questionTags = item.biao_qian_ ? item.biao_qian_.split(',') : []
                 this.form = item
             })
@@ -586,6 +603,7 @@ export default {
                     this.form.zheng_que_da_an_ = a2.join(',')
                     break
                 case '填空题':
+                    this.form.ping_fen_ren_ = this.form.ping_fen_ren_ ? this.form.ping_fen_ren_.join(',') : ''
                     this.form.xuan_xiang_lei_xi = ''
                     this.form.da_an_ = ''
                     this.form.xuan_xiang_shu_ = a3.length
@@ -597,6 +615,7 @@ export default {
                     this.form.da_an_ = ''
                     break
                 case '简答题':
+                    this.form.ping_fen_ren_ = this.form.ping_fen_ren_ ? this.form.ping_fen_ren_.join(',') : ''
                     this.form.xuan_xiang_lei_xi = ''
                     this.form.da_an_ = ''
                     break

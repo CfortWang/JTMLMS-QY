@@ -21,7 +21,12 @@
             @submit.native.prevent
         >
             <el-form-item label="题库名称：" prop="ti_ku_ming_cheng_">
-                <el-input v-model="form.ti_ku_ming_cheng_" type="text" :maxlength="128" />
+                <el-input
+                    v-model="form.ti_ku_ming_cheng_"
+                    type="text"
+                    :maxlength="128"
+                    :disabled="readonly"
+                />
             </el-form-item>
             <el-form-item label="题库分类：" prop="ti_ku_fen_lei_">
                 <el-select
@@ -29,6 +34,7 @@
                     filterable
                     allow-create
                     width="100%"
+                    :disabled="readonly"
                     placeholder="请选择题库分类"
                 >
                     <el-option
@@ -46,7 +52,7 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.ti_ku_zhuang_tai_">
+                <el-radio-group v-model="form.ti_ku_zhuang_tai_" :disabled="readonly">
                     <el-radio label="可用">可用</el-radio>
                     <el-radio label="禁用">禁用</el-radio>
                 </el-radio-group>
@@ -58,7 +64,7 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.shi_fou_gong_kai_">
+                <el-radio-group v-model="form.shi_fou_gong_kai_" :disabled="readonly">
                     <el-radio label="是">是&nbsp;&nbsp;&nbsp;&nbsp;</el-radio>
                     <el-radio label="否">否</el-radio>
                 </el-radio-group>
@@ -70,7 +76,7 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.suo_shu_fan_wei_">
+                <el-radio-group v-model="form.suo_shu_fan_wei_" :disabled="readonly">
                     <el-radio label="科级">科级</el-radio>
                     <el-radio label="组级">组级</el-radio>
                 </el-radio-group>
@@ -78,6 +84,7 @@
                     v-if="form.suo_shu_fan_wei_ === '组级'"
                     v-model="form.bian_zhi_bu_men_"
                     width="100%"
+                    :disabled="readonly"
                     placeholder="请选择专业组"
                 >
                     <el-option
@@ -95,7 +102,7 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.isLimit" @change="changeLimit">
+                <el-radio-group v-model="form.isLimit" :disabled="readonly" @change="changeLimit">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
                 </el-radio-group>
@@ -104,6 +111,7 @@
                         v-model="form.xian_kao_ci_shu_"
                         :min="1"
                         :precision="0"
+                        :disabled="readonly"
                         placeholder="请输入单个用户最大限考次数"
                     />
                     <div class="unit">次</div>
@@ -116,7 +124,7 @@
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.limitTime">
+                <el-radio-group v-model="form.limitTime" :disabled="readonly">
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
                 </el-radio-group>
@@ -127,6 +135,7 @@
                             :min="0"
                             :max="72"
                             :precision="0"
+                            :disabled="readonly"
                         />
                         <div class="unit">小时</div>
                     </div>
@@ -136,6 +145,7 @@
                             :min="0"
                             :max="59"
                             :precision="0"
+                            :disabled="readonly"
                         />
                         <div class="unit">分钟</div>
                     </div>
@@ -153,11 +163,12 @@
                     :min="50"
                     :max="100"
                     :precision="0"
+                    :disabled="readonly"
                     placeholder="请输入达标分值占比"
                 />
                 <div class="unit">%</div>
             </el-form-item>
-            <el-form-item prop="ping_fen_ren_">
+            <el-form-item v-if="!readonly || form.ping_fen_ren_" prop="ping_ fen_ ren_">
                 <template slot="label">
                     默认评分人
                     <el-tooltip effect="dark" content="设置该题库试题的默认评分人，该题库下所有未设置评分人的题目都以该评分人为准。" placement="top">
@@ -180,6 +191,11 @@
                     v-model="form.ping_fen_ren_"
                     filterable
                     width="100%"
+                    clearable
+                    multiple
+                    collapse-tags
+                    :multiple-limit="16"
+                    :disabled="readonly"
                     placeholder="请选择默认评分人"
                 >
                     <el-option
@@ -190,12 +206,13 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item label="题库描述：" prop="miao_shu_">
+            <el-form-item v-if="!readonly || form.miao_shu_" label="题库描述：" prop="miao_shu_">
                 <el-input
                     v-model="form.miao_shu_"
                     type="textarea"
                     :autosize="readonly"
                     :rows="4"
+                    :disabled="readonly"
                     placeholder="请输入描述内容"
                 />
             </el-form-item>
@@ -321,6 +338,7 @@
         <ques-edit
             v-if="questionDialogVisible"
             :id="quesId"
+            :bank-id="id"
             :visible.sync="questionDialogVisible"
             :is-copy="isCopy"
             :ques-data="questionData"
@@ -466,10 +484,14 @@ export default {
             })
             return res
         },
-        transformUser (userId) {
+        transformUser (user) {
+            const idList = user.split(',')
             const { userList = [] } = this.$store.getters
-            const user = userList.find(u => u.userId === userId) || {}
-            return user.userName || '-'
+            const nameList = idList.map(id => {
+                const user = userList.find(u => u.userId === id) || {}
+                return user.userName || '-'
+            })
+            return nameList.join('，')
         },
         formatNum (num) {
             return num === null || num === undefined || num === '' ? 0 : num
@@ -520,6 +542,8 @@ export default {
                 }
                 const bank = bankData[0]
                 bank.isLimit = bank.xian_kao_ci_shu_ === '不限' ? '0' : '1'
+                bank.ping_fen_ren_ = bank.ping_fen_ren_ ? bank.ping_fen_ren_.split(',') : []
+                bank.suo_shu_fan_wei_ = bank.suo_shu_fan_wei_ === '不限' ? '不限' : '科级'
                 if (bank.kao_shi_shi_chang === '不限') {
                     bank.limitTime = '0'
                     bank.hours = null
@@ -593,7 +617,7 @@ export default {
                 xuan_xiang_shu_: item.optionCount || '',
                 zheng_que_da_an_: item.rightKey,
                 ping_fen_fang_shi: item.rateType || '',
-                ping_fen_ren_: item.rater || '',
+                ping_fen_ren_: item.rater,
                 bei_zhu_: item.note || '',
                 zhuang_tai_: item.quesState,
                 biao_qian_: item.quesTag || ''
@@ -626,6 +650,7 @@ export default {
             }
             this.form.bian_zhi_bu_men_ = this.form.suo_shu_fan_wei_ === '科级' ? '' : this.form.bian_zhi_bu_men_
             this.form.di_dian_ = this.level
+            this.form.ping_fen_ren_ = this.form.ping_fen_ren_ ? this.form.ping_fen_ren_.join(',') : ''
             delete this.form.isLimit
             delete this.form.limitTime
             delete this.form.hours
@@ -780,6 +805,9 @@ export default {
             }
             .value {
                 font-weight: 600;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
     }
