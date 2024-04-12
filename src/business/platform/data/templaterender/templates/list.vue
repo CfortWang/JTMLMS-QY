@@ -293,7 +293,7 @@ import { startFlowFromList } from '@/api/platform/bpmn/bpmInst'
 import { getDatabaseType } from '@/api/platform/form/formDef'
 
 import fecha from '@/utils/fecha'
-import { debounce, toUpper, toLower } from 'lodash'
+import { debounce, toUpper, toLower, cloneDeep } from 'lodash'
 import ActionUtils from '@/utils/action'
 import FormOptions from '@/business/platform/form/constants/formOptions'
 import FormUtils from '@/business/platform/form/utils/formUtil'
@@ -384,7 +384,10 @@ export default {
             type: Boolean,
             default: false
         },
-        xlsxFileVisible: false,
+        xlsxFileVisible: {
+            type: Boolean,
+            default: false
+        },
         tempSearch: { // 是否是数据模板使用的筛选条件
             type: Boolean,
             default: false
@@ -1101,10 +1104,10 @@ export default {
                     case 'import': // 导入
                         this.importColumnsVisible = true
                         break
-                    case 'exportAll': // 导出所有
+                    case 'exportTemplate': // 导出模板
                         this.exportActions(buttonType)
                         break
-                    case 'exportMuBan': // 导出模板
+                    case 'exportAll': // 导出所有
                         this.exportActions(buttonType)
                         break
                     case 'exportSelected': // 导出选中
@@ -1126,6 +1129,7 @@ export default {
             const { template } = this
             if (this.$utils.isNotEmpty(template.export_columns)) {
                 if (template.export_columns.select_field === 'Y') {
+                    // 导出时选择字段
                     this.exportColumnsVisible = true
                     // todo
                 } else {
@@ -1154,9 +1158,8 @@ export default {
             // template.filter_conditions = []
             let response_data = JSON.parse(JSON.stringify(dataTemplate))
             if (this.$utils.isEmpty(template.export_columns)) {
+                // 未设置过导出字段时，将所有非子表类型字段导出
                 const arr = dataTemplate.datasets.filter((d) => d.type !== 'table')
-                const select_field = 'N'
-                const export_type = 'db'
                 const defaultfields = arr.map((a) => {
                     return {
                         name: a.name,
@@ -1172,48 +1175,27 @@ export default {
                     }
                 })
                 template.export_columns = {
-                    select_field: select_field,
+                    select_field: 'N',
                     fields: defaultfields,
-                    export_type: export_type
+                    export_type: 'db'
                 }
             } else {
-                const indexs = []
-                let pass = false
-                template.export_columns.fields.forEach((f) => {
-                    const index = f.rights.findIndex((e) => e.type === 'none')
-                    indexs.push(index)
+                const exportField = template.export_columns.fields.filter(f => {
+                    return f.rights.some(r => r.type !== 'none')
                 })
-                indexs.forEach((i) => {
-                    if (i !== 0) {
-                        pass = true
-                        return false
-                    }
-                })
-                if (!pass) {
-                    this.$message({
-                        message: '没有字段可导出！',
-                        type: 'warning'
-                    })
-                    return
+                if (!exportField.length) {
+                    return this.$message.warning('没有字段可导出！')
                 }
             }
-            if (this.$utils.isEmpty(this.listData) && buttonType !== 'exportMuBan') {
-                this.$message({
-                    message: '没有列表数据可导出！',
-                    type: 'warning'
-                })
-                return
+            if (this.$utils.isEmpty(this.listData) && buttonType !== 'exportTemplate') {
+                return this.$message.warning('没有列表数据可导出！')
             }
             response_data = Object.assign(response_data, template)
-            const fieldsArr = []
-            for (var f in fields) {
-                fieldsArr.push(fields[f])
-            }
+            response_data.fields = Object.values(this.fields)
 
-            response_data.fields = fieldsArr
             params.action = buttonType
-
             params['response_data'] = JSON.stringify(response_data)
+
             const searcFormData = this.$refs['searchForm'].getSearcFormData() || {}
             for (const key in searcFormData) {
                 params[key] = searcFormData[key]
@@ -1228,7 +1210,7 @@ export default {
             }
             let saveData
 
-            if (buttonType === 'exportAll' || buttonType === 'exportMuBan') {
+            if (buttonType === 'exportAll' || buttonType === 'exportTemplate') {
                 saveData = ActionUtils.formatParams(params, pagination, sorts)
             }
             if (buttonType === 'exportSelected') {
@@ -1238,8 +1220,7 @@ export default {
             if (buttonType === 'exportCurPage') {
                 saveData = ActionUtils.formatParams(params, pagination, sorts)
             }
-
-            checkExportData(saveData).then((res) => {
+            checkExportData(saveData).then(() => {
                 this.handleExportData(saveData)
             }).catch((err) => console.error(err))
         },

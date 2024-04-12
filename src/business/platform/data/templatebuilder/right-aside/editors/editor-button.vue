@@ -62,6 +62,7 @@
             prop="icon"
         >
             <el-button size="small" type="primary" @click="handleExportFields">设置导出字段</el-button>
+            <el-button size="small" type="primary" @click="resetExportFields">重置导出字段</el-button>
         </el-form-item>
         <el-form-item
             v-if="formData && (formData.button_type === 'consult' || formData.button_type === 'download')"
@@ -238,6 +239,17 @@ export default {
         },
         handleExportFields () {
             this.exportFieldDialogVisible = true
+        },
+        resetExportFields () {
+            this.$confirm('确定要重置导出字段吗？该操作将在模板信息保存后生效', '提示', {
+                type: 'info',
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                showClose: false,
+                closeOnClickModal: false
+            }).then(() => {
+                this.handleData('export_columns', '')
+            })
         },
         handleExportColumn (data) {
             this.handleData('export_columns', data)

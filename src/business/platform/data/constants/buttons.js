@@ -75,22 +75,22 @@ const buttons = {
         scope: ['toolbar'],
         menus: [
             {
+                label: '导出模板',
+                key: 'exportTemplate'
+            },
+            {
                 label: '导出选中',
                 key: 'exportSelected'
-            }, {
+            },
+            {
                 label: '导出所有',
                 key: 'exportAll'
-            }, {
+            },
+            {
                 label: '导出当前页',
                 key: 'exportCurPage'
-            }]
-    },
-    // 导出字段需要在导出按钮那里设置
-    'exportMuBan': {
-        label: '导出模板',
-        type: 'primary',
-        icon: 'ibps-icon-export',
-        scope: ['toolbar']
+            }
+        ]
     },
     'openTask': {
         label: '编制',
