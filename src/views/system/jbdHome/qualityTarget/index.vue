@@ -110,7 +110,8 @@ export default {
             const w = window.innerWidth
             const special = ['综合', '样品', '科研', '医疗', '教学', '急诊', 'test', '测试']
             const { deptList = [] } = this.$store.getters || {}
-            const deptFilter = deptList.filter(item => { return !special.some(i => item.positionName.includes(i)) && item.depth === 4 }).sort(i => i.sn)
+            const poct = deptList.find(item => item.positionName.includes('poct') || item.positionName.includes('POCT') && item.depth === 3) || {}
+            const deptFilter = deptList.filter(item => { return !special.some(i => item.positionName.includes(i)) && item.depth === 4 && !item.path.includes(poct.positionId) }).sort(i => i.sn)
             const { first = '', second = '' } = this.$store.getters.level || {}
 
             this.initData = {}
