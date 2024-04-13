@@ -28,48 +28,44 @@
                 </div>
                 <template>
                     <el-tabs v-model="activeName" class="count" @tab-click="handleClick">
-                        <el-tab-pane label="风险等级统计表" name="first">
-                            <div v-show="riskLeveChange" style="width: 50%;height:320px">
+                        <el-tab-pane label="风险等级统计表" name="first" style="display: flex;">
+                            <div style="width: 50%;height:320px;display: inline-block">
                                 <tableCom :table-prop="RiskLevelProp" :table-list="riskLevelList" />
                             </div>
-                            <div v-show="!riskLeveChange" style="width: 45%; height:320px">
+                            <div style="width: 50%; height:320px;display: inline-block;">
                                 <div id="riskLevePieView" style="width: 500px; height: 300px; margin:0 auto" />
                                 <PieView ref="riskLevePieView" :info="riskLevePieView" />
                             </div>
-                            <div v-show="riskLevelList.length" class="change" @click="changeFn('first')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="涉及条款统计表" name="second">
-                            <div v-show="termChange" style="width: 50%;">
+                            <div style="width: 50%;display: inline-block">
                                 <tableCom :table-prop="termProp" :table-list="termList" />
                             </div>
-                            <div v-show="!termChange" style="width: 60%; height:320px;">
+                            <div style="width: 50%; height:320px;display: inline-block">
                                 <div id="termPieView" style="width: 850px; height: 300px; margin:0 auto" />
                                 <PieView ref="termPieView" :info="termPieView" />
                             </div>
-                            <div v-show="termList.length" class="change" @click="changeFn('second','termPieView')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="责任部门统计表" name="third">
-                            <div v-show="departChange" style="width: 50%;">
+                            <div style="width: 50%;display: inline-block">
                                 <tableCom :table-prop="departProp" :table-list="departList" />
                             </div>
-                            <div v-show="!departChange" style="width: 45%; height:350px">
+                            <div style="width: 45%; height:350px;display: inline-block">
                                 <div id="departPieView" style="width: 500px; height: 300px; margin:0 auto" />
                                 <PieView ref="departPieView" :info="departPieView" />
                             </div>
-                            <div v-show="departList.length" class="change" @click="changeFn('third','departPieView')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="风险应对措施统计表" name="fourth">
-                            <div v-show="riskReChange" style="width: 50%;">
+                            <div style="width: 50%;display: inline-block">
                                 <tableCom :table-prop="riskReProp" :table-list="riskReList" />
                             </div>
-                            <div v-show="!riskReChange" style="width: 45%; height:350px">
+                            <div style="width: 45%; height:350px;display: inline-block">
                                 <div id="riskRePieView" style="width: 500px; height: 300px; margin:0 auto" />
                                 <PieView ref="riskRePieView" :info="riskRePieView" />
                             </div>
-                            <div v-show="riskReList.length" class="change" @click="changeFn('fourth','riskRePieView')">切换 <i class="el-icon-refresh" /></div>
                         </el-tab-pane>
                         <el-tab-pane label="剩余风险等级统计表" name="fine">
-                            <div style="width: 100%; height:350px;display: flex;justify-content: space-around">
+                            <div style="width: 100%; height:350px;display: flex;justify-content: space-around; overflow-x: scroll;">
                                 <div id="remainingRiskCD" style="width: 400px; height: 300px; " />
                                 <PieView ref="remainingRiskCD" :info="remainingRiskCD" />
                                 <div id="remainingRiskDJ" style="width: 350px; height: 300px; " />
@@ -222,27 +218,14 @@ export default {
     created () {
         this.id = this.obj[0].id_
         this.zongid = this.obj[0].zong_id_
-        this.getInits()
+        this.$nextTick(() => {
+            this.getInits()
+        })
     },
     destroyed () {
         this.$destroy()
     },
     methods: {
-        changeFn (type) {
-            if (type === 'first') {
-                this.riskLeveChange = !this.riskLeveChange
-                this.$refs.riskLevePieView.getMiddleLeft('riskLevePieView')
-            } else if (type === 'second') {
-                this.termChange = !this.termChange
-                this.$refs.termPieView.getMiddleLeft('termPieView')
-            } else if (type === 'third') {
-                this.departChange = !this.departChange
-                this.$refs.departPieView.getMiddleLeft('departPieView')
-            } else if (type === 'fourth') {
-                this.riskReChange = !this.riskReChange
-                this.$refs.riskRePieView.getMiddleLeft('riskRePieView')
-            }
-        },
         findDept (depId) {
             const dept = this.deptList.find(i => i.positionId === depId)
             return dept.positionName
@@ -252,16 +235,17 @@ export default {
             return user.userName
         },
         getInits () {
-            this.getRiskLevel() // 风险等级
+            // this.getRiskLevel() // 风险等级
             this.getRiskIdentification()// 风险识别评估表
             this.getImprovementRecords()// 风险改进记录
-            this.remainingRisk()
-            this.getReduceChange()
+            // this.remainingRisk()
+            // this.getReduceChange()
+            this.handleClick()
             this.getSchedule(this.obj[0].zhuang_tai_)
             this.currentPage = 1
             this.pagesize = 5
             this.scan = this.scanVisible
-            this.activeName = 'first'
+            // this.activeName = 'first'
             this.userList = this.$store.getters.userList
             this.deptList = this.$store.getters.deptList
             this.riskLeveChange = true
@@ -283,6 +267,7 @@ export default {
             }
         },
         handleClick () {
+            console.log(111111111111111111, this.activeName)
             if (this.activeName === 'first') {
                 this.getRiskLevel()
             } else if (this.activeName === 'second') {
@@ -293,9 +278,6 @@ export default {
                 this.getRiskResponse()
             } else if (this.activeName === 'fine') {
                 this.remainingRisk()
-                this.$refs.remainingRiskCD.getMiddleLeft('remainingRiskCD')
-                this.$refs.remainingRiskDJ.getMiddleLeft('remainingRiskDJ')
-                this.$refs.remainingRiskYD.getMiddleLeft('remainingRiskYD')
             } else if (this.activeName === 'six') {
                 this.getReduceChange()
             }
@@ -319,7 +301,7 @@ export default {
             const res = await this.countApi(this.zongid, 'FXDJ')
             this.riskLevePieView = {
                 data: [],
-                idSelector: 'adhjaodh',
+                idSelector: 'riskLevePieView',
                 color: ['#FF0033', '#3870e0', '#339933']
             }
             this.riskLevePieView.data = []
@@ -335,6 +317,8 @@ export default {
                 { prop: 'shu_liang_', label: '数量' },
                 { prop: 'zhan_bi_', label: '占比' }
             ]
+
+            this.$refs.riskLevePieView.getMiddleLeft('riskLevePieView', this.riskLevePieView)
         },
         // 涉及条款统计表
         async getClauseStatistics () {
@@ -342,7 +326,7 @@ export default {
             this.termPieView = {
                 data: [],
                 idSelector: 'termPieView',
-                color: ['#FF0033', '#3870e0', '#339933']
+                color: ['#CC0066', '#FF6600', '#3399CC', '#99CC00', '#FF9900', '#FFFFCC', '#FFCC99', '#009999', '#FFCC33']
             }
             this.termPieView.data = []
             this.termList = []
@@ -357,6 +341,7 @@ export default {
                 { prop: 'shu_liang_', label: '数量' },
                 { prop: 'zhan_bi_', label: '占比' }
             ]
+            this.$refs.termPieView.getMiddleLeft('termPieView', this.termPieView)
         },
         // 责任部门统计表统计表
         async getDepartmentStatistics () {
@@ -364,7 +349,7 @@ export default {
             this.departPieView = {
                 data: [],
                 idSelector: 'departPieView',
-                color: ['#FF0033', '#3870e0', '#339933']
+                color: ['#FF0033', '#3870e0', '#339933', '#FF9900']
             }
             this.departPieView.data = []
             this.departList = []
@@ -379,6 +364,7 @@ export default {
                 { prop: 'shu_liang_', label: '数量' },
                 { prop: 'zhan_bi_', label: '占比' }
             ]
+            this.$refs.departPieView.getMiddleLeft('departPieView', this.departPieView)
         },
         // 风险应对措施统计表
         async getRiskResponse () {
@@ -401,6 +387,7 @@ export default {
                 { prop: 'shu_liang_', label: '数量' },
                 { prop: 'zhan_bi_', label: '占比' }
             ]
+            this.$refs.riskRePieView.getMiddleLeft('riskRePieView', this.riskRePieView)
         },
         // 剩余风险统计表
         async remainingRisk () {
@@ -434,6 +421,9 @@ export default {
                 idSelector: 'remainingRiskYD',
                 color: ['#FF0033', '#3870e0', '#339933']
             }
+            this.$refs.remainingRiskCD.getMiddleLeft('remainingRiskCD', this.remainingRiskCD)
+            this.$refs.remainingRiskDJ.getMiddleLeft('remainingRiskDJ', this.remainingRiskDJ)
+            this.$refs.remainingRiskYD.getMiddleLeft('remainingRiskYD', this.remainingRiskYD)
         },
         // 风险识别评估表
         async getRiskIdentification () {

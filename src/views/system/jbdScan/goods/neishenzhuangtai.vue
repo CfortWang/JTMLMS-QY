@@ -568,7 +568,7 @@ export default {
                 grid: {
                 // 让图表占满容器
                     top:"50px",
-                    left:"45px",
+                    left:"100px",
                     right:"80px",
                     bottom:"40px"
                 },

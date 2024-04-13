@@ -7,11 +7,6 @@
 <script>
 import * as echarts from 'echarts'
 export default {
-    props: {
-        info: {
-            type: Object
-        }
-    },
     data () {
         return {
             showChart: true
@@ -20,11 +15,11 @@ export default {
     mounted () {
     },
     methods: {
-        getMiddleLeft (idSelector, orient) {
+        getMiddleLeft (idSelector, info, orient) {
             const chartDom = document.getElementById(idSelector)
             var myChart = echarts.init(chartDom)
             const radius = '50%'
-            const inData = this.info.data
+            const inData = info.data
             var option
             option = {
                 title: {
@@ -36,7 +31,7 @@ export default {
                         fontWeight: '600'
                     }
                 },
-                color: this.info.color,
+                color: info.color,
                 tooltip: {
                     trigger: 'item',
                     formatter: '{d}%'
@@ -60,7 +55,7 @@ export default {
                         type: 'pie',
                         radius: radius,
                         center: ['50%', '50%'],
-                        data: this.info.data,
+                        data: inData,
                         emphasis: {
                             itemStyle: {
                                 shadowBlur: 10,

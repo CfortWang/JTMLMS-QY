@@ -168,7 +168,7 @@
                 />
                 <div class="unit">%</div>
             </el-form-item>
-            <el-form-item v-if="!readonly || form.ping_fen_ren_" prop="ping_ fen_ ren_">
+            <el-form-item v-if="!readonly || form.ping_fen_ren_" prop="ping_fen_ren_">
                 <template slot="label">
                     默认评分人
                     <el-tooltip effect="dark" content="设置该题库试题的默认评分人，该题库下所有未设置评分人的题目都以该评分人为准。" placement="top">
@@ -617,7 +617,7 @@ export default {
                 xuan_xiang_shu_: item.optionCount || '',
                 zheng_que_da_an_: item.rightKey,
                 ping_fen_fang_shi: item.rateType || '',
-                ping_fen_ren_: item.rater,
+                ping_fen_ren_: item.rater || '',
                 bei_zhu_: item.note || '',
                 zhuang_tai_: item.quesState,
                 biao_qian_: item.quesTag || ''

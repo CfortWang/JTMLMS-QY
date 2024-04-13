@@ -206,7 +206,7 @@ export default {
                 this.refreshNode()
             }
         },
-        // 属于
+        // 分配
         handleBelongTo () {
             const tree = this.$refs.elTree
             const postInfo = tree.getCheckedNodes() // 勾选
@@ -214,12 +214,28 @@ export default {
                 this.hint()
                 return
             }
+            const objs = []
             for (let i = 0; i < postInfo.length; i++) {
                 if (postInfo[i].id === '0') {
                     postInfo.splice(i, 1)
                 }
+                const hadData = this.posItemList.find(fid => fid.id === postInfo[i].id)
+                const obj = {
+                    'name': postInfo[i].name,
+                    'id': postInfo[i].id,
+                    'posAlias': postInfo[i].alias,
+                    'isMainPost': hadData ? hadData.isMainPost : 'N',
+                    'isPrincipal': hadData ? hadData.isPrincipal : 'N',
+                    'hasChild': postInfo[i].hasChild
+                }
+                objs.push(obj)
             }
-            this.posItemList = concat(this.posItemList, postInfo)
+            this.posItemList = concat(this.posItemList, objs)
+        },
+        // 清空
+        handleClear () {
+            this.posItemList = []
+            this.init()
         },
         hint () {
             this.$alert('你还没有选择任何节点！', '信息', {
@@ -227,20 +243,27 @@ export default {
                 type: 'warning'
             }).then(() => {})
         },
-        handleClear () {
-            this.posItemList = []
-            this.init()
-        },
+        // 删除
         deleteRow (index, row) {
+            // 删除行数据
             row.splice(index, 1)
+            // 删除树选择的数据
+            const tree = this.$refs.elTree
+            tree.setCheckedNodes([])
+            const arr = []
+            for (const item of row) {
+                arr.push({ id: item.id })
+            }
+            tree.setCheckedNodes(arr)
         },
+        // 是否主部门 变更事件
         changeMainPost (index, row) {
-            this.radioSelection = row
             for (const item of this.posItemList) {
                 item.isMainPost = 'N'
             }
             row.isMainPost = 'Y'
         },
+        // 主负责人 变更事件
         changeCharge (index, row) {
             this.checkBoxSelection = row
             if (row.isPrincipal === 'Y') {
@@ -252,6 +275,7 @@ export default {
         handleEmitEvent () {
             this.$emit('input', this.posItemList)
         },
+        // 回填显示单选、多选框的value
         check (row, type) {
             if (type === 'radio') {
                 return row.isMainPost === 'Y' ? row.id : false
