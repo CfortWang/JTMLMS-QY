@@ -97,6 +97,12 @@
                 @action-event="handleActionEvent"
             />
         </div>
+        <personal-code
+            v-if="qrcodeVisible"
+            :visible.sync="qrcodeVisible"
+            :content="personalInfo"
+            @close="visible => (qrcodeVisible = visible)"
+        />
     </el-dialog>
 </template>
 
@@ -109,6 +115,7 @@ import OrgInfo from './org-info'
 import PositionInfo from './position-info'
 import RoleInfo from './role-info'
 import GroupInfo from './group-info'
+import PersonalCode from './personal-qrcode'
 
 export default {
     components: {
@@ -117,7 +124,8 @@ export default {
         OrgInfo,
         PositionInfo,
         RoleInfo,
-        GroupInfo
+        GroupInfo,
+        PersonalCode
     },
     props: {
         visible: Boolean,
@@ -168,10 +176,18 @@ export default {
                 jiNengZhiCheng: 'inside'
             },
             employee: {},
+            qrcodeVisible: false,
+            personalInfo: '',
             toolbars: [
                 {
                     key: 'save',
                     hidden: () => { return this.readonly && this.formType === 'detail' }
+                },
+                {
+                    key: 'qrcode',
+                    icon: 'ibps-icon-qrcode',
+                    label: '个人二维码',
+                    type: 'success'
                 },
                 { key: 'cancel' }
             ]
@@ -208,6 +224,9 @@ export default {
                 case 'save':
                     this.handleSave()
                     break
+                case 'qrcode':
+                    this.handleQRCode()
+                    break
                 case 'cancel':
                     this.closeDialog()
                     break
@@ -229,6 +248,19 @@ export default {
                     ActionUtils.saveErrorMessage()
                 }
             })
+        },
+        handleQRCode () {
+            this.personalInfo = JSON.stringify({
+                id: this.employee.id,
+                account: this.employee.account,
+                name: this.employee.name,
+                mobile: this.employee.mobile,
+                email: this.employee.email,
+                gender: this.employee.gender,
+                dept: this.employee.posItemList.map(i => i.name).join(','),
+                role: this.employee.roleItemList.map(i => i.name).join(',')
+            })
+            this.qrcodeVisible = true
         },
         checkPhone (value) {
             const reg = /^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/
