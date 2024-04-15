@@ -217,6 +217,7 @@ export default {
                 this.$refs.elTable.toggleRowSelection(row)
             }
             this.$emit('row-click', row, event, column)
+
         },
         /**
          * @description 行右键点击时触发的事件

@@ -29,6 +29,7 @@
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
+            @row-click="handleRowClick"
         >
             <!--自定义查询条件-->
             <template v-slot:searchForm>
@@ -478,7 +479,11 @@ export default {
                 title: ''
             },
             grooveList: [],
-            hadDoSearch: false
+            hadDoSearch: false,
+            clickCount: 0, // 列表点击次数
+            timer: null,
+            initOneButtons: [],
+            initDblButtons: []
         }
     },
     computed: {
@@ -655,6 +660,9 @@ export default {
             // 获取当前页选中的id
             const selectIds = []
             if (this.multiple) {
+                if (!this.$utils.isArray(this.selection)) {
+                    this.selection = [this.selection]
+                }
                 this.selection.forEach((row) => {
                     const pkValue = this.getPkValue(row)
                     selectIds.push(pkValue)
@@ -745,6 +753,9 @@ export default {
             const selectAllIds = []
             if (this.$utils.isEmpty(this.selectionAll)) {
                 return
+            }
+            if (!this.$utils.isArray(this.selectionAll)) {
+                this.selectionAll = [this.selectionAll]
             }
             if (this.multiple) {
                 this.selectionAll.forEach((row) => {
@@ -880,6 +891,8 @@ export default {
             this.hadDoSearch = true
             this.loadData()
             this.addDataCont = {}
+            this.selectionAll = []
+            this.selection = []
         },
         /* 流程页面关闭，刷新当前页面*/
         loadFlowFData (v, temp) {
@@ -1315,6 +1328,12 @@ export default {
                     btn.position = 'manage'
                     manageButtons.push(btn)
                 }
+                if (btn.clickToSync === '单击') {
+                    this.initOneButtons.push(btn)
+                }
+                if (btn.clickToSync === '双击') {
+                    this.initDblButtons.push(btn)
+                }
             })
             let rowHandle = null
 
@@ -1466,11 +1485,13 @@ export default {
                 // eslint-disable-next-line no-eval
                 initAddDataCont: rf.initAddDataCont ? obj : null,
                 reportPath: rf.reportPath,
+                clickToSync: rf.clickToSync,
                 mode: mode,
                 rightIcon: rightIcon,
                 menus: menus,
                 disabled: disabled,
-                hidden: hidden
+                hidden: hidden,
+                position: rf.position
             }
         },
         // 自定义格式数据事件
@@ -1936,6 +1957,77 @@ export default {
             this.dialogFormVisible = visible
             this.dataTemplate = temp
             this.initJTemplate()
+        },
+        /**
+         * @description 行点击时触发的事件
+         */
+        handleRowClick (row, event, column) {
+            this.clickCount++
+            // 判断点击次数，如果是首次点击，则启动延时器
+            if (this.clickCount === 1) {
+                this.timer = setTimeout(() => {
+                    // 执行单击操作
+                    this.handleRowOneclick(row, event, column)
+                    this.clickCount = 0
+                }, 300) // 设置延时时间，单位为毫秒
+            } else {
+                // 如果点击次数大于1，则说明是双击操作，清除延时器，并执行双击操作
+                clearTimeout(this.timer)
+                this.handleRowDblclick(row, event, column)
+                this.clickCount = 0
+            }
+        },
+        /**
+         * @description 行单击时触发的事件
+         */
+        handleRowOneclick (row, event, column) {
+            if (event.label !== '操作') {
+                this.setRowEvent('单击', row)
+            }
+        },
+        /**
+         * @description 行双击时触发的事件
+         */
+        handleRowDblclick (row, event, column) {
+            if (event.label !== '操作') {
+                this.setRowEvent('双击', row)
+            }
+        },
+        setRowEvent (operation, row) {
+            // operation = '单击'
+            const functionButtons = this.template.buttons ? this.template.buttons.function_buttons || [] : []
+            if (!functionButtons.length) {
+                return
+            }
+            const btnIndex = functionButtons.findIndex(item => item.clickToSync === operation)
+            if (btnIndex === -1) {
+                return
+            }
+            // 获取拥有点击同步事件按钮的索引位置，该位置是区分是manage，还是toolbar的按钮里的位置
+            // 先给位置按钮区分成两个数组
+            const managBtn = functionButtons.filter(item => item.position === 'manage')
+            const toolbarBtn = functionButtons.filter(item => item.position === 'toolbar')
+            const buttonAct = this.buildButton(functionButtons[btnIndex], btnIndex)
+            const buttonTypeAct = buttonAct.button_type !== 'custom' ? buttonAct.button_type : buttonAct.code
+            let indexAct = 0
+            let selectAct = ''
+            let dataAct = ''
+            switch (buttonAct.position) {
+                case 'manage':
+                    selectAct = row.id_
+                    dataAct = row
+                    indexAct = managBtn.findIndex(item => item.button_type === buttonAct.key)
+                    break
+                case 'toolbar':
+                    selectAct = [row.id_]
+                    dataAct = [row]
+                    indexAct = toolbarBtn.findIndex(item => item.button_type === buttonAct.key)
+                    break
+                default:
+                    break
+            }
+            // conso
+            this.handleAction(buttonTypeAct, buttonAct.position, selectAct, dataAct, indexAct, buttonAct)
         }
     }
 }

@@ -298,7 +298,26 @@ const util = {
             }
         }
         return oldIds
+    },
+    /**
+     * 有些浏览器不支持indexOf属性
+     * @param {*} arr 数组
+     * @param {*} item 被检索的字符串
+     * @returns
+     */
+    getIndexOf (arr, item) {
+        if (Array.prototype.indexOf) {
+            return arr.indexOf(item)
+        } else {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] === item) {
+                    return i
+                }
+            }
+        }
+        return -1
     }
+
 }
 
 export default util

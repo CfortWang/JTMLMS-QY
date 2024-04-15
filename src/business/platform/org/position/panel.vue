@@ -27,8 +27,6 @@
                     :data="treeData"
                     :expand-on-click-node="false"
                     :props="{ children: 'children', label: 'name',isLeaf: 'leaf'}"
-                    :load="loadTreeNode"
-                    :lazy="lazyTree"
                     :show-checkbox="multiple"
                     :check-strictly="true"
                     :filter-node-method="filterNode"
@@ -49,8 +47,6 @@
                     :data="treeData"
                     :expand-on-click-node="false"
                     :props="{ children: 'children', label: 'name',isLeaf: 'leaf'}"
-                    :load="loadTreeNode"
-                    :lazy="lazyTree"
                     node-key="id"
                     pid-key="parentId"
                     :default-expanded-keys="defaultExpandedKeys"
@@ -83,9 +79,7 @@
 </template>
 <script>
 import { getScriptValue } from '@/api/platform/form/formDef'// 脚本
-import { findTreeData as getTreeData } from '@/api/platform/org/position'
-// import { findTreeData as getPositionTreeData } from '@/api/platform/org/entity'
-
+import { findTreeData as getTreeData, findAllPosition } from '@/api/platform/org/position'
 import MoreSearch from './more-search'
 import TreeUtils from '@/utils/tree'
 
@@ -100,8 +94,12 @@ export default {
             type: String,
             default: '400px'
         },
+        /**
+         * partyTypeId：类型节点ID,
+         * 即：选择范围里的顺序（1全部、2所在范围、3指定范围、4脚本）
+         * 4的逻辑暂时未处理
+         */
         partyTypeId: {
-            // 类型节点ID
             type: [String, Number],
             default: ''
         },
@@ -177,6 +175,58 @@ export default {
             this.$refs.elTree.filter(val)
         }
     },
+    mounted () {
+        const { position, isSuper = false } = this.$store.getters
+
+        /**
+        *  判断是否是超级管理员isSuper账号，目前以该账户为系统最大的管理权限
+        *  如果是测试账号，则获取全部数据
+        *  否则，获取当前用户所在医院的数据
+        */
+        if (this.partyTypeId !== '4') {
+            const type = this.partyTypeId !== '' ? this.partyTypeId : '1'
+            findAllPosition().then(res => {
+                const { data = [] } = res || {}
+                if (data.length) {
+                    for (const i of data) {
+                        if (!isSuper) {
+                            switch (type) {
+                                case '2':
+                                    i.disabled = true
+                                    // 展示所在部门及其上级部门，但是上级部门无法被选择到，但是下属部门要能选择
+                                    for (const item of position.split(',')) {
+                                        if ((this.$utils.getIndexOf(i.path.split('.'), item) > -1) &&
+                                      (this.$utils.getIndexOf(i.path.split('.'), item) <= this.$utils.getIndexOf(i.path.split('.'), i.id))) {
+                                            i.disabled = false
+                                            break
+                                        }
+                                    }
+                                    break
+                                case '3':
+                                    i.disabled = true
+                                    // 展示指定范围的部门
+                                    for (const item of this.currentOrgId.split(',')) {
+                                        if ((this.$utils.getIndexOf(i.path.split('.'), item) > -1) &&
+                                      (this.$utils.getIndexOf(i.path.split('.'), item) <= this.$utils.getIndexOf(i.path.split('.'), i.id))) {
+                                            i.disabled = false
+                                            break
+                                        }
+                                    }
+                                    break
+                                default:
+                                // 展示该院下全部部门，且全部可选
+                                    break
+                            }
+                        }
+                    }
+                }
+                this.treeData = this.toTree(data)
+            }).catch(res => {
+            })
+        } else {
+            this.getScriptData(this.script)
+        }
+    },
     methods: {
         setChecked (data, selected) {
             if (data !== undefined) {
@@ -190,119 +240,6 @@ export default {
                 this.$refs['elTree'].setCheckedKeys([])
             } else {
                 this.radio = ''
-            }
-        },
-        // 加载岗位树
-        loadTreeNode (node, resolve) {
-            this.loading = true
-            let params = {}
-            const type = this.partyTypeId !== '' ? this.partyTypeId : '1'
-            if (this.isUseScope) {
-                params.type = type === '2' ? '1' : type
-                params.includeSub = type === '1' || type === '2'
-                if (type === '2') {
-                    // params.partyId = node.level === 0 ? null : node.data.id
-                    params.posId = node.level === 0 ? null : node.data.id
-                }
-                if (type === '3') {
-                    params.partyId = this.currentOrgId
-                }
-                if (type === '1') {
-                    params.posId = node.level === 0 ? null : node.data.id
-                }
-                // TODO: 用户选择器的岗位懒加载，待岗位选择器处理完整后统一处理。2类型有问题！
-                //  脚本类型初始化
-                if (type === 'script') {
-                    this.getScriptData(this.script)
-                    this.loading = false
-                    return
-                }
-            } else {
-                params.type = '1'
-                params.posId = node.level === 0 ? null : node.data.id
-            }
-            if (this.moreSearchParams) {
-                Object.assign(params, this.moreSearchParams)
-            }
-            if (this.$utils.isEmpty(node.data) || node.data.id === '0') {
-                getTreeData(params).then(res => {
-                    this.loading = false
-                    const arr = JSON.parse(JSON.stringify(res.data))
-                    // 岗位数改成部门树
-                    // 岗位数改成部门树
-                    const arrOne = []
-                    const arrTwo = []
-                    arr.forEach((item) => {
-                        if (item.name === '岗位树') {
-                            item.name = '部门树'
-                            arrOne[0] = item
-                        } else {
-                            arrTwo.push(item)
-                        }
-                    })
-                    let treeData
-                    if (type === '3') {
-                        arrTwo.forEach((item) => {
-                            item.leaf = true
-                        })
-                        this.treeData = arrTwo
-                    } else {
-                        let arrList = []
-                        const frist = this.$store.getters.level.first || ''
-                        if ((type === '1' || type === '2') && this.filtrate && frist) {
-                            const showBoo = arr.some((item) => item.id === frist)
-                            arrList = showBoo ? arr.filter(item => item.id === frist) : arr
-                        } else {
-                            arrList = arr
-                        }
-
-                        if (type === '2') {
-                            this.getPosiData(arrList, true, true, type)
-                        } else if (type === '1') {
-                            this.disabledDotCount(arrList, type)
-                        }
-
-                        if (this.$utils.isEmpty(node.data)) {
-                            treeData = arrList
-                            resolve(this.toTree(treeData))
-                        } else {
-                            treeData = type === '1' || type === '2' ? arrList : this.filterTreeChildren(arrList, 'root')
-                            resolve(this.toTree(treeData))
-                        }
-                    }
-                }).catch(res => {
-                    this.loading = false
-                    resolve([])
-                })
-            } else if (node.data.id !== '0') {
-                if (type === '2') {
-                    params = {}
-                    params.type = '1'
-                    params.posId = node.data.id
-                }
-                getTreeData(params).then(res => {
-                    this.loading = false
-                    const arr = JSON.parse(JSON.stringify(res.data))
-
-                    let arrList = []
-                    const second = this.$store.getters.level.second || ''
-                    if ((type === '1' || type === '2') && this.filtrate && second) {
-                        const showBoo = arr.some((item) => item.id === second)
-                        arrList = showBoo ? arr.filter((item) => item.id === second) : arr
-                    } else {
-                        arrList = arr
-                    }
-
-                    if (type === '2') {
-                        this.getPosiData(arrList, node.data.disabled, node.data.disabledShow, type)
-                    } else if (type === '1') {
-                        this.disabledDotCount(arrList, type)
-                    }
-                    resolve(this.toTree(arrList))
-                }).catch(res => {
-                    this.loading = false
-                    resolve([])
-                })
             }
         },
         getPosiData (arrList, disabled, disabledShow = false, type) {

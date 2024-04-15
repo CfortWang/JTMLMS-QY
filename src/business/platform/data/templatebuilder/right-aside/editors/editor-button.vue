@@ -65,7 +65,7 @@
             <el-button size="small" type="primary" @click="resetExportFields">重置导出字段</el-button>
         </el-form-item>
         <el-form-item
-            v-if="formData && (formData.button_type === 'consult' || formData.button_type === 'download')"
+            v-if="formData && ['consult', 'download'].includes(formData.button_type)"
             label="报表路径"
             required
             prop="label"
@@ -98,6 +98,17 @@
             prop="initAddDataCont"
         >
             <el-input v-model="formData.initAddDataCont" placeholder="a:1&b:2（原template.addDataCont.a = '1'）" />
+        </el-form-item>
+        <el-form-item
+            v-if="formData && ['consult', 'detail','custom'].includes(formData.button_type)"
+            label="点击同步"
+            prop="clickToSync"
+        >
+            <el-radio-group v-model="formData.clickToSync">
+                <el-radio-button label="无" />
+                <el-radio-button label="单击" />
+                <el-radio-button label="双击" />
+            </el-radio-group>
         </el-form-item>
         <el-form-item v-if="formData && ['openTask'].includes(formData.button_type)" prop="isEditOnHis">
             <template slot="label">

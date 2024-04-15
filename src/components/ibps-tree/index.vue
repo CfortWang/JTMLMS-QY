@@ -74,6 +74,7 @@
                 wrap-class="ibps-tree-wrapper"
             >
                 <el-tree
+                    v-if="!lazy ? (treeData && treeData.length>0) : lazy "
                     ref="elTree"
                     v-loading="loading"
                     :data="!lazy ? treeData : null"
@@ -275,8 +276,23 @@ export default {
             this.zIndex = val
         },
         treeData (val) {
-            if (val && val[0] && val[0].children) {
-                this.treeExpandData.push(val[0].children[0].id)
+            // if (val && val[0] && val[0].children) {
+            //     this.treeExpandData.push(val[0].children[0].id)
+            // }
+            // 如果是部门管理里只显示一个医院的，那么就展开所有的节点
+            if (val && val[0] && val[0].children && val[0].children.length === 1 &&
+                this.title === '部门管理') {
+                return
+            }
+            if (val && val[0] && val[0].children && val[0].children.length && val[0].children.length !== 1) {
+                // 默认打开第三层
+                for (const i of val[0].children) {
+                    if (i.children) {
+                        this.treeExpandData.push(
+                            i.children.length ? i.children[0].id : i.id
+                        )
+                    }
+                }
             }
         }
     },
@@ -291,7 +307,13 @@ export default {
          * 判斷tree是否展开
          */
         judgeTitle () {
-            if (this.title === '业务对象管理' || this.title == undefined) {
+            if (this.title === '业务对象管理' ||
+                this.title === undefined ||
+                (
+                    this.treeData[0] && this.treeData[0].children.length === 1 &&
+                    this.title === '部门管理'
+                )
+            ) {
                 return true
             }
             return this.lazy

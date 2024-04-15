@@ -209,7 +209,8 @@ export default {
     watch: {
         dataModel: {
             handler (val) {
-                if (FormOptions.t.NON_MODEL_FIELD_TYPES.includes(this.fieldType)) {
+                const noreturnField = ['piLiangGuiDang', 'guiDangLuJingId']
+                if (FormOptions.t.NON_MODEL_FIELD_TYPES.includes(this.fieldType) && (!noreturnField.includes(this.fieldName))) {
                     return
                 }
                 this.handleModels(this.fieldName, val)
@@ -243,11 +244,25 @@ export default {
         }
     },
     methods: {
-        handleModels (name, val) {
+        handleModels (name, val, index, page, pageSize) {
             if (this.$utils.isEmpty(name)) {
                 return
             }
-            this.models[name] = val
+            if (index !== undefined) {
+                // 判断是来自子表的更新
+                for (const key in this.models) {
+                    if (Object.hasOwnProperty.call(this.models, key)) {
+                        const element = this.models[key]
+                        if (Array.isArray(element)) {
+                            this.models[key][(page - 1) * pageSize + index][name] = val
+                            break
+                        }
+                    }
+                }
+            } else {
+                this.models[name] = val
+            }
+            // this.models[name] = val
             this.$emit('update:models', {
                 ...this.models,
                 [name]: val

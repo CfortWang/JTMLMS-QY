@@ -3,12 +3,11 @@
         <div slot="west">
             <ibps-tree
                 ref="tree"
+                :data="treeData"
                 :width="width"
                 :height="height"
                 :options="orgTreeoptions"
                 :contextmenus="orgTreeContextmenus"
-                :load="loadNode"
-                lazy
                 title="部门管理"
                 @action-event="handleTreeAction"
                 @node-click="handleNodeClick"
@@ -67,7 +66,7 @@
 </template>
 <script>
 import { remove } from '@/api/platform/org/position'
-import { findTreeData as getTreeData } from '@/api/platform/org/position'
+import { findTreeData as getTreeData, findAllPosition } from '@/api/platform/org/position'
 import TreeUtils from '@/utils/tree'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
@@ -118,41 +117,62 @@ export default {
                 { type: 'divided' },
                 { icon: 'sort', label: '节点排序', value: 'nodeSort' }
             ],
-            orgTreeData: []
+            orgTreeData: [],
+            treeData: []
         }
     },
-    methods: {
-        loadNode (node, resolve) {
-            this.loading = true
-            const first = this.$store.getters.level.first
-            const isSuper = this.$store.getters.isSuper
-            getTreeData({
-                type: 1,
-                posId: node.level === 0 ? null : node.data.id
-            }).then(res => {
-                const data = res.data
-                // 岗位树改成部门树
-                data.forEach((item) => {
-                    if (item.name === '岗位树') {
-                        item.name = '部门树'
-                    }
-                })
-                // 数据过滤 - 过滤本部门
-                const show = data.some(item => item.id === first)
-                let showData = []
-                if (show && !isSuper) {
-                    showData = data.filter(item => item.id === first)
-                } else {
-                    showData = data
-                }
-
-                this.loading = false
-                resolve(this.toTree(showData))
+    mounted () {
+        /**
+        *  判断是否是超级管理员isSuper账号，目前以该账户为系统最大的管理权限
+        *  如果是测试账号，则获取全部数据
+        *  否则，获取当前用户所在医院的数据
+        */
+        getTreeData({
+            type: 1
+        }).then(res => {
+            const firstData = res.data || []
+            if (firstData.length) {
+                firstData[0].name = '部门树'
+            }
+            findAllPosition().then(res => {
+                const nextData = res.data || []
+                this.treeData = this.toTree([...firstData, ...nextData])
             }).catch(res => {
-                this.loading = false
-                resolve([])
             })
-        },
+        })
+    },
+    methods: {
+        // loadNode (node, resolve) {
+        //     this.loading = true
+        //     const first = this.$store.getters.level.first
+        //     const isSuper = this.$store.getters.isSuper
+        //     getTreeData({
+        //         type: 1,
+        //         posId: node.level === 0 ? null : node.data.id
+        //     }).then(res => {
+        //         const data = res.data
+        //         // 岗位树改成部门树
+        //         data.forEach((item) => {
+        //             if (item.name === '岗位树') {
+        //                 item.name = '部门树'
+        //             }
+        //         })
+        //         // 数据过滤 - 过滤本部门
+        //         const show = data.some(item => item.id === first)
+        //         let showData = []
+        //         if (show && !isSuper) {
+        //             showData = data.filter(item => item.id === first)
+        //         } else {
+        //             showData = data
+        //         }
+
+        //         this.loading = false
+        //         resolve(this.toTree(showData))
+        //     }).catch(res => {
+        //         this.loading = false
+        //         resolve([])
+        //     })
+        // },
         toTree (data) {
             return TreeUtils.transformToTreeFormat(data, {
                 idKey: 'id',
