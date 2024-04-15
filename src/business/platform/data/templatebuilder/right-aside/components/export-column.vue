@@ -6,7 +6,7 @@
         title="设置导出字段"
         width="90%"
         height="100%"
-        class="edit-dialog"
+        class="export-column-edit-dialog"
         top="2vh"
         append-to-body
         @close="closeDialog"
@@ -55,8 +55,18 @@
                 max-height="500px"
                 :data="exportColumns.fields"
                 style="width: 100%"
+                row-key="name"
                 border
             >
+                <el-table-column
+                    width="100"
+                    prop="sn"
+                    label="排序"
+                >
+                    <template v-slot="scope">
+                        <el-input v-model="scope.row.sn" type="number" />
+                    </template>
+                </el-table-column>
                 <el-table-column
                     width="120"
                     align="center"
@@ -112,13 +122,11 @@
                         />
                     </template>
                     <template v-slot="scope">
-                        <el-input-number
-                            v-model="scope.row.labelWidth"
-                            :precision="0"
-                        />
+                        <el-input-number v-model="scope.row.labelWidth" :precision="0" />
                     </template>
                 </el-table-column>
-                <el-table-column width="110" prop="labelAlign">
+                <!-- 后端无对应属性，不做 -->
+                <!-- <el-table-column width="110" prop="labelAlign">
                     <template slot="header" slot-scope="scope">
                         <div>水平对齐</div>
                         <el-radio-group v-model="exportColumns.labelAlign" @change="value => changeGlobal(value, 'labelAlign')">
@@ -151,19 +159,19 @@
                             <el-radio label="bottom">底部对齐</el-radio>
                         </el-radio-group>
                     </template>
-                </el-table-column>
-                <el-table-column width="110" prop="lineWrap">
+                </el-table-column> -->
+                <el-table-column width="110" prop="autoWrap">
                     <template slot="header" slot-scope="scope">
-                        <div>换行方式</div>
-                        <el-radio-group v-model="exportColumns.lineWrap" @change="value => changeGlobal(value, 'lineWrap')">
-                            <el-radio label="word-wrap">自动换行</el-radio>
-                            <el-radio label="white-space">不换行</el-radio>
+                        <div>自动换行</div>
+                        <el-radio-group v-model="exportColumns.autoWrap" @change="value => changeGlobal(value, 'autoWrap')">
+                            <el-radio :label="true">是</el-radio>
+                            <el-radio :label="false">否</el-radio>
                         </el-radio-group>
                     </template>
                     <template v-slot="scope">
-                        <el-radio-group v-model="scope.row.lineWrap">
-                            <el-radio label="word-wrap">自动换行</el-radio>
-                            <el-radio label="white-space">不换行</el-radio>
+                        <el-radio-group v-model="scope.row.autoWrap">
+                            <el-radio :label="true">是</el-radio>
+                            <el-radio :label="false">否</el-radio>
                         </el-radio-group>
                     </template>
                 </el-table-column>
@@ -268,7 +276,7 @@ export default {
                 labelWidth: 10,
                 labelAlign: 'left',
                 labelVertical: 'middle',
-                lineWrap: 'white-space'
+                autoWrap: false
             },
             toolbars: [
                 { key: 'save' },
@@ -317,19 +325,20 @@ export default {
     methods: {
         initFormData (data) {
             const arr = data.filter(d => d.parentId !== '0')
-            const params = arr.map(d => {
+            const params = arr.map((d, i) => {
                 return {
                     name: d.name,
                     label: d.label,
                     fieldType: 'text',
                     labelDesc: '',
-                    labelWidth: '',
+                    labelWidth: undefined,
                     labelAlign: '',
                     labelVertical: '',
                     labelType: 'string',
                     labelOption: '',
                     unique: 'N',
-                    lineWrap: 'white-space',
+                    autoWrap: '',
+                    sn: i + 1,
                     rights: [
                         {
                             type: 'all',
@@ -426,6 +435,7 @@ export default {
             this.$emit('close', false)
         },
         handleConfirm () {
+            this.exportColumns.fields = this.exportColumns.fields.sort((a, b) => a.sn - b.sn)
             console.log(this.exportColumns)
             this.$emit('callback', this.exportColumns)
             this.closeDialog()
@@ -433,3 +443,14 @@ export default {
     }
 }
 </script>
+<style lang="scss" scoped>
+    .export-column-edit-dialog{
+        ::v-deep {
+            .el-dialog__body{
+                .el-radio {
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+</style>
