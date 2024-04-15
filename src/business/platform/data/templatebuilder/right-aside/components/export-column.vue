@@ -4,10 +4,10 @@
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         title="设置导出字段"
-        width="70%"
+        width="90%"
         height="100%"
         class="edit-dialog"
-        top="5vh"
+        top="2vh"
         append-to-body
         @close="closeDialog"
     >
@@ -89,7 +89,7 @@
                 </el-table-column>
                 <el-table-column
                     width="auto"
-                    min-width="240"
+                    min-width="180"
                     prop="labelDesc"
                     label="字段描述"
                 >
@@ -102,14 +102,84 @@
                         />
                     </template>
                 </el-table-column>
-                <el-table-column
-                    width="100"
-                    prop="unique"
-                    label="唯一字段"
-                >
+                <el-table-column width="160" prop="labelWidth">
+                    <template slot="header" slot-scope="scope">
+                        <div>列宽</div>
+                        <el-input-number
+                            v-model="exportColumns.labelWidth"
+                            :precision="0"
+                            @change="value => changeGlobal(value, 'labelWidth')"
+                        />
+                    </template>
+                    <template v-slot="scope">
+                        <el-input-number
+                            v-model="scope.row.labelWidth"
+                            :precision="0"
+                        />
+                    </template>
+                </el-table-column>
+                <el-table-column width="110" prop="labelAlign">
+                    <template slot="header" slot-scope="scope">
+                        <div>水平对齐</div>
+                        <el-radio-group v-model="exportColumns.labelAlign" @change="value => changeGlobal(value, 'labelAlign')">
+                            <el-radio label="left">左对齐</el-radio>
+                            <el-radio label="center">水平居中</el-radio>
+                            <el-radio label="right">右对齐</el-radio>
+                        </el-radio-group>
+                    </template>
+                    <template v-slot="scope">
+                        <el-radio-group v-model="scope.row.labelAlign">
+                            <el-radio label="left">左对齐</el-radio>
+                            <el-radio label="center">水平居中</el-radio>
+                            <el-radio label="right">右对齐</el-radio>
+                        </el-radio-group>
+                    </template>
+                </el-table-column>
+                <el-table-column width="110" prop="labelVertical">
+                    <template slot="header" slot-scope="scope">
+                        <div>垂直对齐</div>
+                        <el-radio-group v-model="exportColumns.labelVertical" @change="value => changeGlobal(value, 'labelVertical')">
+                            <el-radio label="top">顶部对齐</el-radio>
+                            <el-radio label="middle">垂直居中</el-radio>
+                            <el-radio label="bottom">底部对齐</el-radio>
+                        </el-radio-group>
+                    </template>
+                    <template v-slot="scope">
+                        <el-radio-group v-model="scope.row.labelVertical">
+                            <el-radio label="top">顶部对齐</el-radio>
+                            <el-radio label="middle">垂直居中</el-radio>
+                            <el-radio label="bottom">底部对齐</el-radio>
+                        </el-radio-group>
+                    </template>
+                </el-table-column>
+                <el-table-column width="110" prop="lineWrap">
+                    <template slot="header" slot-scope="scope">
+                        <div>换行方式</div>
+                        <el-radio-group v-model="exportColumns.lineWrap" @change="value => changeGlobal(value, 'lineWrap')">
+                            <el-radio label="word-wrap">自动换行</el-radio>
+                            <el-radio label="white-space">不换行</el-radio>
+                        </el-radio-group>
+                    </template>
+                    <template v-slot="scope">
+                        <el-radio-group v-model="scope.row.lineWrap">
+                            <el-radio label="word-wrap">自动换行</el-radio>
+                            <el-radio label="white-space">不换行</el-radio>
+                        </el-radio-group>
+                    </template>
+                </el-table-column>
+                <el-table-column width="120" prop="labelType" label="字段类型">
+                    <template v-slot="scope">
+                        <el-radio-group v-model="scope.row.labelType">
+                            <el-radio label="string">文本类型</el-radio>
+                            <el-radio label="double">数字类型</el-radio>
+                            <el-radio label="date">日期类型</el-radio>
+                        </el-radio-group>
+                    </template>
+                </el-table-column>
+                <el-table-column width="120" prop="unique" label="唯一字段">
                     <template v-slot="scope">
                         <el-radio-group v-model="exportColumns.unique">
-                            <el-radio :label="scope.$index" @change="changeUnique(scope.$index)" />
+                            <el-radio :label="scope.row.name" @change="changeUnique(scope.$index)" />
                         </el-radio-group>
                     </template>
                 </el-table-column>
@@ -194,7 +264,11 @@ export default {
                 select_field: 'N',
                 export_type: 'db',
                 fields: [],
-                unique: ''
+                unique: '',
+                labelWidth: 10,
+                labelAlign: 'left',
+                labelVertical: 'middle',
+                lineWrap: 'white-space'
             },
             toolbars: [
                 { key: 'save' },
@@ -249,7 +323,13 @@ export default {
                     label: d.label,
                     fieldType: 'text',
                     labelDesc: '',
+                    labelWidth: '',
+                    labelAlign: '',
+                    labelVertical: '',
+                    labelType: 'string',
+                    labelOption: '',
                     unique: 'N',
+                    lineWrap: 'white-space',
                     rights: [
                         {
                             type: 'all',
@@ -310,7 +390,10 @@ export default {
         },
         changeUnique (index) {
             this.exportColumns.fields[index].unique = index
-            this.exportColumns.unique = index
+            this.exportColumns.unique = this.exportColumns.fields[index].name
+        },
+        changeGlobal (value, attr) {
+            this.exportColumns[attr] = value
         },
         handleEdit (index, row) {
             this.dialogRightsVisible = true
@@ -343,6 +426,7 @@ export default {
             this.$emit('close', false)
         },
         handleConfirm () {
+            console.log(this.exportColumns)
             this.$emit('callback', this.exportColumns)
             this.closeDialog()
         }

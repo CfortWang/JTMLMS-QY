@@ -783,6 +783,7 @@ export default {
     }
     .content_item {
         max-height: 200px;
+        overflow-y: auto;
         margin-bottom: 4px;
         &:first-child{
             .sub_content .title {
