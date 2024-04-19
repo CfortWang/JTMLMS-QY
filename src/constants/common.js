@@ -1,4 +1,4 @@
 export default {
-  PAGE: 1,
-  LIMIT: 10
+    PAGE: 1,
+    LIMIT: 20
 }

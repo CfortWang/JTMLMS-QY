@@ -17,7 +17,7 @@ const buttonTypes = {
         label: '删除',
         style: 'danger',
         icon: 'remove',
-        position: 'all',
+        position: 'toolbar',
         scope: ['toolbar', 'manage']
     },
     'edit': {

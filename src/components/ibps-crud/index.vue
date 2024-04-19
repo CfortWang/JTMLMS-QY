@@ -480,6 +480,7 @@ export default {
         background-color: rgb(249, 255, 255);
         width: 100%;
         font-size: 18px;
+        padding-top:6px;
     }
     .el-table .caret-wrapper{
         top: -5px;

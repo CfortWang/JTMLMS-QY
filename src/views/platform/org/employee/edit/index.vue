@@ -305,7 +305,7 @@ export default {
                 tableName: 't_lhgqpxjh',
                 paramWhere: [{
                     di_dian_: second || first,
-                    nian_du_: time.slice(4),
+                    nian_du_: time.slice(0, 4),
                     bian_zhi_bu_men_: userInfo ? userInfo.positionId.split(',').pop() : '',
                     bian_zhi_ren_: teacher,
                     bian_zhi_shi_jian: time,

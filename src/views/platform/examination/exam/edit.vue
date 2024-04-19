@@ -265,7 +265,7 @@ export default {
                 di_dian_: level.second || level.first,
                 chuang_jian_shi_j: '',
                 kao_shi_ming_chen: '',
-                kao_shi_lei_xing_: '发布',
+                kao_shi_lei_xing_: '常规',
                 ti_ku_id_: '',
                 guan_lian_id_: '',
                 xian_kao_shi_jian: '不限',
