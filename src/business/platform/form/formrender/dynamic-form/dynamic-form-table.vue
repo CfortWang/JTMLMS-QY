@@ -607,7 +607,7 @@ export default {
                     hasPermission(button.key, position) && // 有位置权限
                     (!button.position || button.position === 'all' || button.position === position) && // 有位置权限
                     (this.$utils.isEmpty(this.buttonsRights[button.key]) || this.buttonsRights[button.key] !== FormOptions.t.PERMISSIONS.HIDE) && // 有按钮权限
-                    !button.hidden
+                    this.buttonsRights[button.code] !== FormOptions.t.PERMISSIONS.HIDE
                 ) {
                     const b = JSON.parse(JSON.stringify(button))
                     b.position = position

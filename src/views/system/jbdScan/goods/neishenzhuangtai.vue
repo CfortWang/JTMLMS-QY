@@ -44,19 +44,19 @@
                             </div>
                             <el-table :data="CNASTableData" :border="true" style="width: 90%;margin: 0 auto;">
                                 <!-- <el-table-column type="index"  width="30" align="center"/> -->
-                                <el-table-column type="index" width="40" :align="center">            
+                                <el-table-column type="index" width="40" :align="center">
                                     <template slot-scope="scope">
-                                        <span>{{scope.$index+1}} </span>
-                                    </template>
-                                </el-table-column> 
-                                <el-table-column prop="miao_shu_" label="不符合描述" width="278"  :key="Math.random()">
-                                    <template slot-scope="scope">
-                                        {{ scope.row.miao_shu_}}
+                                        <span>{{ scope.$index+1 }} </span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="60" >
+                                <el-table-column :key="Math.random()" prop="miao_shu_" label="不符合描述" width="278">
                                     <template slot-scope="scope">
-                                        {{ scope.row.tiao_kuan_bian_ha}}
+                                        {{ scope.row.miao_shu_ }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="60">
+                                    <template slot-scope="scope">
+                                        {{ scope.row.tiao_kuan_bian_ha }}
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="nei_shen_yuan_" label="内审员" width="60">
@@ -74,14 +74,14 @@
                                         {{ scope.row.fu_ze_ren_ | emfiltes(employeeList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="bu_fu_he_cheng_du" label="不符合程度" width="80" > 
+                                <el-table-column prop="bu_fu_he_cheng_du" label="不符合程度" width="80">
                                     <template slot-scope="scope">
-                                        {{ scope.row.bu_fu_he_cheng_du}}
+                                        {{ scope.row.bu_fu_he_cheng_du }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="shi_fou_guo_shen_" label="状态" width="65" > 
+                                <el-table-column prop="shi_fou_guo_shen_" label="状态" width="65">
                                     <template slot-scope="scope">
-                                        {{ scope.row.shi_fou_guo_shen_}}
+                                        {{ scope.row.shi_fou_guo_shen_ }}
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -140,19 +140,18 @@
                         <div class="cma">
                             <div style="width: 90%; margin: 0 auto; line-height: 35px;display: flex;justify-content: space-between;">
                                 <div>内审检查表编制进度查阅</div>
-                                <div @click="urgingEvent" >
-                                    <button class="urgingBtn"><i class="el-icon-position"></i> 发送催办</button>
+                                <div @click="urgingEvent">
+                                    <button class="urgingBtn"><i class="el-icon-position" /> 发送催办</button>
                                 </div>
                             </div>
-                            <el-table :data="allCheckData" :border="true" @selection-change="handleSelectionChange" style="width: 90%; margin: 0 auto">
-                                <el-table-column type="selection"  width="40" align="center">
-                                </el-table-column>
+                            <el-table :data="allCheckData" :border="true" style="width: 90%; margin: 0 auto" @selection-change="handleSelectionChange">
+                                <el-table-column type="selection" width="40" align="center" />
                                 <el-table-column prop="nei_shen_yuan_" label="内审员" width="100">
                                     <template slot-scope="scope">
                                         {{ scope.row.nei_shen_yuan_ | emfiltes(employeeList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="bei_nei_shen_bu_m" label="被审核部门" width="200" >
+                                <el-table-column prop="bei_nei_shen_bu_m" label="被审核部门" width="200">
                                     <template slot-scope="scope">
                                         {{ scope.row.bei_nei_shen_bu_m | partFilter(partList) }}
                                     </template>
@@ -169,7 +168,7 @@
                                 </el-table-column>
                                 <el-table-column prop="shi_fou_guo_shen_" label="完成状态" width="70">
                                     <template slot-scope="scope">
-                                        {{ scope.row.shi_fou_guo_shen_}}
+                                        {{ scope.row.shi_fou_guo_shen_ }}
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -198,13 +197,13 @@ export default {
                     parts = value.split(',')
                     for (const item of arr) {
                         for (let j = 0; j < parts.length; j++) {
-                            if (item.ID_ == parts[j]) {
+                            if (item.ID_ === parts[j]) {
                                 part = part + ',' + item.NAME_
                             }
                         }
                     }
                     return part.slice(1, part.length)
-                } else if (arr[i].ID_ == value) {
+                } else if (arr[i].ID_ === value) {
                     return arr[i].NAME_
                 }
             }
@@ -217,7 +216,7 @@ export default {
                     parts = value.split(',')
                     for (const item of arr) {
                         for (let j = 0; j < parts.length; j++) {
-                            if (item.ID_ == parts[j]) {
+                            if (item.ID_ === parts[j]) {
                                 part = part + ',' + item.NAME_
                             }
                         }
@@ -225,7 +224,7 @@ export default {
                     return part.slice(1, part.length)
                 } else {
                     for (let i = 0; i < arr.length; i++) {
-                        if (arr[i].ID_ == value) {
+                        if (arr[i].ID_ === value) {
                             return arr[i].NAME_
                         }
                     }
@@ -313,7 +312,7 @@ export default {
             setCheckTime: '',
             checkValue: 0,
             allCheckData: [],
-            selectCheckData:[]
+            selectCheckData: []
             // scanVisible:false,
         }
     },
@@ -342,51 +341,51 @@ export default {
         clearInterval(this.setCheckTime)
     },
     methods: {
-        handleSelectionChange(val) {
-          this.selectCheckData = val;
+        handleSelectionChange (val) {
+            this.selectCheckData = val
         },
         // 催办信息点击
         urgingEvent () {
-            let this_ = this;
-            let receiverId = "";
-            console.log(this.selectCheckData,"选中的数据");
-            if(this.selectCheckData.length == 0){
+            const this_ = this
+            let receiverId = ''
+            console.log(this.selectCheckData, '选中的数据')
+            if (this.selectCheckData.length === 0) {
                 this.$message({
                     showClose: true,
                     message: '您还未选中人员进行发送催办信息，请在列表中选择！',
                     type: 'error'
-                });
-              return
+                })
+                return
             }
-            for(let item of this.selectCheckData){
-                if(item.shi_fou_guo_shen_ !="已完成"){
-                    receiverId += item.nei_shen_yuan_ + ",";
+            for (const item of this.selectCheckData) {
+                if (item.shi_fou_guo_shen_ !== '已完成') {
+                    receiverId += item.nei_shen_yuan_ + ','
                 }
             }
-            receiverId = receiverId.slice(0,receiverId.length - 1);
-            let msage = {
-                  canreply: "0",
-                  content: "内审检查表还未完成，请及时完成",
-                  editorValue: "",
-                  fileMsg: "",
-                  groupId: "",
-                  groupName:  "",
-                  id: "",
-                  messageType :  "normal",
-                  ownerId : this.$store.getters.userId,
-                  ownerName: this.$store.getters.name, //发送人 
-                  positionId :  "",
-                  positionName:  "",
-                  receiver: "",
-                  receiverId: receiverId, //接收人
-                  subject: "请在规定时间内完成" + "内审检查表编制内容，以免影响后续进度"
-              }
-            this_.$common.sendMsg(msage).then(res =>{
+            receiverId = receiverId.slice(0, receiverId.length - 1)
+            const msage = {
+                canreply: '0',
+                content: '内审检查表还未完成，请及时完成',
+                editorValue: '',
+                fileMsg: '',
+                groupId: '',
+                groupName: '',
+                id: '',
+                messageType: 'normal',
+                ownerId: this.$store.getters.userId,
+                ownerName: this.$store.getters.name, // 发送人
+                positionId: '',
+                positionName: '',
+                receiver: '',
+                receiverId: receiverId, // 接收人
+                subject: '请在规定时间内完成' + '内审检查表编制内容，以免影响后续进度'
+            }
+            this_.$common.sendMsg(msage).then(res => {
                 this_.$message({
-                    duration:3000,
+                    duration: 3000,
                     message: '已成功向未完成编制内审检查表的内审员发送催办信息',
                     type: 'success'
-                }); 
+                })
             })
         },
         // 内审核查完成率仪表盘
@@ -545,13 +544,13 @@ export default {
         // cnas指定数据到坐标轴的映射
         getLoadEchartsTwo () {
             var chartDom = document.getElementById('in-echarts')
-            let width,height;
-            if(window.innerWidth > 1600){
-                width = 590;
-                height = 450;
-            }else{
-                width = 480;
-                height = 400;
+            let width, height
+            if (window.innerWidth > 1600) {
+                width = 590
+                height = 450
+            } else {
+                width = 480
+                height = 400
             }
             const setEchartWH = {
                 // 设置控制图表大小变量
@@ -566,11 +565,11 @@ export default {
                     source: this.source
                 },
                 grid: {
-                // 让图表占满容器
-                    top:"50px",
-                    left:"100px",
-                    right:"80px",
-                    bottom:"40px"
+                // 让图表占'满容器
+                    top: '50px',
+                    left: '100px',
+                    right: '80px',
+                    bottom: '40px'
                 },
                 xAxis: {
                     name: '  条数',
@@ -581,7 +580,38 @@ export default {
                         fontSize: 10
                     }
                 },
-                yAxis: { name: '条款编号', type: 'category' },
+                yAxis: {
+                    name: '条款编号',
+                    type: 'category',
+                    axisLabel: {
+                        textStyle: {
+                            color: 'red',
+                            fontSize: '14'
+                        },
+                        formatter: function (params) {
+                            var newParamsName = ''
+                            var paramsNameNumber = params.length
+                            var provideNumber = 12 // 一行显示几个字
+                            var rowNumber = Math.ceil(paramsNameNumber / provideNumber)
+                            if (paramsNameNumber > provideNumber) {
+                                for (var p = 0; p < rowNumber; p++) {
+                                    var tempStr = ''
+                                    var start = p * provideNumber
+                                    var end = start + provideNumber
+                                    if (p === rowNumber - 1) {
+                                        tempStr = params.substring(start, paramsNameNumber)
+                                    } else {
+                                        tempStr = params.substring(start, end) + '\n'
+                                    }
+                                    newParamsName += tempStr
+                                }
+                            } else {
+                                newParamsName = params
+                            }
+                            return newParamsName
+                        }
+                    }
+                },
                 visualMap: {
                     orient: 'horizontal',
                     left: 'center',
@@ -630,10 +660,10 @@ export default {
                 },
                 grid: {
                     // 让图表占满容器
-                    top:"40px",
-                    left:"0px",
-                    right:"40px",
-                    bottom:"40px"
+                    top: '40px',
+                    left: '0px',
+                    right: '40px',
+                    bottom: '40px'
                 },
                 xAxis: {
                     name: '不符合项',
@@ -677,18 +707,18 @@ export default {
         // cnas部门饼图
         getLoadEchartsthree () {
             var chartDom = document.getElementById('department')
-            let radius,width,height,padding,center;
-            if(window.innerWidth > 1600){
-                center = ["60%", "50%"];
-                radius = "55%";
-                width = 590;
-                height = 450;
+            let radius, width, height, padding, center
+            if (window.innerWidth > 1600) {
+                center = ['60%', '50%']
+                radius = '55%'
+                width = 590
+                height = 450
                 padding = [16, 0, 0, 0]
-            }else{
-                center = ["53%", "50%"];
-                radius = "42%";
-                width = 500;
-                height = 400;
+            } else {
+                center = ['53%', '50%']
+                radius = '42%'
+                width = 500
+                height = 400
                 padding = [16, 0, 0, 0]
             }
             // const center = window.innerWidth > 1600 ? "55%" : "42%";
@@ -703,7 +733,7 @@ export default {
                 tooltip: {
                     trigger: 'item'
                 },
-                
+
                 label: {
                     formatter: '{b}\n({c}项)',
                     edgeDistance: '20%'
@@ -718,7 +748,7 @@ export default {
                     bottom: '50%',
                     left: '10%',
                     right: '10%'
-                    },
+                },
                 series: [
                     {
                         type: 'pie',
@@ -816,7 +846,7 @@ export default {
             const firstArr = []
             let secondArr = []
             arr.forEach((it) => {
-                if (firstArr.length == 0) {
+                if (firstArr.length === 0) {
                     secondArr.push('score')
                     secondArr.push('不符合项')
                     secondArr.push('product')
@@ -831,11 +861,11 @@ export default {
                     for (var i in firstArr) {
                         const a = firstArr[i][2]
                         const b = it.tiao_kuan_bian_ha
-                        if (firstArr[i][2] == it.tiao_kuan_bian_ha) {
+                        if (firstArr[i][2] === it.tiao_kuan_bian_ha) {
                             firstArr[i][0] = firstArr[i][0] + 1
                             firstArr[i][1] = firstArr[i][1] + 1
                             break
-                        } else if (i == firstArr.length - 1) {
+                        } else if (i === firstArr.length - 1) {
                             secondArr.push(1)
                             secondArr.push(1)
                             secondArr.push(it.tiao_kuan_bian_ha)
@@ -846,7 +876,7 @@ export default {
                     }
                 }
             })
-            type == 'CMA' ? (this.cmaSuorce = firstArr) : (this.source = firstArr)
+            type === 'CMA' ? (this.cmaSuorce = firstArr) : (this.source = firstArr)
             callBlack()
         },
         // 饼图数据
@@ -861,7 +891,7 @@ export default {
                 arr.forEach((item, index) => {
                     str = ''
                     arr1.forEach((it) => {
-                        if (item.ze_ren_shi_ == it.ID_ && !item.ze_ren_shi_.includes(',')) {
+                        if (item.ze_ren_shi_ === it.ID_ && !item.ze_ren_shi_.includes(',')) {
                             arr[index].ze_ren_shi_ = it.NAME_
                         }
                         if (item.ze_ren_shi_.includes(',') && item.ze_ren_shi_.includes(it.ID_)) {
@@ -883,7 +913,7 @@ export default {
             arr.forEach((item, index) => {
                 let add = 0
                 for (var i = 0; i < arrr.length; i++) {
-                    if (item.ze_ren_shi_ == arrr[i].ze_ren_shi_) {
+                    if (item.ze_ren_shi_ === arrr[i].ze_ren_shi_) {
                         add++
                     }
                 }
@@ -893,7 +923,7 @@ export default {
                 obj = {}
                 this.loading = false
             })
-            type == 'CMA' ? (this.cmaPieData = newarr) : (this.cnasPieData = newarr)
+            type === 'CMA' ? (this.cmaPieData = newarr) : (this.cnasPieData = newarr)
             callBlack()
         },
         // 检查表编制完成数据
@@ -927,9 +957,9 @@ export default {
         getInit () {
             const data = this.obj[0]
             let jieduanvalue
-            if (data.shi_fou_guo_shen_ == '已编制' && data.jie_dian_ren_wu_ == '') {
+            if (data.shi_fou_guo_shen_ === '已编制' && data.jie_dian_ren_wu_ === '') {
                 jieduanvalue = '2'
-            } else if (data.shi_fou_guo_shen_ == '1' && data.jie_dian_ren_wu_ == '') {
+            } else if (data.shi_fou_guo_shen_ === '1' && data.jie_dian_ren_wu_ === '') {
                 jieduanvalue = '3'
             } else if (!data.shi_fou_guo_shen_) {
                 jieduanvalue = '2'
@@ -1007,7 +1037,7 @@ export default {
   }
   .urgingBtn{
     background-color: #e6a23d;
-    color: white; 
+    color: white;
     border: none;
     padding: 4px;
     border-radius: 6%;
@@ -1174,7 +1204,7 @@ export default {
     // }
     ::deep .el-checkbox__inner{
         opacity: 0;
-    } 
+    }
   }
 }
 </style>

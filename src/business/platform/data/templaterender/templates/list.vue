@@ -711,6 +711,7 @@ export default {
             } else {
                 this.selectionAll = selectionAll[0]
             }
+            // this.selectionAll = selectionAll
         },
         setSelectRow () {
             setTimeout(() => {
@@ -753,9 +754,6 @@ export default {
             const selectAllIds = []
             if (this.$utils.isEmpty(this.selectionAll)) {
                 return
-            }
-            if (!this.$utils.isArray(this.selectionAll)) {
-                this.selectionAll = [this.selectionAll]
             }
             if (this.multiple) {
                 this.selectionAll.forEach((row) => {

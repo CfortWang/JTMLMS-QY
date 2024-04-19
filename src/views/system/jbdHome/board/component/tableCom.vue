@@ -4,7 +4,7 @@
         <el-table
             :data="tableList"
             style="width:100%"
-            height="300"
+            :height="controlSchedule?'':'320px'"
         >
             <el-table-column
                 v-for="(item) in tableProp"

@@ -245,6 +245,18 @@ export default {
         randomNum: [String, Number] // 时间戳，用于保证点击请求数据
     },
     data () {
+        const rules = {
+            name: [{ required: true, message: this.$t('validate.required') }],
+            typeKey: [{ required: true, validator: validateKey }]
+        }
+        const level = this.firstDiDian || this.secondDiDian
+        if (this.categoryKey === 'FILE_TYPE') {
+            rules.authorityObject = {
+                chaYue: [{ required: true, message: this.$t('validate.required') }],
+                shenCha: [{ required: true, message: this.$t('validate.required') }],
+                shenHeZouXiang: [{ required: true, message: this.$t('validate.required') }]
+            }
+        }
         return {
             formName: 'typeForm',
             formLabelWidth: '120px',
@@ -260,19 +272,14 @@ export default {
                 typeKey: '',
                 ownerId: '0',
                 authorityObject: {
-                    chaYue: '', buMen: '', shenCha: '', shenHeZouXiang: ''
+                    diDian: level,
+                    chaYue: '',
+                    buMen: '',
+                    shenCha: '',
+                    shenHeZouXiang: ''
                 }
             },
-            rules: {
-                name: [{ required: true, message: this.$t('validate.required') }],
-                typeKey: [{ required: true, validator: validateKey }],
-                authorityObject: {
-                    chaYue: [{ required: false }],
-                    buMen: [{ required: false }],
-                    shenCha: [{ required: false }],
-                    shenHeZouXiang: [{ required: true, message: this.$t('validate.required') }]
-                }
-            },
+            rules,
             toolbars: [
                 { key: 'save', hidden: () => { return this.readonly } },
                 { key: 'cancel' }
@@ -356,22 +363,13 @@ export default {
         },
         // 保存数据
         handleSave () {
-            if (!this.type.authorityObject.chaYue && this.categoryKey === 'FILE_TYPE') {
-                this.rules.authorityObject.chaYue = [{ required: true, message: '查阅权限不得为空！' }]
-            } else {
-                this.rules.authorityObject.chaYue = [{ required: false }]
+            if (this.categoryKey === 'FILE_TYPE') {
+                if (this.type.authorityObject.chaYue === '部门查阅' && (!this.type.authorityObject.buMen || this.type.authorityObject.buMen.length === 0)) {
+                    this.rules.authorityObject.buMen = [{ required: true, message: '部门选择不得为空！' }]
+                } else {
+                    this.rules.authorityObject.buMen = [{ required: false }]
+                }
             }
-            if (!this.type.authorityObject.shneCha && this.categoryKey === 'FILE_TYPE') {
-                this.rules.authorityObject.shneCha = [{ required: true, message: '审查选择不得为空！' }]
-            } else {
-                this.rules.authorityObject.shneCha = [{ required: false }]
-            }
-            if (this.type.authorityObject.chaYue === '部门查阅' && (!this.type.authorityObject.buMen || this.type.authorityObject.buMen.length === 0)) {
-                this.rules.authorityObject.buMen = [{ required: true, message: '部门选择不得为空！' }]
-            } else {
-                this.rules.authorityObject.buMen = [{ required: false }]
-            }
-            this.type.authorityObject.diDian = this.secondDiDian ? this.secondDiDian : this.firstDiDian
             this.$refs[this.formName].validate(valid => {
                 if (valid) {
                     this.saveData()

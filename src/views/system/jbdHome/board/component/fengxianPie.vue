@@ -24,7 +24,9 @@ export default {
             option = {
                 title: {
                     show: true,
-                    left: 'left',
+                    text: info.title,
+                    left: '41%',
+                    top: 'bottom',
                     textStyle: {
                         color: '#1f1f1f',
                         fontSize: 18,

@@ -2,7 +2,7 @@
     <div class="bg">
         <el-dialog width="70vw" height="50vh" :modal-append-to-body="false" title="风险评估进度查询" :visible.sync="scan">
             <!-- 表单是否显示 -->
-            <div ref="childComponent" style="height: 75vh; width: 98%">
+            <div ref="childComponent" style="height: 75vh; width: 100%">
                 <div id="box">
                     <div class="overall">
                         <!-- 步骤条盒子 -->
@@ -38,39 +38,39 @@
                             </div>
                         </el-tab-pane>
                         <el-tab-pane label="涉及条款统计表" name="second">
-                            <div style="width: 50%;display: inline-block">
+                            <div style="width: 45%;height:320px;display: inline-block">
                                 <tableCom :table-prop="termProp" :table-list="termList" />
                             </div>
-                            <div style="width: 50%; height:320px;display: inline-block">
-                                <div id="termPieView" style="width: 850px; height: 300px; margin:0 auto" />
+                            <div style="width: 51%; height:320px;display: inline-block">
+                                <div id="termPieView" style="width: 100%; height: 300px; margin:0 auto" />
                                 <PieView ref="termPieView" :info="termPieView" />
                             </div>
                         </el-tab-pane>
                         <el-tab-pane label="责任部门统计表" name="third">
-                            <div style="width: 50%;display: inline-block">
+                            <div style="width: 50%;height:320px;display: inline-block">
                                 <tableCom :table-prop="departProp" :table-list="departList" />
                             </div>
-                            <div style="width: 45%; height:350px;display: inline-block">
+                            <div style="width: 45%; height:320px;display: inline-block">
                                 <div id="departPieView" style="width: 500px; height: 300px; margin:0 auto" />
                                 <PieView ref="departPieView" :info="departPieView" />
                             </div>
                         </el-tab-pane>
                         <el-tab-pane label="风险应对措施统计表" name="fourth">
-                            <div style="width: 50%;display: inline-block">
+                            <div style="width: 50%;height:320px;display: inline-block">
                                 <tableCom :table-prop="riskReProp" :table-list="riskReList" />
                             </div>
-                            <div style="width: 45%; height:350px;display: inline-block">
+                            <div style="width: 45%; height:320px;display: inline-block">
                                 <div id="riskRePieView" style="width: 500px; height: 300px; margin:0 auto" />
                                 <PieView ref="riskRePieView" :info="riskRePieView" />
                             </div>
                         </el-tab-pane>
                         <el-tab-pane label="剩余风险等级统计表" name="fine">
-                            <div style="width: 100%; height:350px;display: flex;justify-content: space-around; overflow-x: scroll;">
-                                <div id="remainingRiskCD" style="width: 400px; height: 300px; " />
+                            <div style="width: 100%; height:350px;display: flex;justify-content: center; overflow-x: scroll;">
+                                <div id="remainingRiskCD" style="width: 33%; height: 300px; " />
                                 <PieView ref="remainingRiskCD" :info="remainingRiskCD" />
-                                <div id="remainingRiskDJ" style="width: 350px; height: 300px; " />
+                                <div id="remainingRiskDJ" style="width: 33%; height: 300px; " />
                                 <PieView ref="remainingRiskDJ" :info="remainingRiskDJ" />
-                                <div id="remainingRiskYD" style="width: 350px; height: 300px; " />
+                                <div id="remainingRiskYD" style="width: 33%; height: 300px; " />
                                 <PieView ref="remainingRiskYD" :info="remainingRiskYD" />
                             </div>
                         </el-tab-pane>
@@ -81,11 +81,11 @@
                         </el-tab-pane>
                     </el-tabs>
                 </template>
-                <div v-if="obj[0].zhuang_tai_ ==='识别中'">
+                <div v-if="obj[0].zhuang_tai_ ==='识别中'" style="padding: 5px">
                     <div class="tableTitle">风险识别评估</div>
                     <tableCom ref="RiskIdenList" :table-prop="RiskIdenProp" :table-list="RiskIdenList" :page-show="true" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange" />
                 </div>
-                <div v-if="obj[0].zhuang_tai_ ==='改进中'">
+                <div v-if="obj[0].zhuang_tai_ ==='改进中'" style="padding: 5px">
                     <div class="tableTitle">部门风险改进记录</div>
                     <tableCom ref="ImproRecords" :table-prop="ImproRecordsProp" :table-list="ImproRecordsList " :control-schedule="true" :page-show="true" @handleSizeChange="handleSizeChange" @handleCurrentChange="handleCurrentChange" />
                 </div>
@@ -302,7 +302,7 @@ export default {
             this.riskLevePieView = {
                 data: [],
                 idSelector: 'riskLevePieView',
-                color: ['#FF0033', '#3870e0', '#339933']
+                color: ['#d72828', '#2077b5', '#ff7f0d']
             }
             this.riskLevePieView.data = []
             this.riskLevelList = []
@@ -326,7 +326,7 @@ export default {
             this.termPieView = {
                 data: [],
                 idSelector: 'termPieView',
-                color: ['#CC0066', '#FF6600', '#3399CC', '#99CC00', '#FF9900', '#FFFFCC', '#FFCC99', '#009999', '#FFCC33']
+                color: ['#d72828', '#2077b5', '#afc7e8', '#ff7f0d', '#ffbb7a', '#2ba02b', '#98df8a', '#9e9fa3', '#f19066']
             }
             this.termPieView.data = []
             this.termList = []
@@ -349,7 +349,7 @@ export default {
             this.departPieView = {
                 data: [],
                 idSelector: 'departPieView',
-                color: ['#FF0033', '#3870e0', '#339933', '#FF9900']
+                color: ['#d72828', '#2077b5', '#afc7e8', '#ff7f0d']
             }
             this.departPieView.data = []
             this.departList = []
@@ -372,7 +372,7 @@ export default {
             this.riskRePieView = {
                 data: [],
                 idSelector: 'riskRePieView',
-                color: ['#FF0033', '#3870e0', '#339933']
+                color: ['#d72828', '#2077b5', '#ff7f0d']
             }
             this.riskRePieView.data = []
             this.riskReList = []
@@ -391,15 +391,22 @@ export default {
         },
         // 剩余风险统计表
         async remainingRisk () {
+            const sql = `select * FROM t_yzcdfjbzb where zi_fen_lei_ = '严重程度'`
+            let riskCount = []
+            await curdPost('sql', sql).then((res) => {
+                riskCount = res.variables.data
+            })
             const riskCD = await this.countApi(this.zongid, 'SYFX_CD')
             const cdData = []
             for (const item of riskCD) {
-                cdData.push({ name: item.yan_zhong_cheng_d, value: item.total })
+                const findData = riskCount.find(i => i.fen_ji_ === item.yan_zhong_cheng_d)
+                cdData.push({ name: findData.fen_ji_ + '、' + findData.yan_zhong_cheng_d, value: item.total })
             }
             this.remainingRiskCD = {
                 data: cdData,
                 idSelector: 'remainingRiskCD',
-                color: ['#FF0033', '#3870e0', '#339933', '#9900CC', '#99CCFF']
+                title: '严重程度分布',
+                color: ['#d72828', '#2077b5', '#afc7e8', '#ff7f0d', '#2ba02b']
             }
             const riskDJ = await this.countApi(this.zongid, 'SYFX_DJ')
             const djData = []
@@ -409,7 +416,8 @@ export default {
             this.remainingRiskDJ = {
                 data: djData,
                 idSelector: 'remainingRiskDJ',
-                color: ['#FF0033', '#3870e0', '#339933']
+                title: '风险等级分布',
+                color: ['#d72828', '#2077b5', '#ff7f0d']
             }
             const riskYD = await this.countApi(this.zongid, 'SYFX_YD')
             const ydData = []
@@ -418,8 +426,9 @@ export default {
             }
             this.remainingRiskYD = {
                 data: ydData,
+                title: '风险应对分布',
                 idSelector: 'remainingRiskYD',
-                color: ['#FF0033', '#3870e0', '#339933']
+                color: ['#d72828', '#2077b5', '#ff7f0d']
             }
             this.$refs.remainingRiskCD.getMiddleLeft('remainingRiskCD', this.remainingRiskCD)
             this.$refs.remainingRiskDJ.getMiddleLeft('remainingRiskDJ', this.remainingRiskDJ)
@@ -712,6 +721,7 @@ export default {
 .count{
     margin: 0 auto;
     margin-top: 80px;
-    width: 98%;
+    padding: 5px;
+    width: 100%;
 }
 </style>
