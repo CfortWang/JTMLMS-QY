@@ -289,7 +289,8 @@ export function buildComponent (name, column, preview, vm) {
                             // next: '<i class="icon-chevron-right">前进</i>'
                         },
                         dateClick: this.handleDateClick, // 日期点击
-                        eventClick: this.handleEventClick
+                        eventClick: this.handleEventClick,
+                        moreLinkClick: this.handleMoreLinkClick
                     }
                     if (preview) {
                         config.headerToolbar = {
@@ -322,6 +323,15 @@ export function buildComponent (name, column, preview, vm) {
                         [param.event.startStr, param.event._def.extendedProps.jieShuShiJian],
                         this.data,
                         param.event.id
+                    )
+                },
+                handleMoreLinkClick (date) {
+                    this.$emit(
+                        'open',
+                        'calendar',
+                        [date.allSegs[0].event.startStr, date.allSegs[0].event._def.extendedProps.jieShuShiJian],
+                        this.data,
+                        date.allSegs[0].event.id
                     )
                 },
                 refreshData () {

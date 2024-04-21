@@ -254,11 +254,11 @@ export default {
             this.riskReChange = true
         },
         getSchedule (guo_shen_) {
-            if (guo_shen_ === '未编制' || guo_shen_ === '') {
+            if (guo_shen_ === '未编制' || guo_shen_ === '' || guo_shen_ === '已编制' || guo_shen_ === '已暂存') {
                 this.activeIndex = 25
-            } else if (guo_shen_ === '识别中') {
+            } else if (guo_shen_ === '识别中' || guo_shen_ === '已识别') {
                 this.activeIndex = 50
-            } else if (guo_shen_ === '改进中') {
+            } else if (guo_shen_ === '改进中' || guo_shen_ === '已改进') {
                 this.activeIndex = 75
             } else if (guo_shen_ === '已完成') {
                 this.activeIndex = 100
@@ -267,7 +267,6 @@ export default {
             }
         },
         handleClick () {
-            console.log(111111111111111111, this.activeName)
             if (this.activeName === 'first') {
                 this.getRiskLevel()
             } else if (this.activeName === 'second') {
@@ -446,12 +445,12 @@ export default {
             // this_.$refs.RiskIdenList.curreFn(riskCount[0].count)
             this.pageTotal = Number(riskCount[0].count)
 
-            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,bian_zhi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
+            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,shi_shi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
             await curdPost('sql', sql).then((res) => {
                 this_.RiskIdenList = res.variables.data
             })
             for (const item of this_.RiskIdenList) {
-                item.bian_zhi_ren_ = item.bian_zhi_ren_ ? this.findUser(item.bian_zhi_ren_) : '/'
+                item.shi_shi_ren_ = item.shi_shi_ren_ ? this.findUser(item.shi_shi_ren_) : '/'
                 item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'
                 item.bian_zhi_shi_jian = item.bian_zhi_shi_jian.split(' ')[0] || '/'
                 item.shi_fou_guo_shen_ = item.shi_fou_guo_shen_ || '未编制'
@@ -459,7 +458,7 @@ export default {
             this.RiskIdenProp = [
                 { prop: 'bian_zhi_bu_men_', label: '编制部门' },
                 { prop: 'bian_zhi_shi_jian', label: '编制时间' },
-                { prop: 'bian_zhi_ren_', label: '编制人' },
+                { prop: 'shi_shi_ren_', label: '编制人' },
                 { prop: 'shi_fou_guo_shen_', label: '状态' }
             ]
         },
