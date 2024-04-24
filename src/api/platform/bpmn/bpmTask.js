@@ -1,6 +1,7 @@
 import request from '@/utils/request'
 import ActionUtils from '@/utils/action'
 import { BPMN_URL } from '@/api/baseUrl'
+import { cleanFormCache } from '@/api/platform/system/cache'
 /**
  * 查询列表数据
  * @param {*} params
@@ -225,10 +226,12 @@ export function assignee (params) {
  * @param {*} params
  */
 export function getTaskFormData (params) {
-    return request({
-        url: BPMN_URL() + '/bpm/task/getFormData',
-        method: 'get',
-        params: params
+    return cleanFormCache().then(() => {
+        return request({
+            url: BPMN_URL() + '/bpm/task/getFormData',
+            method: 'get',
+            params: params
+        })
     })
 }
 
