@@ -9,23 +9,36 @@
                 </div>
             </template>
 
-            <el-dropdown
-                v-else-if="fieldType === 'text' || fieldType === 'textarea'"
-                :style="{ width: width }"
-                size="mini"
-                placement="top-start"
-                trigger="click"
-                @command="handleCommand"
-            >
-                <!-- <el-dropdown
+            <div v-else-if="fieldType === 'text' || fieldType === 'textarea'" :style="{ width: width }">
+                <el-tooltip effect="dark" :content="dataModel" placement="top" :disabled="!isShowTooltip">
+                    <el-input
+                        v-model="dataModel"
+                        :placeholder="placeholder"
+                        :type="fieldType"
+                        :name="field.name"
+                        :autosize="autosize"
+                        :rows="fieldOptions.rows || 3"
+                        :readonly="readonly"
+                        unselectable="on"
+                        :style="{ width: width }"
+                        :clearable="clearable && hasFocus"
+                        @focus="() => hasFocus = true"
+                        @blur="() => hasFocus = false"
+                        @mouseover.native="inputOnMouseOver($event)"
+                        v-on="$listeners"
+                    />
+                </el-tooltip>
+            </div>
+            <!-- 配置常用语功能，性能较差 -->
+            <!-- <el-dropdown
                 v-else-if="fieldType==='text'||fieldType==='textarea'"
                 :style="{width:width}"
                 size="mini"
-                @click.native="reqPhrase($store.getters.userInfo.employee.groupID,field)"
                 placement="top-start"
                 trigger="click"
+                @click.native="reqPhrase($store.getters.userInfo.employee.groupID,field)"
                 @command="handleCommand"
-            > -->
+            >
                 <el-input
                     v-model="dataModel"
                     :placeholder="placeholder"
@@ -41,18 +54,16 @@
                     @blur="() => hasFocus = false"
                     v-on="$listeners"
                 />
-
-                <!-- <el-button
+                <el-button
                     v-if="(!fieldOptions.custom_class || fieldOptions.custom_class>=120) && !dataModel"
                     size="mini"
-                    title='添加短语'
+                    title="添加常用语"
                     plain
                     icon="el-icon-folder-add"
                     align="center"
                     class="elButtonPlace"
                     @click.stop="addDict($store.getters.userInfo.employee.groupID,field,field.label)"
-                /> -->
-
+                />
                 <el-dropdown-menu v-show="menuHide" slot="dropdown">
                     <el-dropdown-item
                         v-for="(item, index) in selectModel"
@@ -63,7 +74,7 @@
                         <span style="float: right; margin-left: 50px; color: #eb6709;" @click.stop="deleteDicts(item.uuId, field.label)">删</span>
                     </el-dropdown-item>
                 </el-dropdown-menu>
-            </el-dropdown>
+            </el-dropdown> -->
 
             <el-input
                 v-else
@@ -668,7 +679,8 @@ export default {
             inputKey: '',
             dict_add: false,
             selectDataResult: [],
-            hasFocus: false
+            hasFocus: false,
+            isShowTooltip: true
         }
     },
     computed: {
@@ -997,6 +1009,10 @@ export default {
         }
     },
     methods: {
+        inputOnMouseOver (e) {
+            const { offsetWidth, scrollWidth } = e.target || {}
+            this.isShowTooltip = this.isTable && (offsetWidth < scrollWidth)
+        },
         handleRadioChange (val) {
             if (this.dataModel === val && this.fieldOptions.uncheck === true) {
                 this.dataModel = null
@@ -1161,7 +1177,7 @@ export default {
                     if (response.state === 200) {
                         this.selectModel = response.variables.page
                     }
-                }).catch(error => {
+                }).catch(() => {
                     this.$message.error('系统忙、或数据错误,请稍后再试')
                 })
             }
@@ -1200,7 +1216,7 @@ export default {
                             }
                         })
                     }
-                }).catch(error => {
+                }).catch(() => {
                     this.$message.error('系统忙、或数据错误,请稍后再试')
                 })
             }).catch(() => {})

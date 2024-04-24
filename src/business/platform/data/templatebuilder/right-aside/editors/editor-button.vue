@@ -69,7 +69,12 @@
             label="报表路径"
             required
             prop="label"
-        >
+        >   <template slot="label">
+                报表路径
+                <el-tooltip effect="dark" content="在原报表路径后用&分割，添加自定义参数。目前只加主键的，如“&id_=zhu_id_”，id_是报表里接收参数的变量名，zhu_id_是列表上返回的字段" placement="top">
+                    <i class="el-icon-question question-icon" />
+                </el-tooltip>
+            </template>
             <el-input v-model="formData.reportPath" placeholder="请填写润乾报表完整路径" />
         </el-form-item>
         <el-form-item

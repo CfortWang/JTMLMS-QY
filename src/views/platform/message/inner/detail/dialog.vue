@@ -148,44 +148,50 @@ export default {
                 if (!position) {
                     return this.$message.warning('系统所登录的账户并没有所属部门，请先在系统设置完再进行确认！')
                 }
-                const sql = `select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '${userId}'`
-                this.$common.request('sql', sql).then((ryjbqkRes) => {
-                    const ryjbqkDatas = ryjbqkRes.variables.data
+                // 判断签字图文是否存在
+                const sql1 = `select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '${userId}'`
+                // 判断是否已经点击过确认
+                const sql2 = `select id_ FROM ibps_msg_read WHERE msg_id_ = '${this.id}' and receiver_id_='${userId}'`
+                Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then((res) => {
+                    const ryjbqkDatas = res[0].variables.data
+                    const cont2 = res[1].variables.data
                     if (!ryjbqkDatas.length) {
                         return this.$message.warning('系统所登录的账户并没有签字图文在系统，请先上传系统再进行确认！')
                     }
-                    const tempObj = {
-                        id_: generateUUID(),
-                        parent_id_: this.tableId,
-                        tong_zhi_bu_men_: position,
-                        que_ren_qian_ming: JSON.stringify([{
-                            id: ryjbqkDatas[0].qian_zi_tu_wen_,
-                            fileName: '确认签名'
-                        }]),
-                        que_ren_ri_qi_: this.$common.getDateNow(10),
-                        que_ren_ren_xing_: name
+                    if (!cont2.length) {
+                        const tempObj = {
+                            id_: generateUUID(),
+                            parent_id_: this.tableId,
+                            tong_zhi_bu_men_: position,
+                            que_ren_qian_ming: JSON.stringify([{
+                                id: ryjbqkDatas[0].qian_zi_tu_wen_,
+                                fileName: '确认签名'
+                            }]),
+                            que_ren_ri_qi_: this.$common.getDateNow(10),
+                            que_ren_ren_xing_: name
+                        }
+                        const returnParams = {
+                            tableName: this.tableName.slice(0, this.tableName.indexOf('（')), // 字符串 "表名（发放时间）"
+                            paramWhere: [tempObj]
+                        }
+                        // 获取所发放的文件
+                        // const files = this.$refs.innerMessage.form.fileMsg
+                        // const addwjcysqbs = []
+                        // const { userId = '' } = this.$store.getters
+                        // files.split(',').forEach(i => {
+                        //     const addwjcysqb = {
+                        //         yong_hu_id_: userId,
+                        //         wen_jian_id_: i,
+                        //         shou_quan_: '1',
+                        //         fa_bu_ri_qi_: this.tableName.slice(this.tableName.indexOf('（') + 1, this.tableName.lastIndexOf('）'))
+                        //     }
+                        //     addwjcysqbs.push(addwjcysqb)
+                        // })
+                        this.$common.request('add', returnParams).then(() => { console.log('确认接收到发放文件') }).then(() => {
+                            this.type = ''
+                            this.getFormData()
+                        })
                     }
-                    const returnParams = {
-                        tableName: this.tableName.slice(0, this.tableName.indexOf('（')), // 字符串 "表名（发放时间）"
-                        paramWhere: [tempObj]
-                    }
-                    // 获取所发放的文件
-                    // const files = this.$refs.innerMessage.form.fileMsg
-                    // const addwjcysqbs = []
-                    // const { userId = '' } = this.$store.getters
-                    // files.split(',').forEach(i => {
-                    //     const addwjcysqb = {
-                    //         yong_hu_id_: userId,
-                    //         wen_jian_id_: i,
-                    //         shou_quan_: '1',
-                    //         fa_bu_ri_qi_: this.tableName.slice(this.tableName.indexOf('（') + 1, this.tableName.lastIndexOf('）'))
-                    //     }
-                    //     addwjcysqbs.push(addwjcysqb)
-                    // })
-                    this.$common.request('add', returnParams).then(() => { console.log('确认接收到发放文件') }).then(() => {
-                        this.type = ''
-                        this.getFormData()
-                    })
                 })
                 this.closeDialog()
             }).catch(() => { })
