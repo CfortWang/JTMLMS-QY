@@ -8,6 +8,7 @@ import { findAllByCurrUserId, saveCalendarInfos, removeCalendarInfos, delNavigat
 import { isEqual } from 'lodash'
 import Bus from '@/utils/EventBus'
 import newPng from '@/assets/images/homepage/new.png'
+import { BASE_URL } from '@/constant'
 
 /**
  * 创建组件
@@ -59,11 +60,12 @@ export function buildComponent (name, column, preview, vm) {
             },
             data () {
                 const { first = '', second = '' } = this.$store.getters.level
-                const { userList = [], deptList = [], menus, userInfo } = this.$store.getters
+                const { userId, userList = [], deptList = [], menus, userInfo } = this.$store.getters
                 const t1 = deptList.find(i => i.positionId === first) || {}
                 const t2 = deptList.find(i => i.positionId === second) || {}
                 const locationName = second ? t1.positionName + t2.positionName : t1.positionName
                 return {
+                    userId,
                     userList,
                     deptList,
                     menus,
@@ -185,7 +187,13 @@ export function buildComponent (name, column, preview, vm) {
                         })
                     } else if (param.alias === 'quickNavigation') {
                         getNavigation().then(res => {
-                            this.quickNavigationData = res.data || []
+                            const { data = [] } = res || {}
+                            data.forEach(item => {
+                                if (!item.userId) {
+                                    item.urlAddr = `${BASE_URL}#${item.urlAddr}`
+                                }
+                            })
+                            this.quickNavigationData = data
                         })
                     } else {
                         getData(param, params).then(res => {
@@ -278,7 +286,6 @@ export function buildComponent (name, column, preview, vm) {
                         dayMaxEvents: 1, // 最多显示3个日程
                         locale: this.$i18n.locale ? this.$i18n.locale.toLowerCase() : 'zh-cn',
                         events: events,
-                        // headerToolbar: false,
                         buttonText: {
                             today: '今天',
                             dayGridMonth: '月',
@@ -302,11 +309,6 @@ export function buildComponent (name, column, preview, vm) {
                         delete config['dayMaxEvents']
                     }
                     return config
-                },
-                getCalendar () {
-                    console.log(vm.$refs.myCalendar[0].$refs.calendar.$refs.fullCalendar)
-                    const calendar = vm.$refs.myCalendar[0].$refs.calendar.$refs.fullCalendar.getApi()
-                    console.log(calendar)
                 },
                 handleDateClick (param) {
                     this.$emit(
@@ -387,7 +389,8 @@ export function buildComponent (name, column, preview, vm) {
                         myTraining: 'rygl/rypx/wdpx',
                         myTesting: 'rygl/kszx/wdks',
                         myDevices: 'sbgls/mywh',
-                        notice: 'tygl/tzgg'
+                        notice: 'tygl/tzgg',
+                        myFacility: 'sshjgl/sshjjk/sshjkzzl'
                     }
                     if (menuMap[url]) {
                         const alias = menuMap[url].split('/')[0]
@@ -471,7 +474,7 @@ export function buildComponent (name, column, preview, vm) {
                             addNavigation({ id: '', ...this.quickNavform }).then(res => {
                                 this.$message.success('添加成功！')
                                 const { id } = res.variables || {}
-                                this.quickNavigationData.unshift({ id, ...this.quickNavform })
+                                this.quickNavigationData.unshift({ id, ...this.quickNavform, userId: this.userId })
                                 this.dialogFormVisible = false
                             })
                         } else {
@@ -492,12 +495,12 @@ export function buildComponent (name, column, preview, vm) {
                 },
                 // 父组件调用该方法给日程添加数据
                 async setCalendarEvents (param) {
-                    const { userId = '', name = '' } = this.$store.getters
+                    const { name = '' } = this.$store.getters
                     const form = param.form
                     const paramObject = {
                         id: form.id ? form.id : '11111',
                         // diDian: "string", // 地点
-                        userId: userId, // 用户id
+                        userId: this.userId, // 用户id
                         userName: name, // 用户名
                         title: form.biaoTi, // 标题
                         content: form.neiRong, // 内容

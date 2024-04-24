@@ -22,7 +22,7 @@
                     <el-tag
                         v-for="(tag, i) in quickNavigationData"
                         :key="i"
-                        closable
+                        :closable="!!tag.userId"
                         :disable-transitions="false"
                         class="draggable"
                         @close="handleNavRemove(tag.id, i)"
