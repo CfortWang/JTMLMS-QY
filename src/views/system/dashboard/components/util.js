@@ -98,7 +98,8 @@ export function buildComponent (name, column, preview, vm) {
                     quickNavform: {
                         urlName: '',
                         urlAddr: '',
-                        display: '_blank'
+                        display: '_blank',
+                        diDian: second || first
                     },
                     defaultForm: {},
 
@@ -390,7 +391,8 @@ export function buildComponent (name, column, preview, vm) {
                         myTesting: 'rygl/kszx/wdks',
                         myDevices: 'sbgls/mywh',
                         notice: 'tygl/tzgg',
-                        myFacility: 'sshjgl/sshjjk/sshjkzzl'
+                        myFacility: 'sshjgl/sshjjk/sshjkzzl',
+                        quickNavigation: 'xtgl/xtsjpz/tyglpz/kjdhpz'
                     }
                     if (menuMap[url]) {
                         const alias = menuMap[url].split('/')[0]
@@ -403,7 +405,10 @@ export function buildComponent (name, column, preview, vm) {
                  * 处理更多
                  */
                 handleMore () {
-                    if (this.attrs.colUrl === '') {
+                    if (this.attrs.alias === 'quickNavigation') {
+                        return this.openPlate('quickNavigation')
+                    }
+                    if (!this.attrs.colUrl) {
                         return this.$message.warning('未设置更多路径的url')
                     }
                     this.openPlate(this.attrs.colUrl)

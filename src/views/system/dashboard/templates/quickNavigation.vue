@@ -5,7 +5,7 @@
             <span>快捷导航</span>
             <ibps-desktop-toolbar
                 ref="toolbar"
-                :actions="[{ key: 'add' }, { key: 'collapse' }]"
+                :actions="[{ key: 'add' }, { key: 'more' }, { key: 'collapse' }]"
                 @action-event="handleActionEvent"
             />
         </div>
