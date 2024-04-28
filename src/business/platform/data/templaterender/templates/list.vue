@@ -395,7 +395,10 @@ export default {
         }
     },
     data () {
+        const { first = '', second = '' } = this.$store.getters.level || {}
         return {
+            first,
+            second,
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
             proInstId: '', // 编制暂存数据
@@ -982,6 +985,25 @@ export default {
             }
         },
         /**
+         * 根据defId获取当前流程主版本的defId
+         * @param {String} defId 流程ID
+         */
+        getMainDefId (defId) {
+            const sql = `select def_id_, def_key_ from ibps_bpm_def where def_key_ in (select def_key_ from ibps_bpm_def where def_id_ = '${defId}') and is_main_ = 'Y'`
+            return new Promise((resolve, reject) => {
+                this.$common.request('sql', sql).then(res => {
+                    const { data = [] } = res.variables || {}
+                    if (data.length) {
+                        resolve(data[0].def_id_)
+                    } else {
+                        resolve(null)
+                    }
+                }).catch(error => {
+                    reject(error)
+                })
+            })
+        },
+        /**
          * 根据defId获取当前流程最新的已暂存数据
          * @param {String} defId 流程ID
          * @param {Boolean} isOpen 是否开启编制暂存数据功能
@@ -990,12 +1012,12 @@ export default {
             if (!isOpen) {
                 return null
             }
-            const sql = `select proc_inst_id_, businesskey_ from ibps_bpm_bus_rel where def_id_ = '${defId}' and start_id_ = '${userId}' order by create_date_ desc limit 1`
+            const sql = `select id_, biz_key_ from ibps_bpm_inst where proc_def_id_ = '${defId}' and create_by_ = '${userId}' and status_ = 'draft' order by create_time_ desc limit 1`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
                     if (data.length) {
-                        resolve(data[0].proc_inst_id_)
+                        resolve(data[0].id_)
                     } else {
                         resolve(null)
                     }
@@ -1014,7 +1036,6 @@ export default {
             this.beforeScript(command, position, selection, data, async () => {
                 let src = ''
                 this.readonly = false
-                const { first = '', second = '' } = this.$store.getters.level || {}
                 const { userId } = this.$store.getters || {}
                 switch (buttonType) {
                     case 'search': // 查询
@@ -1062,12 +1083,11 @@ export default {
                     case 'custom': // 自定义按钮
                         break
                     case 'openTask': // 编制，开启对应流程
-                        // console.log(button)
                         if (!button.deflow) {
-                            this.$message.warning('请先配置对应流程！')
-                            return
+                            return this.$message.warning('请先配置对应流程！')
                         }
-                        this.defId = button.deflow
+                        // 改进：通过主版本defId启动流程（适用流程升版的情况）
+                        this.defId = await this.getMainDefId(button.deflow)
                         // 补充逻辑，带入已有暂存数据
                         this.proInstId = await this.getProInstId(button.deflow, userId, button.isEditOnHis)
                         this.addDataCont = button.initAddDataCont
@@ -1082,21 +1102,18 @@ export default {
                             }, 500)
                         } else {
                             if (!button.reportPath) {
-                                this.$message.warning('请先配置对应报表路径！')
-                                return
+                                return this.$message.warning('请先配置对应报表路径！')
                             }
-                            src = `${this.$reportPath.replace('show', 'pdf')}${button.reportPath}&id_=${selection}&org_=${first}&second_=${second}`
-                            // console.log(src)
+                            src = this.$reportPath.replace('show', 'pdf') + button.reportPath.split('&')[0] + `&` + this.getReportParams(button.reportPath, selection, data)
                             this.$common.preview(this, src)
                         }
                         break
                     case 'download': // 下载记录
                         if (!button.reportPath) {
-                            this.$message.warning('请先配置对应报表路径！')
-                            return
+                            return this.$message.warning('请先配置对应报表路径！')
                         }
                         this.$common.snapshoot({
-                            url: this.$getReportFile(button.reportPath, `id_=${selection}&org_=${first}&second_=${second}`),
+                            url: this.$getReportFile(button.reportPath.split('&')[0], this.getReportParams(button.reportPath, selection, data)),
                             name: selection,
                             type: 'pdf'
                         }).then((res) => {
@@ -1358,10 +1375,9 @@ export default {
             }
             // 判断地点是否第一层级
             const position = this.$store.getters.userInfo.positions
-            const first = this.$store.getters.level.first
             let showBoolean = false
-            if (position && position.length > 0 && first) {
-                showBoolean = position.some((item) => item.id === first)
+            if (position && position.length > 0 && this.first) {
+                showBoolean = position.some((item) => item.id === this.first)
             }
             const columnsShow = this.listConfig.columns.some((item) => item.prop === 'di_dian_')
             if (!showBoolean && columnsShow) {
@@ -1911,12 +1927,19 @@ export default {
             }
             /**
              * type:default，那么表示是一般的列表
-             * type:dialog,表示对话框列表
+             * type:dialog，表示对话框列表
              * tempSearch为true的时候是列表搜索框点击打开的对话框
              * 数据模板脚本里打开的对话框列表，不需要执行本模块代码，否则会执行到底层列表的onload脚本：洗眼器
              * 但是在表单页面打开对话框的时候需要执行本模块代码：考试管理对话框
              */
             if (this.dataTemplate.type === 'default' || (this.dataTemplate.type === 'dialog' && !this.tempSearch) || this.tempSearch) {
+                // 判断对话框模板脚本是否存在onload，如果存在就执行，如果不存在就不执行JTemplate._onLoad(this)
+                // 对话框模板脚本里的onload如果不想要就删掉，禁止注释，否则对话框模板脚本里的onload注释掉的时候系统逻辑会默认使用主列表上的onload
+                if (this.dataTemplate.type === 'dialog' &&
+                    (!this.dataTemplate.attrs || !this.dataTemplate.attrs.script || this.dataTemplate.attrs.script.indexOf('onload') < 0)) {
+                    return
+                }
+                // 模板脚本 执行逻辑
                 JTemplate._onLoad(this)
             }
         },
@@ -2026,6 +2049,24 @@ export default {
             }
             // conso
             this.handleAction(buttonTypeAct, buttonAct.position, selectAct, dataAct, indexAct, buttonAct)
+        },
+        getReportParams (path, selection, data) {
+            /**
+             * 1、原报表路径：安全管理/紫外灯辐照度值测定记录表.rpx
+             * 2、补充报表路径：安全管理/紫外灯辐照度值测定记录表.rpx&id_=id_
+             * 2-1、最后那么id_表示在列上的字段属性，增加报表传参的便捷性;
+             * 2-2、有些列表需要展示的是子表的数据，但是报表需要展示的是主表数据，列表唯一字段只能是子表id_,所以主表的id_就不能也叫id_；
+             * 2-3、受限于报表快照生成的参数获取，当前只补充关于id_的逻辑；
+             */
+            const str = `org_=${this.first}&second_=${this.second}&id_=`
+            const arr = path.split('&')
+            if (arr.length === 2) {
+                const fieldArr = arr[1].split('=')
+                return str + `${data[fieldArr[1]]}`
+            } else {
+                // 如果是没有传参，还是原报表路径
+                return str + `${selection}`
+            }
         }
     }
 }

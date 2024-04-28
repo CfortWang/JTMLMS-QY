@@ -350,7 +350,7 @@ export default {
             let valNum = this.correspondingNum(this.cycleValue)
             if(this.cycleValue!='按需保养'&&this.cycleValue!=''&&val!=''&&valNum!=''&&this.maintenanceTextarea!=''){
                 if(this.dynamicParams.position == 'manage'){
-                    this.$set(a,this.dynamicParams.params.index,{weiHuLeiXing:this.cycleValue,weiHuRiQi:val,riQiShuZi:valNum,weiHuXiangMuC:this.maintenanceTextarea})
+                    this.$set(a,this.dynamicParams.params.index,{...a[this.dynamicParams.params.index],weiHuLeiXing:this.cycleValue,weiHuRiQi:val,riQiShuZi:valNum,weiHuXiangMuC:this.maintenanceTextarea})
                 }else{
                     a.push({weiHuLeiXing:this.cycleValue,weiHuRiQi:val,riQiShuZi:valNum,weiHuXiangMuC:this.maintenanceTextarea})
                 }
@@ -463,7 +463,7 @@ export default {
                 })
                 this.dayCheckList = strArr
             }else if(content.weiHuLeiXing == '月保养'){
-                that.monthDateValue = content.weiHuRiQi
+                that.monthDateValue = content.weiHuRiQi.slice(2)
             }else if(content.weiHuLeiXing == '周保养'){
                 let str = content.weiHuRiQi.slice(2)
                 let partArr = str.split(",")
