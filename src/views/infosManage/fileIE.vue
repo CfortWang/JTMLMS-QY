@@ -45,13 +45,31 @@
                             slot="wenjinachayue"
                             slot-scope="scope"
                         >
-                            <ibps-attachment
-                                :value="scope.row.fu_jian_"
-                                readonly
-                                allow-download
-                                multiple
-                                :download="fileDownloadAuthority"
-                            />
+                            <div>
+                                <img
+                                    :src="wordPng"
+                                    style="vertical-align: middle; height: 20px;"
+                                >
+                                <el-tag
+                                    type="info"
+                                    style="cursor: pointer;"
+                                    @click="handleClickTag(scope.row)"
+                                >{{ scope.row.file_info_ }}</el-tag>
+                            </div>
+
+                        </template>
+                        <template
+                            slot="readStatus"
+                            slot-scope="scope"
+                        >
+                            <img
+                                :src="scope.row.cy_id_ ? openFilePng : closeFilePng"
+                                style="vertical-align: middle; height: 30px;"
+                            > /
+                            <img
+                                :src="scope.row.sc_id_ ? hadColetcPng : noColectPng"
+                                style="vertical-align: middle; height: 30px;"
+                            >
                         </template>
                     </ibps-crud>
                 </template>
@@ -84,6 +102,10 @@
                     scrolling="no"
                 />
             </el-dialog>
+            <file-lookup
+                :visible="dialogVisible"
+                :file-infos="fileInfos"
+            />
         </div>
 
     </div>
@@ -97,11 +119,19 @@ import FixHeight from '@/mixins/height'
 import IbpsTypeTree from '@/business/platform/cat/type/tree'
 import { findTreeData } from '@/api/platform/cat/type'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
+import closeFilePng from '@/assets/images/icons/closeFile.png'
+import openFilePng from '@/assets/images/icons/openFile.png'
+import hadColetcPng from '@/assets/images/icons/hadColetc.png'
+import noColectPng from '@/assets/images/icons/noColect.png'
+import wordPng from '@/assets/images/icons/word.png'
+import fileTraining from '@/views/component/fileTraining'
+
 export default {
     components: {
         IbpsTypeTree,
         BpmnFormrender,
-        'ibps-attachment': IbpsAttachment
+        'ibps-attachment': IbpsAttachment,
+        'file-lookup': fileTraining
     },
     mixins: [FixHeight],
     data () {
@@ -150,7 +180,12 @@ export default {
             listConfig: {
                 // 工具栏
                 toolbars: [
-                    { key: 'search' }
+                    { key: 'search' },
+                    {
+                        key: 'colect',
+                        label: '收藏或取消收藏',
+                        type: 'success'
+                    }
                 ],
                 // 查询条件
                 searchForm: {
@@ -180,7 +215,14 @@ export default {
                 authority: []
             }, // 存放所点击列表的分类信息
             depArrs,
-            fileDownloadAuthority
+            fileDownloadAuthority,
+            closeFilePng,
+            hadColetcPng,
+            noColectPng,
+            openFilePng,
+            wordPng,
+            dialogVisible: false,
+            fileInfos: {}
         }
     },
     watch: {
@@ -190,32 +232,35 @@ export default {
     },
     created () {
         this.pageKey = this.$route.name
-        this.categoryKey = this.$route.name == 'nbwj' ? 'FILE_TYPE' : 'FLOW_TYPE'
+        this.categoryKey = this.$route.name === 'nbwj' ? 'FILE_TYPE' : 'FLOW_TYPE'
         this.userId = this.$store.getters.userInfo.employee.id
         const roleList = this.$store.getters.userInfo.role
         // 系统管理角色添加删除按钮
         const hasRole = roleList.some(item => item.name === '系统管理角色')
-        if (this.$route.name == 'wjkzgl-ywyxjlsc') {
+        if (this.$route.name === 'wjkzgl-ywyxjlsc') {
             // 系统管理角色不做分类过滤
             this.listConfig.toolbars.push({ key: 'remove' })
             this.selection = true
         }
-        if (this.$route.name == 'nbwj') {
+        if (this.$route.name === 'nbwj') {
             this.listConfig.searchForm.forms = [
                 { prop: 'wen_jian_bian_hao', label: '文件编号' },
                 { prop: 'wen_jian_ming_che', label: '文件名称' }
             ]
             this.listConfig.columns = [
+                { prop: 'status', label: '阅览 / 收藏', slotName: 'readStatus', width: 100 },
                 // { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', minWidth: 100 },
-                { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', minWidth: 100 },
+                { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 150 },
                 { prop: 'wen_jian_ming_che', label: '文件名称', minWidth: 150 },
                 { prop: 'ban_ben_', label: '版本', width: 65 },
-                { prop: 'fu_jian_', label: '查阅', slotName: 'wenjinachayue', minWidth: 150 },
-                { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom', minWidth: 100 },
+                { prop: 'file_info_', label: '查阅', slotName: 'wenjinachayue', minWidth: 150 },
+                { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom', width: 150 },
+                // { prop: 'read', label: '阅览状态', slotName: 'readStatus', minWidth: 60 },
+                // { prop: 'collect', label: '收藏状态', slotName: 'collectStatus', minWidth: 60 },
                 { prop: 'cha_yue_jie_zhi_s', label: '查阅截止时间', sortable: 'custom', minWidth: 120 }
             ]
         }
-        if (this.$route.name == 'wjkzgl-ywyxjlsc' || this.$route.name == 'ywtxyxjl') {
+        if (this.$route.name === 'wjkzgl-ywyxjlsc' || this.$route.name === 'ywtxyxjl') {
             this.listConfig.searchForm.forms = [
                 { prop: 'nian_du_', label: '年度:', fieldType: 'date', dateType: 'year', width: 50 },
                 { prop: 'bian_zhi_shi_jian', label: '上传时间:', fieldType: 'daterange', width: 200 }
@@ -254,7 +299,7 @@ export default {
             //   console.log('this.$store.getters',this.$store.getters)
             const positionsDatas = this.$store.getters.userInfo.positions
             const needSelType = []
-            if (this.$store.getters.userInfo.positions == 0) {
+            if (this.$store.getters.userInfo.positions === 0) {
                 this.$message({
                     message: '该账户并没有所属部门，请先归属部门再来操作。',
                     type: 'error'
@@ -262,10 +307,10 @@ export default {
                 return
             }
             for (var i in this.searchWhere) {
-                if (i == 'b') {
+                if (i === 'b') {
                     start = this.searchWhere[i]
                 }
-                if (i == 'i') {
+                if (i === 'i') {
                     wheres1 = wheres1 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
                     wheres2 = wheres2 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
                     wheres3 = wheres3 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
@@ -279,14 +324,15 @@ export default {
             }
 
             if (fileType) {
-                if (this.pageKey == 'nbwj') {
+                if (this.pageKey === 'nbwj') {
                     if (comAuthority.length !== 0) {
                         wheres1 = wheres1 + ` and FIND_IN_SET (wj.xi_lei_id_,'${comAuthority}')`
                     }
                     if (buMenAuthority.length !== 0) {
                         let orSql = ''
-                        for (var i in positionsDatas) {
-                            if (i == 0) {
+                        // eslint-disable-next-line no-redeclare
+                        for (const i in positionsDatas) {
+                            if (i === '0') {
                                 orSql = `wj.quan_xian_xin_xi_ LIKE '%${positionsDatas[i].id}%'`
                             } else {
                                 orSql = orSql + `or wj.quan_xian_xin_xi_ LIKE '%${positionsDatas[i].id}%'`
@@ -303,31 +349,41 @@ export default {
             }
             if (sorts) {
                 if (JSON.stringify(sorts) !== '{}') {
-                    wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
-                    wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order == 'ascending' ? 'asc' : 'desc'}`
+                    wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
+                    wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
                 }
             }
 
             // 重复发放的文件，在权限表会存在重复的文件信息
             //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian
             //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
-            const selectSql = 'select wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,"" AS cha_yue_jie_zhi_s  from'
+            const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（大小：',file.total_bytes_,'）') as file_info_,
+            wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,"" AS cha_yue_jie_zhi_s  from`
+            const leftSql = `left join (select id_,parent_id_ from t_wjcyjl group by parent_id_) cy on cy.parent_id_ = wj.id_
+            left join (select id_,parent_id_ from t_wjscjl group by parent_id_) sc on sc.parent_id_ = wj.id_
+            left join ibps_file_attachment file on file.id_ = wj.wen_jian_fu_jian_`
             // 内外部文件查阅时候查所有文件
             const allSql = ``
             // 共用文件
-            const comSql = `${selectSql} t_wjxxb wj where wj.shi_fou_guo_shen_ ='有效' and (${this.depArrs.join(' or ')}) ${wheres1}`
+            const comSql = `${selectSql} t_wjxxb wj ${leftSql} 
+             where wj.shi_fou_guo_shen_ ='有效' and (${this.depArrs.join(' or ')}) ${wheres1} `
             // 部门权限文件
-            const buMenSql = `${selectSql}  t_wjxxb wj where wj.shi_fou_guo_shen_ in ('有效','使用') ${wheres2}`
+            const buMenSql = `${selectSql}  t_wjxxb wj ${leftSql}
+            where wj.shi_fou_guo_shen_ in ('有效','使用') ${wheres2} `
             // 受限文件:结合查阅授权模块的截止时间
-            const authoritySql = `select wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s  from
-        t_wjxxb wj left join (select *from t_skwjcysqsqzb order by create_time_ desc limit 1) sq on wj.id_=sq.wen_jian_id_  
-      WHERE wj.shi_fou_guo_shen_ ='有效' and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
-       and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
+            const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',file.total_bytes_,'）') as file_info_,
+            wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s  from
+        t_wjxxb wj 
+        left join (select *from t_skwjcysqsqzb order by create_time_ desc limit 1) sq on wj.id_=sq.wen_jian_id_ 
+        ${leftSql}
+        WHERE wj.shi_fou_guo_shen_ ='有效' and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
+        and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
             const sqlArr = [comSql, buMenSql, authoritySql]
             let oldRecordSql = ''
             const buMenWhere = []
             if (this.pageKey !== 'nbwj') {
                 if (this.$store.getters.deptList.length !== 0) {
+                    // eslint-disable-next-line no-redeclare
                     for (var i of this.$store.getters.deptList) {
                         buMenWhere.push(`bian_zhi_bu_men_ like '%${i.positionId}%'`)
                     }
@@ -340,6 +396,7 @@ export default {
                     return
                 }
             }
+            // eslint-disable-next-line no-redeclare
             for (var i in Object.keys(this.fileTypesDatas)) {
                 var key = Object.keys(this.fileTypesDatas)[i] // key
                 var value = this.fileTypesDatas[key] // value
@@ -349,8 +406,8 @@ export default {
             }
             //   console.log('needSelType',needSelType)
             const fileSearchSql = needSelType.join('union all')
-            const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq ORDER BY sq.wen_jian_bian_hao ASC` : oldRecordSql
-            console.log('sql------------：', sql)
+            const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq ORDER BY sq.wen_jian_bian_hao DESC,sq.wen_jian_ming_che DESC` : oldRecordSql
+            // console.log('sql------------：', sql)
             curdPost('sql', sql).then(res => {
                 const tableDatas = res.variables.data
                 this.selectListData = JSON.parse(JSON.stringify(tableDatas))
@@ -387,7 +444,7 @@ export default {
                 return
             }
             // 判断是否存在下级菜单
-            const noHadNext = nodeData.children == undefined
+            const noHadNext = nodeData.children === undefined
             if (noHadNext && this.pageKey === 'wjkzgl-ywyxjlsc') {
                 const chongfu = this.listConfig.toolbars.filter(el => {
                     return el.key === 'add'
@@ -407,31 +464,32 @@ export default {
                 shiJiSql: [],
                 sheBeiSql: []
             }
-            if (nodeData.children == undefined) {
+            if (nodeData.children === undefined) {
                 const authorityName = JSON.parse(nodeData.authorityName)
                 fileTypes.push(nodeId)
-                if (authorityName.chaYue == '公用查阅') {
+                if (authorityName.chaYue === '公用查阅') {
                     this.fileTypesDatas.comAuthority.push(nodeId)
                 }
-                if (authorityName.chaYue == '部门查阅') {
+                if (authorityName.chaYue === '部门查阅') {
                     this.fileTypesDatas.buMenAuthority.push(nodeId)
                 }
-                if (authorityName.chaYue == '受限查阅') {
+                if (authorityName.chaYue === '受限查阅') {
                     this.fileTypesDatas.authority.push(nodeId)
                 }
             } else {
                 const getTail = item => item.children && item.children.length > 0 ? item.children.map(m => getTail(m)) : [item]
+                // eslint-disable-next-line no-undef
                 const result = _.flattenDeep(nodeData.children.map(m => getTail(m)))
                 for (var i of result) {
                     fileTypes.push(i.id)
                     const authorityName = JSON.parse(i.authorityName)
-                    if (authorityName.chaYue == '公用查阅') {
+                    if (authorityName.chaYue === '公用查阅') {
                         this.fileTypesDatas.comAuthority.push(i.id)
                     }
-                    if (authorityName.chaYue == '部门查阅') {
+                    if (authorityName.chaYue === '部门查阅') {
                         this.fileTypesDatas.buMenAuthority.push(i.id)
                     }
-                    if (authorityName.chaYue == '受限查阅') {
+                    if (authorityName.chaYue === '受限查阅') {
                         this.fileTypesDatas.authority.push(i.id)
                     }
                 }
@@ -462,22 +520,24 @@ export default {
         /**
  * 处理按钮事件
  */
-        handleAction (command, position, selection, data) {
+        handleAction (command, position, selection, data, index, button) {
             switch (command) {
                 case 'search':// 查询
                     this.refreshData()
                     break
                 case 'remove':
-                    if (data.length == 0) {
+                    if (data.length === 0) {
                         this.$message({
                             message: '请选择数据再进行删除',
                             type: 'error'
                         })
                     }
+                    // eslint-disable-next-line no-case-declarations
                     const ids = []
                     for (var i of data) {
                         ids.push(i.id_)
                     }
+                    // eslint-disable-next-line no-case-declarations
                     const deleteParams = {
                         tableName: 't_ywyxjlb',
                         paramWhere: { id_: ids.join(',') }
@@ -493,6 +553,15 @@ export default {
                     break
                 case 'add': // 添加
                     this.openTask('1072813170935988224')
+                    break
+                case 'colect': // 收藏或取消收藏
+                    if (!data || !data.length) {
+                        return this.$message({
+                            message: '请先选择数据再进行操作~',
+                            type: 'warning'
+                        })
+                    }
+                    this.handleColect(data)
                     break
                 default:
                     break
@@ -523,6 +592,71 @@ export default {
                 this.bianlistData.dataResult = JSON.parse(JSON.stringify(filterDatas))
             }
             ActionUtils.handleListData(this, this.bianlistData)
+        },
+        getScSrc (id) {
+            return id ? this.hadColetcPng : this.noColectPng
+        },
+        async handleColect (data) {
+            const addScDatas = []
+            const delIds = []
+            const scTableName = 't_wjscjl'
+            for (const i of data) {
+                // 如果是有sc_id_说明是已经收藏过的，再次点击按钮的时候就取消收藏
+                if (i.sc_id_) {
+                    delIds.push(i.sc_id_)
+                } else {
+                    addScDatas.push({
+                        bian_zhi_ren_: this.userId,
+                        bian_zhi_shi_jian: this.$common.getDateNow(19),
+                        parent_id_: i.id
+                    })
+                }
+            }
+            if (addScDatas.length) {
+                const addParams = {
+                    tableName: scTableName,
+                    paramWhere: addScDatas
+                }
+                await curdPost('add', addParams).then(res => {
+                })
+            }
+            if (delIds.length) {
+                const deleteParams = {
+                    tableName: scTableName,
+                    paramWhere: { id_: delIds.join(',') }
+                }
+                await curdPost('delete', deleteParams).then(() => {
+                })
+            }
+            this.refreshData()
+        },
+        handleClickTag (val) {
+            const sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                if (!data.length) {
+                    this.$message.warning('没有可查阅的文件，请查明原因！')
+                    return
+                }
+                this.fileInfos = { id: val.id, FILE_NAME_: val.wen_jian_ming_che, fileInfos: data[0], func: this.handleUpdate }
+                this.dialogVisible = true
+            })
+        },
+        handleUpdate (fileId, time) {
+            const addParams = {
+                tableName: 't_wjcyjl',
+                paramWhere: [
+                    {
+                        bian_zhi_ren_: this.userId,
+                        bian_zhi_shi_jian: this.$common.getDateNow(19),
+                        parent_id_: fileId,
+                        shi_chang_: time
+                    }
+                ]
+            }
+            curdPost('add', addParams).then(res => {
+                this.refreshData()
+            })
         }
     }
 }

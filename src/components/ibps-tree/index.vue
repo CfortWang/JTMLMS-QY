@@ -92,6 +92,11 @@
                             v-if="showIcon"
                             :name="getIcon(scope.data)"
                         />
+                        <img
+                            v-if="categoryKey === 'FILE_TYPE' || categoryKey ==='FLOW_TYPE'"
+                            :src="filePng"
+                            style="vertical-align: middle; height: 20px;"
+                        >
                         <span>{{ scope.node.label }}</span>
                     </span>
                 </el-tree>
@@ -119,7 +124,7 @@ import TreeUtils from '@/utils/tree'
 import PopupManager from '@/utils/popup'
 import IbpsContextmenu from '@/components/ibps-contextmenu'
 import IbpsContextmenuList from '@/components/ibps-contextmenu/components/contentmenu-list'
-
+import filePng from '@/assets/images/form/file.png'
 export default {
     components: {
         IbpsContextmenu,
@@ -195,6 +200,10 @@ export default {
         lazy: {
             type: Boolean,
             default: false
+        },
+        categoryKey: {
+            type: String,
+            default: ''
         }
     },
     data () {
@@ -208,7 +217,8 @@ export default {
             contextmenuData: {},
             contextmenuList: [],
             zIndex: 2003,
-            treeExpandData: []
+            treeExpandData: [],
+            filePng
         }
     },
     computed: {
@@ -310,7 +320,7 @@ export default {
             if (this.title === '业务对象管理' ||
                 this.title === undefined ||
                 (
-                    this.treeData[0] && this.treeData[0].children.length === 1 &&
+                    this.treeData[0] && this.treeData[0].children && this.treeData[0].children.length === 1 &&
                     this.title === '部门管理'
                 )
             ) {

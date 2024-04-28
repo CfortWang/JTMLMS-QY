@@ -11,6 +11,7 @@
             :contextmenus="hasContextmenu ? treeContextmenus : []"
             :position="position"
             :has-permission="hasPermission"
+            :category-key="categoryKey"
             @action-event="handleTreeAction"
             @node-click="handleNodeClick"
             @expand-collapse="handleExpandCollapse"

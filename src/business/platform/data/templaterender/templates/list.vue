@@ -892,8 +892,6 @@ export default {
             this.hadDoSearch = true
             this.loadData()
             this.addDataCont = {}
-            this.selectionAll = []
-            this.selection = []
         },
         /* 流程页面关闭，刷新当前页面*/
         loadFlowFData (v, temp) {

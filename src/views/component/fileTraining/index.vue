@@ -4,7 +4,7 @@
  * @Author: Liu_jiaYin
  * @Date: 2024-03-01 13:47:32
  * @LastEditors: Do not edit
- * @LastEditTime: 2024-03-07 11:24:29
+ * @LastEditTime: 2024-04-26 16:04:02
 -->
 <template>
     <el-dialog
@@ -13,9 +13,10 @@
         fullscreen
         append-to-body
         custom-class="ibps-file-preview-dialog"
-        @close="closeDialog"
     >
-        <fView ref="fvView" :option-file="optionFile" :operation_status="operation_status" @hadLoadedFile="hadLoadedFile" />
+        <div @mousemove="startTimer" @mouseleave="pauseTimer">
+            <fView ref="fvView" :option-file="optionFile" :operation_status="operation_status" @hadLoadedFile="hadLoadedFile" />
+        </div>
     </el-dialog>
 </template>
 <script>
@@ -48,11 +49,11 @@ export default {
         fileInfos: {
             type: Object,
             default: () => {}
-        },
-        template: {
-            type: Object,
-            default: () => {}
         }
+        // template: {
+        //     type: Object,
+        //     default: () => {}
+        // }
     },
     data () {
         return {
@@ -64,14 +65,16 @@ export default {
             optionFile: {},
             tmpId: '',
             upFunc: () => {},
-            height: 0
+            height: 0,
+            out: false, // 记录鼠标是否离开过被监听的位置，未离开过则startTimer不启用
+            hadLoad: false
         }
     },
     watch: {
         fileInfos: {
             handler: function (val, oldVal) {
                 this.dialogVisible = this.visible
-                this.title = `《${val.FILE_NAME_}》文件培训`
+                this.title = `文件：《${val.FILE_NAME_}》`
                 this.tmpId = val.id
                 this.upFunc = val.func
                 const data = {
@@ -88,14 +91,20 @@ export default {
                 this.optionFile.fileType = data.ext // 类型
                 this.optionFile.data = data // 记录编制的位置，需要替换。
                 this.optionFile.data.index = data.index
-            },
-            immediate: true
+            }
         },
         browseTime: {
             handler: function (val, oldVal) {
-                this.title = `《${this.optionFile.title}》文件培训，查阅时长：${val}秒`
+                this.title = `文件：《 ${this.fileInfos.FILE_NAME_} 》，查阅时长：${val}秒`
             },
             immediate: true
+        },
+        dialogVisible: {
+            handler: function (val, oldVal) {
+                if (!val) {
+                    this.closeDialog()
+                }
+            }
         }
     },
     beforeDestroy () {
@@ -110,14 +119,18 @@ export default {
             const fvView = this.$refs.fvView
             // 销毁子组件方法
             fvView.destoryZiComponent()
-            this.upFunc(this.template, this.tmpId, this.browseTime)
+            this.upFunc(this.tmpId, this.browseTime)
             // 针对关闭窗口或者浏览器的
             if (this.clearTimeSet != null) {
                 clearInterval(this.clearTimeSet)
+                this.clearTimeSet = null
             }
+            this.out = false
+            this.browseTime = 0
         },
         hadLoadedFile (v) {
             this.setBrowseTime()
+            this.hadLoad = true
         },
         setBrowseTime () {
             // 设置定时器
@@ -127,6 +140,20 @@ export default {
         },
         getDialogHeightHeight () {
             return ((document.documentElement.clientHeight || document.body.clientHeight) - 60) + 'px'
+        },
+        startTimer () {
+            if (this.dialogVisible && this.hadLoad && this.out && this.clearTimeSet == null) {
+                this.clearTimeSet = setInterval(() => {
+                    this.browseTime++
+                }, 1000)
+            }
+        },
+        pauseTimer () {
+            if (this.dialogVisible) {
+                this.out = true
+                clearInterval(this.clearTimeSet)
+                this.clearTimeSet = null
+            }
         }
     }
 }

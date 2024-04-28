@@ -9,6 +9,7 @@
                 :options="treeOptions"
                 :contextmenus="treeContextmenus"
                 title="分类管理"
+                :category-key="categoryKey"
                 @action-event="handleTreeAction"
                 @node-click="handleNodeClick"
                 @expand-collapse="handleExpandCollapse"

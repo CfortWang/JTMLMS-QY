@@ -565,7 +565,7 @@ export default {
                     source: this.source
                 },
                 grid: {
-                // 让图表占'满容器
+                // 让图表占满容器
                     top: '50px',
                     left: '100px',
                     right: '80px',
@@ -586,12 +586,12 @@ export default {
                     axisLabel: {
                         textStyle: {
                             color: 'red',
-                            fontSize: '14'
+                            fontSize: '12'
                         },
                         formatter: function (params) {
                             var newParamsName = ''
                             var paramsNameNumber = params.length
-                            var provideNumber = 12 // 一行显示几个字
+                            var provideNumber = 15 // 一行显示几个字
                             var rowNumber = Math.ceil(paramsNameNumber / provideNumber)
                             if (paramsNameNumber > provideNumber) {
                                 for (var p = 0; p < rowNumber; p++) {
@@ -846,7 +846,7 @@ export default {
             const firstArr = []
             let secondArr = []
             arr.forEach((it) => {
-                if (firstArr.length === 0) {
+                if (firstArr.length == 0) {
                     secondArr.push('score')
                     secondArr.push('不符合项')
                     secondArr.push('product')
@@ -861,11 +861,11 @@ export default {
                     for (var i in firstArr) {
                         const a = firstArr[i][2]
                         const b = it.tiao_kuan_bian_ha
-                        if (firstArr[i][2] === it.tiao_kuan_bian_ha) {
+                        if (firstArr[i][2] == it.tiao_kuan_bian_ha) {
                             firstArr[i][0] = firstArr[i][0] + 1
                             firstArr[i][1] = firstArr[i][1] + 1
                             break
-                        } else if (i === firstArr.length - 1) {
+                        } else if (i == firstArr.length - 1) {
                             secondArr.push(1)
                             secondArr.push(1)
                             secondArr.push(it.tiao_kuan_bian_ha)
@@ -913,7 +913,7 @@ export default {
             arr.forEach((item, index) => {
                 let add = 0
                 for (var i = 0; i < arrr.length; i++) {
-                    if (item.ze_ren_shi_ === arrr[i].ze_ren_shi_) {
+                    if (item.ze_ren_shi_ == arrr[i].ze_ren_shi_) {
                         add++
                     }
                 }
@@ -923,7 +923,7 @@ export default {
                 obj = {}
                 this.loading = false
             })
-            type === 'CMA' ? (this.cmaPieData = newarr) : (this.cnasPieData = newarr)
+            type == 'CMA' ? (this.cmaPieData = newarr) : (this.cnasPieData = newarr)
             callBlack()
         },
         // 检查表编制完成数据
