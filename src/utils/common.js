@@ -9,7 +9,7 @@ import { getNextIdByAlias } from '@/api/platform/system/identity'
 import { save as sendMsg } from '@/api/platform/message/innerMessage'
 import { save as saveNews } from '@/api/platform/system/news'
 import { bpmTaskSave } from '@/api/platform/bpmn/bpmTask'
-import { onlyOfficeToPdf, generateUUID } from '@/api/platform/form/seal'
+import { onlyOfficeToPdf } from '@/api/platform/form/seal'
 import { downloadFile as download } from '@/business/platform/file/utils'
 import { removeFormData } from '@/api/platform/data/dataTemplate'
 // 引入工具类
@@ -171,7 +171,7 @@ export default {
     getDateNow,
     getFormatDate,
     onlyOfficeToPdf,
-    generateUUID,
+    generateUUID: Utils.guid,
     download,
     removeFormData,
     replaceNullWithEmpty,

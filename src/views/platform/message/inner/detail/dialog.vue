@@ -32,9 +32,7 @@
 </template>
 <script>
 import InnerMessage from './index'
-import {
-    generateUUID
-} from '@/api/platform/file/attachment'
+
 export default {
     components: { InnerMessage },
     props: {
@@ -160,7 +158,7 @@ export default {
                     }
                     if (!cont2.length) {
                         const tempObj = {
-                            id_: generateUUID(),
+                            id_: this.$utils.guid(),
                             parent_id_: this.tableId,
                             tong_zhi_bu_men_: position,
                             que_ren_qian_ming: JSON.stringify([{

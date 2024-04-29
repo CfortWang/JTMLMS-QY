@@ -2,6 +2,7 @@ import request from '@/utils/request'
 import { FORM_URL } from '@/api/baseUrl'
 import { BASE_SEAL_API } from '@/constant'
 import axios from 'axios'
+import Utils from '@/utils/util'
 
 const BASE_URL = process.env.VUE_APP_BASE_URL
 
@@ -76,7 +77,7 @@ export function seal (url, fileType, type) {
         // "ruleName": "6aqR57yd56ug6KeE5YiZLOmmlumhteeblueroA==",
         'ruleName': type,
         'provideSigFile': Base64.encode(url),
-        'fileKey': Base64.encode(generateUUID() + '.' + fileType)
+        'fileKey': Base64.encode(Utils.guid() + '.' + fileType)
     }
     return axios({
         url: `${BASE_URL}doSeal/`,
@@ -110,14 +111,3 @@ export function getSigPageUrl (sigFile) {
     const sigUrl = `${BASE_SEAL_API}manualSig/manualSigPage/?signKey=V1FTMjAyMTEyMjFkOTVjNWM=&signSecret=YWQwMmY3ZjQ4ZDJmMmYwNDA=&sigFile=${sigFile}`
     return sigUrl
 }
-
-export function generateUUID () {
-    var d = new Date().getTime()
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0
-        d = Math.floor(d / 16)
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
-    })
-    return uuid
-}
-
