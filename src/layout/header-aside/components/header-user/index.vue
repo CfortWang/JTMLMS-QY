@@ -2,6 +2,8 @@
     <div class="ibps-layout-header-user">
         <el-dropdown
             size="small"
+            trigger="click"
+            :hide-on-click="false"
             @command="command => handleControlItemClick(command)"
             @visible-change="visible =>dropdownVisible=visible"
         >
@@ -63,17 +65,42 @@
                     </div>
                     <!-- <div class="item">{{ locationName }}</div> -->
                     <el-tag class="item512" type="success">{{ locationName }}</el-tag>
-                    <template v-if="deptName.length">
+                    <template v-if="positions.length">
                         <div class="title512">
                             <i class="el-icon-office-building" />部门
+                            <el-tooltip
+                                effect="light"
+                                content="双击下方部门可切换主部门"
+                                placement="top"
+                                :enterable="true"
+                            >
+                                <ibps-icon name="help" style="color: #dd5b44;" />
+                            </el-tooltip>
+                            <!-- <el-button type="text" icon="el-icon-edit" size="mini" circle @click="changeMainposiVisible = true" /> -->
                         </div>
-                        <el-tag v-for="(item, index) in deptName" :key="Date.now() + Math.random() + index" class="item512" type="info" size="small">{{ item }}</el-tag>
+                        <div
+                            v-for="item in positions"
+                            :key="item.id"
+                            class="div512"
+                            @dblclick="handleMainChange(item)"
+                        >
+                            <el-tag
+                                class="item512"
+                                :type="item.isMainPost === 'Y' ? 'primary' : 'info'"
+                                size="small"
+                            >{{ item.name }}</el-tag>
+                        </div>
                     </template>
                     <template v-if="roleName.length">
                         <div class="title512">
                             <i class="el-icon-postcard" />岗位
                         </div>
-                        <el-tag v-for="(item, index) in roleName" :key="Date.now() + Math.random() + index" class="item512" type="warning">{{ item }}</el-tag>
+                        <el-tag
+                            v-for="(item, index) in roleName"
+                            :key="Date.now() + Math.random() + index"
+                            class="item512"
+                            type="warning"
+                        >{{ item }}</el-tag>
                     </template>
                 </el-dropdown-item>
             </el-dropdown-menu>
@@ -111,23 +138,25 @@ export default {
     },
     data () {
         const { first = '', second = '' } = this.$store.getters.level
-        const { userList = [], deptList = [], userId = '' } = this.$store.getters
+        const { userList = [], deptList = [], userId = '', mainPosition = {}, userInfo } = this.$store.getters || {}
         const t1 = deptList.find(i => i.positionId === first) || {}
         const t2 = deptList.find(i => i.positionId === second) || {}
         const locationName = second ? t1.positionName + t2.positionName : t1.positionName
         const t3 = userList.find(i => i.userId === userId) || {}
-        const deptName = t3.positions ? deptList.filter(i => t3.positions.includes(i.positionName)).map(i => i.positionName) : []
         const roleName = t3.roles ? t3.roles.split(',') : []
         return {
+            userList,
             locationName,
-            deptName,
             roleName,
+            positions: userInfo.positions || [],
+            mainPosition,
             tenants: this.$store.getters.tenants,
             tenantid: this.$store.getters.tenantid,
             dropdownVisible: false,
             changePasswordVisible: false,
             userInfoVisible: false,
-            formType: 'part'
+            formType: 'part',
+            changeMainposiVisible: false
         }
     },
     computed: {
@@ -225,33 +254,86 @@ export default {
             //  清除菜单
             this.$store.dispatch('ibps/menu/menusSet', null, { root: true })
             this.$router.replace('/tenantSelect')
+        },
+        handleMainChange (item) {
+            if (this.mainPosition && this.mainPosition.id === item.id) {
+                return
+            }
+            this.setMainPosition(this.mainPosition.id, item.id)
+        },
+        setMainPosition (oldId, newId) {
+            const { userId } = this.$store.getters || {}
+            const updateParams = {
+                tableName: 'ibps_party_rel',
+                updList: [
+                    {
+                        where: {
+                            biz_: 'mainPost',
+                            main_type_: 'position',
+                            sub_type_: 'employee',
+                            main_pid_: oldId,
+                            sub_pid_: userId
+                        },
+                        param: {
+                            main_pid_: newId
+                        }
+                    }
+                ]
+            }
+            this.$common.request('update', updateParams).then(() => {
+                this.$message.success('切换成功!')
+                location.reload()
+            })
         }
     }
 }
 </script>
 <style lang="scss" scoped>
-    // .ibps-layout-header-user {
-        .dropdown512 {
-            max-width: 150px;
-            max-height: 300px;
-            overflow-x: hidden;
-            overflow-y: auto;
-            line-height: 24px;
-            padding: 0 5px 0 15px;
-            &:hover {
-                background-color: #fff !important;
+    .ibps-layout-header-user {
+        ::v-deep {
+            .el-dialog__body {
+                display: flex;
+                justify-content: center;
+                padding: 20px 0 !important;
             }
-            .title512 {
-                line-height: 20px;
-                font-weight: 400;
-                color: #606266;
+            .el-dialog__footer {
+                text-align: center;
             }
-            .item512 {
-                font-size: 12px;
-                height: 20px;
-                line-height: 18px;
-                padding: 0px 4px;
+            .el-transfer-panel__filter .el-input__inner {
+                width: 90%;
+            }
+            .el-transfer-panel__filter {
+                margin: 10px 0;
+            }
+            .el-transfer-panel .el-checkbox__inner {
+                border-radius: 100%;
             }
         }
-    // }
+    }
+    .dropdown512 {
+        max-width: 150px;
+        max-height: 300px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        line-height: 24px;
+        padding: 0 5px 0 15px;
+        &:hover {
+            background-color: #fff !important;
+        }
+        .title512 {
+            line-height: 20px;
+            font-weight: 400;
+            color: #606266;
+        }
+        .div512 {
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .item512 {
+            font-size: 12px;
+            height: 20px;
+            line-height: 18px;
+            padding: 0px 4px;
+        }
+    }
 </style>

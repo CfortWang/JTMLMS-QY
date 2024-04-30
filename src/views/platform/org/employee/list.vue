@@ -278,9 +278,9 @@ export default {
                                 if (this.$store.getters.userId === rowData.id) {
                                     return true
                                 }
-                                if (!this.$store.getters.isSuper) {
-                                    return true
-                                }
+                                // if (!this.$store.getters.isSuper) {
+                                //     return true
+                                // }
                             }
                         },
                         {
@@ -296,9 +296,9 @@ export default {
                                 if (this.$store.getters.userId === rowData.id) {
                                     return true
                                 }
-                                if (!this.$store.getters.isSuper) {
-                                    return true
-                                }
+                                // if (!this.$store.getters.isSuper) {
+                                //     return true
+                                // }
                             }
                         },
                         {

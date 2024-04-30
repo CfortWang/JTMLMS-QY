@@ -32,7 +32,6 @@ export default {
     // =========== 子系统
     system: state => state.ibps.system.system, // 子系统
     systemid: state => state.ibps.system.system ? state.ibps.system.system.id : '', // 子系统id
-    pitchDept: state => state.ibps.param && state.ibps.param.pitchDept ? state.ibps.param.pitchDept : [], // 首页自选主部门
     permissions: state => state.ibps.menu.permissions, //  拥有的权限
     myform: state => state.ibps.myform ? state.ibps.myform : '',
     // 获取所有用户信息
