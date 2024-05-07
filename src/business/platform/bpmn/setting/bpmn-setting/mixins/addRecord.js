@@ -17,7 +17,7 @@ export default {
                 if (!data.length) {
                     return
                 }
-                const { bao_biao_lu_jing_, fu_jian_nei_rong_, shi_fou_zi_biao_, guan_lian_zi_duan, ti_jiao_kuai_zhao, bo_hui_kuai_zhao_ } = data[0]
+                const { bao_biao_lu_jing_, fu_jian_nei_rong_, shi_fou_zi_biao_, guan_lian_zi_duan, ti_jiao_kuai_zhao, bo_hui_kuai_zhao_, is_custom_ } = data[0]
                 Object.assign(this, {
                     bao_biao_lu_jing_,
                     fu_jian_nei_rong_,
@@ -25,7 +25,8 @@ export default {
                     guan_lian_zi_duan,
                     liu_cheng_xuan_ze: id,
                     ti_jiao_kuai_zhao,
-                    bo_hui_kuai_zhao_
+                    bo_hui_kuai_zhao_,
+                    is_custom_
                 })
             })
         },
@@ -49,6 +50,7 @@ export default {
                     shi_fou_zi_biao_: this.shi_fou_zi_biao_,
                     ti_jiao_kuai_zhao: this.ti_jiao_kuai_zhao,
                     bo_hui_kuai_zhao_: this.bo_hui_kuai_zhao_,
+                    is_custom_: this.is_custom_,
                     gui_dang_lei_xing: 'process'
                 }]
             }
@@ -72,7 +74,8 @@ export default {
                             guan_lian_zi_duan: this.guan_lian_zi_duan,
                             shi_fou_zi_biao_: this.shi_fou_zi_biao_,
                             ti_jiao_kuai_zhao: this.ti_jiao_kuai_zhao,
-                            bo_hui_kuai_zhao_: this.bo_hui_kuai_zhao_
+                            bo_hui_kuai_zhao_: this.bo_hui_kuai_zhao_,
+                            is_custom_: this.is_custom_
                         }
                     }
                 ]

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="data-template-def">
         <ibps-card-list
             ref="crud"
             :title="title"
@@ -52,27 +52,27 @@
             </template>
 
             <template slot="item-symbol" slot-scope="scope">
-                <template v-if="scope.data.type === 'default'">
-                    <i
-                        class="symbol-icon "
-                        :class="scope.data.showType === 'list'?'ibps-icon-table':(scope.data.showType === 'tree'?'ibps-icon-tree':'ibps-icon-puzzle-piece')"
-                    />
-                </template>
-                <template v-else-if="scope.data.type === 'dialog'">
-                    <span class="ibps-icon-stack symbol-icon " style="font-size:0.55em;">
-
-                        <i class="ibps-icon-window-maximize ibps-icon-stack-2x" />
+                <div :class="scope.data.typeId === 'custom' ? 'is-mark' : ''">
+                    <template v-if="scope.data.type === 'default'">
                         <i
-                            :class=" scope.data.showType === 'list'?'ibps-icon-table':(scope.data.showType === 'tree'?'ibps-icon-tree':'ibps-icon-puzzle-piece')"
-                            class="ibps-icon-stack-1x"
-                            style="top: 5px;"
+                            class="symbol-icon "
+                            :class="scope.data.showType === 'list'?'ibps-icon-table':(scope.data.showType === 'tree'?'ibps-icon-tree':'ibps-icon-puzzle-piece')"
                         />
-                    </span>
-                </template>
-                <template v-else>
-                    <i class="symbol-icon ibps-icon-database" />
-                </template>
-
+                    </template>
+                    <template v-else-if="scope.data.type === 'dialog'">
+                        <span class="ibps-icon-stack symbol-icon " style="font-size:0.55em;">
+                            <i class="ibps-icon-window-maximize ibps-icon-stack-2x" />
+                            <i
+                                :class=" scope.data.showType === 'list'?'ibps-icon-table':(scope.data.showType === 'tree'?'ibps-icon-tree':'ibps-icon-puzzle-piece')"
+                                class="ibps-icon-stack-1x"
+                                style="top: 5px;"
+                            />
+                        </span>
+                    </template>
+                    <template v-else>
+                        <i class="symbol-icon ibps-icon-database" />
+                    </template>
+                </div>
             </template>
         </ibps-card-list>
         <!-- 导入数据 -->
@@ -199,7 +199,24 @@ export default {
                     actions: [
                         { key: 'preview', label: '预览', icon: 'el-icon-view' },
                         { key: 'edit', label: '编辑', icon: 'ibps-icon-edit' },
-                        { key: 'remove', label: '删除', icon: 'ibps-icon-remove' }
+                        { key: 'remove', label: '删除', icon: 'ibps-icon-remove' },
+                        {
+                            key: 'mark',
+                            label: '标记定制',
+                            icon: 'ibps-icon-bookmark',
+                            divided: true,
+                            hidden: (row, index) => {
+                                return row.typeId === 'custom'
+                            }
+                        },
+                        {
+                            key: 'unmark',
+                            label: '取消定制',
+                            icon: 'ibps-icon-bookmark-o',
+                            hidden: (row, index) => {
+                                return row.typeId !== 'custom'
+                            }
+                        }
                     ]
                 }
             },
@@ -309,6 +326,12 @@ export default {
                 case 'copy':// 复制
                     this.handleCopy(data.id)
                     break
+                case 'mark':// 标记定制化
+                    this.handleMark(data.key, command)
+                    break
+                case 'unmark':// 取消标记定制化
+                    this.handleMark(data.key, command)
+                    break
             }
         },
         handleImport () {
@@ -367,7 +390,35 @@ export default {
             }).catch(() => {
                 // this.dialogLoading = false
             })
+        },
+        handleMark (dataTemplateKey, command) {
+            const updateParams = {
+                tableName: 'ibps_data_template_def',
+                updList: [
+                    {
+                        where: {
+                            key_: dataTemplateKey
+                        },
+                        param: {
+                            type_id_: command === 'mark' ? 'custom' : ''
+                        }
+                    }
+                ]
+            }
+            this.$common.request('update', updateParams).then(() => {
+                this.$message.success('操作成功！')
+                this.search()
+            })
         }
     }
 }
 </script>
+<style lang="scss" scoped>
+    .data-template-def {
+        .is-mark {
+            .symbol-icon i {
+                color: #ff4040 !important;
+            }
+        }
+    }
+</style>

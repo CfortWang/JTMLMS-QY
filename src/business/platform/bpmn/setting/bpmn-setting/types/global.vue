@@ -41,7 +41,7 @@
                     :data="variables"
                 />
             </el-collapse-item> -->
-            <el-collapse-item title="流程归档设置" name="varSetting">
+            <el-collapse-item title="流程设置" name="varSetting">
                 <div style="margin-left:5%;">
                     报表路径（以半角','分割）：<el-input v-model="bao_biao_lu_jing_" placeholder="报表路径" type="textarea" rows="5" />
                     附件字段名（多字段以半角','分割 多个数据表以'.'分割）：<el-input v-model="fu_jian_nei_rong_" placeholder="附件字段" />
@@ -57,6 +57,13 @@
                     是否生成驳回快照：
                     <el-switch
                         v-model="bo_hui_kuai_zhao_"
+                        active-value="是"
+                        inactive-value="否"
+                    />
+                    <br>
+                    是否定制化：
+                    <el-switch
+                        v-model="is_custom_"
                         active-value="是"
                         inactive-value="否"
                     />
@@ -100,7 +107,8 @@ export default {
             liu_cheng_xuan_ze: '',
             guan_lian_zi_duan: '',
             ti_jiao_kuai_zhao: '否',
-            bo_hui_kuai_zhao_: '否'
+            bo_hui_kuai_zhao_: '否',
+            is_custom_: '否'
         }
     },
     computed: {
