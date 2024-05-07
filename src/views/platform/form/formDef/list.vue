@@ -187,6 +187,7 @@ export default {
                             key: 'unmark',
                             label: '取消定制',
                             icon: 'ibps-icon-bookmark-o',
+                            divided: true,
                             hidden: (row, index) => {
                                 return row.typeId !== 'custom'
                             }
@@ -209,7 +210,6 @@ export default {
     methods: {
         // 加载数据
         loadData () {
-            console.log(this.getSearcFormData())
             this.loading = true
             queryPageList(this.getSearcFormData()).then(response => {
                 ActionUtils.handleListData(this, response.data)
@@ -279,11 +279,9 @@ export default {
             if (this.$refs.crud) {
                 selection = this.$refs.crud.getSelectedIds()
             }
-            console.log(buttonKey, position, selection, data)
             this.handleAction(buttonKey, position, selection, data)
         },
         handleAction (command, position, selection, data) {
-            console.log(command, position, selection, data)
             switch (command) {
                 case 'search':// 查询
                     ActionUtils.setFirstPagination(this.pagination)

@@ -213,6 +213,7 @@ export default {
                             key: 'unmark',
                             label: '取消定制',
                             icon: 'ibps-icon-bookmark-o',
+                            divided: true,
                             hidden: (row, index) => {
                                 return row.typeId !== 'custom'
                             }
