@@ -1,5 +1,5 @@
 
-export const officeType = ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx']
+export const officeType = ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv']
 export const pdfType = ['pdf']
 export const txtType = ['txt']
 export const imageType = ['jpg', 'jpeg', 'bmp', 'png', 'gif']

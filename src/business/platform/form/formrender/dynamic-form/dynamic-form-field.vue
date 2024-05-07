@@ -1256,10 +1256,10 @@ export default {
         padding-left: 0px;
     }
     .ibps-overflow {
-        white-space: pre-line;
+        white-space: pre-wrap;
     }
     .ibps-field-text {
-        white-space: pre-line;
+        white-space: pre-wrap;
         color: #000000;
         box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(0, 0, 0, 0.1), 0 1px 0px 0 rgba(0, 0, 0, 0.1);
         padding-left: 5px;
