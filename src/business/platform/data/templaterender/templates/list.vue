@@ -643,6 +643,7 @@ export default {
          * 记忆选择核心方法
          */
         changePageCoreRecordData () {
+            const pkKey = this.pkKey || 'id'
             // 如果是单选，则将总选择清空
             // 如果总记忆中还没有选择的数据，那么就直接取当前页选中的数据，不需要后面一系列计算
             if (this.$utils.isEmpty(this.selectionAll)) {
@@ -671,6 +672,11 @@ export default {
                     selectIds.push(pkValue)
                     // 如果总选择里面不包含当前页选中的数据，那么就加入到总选择集合里
                     if (selectAllIds.indexOf(pkValue) < 0) {
+                        selectionAll.push(row)
+                    } else {
+                        // 如果已经存在，那么就先剔除原本的数据，再把新的数据添加进去
+                        const filSelectionAll = selectionAll.filter(item => item[pkKey] !== pkValue)
+                        selectionAll = JSON.parse(JSON.stringify(filSelectionAll))
                         selectionAll.push(row)
                     }
                 })
