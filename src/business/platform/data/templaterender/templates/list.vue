@@ -643,84 +643,30 @@ export default {
          * 记忆选择核心方法
          */
         changePageCoreRecordData () {
-            const pkKey = this.pkKey || 'id'
-            // 如果是单选，则将总选择清空
-            // 如果总记忆中还没有选择的数据，那么就直接取当前页选中的数据，不需要后面一系列计算
-            if (this.$utils.isEmpty(this.selectionAll)) {
-                this.selectionAll = this.selection ? JSON.parse(JSON.stringify(this.selection)) : []
+            const defaultData = this.multiple ? [] : {}
+            // 单选或无已选时，总选中 = 选中
+            if (!this.multiple || this.$utils.isEmpty(this.selectionAll)) {
+                this.selectionAll = this.$utils.isEmpty(this.selection) ? defaultData : JSON.parse(JSON.stringify(this.selection))
                 return
             }
-            // 总选择里面的key集合
-            // 标识当前行的唯一键的名称
             const { listData } = this
-            // 总选择里面的key集合
-            const selectAllIds = this.getSelectAllIds()
-            let selectionAll = []
-            if (this.multiple) {
-                selectionAll = [].concat(this.selectionAll)
-            } else {
-                selectionAll.push(this.selectionAll)
+            // 获取所有选中key值
+            const allSelectId = this.getAllSelectId()
+            if (!this.$utils.isArray(this.selection)) {
+                this.selection = [this.selection]
             }
-            // 获取当前页选中的id
-            const selectIds = []
-            if (this.multiple) {
-                if (!this.$utils.isArray(this.selection)) {
-                    this.selection = [this.selection]
-                }
-                this.selection.forEach((row) => {
-                    const pkValue = this.getPkValue(row)
-                    selectIds.push(pkValue)
-                    // 如果总选择里面不包含当前页选中的数据，那么就加入到总选择集合里
-                    if (selectAllIds.indexOf(pkValue) < 0) {
-                        selectionAll.push(row)
-                    } else {
-                        // 如果已经存在，那么就先剔除原本的数据，再把新的数据添加进去
-                        const filSelectionAll = selectionAll.filter(item => item[pkKey] !== pkValue)
-                        selectionAll = JSON.parse(JSON.stringify(filSelectionAll))
-                        selectionAll.push(row)
-                    }
-                })
-            } else {
-                if (this.$utils.isNotEmpty(this.selection)) {
-                    const pkValue = this.getPkValue(this.selection)
-                    selectIds.push(pkValue)
-                    if (selectAllIds.indexOf(pkValue) < 0) {
-                        selectionAll = []
-                        selectionAll.push(this.selection)
-                    }
-                } else {
-                    if (this.$utils.isNotEmpty(this.selectionAll)) {
-                        const pkValue = this.getPkValue(this.selectionAll)
-                        selectIds.push(pkValue)
-                    }
-                }
-            }
-            const noSelectIds = []
-            // 得到当前页没有选中的id
-            listData.forEach((row) => {
-                const pkValue = this.getPkValue(row)
-                if (selectIds.indexOf(pkValue) < 0) {
-                    noSelectIds.push(pkValue)
+            const currentSelect = this.selection.map(item => this.getPkValue(item))
+            const unSelect = listData.filter(item => !currentSelect.includes(this.getPkValue(item)))
+            const unSelectId = unSelect.map(item => this.getPkValue(item))
+            // 加入选中数据
+            this.selection.forEach(item => {
+                const pkValue = this.getPkValue(item)
+                if (!allSelectId.includes(pkValue)) {
+                    this.selectionAll.push(item)
                 }
             })
-            noSelectIds.forEach((id) => {
-                if (selectAllIds.indexOf(id) >= 0) {
-                    for (let i = 0; i < selectionAll.length; i++) {
-                        const pkValue = this.getPkValue(selectionAll[i])
-                        if (pkValue === id) {
-                            // 如果总选择中有未被选中的，那么就删除这条
-                            selectionAll.splice(i, 1)
-                            break
-                        }
-                    }
-                }
-            })
-            if (this.multiple) {
-                this.selectionAll = selectionAll
-            } else {
-                this.selectionAll = selectionAll[0]
-            }
-            // this.selectionAll = selectionAll
+            // 去除当前页未选中数据
+            this.selectionAll = this.selectionAll.filter(item => !unSelectId.includes(this.getPkValue(item)))
         },
         setSelectRow () {
             setTimeout(() => {
@@ -744,10 +690,10 @@ export default {
                 return
             }
             const { listData } = this
-            const selectAllIds = this.getSelectAllIds()
+            const allSelectId = this.getAllSelectId()
             for (let i = 0; i < listData.length; i++) {
                 const row = listData[i]
-                if (selectAllIds.indexOf(this.getPkValue(row)) >= 0) {
+                if (allSelectId.indexOf(this.getPkValue(row)) >= 0) {
                     if (this.multiple) {
                         tableEl.toggleSelectionRow(row, true)
                     } else {
@@ -759,19 +705,14 @@ export default {
         /**
          * 获取选择的ID
          */
-        getSelectAllIds () {
-            const selectAllIds = []
+        getAllSelectId () {
             if (this.$utils.isEmpty(this.selectionAll)) {
-                return
+                return []
             }
             if (this.multiple) {
-                this.selectionAll.forEach((row) => {
-                    selectAllIds.push(this.getPkValue(row))
-                })
-            } else {
-                selectAllIds.push(this.getPkValue(this.selectionAll))
+                return this.selectionAll.map(item => this.getPkValue(item))
             }
-            return selectAllIds
+            return [this.getPkValue(this.selectionAll)]
         },
         /**
          * 根据key获取对象的值
@@ -1144,7 +1085,7 @@ export default {
                         break
                     case 'exportSelected': // 导出选中
 
-                        ActionUtils.selectedMultiRecord(this.getSelectAllIds()).then((ids) => {
+                        ActionUtils.selectedMultiRecord(this.getAllSelectId()).then((ids) => {
                             this.selecteds = ids
                             this.exportActions(buttonType, ids)
                         }).catch(() => {})
