@@ -417,7 +417,7 @@ export default {
 <style lang="scss" scoped>
     .data-template-def {
         .is-mark {
-            .symbol-icon i {
+            .symbol-icon, i {
                 color: #ff4040 !important;
             }
         }
