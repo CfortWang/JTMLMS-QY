@@ -1,31 +1,105 @@
 <template>
     <div class="info-container">
-        <div class="design info-item">
+        <div class="conclusion info-item">
             <div class="title">
                 <i class="ibps-icon-star" />
                 <span>实验结论</span>
             </div>
-            <div class="desc">
-                最好选择2-3个代表研究项目医学决定水平浓度的低值和高值实验样本，分别做批间和日间重复测定。批内评价，将样品随机插入到病人样品中检测，连续做20次，计算批内精密度；在批内精密度符合要求的情况下，进行日间精密度实验，日间是每天做一次评价样品，连续做20次，确定日间精密度是否可以接受。
+            <div class="form-container">
+                <el-row :gutter="20" class="form-row">
+                    <el-col :span="12">
+                        <el-form-item label="审核人" prop="jieLunShenHeRen" :show-message="false">
+                            <el-select
+                                v-model="pageInfo.jieLunShenHeRen"
+                                filterable
+                                clearable
+                                :disabled="readonly"
+                                placeholder="请选择"
+                            >
+                                <el-option
+                                    v-for="item in userList"
+                                    :key="item.userId"
+                                    :label="item.userName"
+                                    :value="item.userId"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="报告时间" prop="baoGaoShiJian" :show-message="false">
+                            <el-date-picker
+                                v-model="pageInfo.baoGaoShiJian"
+                                type="datetime"
+                                clearable
+                                align="right"
+                                :default-value="new Date()"
+                                value-format="yyyy-MM-dd HH:mm"
+                                format="yyyy-MM-dd HH:mm"
+                                class="date-picker"
+                                disabled
+                            />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="form-row">
+                    <el-col :span="24">
+                        <el-form-item label="结论" prop="shiYanJieLun" :show-message="false">
+                            <el-input
+                                v-model="pageInfo.shiYanJieLun"
+                                type="textarea"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="form-row">
+                    <el-col :span="24">
+                        <el-form-item label="实验附件" prop="fuJian" :show-message="false">
+                            <ibps-attachment
+                                v-model="pageInfo.fuJian"
+                                allow-download
+                                download
+                                multiple
+                                accept="*"
+                                store="id"
+                            />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
             </div>
         </div>
     </div>
 </template>
 <script>
 export default {
+    components: {
+        IbpsAttachment: () => import('@/business/platform/file/attachment/selector')
+    },
     props: {
         info: {
             type: Object,
             default: () => {}
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
+        const { userList = [] } = this.$store.getters || {}
         return {
-            pageInfo: this.info
+            userList,
+            pageInfo: null
         }
     },
-    computed: {
-
+    watch: {
+        info: {
+            handler (val) {
+                this.pageInfo = val
+            },
+            immediate: true,
+        }
     },
     created () {
     }
@@ -34,7 +108,28 @@ export default {
 <style lang="scss" scoped>
     .info-container {
         .info-item {
-            
+            .form-container {
+                padding: 10px;
+                background: #f5f5f5;
+                border: 1px solid #e6e6e6;
+                border-radius: 4px;
+                overflow: hidden;
+                .form-row {
+                    padding: 5px 0;
+                    border-top: 1px solid #e6e6e6;
+                    &:first-child {
+                        border-top: none;
+                        padding-top: 0;
+                    }
+                    &:last-child {
+                        padding-bottom: 0;
+                    }
+                }
+            }
+        }
+        .conclusion .form-container {
+            max-height: 300px;
+            overflow-y: auto;
         }
     }
 </style>

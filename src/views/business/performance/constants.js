@@ -130,6 +130,16 @@ export const formRules = {
         required: true,
         message: '请选择',
         trigger: 'blur'
+    }],
+    jieLunShenHeRen: [{
+        required: true,
+        message: '请选择',
+        trigger: 'blur'
+    }],
+    shiYanJieLun: [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
     }]
 }
 

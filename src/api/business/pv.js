@@ -96,3 +96,39 @@ export function removeReagent (data) {
         data
     })
 }
+
+/**
+ * 导出数据模板
+ * @param {*} params
+ */
+export function exportTemplate (params) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/pv/exportExcelTemplate',
+        responseType: 'arraybuffer',
+        method: 'post',
+        params
+    })
+}
+
+/**
+ * 导入实验数据
+ * @param {*} params
+ */
+export function importTemplate (data) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/pv/importExcelRecord',
+        method: 'post',
+        data
+    })
+}
+/**
+ * 导出数据报告
+ * @param {*} params
+ */
+export function exportReport (data) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/pv/exportExcelReport',
+        method: 'post',
+        data
+    })
+}

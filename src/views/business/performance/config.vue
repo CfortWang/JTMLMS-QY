@@ -107,7 +107,7 @@ export default {
                     model: []
                 },
                 shiYanShuJu: {},
-                shiYanJieLun: {}
+                shiYanJieLun: ''
             },
             rules: formRules,
             loading: false,
@@ -191,8 +191,7 @@ export default {
             const submitData = {
                 ...this.form,
                 shiYanCanShu: JSON.stringify(this.form.shiYanCanShu),
-                shiYanShuJu: JSON.stringify(this.form.shiYanShuJu),
-                shiYanJieLun: JSON.stringify(this.form.shiYanJieLun)
+                shiYanShuJu: JSON.stringify(this.form.shiYanShuJu)
             }
             // 提交数据
             saveExperimental(submitData).then(res => {
@@ -216,9 +215,6 @@ export default {
         },
         handleUpdateData (value) {
             this.form.shiYanShuJu = value
-        },
-        handleUpdateResult (value) {
-            this.form.shiYanJieLun = value
         },
         handleTest () {
             const o = {
@@ -272,7 +268,7 @@ export default {
                     dailyCVSValue: 3.33
                 },
                 shiYanShuJu: null,
-                shiYanJieLun: null
+                shiYanJieLun: '测试达标'
             }
             this.form = JSON.parse(JSON.stringify(o))
         }
@@ -294,9 +290,6 @@ export default {
                 line-height: 24px;
                 font-size: 18px;
                 color: #303133;
-            }
-            .operate {
-
             }
         }
         .config-form {
@@ -353,6 +346,9 @@ export default {
                             .el-table th.el-table__cell > .cell, .el-table td.el-table__cell {
                                 color: #606266;
                                 font-size: 14px;
+                            }
+                            .el-button--mini {
+                                padding: 5px 12px;
                             }
                         }
                     }

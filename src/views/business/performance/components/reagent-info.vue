@@ -28,7 +28,7 @@
                     stripe
                     highlight-current-row
                     style="width: 100%"
-                    max-height="400px"
+                    max-height="250px"
                     class="reagent-table"
                     @selection-change="handleSelectionChange"
                 >
@@ -82,8 +82,8 @@ export default {
             selectionIndex: '',
             rowData: {},
             toolbars: [
-                { key: 'export', icon: 'ibps-icon-sign-out', label: '导出', type: 'info', hidden: this.readonly },
-                { key: 'import', icon: 'ibps-icon-sign-in', label: '导入', type: 'warning', hidden: this.readonly },
+                { key: 'export', icon: 'ibps-icon-cloud-download', label: '导出', type: 'info', hidden: this.readonly },
+                { key: 'import', icon: 'ibps-icon-cloud-upload', label: '导入', type: 'warning', hidden: this.readonly },
                 { key: 'create', icon: 'ibps-icon-plus', label: '添加', type: 'success', hidden: this.readonly },
                 // { key: 'edit', icon: 'ibps-icon-edit', label: '编辑', type: 'primary', hidden: this.readonly },
                 { key: 'remove', icon: 'ibps-icon-trash', label: '删除', type: 'danger', hidden: this.readonly }
