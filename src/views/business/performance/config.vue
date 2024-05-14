@@ -227,10 +227,33 @@ export default {
                                 }
                             }
                             .desc {
-                                color: #666;
+                                color: #606266;
                                 font-size: 14px;
                                 line-height: 1.5;
                                 text-indent: 2em;
+                            }
+                            .el-form-item {
+                                margin-bottom: 0 !important;
+                                .el-form-item__label {
+                                    font-size: 14px !important;
+                                    color: #606266;
+                                }
+                                .el-form-item__content {
+                                    .el-input, .el-select, .el-input-number {
+                                        width: 100%;
+                                    }
+                                    .el-textarea .el-input__count {
+                                        padding: 0 5px;
+                                        line-height: initial;
+                                    }
+                                    .el-radio, .el-checkbox {
+                                        margin-right: 10px;
+                                    }
+                                }
+                            }
+                            .el-table th.el-table__cell > .cell, .el-table td.el-table__cell {
+                                color: #606266;
+                                font-size: 14px;
                             }
                         }
                     }

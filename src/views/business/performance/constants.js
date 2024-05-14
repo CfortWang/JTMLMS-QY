@@ -138,6 +138,34 @@ export const formRules = {
     }]
 }
 
+export const reagentFormRules = {
+    leiBie: [{
+        required: true,
+        message: '请选择类别',
+        trigger: 'change'
+    }],
+    shiJiMingCheng: [{
+        required: true,
+        message: '请输入试剂名称',
+        trigger: 'blur'
+    }],
+    piHao: [{
+        required: true,
+        message: '请输入试剂批号',
+        trigger: 'blur'
+    }],
+    changJia: [{
+        required: true,
+        message: '请输入试剂厂家',
+        trigger: 'blur'
+    }],
+    youXiaoQi: [{
+        required: true,
+        message: '请选择试剂有效期',
+        trigger: 'change'
+    }]
+}
+
 export const reagentType = [
     {
         value: '质控品',
