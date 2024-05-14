@@ -15,7 +15,7 @@
         <el-form
             ref="form"
             :label-width="formLabelWidth"
-            :model="form"
+            :model.sync="form"
             :rules="rules"
             class="config-form"
             :class="readonly ? 'readonly-form' : ''"
@@ -23,10 +23,10 @@
         >
             <div class="config-form-container">
                 <div class="left">
-                    <experimental-desc :info="form" :readonly="readonly" />
-                    <basic-info :info="form" :readonly="readonly" />
-                    <reagent-info :info="form" :readonly="readonly" />
-                    <param-info :info="form" :readonly="readonly" />
+                    <experimental-desc :info.sync="form" :readonly="readonly" />
+                    <basic-info :info.sync="form" :readonly="readonly" />
+                    <reagent-info :info.sync="form.reagentPoList" :readonly="readonly" />
+                    <param-info :info.sync="form.shiYanCanShu" :readonly="readonly" @updateParams="handleUpdateParams" />
                 </div>
                 <div class="right">
                     <experimental-data :info="form" :readonly="readonly" />
@@ -57,6 +57,7 @@
 <script>
 import { round } from 'lodash'
 import { formRules } from './constants'
+import { saveExperimental } from '@/api/business/pv'
 export default {
     components: {
         ExperimentalDesc: () => import('./components/experimental-desc'),
@@ -88,24 +89,30 @@ export default {
             dialogVisible: this.visible,
             formLabelWidth: '110px',
             form: {
-                dept: '',
-                projectName: '',
-                method: '',
-                sample: '',
-                deviceName: '',
-                deviceNo: '',
-                startTime: '',
-                endTime: '',
-                operator: '',
-                rater: '',
-                resultUnit: '',
-                resultValue: '',
-                decimalPlaces: 2,
-                remark: ''
+                bianZhiBuMen: '',
+                shiYanXiangMu: '',
+                shiYanFangFa: '',
+                yangBenLeiXing: '',
+                shiYanYiQi: '',
+                yiQiBianHao: '',
+                kaiShiShiJian: '',
+                jieShuShiJian: '',
+                bianZhiRen: '',
+                createBy: userId,
+                jieGuoDanWei: '',
+                baoLiuXiaoShu: 2,
+                beiZhu: '',
+                reagentPoList: [],
+                shiYanCanShu: {
+                    model: []
+                },
+                shiYanShuJu: {},
+                shiYanJieLun: {}
             },
             rules: formRules,
             loading: false,
             toolbars: [
+                { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning' },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'info', hidden: this.readonly },
                 { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
@@ -149,33 +156,125 @@ export default {
                 case 'cancel':
                     this.handleCancel()
                     break
+                case 'test':
+                    this.handleTest()
+                    break
                 default:
                     break
             }
         },
-        handleSave () {
-            this.$confirm('123123', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning',
-                showClose: false,
-                closeOnClickModal: false,
-                closeOnPressEscape: false
-            }).then(() => {
-                this.submitForm()
+        handleSave (key) {
+            this.$refs.form.validate((valid) => {
+                if (!valid) {
+                    return this.$message.warning('请完善表单必填项信息！')
+                }
+                if (key === 'save') {
+                    this.submitForm(key)
+                } else {
+                    this.$confirm('确定要提交数据吗？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false
+                    }).then(() => {
+                        this.submitForm(key)
+                    })
+                }
             })
         },
         handleGenerate () {
-            console.log('handleGenerate')
+            this.$message.info('waiting...')
         },
-        submitForm (data) {
-
+        submitForm (key) {
+            const submitData = {
+                ...this.form,
+                shiYanCanShu: JSON.stringify(this.form.shiYanCanShu),
+                shiYanShuJu: JSON.stringify(this.form.shiYanShuJu),
+                shiYanJieLun: JSON.stringify(this.form.shiYanJieLun)
+            }
+            // 提交数据
+            saveExperimental(submitData).then(res => {
+                console.log(res)
+                if (key === 'save') {
+                    this.$message.success('保存成功')
+                } else {
+                    this.$message.success('提交成功')
+                    this.closeDialog()
+                }
+            })
         },
         handleCancel () {
             this.closeDialog()
         },
         closeDialog () {
             this.$emit('update:visible', false)
+        },
+        handleUpdateParams (value) {
+            this.form.shiYanCanShu = value
+        },
+        handleUpdateData (value) {
+            this.form.shiYanShuJu = value
+        },
+        handleUpdateResult (value) {
+            this.form.shiYanJieLun = value
+        },
+        handleTest () {
+            const o = {
+                bianZhiBuMen: '1166703356459089920',
+                shiYanXiangMu: '测试项目',
+                shiYanFangFa: '测试方法',
+                yangBenLeiXing: '测试样本类型',
+                shiYanYiQi: '测试实验仪器',
+                yiQiBianHao: 'jyk-test-001',
+                kaiShiShiJian: '2024-05-01 09:00',
+                jieShuShiJian: '2024-05-05 17:00',
+                bianZhiRen: '1166772479054577664',
+                createBy: '1166771426615623680',
+                jieGuoDanWei: 'mmol/L',
+                baoLiuXiaoShu: 2,
+                beiZhu: '测试数据',
+                reagentPoList: [
+                    {
+                        changJia: 'BIO-RIO',
+                        leiBie: '质控品',
+                        piHao: 'test001',
+                        shiJiMingCheng: '生化质控品',
+                        youXiaoQi: '2025-05-01'
+                    },
+                    {
+                        changJia: 'BIO-RIO',
+                        leiBie: '校准品',
+                        piHao: 'test002',
+                        shiJiMingCheng: '生化校准品',
+                        youXiaoQi: '2025-06-01'
+                    },
+                    {
+                        changJia: 'BIO-RIO',
+                        leiBie: '标准物',
+                        piHao: 'test001',
+                        shiJiMingCheng: '标准物',
+                        youXiaoQi: '2025-05-01'
+                    }
+                ],
+                shiYanCanShu: {
+                    sampleCount: 2,
+                    resultCount: 10,
+                    model: ['总不精密度'],
+                    range: '无',
+                    standard: '允许总误差Tea',
+                    remark: '',
+                    tea: 10,
+                    batchCVS: '0.25',
+                    batchCVSValue: 2.50,
+                    dailyCVS: '0.33',
+                    dailyCVSValue: 3.33
+                },
+                shiYanShuJu: null,
+                shiYanJieLun: null
+            }
+            this.form = JSON.parse(JSON.stringify(o))
         }
     }
 }

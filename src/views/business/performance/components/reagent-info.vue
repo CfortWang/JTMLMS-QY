@@ -67,8 +67,8 @@ export default {
     },
     props: {
         info: {
-            type: Object,
-            default: () => {}
+            type: Array,
+            default: () => []
         },
         readonly: {
             type: Boolean,
@@ -77,11 +77,10 @@ export default {
     },
     data () {
         return {
-            pageInfo: this.info,
+            reagentData: [],
             showReagent: false,
             selectionIndex: '',
             rowData: {},
-            reagentData: [],
             toolbars: [
                 { key: 'export', icon: 'ibps-icon-sign-out', label: '导出', type: 'info', hidden: this.readonly },
                 { key: 'import', icon: 'ibps-icon-sign-in', label: '导入', type: 'warning', hidden: this.readonly },
@@ -91,8 +90,14 @@ export default {
             ]
         }
     },
-    computed: {
-
+    watch: {
+        info: {
+            handler (val) {
+                this.reagentData = val || []
+            },
+            immediate: true,
+            deep: true
+        }
     },
     mounted () {
 

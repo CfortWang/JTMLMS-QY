@@ -8,9 +8,9 @@
             <div class="form-container">
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="部门" prop="dept" :show-message="false">
+                        <el-form-item label="部门" prop="bianZhiBuMen" :show-message="false">
                             <el-select
-                                v-model="pageInfo.dept"
+                                v-model="pageInfo.bianZhiBuMen"
                                 filterable
                                 clearable
                                 :disabled="readonly"
@@ -26,9 +26,9 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="实验项目" prop="projectName" :show-message="false">
+                        <el-form-item label="实验项目" prop="shiYanXiangMu" :show-message="false">
                             <el-input
-                                v-model="pageInfo.projectName"
+                                v-model="pageInfo.shiYanXiangMu"
                                 type="text"
                                 clearable
                                 show-word-limit
@@ -41,9 +41,9 @@
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="实验方法" prop="method" :show-message="false">
+                        <el-form-item label="实验方法" prop="shiYanFangFa" :show-message="false">
                             <el-input
-                                v-model="pageInfo.method"
+                                v-model="pageInfo.shiYanFangFa"
                                 type="text"
                                 clearable
                                 show-word-limit
@@ -54,9 +54,9 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="样本类型" prop="sample" :show-message="false">
+                        <el-form-item label="样本类型" prop="yangBenLeiXing" :show-message="false">
                             <el-input
-                                v-model="pageInfo.sample"
+                                v-model="pageInfo.yangBenLeiXing"
                                 type="text"
                                 clearable
                                 show-word-limit
@@ -69,9 +69,9 @@
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="实验仪器" prop="deviceName" :show-message="false">
+                        <el-form-item label="实验仪器" prop="shiYanYiQi" :show-message="false">
                             <el-input
-                                v-model="pageInfo.deviceName"
+                                v-model="pageInfo.shiYanYiQi"
                                 type="text"
                                 clearable
                                 show-word-limit
@@ -82,9 +82,9 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="仪器编号" prop="deviceNo" :show-message="false">
+                        <el-form-item label="仪器编号" prop="yiQiBianHao" :show-message="false">
                             <el-input
-                                v-model="pageInfo.deviceNo"
+                                v-model="pageInfo.yiQiBianHao"
                                 type="text"
                                 clearable
                                 show-word-limit
@@ -97,13 +97,14 @@
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="开始时间" prop="startTime" :show-message="false">
+                        <el-form-item label="开始时间" prop="kaiShiShiJian" :show-message="false">
                             <el-date-picker
-                                v-model="pageInfo.startTime"
+                                v-model="pageInfo.kaiShiShiJian"
                                 type="datetime"
                                 clearable
                                 align="right"
-                                default-time="9:00:00"
+                                value-format="yyyy-MM-dd HH:mm"
+                                format="yyyy-MM-dd HH:mm"
                                 class="date-picker"
                                 :picker-options="startPickerOptions"
                                 placeholder="请选择实验开始时间"
@@ -111,13 +112,14 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="结束时间" prop="endTime" :show-message="false">
+                        <el-form-item label="结束时间" prop="jieShuShiJian" :show-message="false">
                             <el-date-picker
-                                v-model="pageInfo.endTime"
+                                v-model="pageInfo.jieShuShiJian"
                                 type="datetime"
                                 clearable
                                 align="right"
-                                default-time="17:00:00"
+                                value-format="yyyy-MM-dd HH:mm"
+                                format="yyyy-MM-dd HH:mm"
                                 class="date-picker"
                                 :picker-options="endPickerOptions"
                                 placeholder="请选择实验结束时间"
@@ -127,9 +129,9 @@
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="实验操作者" prop="operator" :show-message="false">
+                        <el-form-item label="实验操作者" prop="bianZhiRen" :show-message="false">
                             <el-select
-                                v-model="pageInfo.operator"
+                                v-model="pageInfo.bianZhiRen"
                                 filterable
                                 clearable
                                 :disabled="readonly"
@@ -145,9 +147,9 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="评价创建者" prop="rater" :show-message="false">
+                        <el-form-item label="评价创建者" prop="createBy" :show-message="false">
                             <el-select
-                                v-model="pageInfo.rater"
+                                v-model="pageInfo.createBy"
                                 filterable
                                 clearable
                                 :disabled="readonly"
@@ -165,9 +167,9 @@
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="结果单位" prop="resultUnit" :show-message="false">
+                        <el-form-item label="结果单位" prop="jieGuoDanWei" :show-message="false">
                             <el-input
-                                v-model="pageInfo.resultUnit"
+                                v-model="pageInfo.jieGuoDanWei"
                                 type="text"
                                 clearable
                                 show-word-limit
@@ -178,9 +180,9 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="保留小数位" prop="decimalPlaces" :show-message="false">
+                        <el-form-item label="保留小数位" prop="baoLiuXiaoShu" :show-message="false">
                             <el-input-number
-                                v-model="pageInfo.decimalPlaces"
+                                v-model="pageInfo.baoLiuXiaoShu"
                                 type="number"
                                 :min="1"
                                 :max="4"
@@ -193,9 +195,9 @@
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="24">
-                        <el-form-item label="备注" prop="remark" :show-message="false">
+                        <el-form-item label="备注" prop="beiZhu" :show-message="false">
                             <el-input
-                                v-model="pageInfo.remark"
+                                v-model="pageInfo.beiZhu"
                                 type="textarea"
                                 clearable
                                 show-word-limit
@@ -233,28 +235,41 @@ export default {
             pageInfo: this.info,
             startPickerOptions: {
                 disabledDate (time) {
+                    const t = new Date(time)
                     // 禁用结束日期之后日期
-                    if (that.info.endTime) {
-                        return time.getTime() > that.info.endTime.getTime()
+                    if (that.info.jieShuShiJian) {
+                        const end = new Date(that.info.jieShuShiJian)
+                        return t.getTime() > end.getTime()
                     }
-                    return false
+                    return t.getTime() >= Date.now()
                 }
             },
             endPickerOptions: {
                 disabledDate (time) {
+                    const t = new Date(time)
                     // 禁用当前日期之后和开始日期之前的日期
-                    if (that.info.startTime) {
-                        return time.getTime() < that.info.startTime.getTime() || time.getTime() >= Date.now()
+                    if (that.info.kaiShiShiJian) {
+                        const start = new Date(that.info.kaiShiShiJian)
+                        return t.getTime() < start.getTime() || t.getTime() >= Date.now()
                     }
-                    return time.getTime() >= Date.now()
+                    return t.getTime() >= Date.now()
                 }
             }
         }
     },
-    computed: {
-
+    watch: {
+        info: {
+            handler (val) {
+                this.pageInfo = val || {}
+            },
+            immediate: true,
+            deep: true
+        }
     },
     created () {
+    },
+    methods: {
+
     }
 }
 </script>

@@ -46,92 +46,87 @@ export const performanceList = [
 ]
 
 export const formRules = {
-    dept: [{
+    bianZhiBuMen: [{
         required: true,
         message: '请选择部门',
         trigger: 'change'
     }],
-    projectName: [{
+    shiYanXiangMu: [{
         required: true,
         message: '请选择实验项目',
         trigger: 'change'
     }],
-    method: [{
+    shiYanFangFa: [{
         required: true,
         message: '请选择实验方法',
         trigger: 'change'
     }],
-    sample: [{
+    yangBenLeiXing: [{
         required: true,
         message: '请选择样品',
         trigger: 'change'
     }],
-    deviceName: [{
+    shiYanYiQi: [{
         required: true,
         message: '请选择设备',
         trigger: 'change'
     }],
-    deviceNo: [{
+    yiQiBianHao: [{
         required: true,
         message: '请输入设备编号',
         trigger: 'blur'
     }],
-    startTime: [{
+    kaiShiShiJian: [{
         required: true,
         message: '请选择实验开始时间',
         trigger: 'change'
     }],
-    endTime: [{
+    jieShuShiJian: [{
         required: true,
         message: '请选择实验结束时间',
         trigger: 'change'
     }],
-    operator: [{
+    bianZhiRen: [{
         required: true,
         message: '请选择操作员',
         trigger: 'change'
     }],
-    rater: [{
+    createBy: [{
         required: true,
         message: '请选择评价人',
         trigger: 'change'
     }],
-    resultUnit: [{
+    jieGuoDanWei: [{
         required: true,
         message: '请选择结果单位',
         trigger: 'change'
     }],
-    resultValue: [{
-        required: true,
-        message: '请输入结果值',
-        trigger: 'blur'
-    }],
-    decimalPlaces: [{
+    baoLiuXiaoShu: [{
         required: true,
         message: '请选择小数位数',
         trigger: 'blur'
     }],
-    sampleCount: [{
+    'shiYanCanShu.sampleCount': [{
         required: true,
         message: '请输入',
         trigger: 'change'
     }],
-    resultCount: [{
+    'shiYanCanShu.resultCount': [{
         required: true,
         message: '请输入',
         trigger: 'change'
     }],
-    model: [{
+    'shiYanCanShu.model': [{
         required: true,
         message: '请选择',
         trigger: 'change'
     }],
-    range: [{
+    'shiYanCanShu.range': [{
         required: true,
         message: '请输入',
         trigger: 'change'
     }],
-    standard: [{
+    'shiYanCanShu.standard': [{
         required: true,
         message: '请选择',
         trigger: 'blur'
@@ -197,5 +192,24 @@ export const standardOption = [
     {
         value: '生物学变异参数',
         label: '基于生物学变异'
+    }
+]
+
+export const batchOption = [
+    {
+        value: 0.5,
+        label: '1/2TEa'
+    },
+    {
+        value: 0.33,
+        label: '1/3TEa'
+    },
+    {
+        value: 0.25,
+        label: '1/4TEa'
+    },
+    {
+        value: 0.2,
+        label: '1/5TEa'
     }
 ]

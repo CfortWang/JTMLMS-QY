@@ -8,7 +8,7 @@
             <div class="form-container">
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="浓度水平数" prop="sampleCount" :show-message="false">
+                        <el-form-item label="浓度水平数" prop="shiYanCanShu.sampleCount" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.sampleCount"
                                 type="number"
@@ -21,7 +21,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="测定结果数" prop="resultCount" :show-message="false">
+                        <el-form-item label="测定结果数" prop="shiYanCanShu.resultCount" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.resultCount"
                                 type="number"
@@ -36,7 +36,7 @@
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="精密度模型" prop="model" :show-message="false">
+                        <el-form-item label="精密度模型" prop="shiYanCanShu.model" :show-message="false">
                             <el-checkbox-group v-model="pageInfo.model">
                                 <el-checkbox label="批内不精密度">批内不精密度</el-checkbox>
                                 <el-checkbox label="总不精密度">总不精密度</el-checkbox>
@@ -44,7 +44,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="频数目标范围" prop="range" :show-message="false">
+                        <el-form-item label="频数目标范围" prop="shiYanCanShu.range" :show-message="false">
                             <el-select
                                 v-model="pageInfo.range"
                                 filterable
@@ -62,31 +62,97 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="form-row">
-                    <el-col :span="24">
-                        <el-form-item label="性能标准" prop="standard" :show-message="false">
-                            <el-radio-group v-model="pageInfo.standard">
-                                <el-radio
+                    <el-col :span="12">
+                        <el-form-item label="性能标准" prop="shiYanCanShu.standard" :show-message="false">
+                            <el-select
+                                v-model="pageInfo.standard"
+                                filterable
+                                clearable
+                                :disabled="readonly"
+                                placeholder="请选择"
+                            >
+                                <el-option
                                     v-for="(item, index) in standardOption"
                                     :key="index"
-                                    :label="item.value"
-                                >{{ item.label }}</el-radio>
-                            </el-radio-group>
+                                    :label="item.label"
+                                    :value="item.value"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="TEa数值" prop="tea" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.tea"
+                                type="number"
+                                :min="0"
+                                :precision="2"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="form-row">
-                    <el-col :span="24">
-                        <el-form-item :label="pageInfo.standard" prop="param1" :show-message="false">
-                            <el-input
-                                v-model="pageInfo.remark"
-                                type="textarea"
+                    <el-col :span="12">
+                        <el-form-item label="批内CVs" prop="batchCVS" :show-message="false">
+                            <el-select
+                                v-model="pageInfo.batchCVS"
+                                filterable
                                 clearable
-                                show-word-limit
-                                :maxlength="512"
-                                :rows="1"
-                                :autosize="readonly"
                                 :disabled="readonly"
-                                placeholder=""
+                                placeholder="请选择"
+                            >
+                                <el-option
+                                    v-for="(item, index) in batchOption"
+                                    :key="index"
+                                    :label="item.label"
+                                    :value="item.value"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="数值" prop="batchCVSValue" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.batchCVSValue"
+                                type="number"
+                                :min="0"
+                                :precision="2"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="form-row">
+                    <el-col :span="12">
+                        <el-form-item label="日间CVs" prop="dailyCVS" :show-message="false">
+                            <el-select
+                                v-model="pageInfo.dailyCVS"
+                                filterable
+                                clearable
+                                :disabled="readonly"
+                                placeholder="请选择"
+                            >
+                                <el-option
+                                    v-for="(item, index) in batchOption"
+                                    :key="index"
+                                    :label="item.label"
+                                    :value="item.value"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="数值" prop="dailyCVSValue" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.dailyCVSValue"
+                                type="number"
+                                :min="0"
+                                :precision="2"
+                                :disabled="readonly"
+                                placeholder="请输入"
                             />
                         </el-form-item>
                     </el-col>
@@ -96,7 +162,7 @@
     </div>
 </template>
 <script>
-import { standardOption } from '../constants'
+import { standardOption, batchOption } from '../constants'
 export default {
     props: {
         info: {
@@ -111,20 +177,27 @@ export default {
     data () {
         return {
             standardOption,
-            pageInfo: this.info && this.info.params ? JSON.parse(this.info.params) : {
-                sampleCount: 2,
-                resultCount: 20,
-                model: [],
-                range: '',
-                standard: '',
-                remark: ''
-            }
+            batchOption,
+            pageInfo: {}
         }
     },
-    computed: {
-
+    watch: {
+        info: {
+            handler (val) {
+                this.pageInfo = val || { model: [] }
+            },
+            immediate: true,
+            deep: true
+        },
+        pageInfo: {
+            handler (val, oldVal) {
+                this.$emit('updateParams', val)
+            },
+            deep: true
+        }
     },
-    created () {
+    methods: {
+
     }
 }
 </script>
