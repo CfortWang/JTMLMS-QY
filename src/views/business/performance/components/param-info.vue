@@ -37,7 +37,7 @@
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
                         <el-form-item label="精密度模型" prop="shiYanCanShu.model" :show-message="false">
-                            <el-checkbox-group v-model="pageInfo.model">
+                            <el-checkbox-group v-model="pageInfo.model" :disabled="readonly">
                                 <el-checkbox label="批内不精密度">批内不精密度</el-checkbox>
                                 <el-checkbox label="总不精密度">总不精密度</el-checkbox>
                             </el-checkbox-group>

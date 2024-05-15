@@ -39,7 +39,7 @@
                     <el-table-column prop="piHao" label="批号" width="75" header-align="center" align="center" sortable />
                     <el-table-column prop="changJia" label="厂家" width="100" header-align="center" />
                     <el-table-column prop="youXiaoQi" label="有效期" width="100" header-align="center" align="center" sortable />
-                    <el-table-column fixed="right" label="操作" width="70" header-align="center" align="center">
+                    <el-table-column v-if="!readonly" fixed="right" label="操作" width="70" header-align="center" align="center">
                         <template slot-scope="scope">
                             <div class="inline-operate">
                                 <a><i class="el-icon-edit" @click="handleEdit('edit', scope.row, scope.$index)" /></a>
@@ -58,12 +58,22 @@
             @close="() => showReagent = false"
             @callback="updates"
         />
+        <import-table
+            :visible="showImportTable"
+            title="导入"
+            @close="visible => (showImportTable = visible)"
+            @action-event="handleImport"
+        />
     </div>
 </template>
 <script>
+import IbpsExport from '@/plugins/export'
+import IbpsImport from '@/plugins/import'
+import ActionUtils from '@/utils/action'
 export default {
     components: {
-        ReagentEdit: () => import('./reagent-edit')
+        ReagentEdit: () => import('./reagent-edit'),
+        ImportTable: () => import('@/business/platform/form/formrender/dynamic-form/components/import-table')
     },
     props: {
         info: {
@@ -79,6 +89,7 @@ export default {
         return {
             reagentData: [],
             showReagent: false,
+            showImportTable: false,
             selectionIndex: '',
             rowData: {},
             toolbars: [
@@ -112,7 +123,7 @@ export default {
                     this.handleExport()
                     break
                 case 'import':
-                    this.handleImport()
+                    this.showImportTable = true
                     break
                 case 'create':
                     this.handleEdit(key)
@@ -125,11 +136,46 @@ export default {
                     break
             }
         },
-        handleExport () {
-            console.log('导出')
+        getColumns () {
+            return [
+                { label: '类别', field_name: 'leiBie', name: 'leiBie' },
+                { label: '试剂名称', field_name: 'shiJiMingCheng', name: 'shiJiMingCheng' },
+                { label: '批号', field_name: 'piHao', name: 'piHao' },
+                { label: '厂家', field_name: 'changJia', name: 'changJia' },
+                { label: '有效期', field_name: 'youXiaoQi', name: 'youXiaoQi' }
+            ]
         },
-        handleImport () {
-            console.log('导入')
+        handleExport () {
+            IbpsExport.excel({
+                columns: this.getColumns(),
+                data: this.reagentData,
+                nameKey: 'name',
+                title: '实验试剂信息'
+            }).then(() => {
+                ActionUtils.success('导出成功')
+            })
+        },
+        handleImport (file, options) {
+            this.loading = false
+            IbpsImport.xlsx(file, options).then(({ header, results }) => {
+                const keys = this.getKeys(this.getColumns())
+                const list = []
+                results.forEach(item => {
+                    const obj = {}
+                    Object.keys(item).forEach(key => {
+                        console.log(key)
+                        if (keys[key]) {
+                            obj[keys[key]] = item[key]
+                        }
+                    })
+                    list.push(obj)
+                })
+                this.reagentData = Array.from(this.reagentData.concat(list))
+                this.showImportTable = false
+            })
+        },
+        getKeys (data) {
+            return Array.isArray(data) ? data.reduce((acc, item) => ({ ...acc, [item.label]: item.name }), {}) : {}
         },
         handleEdit (key, selection, index) {
             this.showReagent = true

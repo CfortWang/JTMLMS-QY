@@ -107,6 +107,7 @@
                                 format="yyyy-MM-dd HH:mm"
                                 class="date-picker"
                                 :picker-options="startPickerOptions"
+                                :disabled="readonly"
                                 placeholder="请选择实验开始时间"
                             />
                         </el-form-item>
@@ -122,6 +123,7 @@
                                 format="yyyy-MM-dd HH:mm"
                                 class="date-picker"
                                 :picker-options="endPickerOptions"
+                                :disabled="readonly"
                                 placeholder="请选择实验结束时间"
                             />
                         </el-form-item>

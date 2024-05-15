@@ -57,7 +57,7 @@
 <script>
 import { round } from 'lodash'
 import { formRules } from './constants'
-import { saveExperimental } from '@/api/business/pv'
+import { getExperimental, saveExperimental } from '@/api/business/pv'
 export default {
     components: {
         ExperimentalDesc: () => import('./components/experimental-desc'),
@@ -81,6 +81,10 @@ export default {
             default: () => {
                 return {}
             }
+        },
+        id: {
+            type: String,
+            default: ''
         }
     },
     data () {
@@ -89,6 +93,8 @@ export default {
             dialogVisible: this.visible,
             formLabelWidth: '110px',
             form: {
+                xingNengZhiBiao: '',
+                fangAnLeiXing: '',
                 bianZhiBuMen: '',
                 shiYanXiangMu: '',
                 shiYanFangFa: '',
@@ -112,7 +118,7 @@ export default {
             rules: formRules,
             loading: false,
             toolbars: [
-                { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning' },
+                { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'info', hidden: this.readonly },
                 { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
@@ -135,12 +141,22 @@ export default {
 
     },
     mounted () {
+        if (!this.pageData.id) {
+            return
+        }
         this.loadData()
     },
     methods: {
         // 获取数据
         async loadData () {
-            console.log(11)
+            getExperimental({ id: this.pageData.id }).then(res => {
+                const { data } = res || {}
+                if (data) {
+                    data.shiYanCanShu = data.shiYanCanShu ? JSON.parse(data.shiYanCanShu) : {}
+                    data.shiYanShuJu = data.shiYanShuJu ? JSON.parse(data.shiYanShuJu) : {}
+                    this.form = Object.assign(this.form, data)
+                }
+            })
         },
         handleActionEvent (key) {
             switch (key) {
@@ -218,6 +234,8 @@ export default {
         },
         handleTest () {
             const o = {
+                xingNengZhiBiao: '精密度',
+                fangAnLeiXing: '简单精密度评价',
                 bianZhiBuMen: '1166703356459089920',
                 shiYanXiangMu: '测试项目',
                 shiYanFangFa: '测试方法',
@@ -268,7 +286,10 @@ export default {
                     dailyCVSValue: 3.33
                 },
                 shiYanShuJu: null,
-                shiYanJieLun: '测试达标'
+                shiYanJieLun: '测试达标',
+                jieLunShenHeRen: '1166673437578493952',
+                baoGaoShiJian: '2024-05-06',
+                fuJian: '1239940596743798784'
             }
             this.form = JSON.parse(JSON.stringify(o))
         }
@@ -301,7 +322,9 @@ export default {
                 display: flex;
                 .left, .right {
                     width: 50%;
-                    min-height: 100%;
+                    // min-height: 100%;
+                    height: 100%;
+                    overflow-y: auto;
                     padding: 15px 20px;
                     box-sizing: border-box;
                     ::v-deep {

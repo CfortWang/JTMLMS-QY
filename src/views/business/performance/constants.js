@@ -14,8 +14,12 @@ export const performanceList = [
                 sn: '01-02'
             },
             {
-                name: 'EP15-A精密度评价',
+                name: 'EP15-A2精密度评价',
                 sn: '01-03'
+            },
+            {
+                name: 'EP15-A3精密度评价',
+                sn: '01-04'
             }
         ]
     },

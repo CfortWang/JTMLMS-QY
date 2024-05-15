@@ -63,6 +63,7 @@
                                 multiple
                                 accept="*"
                                 store="id"
+                                :readonly="readonly"
                             />
                         </el-form-item>
                     </el-col>
@@ -99,6 +100,7 @@ export default {
                 this.pageInfo = val
             },
             immediate: true,
+            deep: true
         }
     },
     created () {

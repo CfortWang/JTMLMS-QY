@@ -5,11 +5,11 @@ import { BUSINESS_BASE_URL } from '@/api/baseUrl'
  * 获取性能验证实验数据
  * @param {*} params
  */
-export function getExperimentalList (params) {
+export function queryExperimental (data) {
     return request({
         url: BUSINESS_BASE_URL() + '/pv/experimental/query',
-        method: 'get',
-        params
+        method: 'post',
+        data
     })
 }
 
@@ -17,7 +17,7 @@ export function getExperimentalList (params) {
  * 获取性能验证实验数据详情
  * @param {*} params
  */
-export function getExperimentalDetail (params) {
+export function getExperimental (params) {
     return request({
         url: BUSINESS_BASE_URL() + '/pv/experimental/get',
         method: 'get',
@@ -41,11 +41,11 @@ export function saveExperimental (data) {
  * 删除性能验证实验数据
  * @param {*} params
  */
-export function removeExperimental (data) {
+export function removeExperimental (params) {
     return request({
         url: BUSINESS_BASE_URL() + '/pv/experimental/remove',
         method: 'post',
-        data
+        params
     })
 }
 
