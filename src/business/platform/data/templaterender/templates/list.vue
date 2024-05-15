@@ -691,16 +691,19 @@ export default {
             }
             const { listData } = this
             const allSelectId = this.getAllSelectId()
-            for (let i = 0; i < listData.length; i++) {
-                const row = listData[i]
-                if (allSelectId.indexOf(this.getPkValue(row)) >= 0) {
+            listData.forEach(row => {
+                const pkValue = this.getPkValue(row)
+                if (allSelectId.includes(pkValue)) {
                     if (this.multiple) {
                         tableEl.toggleSelectionRow(row, true)
                     } else {
                         tableEl.setSelectionRadio(row)
                     }
+                    // fixbug: 替换所有选中列表中的数据为最新数据，避免脚本返回的选中数据不更新
+                    const index = this.selectionAll.findIndex(item => this.getPkValue(item) === pkValue)
+                    this.selectionAll[index] = row
                 }
-            }
+            })
         },
         /**
          * 获取选择的ID
@@ -1807,22 +1810,10 @@ export default {
             })
         },
         setValue (data) {
-            const obj = {}
-            Object.values(data).forEach((item) => {
-                obj[item] = ''
-            })
-            return obj
+            return Array.isArray(data) ? data.map(item => ({ [item]: '' })) : {}
         },
         getKeys (data) {
-            const obj = {}
-            if (data.length > 0) {
-                data.forEach((item) => {
-                    obj[item.label] = item.name
-                })
-                return obj
-            } else {
-                return obj
-            }
+            return Array.isArray(data) ? data.map(item => ({ [item.label]: item.name })) : {}
         },
         xlsxFileClick () {
             this.xlsxFileVisible = true
