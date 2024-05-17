@@ -32,6 +32,14 @@
                     </div>
                 </el-form-item>
             </el-col>
+            <el-col v-if="judgeTF(form)" :span="12">
+                <el-form-item v-if="showDialog==true" :label="fontText[JSON.parse(form.skipTypeMsg).skipType-1]">
+                    <el-button
+                        :type="form.messageType | optionsFilter(typeOptions, 'type')"
+                        @click.native="handleDifferentTab(form)"
+                    >点击</el-button>
+                </el-form-item>
+            </el-col>
             <el-col :span="12">
                 <el-form-item
                     label="是否公告:"
@@ -87,21 +95,40 @@
                 </el-form-item>
             </el-col> -->
         </el-row>
+        <bpmn-formrender
+            :visible="dialogFormVisible"
+            :task-id="taskId"
+            :instance-id="instanceId"
+            @close="visible => dialogFormVisible = visible"
+        />
+        <!-- <data-template-formrender-dialog
+            :visible="dialogformrenderVisible"
+            :form-key="formKey"
+            :default-data="defaultFormData"
+            :pk-value="pkValue"
+            :toolbars="editToolbars"
+            :readonly="readonly"
+            @close="visible => dialogformrenderVisible = visible"
+        /> -->
+        <!-- @callback="search" -->
     </el-form>
 </template>
 
 <script>
 import { get } from '@/api/platform/message/innerMessage'
+import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import { typeOptions, publicOrCanreplyOptions } from '../constants'
 import IbpsAttachmentSelector from '@/business/platform/file/attachment/selector'
 import ReadedList from './readed-list'
 import ReplyList from './reply-list'
+import DataTemplateFormrenderDialog from '@/business/platform/data/templaterender/form/dialog'
 
 export default {
     components: {
         ReadedList,
         IbpsAttachmentSelector,
-        ReplyList
+        ReplyList,
+        DataTemplateFormrenderDialog
     },
     props: {
         inside: {
@@ -116,10 +143,14 @@ export default {
             type: Boolean,
             default: false
         },
+
         id: String,
         title: String,
         type: String,
-        getform: () => { }
+        getform: {
+            type: Function,
+            default: () => {}
+        }
     },
     data () {
         return {
@@ -130,7 +161,30 @@ export default {
             loading: false,
             form: {},
             fileSrc: '',
-            fileTitle: ''
+            fileTitle: '',
+            instanceId: '',
+            dialogFormVisible: false, // 弹窗
+            // dialogformrenderVisible: false,
+            taskId: '', // 编辑dialog需要使用
+            fontText: ['明细：', '流程：', '路由：', '表单：'],
+            showDialog: false
+            // formKey: 'snwsdjkjlb',
+            // defaultFormData: {},
+            // pkValue: '',
+            // editToolbars: [
+            //     {
+            //         button_type: 'close',
+            //         label: '关闭',
+            //         key: 'close'
+            //     },
+            //     {
+            //         button_type: 'save',
+            //         label: '提交',
+            //         key: 'save',
+            //         icon: 'el-icon-finished'
+            //     }
+            // ],
+            // readonly: false
         }
     },
     computed: {
@@ -142,6 +196,47 @@ export default {
         handleClick (tab, event) {
             this.$refs['readedList'].loadData()
         },
+        // 流程
+        handleEdit (id) {
+            this.taskId = id
+            this.dialogFormVisible = true
+        },
+        // 明细
+        handleLinkClick (data) {
+            this.instanceId = data
+            this.dialogFormVisible = true
+        },
+        // 路由
+        handleRouterSkip (way) {
+            this.$router.push(`${way}`)
+        },
+        // 无流程表单
+        // handleFlowlessForm(way){
+        //     this.dialogformrenderVisible = true
+        // },
+        handleDifferentTab (objNum) {
+            const stm = JSON.parse(objNum.skipTypeMsg)
+            const tid = stm.pathInfo ? objNum.taskId : stm.pathInfo
+            switch (stm.skipType) {
+                case 1:// 明细
+                    this.handleLinkClick(stm.pathInfo)
+                    break
+                case 2:// 流程
+                    this.handleEdit(tid)
+                    break
+                case 3:// 路由
+                    this.handleRouterSkip(stm.pathInfo)
+                    break
+                // case 4:// 表单
+                //     this.handleFlowlessForm(stm.pathInfo)
+                //     break
+                default:
+                    break
+            }
+        },
+        // search() {
+        //     this.loadData()
+        // },
         /**
          * 获取表单数据
          */
@@ -151,18 +246,62 @@ export default {
             this.loading = true
             get({
                 innerMessageId: this.formId,
-                type: this.type // 是否为空值，来决定消息是否要已读：空就已读，非空就未读
+                type: this.type || '' // 是否为空值，来决定消息是否要已读：空就已读，非空就未读
             }).then(response => {
                 this.form = response.data
                 if (this.$refs['replyList']) { this.$refs['replyList'].loadData() }
                 if (this.$refs['readedList']) { this.$refs['readedList'].loadData() }
-                this.fileSrc = this.form.fileMsg.src
-                this.fileTitle = this.form.fileMsg.title
+                const { fileMsg } = this.form
+                this.fileSrc = fileMsg && fileMsg.src ? fileMsg.src : ''
+                this.fileTitle = fileMsg && fileMsg.src ? fileMsg.src : ''
                 this.loading = false
-                this.$emit('callback', true)
+                if (!this.type) {
+                    this.$emit('callback', true)
+                }
             }).catch(() => {
                 this.loading = false
             })
+        },
+        judgeTF (form) {
+            if (form.skipTypeMsg) {
+                try {
+                    const obj = JSON.parse(form.skipTypeMsg)
+                    if (typeof obj === 'object' && obj) {
+                        if (obj.skipType > 0) {
+                            if (obj.skipType === 1) {
+                                this.showDialog = true
+                            } else if (obj.skipType === 2 && form.taskId != null) {
+                                const sql = "select count(id_) as num from ibps_bpm_task_pendding where task_id_='" + form.taskId + "'"
+                                curdPost('sql', sql).then(res => {
+                                    console.log(res.variables.data[0].num)
+                                    if (res.variables.data[0].num > 0) {
+                                        this.showDialog = true
+                                    } else {
+                                        this.showDialog = false
+                                    }
+                                })
+                            } else if (obj.skipType === 3) {
+                                this.showDialog = true
+                            }
+                            // else if(obj.skipType==4){
+                            //     this.showDialog = true;
+                            // }
+                            else {
+                                this.showDialog = false
+                            }
+                        } else {
+                            this.showDialog = false
+                        }
+                    } else {
+                        this.showDialog = false
+                    }
+                } catch (e) {
+                    this.showDialog = false
+                }
+            } else {
+                this.showDialog = false
+            }
+            return true
         }
     }
 

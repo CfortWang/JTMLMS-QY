@@ -168,7 +168,7 @@ export default {
                 return []
             }
             const defaultBtn = buttons.filter(i => keys.includes(i.button_type))
-            const customBtn = buttons.filter(i => i.show_on_record == 'Y')
+            const customBtn = buttons.filter(i => i.show_on_record === 'Y')
             return [...defaultBtn, ...customBtn]
         },
         dealFilter (dataList) {
@@ -203,7 +203,8 @@ export default {
                     ...rules,
                     levelFilter
                 ]
-                return { ...data, filter: { ...data.filter, rules: newRules }}
+                // 关联关系固定为AND
+                return { ...data, filter: { ...data.filter, condition: 'AND', rules: newRules }}
             })
             return newDataList
         },

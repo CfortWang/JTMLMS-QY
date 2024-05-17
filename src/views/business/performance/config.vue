@@ -348,7 +348,7 @@ export default {
             }
         }
         .config-form {
-            .config-form-container {
+            &-container {
                 position: relative;
                 width: 100%;
                 height: calc(100vh - 60px);
@@ -383,11 +383,11 @@ export default {
                             }
                             .el-form-item {
                                 margin-bottom: 0 !important;
-                                .el-form-item__label {
+                                &__label {
                                     font-size: 14px !important;
                                     color: #606266;
                                 }
-                                .el-form-item__content {
+                                &__content {
                                     .el-input, .el-select, .el-input-number {
                                         width: 100%;
                                     }
