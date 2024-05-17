@@ -262,16 +262,12 @@ export default {
     watch: {
         info: {
             handler (val) {
+                // 浅拷贝，数据父子组件间双向传递
                 this.pageInfo = val || {}
             },
             immediate: true,
             deep: true
         }
-    },
-    created () {
-    },
-    methods: {
-
     }
 }
 </script>

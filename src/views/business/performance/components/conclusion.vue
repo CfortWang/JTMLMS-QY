@@ -5,7 +5,7 @@
                 <i class="ibps-icon-star" />
                 <span>实验结论</span>
             </div>
-            <div class="form-container">
+            <div v-if="pageInfo" class="form-container">
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
                         <el-form-item label="审核人" prop="shenHeRen" :show-message="false">
@@ -95,15 +95,17 @@ export default {
         }
     },
     watch: {
-        info: {
-            handler (val) {
-                this.pageInfo = val
+        pageInfo: {
+            handler (val, oldVal) {
+                this.$emit('updateData', val)
             },
-            immediate: true,
             deep: true
         }
     },
-    created () {
+    mounted () {
+        const { shenHeRen, baoGaoShiJian, shiYanJieLun, fuJian } = this.info || {}
+        this.pageInfo = { shenHeRen, baoGaoShiJian, shiYanJieLun, fuJian }
+        console.log(this.pageInfo, 123)
     }
 }
 </script>

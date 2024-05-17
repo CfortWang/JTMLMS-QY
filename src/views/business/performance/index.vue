@@ -28,7 +28,10 @@
                     :key="t.sn"
                     class="card-item"
                 >
-                    <div class="method-btn" @click="handleEdit(item, t)">{{ t.name }}</div>
+                    <div
+                        :class="t.disabled ? 'method-btn disabled' : 'method-btn'"
+                        @click="handleEdit(item, t)"
+                    >{{ t.name }}</div>
                 </div>
             </el-card>
         </div>
@@ -90,6 +93,9 @@ export default {
             this.$message.info('coming soon!')
         },
         handleEdit (item, t) {
+            if (t.disabled) {
+                return
+            }
             this.configData = {
                 target: item.title,
                 method: t.name
@@ -188,6 +194,13 @@ export default {
                                 transition: background-position 0.5s ease;
                                 &:hover {
                                     background-position: 100% 0;
+                                }
+                            }
+                            .disabled {
+                                cursor: not-allowed;
+                                background-image: linear-gradient(to right, #909399 0%, #909399 50%, #C0C4CC 50%, #C0C4CC 100%);
+                                &:hover {
+                                    background-position: 0 0
                                 }
                             }
                         }

@@ -87,8 +87,6 @@ export default {
         this.activeTab = this.tabs[0] || ''
         this.dealData(this.info)
     },
-    created () {
-    },
     methods: {
         handleClick (v) {
             this.activeTab = v.name

@@ -21,17 +21,33 @@
             :class="readonly ? 'readonly-form' : ''"
             @submit.native.prevent
         >
-            <div class="config-form-container">
+            <div v-if="loadCompleted" class="config-form-container">
                 <div class="left">
-                    <experimental-desc :info.sync="form" :readonly="readonly" />
+                    <experimental-desc :step-desc="stepDesc" :readonly="readonly" />
                     <basic-info :info.sync="form" :readonly="readonly" />
                     <reagent-info :info.sync="form.reagentPoList" :readonly="readonly" />
-                    <param-info :info.sync="form.shiYanCanShu" :readonly="readonly" @updateParams="handleUpdateParams" />
+                    <param-info
+                        :info.sync="form.shiYanCanShu"
+                        :readonly="readonly"
+                        @updateParams="handleUpdateParams"
+                    />
                 </div>
                 <div class="right">
-                    <experimental-data :info="form" :readonly="readonly" />
-                    <precision v-if="$utils.isNotEmpty(form.shiYanShuJu)" :info="form.shiYanShuJu" :readonly="readonly" />
-                    <conclusion :info="form" :readonly="readonly" />
+                    <experimental-data
+                        :info="form.shiYanShuJu"
+                        :form-id="form.id"
+                        :readonly="readonly"
+                    />
+                    <precision
+                        v-if="$utils.isNotEmpty(form.shiYanShuJu)"
+                        :info="form.shiYanShuJu"
+                        :readonly="readonly"
+                    />
+                    <conclusion
+                        :info="form"
+                        :readonly="readonly"
+                        @updateData="handleUpdateData"
+                    />
                 </div>
             </div>
         </el-form>
@@ -57,6 +73,7 @@
 
 <script>
 import { round } from 'lodash'
+import { performanceList } from './constants'
 import { formRules } from './constants'
 import { getExperimental, saveExperimental } from '@/api/business/pv'
 export default {
@@ -83,10 +100,6 @@ export default {
             default: () => {
                 return {}
             }
-        },
-        id: {
-            type: String,
-            default: ''
         }
     },
     data () {
@@ -119,13 +132,15 @@ export default {
             },
             rules: formRules,
             loading: false,
+            loadCompleted: false,
             toolbars: [
                 { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'info', hidden: this.readonly },
                 { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
-            ]
+            ],
+            stepDesc: ''
         }
     },
     computed: {
@@ -143,7 +158,12 @@ export default {
 
     },
     mounted () {
-        if (!this.pageData.id) {
+        const { id, target, method } = this.pageData || {}
+        const t = performanceList.find(i => i.title === target)
+        const m = t.methods.find(i => i.name === method)
+        this.stepDesc = m ? m.step : ''
+        if (!id) {
+            this.loadCompleted = true
             return
         }
         this.loadData()
@@ -151,13 +171,18 @@ export default {
     methods: {
         // 获取数据
         async loadData () {
+            this.loading = true
             getExperimental({ id: this.pageData.id }).then(res => {
+                this.loading = false
                 const { data } = res || {}
                 if (data) {
                     data.shiYanCanShu = data.shiYanCanShu ? JSON.parse(data.shiYanCanShu) : {}
                     data.shiYanShuJu = data.shiYanShuJu ? JSON.parse(data.shiYanShuJu) : {}
                     this.form = Object.assign(this.form, data)
+                    this.loadCompleted = true
                 }
+            }).catch(() => {
+                this.loading = false
             })
         },
         handleActionEvent (key) {
@@ -234,7 +259,10 @@ export default {
             this.form.shiYanCanShu = value
         },
         handleUpdateData (value) {
-            this.form.shiYanShuJu = value
+            this.form = {
+                ...this.form,
+                ...value
+            }
         },
         handleTest () {
             const o = {

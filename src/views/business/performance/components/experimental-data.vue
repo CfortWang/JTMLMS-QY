@@ -48,7 +48,7 @@
     </div>
 </template>
 <script>
-import IbpsImport from '@/plugins/import'
+// import IbpsImport from '@/plugins/import'
 import ActionUtils from '@/utils/action'
 import { exportTemplate, importTemplate } from '@/api/business/pv'
 
@@ -60,6 +60,10 @@ export default {
         info: {
             type: Object,
             default: () => {}
+        },
+        formId: {
+            type: String,
+            default: ''
         },
         readonly: {
             type: Boolean,
@@ -76,20 +80,26 @@ export default {
             toolbars: [
                 { key: 'export', icon: 'ibps-icon-cloud-download', label: '导出模板', type: 'info', hidden: this.readonly },
                 { key: 'import', icon: 'ibps-icon-cloud-upload', label: '导入数据', type: 'warning', hidden: this.readonly },
-                { key: 'generate', icon: 'ibps-icon-file-text-o', label: '查看实验报告', type: 'success', hidden: this.readonly }
+                { key: 'generate', icon: 'ibps-icon-file-text-o', label: '查看实验报告', type: 'success', hidden: true }
             ]
         }
     },
-    watch: {
-        info: {
-            handler (val, oldVal) {
-                this.pageInfo = val
-                if (!this.showTemplate && this.$utils.isNotEmpty(val.shiYanShuJu)) {
-                    this.dealData(val.shiYanShuJu)
-                }
-            },
-            immediate: true,
-            deep: true
+    // watch: {
+    //     info: {
+    //         handler (val, oldVal) {
+    //             this.pageInfo = val
+    //             if (!this.showTemplate && this.$utils.isNotEmpty(val.shiYanShuJu)) {
+    //                 this.dealData(val.shiYanShuJu)
+    //             }
+    //         },
+    //         immediate: true,
+    //         deep: true
+    //     }
+    // },
+    mounted () {
+        this.pageInfo = JSON.parse(JSON.stringify(this.info))
+        if (!this.showTemplate && this.$utils.isNotEmpty(this.pageInfo)) {
+            this.dealData(this.pageInfo)
         }
     },
     methods: {
@@ -109,17 +119,13 @@ export default {
         },
         handleGenerate () {
             this.$message.info('waiting...')
-            // this.showTemplate = true
-            // this.$nextTick(() => {
-            //     this.$refs.template.init()
-            // })
         },
         handleExport () {
-            if (!this.pageInfo.id) {
+            if (!this.formId) {
                 return this.$message.error('请先保存数据！')
             }
             exportTemplate({
-                id: this.pageInfo.id
+                id: this.formId
             }).then(res => {
                 ActionUtils.download(res.data, '实验数据模板.xlsx')
             })
@@ -131,7 +137,7 @@ export default {
         //     })
         // },
         handleImport () {
-            if (!this.pageInfo.id) {
+            if (!this.formId) {
                 return this.$message.error('请先保存数据！')
             }
             const input = document.createElement('input')
@@ -142,7 +148,7 @@ export default {
                 const reader = new FileReader()
                 reader.onload = event => {
                     const data = new FormData()
-                    data.append('id', this.pageInfo.id)
+                    data.append('id', this.formId)
                     data.append('applyFiles', file)
                     importTemplate(data).then(res => {
                         this.$message.success('实验数据导入成功')

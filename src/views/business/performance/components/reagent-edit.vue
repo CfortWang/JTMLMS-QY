@@ -163,15 +163,13 @@ export default {
         },
         handleSave (key) {
             this.$refs.form.validate((valid) => {
-                if (valid) {
-                    this.submitForm(this.reagentForm, key)
-                } else {
-                    return false
+                if (!valid) {
+                    return
                 }
+                this.submitForm(this.reagentForm, key)
             })
         },
         submitForm (data, key) {
-            console.log(this.dataIndex)
             this.$emit('callback', { data, index: this.dataIndex })
             if (key === 'save') {
                 return this.closeDialog()

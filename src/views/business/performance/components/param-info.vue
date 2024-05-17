@@ -5,7 +5,7 @@
                 <i class="ibps-icon-star" />
                 <span>性能验证实验参数</span>
             </div>
-            <div class="form-container">
+            <div v-if="pageInfo" class="form-container">
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
                         <el-form-item label="浓度水平数" prop="shiYanCanShu.specimensNum" :show-message="false">
@@ -54,6 +54,32 @@
                                 <el-radio-button :label="true">转换</el-radio-button>
                                 <el-radio-button :label="false">不转换</el-radio-button>
                             </el-radio-group>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="form-row">
+                    <el-col :span="12">
+                        <el-form-item label="靶值" prop="targetValue" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.targetValue"
+                                type="number"
+                                :min="0"
+                                :precision="2"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="厂商声明差值" prop="claimValue" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.claimValue"
+                                type="number"
+                                :min="0"
+                                :precision="2"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -157,7 +183,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-show="1" :gutter="20" class="form-row">
+                <el-row v-show="0" :gutter="20" class="form-row">
                     <el-col :span="12">
                         <el-form-item label="数值" prop="batchCVSValue" :show-message="false">
                             <el-input-number
@@ -204,23 +230,19 @@ export default {
         return {
             standardOption,
             batchOption,
-            pageInfo: {}
+            pageInfo: null
         }
     },
     watch: {
-        info: {
-            handler (val) {
-                this.pageInfo = val || { model: [] }
-            },
-            immediate: true,
-            deep: true
-        },
         pageInfo: {
             handler (val, oldVal) {
                 this.$emit('updateParams', val)
             },
             deep: true
         }
+    },
+    mounted () {
+        this.pageInfo = this.info || { model: [] }
     },
     methods: {
         changeCVS () {

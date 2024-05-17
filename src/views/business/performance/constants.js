@@ -1,49 +1,91 @@
 export const performanceList = [
     {
-        type: '精密度',
+        type: 'precision',
         title: '精密度评价实验',
-        sn: 1,
+        sn: '01',
         icon: '',
         methods: [
             {
                 name: '简单精密度评价',
-                sn: '01-01'
+                sn: '01-01',
+                disabled: true,
+                step: ''
             },
             {
                 name: 'EP5-A精密度评价',
-                sn: '01-02'
+                sn: '01-02',
+                disabled: true,
+                step: ''
             },
             {
                 name: 'EP15-A2精密度评价',
-                sn: '01-03'
+                sn: '01-03',
+                step: `1. 连续测定5d，每天一个分析批，每批两个浓度水平，每一个浓度水平同一样品重复测定3次；
+2. 如果因为质量控制程序或操作问题判断一批为，应剔除，并增加执行一个分析批；
+3. 正常使用每日质控品；
+4. 正确度试验样品可在同一批内进行检测；
+5. 按照厂家的操作说明进行校准。如果厂家指出其声明精密度数据是在多个校准周期下产生的，则操作者在实验期间应选择重新校准。`,
+                default: {
+                    specimensNum: 2,
+                    repeatNum: 3,
+                    days: 5
+                }
             },
             {
                 name: 'EP15-A3精密度评价',
-                sn: '01-04'
+                sn: '01-04',
+                step: `1. 连续测定5d，每天一个分析批，每批两个浓度水平，每一个浓度水平同一样品重复测定5次；
+2. 如果因为质量控制程序或操作问题判断一批为，应剔除，并增加执行一个分析批；
+3. 正常使用每日质控品；
+4. 正确度试验样品可在同一批内进行检测；
+5. 按照厂家的操作说明进行校准。如果厂家指出其声明精密度数据是在多个校准周期下产生的，则操作者在实验期间应选择重新校准。`,
+                // step: [
+                //     '连续测定5d，每天一个分析批，每批两个浓度水平，每一个浓度水平同一样品重复测定5次;',
+                //     '如果因为质量控制程序或操作问题判断一批为，应剔除，并增加执行一个分析批;',
+                //     '正常使用每日质控品;',
+                //     '正确度试验样品可在同一批内进行检测;',
+                //     '按照厂家的操作说明进行校准。如果厂家指出其声明精密度数据是在多个校准周期下产生的，则操作者在实验期间应选择重新校准。'
+                // ],
+                default: {
+                    specimensNum: 2,
+                    repeatNum: 5,
+                    days: 5
+                }
             }
         ]
     },
     {
-        type: '正确度',
+        type: 'accuracy',
         title: '正确度评价实验',
-        sn: 2,
+        sn: '02',
         icon: '',
         methods: [
             {
                 name: '简单正确度评价',
-                sn: '02-01'
+                sn: '02-01',
+                disabled: true,
+                step: ''
             },
             {
                 name: 'EP9-A方法学比对',
-                sn: '02-02'
+                sn: '02-02',
+                disabled: true,
+                step: ''
             },
             {
                 name: 'EP15-A方法学比对',
-                sn: '02-03'
+                sn: '02-03',
+                step: ''
             },
             {
-                name: 'EP15-A定值参考',
-                sn: '02-04'
+                name: '定值参考物质验证',
+                sn: '02-04',
+                step: '推荐至少选择2个浓度水平参考物质，其代表方法可报告范围中高和低的决定性浓度。应根据厂家说明书制备物质，在3d~5d时间内每批进行2次重复测定，然后计算均值和标准差，以及置信区间帮助验证指定值。',
+                default: {
+                    specimensNum: 2,
+                    repeatNum: 3,
+                    days: 5
+                }
             }
         ]
     }
@@ -110,6 +152,16 @@ export const formRules = {
         message: '请选择小数位数',
         trigger: 'blur'
     }],
+    shenHeRen: [{
+        required: true,
+        message: '请选择',
+        trigger: 'change'
+    }],
+    shiYanJieLun: [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
     'shiYanCanShu.specimensNum': [{
         required: true,
         message: '请输入',
@@ -139,16 +191,6 @@ export const formRules = {
         required: true,
         message: '请选择',
         trigger: 'blur'
-    }],
-    jieLunShenHeRen: [{
-        required: true,
-        message: '请选择',
-        trigger: 'blur'
-    }],
-    shiYanJieLun: [{
-        required: true,
-        message: '请输入',
-        trigger: 'change'
     }]
 }
 
@@ -216,19 +258,19 @@ export const standardOption = [
 
 export const batchOption = [
     {
-        value: 0.5,
+        value: 0.5000,
         label: '1/2TEa'
     },
     {
-        value: 0.33,
+        value: 0.3333,
         label: '1/3TEa'
     },
     {
-        value: 0.25,
+        value: 0.2500,
         label: '1/4TEa'
     },
     {
-        value: 0.2,
+        value: 0.200,
         label: '1/5TEa'
     }
 ]
