@@ -8,9 +8,9 @@
             <div class="form-container">
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="审核人" prop="jieLunShenHeRen" :show-message="false">
+                        <el-form-item label="审核人" prop="shenHeRen" :show-message="false">
                             <el-select
-                                v-model="pageInfo.jieLunShenHeRen"
+                                v-model="pageInfo.shenHeRen"
                                 filterable
                                 clearable
                                 :disabled="readonly"

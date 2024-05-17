@@ -15,6 +15,7 @@
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
+            @row-dblclick="handleRowDblclick"
         >
             <template slot="time" slot-scope="scope">
                 <div>起：{{ scope.row.kaiShiShiJian }}</div>
@@ -25,7 +26,7 @@
             v-if="showConfig"
             :visible.sync="showConfig"
             :page-data="detailData"
-            readonly
+            :readonly="readonly"
             @close="() => showConfig = false"
         />
     </div>
@@ -45,7 +46,7 @@ export default {
     data () {
         const { userList = [] } = this.$store.getters || {}
         const userOption = userList.map(item => ({ label: item.userName, value: item.userId }))
-        const targetOption = performanceList.map(item => ({ label: item.type, value: item.type }))
+        const targetOption = performanceList.map(item => ({ label: item.title, value: item.title }))
         const methodOption = performanceList.flatMap(item => item.methods.map(method => ({ label: method.name, value: method.name })))
         return {
             userOption,
@@ -59,6 +60,7 @@ export default {
             pagination: {},
             sorts: {},
             showConfig: false,
+            readonly: false,
             detailData: {},
             listConfig: {
                 toolbars: [
@@ -94,7 +96,7 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'name', label: '性能指标', tags: targetOption, minWidth: 110 },
+                    { prop: 'xingNengZhiBia', label: '性能指标', tags: targetOption, minWidth: 110 },
                     { prop: 'fangAnLeiXing', label: '方案类型', tags: methodOption, width: 125 },
                     { prop: 'shiYanXiangMu', label: '实验项目', width: 120 },
                     { prop: 'shiYanFangFa', label: '实验方法', width: 120 },
@@ -115,8 +117,14 @@ export default {
                 rowHandle: {
                     actions: [
                         {
-                            key: 'detail',
-                            icon: 'ibps-icon-detail'
+                            key: 'edit',
+                            icon: 'ibps-icon-edit'
+                        },
+                        {
+                            key: 'report',
+                            label: '实验报告',
+                            type: 'success',
+                            icon: 'ibps-icon-file-text-o'
                         },
                         {
                             key: 'remove'
@@ -179,10 +187,11 @@ export default {
                     ActionUtils.setFirstPagination(this.pagination)
                     this.search()
                     break
-                case 'detail': // 明细
-                    ActionUtils.selectedRecord(selection).then((id) => {
-                        this.handleDetail(data)
-                    })
+                case 'edit':
+                    this.handleEdit(data, command)
+                    break
+                case 'report': // 明细
+                    this.handleReport(data)
                     break
                 case 'remove': // 删除
                     ActionUtils.removeRecord(selection).then((ids) => {
@@ -194,14 +203,19 @@ export default {
             }
         },
         /**
-         * 处理明细
+         * 处理编辑
          */
-        handleDetail ({ id, name }) {
+        handleEdit ({ id, fangAnLeiXing, xingNengZhiBia }, key) {
             this.detailData = {
-                title: name,
-                id
+                id,
+                target: xingNengZhiBia,
+                method: fangAnLeiXing
             }
+            this.readonly = key === 'detail'
             this.showConfig = true
+        },
+        handleReport (data) {
+            console.log('wwww')
         },
         /**
          * 处理删除
@@ -211,6 +225,9 @@ export default {
                 ActionUtils.removeSuccessMessage()
                 this.search()
             }).catch(() => {})
+        },
+        handleRowDblclick (row) {
+            this.handleEdit(row, 'detail')
         }
     }
 }

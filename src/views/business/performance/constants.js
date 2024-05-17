@@ -110,12 +110,17 @@ export const formRules = {
         message: '请选择小数位数',
         trigger: 'blur'
     }],
-    'shiYanCanShu.sampleCount': [{
+    'shiYanCanShu.specimensNum': [{
         required: true,
         message: '请输入',
         trigger: 'change'
     }],
-    'shiYanCanShu.resultCount': [{
+    'shiYanCanShu.repeatNum': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'shiYanCanShu.days': [{
         required: true,
         message: '请输入',
         trigger: 'change'

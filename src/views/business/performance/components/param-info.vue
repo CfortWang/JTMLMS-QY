@@ -8,9 +8,9 @@
             <div class="form-container">
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
-                        <el-form-item label="浓度水平数" prop="shiYanCanShu.sampleCount" :show-message="false">
+                        <el-form-item label="浓度水平数" prop="shiYanCanShu.specimensNum" :show-message="false">
                             <el-input-number
-                                v-model="pageInfo.sampleCount"
+                                v-model="pageInfo.specimensNum"
                                 type="number"
                                 :min="1"
                                 :max="10"
@@ -21,16 +21,39 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="测定结果数" prop="shiYanCanShu.resultCount" :show-message="false">
+                        <el-form-item label="重复次数" prop="shiYanCanShu.repeatNum" :show-message="false">
                             <el-input-number
-                                v-model="pageInfo.resultCount"
+                                v-model="pageInfo.repeatNum"
                                 type="number"
                                 :min="1"
                                 :max="50"
                                 :precision="0"
                                 :disabled="readonly"
-                                placeholder="请输入测定结果数"
+                                placeholder="请输入重复次数"
                             />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="form-row">
+                    <el-col :span="12">
+                        <el-form-item label="实验天数" prop="shiYanCanShu.days" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.days"
+                                type="number"
+                                :min="1"
+                                :max="10"
+                                :precision="0"
+                                :disabled="readonly"
+                                placeholder="请输入实验天数"
+                            />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="对数转化" prop="shiYanCanShu.isConvert" :show-message="false">
+                            <el-radio-group v-model="pageInfo.isConvert" :disabled="readonly">
+                                <el-radio-button :label="true">转换</el-radio-button>
+                                <el-radio-button :label="false">不转换</el-radio-button>
+                            </el-radio-group>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -89,6 +112,7 @@
                                 :precision="2"
                                 :disabled="readonly"
                                 placeholder="请输入"
+                                @change="changeCVS"
                             />
                         </el-form-item>
                     </el-col>
@@ -102,6 +126,7 @@
                                 clearable
                                 :disabled="readonly"
                                 placeholder="请选择"
+                                @change="changeCVS"
                             >
                                 <el-option
                                     v-for="(item, index) in batchOption"
@@ -112,6 +137,27 @@
                             </el-select>
                         </el-form-item>
                     </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="日间CVs" prop="dailyCVS" :show-message="false">
+                            <el-select
+                                v-model="pageInfo.dailyCVS"
+                                filterable
+                                clearable
+                                :disabled="readonly"
+                                placeholder="请选择"
+                                @change="changeCVS"
+                            >
+                                <el-option
+                                    v-for="(item, index) in batchOption"
+                                    :key="index"
+                                    :label="item.label"
+                                    :value="item.value"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row v-show="1" :gutter="20" class="form-row">
                     <el-col :span="12">
                         <el-form-item label="数值" prop="batchCVSValue" :show-message="false">
                             <el-input-number
@@ -122,26 +168,6 @@
                                 :disabled="readonly"
                                 placeholder="请输入"
                             />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="20" class="form-row">
-                    <el-col :span="12">
-                        <el-form-item label="日间CVs" prop="dailyCVS" :show-message="false">
-                            <el-select
-                                v-model="pageInfo.dailyCVS"
-                                filterable
-                                clearable
-                                :disabled="readonly"
-                                placeholder="请选择"
-                            >
-                                <el-option
-                                    v-for="(item, index) in batchOption"
-                                    :key="index"
-                                    :label="item.label"
-                                    :value="item.value"
-                                />
-                            </el-select>
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
@@ -197,7 +223,11 @@ export default {
         }
     },
     methods: {
-
+        changeCVS () {
+            const { batchCVS, dailyCVS, tea } = this.pageInfo
+            this.pageInfo.batchCVSValue = parseFloat(tea * batchCVS)
+            this.pageInfo.dailyCVSValue = parseFloat(tea * dailyCVS)
+        }
     }
 }
 </script>

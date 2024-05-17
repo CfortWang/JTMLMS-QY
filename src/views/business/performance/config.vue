@@ -30,12 +30,13 @@
                 </div>
                 <div class="right">
                     <experimental-data :info="form" :readonly="readonly" />
+                    <precision v-if="$utils.isNotEmpty(form.shiYanShuJu)" :info="form.shiYanShuJu" :readonly="readonly" />
                     <conclusion :info="form" :readonly="readonly" />
                 </div>
             </div>
         </el-form>
         <div slot="title" class="config-dialog-header">
-            <div class="title">{{ pageData.name }}</div>
+            <div class="title">{{ pageData.method }}</div>
             <div class="operate">
                 <template v-for="btn in toolbars">
                     <el-button
@@ -65,7 +66,8 @@ export default {
         ReagentInfo: () => import('./components/reagent-info'),
         ParamInfo: () => import('./components/param-info'),
         ExperimentalData: () => import('./components/experimental-data'),
-        Conclusion: () => import('./components/conclusion')
+        Conclusion: () => import('./components/conclusion'),
+        Precision: () => import('./report/precision')
     },
     props: {
         visible: {
@@ -93,7 +95,7 @@ export default {
             dialogVisible: this.visible,
             formLabelWidth: '110px',
             form: {
-                xingNengZhiBiao: '',
+                xingNengZhiBia: '',
                 fangAnLeiXing: '',
                 bianZhiBuMen: '',
                 shiYanXiangMu: '',
@@ -121,7 +123,7 @@ export default {
                 { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'info', hidden: this.readonly },
                 { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
-                { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
+                // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ]
         }
@@ -161,8 +163,6 @@ export default {
         handleActionEvent (key) {
             switch (key) {
                 case 'save':
-                    this.handleSave(key)
-                    break
                 case 'submit':
                     this.handleSave(key)
                     break
@@ -207,12 +207,16 @@ export default {
             const submitData = {
                 ...this.form,
                 shiYanCanShu: JSON.stringify(this.form.shiYanCanShu),
-                shiYanShuJu: JSON.stringify(this.form.shiYanShuJu)
+                shiYanShuJu: JSON.stringify(this.form.shiYanShuJu),
+                xingNengZhiBia: this.pageData.target,
+                fangAnLeiXing: this.pageData.method,
+                id: this.pageData.id
             }
             // 提交数据
             saveExperimental(submitData).then(res => {
                 console.log(res)
                 if (key === 'save') {
+                    this.form.id = res.data
                     this.$message.success('保存成功')
                 } else {
                     this.$message.success('提交成功')
@@ -234,8 +238,8 @@ export default {
         },
         handleTest () {
             const o = {
-                xingNengZhiBiao: '精密度',
-                fangAnLeiXing: '简单精密度评价',
+                xingNengZhiBia: '精密度',
+                fangAnLeiXing: 'EP15-A3精密度评价',
                 bianZhiBuMen: '1166703356459089920',
                 shiYanXiangMu: '测试项目',
                 shiYanFangFa: '测试方法',
@@ -273,21 +277,23 @@ export default {
                     }
                 ],
                 shiYanCanShu: {
-                    sampleCount: 2,
-                    resultCount: 10,
+                    specimensNum: 2,
+                    repeatNum: 10,
+                    days: 5,
+                    isConvert: true,
                     model: ['总不精密度'],
                     range: '无',
                     standard: '允许总误差Tea',
                     remark: '',
                     tea: 10,
-                    batchCVS: '0.25',
+                    batchCVS: 0.25,
                     batchCVSValue: 2.50,
-                    dailyCVS: '0.33',
+                    dailyCVS: 0.33,
                     dailyCVSValue: 3.33
                 },
                 shiYanShuJu: null,
                 shiYanJieLun: '测试达标',
-                jieLunShenHeRen: '1166673437578493952',
+                shenHeRen: '1166673437578493952',
                 baoGaoShiJian: '2024-05-06',
                 fuJian: '1239940596743798784'
             }

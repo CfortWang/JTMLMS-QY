@@ -28,7 +28,7 @@
                     :key="t.sn"
                     class="card-item"
                 >
-                    <div class="method-btn" @click="handleEdit(t)">{{ t.name }}</div>
+                    <div class="method-btn" @click="handleEdit(item, t)">{{ t.name }}</div>
                 </div>
             </el-card>
         </div>
@@ -51,7 +51,8 @@ export default {
         return {
             showConfig: false,
             configData: {
-                title: ''
+                target: '',
+                method: ''
             },
             performanceList
         }
@@ -88,8 +89,11 @@ export default {
         handleConfig (item) {
             this.$message.info('coming soon!')
         },
-        handleEdit (t) {
-            this.configData = t
+        handleEdit (item, t) {
+            this.configData = {
+                target: item.title,
+                method: t.name
+            }
             this.showConfig = true
         },
         goToDetailPage (card) {
