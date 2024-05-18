@@ -36,10 +36,6 @@ export default {
     methods: {
         getMiddleLeft () {
             var chartDom = document.getElementById(this.info.config.idSelector)
-            // console.log(chartDom.getBoundingClientRect().height, 'chartDom')
-            // const domHeight = parseInt(chartDom.getBoundingClientRect().height)
-            // let interval =
-            // var myChart = echarts.init(chartDom)
             const ay = this.info.data
             let yc
             ay[0] > ay[1] ? yc = ay[0] : yc = ay[1]

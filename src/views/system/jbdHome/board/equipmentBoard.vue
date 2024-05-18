@@ -79,7 +79,6 @@
 <script>
 import screenfull from 'screenfull'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import data from '@/components/ibps-icon-select/data'
 export default {
     name: 'check-board',
     components: {
@@ -141,14 +140,14 @@ export default {
                 color: ['#339933', '#3870e0', '#FF0033']
             },
             allWeihuSheBeiData: {
-                data: [{ name: '计划数', value: 0 }, { name: '完成数', value: 0 }],
+                data: [{ name: '待处理', value: 0 }, { name: '已完成', value: 0 }],
                 config: { title: '检验科设备维护完成情况', idSelector: 'allWeihuShebei' },
-                color: ['#3870e0', '#FFFF66']
+                color: ['#3870e0', '#339933']
             },
             allJiaozhunSheBeiData: {
                 data: [{ name: '计划数', value: 0 }, { name: '完成数', value: 0 }],
                 config: { title: '检验科设备检定/校准完成情况', idSelector: 'allJiaozhunShebei' },
-                color: ['#3870e0', '#FFFF66']
+                color: ['#3870e0', '#339933']
             }
         }
     },
@@ -483,15 +482,10 @@ export default {
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
             // 计划数，查询设备维护计划表完成数
-            //         const sql1 = `select DISTINCT(q.id_) ,q.name_,COUNT(*) AS total  FROM
-            //   (select DISTINCT(a.she_bei_bian_hao_),b.name_,b.id_ FROM t_mjsbwhjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN
-            //   (select id_ FROM t_mjsbwhjhb WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND shi_fou_guo_shen_ = '已完成' AND di_dian_ = '${didian}') GROUP BY a.she_bei_bian_hao_) AS q  GROUP BY q.id_`
-
-            // 计划数，查询设备维护计划表完成数
-            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE (a.bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR a.create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND a.shi_fou_guo_shen_ != '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE '%${this_.today}%' AND a.shi_fou_guo_shen_ != '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
             //   维护记录数
-            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE (a.bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR a.create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND a.shi_fou_guo_shen_ = '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
-            this.weihuBarData.data.dimensions = ['product', '计划数', '完成数']
+            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE '%${this_.today}%' AND a.shi_fou_guo_shen_ = '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+            this.weihuBarData.data.dimensions = ['product', '待处理', '已完成']
             let data1, data2
             await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2)]).then(([res1, res2]) => {
                 if (res1.state === 200) {
@@ -501,46 +495,43 @@ export default {
                     data2 = res2.variables.data
                 }
             })
-
-            data2 = [
-
-                { bian_zhi_bu_men_: '1166373523464126464', name_: '检验科', total: 4 },
-
-                { bian_zhi_bu_men_: '1166703356459089920', name_: '临检组', total: 2544 },
-
-                { bian_zhi_bu_men_: '1166703455549521920', name_: '生化组', total: 2559 },
-
-                { bian_zhi_bu_men_: '1166703521244905472', name_: '免疫组', total: 1331 },
-
-                { bian_zhi_bu_men_: '1166703593022029824', name_: '微生物组', total: 2055 }]
             const source = []
             data1.forEach((item, index) => {
                 source.push({
                     product: item.name_,
-                    '计划数': item.total,
-                    '完成数': 0
+                    '待处理': item.total || 0,
+                    '已完成': 0
                 })
             })
             data2.forEach(item => {
                 let lock = true
-                source.forEach((el, index) => {
-                    if (item.name_ === el.product) {
-                        source[index]['完成数'] = item.total
-                        lock = false
-                    } else if (lock && index === source.length - 1) {
-                        source.push({
-                            product: item.name_,
-                            '计划数': 0,
-                            '完成数': item.total
-                        })
-                    }
-                })
+                if (source.length > 0) {
+                    source.forEach((el, index) => {
+                        if (item.name_ === el.product) {
+                            source[index]['完成数'] = item.total
+                            lock = false
+                        } else if (lock && index === source.length - 1) {
+                            source.push({
+                                product: item.name_,
+                                '待处理': 0,
+                                '已完成': item.total || 0
+                            })
+                        }
+                    })
+                } else {
+                    source.push({
+                        product: item.name_,
+                        '待处理': 0,
+                        '已完成': item.total || 0
+                    })
+                }
             })
             let allPlan = 0; let finishs = 0
             source.forEach(item => {
-                allPlan += item['计划数']
-                finishs += item['完成数']
+                allPlan += item['待处理']
+                finishs += item['已完成']
             })
+            console.log(source, 'source2')
             this.allWeihuSheBeiData.data[0].value = allPlan
             this.allWeihuSheBeiData.data[1].value = finishs
             this.moreBarData.data.source.forEach(item => {
@@ -552,8 +543,8 @@ export default {
                     if (item.product !== el.product && index === source.length - 1 && lock) {
                         source.push({
                             product: item.product,
-                            '计划数': 0,
-                            '完成数': 0
+                            '待处理': 0,
+                            '已完成': 0
                         })
                     }
                 })

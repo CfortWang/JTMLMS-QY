@@ -74,7 +74,7 @@ export default {
                     formatter: '{d}%'
                 },
                 label: {
-                    formatter: '{b}\n{c}，{d}%',
+                    formatter: '{c}，{d}%\n{b}',
                     edgeDistance: '20%'
                 },
 

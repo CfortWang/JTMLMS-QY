@@ -38,7 +38,6 @@ export default {
         getMiddleLeft () {
             const this_ = this
             const series = []
-            console.log(this_.info, this_.info.config.idSelector, '12')
             if (this_.info.data.source[0] === 999) {
                 this.showChart = false
                 return
@@ -60,7 +59,6 @@ export default {
             if (this_.info.config.idSelector === 'eqFinish') {
                 let max = 0
                 this_.info.data.source.forEach(item => {
-                    console.log(item.设备总数)
                     if (item.设备总数 > max) {
                         max = item.设备总数
                     }
@@ -76,13 +74,11 @@ export default {
                 let wanchengmax = 0
                 let max = 0
                 this_.info.data.source.forEach(item => {
-                    console.log(item.计划数)
                     if (item.计划数 > max) {
                         jihuamax = item.计划数
                     }
                 })
                 this_.info.data.source.forEach(item => {
-                    console.log(item.完成数)
                     if (item.完成数 > wanchengmax) {
                         wanchengmax = item.完成数
                     }
