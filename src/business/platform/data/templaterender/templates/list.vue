@@ -187,7 +187,7 @@
             :template-key="dataTemplate.key"
             :add-data-cont="addDataCont"
             :previous-data-template="dataTemplate"
-            @callback="search"
+            @callback="search('callback')"
             @close="closeDataTemplateFormrenderDialog"
         />
         <!-- 流程定义选择器 -->
@@ -248,7 +248,7 @@
             :task-id="taskId"
             :add-data-cont="addDataCont"
             :previous-data-template="dataTemplate"
-            @callback="search"
+            @callback="search('callback')"
             @close="loadFlowFData"
         />
         <Scan
@@ -717,6 +717,10 @@ export default {
             }
             return [this.getPkValue(this.selectionAll)]
         },
+        initSelect () {
+            this.selection = this.multiple ? [] : {}
+            this.selectionAll = this.multiple ? [] : {}
+        },
         /**
          * 根据key获取对象的值
          * 用于解决key值大小写不同的问题
@@ -739,14 +743,19 @@ export default {
         /**
          * 加载数据
          */
-        loadData (outerKey) {
+        loadData (outerKey, type) {
             // 仅模板类型为对话框时触发页内loading事件，其余根据接口判定触发全局loading
             this.loading = this.dataTemplate.type === 'dialog'
             if (this.$utils.isEmpty(this.template)) return
             queryDataTable(this.getFormatParams(outerKey), this.dataTemplate.type).then((response) => {
                 this.loading = false
                 ActionUtils.handleListData(this, response.data)
-                this.setSelectRow()
+                // 回调查询不再选中原有数据
+                if (type !== 'callback') {
+                    this.setSelectRow()
+                } else {
+                    this.initSelect()
+                }
                 if (this.$refs.crud) {
                     this.$refs.crud.handleTableHeight()
                     debounce(() => {
@@ -794,7 +803,6 @@ export default {
                                     refSerchForm.params[getBuildSearchForm.prop[0]] = val[0]
                                     refSerchForm.params[getBuildSearchForm.prop[1]] = val[1]
                                     refSerchForm.params['daterange-prefix' + index] = [val[0], val[1]]
-
                                     break
                             }
                             // refSerchForm.params[getBuildSearchForm.modelValue] = val
@@ -838,9 +846,9 @@ export default {
             this.loadData()
         },
         // 查询数据
-        search () {
+        search (type) {
             this.hadDoSearch = true
-            this.loadData()
+            this.loadData('', type)
             this.addDataCont = {}
         },
         /* 流程页面关闭，刷新当前页面*/
@@ -1762,6 +1770,7 @@ export default {
             }).then((response) => {
                 this.afterScript(action, position, selection, data, () => {
                     ActionUtils.removeSuccessMessage()
+                    this.initSelect()
                     this.search()
                 })
             }).catch(() => {})
