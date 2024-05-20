@@ -105,7 +105,6 @@ export default {
     mounted () {
         const { shenHeRen, baoGaoShiJian, shiYanJieLun, fuJian } = this.info || {}
         this.pageInfo = { shenHeRen, baoGaoShiJian, shiYanJieLun, fuJian }
-        console.log(this.pageInfo, 123)
     }
 }
 </script>

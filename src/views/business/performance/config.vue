@@ -23,11 +23,17 @@
         >
             <div v-if="loadCompleted" class="config-form-container">
                 <div class="left">
-                    <experimental-desc :step-desc="stepDesc" :readonly="readonly" />
-                    <basic-info :info.sync="form" :readonly="readonly" />
-                    <reagent-info :info.sync="form.reagentPoList" :readonly="readonly" />
+                    <experimental-desc
+                        :step-desc="stepDesc"
+                        :references="references"
+                        :readonly="readonly"
+                    />
+                    <basic-info :info="form" :readonly="readonly" />
+                    <reagent-info :info="form.reagentPoList" :readonly="readonly" />
                     <param-info
-                        :info.sync="form.shiYanCanShu"
+                        :info="form.shiYanCanShu"
+                        :config-data="configData"
+                        :params="params"
                         :readonly="readonly"
                         @updateParams="handleUpdateParams"
                     />
@@ -125,12 +131,17 @@ export default {
                 beiZhu: '',
                 reagentPoList: [],
                 shiYanCanShu: {
-                    model: []
+                    model: [],
+                    specimensName: [],
+                    targetValue: []
                 },
                 shiYanShuJu: {},
                 shiYanJieLun: ''
             },
             rules: formRules,
+            configData: [],
+            params: [],
+            references: '',
             loading: false,
             loadCompleted: false,
             toolbars: [
@@ -155,14 +166,10 @@ export default {
         }
     },
     created () {
-
+        this.getConfigData()
     },
     mounted () {
-        const { id, target, method } = this.pageData || {}
-        const t = performanceList.find(i => i.title === target)
-        const m = t.methods.find(i => i.name === method)
-        this.stepDesc = m ? m.step : ''
-        if (!id) {
+        if (!this.pageData.id) {
             this.loadCompleted = true
             return
         }
@@ -184,6 +191,15 @@ export default {
             }).catch(() => {
                 this.loading = false
             })
+        },
+        getConfigData () {
+            const { target, method } = this.pageData || {}
+            const t = performanceList.find(i => i.title === target)
+            const m = t.methods.find(i => i.name === method)
+            this.stepDesc = m ? m.step : ''
+            this.params = m ? m.params : []
+            this.configData = m ? m.config : null
+            this.references = m ? m.references : ''
         },
         handleActionEvent (key) {
             switch (key) {
@@ -348,7 +364,7 @@ export default {
             }
         }
         .config-form {
-            .config-form-container {
+            &-container {
                 position: relative;
                 width: 100%;
                 height: calc(100vh - 60px);
@@ -375,19 +391,13 @@ export default {
                                     margin-right: 5px;
                                 }
                             }
-                            .desc {
-                                color: #606266;
-                                font-size: 14px;
-                                line-height: 1.5;
-                                text-indent: 2em;
-                            }
                             .el-form-item {
                                 margin-bottom: 0 !important;
-                                .el-form-item__label {
+                                &__label {
                                     font-size: 14px !important;
                                     color: #606266;
                                 }
-                                .el-form-item__content {
+                                &__content {
                                     .el-input, .el-select, .el-input-number {
                                         width: 100%;
                                     }

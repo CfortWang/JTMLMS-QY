@@ -130,6 +130,36 @@ export default {
                 ActionUtils.download(res.data, '实验数据模板.xlsx')
             })
         },
+        objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
+            // 判断当前列是否需要进行同值合并
+            if (column.merge) {
+                const firstSameRowIndex = this.getFirstSameRowIndex(this.tableData, rowIndex, column.property)
+                const firstSameColIndex = this.getFirstSameColIndex(this.tableData, columnIndex, rowIndex)
+
+                return {
+                    rowspan: firstSameRowIndex === -1 ? 1 : rowIndex - firstSameRowIndex + 1,
+                    colspan: firstSameColIndex === -1 ? 1 : columnIndex - firstSameColIndex + 1
+                }
+            }
+        },
+        // 获取行同值合并的起始下标
+        getFirstSameRowIndex (data, rowIndex, prop) {
+            for (let i = rowIndex; i >= 0; i--) {
+                if (data[i][prop] === data[rowIndex][prop]) {
+                    return i
+                }
+            }
+            return -1
+        },
+        // 获取列同值合并的起始下标
+        getFirstSameColIndex (data, colIndex, rowIndex) {
+            for (let i = colIndex; i >= 0; i--) {
+                if (data[rowIndex][i] === data[rowIndex][colIndex]) {
+                    return i
+                }
+            }
+            return -1
+        },
         // handleImport (file, options) {
         //     this.loading = false
         //     IbpsImport.xlsx(file, options).then(res => {
