@@ -1819,10 +1819,16 @@ export default {
             })
         },
         setValue (data) {
-            return Array.isArray(data) ? data.map(item => ({ [item]: '' })) : {}
+            return Object.values(data).reduce((obj, item) => {
+                obj[item] = ''
+                return obj
+            }, {})
         },
         getKeys (data) {
-            return Array.isArray(data) ? data.map(item => ({ [item.label]: item.name })) : {}
+            return data.reduce((obj, item) => {
+                obj[item.label] = item.name
+                return obj
+            }, {})
         },
         xlsxFileClick () {
             this.xlsxFileVisible = true

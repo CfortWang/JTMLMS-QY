@@ -285,14 +285,18 @@ export default {
                     selectFieldsTableData.push({ title: target[f] || null, dataType: '', disabled: true, checked: false, key: '' })
                 }
             }
+            const labelList = Object.keys(this.fields).map(key => ({
+                key,
+                label: this.fields[key].label,
+                field_type: this.fields[key].field_type || this.fields[key].type
+            }))
             selectFieldsTableData.forEach(s => {
-                for (var f in this.fields) {
-                    if (s.title === this.fields[f].label) {
-                        s.dataType = this.fields[f].field_type || this.fields[f].type
-                        s.disabled = !this.fields[f].label === s.title
-                        s.checked = this.fields[f].label === s.title
-                        s.key = f
-                    }
+                const t = labelList.find(i => i.label === s.title)
+                if (t) {
+                    s.dataType = t.field_type || t.type
+                    s.disabled = !t.label === s.title
+                    s.checked = t.label === s.title
+                    s.key = t.key
                 }
             })
             this.selectFieldsTableData = selectFieldsTableData
@@ -376,15 +380,6 @@ export default {
             // 列表数据处理
             const tableData = JSON.parse(JSON.stringify(this.tableData.data))
             const saveData = []
-            const gysmlSql = 'select * FROM t_gysml'
-            // 去除字符串里的空格
-            function trim (str) {
-                var reg = /\s+/g
-                if (typeof str === 'string') {
-                    var trimStr = str.replace(reg, '')
-                }
-                return trimStr
-            }
             switch (formKey) {
                 default:
                     tableData.forEach(data => {
