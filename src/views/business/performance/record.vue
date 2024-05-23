@@ -22,7 +22,7 @@
                 <div>止：{{ scope.row.jieShuShiJian }}</div>
             </template>
         </ibps-crud>
-        <config
+        <Experimental
             v-if="showConfig"
             :visible.sync="showConfig"
             :page-data="detailData"
@@ -34,13 +34,13 @@
 
 <script>
 import { queryExperimental, getExperimental, removeExperimental } from '@/api/business/pv'
-import { performanceList } from './constants'
+import { performanceList } from './constants/index'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 
 export default {
     components: {
-        Config: () => import('./config')
+        Experimental: () => import('./experimental')
     },
     mixins: [FixHeight],
     data () {
@@ -221,6 +221,7 @@ export default {
          * 处理删除
          */
         handleRemove (ids) {
+            // return this.$message.warning('避免误删测试数据，联系开发删除')
             removeExperimental({ ids }).then(() => {
                 ActionUtils.removeSuccessMessage()
                 this.search()

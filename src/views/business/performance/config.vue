@@ -12,53 +12,8 @@
         @open="loadData"
         @close="closeDialog"
     >
-        <el-form
-            ref="form"
-            :label-width="formLabelWidth"
-            :model.sync="form"
-            :rules="rules"
-            class="config-form"
-            :class="readonly ? 'readonly-form' : ''"
-            @submit.native.prevent
-        >
-            <div v-if="loadCompleted" class="config-form-container">
-                <div class="left">
-                    <experimental-desc
-                        :step-desc="stepDesc"
-                        :references="references"
-                        :readonly="readonly"
-                    />
-                    <basic-info :info="form" :readonly="readonly" />
-                    <reagent-info :info="form.reagentPoList" :readonly="readonly" />
-                    <param-info
-                        :info="form.shiYanCanShu"
-                        :config-data="configData"
-                        :params="params"
-                        :readonly="readonly"
-                        @updateParams="handleUpdateParams"
-                    />
-                </div>
-                <div class="right">
-                    <experimental-data
-                        :info="form.shiYanShuJu"
-                        :form-id="form.id"
-                        :readonly="readonly"
-                    />
-                    <precision
-                        v-if="$utils.isNotEmpty(form.shiYanShuJu)"
-                        :info="form.shiYanShuJu"
-                        :readonly="readonly"
-                    />
-                    <conclusion
-                        :info="form"
-                        :readonly="readonly"
-                        @updateData="handleUpdateData"
-                    />
-                </div>
-            </div>
-        </el-form>
         <div slot="title" class="config-dialog-header">
-            <div class="title">{{ pageData.method }}</div>
+            <div class="title">{{ pageData.target + '配置' }}</div>
             <div class="operate">
                 <template v-for="btn in toolbars">
                     <el-button
@@ -74,84 +29,184 @@
                 </template>
             </div>
         </div>
+        <el-form
+            v-if="loadCompleted"
+            ref="configForm"
+            :label-width="formLabelWidth"
+            :model.sync="formData"
+            :rules="rules"
+            class="config-form"
+            @submit.native.prevent
+        >
+            <div class="config-item">
+                <div class="title">
+                    <i class="ibps-icon-star" />
+                    <span>指标配置</span>
+                </div>
+                <div class="form-container">
+                    <el-row :gutter="20" class="form-row">
+                        <el-col :span="12">
+                            <el-form-item label="指标名称" prop="target" :show-message="false">
+                                <el-input
+                                    v-model="formData.target"
+                                    type="text"
+                                    :disabled="readonly"
+                                    placeholder="请输入"
+                                />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-form-item label="指标类型" prop="type" :show-message="false">
+                                <el-input
+                                    v-model="formData.type"
+                                    type="text"
+                                    :disabled="readonly"
+                                    placeholder="请输入"
+                                />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-form-item label="排序" prop="sn" :show-message="false">
+                                <el-input
+                                    v-model="formData.sn"
+                                    type="text"
+                                    :disabled="readonly"
+                                    placeholder="请输入"
+                                />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-form-item label="图标" prop="icon">
+                                <el-input
+                                    v-model="formData.icon"
+                                    type="text"
+                                    :disabled="readonly"
+                                    placeholder="请输入"
+                                />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+            <div class="config-item">
+                <div class="title">
+                    <i class="ibps-icon-star" />
+                    <span>方法配置</span>
+                </div>
+                <el-tabs v-model="activeTab" type="border-card" class="method-tab">
+                    <!-- <template slot="tab-bar">
+                        <el-button
+                            class="add-btn"
+                            size="mini"
+                            type="primary"
+                            icon="el-icon-plus"
+                            @click="addMethod"
+                        >添加</el-button>
+                    </template> -->
+                    <el-tab-pane
+                        v-for="(method, index) in methodTabs"
+                        :key="index"
+                        :label="method.name"
+                        :name="method.name"
+                    >
+                        <template #label>
+                            <span>{{ method.name }}</span>
+                            <el-dropdown @command="handleCommand(method)">
+                                <i class="el-icon-setting el-dropdown-link" />
+                                <el-dropdown-menu slot="dropdown">
+                                    <el-dropdown-item command="copy">复制</el-dropdown-item>
+                                    <el-dropdown-item command="delete">删除</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </el-dropdown>
+                        </template>
+                        <el-row :gutter="20" class="form-row">
+                            <el-col :span="12">
+                                <el-form-item label="方法名称" :prop="`methods[${index}].name`" :show-message="false">
+                                    <el-input v-model="method.name" @input="handleNameChange" />
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="排序" :prop="`methods[${index}].sn`" :show-message="false">
+                                    <el-input v-model="method.sn" />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20" class="form-row">
+                            <el-col :span="12">
+                                <el-form-item label="是否禁用" :prop="`methods[${index}].disabled`" :show-message="false">
+                                    <el-switch v-model="method.disabled" />
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="是否公开" :prop="`methods[${index}].isPrivate`" :show-message="false">
+                                    <el-switch v-model="method.isPrivate" />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20" class="form-row" :prop="`methods[${index}].step`" :show-message="false">
+                            <el-col :span="24">
+                                <el-form-item label="实验步骤">
+                                    <el-input
+                                        v-model="method.step"
+                                        type="textarea"
+                                        :autosize="{ minRows: 4, maxRows: 6 }"
+                                    />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-form-item label="参考资料" :prop="`methods[${index}].step`">
+                            <ibps-attachment
+                                v-model="method.references"
+                                allow-download
+                                download
+                                multiple
+                                accept="*"
+                                store="id"
+                                :readonly="readonly"
+                            />
+                        </el-form-item>
+                    </el-tab-pane>
+                </el-tabs>
+            </div>
+        </el-form>
     </el-dialog>
 </template>
 
 <script>
-import { round } from 'lodash'
-import { performanceList } from './constants'
-import { formRules } from './constants'
-import { getExperimental, saveExperimental } from '@/api/business/pv'
+import { performanceList, configFormRules } from './constants/index'
+import { getConfigDetail, saveConfig } from '@/api/business/pv'
 export default {
     components: {
-        ExperimentalDesc: () => import('./components/experimental-desc'),
-        BasicInfo: () => import('./components/basic-info'),
-        ReagentInfo: () => import('./components/reagent-info'),
-        ParamInfo: () => import('./components/param-info'),
-        ExperimentalData: () => import('./components/experimental-data'),
-        Conclusion: () => import('./components/conclusion'),
-        Precision: () => import('./report/precision')
+        IbpsAttachment: () => import('@/business/platform/file/attachment/selector')
     },
     props: {
         visible: {
             type: Boolean,
             default: false
         },
-        readonly: {
-            type: Boolean,
-            default: false
-        },
         pageData: {
             type: Object,
-            default: () => {
-                return {}
-            }
+            default: () => {}
         }
     },
     data () {
-        const { userId } = this.$store.getters || {}
         return {
             dialogVisible: this.visible,
-            formLabelWidth: '110px',
-            form: {
-                xingNengZhiBia: '',
-                fangAnLeiXing: '',
-                bianZhiBuMen: '',
-                shiYanXiangMu: '',
-                shiYanFangFa: '',
-                yangBenLeiXing: '',
-                shiYanYiQi: '',
-                yiQiBianHao: '',
-                kaiShiShiJian: '',
-                jieShuShiJian: '',
-                bianZhiRen: '',
-                createBy: userId,
-                jieGuoDanWei: '',
-                baoLiuXiaoShu: 2,
-                beiZhu: '',
-                reagentPoList: [],
-                shiYanCanShu: {
-                    model: [],
-                    specimensName: [],
-                    targetValue: []
-                },
-                shiYanShuJu: {},
-                shiYanJieLun: ''
-            },
-            rules: formRules,
-            configData: [],
-            params: [],
-            references: '',
+            formLabelWidth: '90px',
+            formData: {},
+            rules: configFormRules,
+            activeTab: '',
+            methodTabs: [],
+            targetId: '',
             loading: false,
             loadCompleted: false,
+            readonly: false,
             toolbars: [
-                { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
-                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'info', hidden: this.readonly },
-                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
-                // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
+                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success' },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ],
-            stepDesc: ''
+            paramsTitle: ['名称', '编码', '默认值', '最大值', '最小值', '精度'],
+            formulaTitle: ['名称', '编码', '表达式']
         }
     },
     computed: {
@@ -162,24 +217,26 @@ export default {
             handler (val, oldVal) {
                 this.dialogVisible = this.visible
             }
-            // immediate: true
         }
     },
     created () {
-        this.getConfigData()
+        // this.getConfigData()
     },
     mounted () {
-        if (!this.pageData.id) {
-            this.loadCompleted = true
-            return
-        }
-        this.loadData()
+        const temp = performanceList.find(i => i.type === 'precision') || {}
+        this.formData = JSON.parse(JSON.stringify(temp))
+        this.formData.target = this.formData.title
+        console.log(this.formData)
+        this.methodTabs = this.formData.methods
+        this.activeTab = this.methodTabs[0].name
+        this.loadCompleted = true
+        // this.loadData()
     },
     methods: {
         // 获取数据
         async loadData () {
             this.loading = true
-            getExperimental({ id: this.pageData.id }).then(res => {
+            getConfigDetail({ id: this.pageData.id }).then(res => {
                 this.loading = false
                 const { data } = res || {}
                 if (data) {
@@ -192,77 +249,88 @@ export default {
                 this.loading = false
             })
         },
+        handleClick (v) {
+            this.activeTab = v.name
+        },
+        handleNameChange (v) {
+            this.activeTab = v
+        },
+        handleCommand (method) {
+            return (command) => {
+                if (command === 'copy') {
+                    this.copyMethod(method)
+                } else if (command === 'delete') {
+                    this.deleteMethod(method)
+                }
+            }
+        },
+        copyMethod (method) {
+            const newMethod = JSON.parse(JSON.stringify(method))
+            newMethod.sn = `02-${this.form.methods.length + 1}`
+            newMethod.name += ' (复制)'
+            this.form.methods.push(newMethod)
+        },
+        deleteMethod (method) {
+            this.form.methods = this.form.methods.filter((m) => m.sn !== method.sn)
+            this.activeTab = this.form.methods.length ? this.form.methods[0].sn : ''
+        },
+        addMethod () {
+            console.log(123)
+        },
         getConfigData () {
             const { target, method } = this.pageData || {}
             const t = performanceList.find(i => i.title === target)
             const m = t.methods.find(i => i.name === method)
-            this.stepDesc = m ? m.step : ''
-            this.params = m ? m.params : []
-            this.configData = m ? m.config : null
-            this.references = m ? m.references : ''
+            this.targetId = t.id
         },
         handleActionEvent (key) {
             switch (key) {
                 case 'save':
-                case 'submit':
                     this.handleSave(key)
-                    break
-                case 'generate':
-                    this.handleGenerate()
                     break
                 case 'cancel':
                     this.handleCancel()
-                    break
-                case 'test':
-                    this.handleTest()
                     break
                 default:
                     break
             }
         },
         handleSave (key) {
-            this.$refs.form.validate((valid) => {
+            console.log(this.formData)
+            this.$refs.configForm.validate((valid) => {
                 if (!valid) {
                     return this.$message.warning('请完善表单必填项信息！')
                 }
-                if (key === 'save') {
-                    this.submitForm(key)
-                } else {
-                    this.$confirm('确定要提交数据吗？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning',
-                        showClose: false,
-                        closeOnClickModal: false,
-                        closeOnPressEscape: false
-                    }).then(() => {
-                        this.submitForm(key)
-                    })
-                }
+                this.submitForm()
             })
         },
-        handleGenerate () {
-            this.$message.info('waiting...')
+        handleAddParam (type, index) {
+            const obj = type === 'config' ? {
+                key: '',
+                label: '',
+                default: '',
+                max: '',
+                min: '',
+                precision: ''
+            } : {
+                key: '',
+                label: '',
+                value: ''
+            }
+            const temp = this.formData.methods[index][type] || []
+            temp.push(obj)
+            this.formData.methods[index][type] = temp
+        },
+        handleDelParam (type, index, cIndex) {
+            this.formData.methods[index][type].splice(cIndex, 1)
         },
         submitForm (key) {
-            const submitData = {
-                ...this.form,
-                shiYanCanShu: JSON.stringify(this.form.shiYanCanShu),
-                shiYanShuJu: JSON.stringify(this.form.shiYanShuJu),
-                xingNengZhiBia: this.pageData.target,
-                fangAnLeiXing: this.pageData.method,
-                id: this.pageData.id
-            }
+            const submitData = {}
             // 提交数据
-            saveExperimental(submitData).then(res => {
+            saveConfig(submitData).then(res => {
                 console.log(res)
-                if (key === 'save') {
-                    this.form.id = res.data
-                    this.$message.success('保存成功')
-                } else {
-                    this.$message.success('提交成功')
-                    this.closeDialog()
-                }
+                this.$message.success('保存成功')
+                this.closeDialog()
             })
         },
         handleCancel () {
@@ -270,78 +338,6 @@ export default {
         },
         closeDialog () {
             this.$emit('update:visible', false)
-        },
-        handleUpdateParams (value) {
-            this.form.shiYanCanShu = value
-        },
-        handleUpdateData (value) {
-            this.form = {
-                ...this.form,
-                ...value
-            }
-        },
-        handleTest () {
-            const o = {
-                xingNengZhiBia: '精密度',
-                fangAnLeiXing: 'EP15-A3精密度评价',
-                bianZhiBuMen: '1166703356459089920',
-                shiYanXiangMu: '测试项目',
-                shiYanFangFa: '测试方法',
-                yangBenLeiXing: '测试样本类型',
-                shiYanYiQi: '测试实验仪器',
-                yiQiBianHao: 'jyk-test-001',
-                kaiShiShiJian: '2024-05-01 09:00',
-                jieShuShiJian: '2024-05-05 17:00',
-                bianZhiRen: '1166772479054577664',
-                createBy: '1166771426615623680',
-                jieGuoDanWei: 'mmol/L',
-                baoLiuXiaoShu: 2,
-                beiZhu: '测试数据',
-                reagentPoList: [
-                    {
-                        changJia: 'BIO-RIO',
-                        leiBie: '质控品',
-                        piHao: 'test001',
-                        shiJiMingCheng: '生化质控品',
-                        youXiaoQi: '2025-05-01'
-                    },
-                    {
-                        changJia: 'BIO-RIO',
-                        leiBie: '校准品',
-                        piHao: 'test002',
-                        shiJiMingCheng: '生化校准品',
-                        youXiaoQi: '2025-06-01'
-                    },
-                    {
-                        changJia: 'BIO-RIO',
-                        leiBie: '标准物',
-                        piHao: 'test001',
-                        shiJiMingCheng: '标准物',
-                        youXiaoQi: '2025-05-01'
-                    }
-                ],
-                shiYanCanShu: {
-                    specimensNum: 2,
-                    repeatNum: 10,
-                    days: 5,
-                    isConvert: true,
-                    model: ['总不精密度'],
-                    range: '无',
-                    standard: '允许总误差Tea',
-                    remark: '',
-                    tea: 10,
-                    batchCVS: 0.25,
-                    batchCVSValue: 2.50,
-                    dailyCVS: 0.33,
-                    dailyCVSValue: 3.33
-                },
-                shiYanShuJu: null,
-                shiYanJieLun: '测试达标',
-                shenHeRen: '1166673437578493952',
-                baoGaoShiJian: '2024-05-06',
-                fuJian: '1239940596743798784'
-            }
-            this.form = JSON.parse(JSON.stringify(o))
         }
     }
 }
@@ -364,71 +360,100 @@ export default {
             }
         }
         .config-form {
-            &-container {
-                position: relative;
-                width: 100%;
-                height: calc(100vh - 60px);
-                overflow: auto;
-                display: flex;
-                .left, .right {
-                    width: 50%;
-                    // min-height: 100%;
-                    height: 100%;
-                    overflow-y: auto;
-                    padding: 15px 20px;
-                    box-sizing: border-box;
-                    ::v-deep {
-                        .info-item {
-                            margin-bottom: 20px;
-                            .title {
-                                height: 20px;
-                                line-height: 20px;
-                                font-size: 16px;
-                                font-weight: bold;
-                                margin-bottom: 10px;
-                                .ibps-icon-star {
-                                    color: #FB9600;
-                                    margin-right: 5px;
-                                }
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            overflow: hidden;
+            height: calc(100vh - 100px);
+            .config-item {
+                margin-bottom: 20px;
+                .title {
+                    height: 20px;
+                    line-height: 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                    .ibps-icon-star {
+                        color: #FB9600;
+                        margin-right: 5px;
+                    }
+                }
+                ::v-deep {
+                    .el-form-item {
+                        margin-bottom: 10 !important;
+                        &__label {
+                            font-size: 14px !important;
+                            color: #606266;
+                        }
+                        &__content {
+                            .el-input, .el-select, .el-input-number {
+                                width: 100%;
                             }
-                            .el-form-item {
-                                margin-bottom: 0 !important;
-                                &__label {
-                                    font-size: 14px !important;
-                                    color: #606266;
-                                }
-                                &__content {
-                                    .el-input, .el-select, .el-input-number {
-                                        width: 100%;
-                                    }
-                                    .el-textarea .el-input__count {
-                                        padding: 0 5px;
-                                        line-height: initial;
-                                    }
-                                    .el-radio, .el-checkbox {
-                                        margin-right: 10px;
-                                    }
-                                }
+                            .el-textarea .el-input__count {
+                                padding: 0 5px;
+                                line-height: initial;
                             }
-                            .el-table th.el-table__cell > .cell, .el-table td.el-table__cell {
-                                color: #606266;
-                                font-size: 14px;
-                            }
-                            .el-button--mini {
-                                padding: 5px 12px;
+                            .el-radio, .el-checkbox {
+                                margin-right: 10px;
                             }
                         }
                     }
+                    .el-table th.el-table__cell > .cell, .el-table td.el-table__cell {
+                        color: #606266;
+                        font-size: 14px;
+                    }
+                    .el-button--mini {
+                        padding: 5px 12px;
+                    }
+                    .el-dropdown-link {
+                        margin-left: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        color: #409EFF;
+                    }
+                    .el-tabs__nav-wrap.is-scrollable {
+                        width: calc(100% - 120px);
+                    }
+                    .el-tabs__content {
+                        height: calc(100vh - 290px);
+                        overflow: auto;
+                    }
                 }
-                .left {
-                    &::before {
-                        content: '';
-                        width: 0;
-                        height: 100%;
-                        border-left: 1px dashed #dcdfe6;
+                .method-tab {
+                    .add-btn {
                         position: absolute;
                         top: 0;
-                        left: 50%;
+                        right: 0;
+                    }
+                    .params {
+                        display: flex;
+                        .params-label {
+                            width: 78px;
+                            padding-right: 12px;
+                            padding-top: 10px;
+                            text-align: right;
+                        }
+                        .params-content {
+                            flex: 1;
+                            .params-row, .params-title {
+                                display: flex;
+                                margin-bottom: 10px;
+                                .left {
+                                    display: flex;
+                                    flex: 1;
+                                    justify-content: space-around;
+                                    align-items: center;
+                                }
+                                .operate-btn {
+                                    width: 40px;
+                                    height: 40px;
+                                    margin-left: 20px;
+                                }
+                            }
+                            .params-title > div {
+                                // flex: 1;
+                            }
+                        }
                     }
                 }
             }

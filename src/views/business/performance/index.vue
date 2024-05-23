@@ -10,7 +10,6 @@
                 :key="index"
                 :header="item.title"
                 class="performance-card"
-                @click.native="goToDetailPage(item)"
             >
                 <template slot="header">
                     <div class="card-title">
@@ -41,18 +40,26 @@
             :page-data="configData"
             @close="() => showConfig = false"
         />
+        <experimental
+            v-if="showExperimental"
+            :visible.sync="showExperimental"
+            :page-data="configData"
+            @close="() => showExperimental = false"
+        />
     </div>
 </template>
 
 <script>
-import { performanceList } from './constants'
+import { performanceList } from './constants/index'
 export default {
     components: {
-        Config: () => import('./config')
+        Config: () => import('./config'),
+        Experimental: () => import('./experimental')
     },
     data () {
         return {
             showConfig: false,
+            showExperimental: false,
             configData: {
                 target: '',
                 method: ''
@@ -90,7 +97,12 @@ export default {
     },
     methods: {
         handleConfig (item) {
-            this.$message.info('coming soon!')
+            this.configData = {
+                id: item.id,
+                type: item.type,
+                target: item.title
+            }
+            this.showConfig = true
         },
         handleEdit (item, t) {
             if (t.disabled) {
@@ -100,14 +112,7 @@ export default {
                 target: item.title,
                 method: t.name
             }
-            this.showConfig = true
-        },
-        goToDetailPage (card) {
-            // if (!card.pagePath) {
-            //     this.$message.warning('该卡片暂未配置页面路径')
-            //     return
-            // }
-            // this.$router.push(card.pagePath)
+            this.showExperimental = true
         }
     }
 }

@@ -48,7 +48,7 @@
                             />
                         </el-form-item>
                     </el-col>
-                    <el-col v-if="isShow('isConvert')" :span="12">
+                    <el-col v-if="0 && isShow('isConvert')" :span="12">
                         <el-form-item :label="getAttrs('isConvert', 'label', false)" prop="shiYanCanShu.isConvert" :show-message="false">
                             <el-radio-group v-model="pageInfo.isConvert" :disabled="readonly">
                                 <el-radio-button :label="true">转换</el-radio-button>
@@ -72,8 +72,8 @@
                                 </el-tooltip>
                             </template>
                             <el-tag
-                                v-for="tag in pageInfo.specimensName"
-                                :key="tag"
+                                v-for="(tag, index) in pageInfo.specimensName"
+                                :key="index"
                                 closable
                                 size="medium"
                                 class="params-tag"
@@ -117,8 +117,8 @@
                                 </el-tooltip>
                             </template>
                             <el-tag
-                                v-for="tag in pageInfo.targetValue"
-                                :key="tag"
+                                v-for="(tag, index) in pageInfo.targetValue"
+                                :key="index"
                                 closable
                                 size="medium"
                                 class="params-tag"
@@ -176,7 +176,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col v-if="isShow('claimValue')" :span="12">
-                        <el-form-item label="厂商声明差值" prop="claimValue" :show-message="false">
+                        <el-form-item label="指定的差值" prop="claimValue" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.claimValue"
                                 type="number"
@@ -292,7 +292,7 @@
     </div>
 </template>
 <script>
-import { standardOption, batchOption } from '../constants'
+import { standardOption, batchOption } from '../constants/index'
 export default {
     props: {
         info: {
@@ -340,7 +340,6 @@ export default {
             }
         })
         this.pageInfo = temp || { model: [], targetValue: [], specimensName: [] }
-        console.log(this.pageInfo)
     },
     methods: {
         isShow (props) {

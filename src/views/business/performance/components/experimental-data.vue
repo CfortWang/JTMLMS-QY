@@ -21,21 +21,41 @@
                 </template>
             </div>
             <div class="content">
-                <div v-if="showTemplate" class="data-table">
-                    <div class="table-header">
-                        <div v-for="(h, index) in tableData.headerData" :key="index" class="th">{{ h }}</div>
-                    </div>
-                    <div class="table-content">
-                        <div v-for="(row, trIndex) in tableData.tableContent" :key="trIndex" class="tr">
-                            <div
-                                v-for="(item, tdIndex) in row"
-                                :key="tdIndex"
-                                class="td"
-                                :class="tdIndex === 1 ? trIndex % repeatNum === 0 ? 'merge' : 'hidden' : ''"
-                            >{{ item }}</div>
-                        </div>
-                    </div>
-                </div>
+                <el-table
+                    v-if="showTemplate"
+                    :data="pageInfo.dataDTO.list"
+                    border
+                    stripe
+                    highlight-current-row
+                    style="width: 100%"
+                    max-height="250px"
+                >
+                    <el-table-column
+                        v-for="(h, hIndex) in pageInfo.dataDTO.header"
+                        :key="h.children && h.children.length ? hIndex : h.prop"
+                        :prop="h.prop"
+                        :label="h.label"
+                        width="80"
+                        header-align="center"
+                        align="center"
+                    >
+                        <template slot="header" slot-scope="scope">
+                            <span v-html="scope.column.label" />
+                        </template>
+                        <el-table-column
+                            v-for="c in h.children"
+                            :key="c.prop"
+                            :prop="c.prop"
+                            :label="c.label"
+                            header-align="center"
+                            align="center"
+                        >
+                            <template slot="header" slot-scope="scope">
+                                <span v-html="scope.column.label" />
+                            </template>
+                        </el-table-column>
+                    </el-table-column>
+                </el-table>
                 <el-empty v-else description="暂无数据，请导出模板填写后导入" />
             </div>
         </div>
@@ -75,7 +95,6 @@ export default {
             pageInfo: {},
             showTemplate: false,
             showImportTable: false,
-            tableData: {},
             repeatNum: 1,
             toolbars: [
                 { key: 'export', icon: 'ibps-icon-cloud-download', label: '导出模板', type: 'info', hidden: this.readonly },
@@ -84,22 +103,10 @@ export default {
             ]
         }
     },
-    // watch: {
-    //     info: {
-    //         handler (val, oldVal) {
-    //             this.pageInfo = val
-    //             if (!this.showTemplate && this.$utils.isNotEmpty(val.shiYanShuJu)) {
-    //                 this.dealData(val.shiYanShuJu)
-    //             }
-    //         },
-    //         immediate: true,
-    //         deep: true
-    //     }
-    // },
     mounted () {
         this.pageInfo = JSON.parse(JSON.stringify(this.info))
         if (!this.showTemplate && this.$utils.isNotEmpty(this.pageInfo)) {
-            this.dealData(this.pageInfo)
+            this.showTemplate = true
         }
     },
     methods: {
@@ -183,7 +190,8 @@ export default {
                     importTemplate(data).then(res => {
                         this.$message.success('实验数据导入成功')
                         this.info.shiYanShuJu = res.data
-                        this.dealData(res.data)
+                        this.pageInfo = res.data
+                        this.showTemplate = true
                     }).catch(({ state, cause }) => {
                         const errMsg = JSON.parse(cause)
                         let msgContent = ''
@@ -208,38 +216,6 @@ export default {
                 reader.readAsBinaryString(file)
             }
             input.click()
-        },
-        dealData (res) {
-            const { data, config, reportData } = res || {}
-            const { days, repeatNum, specimensName = [] } = config || {}
-            this.repeatNum = repeatNum
-            const headerData = ['序号', '日期'].concat(specimensName)
-            const tableContent = []
-            const snList = Array.from({ length: days * repeatNum }, (_, index) => index + 1)
-            const dateList = Array.from({ length: days * repeatNum }, (_, index) => `第${Math.floor(index / repeatNum) + 1}天`)
-            data['序号'] = snList
-            data['日期'] = dateList
-
-            // 将data按表头顺序排序
-            const sortedData = Object.entries(data)
-                .sort(([keyA], [keyB]) => headerData.indexOf(keyA) - headerData.indexOf(keyB))
-                .reduce((obj, [key, value]) => {
-                    obj[key] = value
-                    return obj
-                }, {})
-
-            for (let i = 0; i < snList.length; i++) {
-                const row = []
-                for (const key in sortedData) {
-                    row.push(sortedData[key][i])
-                }
-                tableContent.push(row)
-            }
-            this.tableData = {
-                headerData,
-                tableContent
-            }
-            this.showTemplate = true
         }
     }
 }
@@ -256,78 +232,6 @@ export default {
             .content {
                 padding: 10px;
                 position: relative;
-                .data-table {
-                    max-height: 400px;
-                    overflow: auto;
-                    padding: 0 5px 5px 0;
-                    .table-header {
-                        position: sticky;
-                        top: 0;
-                        z-index: 100;
-                        background: #fff;
-                        display: flex;
-                        .th {
-                            font-size: 14px;
-                            font-weight: bold;
-                            text-align: center;
-                            height: 28px;
-                            line-height: 28px;
-                            padding: 2px 6px;
-                            border: 1px solid #ddd;
-                            border-right: none;
-                            flex: 1;
-                            flex-basis: 0;
-                            &:first-child {
-                                flex: 0 0 60px
-                            }
-                            &:nth-child(2) {
-                                flex: 0 0 90px
-                            }
-                            &:last-child {
-                                border-right: 1px solid #ddd;
-                            }
-                        }
-                    }
-                    .table-content {
-                        .tr {
-                            display: flex;
-                            align-items: center;
-                            font-size: 14px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            border-top: none;
-                            position: relative;
-                            .td {
-                                position: relative;
-                                flex: 1;
-                                flex-basis: 0;
-                                height: 28px;
-                                line-height: 28px;
-                                padding: 2px 6px;
-                                border-right: 1px solid #ddd;
-                                &:first-child {
-                                    flex: 0 0 60px
-                                }
-                                &:nth-child(2) {
-                                    flex: 0 0 90px
-                                }
-                                &:last-child {
-                                    border-right: none;
-                                }
-                            }
-                            // .merge {
-                            //     height: 72px;
-                            //     position: relative;
-                            //     float: left;
-                            //     top: 0;
-                            //     left: 0;
-                            // }
-                            // .hidden {
-                            //     visibility: hidden;
-                            // }
-                        }
-                    }
-                }
             }
         }
     }

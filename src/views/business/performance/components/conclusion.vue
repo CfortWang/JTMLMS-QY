@@ -6,7 +6,7 @@
                 <span>实验结论</span>
             </div>
             <div v-if="pageInfo" class="form-container">
-                <el-row :gutter="20" class="form-row">
+                <!-- <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
                         <el-form-item label="审核人" prop="shenHeRen" :show-message="false">
                             <el-select
@@ -40,13 +40,15 @@
                             />
                         </el-form-item>
                     </el-col>
-                </el-row>
+                </el-row> -->
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="24">
                         <el-form-item label="结论" prop="shiYanJieLun" :show-message="false">
                             <el-input
                                 v-model="pageInfo.shiYanJieLun"
                                 type="textarea"
+                                :rows="4"
+                                :autosize="readonly ? { minRows: 2, maxRows: 6 } : false"
                                 :disabled="readonly"
                                 placeholder="请输入"
                             />

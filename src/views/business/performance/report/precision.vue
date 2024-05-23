@@ -3,126 +3,207 @@
         <div class="experimental-report info-item">
             <div class="title">
                 <i class="ibps-icon-star" />
-                <span>实验报告</span>
+                <span>计算结果</span>
             </div>
             <el-tabs v-model="activeTab" @tab-click="handleClick">
                 <el-tab-pane
-                    v-for="(tab, index) in tabs"
-                    :key="index"
+                    v-for="(tab, tabIndex) in tabs"
+                    :key="tabIndex"
                     :label="tab"
                     :name="tab"
                 >
                     <div class="content">
-                        <div class="data-table">
-                            <div class="table-header">
-                                <div v-for="(h, thIndex) in expData.header" :key="thIndex" class="th">{{ h }}</div>
+                        <div v-for="(table, tableIndex) in reportData" :key="tableIndex" class="table-item">
+                            <div class="table-title">
+                                <span>{{ table.title }}</span>
                             </div>
-                            <div class="table-content">
-                                <div v-for="(row, trIndex) in expData.list" :key="trIndex" class="tr">
-                                    <div :key="`${trIndex}-0`" class="td">
-                                        X<sub>{{ trIndex + 1 }}</sub>
-                                    </div>
-                                    <div v-for="(item, tdIndex) in row" :key="`${trIndex}-${tdIndex + 1}`" class="td">{{ item }}</div>
-                                </div>
-                            </div>
+                            <el-table
+                                :data="table.list"
+                                border
+                                stripe
+                                highlight-current-row
+                                style="width: 100%"
+                                max-height="250px"
+                                :show-header="!table.hideHeader"
+                                :span-method="getSpanMethod(table)"
+                            >
+                                <el-table-column
+                                    v-for="h in table.header"
+                                    :key="h.prop"
+                                    :prop="h.children && h.children.length ? '' : h.prop"
+                                    :label="h.label"
+                                    header-align="center"
+                                    align="center"
+                                >
+                                    <template slot="header" slot-scope="scope">
+                                        <span v-html="scope.column.label" />
+                                    </template>
+                                    <template slot-scope="scope">
+                                        <span v-if="h.slot" v-html="scope.row[h.prop]" />
+                                        <span v-else>{{ scope.row[h.prop] }}</span>
+                                    </template>
+                                    <el-table-column
+                                        v-for="c in h.children"
+                                        :key="c.prop"
+                                        :prop="c.prop"
+                                        :label="c.label"
+                                        header-align="center"
+                                        align="center"
+                                    >
+                                        <template slot="header" slot-scope="scope">
+                                            <span v-html="scope.column.label" />
+                                        </template>
+                                        <template slot-scope="scope">
+                                            <span v-if="c.slot" v-html="scope.row[c.prop]" />
+                                            <span v-else>{{ scope.row[c.prop] }}</span>
+                                        </template>
+                                    </el-table-column>
+                                </el-table-column>
+                            </el-table>
                         </div>
-                        <br>
-                        <div class="statistical-table">
-                            <div class="first-col">
-                                <div
-                                    v-for="(c, colIndex) in statistics.firstCol"
-                                    :key="colIndex"
-                                    class="col-cell"
-                                >{{ c }}</div>
+                        <!-- <div v-if="formula.length" class="formula-box">
+                            <div v-for="item in formula" :key="item.key" class="formula-item">
+                                <div>{{ item.label }}</div>
+                                <div>{{ item.value }}</div>
+                                <div>=&nbsp; {{ info.reportData[activeTab][item.key] }}</div>
                             </div>
-                            <div class="other-col">
-                                <div class="table-header">
-                                    <div v-for="(h, thIndex) in statistics.header" :key="thIndex" class="th">{{ h }}</div>
-                                </div>
-                                <div class="table-content">
-                                    <div v-for="(row, trIndex) in statistics.list" :key="trIndex" class="tr">
-                                        <!-- <div :key="`${trIndex}-0`" class="td">
-                                            X<sub>{{ trIndex + 1 }}</sub>
-                                        </div> -->
-                                        <div
-                                            v-for="(item, tdIndex) in row"
-                                            :key="`${trIndex}-${tdIndex + 1}`"
-                                            class="td"
-                                        >
-                                            <template v-if="item.main">
-                                                {{ item.main }}<sub>{{ item.sub }}</sub>
-                                            </template>
-                                            <template v-else>
-                                                {{ item }}
-                                            </template>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        </div> -->
                     </div>
                 </el-tab-pane>
             </el-tabs>
         </div>
+        <chart
+            v-if="chartData.length"
+            :chart-data="chartData"
+            :readonly="readonly"
+        />
     </div>
 </template>
 <script>
+import MathJax from '@/utils/MathJax'
 export default {
+    components: {
+        chart: () => import('../components/chart.vue')
+    },
     props: {
         info: {
             type: Object,
             default: () => {}
+        },
+        formula: {
+            type: Array,
+            default: () => []
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
         return {
             tabs: [],
             activeTab: '',
-            expData: {},
-            statistics: {}
+            activeTabIndex: 0,
+            reportData: [],
+            chartData: []
+        }
+    },
+    watch: {
+        activeTabIndex (v) {
+            this.initData(v)
         }
     },
     mounted () {
-        this.tabs = this.info.config.specimensName || []
-        this.activeTab = this.tabs[0] || ''
-        this.dealData(this.info)
+        this.tabs = this.info.sheetDTO && this.info.sheetDTO.length ? this.info.sheetDTO.map(item => item.title) : []
+        this.activeTab = this.tabs[this.activeTabIndex] || ''
+        this.initData(this.activeTabIndex)
+        this.formatMath()
     },
     methods: {
         handleClick (v) {
             this.activeTab = v.name
+            this.activeTabIndex = this.tabs.findIndex(item => item === v.name) || 0
         },
-        dealData (res) {
-            const { config, reportData } = res || {}
-            const { days } = config || {}
-            const { data: rawData, allowableCv1, allowableCvr, allowableS1, allowableSr, cv1, cvr, mean, s1, sr, vb } = reportData[this.activeTab] || {}
-            const header = ['次数/日期'].concat(Array.from({ length: days }, (_, index) => `第${index + 1}天`))
-            const list = rawData[0].map((_, index) => rawData.map(row => row[index]))
-            this.expData = {
-                header,
-                list
+        initData (index) {
+            const { sheetDTO } = this.info || {}
+            const { reportDataDTO, chartDataDTO } = sheetDTO[index] || {}
+            const reportData = Object.keys(reportDataDTO).map(k => ({
+                title: k,
+                header: reportDataDTO[k].header || this.getTableHeader(reportDataDTO[k].list),
+                hideHeader: this.$utils.isEmpty(reportDataDTO[k].header),
+                list: reportDataDTO[k].list
+            })).sort((a, b) => a.title.localeCompare(b.title))
+            const chartData = chartDataDTO ? Object.keys(chartDataDTO).map(k => ({
+                title: k,
+                id: chartDataDTO[k].name,
+                data: chartDataDTO[k].data,
+                option: chartDataDTO[k].option
+            })).sort((a, b) => a.title.localeCompare(b.title)) : []
+            this.chartData = chartData
+            this.reportData = reportData
+        },
+        getTableHeader (data) {
+            return data.length ? Object.keys(data[0]).map(key => ({ label: key, prop: key, slot: true })) : []
+        },
+        formatMath () {
+            setTimeout(() => {
+                this.$nextTick(() => {
+                    if (MathJax.isMathjaxConfig) {
+                        MathJax.initMathjaxConfig()
+                    }
+                    MathJax.MathQueue('.formula-box')
+                })
+            }, 500)
+        },
+        getSpanMethod (table) {
+            return (params) => {
+                return this.objectSpanMethod(params, table)
             }
-
-            this.statistics = {
-                firstCol: ['', '实验室允许不精密度', '实验不精密度'],
-                // firstCol: ['参数/模型', '实验室允许不精密度', '实验不精密度', '不精密度验证'],
-                header: ['重复（批内）不精密度', '总（室内）不精密度'],
-                list: [
-                    [
-                        { main: 'σ', sub: 'r' },
-                        { main: 'CV', sub: '' },
-                        { main: 'σ', sub: '1' },
-                        { main: 'CV', sub: '' }
-                    ],
-                    [allowableSr, allowableCvr, allowableS1, allowableCv1],
-                    [
-                        { main: 'S', sub: 'r' },
-                        { main: 'CV', sub: 'r' },
-                        { main: 'S', sub: '1' },
-                        { main: 'CV', sub: '1' }
-                    ],
-                    [sr, cvr, s1, cv1]
-                ]
+        },
+        objectSpanMethod ({ row, column, rowIndex, columnIndex }, { list, header }) {
+            // 判断当前列是否需要进行同值合并
+            if (header[columnIndex].merge) {
+                const firstSameRowIndex = this.getFirstSameRowIndex(list, rowIndex, column.property)
+                const firstSameColIndex = this.getFirstSameColIndex(list, columnIndex, rowIndex)
+                return {
+                    rowspan: rowIndex === firstSameRowIndex ? this.getRowSpanCount(list, rowIndex, column.property) : 0,
+                    colspan: 1
+                    // colspan: firstSameColIndex === -1 ? 1 : columnIndex - firstSameColIndex + 1
+                }
             }
+            return {
+                rowspan: 1,
+                colspan: 1
+            }
+        },
+        // 获取行同值合并的起始下标
+        getFirstSameRowIndex (data, rowIndex, prop) {
+            for (let i = rowIndex; i >= 0; i--) {
+                if (data[i][prop] !== data[rowIndex][prop]) {
+                    return i + 1
+                }
+            }
+            return 0
+        },
+        // 获取列同值合并的起始下标
+        getFirstSameColIndex (data, colIndex, rowIndex) {
+            for (let i = colIndex; i >= 0; i--) {
+                if (data[rowIndex][i] !== data[rowIndex][colIndex]) {
+                    return i
+                }
+            }
+            return 0
+        },
+        getRowSpanCount (data, rowIndex, prop) {
+            let count = 1
+            for (let i = rowIndex + 1; i < data.length; i++) {
+                if (data[i][prop] === data[rowIndex][prop]) {
+                    count++
+                } else {
+                    break
+                }
+            }
+            return count
         }
     }
 }
@@ -134,120 +215,24 @@ export default {
             .content {
                 padding: 10px;
                 position: relative;
-                .data-table {
-                    max-height: 400px;
-                    overflow: auto;
-                    // padding: 0 5px 5px 0;
-                    .table-header {
-                        position: sticky;
-                        top: 0;
-                        background: #fff;
-                        display: flex;
-                        .th {
-                            font-size: 14px;
-                            font-weight: bold;
-                            text-align: center;
-                            height: 28px;
-                            line-height: 28px;
-                            padding: 2px 6px;
-                            border: 1px solid #ddd;
-                            border-right: none;
-                            flex: 1;
-                            flex-basis: 0;
-                            &:first-child {
-                                flex: 0 0 60px
-                            }
-                            &:last-child {
-                                border-right: 1px solid #ddd;
-                            }
-                        }
+                .table-item {
+                    .table-title {
+                        margin: 15px 0 10px 0;
+                        font-size: 14px;
+                        font-weight: bold;
                     }
-                    .table-content {
-                        .tr {
-                            display: flex;
-                            font-size: 14px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            border-top: none;
-                            .td {
-                                flex: 1;
-                                flex-basis: 0;
-                                height: 28px;
-                                line-height: 28px;
-                                padding: 2px 6px;
-                                border-right: 1px solid #ddd;
-                                &:first-child {
-                                    flex: 0 0 60px
-                                }
-                                &:last-child {
-                                    border-right: none;
-                                }
-                            }
+                    &:first-child {
+                        .table-title {
+                            margin-top: 0;
                         }
                     }
                 }
-                .statistical-table {
+                .formula-item {
                     display: flex;
-                    .first-col {
-                        width: 150px;
-                        .col-cell {
-                            height: 61px;
-                            line-height: 60px;
-                            border: 1px solid #ddd;
-                            border-top: none;
-                            border-right: none;
-                            text-align: center;
-                            padding: 2px 6px;
-                            &:first-child {
-                                font-weight: bold;
-                                height: 28px;
-                                line-height: 28px;
-                                border-top: 1px solid #ddd;
-                            }
-                        }
-                    }
-                    .other-col {
-                        flex: 1;
-                        flex-basis: 0;
-                        .table-header {
-                            background: #fff;
-                            display: flex;
-                            .th {
-                                font-size: 14px;
-                                font-weight: bold;
-                                text-align: center;
-                                height: 28px;
-                                line-height: 28px;
-                                padding: 2px 6px;
-                                border: 1px solid #ddd;
-                                border-right: none;
-                                flex: 1;
-                                flex-basis: 0;
-                                &:last-child {
-                                    border-right: 1px solid #ddd;
-                                }
-                            }
-                        }
-                        .table-content {
-                            .tr {
-                                display: flex;
-                                font-size: 14px;
-                                text-align: center;
-                                border: 1px solid #ddd;
-                                border-top: none;
-                                .td {
-                                    flex: 1;
-                                    flex-basis: 0;
-                                    height: 28px;
-                                    line-height: 28px;
-                                    padding: 2px 6px;
-                                    border-right: 1px solid #ddd;
-                                    &:last-child {
-                                        border-right: none;
-                                    }
-                                }
-                            }
-                        }
+                    justify-content: center;
+                    align-items: center;
+                    > div:nth-child(2) {
+                        margin: 0 10px;
                     }
                 }
             }

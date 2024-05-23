@@ -98,6 +98,54 @@ export function removeReagent (data) {
 }
 
 /**
+ * 获取性能验证配置数据
+ * @param {*} params
+ */
+export function getConfigList (params) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/pv/experimentalConfig/query',
+        method: 'get',
+        params
+    })
+}
+
+/**
+ * 获取性能验证配置数据详情
+ * @param {*} params
+ */
+export function getConfigDetail (params) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/pv/experimentalConfig/get',
+        method: 'get',
+        params
+    })
+}
+
+/**
+ * 保存性能验证配置数据
+ * @param {*} params
+ */
+export function saveConfig (data) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/pv/experimentalConfig/save',
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * 删除性能验证配置数据
+ * @param {*} params
+ */
+export function removeConfig (data) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/pv/experimentalConfig/remove',
+        method: 'post',
+        data
+    })
+}
+
+/**
  * 导出数据模板
  * @param {*} params
  */
@@ -121,6 +169,7 @@ export function importTemplate (data) {
         data
     })
 }
+
 /**
  * 导出数据报告
  * @param {*} params

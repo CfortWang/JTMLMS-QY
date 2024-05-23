@@ -9,13 +9,15 @@ export const performanceList = [
                 name: '简单精密度评价',
                 sn: '01-01',
                 disabled: true,
-                step: ''
+                step: '',
+                config: []
             },
             {
                 name: 'EP5-A精密度评价',
                 sn: '01-02',
                 disabled: true,
-                step: ''
+                step: '',
+                config: []
             },
             {
                 name: 'EP15-A2精密度评价',
@@ -57,7 +59,24 @@ export const performanceList = [
                     }
                 ],
                 params: ['specimensNum', 'repeatNum', 'days', 'isConvert', 'specimensName', 'model', 'range', 'standard', 'tea', 'batchCVS', 'dailyCVS', 'batchCVSValue', 'dailyCVSValue'],
-                references: '1242280899299508224,1242280899286925312'
+                references: '1242280899299508224,1242280899286925312',
+                formula: [
+                    {
+                        label: '室内标准差',
+                        key: 's1',
+                        value: '$$S_1=\\sqrt{\\frac{n-1}{n}·S_r^2+S_b^2}$$'
+                    },
+                    {
+                        label: '批内标准差',
+                        key: 'sr',
+                        value: '$$S_r=\\sqrt{\\frac{\\sum_{d=1}^D\\sum_{i-1}^n(x_{di}-\\overline{x_d})^2}{D(n-1)}}$$'
+                    },
+                    {
+                        label: '批间方差',
+                        key: 'vb',
+                        value: '$$S_b^2=\\frac{\\sum_{d=1}^D(\\overline{x_d}-\\overset{=}{x})^2}{D-1}$$'
+                    }
+                ]
             },
             {
                 name: 'EP15-A3精密度评价',
@@ -106,7 +125,24 @@ export const performanceList = [
                     }
                 ],
                 params: ['specimensNum', 'repeatNum', 'days', 'isConvert', 'specimensName', 'model', 'range', 'standard', 'tea', 'batchCVS', 'dailyCVS', 'batchCVSValue', 'dailyCVSValue'],
-                references: '1242280899299508224,1242280899286925312'
+                references: '1242280899299508224,1242280899286925312',
+                formula: [
+                    {
+                        label: '室内标准差',
+                        key: 's1',
+                        value: '$$S_1=\\sqrt{\\frac{n-1}{n}·S_r^2+S_b^2}$$'
+                    },
+                    {
+                        label: '批内标准差',
+                        key: 'sr',
+                        value: '$$S_r=\\sqrt{\\frac{\\sum_{d=1}^D\\sum_{i-1}^n(x_{di}-\\overline{x_d})^2}{D(n-1)}}$$'
+                    },
+                    {
+                        label: '批间方差',
+                        key: 'vb',
+                        value: '$$S_b^2=\\frac{\\sum_{d=1}^D(\\overline{x_d}-\\overset{=}{x})^2}{D-1}$$'
+                    }
+                ]
             }
         ]
     },
@@ -129,7 +165,7 @@ export const performanceList = [
                 step: ''
             },
             {
-                name: 'EP15-A方法学比对',
+                name: 'EP15-A2方法学比对',
                 sn: '02-03',
                 step: '推荐至少选择2个浓度水平参考物质，其代表方法可报告范围中高和低的决定性浓度。应根据厂家说明书制备物质，在3d~5d时间内每批进行2次重复测定，然后计算均值和标准差，以及置信区间帮助验证指定值。',
                 config: [
@@ -137,24 +173,24 @@ export const performanceList = [
                         key: 'specimensNum',
                         label: '浓度水平数',
                         default: 2,
-                        max: 3,
-                        min: 2,
+                        // max: 3,
+                        // min: 2,
                         precision: 0
                     },
                     {
                         key: 'repeatNum',
                         label: '重复次数',
-                        default: 5,
-                        max: 5,
-                        min: 3,
+                        default: 20,
+                        // max: 20,
+                        // min: 10,
                         precision: 0
                     },
                     {
                         key: 'days',
                         label: '实验天数',
                         default: 1,
-                        max: 1,
-                        min: 1,
+                        // max: 1,
+                        // min: 1,
                         precision: 0
                     },
                     {
@@ -167,7 +203,7 @@ export const performanceList = [
                 references: '1242280899299508224,1242280899286925312'
             },
             {
-                name: '定值参考物质验证',
+                name: 'EP15-A2定值参考物质验证',
                 sn: '02-04',
                 step: '推荐至少选择2个浓度水平参考物质，其代表方法可报告范围中高和低的决定性浓度。应根据厂家说明书制备物质，在3d~5d时间内每批进行2次重复测定，然后计算均值和标准差，以及置信区间帮助验证指定值。',
                 config: [
@@ -182,17 +218,17 @@ export const performanceList = [
                     {
                         key: 'repeatNum',
                         label: '重复次数',
-                        default: 5,
-                        max: 5,
+                        default: 3,
+                        max: 3,
                         min: 3,
                         precision: 0
                     },
                     {
                         key: 'days',
                         label: '实验天数',
-                        default: 1,
-                        max: 1,
-                        min: 1,
+                        default: 5,
+                        max: 5,
+                        min: 5,
                         precision: 0
                     },
                     {
@@ -221,14 +257,84 @@ export const performanceList = [
             {
                 name: '线性稀释回收法',
                 sn: '02-02',
-                disabled: true,
-                step: ''
+                step: `1. 样本基质应与待检临床实验样本相似，不可采用含有对测定方法具有明确干扰作用物质的样本，如溶血、脂血、黄疸或含有某些特定药物的样本。在已知线性区间内选择 5~7个浓度水平，应覆盖定量限(低限和高限)。
+2. 可将高浓度样本与低浓度样本按预定比例进行稀释得到系列样本。如果高/低浓度样本的值未知，可将每种血清编码，用编码代表每个血清的相对浓度。对于等浓度间隔样本，可用连续整数（如1、2、3、4与5）代表连续样本。进行数据处理时，可用样本号代替浓度值。
+3. 每个浓度水平的样本重复测定 3~4次。所有样本应在一次运行中或几次间隔很短的运行中随机测定，最好在1天之内完成。
+4. 分别计算每个样本检测结果的均值，排除离群值。`,
+                config: [
+                    {
+                        key: 'specimensNum',
+                        label: '浓度水平数',
+                        default: 6,
+                        // max: 10,
+                        // min: 2,
+                        precision: 0
+                    },
+                    {
+                        key: 'repeatNum',
+                        label: '重复次数',
+                        default: 5,
+                        // max: 5,
+                        // min: 3,
+                        precision: 0
+                    },
+                    {
+                        key: 'days',
+                        label: '实验天数',
+                        default: 1,
+                        // max: 1,
+                        // min: 1,
+                        precision: 0
+                    },
+                    {
+                        key: 'isConvert',
+                        label: '对数转换',
+                        default: false
+                    }
+                ],
+                params: ['specimensNum', 'repeatNum', 'days', 'isConvert', 'specimensName', 'targetValue', 'range', 'claimValue'],
+                references: '1242280899299508224,1242280899286925312'
             },
             {
                 name: '平均斜率评价法',
                 sn: '02-03',
-                disabled: true,
-                step: ''
+                step: `1. 样本基质应与待检临床实验样本相似，不可采用含有对测定方法具有明确干扰作用物质的样本，如溶血、脂血、黄疸或含有某些特定药物的样本。在已知线性区间内选择 5~7个浓度水平，应覆盖定量限(低限和高限)。
+2. 可将高浓度样本与低浓度样本按预定比例进行稀释得到系列样本。如果高/低浓度样本的值未知，可将每种血清编码，用编码代表每个血清的相对浓度。对于等浓度间隔样本，可用连续整数（如1、2、3、4与5）代表连续样本。进行数据处理时，可用样本号代替浓度值。
+3. 每个浓度水平的样本重复测定 3~4次。所有样本应在一次运行中或几次间隔很短的运行中随机测定，最好在1天之内完成。
+4. 分别计算每个样本检测结果的均值，排除离群值。`,
+                config: [
+                    {
+                        key: 'specimensNum',
+                        label: '浓度水平数',
+                        default: 6,
+                        // max: 10,
+                        // min: 2,
+                        precision: 0
+                    },
+                    {
+                        key: 'repeatNum',
+                        label: '重复次数',
+                        default: 5,
+                        // max: 5,
+                        // min: 3,
+                        precision: 0
+                    },
+                    {
+                        key: 'days',
+                        label: '实验天数',
+                        default: 1,
+                        // max: 1,
+                        // min: 1,
+                        precision: 0
+                    },
+                    {
+                        key: 'isConvert',
+                        label: '对数转换',
+                        default: false
+                    }
+                ],
+                params: ['specimensNum', 'repeatNum', 'days', 'isConvert', 'specimensName', 'targetValue', 'range', 'claimValue'],
+                references: '1242280899299508224,1242280899286925312'
             },
             {
                 name: 'EP6-A线性评价',
@@ -241,25 +347,25 @@ export const performanceList = [
                     {
                         key: 'specimensNum',
                         label: '浓度水平数',
-                        default: 2,
-                        max: 3,
-                        min: 2,
+                        default: 6,
+                        // max: 10,
+                        // min: 2,
                         precision: 0
                     },
                     {
                         key: 'repeatNum',
                         label: '重复次数',
                         default: 5,
-                        max: 5,
-                        min: 3,
+                        // max: 5,
+                        // min: 3,
                         precision: 0
                     },
                     {
                         key: 'days',
                         label: '实验天数',
                         default: 1,
-                        max: 1,
-                        min: 1,
+                        // max: 1,
+                        // min: 1,
                         precision: 0
                     },
                     {
@@ -408,6 +514,109 @@ export const reagentFormRules = {
     youXiaoQi: [{
         required: true,
         message: '请选择试剂有效期',
+        trigger: 'change'
+    }]
+}
+
+export const configFormRules = {
+    type: [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    target: [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    sn: [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    icon: [{
+        required: false,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].name': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].sn': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].isBasic': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].disabled': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].isPrivate': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].step': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].references': [{
+        required: false,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].config[].key': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].config[].label': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].config[].default': [{
+        required: false,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].config[].max': [{
+        required: false,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].config[].min': [{
+        required: false,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].config[].precision': [{
+        required: false,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].formula[].key': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].formula[].label': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].formula[].value': [{
+        required: true,
+        message: '请输入',
         trigger: 'change'
     }]
 }

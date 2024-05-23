@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import { reagentFormRules, reagentType } from '../constants'
+import { reagentFormRules, reagentType } from '../constants/index'
 export default {
     props: {
         show: {
