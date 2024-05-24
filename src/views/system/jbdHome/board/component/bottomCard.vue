@@ -27,7 +27,7 @@
     </div>
 </template>
 <script>
-    import echarts from 'echarts'
+    import * as echarts from 'echarts'
     import { trustOption, sampleOption, monthOption, yearOption } from '../data'
     export default {
         name: 'topBar',

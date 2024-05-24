@@ -176,7 +176,7 @@
 
 
   import none from './item/none.vue'
-  import echarts from 'echarts'
+  import * as echarts from 'echarts'
   import { DBData ,getConfig,getJiaoYanObj, gethechaObj,getgangqianpeixunFBObj,getguanshenObjFB, getzhiliangmubiaotitleObj,getneishenObjFB,getfengxianObjFB,getyingjiObjFB,getwaibuObjFB,getneibuObjFB,getJiaoYanObjFB,gethechaObjFB,getnengliObj,getkangningyangpinObj,getzaigangrenyuanFBObj,getgaijinxiangObj,getbufuheObj,getguanshenObj,getneishenObj,getfengxianObj,getyingjiObj,getneibuObj,getwaibuObj,gethechaMGObj,getJiaoYanMGObj,getgangqianpeixunObj,getzaigangrenyuanObj,getfenzuZLZBObj,getzongZLMBObj,getzhiliangzhibiaotitleObj, getyangPinCaiJiObj,getbiaozhunTObj,getbzJunZhuObj,getbzJunZhuTObj,getbzXiBaoObj,getbzXiBaoTObj} from './js/selectDB.js'
   import sendDatas from './sendDatas.js'
   import repostCurd from '@/business/platform/form/utils/custom/joinCURD.js'

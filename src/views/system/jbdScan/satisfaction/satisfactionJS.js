@@ -1,5 +1,5 @@
 import { datasetTypeOptions } from '@/business/platform/data/constants/index'
-import echarts from 'echarts'
+import * as echarts from 'echarts'
 const radius = window.innerWidth > 1600 ? '55%' : '45%'
 export default {
     data () {

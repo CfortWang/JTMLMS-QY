@@ -11,7 +11,7 @@
 
 <script>
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import echarts from 'echarts'
+import * as echarts from 'echarts'
 
 export default {
  data(){

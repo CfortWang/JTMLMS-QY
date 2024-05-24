@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import echarts from 'echarts'
+  import * as echarts from 'echarts'
   import dialogView from '../properties/s14bufehexiangPro.vue'
   import {GetPercent,GetMax} from  '../js/config.js'
   export default {

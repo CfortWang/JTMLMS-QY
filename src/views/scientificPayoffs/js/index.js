@@ -1,4 +1,4 @@
-import echarts from 'echarts'
+import * as echarts from 'echarts'
 export default {
     // 轮播表数据封装
     getDataList (data) {

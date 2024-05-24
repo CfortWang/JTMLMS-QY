@@ -17,7 +17,7 @@
 
 <script>
 import { barData } from '../js/index.js'
-import echarts from 'echarts'
+import * as echarts from 'echarts'
 import scrollBoardVue from './scrollBoard.vue'
 export default {
     name: 'scientificBox',

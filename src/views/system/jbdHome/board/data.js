@@ -1,4 +1,4 @@
-import echarts from "echarts"
+import * as echarts from 'echarts'
 
 const rowLimit = (params, max) => {
     let result = ''

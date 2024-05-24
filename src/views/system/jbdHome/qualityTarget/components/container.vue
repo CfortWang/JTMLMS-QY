@@ -20,7 +20,7 @@
     </div>
 </template>
 <script>
-import echarts from 'echarts'
+import * as echarts from 'echarts'
 import { chartOption } from './option'
 export default {
     name: 'chart',

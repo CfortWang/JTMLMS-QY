@@ -15,7 +15,7 @@
 </template>
 
 <script>
-  import echarts from 'echarts'
+  import * as echarts from 'echarts'
   import {GetPercent,GetMax} from  '../js/config.js'
   import dialogView from '../properties/s2manYiDuPro.vue'
 

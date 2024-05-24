@@ -28,7 +28,7 @@
     </div>
 </template>
 <script>
-    import echarts from 'echarts'
+    import * as echarts from 'echarts'
     import { acceptOption, taskOption } from '../data'
     export default {
         name: 'topBar',
