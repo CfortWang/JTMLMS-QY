@@ -5,7 +5,7 @@
                 <i class="ibps-icon-star" />
                 <span>实验步骤</span>
             </div>
-            <div class="step">{{ stepDesc }}</div>
+            <div class="step">{{ step }}</div>
         </div>
         <div v-if="references" class="design info-item">
             <div class="title">
@@ -30,7 +30,7 @@ export default {
         IbpsAttachment: () => import('@/business/platform/file/attachment/selector')
     },
     props: {
-        stepDesc: {
+        step: {
             type: String,
             default: ''
         },
@@ -44,6 +44,10 @@ export default {
 <style lang="scss" scoped>
     .info-container {
         .design {
+            margin-bottom: 20px;
+            &:last-child {
+                margin-bottom: 0;
+            }
             .step {
                 white-space: pre-wrap;
                 color: #606266;

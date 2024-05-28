@@ -77,7 +77,7 @@ export default {
         ImportTable: () => import('@/business/platform/form/formrender/dynamic-form/components/import-table')
     },
     props: {
-        info: {
+        dataList: {
             type: Object,
             default: () => {}
         },
@@ -104,7 +104,7 @@ export default {
         }
     },
     mounted () {
-        this.pageInfo = JSON.parse(JSON.stringify(this.info))
+        this.pageInfo = JSON.parse(JSON.stringify(this.dataList))
         if (!this.showTemplate && this.$utils.isNotEmpty(this.pageInfo)) {
             this.showTemplate = true
         }
@@ -131,9 +131,7 @@ export default {
             if (!this.formId) {
                 return this.$message.error('请先保存数据！')
             }
-            exportTemplate({
-                id: this.formId
-            }).then(res => {
+            exportTemplate({ id: this.formId }).then(res => {
                 ActionUtils.download(res.data, '实验数据模板.xlsx')
             })
         },
@@ -189,7 +187,6 @@ export default {
                     data.append('applyFiles', file)
                     importTemplate(data).then(res => {
                         this.$message.success('实验数据导入成功')
-                        this.info.shiYanShuJu = res.data
                         this.pageInfo = res.data
                         this.showTemplate = true
                     }).catch(({ state, cause }) => {

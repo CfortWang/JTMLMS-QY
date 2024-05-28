@@ -17,6 +17,7 @@
                                 :precision="getAttrs('specimensNum', 'precision')"
                                 :disabled="readonly"
                                 placeholder="请输入"
+                                @change="handleNumChange"
                             />
                         </el-form-item>
                     </el-col>
@@ -48,7 +49,7 @@
                             />
                         </el-form-item>
                     </el-col>
-                    <el-col v-if="0 && isShow('isConvert')" :span="12">
+                    <el-col v-if="isShow('isConvert')" :span="12">
                         <el-form-item :label="getAttrs('isConvert', 'label', false)" prop="shiYanCanShu.isConvert" :show-message="false">
                             <el-radio-group v-model="pageInfo.isConvert" :disabled="readonly">
                                 <el-radio-button :label="true">转换</el-radio-button>
@@ -56,49 +57,42 @@
                             </el-radio-group>
                         </el-form-item>
                     </el-col>
+                    <el-col v-if="isShow('methodNum')" :span="12">
+                        <el-form-item :label="getAttrs('methodNum', 'label', false)" prop="shiYanCanShu.methodNum" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.methodNum"
+                                type="number"
+                                :min="getAttrs('methodNum', 'min')"
+                                :max="getAttrs('methodNum', 'max')"
+                                :precision="getAttrs('methodNum', 'precision')"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
                 </el-row>
-                <el-row v-if="isShow('specimensName')" :gutter="20" class="form-row tag-row">
+                <el-row v-if="isShow('specimensName')" :gutter="20" class="form-row">
                     <el-col :span="24">
-                        <el-form-item prop="specimensName" :show-message="false">
+                        <el-form-item prop="shiYanCanShu.specimensName" :show-message="false" class="inline-item">
                             <template slot="label">
-                                <span>浓度水平名</span>
+                                <span>{{ getAttrs('specimensName', 'label', false) }}</span>
                                 <el-tooltip
                                     class="item"
                                     effect="dark"
-                                    content="请填写与浓度水平数相同数量的浓度水平名"
+                                    content="与浓度水平数对应"
                                     placement="top"
                                 >
                                     <i class="el-icon-question" />
                                 </el-tooltip>
                             </template>
-                            <el-tag
-                                v-for="(tag, index) in pageInfo.specimensName"
-                                :key="index"
-                                closable
-                                size="medium"
-                                class="params-tag"
-                                :disable-transitions="false"
-                                :disabled="readonly"
-                                @close="handleTagDelete(tag, 'specimensName')"
-                            >
-                                {{ tag }}
-                            </el-tag>
                             <el-input
-                                v-if="nameTagVisible"
-                                ref="specimensName"
-                                v-model="nameTagValue"
+                                v-for="(item, index) in pageInfo.specimensNum"
+                                :key="index"
+                                v-model="pageInfo.specimensName[index]"
                                 class="input-new-tag"
                                 size="small"
                                 :disabled="readonly"
-                                @keyup.enter.native="handleTagConfirm('specimensName')"
-                                @blur="handleTagConfirm('specimensName')"
                             />
-                            <el-button
-                                v-show="pageInfo.specimensName && pageInfo.specimensName.length < pageInfo.specimensNum || !pageInfo.specimensNum"
-                                class="button-new-tag"
-                                size="mini"
-                                @click="showTagEdit('specimensName')"
-                            >+ 添 加</el-button>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -106,7 +100,7 @@
                     <el-col :span="24">
                         <el-form-item prop="targetValue" :show-message="false">
                             <template slot="label">
-                                <span>靶值</span>
+                                <span>{{ getAttrs('targetValue', 'label', false) }}</span>
                                 <el-tooltip
                                     class="item"
                                     effect="dark"
@@ -147,36 +141,9 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="isShow('model')" :gutter="20" class="form-row">
+                <el-row v-if="isShow('claimValue')" :gutter="20" class="form-row">
                     <el-col :span="24">
-                        <el-form-item label="精密度模型" prop="shiYanCanShu.model" :show-message="false">
-                            <el-checkbox-group v-model="pageInfo.model" :disabled="readonly">
-                                <el-checkbox label="批内不精密度">批内不精密度</el-checkbox>
-                                <el-checkbox label="总不精密度">总不精密度</el-checkbox>
-                            </el-checkbox-group>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="20" class="form-row">
-                    <el-col v-if="isShow('range')" :span="12">
-                        <el-form-item label="频数目标范围" prop="shiYanCanShu.range" :show-message="false">
-                            <el-select
-                                v-model="pageInfo.range"
-                                filterable
-                                clearable
-                                :disabled="readonly"
-                                placeholder="请选择"
-                            >
-                                <el-option
-                                    :key="1"
-                                    label="无"
-                                    :value="1"
-                                />
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
-                    <el-col v-if="isShow('claimValue')" :span="12">
-                        <el-form-item label="指定的差值" prop="claimValue" :show-message="false">
+                        <el-form-item :label="getAttrs('claimValue', 'label', false)" prop="claimValue" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.claimValue"
                                 type="number"
@@ -188,9 +155,51 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="isShow('standard') || isShow('tea')" :gutter="20" class="form-row">
+                <el-row v-if="isShow('model')" :gutter="20" class="form-row">
+                    <el-col :span="24">
+                        <el-form-item :label="getAttrs('model', 'label', false)" prop="shiYanCanShu.model" :show-message="false">
+                            <el-checkbox-group v-model="pageInfo.model" :disabled="readonly">
+                                <el-checkbox label="批内不精密度">批内不精密度</el-checkbox>
+                                <el-checkbox label="总不精密度">总不精密度</el-checkbox>
+                            </el-checkbox-group>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="form-row">
+                    <el-col v-if="isShow('range')" :span="12">
+                        <el-form-item :label="getAttrs('range', 'label', false)" prop="shiYanCanShu.range" :show-message="false">
+                            <el-select
+                                v-model="pageInfo.range"
+                                filterable
+                                clearable
+                                :disabled="readonly"
+                                placeholder="请选择"
+                            >
+                                <el-option
+                                    v-for="(item, index) in rangeOption"
+                                    :key="index"
+                                    :label="item.label"
+                                    :value="item.value"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <!-- <el-col v-if="isShow('claimValue')" :span="12">
+                        <el-form-item :label="getAttrs('claimValue', 'label', false)" prop="claimValue" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.claimValue"
+                                type="number"
+                                :min="0"
+                                :precision="2"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col> -->
+                </el-row>
+                <el-row :gutter="20" class="form-row">
                     <el-col v-if="isShow('standard')" :span="12">
-                        <el-form-item label="性能标准" prop="shiYanCanShu.standard" :show-message="false">
+                        <el-form-item :label="getAttrs('standard', 'label', false)" prop="shiYanCanShu.standard" :show-message="false">
                             <el-select
                                 v-model="pageInfo.standard"
                                 filterable
@@ -207,7 +216,7 @@
                             </el-select>
                         </el-form-item>
                     </el-col>
-                    <el-col v-if="isShow('tea')" :span="12">
+                    <el-col v-if="pageInfo.standard === '允许总误差Tea' && isShow('tea')" :span="12">
                         <el-form-item label="TEa数值" prop="tea" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.tea"
@@ -216,21 +225,21 @@
                                 :precision="2"
                                 :disabled="readonly"
                                 placeholder="请输入"
-                                @change="changeCVS"
+                                @change="handleCvsChange"
                             />
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="isShow('batchCVS') || isShow('dailyCVS')" :gutter="20" class="form-row">
+                <el-row v-if="pageInfo.standard === '允许总误差Tea'" :gutter="20" class="form-row">
                     <el-col v-if="isShow('batchCVS')" :span="12">
-                        <el-form-item label="批内CVs" prop="batchCVS" :show-message="false">
+                        <el-form-item :label="getAttrs('batchCVS', 'label', false)" prop="shiYanCanShu.batchCVS" :show-message="false">
                             <el-select
                                 v-model="pageInfo.batchCVS"
                                 filterable
                                 clearable
                                 :disabled="readonly"
                                 placeholder="请选择"
-                                @change="changeCVS"
+                                @change="handleCvsChange"
                             >
                                 <el-option
                                     v-for="(item, index) in batchOption"
@@ -242,14 +251,14 @@
                         </el-form-item>
                     </el-col>
                     <el-col v-if="isShow('dailyCVS')" :span="12">
-                        <el-form-item label="日间CVs" prop="dailyCVS" :show-message="false">
+                        <el-form-item label="日间CVs" prop="shiYanCanShu.dailyCVS" :show-message="false">
                             <el-select
                                 v-model="pageInfo.dailyCVS"
                                 filterable
                                 clearable
                                 :disabled="readonly"
                                 placeholder="请选择"
-                                @change="changeCVS"
+                                @change="handleCvsChange"
                             >
                                 <el-option
                                     v-for="(item, index) in batchOption"
@@ -261,9 +270,35 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
+                <el-row v-if="pageInfo.standard === '厂商参数'" :gutter="20" class="form-row">
+                    <el-col :span="12">
+                        <el-form-item label="重复（批内）标准差" prop="shiYanCanShu.allowableSDr" label-width="140px" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.allowableSDr"
+                                type="number"
+                                :min="0"
+                                :precision="2"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="期间（实验室）标准差" prop="shiYanCanShu.allowableSDl" label-width="155px" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.allowableSDl"
+                                type="number"
+                                :min="0"
+                                :precision="2"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
                 <el-row v-show="0" :gutter="20" class="form-row">
-                    <el-col v-if="isShow('batchCVSValue')" :span="12">
-                        <el-form-item label="数值" prop="batchCVSValue" :show-message="false">
+                    <el-col :span="12">
+                        <el-form-item label="数值" prop="shiYanCanShu.batchCVSValue" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.batchCVSValue"
                                 type="number"
@@ -274,8 +309,8 @@
                             />
                         </el-form-item>
                     </el-col>
-                    <el-col v-if="isShow('dailyCVSValue')" :span="12">
-                        <el-form-item label="数值" prop="dailyCVSValue" :show-message="false">
+                    <el-col :span="12">
+                        <el-form-item label="数值" prop="shiYanCanShu.dailyCVSValue" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.dailyCVSValue"
                                 type="number"
@@ -292,7 +327,7 @@
     </div>
 </template>
 <script>
-import { standardOption, batchOption } from '../constants/index'
+import { standardOption, batchOption, rangeOption } from '../constants/index'
 export default {
     props: {
         info: {
@@ -306,21 +341,19 @@ export default {
         configData: {
             type: Array,
             default: () => []
-        },
-        params: {
-            type: Array,
-            default: () => []
         }
     },
     data () {
         return {
             standardOption,
             batchOption,
+            rangeOption,
             pageInfo: null,
             nameTagValue: '',
             targetTagValue: '',
             nameTagVisible: false,
-            targetTagVisible: false
+            targetTagVisible: false,
+            paramsList: this.configData.map(i => ({ key: i.key, visible: i.isVisible }))
         }
     },
     watch: {
@@ -339,18 +372,28 @@ export default {
                 temp[item.key] = item.default
             }
         })
-        this.pageInfo = temp || { model: [], targetValue: [], specimensName: [] }
+        temp.specimensName = temp.specimensNum ? Array.from({ length: temp.specimensNum }, (_, index) => `水平${index + 1}`) : []
+        this.pageInfo = temp || { model: [], targetValue: [], specimensName: [], claimValue: [] }
     },
     methods: {
         isShow (props) {
-            return this.params.includes(props)
+            const t = this.paramsList.find(i => i.key === props)
+            return t && t.visible
         },
         getAttrs (props, attr, isNumber = true) {
             const t = this.configData.find(i => i.key === props)
             const res = t ? t[attr] : ''
             return isNumber ? Number(res) : res
         },
-        changeCVS () {
+        handleNumChange (v) {
+            const { specimensName: s = [] } = this.pageInfo || {}
+            if (v > s.length) {
+                this.pageInfo.specimensName = s.concat(Array.from({ length: v - s.length }, (_, index) => `水平${index + s.length + 1}`))
+            } else {
+                this.pageInfo.specimensName.splice(v)
+            }
+        },
+        handleCvsChange () {
             const { batchCVS, dailyCVS, tea } = this.pageInfo
             this.pageInfo.batchCVSValue = parseFloat(tea * batchCVS)
             this.pageInfo.dailyCVSValue = parseFloat(tea * dailyCVS)
@@ -410,6 +453,24 @@ export default {
                     }
                     &:last-child {
                         padding-bottom: 0;
+                    }
+                    &:empty {
+                        display: none;
+                    }
+                    .inline-item {
+                        ::v-deep {
+                            .el-form-item__content {
+                                display: flex;
+                                justify-content: flex-start;
+                                .el-input {
+                                    max-width: 120px;
+                                    margin-right: 10px;
+                                    &:last-of-type {
+                                        margin-right: 0;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 .tag-row {

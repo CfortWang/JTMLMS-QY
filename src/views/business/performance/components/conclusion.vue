@@ -44,14 +44,7 @@
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="24">
                         <el-form-item label="结论" prop="shiYanJieLun" :show-message="false">
-                            <el-input
-                                v-model="pageInfo.shiYanJieLun"
-                                type="textarea"
-                                :rows="4"
-                                :autosize="readonly ? { minRows: 2, maxRows: 6 } : false"
-                                :disabled="readonly"
-                                placeholder="请输入"
-                            />
+                            <ibps-ueditor v-model="pageInfo.shiYanJieLun" :readonly="readonly" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -77,7 +70,8 @@
 <script>
 export default {
     components: {
-        IbpsAttachment: () => import('@/business/platform/file/attachment/selector')
+        IbpsAttachment: () => import('@/business/platform/file/attachment/selector'),
+        IbpsUeditor: () => import('@/components/ibps-ueditor')
     },
     props: {
         info: {
@@ -132,9 +126,9 @@ export default {
                 }
             }
         }
-        .conclusion .form-container {
-            max-height: 300px;
-            overflow-y: auto;
-        }
+        // .conclusion .form-container {
+        //     max-height: 300px;
+        //     overflow-y: auto;
+        // }
     }
 </style>

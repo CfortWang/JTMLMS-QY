@@ -24,30 +24,29 @@
             <div v-if="loadCompleted" class="config-form-container">
                 <div class="left">
                     <experimental-desc
-                        :step-desc="stepDesc"
-                        :references="references"
+                        :step="pageData.step"
+                        :references="pageData.references"
                         :readonly="readonly"
                     />
                     <basic-info :info="form" :readonly="readonly" />
                     <reagent-info :info="form.reagentPoList" :readonly="readonly" />
                     <param-info
                         :info="form.shiYanCanShu"
-                        :config-data="configData"
-                        :params="params"
+                        :config-data="pageData.config"
                         :readonly="readonly"
                         @updateParams="handleUpdateParams"
                     />
                 </div>
                 <div class="right">
                     <experimental-data
-                        :info="form.shiYanShuJu"
-                        :form-id="form.id"
+                        :data-list="form.jiSuanJieGuo"
+                        :form-id="formId"
                         :readonly="readonly"
                     />
                     <precision
-                        v-if="$utils.isNotEmpty(form.shiYanShuJu)"
-                        :info="form.shiYanShuJu"
-                        :formula="formulaData"
+                        v-if="$utils.isNotEmpty(form.jiSuanJieGuo)"
+                        :info="form.jiSuanJieGuo"
+                        :formula="pageData.formula"
                         :readonly="readonly"
                     />
                     <conclusion
@@ -59,7 +58,7 @@
             </div>
         </el-form>
         <div slot="title" class="config-dialog-header">
-            <div class="title">{{ pageData.method }}</div>
+            <div class="title">{{ pageData.name }}</div>
             <div class="operate">
                 <template v-for="btn in toolbars">
                     <el-button
@@ -79,8 +78,7 @@
 </template>
 
 <script>
-import { round } from 'lodash'
-import { performanceList, formRules } from './constants/index'
+import { formRules } from './constants/index'
 import { getExperimental, saveExperimental } from '@/api/business/pv'
 export default {
     components: {
@@ -113,6 +111,7 @@ export default {
         return {
             dialogVisible: this.visible,
             formLabelWidth: '110px',
+            formId: this.pageData.recordId,
             form: {
                 xingNengZhiBia: '',
                 fangAnLeiXing: '',
@@ -139,10 +138,6 @@ export default {
                 shiYanJieLun: ''
             },
             rules: formRules,
-            configData: [],
-            params: [],
-            references: '',
-            formulaData: [],
             loading: false,
             loadCompleted: false,
             toolbars: [
@@ -151,8 +146,7 @@ export default {
                 { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
-            ],
-            stepDesc: ''
+            ]
         }
     },
     computed: {
@@ -167,10 +161,11 @@ export default {
         }
     },
     created () {
-        this.getConfigData()
+
     },
     mounted () {
-        if (!this.pageData.id) {
+        console.log(this.pageData)
+        if (!this.pageData.recordId) {
             this.loadCompleted = true
             return
         }
@@ -180,28 +175,19 @@ export default {
         // 获取数据
         async loadData () {
             this.loading = true
-            getExperimental({ id: this.pageData.id }).then(res => {
+            getExperimental({ id: this.pageData.recordId }).then(res => {
                 this.loading = false
                 const { data } = res || {}
                 if (data) {
                     data.shiYanCanShu = data.shiYanCanShu ? JSON.parse(data.shiYanCanShu) : {}
-                    data.shiYanShuJu = data.shiYanShuJu ? JSON.parse(data.shiYanShuJu) : {}
+                    data.shiYanShuJu = data.shiYanShuJu ? JSON.parse(data.shiYanShuJu) : []
+                    data.jiSuanJieGuo = data.jiSuanJieGuo ? JSON.parse(data.jiSuanJieGuo) : {}
                     this.form = Object.assign(this.form, data)
                     this.loadCompleted = true
                 }
             }).catch(() => {
                 this.loading = false
             })
-        },
-        getConfigData () {
-            const { target, method } = this.pageData || {}
-            const t = performanceList.find(i => i.title === target)
-            const m = t.methods.find(i => i.name === method)
-            this.stepDesc = m ? m.step : ''
-            this.params = m ? m.params : []
-            this.configData = m ? m.config : null
-            this.references = m ? m.references : ''
-            this.formulaData = m ? m.formula : []
         },
         handleActionEvent (key) {
             switch (key) {
@@ -252,14 +238,15 @@ export default {
                 shiYanCanShu: JSON.stringify(this.form.shiYanCanShu),
                 shiYanShuJu: JSON.stringify(this.form.shiYanShuJu),
                 xingNengZhiBia: this.pageData.target,
-                fangAnLeiXing: this.pageData.method,
-                id: this.pageData.id
+                fangAnLeiXing: this.pageData.name,
+                fangFaKey: this.pageData.key,
+                zhiBiaoId: this.pageData.targetId,
+                id: this.formId
             }
             // 提交数据
             saveExperimental(submitData).then(res => {
-                console.log(res)
                 if (key === 'save') {
-                    this.form.id = res.data
+                    this.formId = res.data
                     this.$message.success('保存成功')
                 } else {
                     this.$message.success('提交成功')
@@ -379,9 +366,14 @@ export default {
                     overflow-y: auto;
                     padding: 15px 20px;
                     box-sizing: border-box;
+                    .info-container {
+                        margin-bottom: 20px;
+                        &:last-child {
+                            margin-bottom: 0;
+                        }
+                    }
                     ::v-deep {
                         .info-item {
-                            margin-bottom: 20px;
                             .title {
                                 height: 20px;
                                 line-height: 20px;

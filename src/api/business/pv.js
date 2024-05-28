@@ -53,11 +53,11 @@ export function removeExperimental (params) {
  * 获取性能验证实验试剂数据
  * @param {*} params
  */
-export function getReagentList (params) {
+export function getReagentList (data) {
     return request({
         url: BUSINESS_BASE_URL() + '/pv/reagent/query',
-        method: 'get',
-        params
+        method: 'post',
+        data
     })
 }
 
@@ -101,11 +101,11 @@ export function removeReagent (data) {
  * 获取性能验证配置数据
  * @param {*} params
  */
-export function getConfigList (params) {
+export function getConfigList (data) {
     return request({
         url: BUSINESS_BASE_URL() + '/pv/experimentalConfig/query',
-        method: 'get',
-        params
+        method: 'post',
+        data
     })
 }
 

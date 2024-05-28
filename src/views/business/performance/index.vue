@@ -8,12 +8,12 @@
             <el-card
                 v-for="(item, index) in performanceList"
                 :key="index"
-                :header="item.title"
+                :header="item.target"
                 class="performance-card"
             >
                 <template slot="header">
                     <div class="card-title">
-                        <span>{{ item.title }}</span>
+                        <span>{{ item.target }}</span>
                         <el-button
                             size="mini"
                             icon="ibps-icon-cogs"
@@ -39,6 +39,7 @@
             :visible.sync="showConfig"
             :page-data="configData"
             @close="() => showConfig = false"
+            @callback="loadData"
         />
         <experimental
             v-if="showExperimental"
@@ -50,7 +51,7 @@
 </template>
 
 <script>
-import { performanceList } from './constants/index'
+import { getConfigList } from '@/api/business/pv'
 export default {
     components: {
         Config: () => import('./config'),
@@ -64,53 +65,52 @@ export default {
                 target: '',
                 method: ''
             },
-            performanceList
+            performanceList: []
         }
     },
-    mounted () {
-        // getFacsDaily().then(res => {
-        //     const data = res.data || []
-        //     data.forEach(item => {
-        //         const index = this.performanceList.findIndex(i => item.facs_type.includes(i.type))
-        //         if (index !== -1) {
-        //             this.performanceList[index].detail.push({
-        //                 name: item.name_,
-        //                 done: item.done,
-        //                 todo: item.todo,
-        //                 status: item.todo === 0 ? 'success' : 'warning'
-        //             })
-        //         } else {
-        //             this.performanceList.push({
-        //                 type: item.facs_type.split('-')[1],
-        //                 detail: [{
-        //                     name: item.name_,
-        //                     done: item.done,
-        //                     todo: item.todo,
-        //                     status: item.todo === 0 ? 'success' : 'warning'
-        //                 }],
-        //                 isComplete: !data.some(i => i.facs_type === item.facs_type && i.todo !== 0),
-        //                 pagePath: item.pagePath
-        //             })
-        //         }
-        //     })
-        // })
+    created () {
+        this.loadData()
     },
     methods: {
-        handleConfig (item) {
-            this.configData = {
-                id: item.id,
-                type: item.type,
-                target: item.title
+        loadData () {
+            const params = {
+                parameters: [],
+                requestPage: {
+                    pageNo: 1,
+                    limit: 200
+                },
+                sorts: []
             }
+            const dataList = []
+            getConfigList(params).then(res => {
+                const { dataResult = [] } = res.data || {}
+                dataResult.forEach(item => {
+                    const config = JSON.parse(item.config)
+                    dataList.push({
+                        id: item.id,
+                        sn: item.sn,
+                        target: item.target,
+                        type: item.type,
+                        icon: item.icon,
+                        methods: config.methods.sort((a, b) => a.sn - b.sn)
+                    })
+                })
+                this.performanceList = dataList.sort((a, b) => a.sn - b.sn)
+            })
+        },
+        handleConfig (item) {
+            this.configData = item
             this.showConfig = true
         },
         handleEdit (item, t) {
-            if (t.disabled) {
+            if (t.disabled === true || t.disabled === 'true') {
                 return
             }
+            const { sn, disabled, ...method } = t
             this.configData = {
-                target: item.title,
-                method: t.name
+                ...item,
+                targetId: item.id,
+                ...method
             }
             this.showExperimental = true
         }

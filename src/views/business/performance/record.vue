@@ -33,8 +33,7 @@
 </template>
 
 <script>
-import { queryExperimental, getExperimental, removeExperimental } from '@/api/business/pv'
-import { performanceList } from './constants/index'
+import { queryExperimental, getConfigList, getConfigDetail, removeExperimental } from '@/api/business/pv'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 
@@ -46,12 +45,8 @@ export default {
     data () {
         const { userList = [] } = this.$store.getters || {}
         const userOption = userList.map(item => ({ label: item.userName, value: item.userId }))
-        const targetOption = performanceList.map(item => ({ label: item.title, value: item.title }))
-        const methodOption = performanceList.flatMap(item => item.methods.map(method => ({ label: method.name, value: method.name })))
         return {
             userOption,
-            targetOption,
-            methodOption,
             title: '性能验证记录',
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: true,
@@ -62,24 +57,23 @@ export default {
             showConfig: false,
             readonly: false,
             detailData: {},
+            targetOption: [],
+            methodOption: [],
             listConfig: {
                 toolbars: [
                     {
                         key: 'search'
                     },
-                    // {
-                    //     key: 'upLoad',
-                    //     label: '上传',
-                    //     icon: 'ibps-icon-upload'
-                    // },
                     {
                         key: 'remove'
                     }
                 ],
                 searchForm: {
                     forms: [
-                        { prop: 'Q^name_^SL', label: '性能指标', fieldType: 'select', options: targetOption },
-                        { prop: 'Q^fang_an_lei_xing_^SL', label: '方案类型', fieldType: 'select', options: methodOption },
+                        // { prop: 'Q^name_^SL', label: '性能指标', fieldType: 'select', options: this.targetOption },
+                        // { prop: 'Q^fang_an_lei_xing_^SL', label: '方案类型', fieldType: 'select', options: this.methodOption },
+                        { prop: 'Q^name_^SL', label: '性能指标' },
+                        { prop: 'Q^fang_an_lei_xing_^SL', label: '方案类型' },
                         { prop: 'Q^shi_yan_xiang_mu_^SL', label: '实验项目' },
                         { prop: 'Q^shi_yan_fang_fa_^SL', label: '实验方法' },
                         { prop: 'Q^yang_ben_lei_xing^SL', label: '样本类型' },
@@ -96,8 +90,8 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'xingNengZhiBia', label: '性能指标', tags: targetOption, minWidth: 110 },
-                    { prop: 'fangAnLeiXing', label: '方案类型', tags: methodOption, width: 125 },
+                    { prop: 'xingNengZhiBia', label: '性能指标', tags: [], minWidth: 110 },
+                    { prop: 'fangAnLeiXing', label: '方案类型', tags: [], width: 125 },
                     { prop: 'shiYanXiangMu', label: '实验项目', width: 120 },
                     { prop: 'shiYanFangFa', label: '实验方法', width: 120 },
                     { prop: 'yangBenLeiXing', label: '样本类型', width: 100 },
@@ -115,9 +109,12 @@ export default {
                     }
                 ],
                 rowHandle: {
+                    effect: 'display',
                     actions: [
                         {
                             key: 'edit',
+                            label: '编辑',
+                            type: 'primary',
                             icon: 'ibps-icon-edit'
                         },
                         {
@@ -125,9 +122,6 @@ export default {
                             label: '实验报告',
                             type: 'success',
                             icon: 'ibps-icon-file-text-o'
-                        },
-                        {
-                            key: 'remove'
                         }
                     ]
                 }
@@ -141,6 +135,40 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
+            // const params = {
+            //     parameters: [],
+            //     requestPage: {
+            //         pageNo: 1,
+            //         limit: 200
+            //     },
+            //     sorts: []
+            // }
+            // Promise.all([
+            //     queryExperimental(this.getSearchFormData()),
+            //     getConfigList(params)
+            // ]).then(([res1, res2]) => {
+            //     this.loading = false
+            //     ActionUtils.handleListData(this, res1.data)
+            //     const { dataResult = [] } = res2.data || {}
+            //     const dataList = []
+            //     dataResult.forEach(item => {
+            //         const config = JSON.parse(item.config)
+            //         dataList.push({
+            //             id: item.id,
+            //             sn: item.sn,
+            //             target: item.target,
+            //             type: item.type,
+            //             icon: item.icon,
+            //             methods: config.methods.sort((a, b) => a.sn - b.sn)
+            //         })
+            //     })
+            //     this.targetOption = dataList.map(item => ({ label: item.target, value: item.target }))
+            //     console.log(this.targetOption)
+            //     this.searchForm.form[0].options = this.targetOption
+            //     this.methodOption = dataList.flatMap(item => item.methods.map(method => ({ label: method.name, value: method.name })))
+            // }).catch(() => {
+            //     this.loading = false
+            // })
             queryExperimental(this.getSearchFormData()).then(res => {
                 ActionUtils.handleListData(this, res.data)
                 this.loading = false
@@ -205,14 +233,34 @@ export default {
         /**
          * 处理编辑
          */
-        handleEdit ({ id, fangAnLeiXing, xingNengZhiBia }, key) {
-            this.detailData = {
-                id,
-                target: xingNengZhiBia,
-                method: fangAnLeiXing
-            }
+        async handleEdit ({ id, zhiBiaoId, fangAnLeiXing, xingNengZhiBia }, key) {
+            this.detailData = await this.getConfigData(zhiBiaoId, fangAnLeiXing, id)
             this.readonly = key === 'detail'
             this.showConfig = true
+        },
+        async getConfigData (id, method, recordId) {
+            return new Promise((resolve, reject) => {
+                getConfigDetail({ id }).then(res => {
+                    const data = res.data || {}
+                    const config = JSON.parse(data.config)
+                    const m = config.methods.find(i => i.name === method)
+                    const result = {
+                        targetId: data.id,
+                        target: data.target,
+                        sn: data.sn,
+                        type: data.type,
+                        name: m.name,
+                        key: m.key,
+                        step: m.step,
+                        config: m.config,
+                        formula: m.formula,
+                        recordId
+                    }
+                    resolve(result)
+                }).catch(error => {
+                    reject(error)
+                })
+            })
         },
         handleReport (data) {
             console.log('wwww')
