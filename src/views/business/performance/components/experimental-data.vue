@@ -22,8 +22,8 @@
             </div>
             <div class="content">
                 <el-table
-                    v-if="showTemplate"
-                    :data="pageInfo.dataDTO.list"
+                    v-if="expData && $utils.isNotEmpty(expData.dataDTO)"
+                    :data="expData.dataDTO.list"
                     border
                     stripe
                     highlight-current-row
@@ -31,7 +31,7 @@
                     max-height="250px"
                 >
                     <el-table-column
-                        v-for="(h, hIndex) in pageInfo.dataDTO.header"
+                        v-for="(h, hIndex) in expData.dataDTO.header"
                         :key="h.children && h.children.length ? hIndex : h.prop"
                         :prop="h.prop"
                         :label="h.label"
@@ -77,7 +77,7 @@ export default {
         ImportTable: () => import('@/business/platform/form/formrender/dynamic-form/components/import-table')
     },
     props: {
-        dataList: {
+        expData: {
             type: Object,
             default: () => {}
         },
@@ -92,21 +92,12 @@ export default {
     },
     data () {
         return {
-            pageInfo: {},
-            showTemplate: false,
             showImportTable: false,
-            repeatNum: 1,
             toolbars: [
                 { key: 'export', icon: 'ibps-icon-cloud-download', label: '导出模板', type: 'info', hidden: this.readonly },
                 { key: 'import', icon: 'ibps-icon-cloud-upload', label: '导入数据', type: 'warning', hidden: this.readonly },
                 { key: 'generate', icon: 'ibps-icon-file-text-o', label: '查看实验报告', type: 'success', hidden: true }
             ]
-        }
-    },
-    mounted () {
-        this.pageInfo = this.$utils.isEmpty(this.dataList) ? {} : JSON.parse(JSON.stringify(this.dataList))
-        if (!this.showTemplate && this.$utils.isNotEmpty(this.pageInfo)) {
-            this.showTemplate = true
         }
     },
     methods: {
@@ -116,11 +107,13 @@ export default {
                     this.handleGenerate()
                     break
                 case 'export':
-                    this.handleExport()
+                    // this.handleExport()
+                    this.$emit('export')
                     break
                 case 'import':
                     // this.showImportTable = true
-                    this.handleImport()
+                    // this.handleImport()
+                    this.$emit('import')
                     break
             }
         },
@@ -187,8 +180,7 @@ export default {
                     data.append('applyFiles', file)
                     importTemplate(data).then(res => {
                         this.$message.success('实验数据导入成功')
-                        this.pageInfo = res.data
-                        this.showTemplate = true
+                        this.expData = res.data
                     }).catch(({ state, cause }) => {
                         const errMsg = JSON.parse(cause)
                         let msgContent = ''

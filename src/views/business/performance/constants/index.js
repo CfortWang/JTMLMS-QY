@@ -66,7 +66,7 @@ export const formRules = {
         trigger: 'change'
     }],
     shiYanJieLun: [{
-        required: true,
+        required: false,
         message: '请输入',
         trigger: 'change'
     }],
@@ -131,12 +131,12 @@ export const reagentFormRules = {
 }
 
 export const configFormRules = {
-    type: [{
+    target: [{
         required: true,
         message: '请输入',
         trigger: 'change'
     }],
-    target: [{
+    targetKey: [{
         required: true,
         message: '请输入',
         trigger: 'change'
@@ -156,6 +156,16 @@ export const configFormRules = {
         message: '请输入',
         trigger: 'change'
     }],
+    'methods[].methodName': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].methodType': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
     'methods[].sn': [{
         required: true,
         message: '请输入',
@@ -166,12 +176,12 @@ export const configFormRules = {
         message: '请输入',
         trigger: 'change'
     }],
-    'methods[].disabled': [{
+    'methods[].isDisabled': [{
         required: true,
         message: '请输入',
         trigger: 'change'
     }],
-    'methods[].isPrivate': [{
+    'methods[].isPublic': [{
         required: true,
         message: '请输入',
         trigger: 'change'
@@ -181,8 +191,13 @@ export const configFormRules = {
         message: '请输入',
         trigger: 'change'
     }],
-    'methods[].references': [{
-        required: false,
+    'methods[].criterion': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'methods[].params': [{
+        required: true,
         message: '请输入',
         trigger: 'change'
     }]
@@ -256,6 +271,17 @@ export const rangeOption = [
     }
 ]
 
+export const methodTypeOption = [
+    {
+        value: '定性',
+        label: '定性'
+    },
+    {
+        value: '定量',
+        label: '定量'
+    }
+]
+
 export const paramsList = [
     { label: '名称', key: 'label', width: '180px' },
     { label: '编码', key: 'key', width: '150px' },
@@ -264,7 +290,7 @@ export const paramsList = [
     { label: '最大值', key: 'max', type: 'number', min: 0, precision: 0, width: '150px' },
     { label: '精度', key: 'precision', type: 'number', min: 0, max: 4, width: '120px' },
     { label: '是否显示', key: 'isVisible', type: 'switch', width: '100px' },
-    { label: '是否禁用', key: 'isDisable', type: 'switch', width: '100px' }
+    { label: '是否只读', key: 'isReadonly', type: 'switch', width: '100px' }
 ]
 
 export const formulaList = [

@@ -25,7 +25,7 @@
         <Experimental
             v-if="showConfig"
             :visible.sync="showConfig"
-            :page-data="detailData"
+            :params="params"
             :readonly="readonly"
             @close="() => showConfig = false"
         />
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { queryExperimental, getConfigList, getConfigDetail, removeExperimental } from '@/api/business/pv'
+import { queryExperimental, removeExperimental } from '@/api/business/pv'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 
@@ -56,17 +56,13 @@ export default {
             sorts: {},
             showConfig: false,
             readonly: false,
-            detailData: {},
+            params: {},
             targetOption: [],
             methodOption: [],
             listConfig: {
                 toolbars: [
-                    {
-                        key: 'search'
-                    },
-                    {
-                        key: 'remove'
-                    }
+                    { key: 'search' },
+                    { key: 'remove' }
                 ],
                 searchForm: {
                     forms: [
@@ -78,14 +74,7 @@ export default {
                         { prop: 'Q^shi_yan_fang_fa_^SL', label: '实验方法' },
                         { prop: 'Q^yang_ben_lei_xing^SL', label: '样本类型' },
                         { prop: 'Q^shi_yan_yi_qi_^SL', label: '实验仪器' },
-                        {
-                            prop: [
-                                'Q^create_time_^DL',
-                                'Q^create_time_^DG'
-                            ],
-                            label: '创建时间',
-                            fieldType: 'daterange'
-                        }
+                        { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '创建时间', fieldType: 'daterange' }
                     ]
                 },
                 // 表格字段配置
@@ -100,29 +89,13 @@ export default {
                     { prop: 'dataStatus', label: '状态', width: 80 },
                     { prop: 'bianZhiRen', label: '实验人', tags: userOption, width: 90 },
                     { prop: 'createBy', label: '评价人', tags: userOption, width: 90 },
-                    {
-                        prop: 'createTime',
-                        label: '创建时间',
-                        dateFormat: 'yyyy-MM-dd HH:mm',
-                        sortable: 'custom',
-                        width: 130
-                    }
+                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 130 }
                 ],
                 rowHandle: {
                     effect: 'display',
                     actions: [
-                        {
-                            key: 'edit',
-                            label: '编辑',
-                            type: 'primary',
-                            icon: 'ibps-icon-edit'
-                        },
-                        {
-                            key: 'report',
-                            label: '实验报告',
-                            type: 'success',
-                            icon: 'ibps-icon-file-text-o'
-                        }
+                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' },
+                        { key: 'report', label: '实验报告', type: 'success', icon: 'ibps-icon-file-text-o' }
                     ]
                 }
             }
@@ -135,40 +108,6 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
-            // const params = {
-            //     parameters: [],
-            //     requestPage: {
-            //         pageNo: 1,
-            //         limit: 200
-            //     },
-            //     sorts: []
-            // }
-            // Promise.all([
-            //     queryExperimental(this.getSearchFormData()),
-            //     getConfigList(params)
-            // ]).then(([res1, res2]) => {
-            //     this.loading = false
-            //     ActionUtils.handleListData(this, res1.data)
-            //     const { dataResult = [] } = res2.data || {}
-            //     const dataList = []
-            //     dataResult.forEach(item => {
-            //         const config = JSON.parse(item.config)
-            //         dataList.push({
-            //             id: item.id,
-            //             sn: item.sn,
-            //             target: item.target,
-            //             type: item.type,
-            //             icon: item.icon,
-            //             methods: config.methods.sort((a, b) => a.sn - b.sn)
-            //         })
-            //     })
-            //     this.targetOption = dataList.map(item => ({ label: item.target, value: item.target }))
-            //     console.log(this.targetOption)
-            //     this.searchForm.form[0].options = this.targetOption
-            //     this.methodOption = dataList.flatMap(item => item.methods.map(method => ({ label: method.name, value: method.name })))
-            // }).catch(() => {
-            //     this.loading = false
-            // })
             queryExperimental(this.getSearchFormData()).then(res => {
                 ActionUtils.handleListData(this, res.data)
                 this.loading = false
@@ -211,17 +150,17 @@ export default {
          */
         handleAction (command, position, selection, data) {
             switch (command) {
-                case 'search': // 查询
+                case 'search':
                     ActionUtils.setFirstPagination(this.pagination)
                     this.search()
                     break
                 case 'edit':
                     this.handleEdit(data, command)
                     break
-                case 'report': // 明细
+                case 'report':
                     this.handleReport(data)
                     break
-                case 'remove': // 删除
+                case 'remove':
                     ActionUtils.removeRecord(selection).then((ids) => {
                         this.handleRemove(ids)
                     }).catch(() => {})
@@ -233,34 +172,14 @@ export default {
         /**
          * 处理编辑
          */
-        async handleEdit ({ id, zhiBiaoId, fangAnLeiXing, xingNengZhiBia }, key) {
-            this.detailData = await this.getConfigData(zhiBiaoId, fangAnLeiXing, id)
+        async handleEdit ({ id, zhiBiaoId, fangFaKey }, key) {
+            this.params = {
+                targetId: zhiBiaoId,
+                methodId: fangFaKey,
+                recordId: id
+            }
             this.readonly = key === 'detail'
             this.showConfig = true
-        },
-        async getConfigData (id, method, recordId) {
-            return new Promise((resolve, reject) => {
-                getConfigDetail({ id }).then(res => {
-                    const data = res.data || {}
-                    const config = JSON.parse(data.config)
-                    const m = config.methods.find(i => i.name === method)
-                    const result = {
-                        targetId: data.id,
-                        target: data.target,
-                        sn: data.sn,
-                        type: data.type,
-                        name: m.name,
-                        key: m.key,
-                        step: m.step,
-                        config: m.config,
-                        formula: m.formula,
-                        recordId
-                    }
-                    resolve(result)
-                }).catch(error => {
-                    reject(error)
-                })
-            })
         },
         handleReport (data) {
             console.log('wwww')

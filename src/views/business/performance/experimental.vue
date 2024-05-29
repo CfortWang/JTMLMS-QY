@@ -24,29 +24,32 @@
             <div v-if="loadCompleted" class="config-form-container">
                 <div class="left">
                     <experimental-desc
-                        :step="pageData.step"
-                        :references="pageData.references"
+                        :step="configData.step"
+                        :references="configData.references"
                         :readonly="readonly"
                     />
                     <basic-info :info="form" :readonly="readonly" />
                     <reagent-info :info="form.reagentPoList" :readonly="readonly" />
                     <param-info
+                        v-if="$utils.isNotEmpty(configData.params)"
                         :info="form.shiYanCanShu"
-                        :config-data="pageData.config"
+                        :config-data="configData.params"
                         :readonly="readonly"
                         @updateParams="handleUpdateParams"
                     />
                 </div>
                 <div class="right">
                     <experimental-data
-                        :data-list="form.jiSuanJieGuo"
+                        :exp-data="form.jiSuanJieGuo"
                         :form-id="formId"
                         :readonly="readonly"
+                        @export="handleExport"
+                        @import="handleImport"
                     />
                     <precision
                         v-if="$utils.isNotEmpty(form.jiSuanJieGuo)"
                         :info="form.jiSuanJieGuo"
-                        :formula="pageData.formula"
+                        :formula="configData.formulas"
                         :readonly="readonly"
                         @recalculate="handleRecalculate"
                     />
@@ -59,7 +62,7 @@
             </div>
         </el-form>
         <div slot="title" class="config-dialog-header">
-            <div class="title">{{ pageData.name }}</div>
+            <div class="title">{{ configData.methodName }}</div>
             <div class="operate">
                 <template v-for="btn in toolbars">
                     <el-button
@@ -80,7 +83,8 @@
 
 <script>
 import { formRules } from './constants/index'
-import { getExperimental, saveExperimental, recalculate } from '@/api/business/pv'
+import ActionUtils from '@/utils/action'
+import { getExperimental, saveExperimental, getConfigDetail, recalculate, exportTemplate, importTemplate } from '@/api/business/pv'
 export default {
     components: {
         ExperimentalDesc: () => import('./components/experimental-desc'),
@@ -100,11 +104,9 @@ export default {
             type: Boolean,
             default: false
         },
-        pageData: {
+        params: {
             type: Object,
-            default: () => {
-                return {}
-            }
+            default: () => {}
         }
     },
     data () {
@@ -112,7 +114,8 @@ export default {
         return {
             dialogVisible: this.visible,
             formLabelWidth: '110px',
-            formId: this.pageData.recordId,
+            configData: {},
+            formId: this.params.recordId,
             form: {
                 xingNengZhiBia: '',
                 fangAnLeiXing: '',
@@ -136,6 +139,7 @@ export default {
                     targetValue: []
                 },
                 shiYanShuJu: [],
+                jiSuanJieGuo: {},
                 shiYanJieLun: ''
             },
             rules: formRules,
@@ -143,15 +147,12 @@ export default {
             loadCompleted: false,
             toolbars: [
                 { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
-                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success', hidden: this.readonly },
-                // { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
+                { key: 'save', icon: 'ibps-icon-save', label: '暂存', type: 'info', hidden: this.readonly },
+                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ]
         }
-    },
-    computed: {
-
     },
     watch: {
         visible: {
@@ -162,11 +163,8 @@ export default {
         }
     },
     created () {
-
-    },
-    mounted () {
-        console.log(this.pageData)
-        if (!this.pageData.recordId) {
+        this.getConfigData(this.params)
+        if (!this.params.recordId) {
             this.loadCompleted = true
             return
         }
@@ -174,9 +172,9 @@ export default {
     },
     methods: {
         // 获取数据
-        async loadData () {
+        loadData () {
             this.loading = true
-            getExperimental({ id: this.pageData.recordId }).then(res => {
+            getExperimental({ id: this.params.recordId }).then(res => {
                 this.loading = false
                 const { data } = res || {}
                 if (data) {
@@ -188,6 +186,19 @@ export default {
                 }
             }).catch(() => {
                 this.loading = false
+            })
+        },
+        getConfigData ({ targetId, methodId }) {
+            getConfigDetail({ id: targetId }).then(res => {
+                const { target, targetKey, experimentalConfigDetailPoList: methods } = res.data || {}
+                const method = methods.find(i => i.id === methodId) || {}
+                this.configData = {
+                    target,
+                    targetKey,
+                    ...method,
+                    params: this.$utils.isNotEmpty(method.params) ? JSON.parse(method.params) : [],
+                    formulas: this.$utils.isNotEmpty(method.formulas) ? JSON.parse(method.formulas) : []
+                }
             })
         },
         handleActionEvent (key) {
@@ -209,13 +220,13 @@ export default {
                     break
             }
         },
-        handleSave (key) {
+        handleSave (key, callback) {
             this.$refs.form.validate((valid) => {
                 if (!valid) {
                     return this.$message.warning('请完善表单必填项信息！')
                 }
                 if (key === 'save') {
-                    this.submitForm(key)
+                    this.submitForm(key, callback)
                 } else {
                     this.$confirm('确定要提交数据吗？', '提示', {
                         confirmButtonText: '确定',
@@ -225,7 +236,7 @@ export default {
                         closeOnClickModal: false,
                         closeOnPressEscape: false
                     }).then(() => {
-                        this.submitForm(key)
+                        this.submitForm(key, callback)
                     })
                 }
             })
@@ -233,15 +244,15 @@ export default {
         handleGenerate () {
             this.$message.info('waiting...')
         },
-        submitForm (key) {
+        submitForm (key, callback, showMsg) {
             const submitData = {
                 ...this.form,
                 shiYanCanShu: JSON.stringify(this.form.shiYanCanShu),
                 shiYanShuJu: this.$utils.isEmpty(this.form.shiYanShuJu) ? null : JSON.stringify(this.form.shiYanShuJu),
-                xingNengZhiBia: this.pageData.target,
-                fangAnLeiXing: this.pageData.name,
-                fangFaKey: this.pageData.key,
-                zhiBiaoId: this.pageData.targetId,
+                xingNengZhiBia: this.configData.target,
+                fangAnLeiXing: this.configData.methodName,
+                fangFaKey: this.params.methodId,
+                zhiBiaoId: this.params.targetId,
                 id: this.formId
             }
             delete submitData.jiSuanJieGuo
@@ -254,10 +265,9 @@ export default {
                     this.$message.success('提交成功')
                     this.closeDialog()
                 }
-                recalculate({ id: res.data }).then(res => {
-                    this.$message.success('重新计算成功')
-                    this.form.jiSuanJieGuo = res.data
-                })
+                if (callback) {
+                    callback()
+                }
             })
         },
         handleCancel () {
@@ -274,6 +284,57 @@ export default {
                 ...this.form,
                 ...value
             }
+        },
+        handleExport () {
+            this.handleSave('save', () => {
+                exportTemplate({ id: this.formId }).then(res => {
+                    ActionUtils.download(res.data, `${this.form.fangAnLeiXing}-${this.form.shiYanXiangMu}.xlsx`)
+                })
+            })
+        },
+        handleImport () {
+            this.handleSave('save', () => {
+                this.importData()
+            })
+        },
+        importData () {
+            const input = document.createElement('input')
+            input.type = 'file'
+            input.accept = '.xlsx'
+            input.onchange = event => {
+                const file = event.target.files[0]
+                const reader = new FileReader()
+                reader.onload = event => {
+                    const data = new FormData()
+                    data.append('id', this.formId)
+                    data.append('applyFiles', file)
+                    importTemplate(data).then(res => {
+                        this.$message.success('实验数据导入成功')
+                        this.form.jiSuanJieGuo = res.data
+                    }).catch(({ state, cause }) => {
+                        const errMsg = JSON.parse(cause)
+                        let msgContent = ''
+                        Object.keys(errMsg).forEach(key => {
+                            let msgItem = '<div >'
+                            errMsg[key].forEach(item => {
+                                msgItem += `<div>${item}</div>`
+                            })
+                            msgContent += `<div><div style="font-weight: bold;">${key}：</div>${msgItem}<div>`
+                        })
+                        this.$confirm(`<div style="font-size: 14px;">${msgContent}</div>`, '数据校验失败，请根据以下提示完善您的数据！', {
+                            confirmButtonText: '确认',
+                            showClose: false,
+                            showCancelButton: false,
+                            closeOnClickModal: false,
+                            dangerouslyUseHTMLString: true,
+                            customClass: 'errorTips',
+                            type: 'error'
+                        }).then(() => {}).catch(() => {})
+                    })
+                }
+                reader.readAsBinaryString(file)
+            }
+            input.click()
         },
         handleRecalculate () {
             this.submitForm('save', () => {

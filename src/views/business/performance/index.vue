@@ -18,7 +18,7 @@
                             size="mini"
                             icon="ibps-icon-cogs"
                             circle
-                            @click="handleConfig(item)"
+                            @click="handleConfig(item.id)"
                         />
                     </div>
                 </template>
@@ -28,23 +28,23 @@
                     class="card-item"
                 >
                     <div
-                        :class="t.disabled ? 'method-btn disabled' : 'method-btn'"
-                        @click="handleEdit(item, t)"
-                    >{{ t.name }}</div>
+                        :class="t.isDisabled === 'Y' ? 'method-btn disabled' : 'method-btn'"
+                        @click="handleEdit(item.id, t)"
+                    >{{ t.methodName }}</div>
                 </div>
             </el-card>
         </div>
         <config
             v-if="showConfig"
             :visible.sync="showConfig"
-            :page-data="configData"
+            :target-id="targetId"
             @close="() => showConfig = false"
             @callback="loadData"
         />
         <experimental
             v-if="showExperimental"
             :visible.sync="showExperimental"
-            :page-data="configData"
+            :params="params"
             @close="() => showExperimental = false"
         />
     </div>
@@ -61,10 +61,8 @@ export default {
         return {
             showConfig: false,
             showExperimental: false,
-            configData: {
-                target: '',
-                method: ''
-            },
+            params: {},
+            targetId: '',
             performanceList: []
         }
     },
@@ -85,32 +83,30 @@ export default {
             getConfigList(params).then(res => {
                 const { dataResult = [] } = res.data || {}
                 dataResult.forEach(item => {
-                    const config = JSON.parse(item.config)
+                    const config = item.config ? JSON.parse(item.config) : []
                     dataList.push({
                         id: item.id,
                         sn: item.sn,
                         target: item.target,
-                        type: item.type,
+                        targetKey: item.targetKey,
                         icon: item.icon,
-                        methods: config.methods.sort((a, b) => a.sn - b.sn)
+                        methods: config.sort((a, b) => a.sn - b.sn)
                     })
                 })
                 this.performanceList = dataList.sort((a, b) => a.sn - b.sn)
             })
         },
-        handleConfig (item) {
-            this.configData = item
+        handleConfig (id) {
+            this.targetId = id
             this.showConfig = true
         },
-        handleEdit (item, t) {
-            if (t.disabled === true || t.disabled === 'true') {
+        handleEdit (targetId, { id, isDisabled }) {
+            if (isDisabled === 'Y') {
                 return
             }
-            const { sn, disabled, ...method } = t
-            this.configData = {
-                ...item,
-                targetId: item.id,
-                ...method
+            this.params = {
+                targetId,
+                methodId: id
             }
             this.showExperimental = true
         }

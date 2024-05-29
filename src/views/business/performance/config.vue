@@ -13,7 +13,7 @@
         @close="closeDialog"
     >
         <div slot="title" class="config-dialog-header">
-            <div class="title">{{ pageData.target + '配置' }}</div>
+            <div class="title">{{ formData.target + '配置' }}</div>
             <div class="operate">
                 <template v-for="btn in toolbars">
                     <el-button
@@ -58,9 +58,9 @@
                             </el-form-item>
                         </el-col>
                         <el-col :span="4">
-                            <el-form-item label="指标类型" prop="type" :show-message="false">
+                            <el-form-item label="指标类型" prop="targetKey" :show-message="false">
                                 <el-input
-                                    v-model="formData.type"
+                                    v-model="formData.targetKey"
                                     type="text"
                                     clearable
                                     show-word-limit
@@ -109,14 +109,14 @@
                 >新增</el-button>
                 <el-tabs v-model="activeTab" type="border-card" class="outer-tabs" @tab-click="handleTabClick">
                     <el-tab-pane
-                        v-for="(method, index) in formData.methods"
-                        :key="index"
-                        :label="method.name"
-                        :name="method.name"
+                        v-for="(method, mIndex) in formData.methods"
+                        :key="mIndex"
+                        :label="method.methodName"
+                        :name="method.methodName"
                     >
                         <template #label>
-                            <span>{{ method.name }}</span>
-                            <el-dropdown @command="(command) => handleCommand(index, command)">
+                            <span>{{ method.methodName }}</span>
+                            <el-dropdown @command="(command) => handleCommand(mIndex, command)">
                                 <i class="el-icon-setting el-dropdown-link" />
                                 <el-dropdown-menu slot="dropdown">
                                     <el-dropdown-item command="copy">复制</el-dropdown-item>
@@ -126,30 +126,35 @@
                         </template>
                         <el-row :gutter="20" class="form-row">
                             <el-col :span="8">
-                                <el-form-item label="方法名称" :prop="`methods[${index}].name`" :show-message="false">
+                                <el-form-item label="方法名称" :prop="`methods[${mIndex}].methodName`" :show-message="false">
                                     <el-input
-                                        v-model="method.name"
+                                        v-model="method.methodName"
                                         type="text"
                                         show-word-limit
-                                        :maxlength="32"
+                                        :maxlength="64"
                                         :disabled="readonly && method.isBasic"
                                         @input="handleNameChange"
                                     />
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8">
-                                <el-form-item label="方法KEY" :prop="`methods[${index}].key`" :show-message="false">
-                                    <el-input
-                                        v-model="method.key"
-                                        type="text"
-                                        show-word-limit
-                                        :maxlength="32"
+                                <el-form-item label="方法类型" :prop="`methods[${mIndex}].methodType`" :show-message="false">
+                                    <el-select
+                                        v-model="method.methodType"
                                         :disabled="readonly"
-                                    />
+                                        placeholder="请选择"
+                                    >
+                                        <el-option
+                                            v-for="(item, index) in methodTypeOption"
+                                            :key="index"
+                                            :label="item.label"
+                                            :value="item.value"
+                                        />
+                                    </el-select>
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8">
-                                <el-form-item label="排序" :prop="`methods[${index}].sn`" :show-message="false">
+                                <el-form-item label="排序" :prop="`methods[${mIndex}].sn`" :show-message="false">
                                     <el-input-number
                                         v-model="method.sn"
                                         type="number"
@@ -162,37 +167,42 @@
                         </el-row>
                         <el-row :gutter="20" class="form-row">
                             <el-col v-if="isSuper" :span="8">
-                                <el-form-item label="是否基础" :prop="`methods[${index}].isBasic`" :show-message="false">
-                                    <el-switch v-model="method.isBasic" />
+                                <el-form-item label="是否基础" :prop="`methods[${mIndex}].isBasic`" :show-message="false">
+                                    <el-switch v-model="method.isBasic" active-value="Y" inactive-value="N" />
                                 </el-form-item>
                             </el-col>
-                            <template v-if="!method.isBasic">
+                            <template v-if="!method.isBasic || isSuper">
                                 <el-col :span="8">
-                                    <el-form-item label="是否禁用" :prop="`methods[${index}].disabled`" :show-message="false">
-                                        <el-switch v-model="method.disabled" />
+                                    <el-form-item label="是否禁用" :prop="`methods[${mIndex}].isDisabled`" :show-message="false">
+                                        <el-switch v-model="method.isDisabled" active-value="Y" inactive-value="N" />
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="8">
-                                    <el-form-item label="是否公开" :prop="`methods[${index}].isPrivate`" :show-message="false">
-                                        <el-switch v-model="method.isPrivate" />
+                                    <el-form-item label="是否公开" :prop="`methods[${mIndex}].isPublic`" :show-message="false">
+                                        <el-switch v-model="method.isPublic" active-value="Y" inactive-value="N" />
                                     </el-form-item>
                                 </el-col>
                             </template>
                         </el-row>
-                        <el-row :gutter="20" class="form-row" :prop="`methods[${index}].step`" :show-message="false">
-                            <el-col :span="24">
-                                <el-form-item label="实验步骤">
-                                    <el-input
-                                        v-model="method.step"
-                                        type="textarea"
-                                        :maxlength="512"
-                                        show-word-limit
-                                        :autosize="{ minRows: 4, maxRows: 6 }"
-                                    />
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                        <el-form-item label="参考资料" :prop="`methods[${index}].step`">
+                        <el-form-item label="实验步骤" :prop="`methods[${mIndex}].step`" :show-message="false">
+                            <el-input
+                                v-model="method.step"
+                                type="textarea"
+                                :maxlength="2000"
+                                show-word-limit
+                                :autosize="{ minRows: 4, maxRows: 6 }"
+                            />
+                        </el-form-item>
+                        <el-form-item label="判定标准" :prop="`methods[${mIndex}].criterion`" :show-message="false">
+                            <el-input
+                                v-model="method.criterion"
+                                type="textarea"
+                                :maxlength="2000"
+                                show-word-limit
+                                :autosize="{ minRows: 4, maxRows: 6 }"
+                            />
+                        </el-form-item>
+                        <el-form-item label="参考资料" :prop="`methods[${mIndex}].references`">
                             <ibps-attachment
                                 v-model="method.references"
                                 allow-download
@@ -213,21 +223,21 @@
                                         :icon="btn.icon"
                                         :size="btn.size || 'mini'"
                                         plain
-                                        @click="handleActionEvent(btn.key, 'config', index)"
+                                        @click="handleActionEvent(btn.key, 'config', mIndex)"
                                     >
                                         {{ btn.label }}
                                     </el-button>
                                 </div>
                                 <el-table
-                                    ref="configTable"
-                                    :data="method.config"
+                                    :ref="`configTable${mIndex}`"
+                                    :data="method.params"
                                     border
                                     stripe
                                     highlight-current-row
                                     style="width: 100%"
                                     max-height="300px"
                                     class="config-table"
-                                    @selection-change="selection => handleSelectionChange(selection, method.config, 'selectedParams')"
+                                    @selection-change="selection => handleSelectionChange(selection, method.params, 'selectedParams')"
                                 >
                                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
@@ -261,7 +271,7 @@
                                     </el-table-column>
                                     <el-table-column v-if="!readonly" fixed="right" label="操作" width="50" header-align="center" align="center">
                                         <template slot-scope="scope">
-                                            <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'config', index)" /></a>
+                                            <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'config', mIndex)" /></a>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -275,21 +285,21 @@
                                         :icon="btn.icon"
                                         :size="btn.size || 'mini'"
                                         plain
-                                        @click="handleActionEvent(btn.key, 'formula', index)"
+                                        @click="handleActionEvent(btn.key, 'formula', mIndex)"
                                     >
                                         {{ btn.label }}
                                     </el-button>
                                 </div>
                                 <el-table
-                                    ref="formulaTable"
-                                    :data="method.formula"
+                                    :ref="`formulaTable${mIndex}`"
+                                    :data="method.formulas"
                                     border
                                     stripe
                                     highlight-current-row
                                     style="width: 100%"
                                     max-height="300px"
                                     class="formula-table"
-                                    @selection-change="selection => handleSelectionChange(selection, method.formula, 'selectedFormula')"
+                                    @selection-change="selection => handleSelectionChange(selection, method.formulas, 'selectedFormula')"
                                 >
                                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
@@ -314,13 +324,25 @@
                                     </el-table-column>
                                     <el-table-column v-if="!readonly" fixed="right" label="操作" width="50" header-align="center" align="center">
                                         <template slot-scope="scope">
-                                            <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'formula', index)" /></a>
+                                            <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'formula', mIndex)" /></a>
                                         </template>
                                     </el-table-column>
                                 </el-table>
                             </el-tab-pane>
                             <el-tab-pane label="结论模板">
                                 <ibps-ueditor v-model="method.template" class="editor" :config="ueditorConfig" />
+                            </el-tab-pane>
+                            <el-tab-pane label="模板说明">
+                                <ibps-ueditor v-model="method.templateDesc" class="editor" :config="ueditorConfig" />
+                            </el-tab-pane>
+                            <el-tab-pane label="图表配置">
+                                <el-input
+                                    v-model="method.chartOption"
+                                    type="textarea"
+                                    :maxlength="2000"
+                                    show-word-limit
+                                    :autosize="{ minRows: 12, maxRows: 16 }"
+                                />
                             </el-tab-pane>
                         </el-tabs>
                     </el-tab-pane>
@@ -331,7 +353,7 @@
 </template>
 
 <script>
-import { configFormRules, paramsList, formulaList } from './constants/index'
+import { configFormRules, paramsList, formulaList, methodTypeOption } from './constants/index'
 import { getConfigDetail, saveConfig } from '@/api/business/pv'
 export default {
     components: {
@@ -343,15 +365,18 @@ export default {
             type: Boolean,
             default: false
         },
-        pageData: {
-            type: Object,
-            default: () => {}
+        targetId: {
+            type: String,
+            default: ''
         }
     },
     data () {
         const { isSuper } = this.$store.getters || {}
         return {
             isSuper,
+            paramsList,
+            formulaList,
+            methodTypeOption,
             dialogVisible: this.visible,
             formLabelWidth: '90px',
             formData: {},
@@ -362,10 +387,9 @@ export default {
             loading: false,
             loadCompleted: false,
             readonly: !isSuper,
+            selectionIndex: {},
             selectedParams: [],
             selectedFormula: [],
-            paramsList,
-            formulaList,
             toolbars: [
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success' },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
@@ -375,24 +399,25 @@ export default {
                 { key: 'remove', icon: 'ibps-icon-trash', label: '删除', type: 'danger' }
             ],
             ueditorConfig: {
-                // 编辑器不自动被内容撑高
                 autoHeightEnabled: false,
-                // 初始容器高度
                 initialFrameHeight: 300,
-                // 初始容器宽度
                 initialFrameWidth: '100%'
             },
             initMethod: {
-                name: '方法',
+                methodName: '方法',
+                methodType: '',
                 sn: '',
-                isBasic: false,
-                isPrivide: false,
-                disabled: false,
+                isBasic: 'N',
+                isDisabled: 'N',
+                isPublic: 'N',
                 step: '',
+                criterion: '',
                 references: '',
-                config: [],
-                formula: [],
-                template: ''
+                params: [],
+                formulas: [],
+                template: '',
+                templateDesc: '',
+                chartOption: ''
             }
         }
     },
@@ -404,24 +429,23 @@ export default {
         }
     },
     mounted () {
-        this.formData = JSON.parse(JSON.stringify(this.pageData))
-        this.methodTabs = this.formData.methods
-        this.activeTab = this.methodTabs[0].name
-        this.loadCompleted = true
+        this.loadData()
     },
     methods: {
         // 获取数据
         async loadData () {
             this.loading = true
-            getConfigDetail({ id: this.pageData.id }).then(res => {
+            getConfigDetail({ id: this.targetId }).then(res => {
                 this.loading = false
-                const { data } = res || {}
-                if (data) {
-                    data.shiYanCanShu = data.shiYanCanShu ? JSON.parse(data.shiYanCanShu) : {}
-                    data.shiYanShuJu = data.shiYanShuJu ? JSON.parse(data.shiYanShuJu) : {}
-                    this.form = Object.assign(this.form, data)
-                    this.loadCompleted = true
-                }
+                const { config, experimentalConfigDetailPoList: methods, icon, sn, target, targetKey } = res.data
+                methods.forEach(item => {
+                    item.params = this.$utils.isNotEmpty(item.params) ? JSON.parse(item.params) : []
+                    item.formulas = this.$utils.isNotEmpty(item.formulas) ? JSON.parse(item.formulas) : []
+                })
+                this.formData = { icon, sn, target, targetKey, id: this.targetId, methods }
+                this.methodTabs = methods
+                this.activeTab = this.methodTabs[0].methodName
+                this.loadCompleted = true
             }).catch(() => {
                 this.loading = false
             })
@@ -430,11 +454,13 @@ export default {
             const t = this.methodTabs.findIndex(item => item.name === tab.name)
             // 外层tab切换清除选中数据
             if (t !== this.activeTabIndex) {
-                this.activeTabIndex = t
-                this.selectedParams = []
-                this.$refs.configTable[this.activeTabIndex].clearSelection()
-                this.selectedFormula = []
-                this.$refs.formulaTable[this.activeTabIndex].clearSelection()
+                this.$nextTick(() => {
+                    this.activeTabIndex = t
+                    this.selectedParams = []
+                    this.$refs[`configTable${this.activeTabIndex}`].clearSelection()
+                    this.selectedFormula = []
+                    this.$refs[`formulaTable${this.activeTabIndex}`].clearSelection()
+                })
             }
         },
         handleNameChange (v) {
@@ -509,7 +535,14 @@ export default {
                     return this.$message.warning('请完善表单必填项信息！')
                 }
                 const submitData = JSON.parse(JSON.stringify(this.formData))
-                submitData.config = JSON.stringify({ methods: this.formData.methods })
+                submitData.methods.forEach(item => {
+                    item.params = JSON.stringify(item.params)
+                    item.formulas = JSON.stringify(item.formulas)
+                })
+                submitData.experimentalConfigDetailPoList = submitData.methods
+                // 方法数据同时存储于主子表，便于列表获取
+                submitData.config = JSON.stringify(submitData.methods)
+                delete submitData.methods
                 this.submitForm(submitData)
             })
         },
@@ -611,7 +644,7 @@ export default {
                     }
                 }
                 .operate-btn {
-                    text-align: right;
+                    text-align: left;
                 }
                 ::v-deep {
                     .el-form-item {
