@@ -48,6 +48,7 @@
                         :info="form.jiSuanJieGuo"
                         :formula="pageData.formula"
                         :readonly="readonly"
+                        @recalculate="handleRecalculate"
                     />
                     <conclusion
                         :info="form"
@@ -79,7 +80,7 @@
 
 <script>
 import { formRules } from './constants/index'
-import { getExperimental, saveExperimental } from '@/api/business/pv'
+import { getExperimental, saveExperimental, recalculate } from '@/api/business/pv'
 export default {
     components: {
         ExperimentalDesc: () => import('./components/experimental-desc'),
@@ -134,7 +135,7 @@ export default {
                     specimensName: [],
                     targetValue: []
                 },
-                shiYanShuJu: {},
+                shiYanShuJu: [],
                 shiYanJieLun: ''
             },
             rules: formRules,
@@ -142,8 +143,8 @@ export default {
             loadCompleted: false,
             toolbars: [
                 { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
-                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'info', hidden: this.readonly },
-                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
+                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success', hidden: this.readonly },
+                // { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ]
@@ -236,22 +237,27 @@ export default {
             const submitData = {
                 ...this.form,
                 shiYanCanShu: JSON.stringify(this.form.shiYanCanShu),
-                shiYanShuJu: JSON.stringify(this.form.shiYanShuJu),
+                shiYanShuJu: this.$utils.isEmpty(this.form.shiYanShuJu) ? null : JSON.stringify(this.form.shiYanShuJu),
                 xingNengZhiBia: this.pageData.target,
                 fangAnLeiXing: this.pageData.name,
                 fangFaKey: this.pageData.key,
                 zhiBiaoId: this.pageData.targetId,
                 id: this.formId
             }
+            delete submitData.jiSuanJieGuo
             // 提交数据
             saveExperimental(submitData).then(res => {
+                this.formId = res.data
                 if (key === 'save') {
-                    this.formId = res.data
                     this.$message.success('保存成功')
                 } else {
                     this.$message.success('提交成功')
                     this.closeDialog()
                 }
+                recalculate({ id: res.data }).then(res => {
+                    this.$message.success('重新计算成功')
+                    this.form.jiSuanJieGuo = res.data
+                })
             })
         },
         handleCancel () {
@@ -268,6 +274,14 @@ export default {
                 ...this.form,
                 ...value
             }
+        },
+        handleRecalculate () {
+            this.submitForm('save', () => {
+                recalculate({ id: this.formId }).then(res => {
+                    this.$message.success('重新计算成功')
+                    this.form.jiSuanJieGuo = res.data
+                })
+            })
         },
         handleTest () {
             const o = {
@@ -313,18 +327,15 @@ export default {
                     specimensNum: 2,
                     repeatNum: 10,
                     days: 5,
-                    isConvert: true,
-                    model: ['总不精密度'],
-                    range: '无',
+                    isConvert: false,
                     standard: '允许总误差Tea',
-                    remark: '',
                     tea: 10,
                     batchCVS: 0.25,
                     batchCVSValue: 2.50,
                     dailyCVS: 0.33,
                     dailyCVSValue: 3.33
                 },
-                shiYanShuJu: null,
+                shiYanShuJu: [],
                 shiYanJieLun: '测试达标',
                 shenHeRen: '1166673437578493952',
                 baoGaoShiJian: '2024-05-06',

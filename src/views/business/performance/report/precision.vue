@@ -1,9 +1,18 @@
 <template>
     <div class="info-container">
-        <div class="experimental-report info-item">
+        <div class="experimental-result info-item">
             <div class="title">
                 <i class="ibps-icon-star" />
                 <span>计算结果</span>
+                <!-- <el-button
+                    key="recalculate"
+                    type="primary"
+                    icon="refresh"
+                    size="mini"
+                    plain
+                    class="right-btn"
+                    @click="handleRecalculate"
+                >重新计算</el-button> -->
             </div>
             <el-tabs v-model="activeTab" @tab-click="handleClick">
                 <el-tab-pane
@@ -204,14 +213,25 @@ export default {
                 }
             }
             return count
+        },
+        handleRecalculate () {
+            this.$emit('recalculate')
         }
     }
 }
 </script>
 <style lang="scss" scoped>
     .info-container {
-        .experimental-report {
+        .experimental-result {
             position: relative;
+            .title {
+                position: relative;
+                .right-btn {
+                    position: absolute;
+                    top: -2px;
+                    right: 0;
+                }
+            }
             .content {
                 padding: 10px;
                 position: relative;

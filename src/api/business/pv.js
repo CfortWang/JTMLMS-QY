@@ -171,6 +171,18 @@ export function importTemplate (data) {
 }
 
 /**
+ * 实验数据计算
+ * @param {*} params
+ */
+export function recalculate (params) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/pv/recalculate',
+        method: 'post',
+        params
+    })
+}
+
+/**
  * 导出数据报告
  * @param {*} params
  */

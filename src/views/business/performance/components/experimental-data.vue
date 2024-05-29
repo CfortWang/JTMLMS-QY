@@ -104,7 +104,7 @@ export default {
         }
     },
     mounted () {
-        this.pageInfo = JSON.parse(JSON.stringify(this.dataList))
+        this.pageInfo = this.$utils.isEmpty(this.dataList) ? {} : JSON.parse(JSON.stringify(this.dataList))
         if (!this.showTemplate && this.$utils.isNotEmpty(this.pageInfo)) {
             this.showTemplate = true
         }

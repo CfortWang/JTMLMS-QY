@@ -5,7 +5,8 @@
                 <i class="ibps-icon-star" />
                 <span>实验步骤</span>
             </div>
-            <div class="step">{{ step }}</div>
+            <!-- <div class="step">{{ step }}</div> -->
+            <div class="step" v-html="step" />
         </div>
         <div v-if="references" class="design info-item">
             <div class="title">

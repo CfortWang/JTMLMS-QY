@@ -44,7 +44,7 @@
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="24">
                         <el-form-item label="结论" prop="shiYanJieLun" :show-message="false">
-                            <ibps-ueditor v-model="pageInfo.shiYanJieLun" :readonly="readonly" />
+                            <ibps-ueditor v-model="pageInfo.shiYanJieLun" :config="ueditorConfig" :readonly="readonly" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -87,7 +87,15 @@ export default {
         const { userList = [] } = this.$store.getters || {}
         return {
             userList,
-            pageInfo: null
+            pageInfo: null,
+            ueditorConfig: {
+                // 编辑器不自动被内容撑高
+                autoHeightEnabled: false,
+                // 初始容器高度
+                initialFrameHeight: 240,
+                // 初始容器宽度
+                initialFrameWidth: '100%'
+            }
         }
     },
     watch: {
