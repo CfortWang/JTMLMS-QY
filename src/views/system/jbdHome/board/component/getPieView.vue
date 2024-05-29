@@ -75,7 +75,9 @@ export default {
                 },
                 label: {
                     formatter: '{c}，{d}%\n{b}',
-                    edgeDistance: '20%'
+                    edgeDistance: '20%',
+                    color: '#fff',
+                    fontSize: '12px'
                 },
 
                 legend: {

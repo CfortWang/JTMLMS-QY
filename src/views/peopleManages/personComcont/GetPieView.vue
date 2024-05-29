@@ -76,9 +76,10 @@ export default {
                 },
                 label: {
                     formatter: '{b}\n({d}%)',
-                    edgeDistance: '20%'
+                    edgeDistance: '20%',
+                    color: '#fff',
+                    fontSize: '12px'
                 },
-
                 legend: {
                     show: true,
                     // orient: 'vertical',

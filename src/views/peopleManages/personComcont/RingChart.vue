@@ -96,13 +96,12 @@ export default {
                         avoidLabelOverlap: false,
                         label: {
                             show: true,
-                            // fontSize: 20,
                             position: 'outside',
                             fontWeight: 'bold',
                             alignTo: 'edge',
                             margin: '1px',
-                            fontSize: 12
-                            // color:'#fff'
+                            fontSize: 12,
+                            color: '#fff'
                         },
                         emphasis: {
                             // label: {

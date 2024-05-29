@@ -165,6 +165,8 @@ export default {
         PieView: () => import('../personComcont/GetPieView')
     },
     data () {
+        const colorGroup1 = ['#d20962', '#f47721', '#00bce4', '#7552cc']
+        const colorGroup2 = ['#00a78e', '#7d3f98', '#f85a40']
         return {
             monthValues: [],
             startDate: '2023-03-01',
@@ -233,7 +235,7 @@ export default {
                         value: 0
                     }
                 ],
-                color: ['#c91f37', '#6666FF', '#99CC00', '#FFFF00'],
+                color: colorGroup1,
                 config: { title: '学历学位统计', idSelector: 'degreeId' }
             },
             // 职称统计图配置
@@ -253,7 +255,7 @@ export default {
                         value: 0
                     }
                 ],
-                color: ['#9b4400', '#896c39', '#eacd76'],
+                color: colorGroup2,
                 config: { title: '职称统计', idSelector: 'ranksid' }
             },
             // 部门学位学历信息统计配置表
@@ -268,10 +270,10 @@ export default {
 
                 legend: {
                     textStyle: {
-                        color: 'rgba(251, 251, 251, 1)'
+                        color: '#fff'
                     }
                 },
-                color: ['#c91f37', '#6666FF', '#99CC00', '#FFFF00'],
+                color: colorGroup1,
                 grid: {
                     left: '3%',
                     right: '4%',
@@ -283,11 +285,11 @@ export default {
                         type: 'category',
                         data: [],
                         nameTextStyle: {
-                            color: 'rgba(251, 251, 251, 1)'
+                            color: '#fff'
                         },
                         axisLabel: {
                             textStyle: {
-                                color: 'rgba(251, 251, 251, 1)'
+                                color: '#fff'
                             },
                             interval: 0,
                             rotate: 50
@@ -299,11 +301,11 @@ export default {
                         name: '个数（人）',
                         type: 'value',
                         nameTextStyle: {
-                            color: 'rgba(251, 251, 251, 1)'
+                            color: '#fff'
                         },
                         axisLabel: {
                             textStyle: {
-                                color: 'rgba(251, 251, 251, 1)'
+                                color: '#fff'
                             }
                         }
                     }
@@ -323,8 +325,8 @@ export default {
                             show: true, // 开启显示
                             textStyle: {
                                 // 数值样式
-                                fontSize: '6px',
-                                color: 'rgba(251, 251, 251, 1)'
+                                fontSize: '12px',
+                                color: '#fff'
                             },
                             formatter: function (name) {
                                 return name.value === 0
@@ -346,8 +348,8 @@ export default {
                             show: true, // 开启显示
                             textStyle: {
                                 // 数值样式
-                                fontSize: '6px',
-                                color: 'rgba(251, 251, 251, 1)'
+                                fontSize: '12px',
+                                color: '#fff'
                             },
                             formatter: function (name) {
                                 return name.value === 0
@@ -369,8 +371,8 @@ export default {
                             show: true, // 开启显示
                             textStyle: {
                                 // 数值样式
-                                fontSize: '6px',
-                                color: 'rgba(251, 251, 251, 1)'
+                                fontSize: '12px',
+                                color: '#fff'
                             },
                             formatter: function (name) {
                                 return name.value === 0
@@ -393,8 +395,8 @@ export default {
                             textStyle: {
                                 // 数值样式
                                 position: 'top',
-                                fontSize: '6px',
-                                color: 'rgba(251, 251, 251, 1)'
+                                fontSize: '12px',
+                                color: '#fff'
                             },
                             formatter: function (name) {
                                 return name.value === 0
@@ -421,10 +423,10 @@ export default {
                 },
                 legend: {
                     textStyle: {
-                        color: 'rgba(251, 251, 251, 1)'
+                        color: '#fff'
                     }
                 },
-                color: ['#9b4400', '#896c39', '#eacd76'],
+                color: colorGroup2,
                 grid: {
                     left: '3%',
                     right: '4%',
@@ -436,11 +438,11 @@ export default {
                         type: 'category',
                         data: [],
                         nameTextStyle: {
-                            color: 'rgba(251, 251, 251, 1)'
+                            color: '#fff'
                         },
                         axisLabel: {
                             textStyle: {
-                                color: 'rgba(251, 251, 251, 1)'
+                                color: '#fff'
                             },
                             interval: 0,
                             rotate: 50
@@ -452,11 +454,11 @@ export default {
                         name: '个数（人）',
                         type: 'value',
                         nameTextStyle: {
-                            color: 'rgba(251, 251, 251, 1)'
+                            color: '#fff'
                         },
                         axisLabel: {
                             textStyle: {
-                                color: 'rgba(251, 251, 251, 1)'
+                                color: '#fff'
                             }
                         }
                     }
@@ -476,7 +478,7 @@ export default {
                             show: true, // 开启显示
                             textStyle: {
                                 // 数值样式
-                                fontSize: '6px',
+                                fontSize: '12px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
@@ -499,7 +501,7 @@ export default {
                             show: true, // 开启显示
                             textStyle: {
                                 // 数值样式
-                                fontSize: '6px',
+                                fontSize: '12px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
@@ -523,7 +525,7 @@ export default {
                             position: 'top',
                             textStyle: {
                                 // 数值样式
-                                fontSize: '6px',
+                                fontSize: '12px',
                                 color: 'rgba(251, 251, 251, 1)'
                             },
                             formatter: function (name) {
@@ -601,10 +603,10 @@ export default {
                             show: true,
                             position: 'right',
                             valueAnimation: true,
+                            fontSize: 12,
+                            color: '#00bce4',
                             formatter: function (name) {
-                                return name.value === 0
-                                    ? ''
-                                    : '待办事宜数:' + name.value
+                                return name.value === 0 ? '' : '' + name.value
                             }
                         }
                     },
@@ -617,10 +619,10 @@ export default {
                             show: true,
                             position: 'right',
                             valueAnimation: true,
+                            fontSize: 12,
+                            color: '#00c16e',
                             formatter: function (name) {
-                                return name.value === 0
-                                    ? ''
-                                    : '已办事宜数:' + name.value
+                                return name.value === 0 ? '' : '' + name.value
                             }
                         }
                     }
@@ -638,7 +640,7 @@ export default {
                         filterMode: 'none'
                     }
                 ],
-                color: ['#6666FF', '#9b4400']
+                color: ['#00bce4', '#00c16e']
             },
             optionPersonConfig: {
                 title: '部门员工任务统计',
