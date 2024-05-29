@@ -1326,7 +1326,7 @@
       //         },
       //         legend: {
       //           textStyle: {
-      //             fontSize: 8,
+      //             fontSize: 12,
       //             color: '#B0CEFC'  // 图例文字颜色
       //           }
 

@@ -92,14 +92,10 @@
             },
             markLine: {
                   symbol: ['none', 'none'], // 去掉箭头
-                  // label:{
-                  //   show: true,
-                  //   position: 'right',
-                  //   color: barColor[i],
-                  //   formatter: function (params) {
-                  //     return that.data.Num.titleall[i].zhi_liang_mu_biao
-                  //   },
-                  // },
+                  label:{
+                    show: true,
+                    color: barColor[i]
+                  },
                   data: [
                     {
                       name: '阈值',
@@ -174,7 +170,7 @@
             },
           legend: {
             textStyle: {
-              fontSize: 8,
+              fontSize: 12,
               color: '#B0CEFC'  // 图例文字颜色
             },
             top:"5%",

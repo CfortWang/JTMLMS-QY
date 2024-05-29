@@ -113,7 +113,9 @@
               type: 'pie',
               radius: '50%',
               label: {
-                formatter: '{b}: {d}%'
+                formatter: '{b}: {d}%',
+                color: '#fff',
+                fontSize: '12px'
               },
               data: [
                 { value: this.data.t_mjsbjdxzjhzbNum.val, name: '完成率' },

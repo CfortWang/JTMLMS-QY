@@ -89,7 +89,7 @@
 					//       },
           //       position: this.direction=='x'?'right':'top',
           //       textStyle:{
-          //           fontSize:8,
+          //           fontSize: 12,
           //           color:'#B0CEFC'
           //         }
           //     }
@@ -101,6 +101,10 @@
               barWidth:40,
               markLine: {
                 symbol: ['none', 'none'], // 去掉箭头
+                label:{
+                    show: true,
+                    color: barColor[i]
+                },
                 data: [
                   {
                     name: '阈值',
@@ -117,7 +121,7 @@
                   position:this.direction=='x'?'right':'top',
                           
                   textStyle:{
-                    fontSize:8,
+                    fontSize: 12,
                     color:'#B0CEFC'
                   }
                 }
@@ -137,7 +141,7 @@
               textStyle: {
                 color: this.colorw   //这里用参数代替了
               },
-              fontSize: 8
+              fontSize: 12
             },
             axisLine:{
               lineStyle:{
@@ -155,7 +159,7 @@
               textStyle: {
                 color: this.colorw    //这里用参数代替了
               },
-              fontSize: 8
+              fontSize: 12
             },
             axisLine:{
               lineStyle:{
@@ -172,7 +176,7 @@
           },
           legend: {
                 textStyle: {
-                  fontSize: 8,
+                  fontSize: 12,
                   color: '#B0CEFC'  // 图例文字颜色
                 },
                 top:"5%",
