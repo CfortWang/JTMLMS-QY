@@ -89,16 +89,16 @@
                                 v-for="(item, index) in pageInfo.specimensNum"
                                 :key="index"
                                 v-model="pageInfo.specimensName[index]"
-                                class="input-new-tag"
+                                class="inline-input"
                                 size="small"
                                 :disabled="readonly"
                             />
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="isShow('targetValue')" :gutter="20" class="form-row tag-row">
+                <el-row v-if="isShow('targetValue')" :gutter="20" class="form-row">
                     <el-col :span="24">
-                        <el-form-item prop="targetValue" :show-message="false">
+                        <el-form-item prop="targetValue" :show-message="false" class="inline-item">
                             <template slot="label">
                                 <span>{{ getAttrs('targetValue', 'label', false) }}</span>
                                 <el-tooltip
@@ -110,34 +110,16 @@
                                     <i class="el-icon-question" />
                                 </el-tooltip>
                             </template>
-                            <el-tag
-                                v-for="(tag, index) in pageInfo.targetValue"
+                            <el-input-number
+                                v-for="(item, index) in pageInfo.specimensNum"
                                 :key="index"
-                                closable
-                                size="medium"
-                                class="params-tag"
-                                :disable-transitions="false"
-                                :disabled="readonly"
-                                @close="handleTagDelete(tag, 'targetValue')"
-                            >
-                                {{ tag }}
-                            </el-tag>
-                            <el-input
-                                v-if="targetTagVisible"
-                                ref="targetValue"
-                                v-model="targetTagValue"
-                                class="input-new-tag"
+                                v-model="pageInfo.targetValue[index]"
+                                type="number"
+                                class="inline-number"
                                 size="small"
+                                :min="0"
                                 :disabled="readonly"
-                                @keyup.enter.native="handleTagConfirm('targetValue')"
-                                @blur="handleTagConfirm('targetValue')"
                             />
-                            <el-button
-                                v-show="pageInfo.targetValue && pageInfo.targetValue.length < pageInfo.specimensNum || !pageInfo.specimensNum"
-                                class="button-new-tag"
-                                size="mini"
-                                @click="showTagEdit('targetValue')"
-                            >+ 添 加</el-button>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -170,7 +152,6 @@
                         <el-form-item :label="getAttrs('range', 'label', false)" prop="shiYanCanShu.range" :show-message="false">
                             <el-select
                                 v-model="pageInfo.range"
-                                filterable
                                 clearable
                                 :disabled="readonly"
                                 placeholder="请选择"
@@ -184,7 +165,24 @@
                             </el-select>
                         </el-form-item>
                     </el-col>
-                    <!-- <el-col v-if="isShow('claimValue')" :span="12">
+                    <el-col v-if="isShow('rejectionRate')" :span="12">
+                        <el-form-item :label="getAttrs('rejectionRate', 'label', false)" prop="rejectionRate" :show-message="false">
+                            <el-select
+                                v-model="pageInfo.rejectionRate"
+                                clearable
+                                :disabled="readonly"
+                                placeholder="请选择"
+                            >
+                                <el-option
+                                    v-for="(item, index) in rateOption"
+                                    :key="index"
+                                    :label="item.label"
+                                    :value="item.value"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col v-if="isShow('claimValue')" :span="12">
                         <el-form-item :label="getAttrs('claimValue', 'label', false)" prop="claimValue" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.claimValue"
@@ -195,7 +193,7 @@
                                 placeholder="请输入"
                             />
                         </el-form-item>
-                    </el-col> -->
+                    </el-col>
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col v-if="isShow('standard')" :span="12">
@@ -271,27 +269,53 @@
                     </el-col>
                 </el-row>
                 <el-row v-if="pageInfo.standard === '厂商参数'" :gutter="20" class="form-row">
-                    <el-col :span="12">
-                        <el-form-item label="重复（批内）标准差" prop="shiYanCanShu.allowableSDr" label-width="140px" :show-message="false">
+                    <el-col :span="24">
+                        <el-form-item prop="shiYanCanShu.allowableSDr" :show-message="false" class="inline-item">
+                            <template slot="label">
+                                <span>重复标准差</span>
+                                <el-tooltip
+                                    class="item"
+                                    effect="dark"
+                                    content="即批内标准差，与浓度水平名一一对应"
+                                    placement="top"
+                                >
+                                    <i class="el-icon-question" />
+                                </el-tooltip>
+                            </template>
                             <el-input-number
-                                v-model="pageInfo.allowableSDr"
+                                v-for="(item, index) in pageInfo.specimensNum"
+                                :key="index"
+                                v-model="pageInfo.allowableSDr[index]"
                                 type="number"
-                                :min="0"
-                                :precision="2"
+                                class="inline-number"
+                                size="small"
                                 :disabled="readonly"
-                                placeholder="请输入"
                             />
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12">
-                        <el-form-item label="期间（实验室）标准差" prop="shiYanCanShu.allowableSDl" label-width="155px" :show-message="false">
+                </el-row>
+                <el-row v-if="pageInfo.standard === '厂商参数'" :gutter="20" class="form-row">
+                    <el-col :span="24">
+                        <el-form-item prop="shiYanCanShu.allowableSDl" :show-message="false" class="inline-item">
+                            <template slot="label">
+                                <span>期间标准差</span>
+                                <el-tooltip
+                                    class="item"
+                                    effect="dark"
+                                    content="即实验室标准差，与浓度水平名一一对应"
+                                    placement="top"
+                                >
+                                    <i class="el-icon-question" />
+                                </el-tooltip>
+                            </template>
                             <el-input-number
-                                v-model="pageInfo.allowableSDl"
+                                v-for="(item, index) in pageInfo.specimensNum"
+                                :key="index"
+                                v-model="pageInfo.allowableSDl[index]"
                                 type="number"
-                                :min="0"
-                                :precision="2"
+                                class="inline-number"
+                                size="small"
                                 :disabled="readonly"
-                                placeholder="请输入"
                             />
                         </el-form-item>
                     </el-col>
@@ -327,7 +351,7 @@
     </div>
 </template>
 <script>
-import { standardOption, batchOption, rangeOption } from '../constants/index'
+import { standardOption, batchOption, rangeOption, rateOption } from '../constants/index'
 export default {
     props: {
         info: {
@@ -348,6 +372,7 @@ export default {
             standardOption,
             batchOption,
             rangeOption,
+            rateOption,
             pageInfo: null,
             nameTagValue: '',
             targetTagValue: '',
@@ -397,40 +422,6 @@ export default {
             const { batchCVS, dailyCVS, tea } = this.pageInfo
             this.pageInfo.batchCVSValue = parseFloat(tea * batchCVS)
             this.pageInfo.dailyCVSValue = parseFloat(tea * dailyCVS)
-        },
-        handleTagDelete (tag, type) {
-            this.pageInfo[type].splice(this.pageInfo[type].indexOf(tag), 1)
-        },
-        handleTagConfirm (type) {
-            const typeMap = {
-                specimensName: 'nameTagValue',
-                targetValue: 'targetTagValue'
-            }
-            const visibleMap = {
-                specimensName: 'nameTagVisible',
-                targetValue: 'targetTagVisible'
-            }
-            if (this[typeMap[type]]) {
-                this.pageInfo[type].push(this[typeMap[type]])
-            }
-            this[visibleMap[type]] = false
-            this[typeMap[type]] = ''
-        },
-        showTagEdit (type) {
-            if (!this.pageInfo.specimensNum) {
-                return this.$message.warning('请先填写浓度水平数！')
-            }
-            const typeMap = {
-                specimensName: 'nameTagVisible',
-                targetValue: 'targetTagVisible'
-            }
-            if (this.pageInfo.specimensNum <= this.pageInfo[type].length) {
-                return this.$message.warning('已达最大浓度水平数')
-            }
-            this[typeMap[type]] = true
-            this.$nextTick(_ => {
-                this.$refs[type].$refs.input.focus()
-            })
         }
     }
 }
@@ -462,7 +453,7 @@ export default {
                             .el-form-item__content {
                                 display: flex;
                                 justify-content: flex-start;
-                                .el-input {
+                                > .el-input {
                                     max-width: 120px;
                                     margin-right: 10px;
                                     &:last-of-type {
@@ -471,41 +462,17 @@ export default {
                                 }
                             }
                         }
-                    }
-                }
-                .tag-row {
-                    ::v-deep {
-                        .el-form-item {
-                            .el-form-item__content {
-                                .el-input {
-                                    width: 100px;
-                                }
+                        .inline-input {
+                            width: 100px;
+                            vertical-align: bottom;
+                        }
+                        .inline-number {
+                            width: 140px;
+                            margin-right: 10px;
+                            &:last-of-type {
+                                margin-right: 0;
                             }
                         }
-                    }
-                    .params-tag{
-                        height: 32px;
-                        line-height: 30px;
-                        margin-right: 10px;
-                        &:last-of-type{
-                            margin-right: 0;
-                        }
-                        ::v-deep {
-                            .el-icon-close {
-                                top: 0px;
-                            }
-                        }
-                    }
-                    .button-new-tag {
-                        height: 32px;
-                        line-height: 30px;
-                        padding-top: 0;
-                        padding-bottom: 0;
-                        margin-left: 10px;
-                    }
-                    .input-new-tag {
-                        width: 100px;
-                        vertical-align: bottom;
                     }
                 }
             }

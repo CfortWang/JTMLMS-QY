@@ -27,6 +27,7 @@
             :visible.sync="showConfig"
             :params="params"
             :readonly="readonly"
+            @refresh="loadData"
             @close="() => showConfig = false"
         />
     </div>
@@ -95,7 +96,7 @@ export default {
                     effect: 'display',
                     actions: [
                         { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' },
-                        { key: 'report', label: '实验报告', type: 'success', icon: 'ibps-icon-file-text-o' }
+                        // { key: 'report', label: '实验报告', type: 'success', icon: 'ibps-icon-file-text-o' }
                     ]
                 }
             }

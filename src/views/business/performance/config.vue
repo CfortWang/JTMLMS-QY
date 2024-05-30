@@ -53,6 +53,7 @@
                                     clearable
                                     show-word-limit
                                     :maxlength="64"
+                                    :disabled="readonly"
                                     placeholder="请输入"
                                 />
                             </el-form-item>
@@ -77,6 +78,7 @@
                                     type="number"
                                     :min="1"
                                     :max="99"
+                                    :disabled="readonly"
                                     :precision="0"
                                 />
                             </el-form-item>
@@ -88,6 +90,7 @@
                                     type="text"
                                     clearable
                                     :maxlength="32"
+                                    :disabled="readonly"
                                     placeholder="请输入"
                                 />
                             </el-form-item>
@@ -120,7 +123,7 @@
                                 <i class="el-icon-setting el-dropdown-link" />
                                 <el-dropdown-menu slot="dropdown">
                                     <el-dropdown-item command="copy">复制</el-dropdown-item>
-                                    <el-dropdown-item command="delete">删除</el-dropdown-item>
+                                    <el-dropdown-item :disabled="readonly && method.isBasic === 'Y'" command="delete">删除</el-dropdown-item>
                                 </el-dropdown-menu>
                             </el-dropdown>
                         </template>
@@ -132,7 +135,7 @@
                                         type="text"
                                         show-word-limit
                                         :maxlength="64"
-                                        :disabled="readonly && method.isBasic"
+                                        :disabled="readonly && method.isBasic === 'Y'"
                                         @input="handleNameChange"
                                     />
                                 </el-form-item>
@@ -141,7 +144,7 @@
                                 <el-form-item label="方法类型" :prop="`methods[${mIndex}].methodType`" :show-message="false">
                                     <el-select
                                         v-model="method.methodType"
-                                        :disabled="readonly"
+                                        :disabled="readonly && method.isBasic === 'Y'"
                                         placeholder="请选择"
                                     >
                                         <el-option
@@ -157,7 +160,7 @@
                                 <el-form-item label="方法KEY" :prop="`methods[${mIndex}].methodKey`" :show-message="false">
                                     <el-select
                                         v-model="method.methodKey"
-                                        :disabled="readonly"
+                                        :disabled="readonly && method.isBasic === 'Y'"
                                         placeholder="请选择"
                                     >
                                         <el-option
@@ -177,6 +180,7 @@
                                         :min="1"
                                         :max="99"
                                         :precision="0"
+                                        :disabled="readonly && method.isBasic === 'Y'"
                                     />
                                 </el-form-item>
                             </el-col>
@@ -187,7 +191,7 @@
                                     <el-switch v-model="method.isBasic" active-value="Y" inactive-value="N" />
                                 </el-form-item>
                             </el-col>
-                            <template v-if="!method.isBasic || isSuper">
+                            <template v-if="method.isBasic === 'N' || isSuper">
                                 <el-col :span="8">
                                     <el-form-item label="是否禁用" :prop="`methods[${mIndex}].isDisabled`" :show-message="false">
                                         <el-switch v-model="method.isDisabled" active-value="Y" inactive-value="N" />
@@ -200,38 +204,40 @@
                                 </el-col>
                             </template>
                         </el-row>
-                        <el-form-item label="实验步骤" :prop="`methods[${mIndex}].step`" :show-message="false">
-                            <el-input
-                                v-model="method.step"
-                                type="textarea"
-                                :maxlength="2000"
-                                show-word-limit
-                                :autosize="{ minRows: 4, maxRows: 6 }"
-                            />
-                        </el-form-item>
-                        <el-form-item label="判定标准" :prop="`methods[${mIndex}].criterion`" :show-message="false">
-                            <el-input
-                                v-model="method.criterion"
-                                type="textarea"
-                                :maxlength="2000"
-                                show-word-limit
-                                :autosize="{ minRows: 4, maxRows: 6 }"
-                            />
-                        </el-form-item>
-                        <el-form-item label="参考资料" :prop="`methods[${mIndex}].references`">
-                            <ibps-attachment
-                                v-model="method.references"
-                                allow-download
-                                download
-                                multiple
-                                accept="*"
-                                store="id"
-                                :readonly="readonly"
-                            />
-                        </el-form-item>
                         <el-tabs tab-position="left" class="inner-tabs">
+                            <el-tab-pane label="实验步骤">
+                                <el-input
+                                    v-model="method.step"
+                                    type="textarea"
+                                    :maxlength="2000"
+                                    show-word-limit
+                                    :rows="16"
+                                    :disabled="readonly && method.isBasic === 'Y'"
+                                />
+                            </el-tab-pane>
+                            <el-tab-pane label="判定标准">
+                                <el-input
+                                    v-model="method.criterion"
+                                    type="textarea"
+                                    :maxlength="2000"
+                                    show-word-limit
+                                    :rows="16"
+                                    :disabled="readonly && method.isBasic === 'Y'"
+                                />
+                            </el-tab-pane>
+                            <el-tab-pane label="参考资料">
+                                <ibps-attachment
+                                    v-model="method.references"
+                                    allow-download
+                                    download
+                                    multiple
+                                    accept="*"
+                                    store="id"
+                                    :readonly="readonly && method.isBasic === 'Y'"
+                                />
+                            </el-tab-pane>
                             <el-tab-pane label="实验参数">
-                                <div class="operate-btn">
+                                <div v-if="!readonly || method.isBasic === 'N'" class="operate-btn">
                                     <el-button
                                         v-for="btn in tableToolbars"
                                         :key="btn.key"
@@ -239,7 +245,7 @@
                                         :icon="btn.icon"
                                         :size="btn.size || 'mini'"
                                         plain
-                                        @click="handleActionEvent(btn.key, 'config', mIndex)"
+                                        @click="handleActionEvent(btn.key, 'params', mIndex)"
                                     >
                                         {{ btn.label }}
                                     </el-button>
@@ -251,9 +257,9 @@
                                     stripe
                                     highlight-current-row
                                     style="width: 100%"
-                                    max-height="300px"
+                                    :max-height="maxHeight"
                                     class="config-table"
-                                    @selection-change="selection => handleSelectionChange(selection, method.params, 'selectedParams')"
+                                    @selection-change="selection => handleSelectionChange(selection, method.params, 'params')"
                                 >
                                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
@@ -271,18 +277,22 @@
                                             <el-switch
                                                 v-if="item.type === 'switch'"
                                                 v-model="scope.row[item.key]"
-                                                :disabled="readonly && method.isBasic"
+                                                :disabled="readonly && method.isBasic === 'Y'"
                                             />
                                             <el-input-number
                                                 v-else-if="item.type === 'number'"
                                                 v-model="scope.row[item.key]"
                                                 type="number"
-                                                :disabled="readonly && method.isBasic"
+                                                :disabled="readonly && method.isBasic === 'Y'"
                                                 :min="item.min"
                                                 :max="item.max"
                                                 :precision="item.precision"
                                             />
-                                            <el-input v-else v-model="scope.row[item.key]" :readonly="readonly" />
+                                            <el-input
+                                                v-else
+                                                v-model="scope.row[item.key]"
+                                                :disabled="readonly && method.isBasic === 'Y'"
+                                            />
                                         </template>
                                     </el-table-column>
                                     <el-table-column v-if="!readonly" fixed="right" label="操作" width="50" header-align="center" align="center">
@@ -293,7 +303,7 @@
                                 </el-table>
                             </el-tab-pane>
                             <el-tab-pane label="实验公式">
-                                <div class="operate-btn">
+                                <div v-if="!readonly || method.isBasic === 'N'" class="operate-btn">
                                     <el-button
                                         v-for="btn in tableToolbars"
                                         :key="btn.key"
@@ -301,7 +311,7 @@
                                         :icon="btn.icon"
                                         :size="btn.size || 'mini'"
                                         plain
-                                        @click="handleActionEvent(btn.key, 'formula', mIndex)"
+                                        @click="handleActionEvent(btn.key, 'formulas', mIndex)"
                                     >
                                         {{ btn.label }}
                                     </el-button>
@@ -313,9 +323,9 @@
                                     stripe
                                     highlight-current-row
                                     style="width: 100%"
-                                    max-height="300px"
+                                    :max-height="maxHeight"
                                     class="formula-table"
-                                    @selection-change="selection => handleSelectionChange(selection, method.formulas, 'selectedFormula')"
+                                    @selection-change="selection => handleSelectionChange(selection, method.formulas, 'formulas')"
                                 >
                                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
@@ -333,12 +343,16 @@
                                             <el-switch
                                                 v-if="item.type === 'switch'"
                                                 v-model="scope.row[item.key]"
-                                                :disabled="readonly && method.isBasic"
+                                                :disabled="readonly && method.isBasic === 'Y'"
                                             />
-                                            <el-input v-else v-model="scope.row[item.key]" :readonly="readonly" />
+                                            <el-input
+                                                v-else
+                                                v-model="scope.row[item.key]"
+                                                :disabled="readonly && method.isBasic === 'Y'"
+                                            />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column v-if="!readonly" fixed="right" label="操作" width="50" header-align="center" align="center">
+                                    <el-table-column v-if="!readonly || method.isBasic !== 'Y'" fixed="right" label="操作" width="50" header-align="center" align="center">
                                         <template slot-scope="scope">
                                             <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'formula', mIndex)" /></a>
                                         </template>
@@ -347,18 +361,66 @@
                             </el-tab-pane>
                             <el-tab-pane label="结论模板">
                                 <ibps-ueditor v-model="method.template" class="editor" :config="ueditorConfig" />
-                            </el-tab-pane>
-                            <el-tab-pane label="模板说明">
                                 <ibps-ueditor v-model="method.templateDesc" class="editor" :config="ueditorConfig" />
                             </el-tab-pane>
                             <el-tab-pane label="图表配置">
-                                <el-input
-                                    v-model="method.chartOption"
-                                    type="textarea"
-                                    :maxlength="2000"
-                                    show-word-limit
-                                    :autosize="{ minRows: 12, maxRows: 16 }"
-                                />
+                                <div v-if="!readonly || method.isBasic === 'N'" class="operate-btn">
+                                    <el-button
+                                        v-for="btn in tableToolbars"
+                                        :key="btn.key"
+                                        :type="btn.type"
+                                        :icon="btn.icon"
+                                        :size="btn.size || 'mini'"
+                                        plain
+                                        @click="handleActionEvent(btn.key, 'chartOption', mIndex)"
+                                    >
+                                        {{ btn.label }}
+                                    </el-button>
+                                </div>
+                                <el-table
+                                    :ref="`chartTable${mIndex}`"
+                                    :data="method.chartOption"
+                                    border
+                                    stripe
+                                    highlight-current-row
+                                    style="width: 100%"
+                                    :max-height="maxHeight"
+                                    class="formula-table"
+                                    @selection-change="selection => handleSelectionChange(selection, method.chartOption, 'chart')"
+                                >
+                                    <el-table-column type="selection" width="45" header-align="center" align="center" />
+                                    <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
+                                    <el-table-column
+                                        v-for="(item, pIndex) in chartList"
+                                        :key="pIndex"
+                                        :prop="item.key"
+                                        :label="item.label"
+                                        :width="item.width"
+                                        :min-width="item.minWidth"
+                                        header-align="center"
+                                        align="center"
+                                    >
+                                        <template slot-scope="scope">
+                                            <el-input
+                                                v-if="item.type === 'textarea'"
+                                                v-model="scope.row[item.key]"
+                                                type="textarea"
+                                                :rows="4"
+                                                :disabled="readonly && method.isBasic === 'Y'"
+                                            />
+                                            <el-input
+                                                v-else
+                                                v-model="scope.row[item.key]"
+                                                :disabled="readonly && method.isBasic === 'Y'"
+                                            />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column v-if="!readonly || method.isBasic !== 'Y'" fixed="right" label="操作" width="50" header-align="center" align="center">
+                                        <template slot-scope="scope">
+                                            <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'chartOption', mIndex)" /></a>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
                             </el-tab-pane>
                         </el-tabs>
                     </el-tab-pane>
@@ -369,7 +431,7 @@
 </template>
 
 <script>
-import { configFormRules, paramsList, formulaList, methodTypeOption, methodKeyOption } from './constants/index'
+import { configFormRules, paramsList, formulaList, chartList, methodTypeOption, methodKeyOption } from './constants/index'
 import { getConfigDetail, saveConfig } from '@/api/business/pv'
 export default {
     components: {
@@ -392,8 +454,10 @@ export default {
             isSuper,
             paramsList,
             formulaList,
+            chartList,
             methodTypeOption,
             methodKeyOption,
+            maxHeight: document.body.clientHeight - 438 + 'px',
             dialogVisible: this.visible,
             formLabelWidth: '90px',
             formData: {},
@@ -404,7 +468,11 @@ export default {
             loading: false,
             loadCompleted: false,
             readonly: !isSuper,
-            selectionIndex: {},
+            selectionIndex: {
+                params: [],
+                formulas: [],
+                chart: []
+            },
             selectedParams: [],
             selectedFormula: [],
             toolbars: [
@@ -435,7 +503,7 @@ export default {
                 formulas: [],
                 template: '',
                 templateDesc: '',
-                chartOption: ''
+                chartOption: []
             }
         }
     },
@@ -459,6 +527,7 @@ export default {
                 methods.forEach(item => {
                     item.params = this.$utils.isNotEmpty(item.params) ? JSON.parse(item.params) : []
                     item.formulas = this.$utils.isNotEmpty(item.formulas) ? JSON.parse(item.formulas) : []
+                    item.chartOption = this.$utils.isNotEmpty(item.chartOption) ? JSON.parse(item.chartOption) : []
                 })
                 this.formData = { icon, sn, target, targetKey, id: this.targetId, methods }
                 this.methodTabs = methods
@@ -469,7 +538,7 @@ export default {
             })
         },
         handleTabClick (tab) {
-            const t = this.methodTabs.findIndex(item => item.name === tab.name)
+            const t = this.methodTabs.findIndex(item => item.methodName === tab.methodName)
             // 外层tab切换清除选中数据
             if (t !== this.activeTabIndex) {
                 this.$nextTick(() => {
@@ -499,8 +568,9 @@ export default {
         copyMethod (index) {
             const copyData = JSON.parse(JSON.stringify(this.formData.methods[index]))
             copyData.sn = this.methodTabs.length + 1
-            copyData.name += ' (复制)'
-            copyData.isBasic = false
+            copyData.methodName += ' (复制)'
+            copyData.isBasic = 'N'
+            copyData.isDisabled = 'N'
             this.formData.methods.push(copyData)
         },
         deleteMethod (index) {
@@ -512,21 +582,17 @@ export default {
             }).then(() => {
                 methods.splice(index, 1)
                 this.formData.method = methods
-                this.activeTab = methods.length ? methods[0].name : ''
+                this.activeTab = methods.length ? methods[0].methodName : ''
             }).catch(() => {})
         },
         addMethod () {
             const data = JSON.parse(JSON.stringify(this.initMethod))
             data.sn = this.methodTabs.length + 1
-            data.name += data.sn
+            data.methodName += data.sn
             this.formData.methods.push(data)
-            this.activeTab = data.name
+            this.activeTab = data.methodName
         },
         handleActionEvent (key, type, index) {
-            const indexMap = {
-                'config': 'selectedParams',
-                'formula': 'selectedFormula'
-            }
             switch (key) {
                 case 'save':
                     this.handleSave()
@@ -538,10 +604,10 @@ export default {
                     this.handleAddParam(type, index)
                     break
                 case 'remove':
-                    if (!this[indexMap[type]].length) {
+                    if (!this.selectionIndex[type].length) {
                         return this.$message.warning('请选择要删除的数据')
                     }
-                    this.handleRemove(this[indexMap[type]], type, index)
+                    this.handleRemove(this.selectionIndex[type], type, index)
                     break
                 default:
                     break
@@ -556,6 +622,7 @@ export default {
                 submitData.methods.forEach(item => {
                     item.params = JSON.stringify(item.params)
                     item.formulas = JSON.stringify(item.formulas)
+                    item.chartOption = JSON.stringify(item.chartOption)
                 })
                 submitData.experimentalConfigDetailPoList = submitData.methods
                 // 方法数据同时存储于主子表，便于列表获取
@@ -581,13 +648,15 @@ export default {
             const temp = this.formData.methods[index][type] || []
             temp.push(obj)
             this.formData.methods[index][type] = temp
+            console.log(111)
+            console.log(this.formData.methods)
             this.methodTabs = this.formData.methods
         },
         handleDelParam (type, index, cIndex) {
             this.formData.methods[index][type].splice(cIndex, 1)
         },
         handleSelectionChange (v, data, type) {
-            this[type] = v.map(item => data.indexOf(item))
+            this.selectionIndex[type] = v.map(item => data.indexOf(item))
         },
         handleRemove (removeIndex, type, methodIndex) {
             let indexList = []
@@ -707,8 +776,8 @@ export default {
                                 padding: 0 12px 0 0;
                             }
                             .el-tabs__content {
-                                height: auto;
-                                // overflow: auto;
+                                height: calc(100vh - 410px);
+                                overflow: auto;
                             }
                             .el-input-number--small {
                                 width: 100%;
