@@ -271,6 +271,21 @@ export const rangeOption = [
     }
 ]
 
+export const rateOption = [
+    {
+        value: '1',
+        label: '1%'
+    },
+    {
+        value: '5',
+        label: '5%'
+    },
+    {
+        value: '10',
+        label: '10%'
+    }
+]
+
 export const methodTypeOption = [
     {
         value: '定性',
@@ -279,6 +294,49 @@ export const methodTypeOption = [
     {
         value: '定量',
         label: '定量'
+    }
+]
+
+export const methodKeyOption = [
+    {
+        type: 'precision',
+        label: '重复性验证',
+        value: '精密度:重复性验证'
+    },
+    {
+        type: 'precision',
+        label: 'EP15精密度验证',
+        value: '精密度:EP15精密度验证'
+    },
+    {
+        type: 'trueness',
+        label: '偏倚评估',
+        value: '正确度:偏倚评估'
+    },
+    {
+        type: 'trueness',
+        label: '使用患者样品验证',
+        value: '正确度:使用患者样品验证'
+    },
+    {
+        type: 'trueness',
+        label: '使用定值参考物质验证',
+        value: '正确度:使用定值参考物质验证'
+    },
+    {
+        type: 'linearRange',
+        label: '平均斜率评价法',
+        value: '线性区间:平均斜率评价法'
+    },
+    {
+        type: 'linearRange',
+        label: 'EP6线性评价',
+        value: '线性区间:EP6线性评价'
+    },
+    {
+        type: 'linearRange',
+        label: '线性稀释回收法',
+        value: '线性区间:线性稀释回收法'
     }
 ]
 

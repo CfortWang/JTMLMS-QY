@@ -154,6 +154,22 @@
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8">
+                                <el-form-item label="方法KEY" :prop="`methods[${mIndex}].methodKey`" :show-message="false">
+                                    <el-select
+                                        v-model="method.methodKey"
+                                        :disabled="readonly"
+                                        placeholder="请选择"
+                                    >
+                                        <el-option
+                                            v-for="(item, index) in methodKeyOption.filter(i => i.type === formData.targetKey)"
+                                            :key="index"
+                                            :label="item.label"
+                                            :value="item.value"
+                                        />
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="8">
                                 <el-form-item label="排序" :prop="`methods[${mIndex}].sn`" :show-message="false">
                                     <el-input-number
                                         v-model="method.sn"
@@ -353,7 +369,7 @@
 </template>
 
 <script>
-import { configFormRules, paramsList, formulaList, methodTypeOption } from './constants/index'
+import { configFormRules, paramsList, formulaList, methodTypeOption, methodKeyOption } from './constants/index'
 import { getConfigDetail, saveConfig } from '@/api/business/pv'
 export default {
     components: {
@@ -377,6 +393,7 @@ export default {
             paramsList,
             formulaList,
             methodTypeOption,
+            methodKeyOption,
             dialogVisible: this.visible,
             formLabelWidth: '90px',
             formData: {},
@@ -406,6 +423,7 @@ export default {
             initMethod: {
                 methodName: '方法',
                 methodType: '',
+                methodKey: '',
                 sn: '',
                 isBasic: 'N',
                 isDisabled: 'N',

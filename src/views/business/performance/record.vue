@@ -172,10 +172,11 @@ export default {
         /**
          * 处理编辑
          */
-        async handleEdit ({ id, zhiBiaoId, fangFaKey }, key) {
+        async handleEdit ({ id, zhiBiaoId, fangFaId, fangFaKey }, key) {
             this.params = {
                 targetId: zhiBiaoId,
-                methodId: fangFaKey,
+                methodId: fangFaId,
+                methodKey: fangFaKey,
                 recordId: id
             }
             this.readonly = key === 'detail'

@@ -100,13 +100,14 @@ export default {
             this.targetId = id
             this.showConfig = true
         },
-        handleEdit (targetId, { id, isDisabled }) {
+        handleEdit (targetId, { id, methodKey, isDisabled }) {
             if (isDisabled === 'Y') {
                 return
             }
             this.params = {
                 targetId,
-                methodId: id
+                methodId: id,
+                methodKey
             }
             this.showExperimental = true
         }
