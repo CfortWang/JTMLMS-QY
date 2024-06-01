@@ -5,46 +5,11 @@
                 <i class="ibps-icon-star" />
                 <span>实验结论</span>
             </div>
-            <div v-if="$utils.isNotEmpty(info.jiSuanJieGuo)" class="form-container">
-                <!-- <el-row :gutter="20" class="form-row">
-                    <el-col :span="12">
-                        <el-form-item label="审核人" prop="shenHeRen" :show-message="false">
-                            <el-select
-                                v-model="pageInfo.shenHeRen"
-                                filterable
-                                clearable
-                                :disabled="readonly"
-                                placeholder="请选择"
-                            >
-                                <el-option
-                                    v-for="item in userList"
-                                    :key="item.userId"
-                                    :label="item.userName"
-                                    :value="item.userId"
-                                />
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                        <el-form-item label="报告时间" prop="baoGaoShiJian" :show-message="false">
-                            <el-date-picker
-                                v-model="pageInfo.baoGaoShiJian"
-                                type="datetime"
-                                clearable
-                                align="right"
-                                :default-value="new Date()"
-                                value-format="yyyy-MM-dd HH:mm"
-                                format="yyyy-MM-dd HH:mm"
-                                class="date-picker"
-                                disabled
-                            />
-                        </el-form-item>
-                    </el-col>
-                </el-row> -->
+            <div v-if="$utils.isNotEmpty(expResult)" class="form-container">
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="24">
                         <el-form-item label="结论" prop="shiYanJieLun" :show-message="false">
-                            <ibps-ueditor v-model="pageInfo.shiYanJieLun" :config="ueditorConfig" :readonly="readonly" />
+                            <ibps-ueditor v-model="expResult" :config="ueditorConfig" :readonly="true" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -52,7 +17,7 @@
                     <el-col :span="24">
                         <el-form-item label="实验附件" prop="fuJian" :show-message="false">
                             <ibps-attachment
-                                v-model="pageInfo.fuJian"
+                                v-model="expFiles"
                                 allow-download
                                 download
                                 multiple
@@ -75,9 +40,13 @@ export default {
         IbpsUeditor: () => import('@/components/ibps-ueditor')
     },
     props: {
-        info: {
-            type: Object,
-            default: () => {}
+        result: {
+            type: String,
+            default: ''
+        },
+        files: {
+            type: String,
+            default: ''
         },
         readonly: {
             type: Boolean,
@@ -88,28 +57,22 @@ export default {
         const { userList = [] } = this.$store.getters || {}
         return {
             userList,
+            expResult: this.result,
+            expFiles: this.files,
             pageInfo: null,
             ueditorConfig: {
-                // 编辑器不自动被内容撑高
                 autoHeightEnabled: false,
-                // 初始容器高度
                 initialFrameHeight: 240,
-                // 初始容器宽度
                 initialFrameWidth: '100%'
             }
         }
     },
     watch: {
-        pageInfo: {
+        expFiles: {
             handler (val, oldVal) {
-                this.$emit('updateData', val)
-            },
-            deep: true
+                this.$emit('updateData', { fuJian: val })
+            }
         }
-    },
-    mounted () {
-        const { shenHeRen, baoGaoShiJian, shiYanJieLun, fuJian } = this.info || {}
-        this.pageInfo = { shenHeRen, baoGaoShiJian, shiYanJieLun, fuJian }
     }
 }
 </script>
