@@ -1886,8 +1886,7 @@ export default {
             if (this.dataTemplate.type === 'default' || (this.dataTemplate.type === 'dialog' && !this.tempSearch) || this.tempSearch) {
                 // 判断对话框模板脚本是否存在onload，如果存在就执行，如果不存在就不执行JTemplate._onLoad(this)
                 // 对话框模板脚本里的onload如果不想要就删掉，禁止注释，否则对话框模板脚本里的onload注释掉的时候系统逻辑会默认使用主列表上的onload
-                if (this.dataTemplate.type === 'dialog' &&
-                    (!this.dataTemplate.attrs || !this.dataTemplate.attrs.script || this.dataTemplate.attrs.script.indexOf('onload') < 0)) {
+                if (this.dataTemplate.type === 'dialog' && (!this.dataTemplate.attrs || !this.dataTemplate.attrs.script || this.dataTemplate.attrs.script.indexOf('onload') < 0)) {
                     return
                 }
                 // 模板脚本 执行逻辑
