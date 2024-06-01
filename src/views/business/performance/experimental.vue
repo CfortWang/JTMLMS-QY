@@ -25,6 +25,8 @@
                 <div class="left">
                     <experimental-desc
                         :step="configData.step"
+                        :criterion="configData.criterion"
+                        :formulas="configData.formulas"
                         :references="configData.references"
                         :readonly="readonly"
                     />
@@ -32,6 +34,7 @@
                     <reagent-info :info="form.reagentPoList" :readonly="readonly" />
                     <param-info
                         v-if="$utils.isNotEmpty(configData.params)"
+                        :form-id="formId"
                         :info="form.shiYanCanShu"
                         :config-data="configData.params"
                         :readonly="readonly"
@@ -49,12 +52,12 @@
                     <precision
                         v-if="$utils.isNotEmpty(form.jiSuanJieGuo)"
                         :info="form.jiSuanJieGuo"
-                        :formula="configData.formulas"
                         :readonly="readonly"
                         @recalculate="handleRecalculate"
                     />
                     <conclusion
-                        :info="form"
+                        :result="form.shiYanJieLun"
+                        :files="form.fuJian"
                         :readonly="readonly"
                         @updateData="handleUpdateData"
                     />
@@ -133,22 +136,19 @@ export default {
                 baoLiuXiaoShu: 2,
                 beiZhu: '',
                 reagentPoList: [],
-                shiYanCanShu: {
-                    model: [],
-                    specimensName: [],
-                    targetValue: []
-                },
+                shiYanCanShu: {},
                 shiYanShuJu: [],
                 jiSuanJieGuo: {},
-                shiYanJieLun: ''
+                shiYanJieLun: '',
+                fuJian: ''
             },
             rules: formRules,
             loading: false,
             loadCompleted: false,
             toolbars: [
                 { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
-                { key: 'save', icon: 'ibps-icon-save', label: '暂存', type: 'info', hidden: this.readonly },
-                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
+                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success', hidden: this.readonly },
+                // { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ]
@@ -176,14 +176,15 @@ export default {
             this.loading = true
             getExperimental({ id: this.params.recordId }).then(res => {
                 this.loading = false
-                const { data } = res || {}
-                if (data) {
-                    data.shiYanCanShu = data.shiYanCanShu ? JSON.parse(data.shiYanCanShu) : {}
-                    data.shiYanShuJu = data.shiYanShuJu ? JSON.parse(data.shiYanShuJu) : []
-                    data.jiSuanJieGuo = data.jiSuanJieGuo ? JSON.parse(data.jiSuanJieGuo) : {}
-                    this.form = Object.assign(this.form, data)
-                    this.loadCompleted = true
+                const data = res.data
+                if (!data) {
+                    return
                 }
+                data.shiYanCanShu = data.shiYanCanShu ? JSON.parse(data.shiYanCanShu) : {}
+                data.shiYanShuJu = data.shiYanShuJu ? JSON.parse(data.shiYanShuJu) : []
+                data.jiSuanJieGuo = data.jiSuanJieGuo ? JSON.parse(data.jiSuanJieGuo) : {}
+                this.form = Object.assign(this.form, data)
+                this.loadCompleted = true
             }).catch(() => {
                 this.loading = false
             })
@@ -199,13 +200,14 @@ export default {
                     params: this.$utils.isNotEmpty(method.params) ? JSON.parse(method.params) : [],
                     formulas: this.$utils.isNotEmpty(method.formulas) ? JSON.parse(method.formulas) : []
                 }
+                console.log(this.configData)
             })
         },
         handleActionEvent (key) {
             switch (key) {
                 case 'save':
                 case 'submit':
-                    this.handleSave(key)
+                    this.handleSubmit('submit', true)
                     break
                 case 'generate':
                     this.handleGenerate()
@@ -221,52 +223,59 @@ export default {
             }
         },
         handleSave (key, callback) {
+            this.submitForm(key, callback)
+        },
+        handleSubmit (key, showMsg, callback) {
             this.$refs.form.validate((valid) => {
                 if (!valid) {
-                    return this.$message.warning('请完善表单必填项信息！')
+                    return this.$message.warning('请完善表单必填项后再进行操作！')
                 }
-                if (key === 'save') {
-                    this.submitForm(key, callback)
-                } else {
-                    this.$confirm('确定要提交数据吗？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning',
-                        showClose: false,
-                        closeOnClickModal: false,
-                        closeOnPressEscape: false
-                    }).then(() => {
-                        this.submitForm(key, callback)
-                    })
-                }
+                this.submitForm(key, showMsg, callback)
+                // this.$confirm('确定要提交数据吗？', '提示', {
+                //     confirmButtonText: '确定',
+                //     cancelButtonText: '取消',
+                //     type: 'warning',
+                //     showClose: false,
+                //     closeOnClickModal: false,
+                //     closeOnPressEscape: false
+                // }).then(() => {
+                //     this.submitForm('submit', callback)
+                // })
             })
         },
         handleGenerate () {
             this.$message.info('waiting...')
         },
-        submitForm (key, callback, showMsg) {
+        submitForm (key, showMsg, callback) {
+            const { shiYanCanShu, shiYanShuJu, jiSuanJieGuo, ...rest } = this.form || {}
             const submitData = {
-                ...this.form,
-                shiYanCanShu: JSON.stringify(this.form.shiYanCanShu),
-                shiYanShuJu: this.$utils.isEmpty(this.form.shiYanShuJu) ? null : JSON.stringify(this.form.shiYanShuJu),
+                ...rest,
+                shiYanCanShu: this.$utils.isNotEmpty(shiYanCanShu) ? JSON.stringify(shiYanCanShu) : null,
+                shiYanShuJu: this.$utils.isNotEmpty(shiYanShuJu) ? JSON.stringify(shiYanShuJu) : null,
+                jiSuanJieGuo: this.$utils.isNotEmpty(jiSuanJieGuo) ? JSON.stringify(jiSuanJieGuo) : null,
                 xingNengZhiBia: this.configData.target,
                 fangAnLeiXing: this.configData.methodName,
-                fangFaKey: this.params.methodId,
                 zhiBiaoId: this.params.targetId,
+                fangFaKey: this.params.methodKey,
+                fangFaId: this.params.methodId,
                 id: this.formId
             }
-            delete submitData.jiSuanJieGuo
+            const isEdit = !!this.formId
             // 提交数据
             saveExperimental(submitData).then(res => {
                 this.formId = res.data
-                if (key === 'save') {
+                if (showMsg) {
                     this.$message.success('保存成功')
-                } else {
-                    this.$message.success('提交成功')
-                    this.closeDialog()
                 }
                 if (callback) {
                     callback()
+                }
+                // 提交时且有实验数据时，重新计算
+                if (key === 'submit' && isEdit && this.$utils.isNotEmpty(shiYanShuJu)) {
+                    recalculate({ id: this.formId }).then(res => {
+                        this.form.jiSuanJieGuo = res.data
+                        this.form.shiYanJieLun = res.data.reportResult
+                    })
                 }
             })
         },
@@ -275,6 +284,7 @@ export default {
         },
         closeDialog () {
             this.$emit('update:visible', false)
+            this.$emit('refresh')
         },
         handleUpdateParams (value) {
             this.form.shiYanCanShu = value
@@ -286,14 +296,14 @@ export default {
             }
         },
         handleExport () {
-            this.handleSave('save', () => {
+            this.handleSubmit('beforeExport', false, () => {
                 exportTemplate({ id: this.formId }).then(res => {
                     ActionUtils.download(res.data, `${this.form.fangAnLeiXing}-${this.form.shiYanXiangMu}.xlsx`)
                 })
             })
         },
         handleImport () {
-            this.handleSave('save', () => {
+            this.handleSubmit('beforeImport', false, () => {
                 this.importData()
             })
         },
@@ -386,7 +396,7 @@ export default {
                 ],
                 shiYanCanShu: {
                     specimensNum: 2,
-                    repeatNum: 10,
+                    repeatNum: 3,
                     days: 5,
                     isConvert: false,
                     standard: '允许总误差Tea',
