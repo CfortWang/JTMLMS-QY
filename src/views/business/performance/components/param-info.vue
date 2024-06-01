@@ -214,7 +214,7 @@
                             </el-select>
                         </el-form-item>
                     </el-col>
-                    <el-col v-if="pageInfo.standard === '允许总误差Tea' && isShow('tea')" :span="12">
+                    <el-col v-if="pageInfo.standard === '基于允许总误差TEa' && isShow('tea')" :span="12">
                         <el-form-item label="TEa数值" prop="tea" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.tea"
@@ -228,7 +228,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="pageInfo.standard === '允许总误差Tea'" :gutter="20" class="form-row">
+                <el-row v-if="['基于允许总误差TEa'].includes(pageInfo.standard)" :gutter="20" class="form-row">
                     <el-col v-if="isShow('batchCVS')" :span="12">
                         <el-form-item :label="getAttrs('batchCVS', 'label', false)" prop="shiYanCanShu.batchCVS" :show-message="false">
                             <el-select
@@ -249,7 +249,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col v-if="isShow('dailyCVS')" :span="12">
-                        <el-form-item label="日间CVs" prop="shiYanCanShu.dailyCVS" :show-message="false">
+                        <el-form-item :label="getAttrs('dailyCVS', 'label', false)" prop="shiYanCanShu.dailyCVS" :show-message="false">
                             <el-select
                                 v-model="pageInfo.dailyCVS"
                                 filterable
@@ -268,15 +268,16 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="pageInfo.standard === '厂商参数'" :gutter="20" class="form-row">
+                <el-row v-if="pageInfo.standard === '基于厂商声明参数'" :gutter="20" class="form-row">
                     <el-col :span="24">
                         <el-form-item prop="shiYanCanShu.allowableSDr" :show-message="false" class="inline-item">
                             <template slot="label">
-                                <span>重复标准差</span>
+                                <!-- <span>{{ getAttrs('allowableSDr', 'label', false) }}</span> -->
+                                <span>重复（批内）</span>
                                 <el-tooltip
                                     class="item"
                                     effect="dark"
-                                    content="即批内标准差，与浓度水平名一一对应"
+                                    content="与浓度水平名一一对应"
                                     placement="top"
                                 >
                                     <i class="el-icon-question" />
@@ -294,15 +295,16 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-row v-if="pageInfo.standard === '厂商参数'" :gutter="20" class="form-row">
+                <el-row v-if="pageInfo.standard === '基于厂商声明参数'" :gutter="20" class="form-row">
                     <el-col :span="24">
                         <el-form-item prop="shiYanCanShu.allowableSDl" :show-message="false" class="inline-item">
                             <template slot="label">
-                                <span>期间标准差</span>
+                                <!-- <span>{{ getAttrs('allowableSDl', 'label', false) }}</span> -->
+                                <span>期间（批间）</span>
                                 <el-tooltip
                                     class="item"
                                     effect="dark"
-                                    content="即实验室标准差，与浓度水平名一一对应"
+                                    content="与浓度水平名一一对应"
                                     placement="top"
                                 >
                                     <i class="el-icon-question" />
@@ -354,6 +356,10 @@
 import { standardOption, batchOption, rangeOption, rateOption } from '../constants/index'
 export default {
     props: {
+        formId: {
+            type: String,
+            default: ''
+        },
         info: {
             type: Object,
             default: () => {}
@@ -397,7 +403,12 @@ export default {
                 temp[item.key] = item.default
             }
         })
-        temp.specimensName = temp.specimensNum ? Array.from({ length: temp.specimensNum }, (_, index) => `水平${index + 1}`) : []
+        if (!this.formId) {
+            temp.specimensName = temp.specimensNum ? Array.from({ length: temp.specimensNum }, (_, index) => `水平${index + 1}`) : []
+            temp.allowableSDr = []
+            temp.allowableSDl = []
+            temp.targetValue = []
+        }
         this.pageInfo = temp || { model: [], targetValue: [], specimensName: [], claimValue: [] }
     },
     methods: {

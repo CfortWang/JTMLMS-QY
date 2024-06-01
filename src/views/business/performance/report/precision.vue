@@ -70,13 +70,6 @@
                                 </el-table-column>
                             </el-table>
                         </div>
-                        <!-- <div v-if="formula.length" class="formula-box">
-                            <div v-for="item in formula" :key="item.key" class="formula-item">
-                                <div>{{ item.label }}</div>
-                                <div>{{ item.value }}</div>
-                                <div>=&nbsp; {{ info.reportData[activeTab][item.key] }}</div>
-                            </div>
-                        </div> -->
                     </div>
                 </el-tab-pane>
             </el-tabs>
@@ -89,7 +82,6 @@
     </div>
 </template>
 <script>
-import MathJax from '@/utils/MathJax'
 export default {
     components: {
         chart: () => import('../components/chart.vue')
@@ -118,15 +110,25 @@ export default {
         }
     },
     watch: {
+        info: {
+            handler (v) {
+                if (v.sheetDTO && v.sheetDTO.length) {
+                    this.tabs = v.sheetDTO.map(item => item.title)
+                    this.activeTab = this.tabs[this.activeTabIndex] || ''
+                    this.initData(this.activeTabIndex)
+                }
+            },
+            immediate: true,
+            deep: true
+        },
         activeTabIndex (v) {
             this.initData(v)
         }
     },
     mounted () {
-        this.tabs = this.info.sheetDTO && this.info.sheetDTO.length ? this.info.sheetDTO.map(item => item.title) : []
-        this.activeTab = this.tabs[this.activeTabIndex] || ''
-        this.initData(this.activeTabIndex)
-        this.formatMath()
+        // this.tabs = this.info.sheetDTO && this.info.sheetDTO.length ? this.info.sheetDTO.map(item => item.title) : []
+        // this.activeTab = this.tabs[this.activeTabIndex] || ''
+        // this.initData(this.activeTabIndex)
     },
     methods: {
         handleClick (v) {
@@ -153,16 +155,6 @@ export default {
         },
         getTableHeader (data) {
             return data.length ? Object.keys(data[0]).map(key => ({ label: key, prop: key, slot: true })) : []
-        },
-        formatMath () {
-            setTimeout(() => {
-                this.$nextTick(() => {
-                    if (MathJax.isMathjaxConfig) {
-                        MathJax.initMathjaxConfig()
-                    }
-                    MathJax.MathQueue('.formula-box')
-                })
-            }, 500)
         },
         getSpanMethod (table) {
             return (params) => {
@@ -245,14 +237,6 @@ export default {
                         .table-title {
                             margin-top: 0;
                         }
-                    }
-                }
-                .formula-item {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    > div:nth-child(2) {
-                        margin: 0 10px;
                     }
                 }
             }

@@ -5,7 +5,7 @@
                 <i class="ibps-icon-star" />
                 <span>实验结论</span>
             </div>
-            <div v-if="pageInfo" class="form-container">
+            <div v-if="$utils.isNotEmpty(info.jiSuanJieGuo)" class="form-container">
                 <!-- <el-row :gutter="20" class="form-row">
                     <el-col :span="12">
                         <el-form-item label="审核人" prop="shenHeRen" :show-message="false">
@@ -64,6 +64,7 @@
                     </el-col>
                 </el-row>
             </div>
+            <el-empty v-else description="导入实验数据后查看" />
         </div>
     </div>
 </template>

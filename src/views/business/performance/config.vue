@@ -360,8 +360,8 @@
                                 </el-table>
                             </el-tab-pane>
                             <el-tab-pane label="结论模板">
-                                <ibps-ueditor v-model="method.template" class="editor" :config="ueditorConfig" />
-                                <ibps-ueditor v-model="method.templateDesc" class="editor" :config="ueditorConfig" />
+                                <codemirror v-model="method.template" :options="cmConfg" />
+                                <!-- <ibps-ueditor v-model="method.templateDesc" class="editor" :config="ueditorConfig" /> -->
                             </el-tab-pane>
                             <el-tab-pane label="图表配置">
                                 <div v-if="!readonly || method.isBasic === 'N'" class="operate-btn">
@@ -386,7 +386,7 @@
                                     style="width: 100%"
                                     :max-height="maxHeight"
                                     class="formula-table"
-                                    @selection-change="selection => handleSelectionChange(selection, method.chartOption, 'chart')"
+                                    @selection-change="selection => handleSelectionChange(selection, method.chartOption, 'chartOption')"
                                 >
                                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
@@ -431,12 +431,18 @@
 </template>
 
 <script>
-import { configFormRules, paramsList, formulaList, chartList, methodTypeOption, methodKeyOption } from './constants/index'
+import { configFormRules, paramsList, formulaList, chartList, methodTypeOption, methodKeyOption, cmConfg } from './constants/index'
 import { getConfigDetail, saveConfig } from '@/api/business/pv'
+import { codemirror } from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/eclipse.css'
+import 'codemirror/mode/xml/xml.js'
+import 'codemirror/addon/selection/active-line.js'
 export default {
     components: {
         IbpsAttachment: () => import('@/business/platform/file/attachment/selector'),
-        IbpsUeditor: () => import('@/components/ibps-ueditor')
+        IbpsUeditor: () => import('@/components/ibps-ueditor'),
+        codemirror
     },
     props: {
         visible: {
@@ -457,6 +463,7 @@ export default {
             chartList,
             methodTypeOption,
             methodKeyOption,
+            cmConfg,
             maxHeight: document.body.clientHeight - 438 + 'px',
             dialogVisible: this.visible,
             formLabelWidth: '90px',
@@ -471,7 +478,7 @@ export default {
             selectionIndex: {
                 params: [],
                 formulas: [],
-                chart: []
+                chartOption: []
             },
             selectedParams: [],
             selectedFormula: [],
@@ -530,7 +537,7 @@ export default {
                     item.chartOption = this.$utils.isNotEmpty(item.chartOption) ? JSON.parse(item.chartOption) : []
                 })
                 this.formData = { icon, sn, target, targetKey, id: this.targetId, methods }
-                this.methodTabs = methods
+                this.methodTabs = methods.sort((a, b) => a.sn - b.sn)
                 this.activeTab = this.methodTabs[0].methodName
                 this.loadCompleted = true
             }).catch(() => {
@@ -568,6 +575,7 @@ export default {
         copyMethod (index) {
             const copyData = JSON.parse(JSON.stringify(this.formData.methods[index]))
             copyData.sn = this.methodTabs.length + 1
+            copyData.id = ''
             copyData.methodName += ' (复制)'
             copyData.isBasic = 'N'
             copyData.isDisabled = 'N'
@@ -628,6 +636,7 @@ export default {
                 // 方法数据同时存储于主子表，便于列表获取
                 submitData.config = JSON.stringify(submitData.methods)
                 delete submitData.methods
+                console.log(submitData)
                 this.submitForm(submitData)
             })
         },
@@ -648,7 +657,6 @@ export default {
             const temp = this.formData.methods[index][type] || []
             temp.push(obj)
             this.formData.methods[index][type] = temp
-            console.log(111)
             console.log(this.formData.methods)
             this.methodTabs = this.formData.methods
         },

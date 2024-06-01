@@ -224,11 +224,11 @@ export const standardOption = [
     //     label: '基于实验室指定'
     // },
     {
-        value: '允许总误差Tea',
-        label: '基于允许总误差Tea'
+        value: '基于允许总误差TEa',
+        label: '基于允许总误差TEa'
     },
     {
-        value: '厂商参数',
+        value: '基于厂商声明参数',
         label: '基于厂商声明参数'
     }
     // {
@@ -356,3 +356,24 @@ export const formulaList = [
     { label: '编码', key: 'key', width: '150px' },
     { label: '表达式', key: 'value', minWidth: '220px' }
 ]
+
+export const chartList = [
+    { label: '名称', key: 'label', width: '200px' },
+    { label: '编码', key: 'key', width: '150px' },
+    { label: '配置项', key: 'value', minWidth: '220px', type: 'textarea' }
+]
+
+export const cmConfg = {
+    mode: 'text/html',
+    theme: 'eclipse',
+    // 是否显示行号
+    lineNumbers: true,
+    indentWithTabs: false,
+    smartIndent: true,
+    matchBrackets: true,
+    styleActiveLine: true,
+    lineWrapping: true,
+    indentUnit: 4,
+    tabSize: 4,
+    lineWiseCopyCut: true
+}

@@ -95,7 +95,7 @@ export default {
                 rowHandle: {
                     effect: 'display',
                     actions: [
-                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' },
+                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' }
                         // { key: 'report', label: '实验报告', type: 'success', icon: 'ibps-icon-file-text-o' }
                     ]
                 }
