@@ -69,17 +69,17 @@ export default {
         }
     },
     mounted () {
-        this.formatMath()
+        this.$nextTick(() => {
+            this.formatMath()
+        })
     },
     methods: {
         formatMath () {
             setTimeout(() => {
-                this.$nextTick(() => {
-                    if (MathJax.isMathjaxConfig) {
-                        MathJax.initMathjaxConfig()
-                    }
-                    MathJax.MathQueue('.formula-box')
-                })
+                if (MathJax.isMathjaxConfig) {
+                    MathJax.initMathjaxConfig()
+                }
+                MathJax.MathQueue('.formula-box')
             }, 500)
         }
     }

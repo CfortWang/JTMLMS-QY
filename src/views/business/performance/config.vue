@@ -352,9 +352,12 @@
                                             />
                                         </template>
                                     </el-table-column>
-                                    <el-table-column v-if="!readonly || method.isBasic !== 'Y'" fixed="right" label="操作" width="50" header-align="center" align="center">
+                                    <el-table-column v-if="!readonly || method.isBasic !== 'Y'" fixed="right" label="操作" width="70" header-align="center" align="center">
                                         <template slot-scope="scope">
-                                            <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'formula', mIndex)" /></a>
+                                            <div class="inline-operate">
+                                                <a><i class="el-icon-view" @click="handlePreview(scope.row)" /></a>
+                                                <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'formula', mIndex)" /></a>
+                                            </div>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -427,6 +430,12 @@
                 </el-tabs>
             </div>
         </el-form>
+        <formula-preview
+            v-if="showFormula"
+            :show.sync="showFormula"
+            :formula="formulaInfo"
+            @close="() => showFormula = false"
+        />
     </el-dialog>
 </template>
 
@@ -442,6 +451,7 @@ export default {
     components: {
         IbpsAttachment: () => import('@/business/platform/file/attachment/selector'),
         IbpsUeditor: () => import('@/components/ibps-ueditor'),
+        FormulaPreview: () => import('./components/formula-preview'),
         codemirror
     },
     props: {
@@ -480,8 +490,8 @@ export default {
                 formulas: [],
                 chartOption: []
             },
-            selectedParams: [],
-            selectedFormula: [],
+            showFormula: false,
+            formulaInfo: {},
             toolbars: [
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success' },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
@@ -550,10 +560,14 @@ export default {
             if (t !== this.activeTabIndex) {
                 this.$nextTick(() => {
                     this.activeTabIndex = t
-                    this.selectedParams = []
+                    this.selectionIndex = {
+                        params: [],
+                        formulas: [],
+                        chartOption: []
+                    }
                     this.$refs[`configTable${this.activeTabIndex}`].clearSelection()
-                    this.selectedFormula = []
                     this.$refs[`formulaTable${this.activeTabIndex}`].clearSelection()
+                    this.$refs[`chartOption${this.activeTabIndex}`].clearSelection()
                 })
             }
         },
@@ -657,7 +671,6 @@ export default {
             const temp = this.formData.methods[index][type] || []
             temp.push(obj)
             this.formData.methods[index][type] = temp
-            console.log(this.formData.methods)
             this.methodTabs = this.formData.methods
         },
         handleDelParam (type, index, cIndex) {
@@ -665,6 +678,10 @@ export default {
         },
         handleSelectionChange (v, data, type) {
             this.selectionIndex[type] = v.map(item => data.indexOf(item))
+        },
+        handlePreview (row) {
+            this.formulaInfo = row
+            this.showFormula = true
         },
         handleRemove (removeIndex, type, methodIndex) {
             let indexList = []
@@ -740,6 +757,14 @@ export default {
                 }
                 .operate-btn {
                     text-align: left;
+                }
+                .inline-operate {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-around;
+                    a:hover {
+                        color: #409eff;
+                    }
                 }
                 ::v-deep {
                     .el-form-item {
