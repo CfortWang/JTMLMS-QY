@@ -90,8 +90,13 @@ export const formRules = {
         message: '请选择',
         trigger: 'change'
     }],
-    'shiYanCanShu.range': [{
+    'shiYanCanShu.allowableR2': [{
         required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'shiYanCanShu.range': [{
+        required: false,
         message: '请输入',
         trigger: 'change'
     }],
@@ -340,7 +345,7 @@ export const methodKeyOption = [
     }
 ]
 
-export const paramsList = [
+export const paramColumn = [
     { label: '名称', key: 'label', width: '180px' },
     { label: '编码', key: 'key', width: '150px' },
     { label: '默认值', key: 'default', minWidth: '120px' },
@@ -351,17 +356,39 @@ export const paramsList = [
     { label: '是否只读', key: 'isReadonly', type: 'switch', width: '100px' }
 ]
 
+export const paramList = []
+
 export const formulaList = [
-    { label: '名称', key: 'label', width: '200px' },
+    {
+        label: '室内标准差',
+        key: 'sl',
+        value: '$$S_1=\sqrt{\frac{n-1}{n}·S_r^2+S_b^2}$$'
+    },
+    {
+        label: '批内标准差',
+        key: 'sr',
+        value: '$$S_r=\sqrt{\frac{\sum_{d=1}^D\sum_{i-1}^n(x_{di}-\overline{x_d})^2}{D(n-1)}}$$'
+    },
+    {
+        label: '批间方差',
+        key: 'vb',
+        value: '$$S_b^2=\frac{\sum_{d=1}^D(\overline{x_d}-\overset{=}{x})^2}{D-1}$$'
+    }
+]
+
+export const formulaColumn = [
+    { label: '名称', key: 'label', width: '200px', type: 'select', options: formulaList },
     { label: '编码', key: 'key', width: '150px' },
     { label: '表达式', key: 'value', minWidth: '220px' }
 ]
 
-export const chartList = [
+export const chartColumn = [
     { label: '名称', key: 'label', width: '200px' },
-    { label: '编码', key: 'key', width: '150px' },
+    { label: '编码', key: 'key', width: '150px', visible: false },
     { label: '配置项', key: 'value', minWidth: '220px', type: 'textarea' }
 ]
+
+export const chartList = []
 
 export const cmConfg = {
     mode: 'text/html',

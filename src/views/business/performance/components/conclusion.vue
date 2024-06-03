@@ -61,13 +61,21 @@ export default {
             expFiles: this.files,
             pageInfo: null,
             ueditorConfig: {
-                autoHeightEnabled: false,
+                autoHeightEnabled: true,
                 initialFrameHeight: 240,
                 initialFrameWidth: '100%'
             }
         }
     },
+    // computed: {
+    //     expResult () {
+    //         return this.result
+    //     }
+    // },
     watch: {
+        result (val) {
+            this.expResult = val
+        },
         expFiles: {
             handler (val, oldVal) {
                 this.$emit('updateData', { fuJian: val })
@@ -98,9 +106,5 @@ export default {
                 }
             }
         }
-        // .conclusion .form-container {
-        //     max-height: 300px;
-        //     overflow-y: auto;
-        // }
     }
 </style>

@@ -264,7 +264,7 @@
                                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
                                     <el-table-column
-                                        v-for="(item, pIndex) in paramsList"
+                                        v-for="(item, pIndex) in paramColumn"
                                         :key="pIndex"
                                         :prop="item.key"
                                         :label="item.label"
@@ -297,7 +297,7 @@
                                     </el-table-column>
                                     <el-table-column v-if="!readonly" fixed="right" label="操作" width="50" header-align="center" align="center">
                                         <template slot-scope="scope">
-                                            <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'config', mIndex)" /></a>
+                                            <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'params', mIndex)" /></a>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -330,12 +330,13 @@
                                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
                                     <el-table-column
-                                        v-for="(item, pIndex) in formulaList"
-                                        :key="pIndex"
+                                        v-for="(item, fIndex) in formulaColumn"
+                                        :key="fIndex"
                                         :prop="item.key"
                                         :label="item.label"
                                         :width="item.width"
                                         :min-width="item.minWidth"
+                                        :style="item.visible === false ? 'display: none;' : ''"
                                         header-align="center"
                                         align="center"
                                     >
@@ -345,6 +346,22 @@
                                                 v-model="scope.row[item.key]"
                                                 :disabled="readonly && method.isBasic === 'Y'"
                                             />
+                                            <el-select
+                                                v-if="item.type === 'select'"
+                                                v-model="scope.row[item.key]"
+                                                :disabled="readonly && method.isBasic === 'Y'"
+                                                placeholder="请选择"
+                                                allow-create
+                                                filterable
+                                                @change="handleFormulaChange(mIndex, scope, item.key, 'formulas', ['key', 'value'])"
+                                            >
+                                                <el-option
+                                                    v-for="(f, index) in item.options"
+                                                    :key="index"
+                                                    :label="f.label"
+                                                    :value="f.label"
+                                                />
+                                            </el-select>
                                             <el-input
                                                 v-else
                                                 v-model="scope.row[item.key]"
@@ -356,7 +373,7 @@
                                         <template slot-scope="scope">
                                             <div class="inline-operate">
                                                 <a><i class="el-icon-view" @click="handlePreview(scope.row)" /></a>
-                                                <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'formula', mIndex)" /></a>
+                                                <a><i class="el-icon-delete" @click="handleRemove(scope.$index, 'formulas', mIndex)" /></a>
                                             </div>
                                         </template>
                                     </el-table-column>
@@ -394,12 +411,13 @@
                                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
                                     <el-table-column
-                                        v-for="(item, pIndex) in chartList"
-                                        :key="pIndex"
+                                        v-for="(item, cIndex) in chartColumn"
+                                        :key="cIndex"
                                         :prop="item.key"
                                         :label="item.label"
                                         :width="item.width"
                                         :min-width="item.minWidth"
+                                        :style="item.visible === false ? 'display: none;' : ''"
                                         header-align="center"
                                         align="center"
                                     >
@@ -440,7 +458,7 @@
 </template>
 
 <script>
-import { configFormRules, paramsList, formulaList, chartList, methodTypeOption, methodKeyOption, cmConfg } from './constants/index'
+import { configFormRules, paramColumn, formulaColumn, chartColumn, paramList, formulaList, chartList, methodTypeOption, methodKeyOption, cmConfg } from './constants/index'
 import { getConfigDetail, saveConfig } from '@/api/business/pv'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -468,8 +486,11 @@ export default {
         const { isSuper } = this.$store.getters || {}
         return {
             isSuper,
-            paramsList,
+            paramColumn,
+            paramList,
+            formulaColumn,
             formulaList,
+            chartColumn,
             chartList,
             methodTypeOption,
             methodKeyOption,
@@ -679,6 +700,12 @@ export default {
         handleSelectionChange (v, data, type) {
             this.selectionIndex[type] = v.map(item => data.indexOf(item))
         },
+        handleFormulaChange (methodIndex, { $index, row }, key, type, args) {
+            const t = formulaList.find(i => i[key] === row[key])
+            args.forEach(i => {
+                this.methodTabs[methodIndex][type][$index][i] = t ? t[i] : ''
+            })
+        },
         handlePreview (row) {
             this.formulaInfo = row
             this.showFormula = true
@@ -828,38 +855,6 @@ export default {
                     top: 36px;
                     right: 18px;
                     z-index: 99;
-                }
-                .outer-tabs {
-                    .params {
-                        display: flex;
-                        .params-label {
-                            width: 78px;
-                            padding-right: 12px;
-                            padding-top: 10px;
-                            text-align: right;
-                        }
-                        .params-content {
-                            flex: 1;
-                            .params-row, .params-title {
-                                display: flex;
-                                margin-bottom: 10px;
-                                .left {
-                                    display: flex;
-                                    flex: 1;
-                                    justify-content: space-around;
-                                    align-items: center;
-                                }
-                                .operate-btn {
-                                    width: 40px;
-                                    height: 40px;
-                                    margin-left: 20px;
-                                }
-                            }
-                            .params-title > div {
-                                // flex: 1;
-                            }
-                        }
-                    }
                 }
             }
         }

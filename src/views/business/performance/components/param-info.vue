@@ -125,14 +125,26 @@
                 </el-row>
                 <el-row v-if="isShow('claimValue')" :gutter="20" class="form-row">
                     <el-col :span="24">
-                        <el-form-item :label="getAttrs('claimValue', 'label', false)" prop="claimValue" :show-message="false">
+                        <el-form-item prop="claimValue" :show-message="false" class="inline-item">
+                            <template slot="label">
+                                <span>{{ getAttrs('claimValue', 'label', false) }}</span>
+                                <el-tooltip
+                                    class="item"
+                                    effect="dark"
+                                    content="与浓度水平名一一对应"
+                                    placement="top"
+                                >
+                                    <i class="el-icon-question" />
+                                </el-tooltip>
+                            </template>
                             <el-input-number
-                                v-model="pageInfo.claimValue"
+                                v-for="(item, index) in pageInfo.specimensNum"
+                                :key="index"
+                                v-model="pageInfo.claimValue[index]"
                                 type="number"
-                                :min="0"
-                                :precision="2"
+                                class="inline-number"
+                                size="small"
                                 :disabled="readonly"
-                                placeholder="请输入"
                             />
                         </el-form-item>
                     </el-col>
@@ -148,23 +160,6 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="form-row">
-                    <el-col v-if="isShow('range')" :span="12">
-                        <el-form-item :label="getAttrs('range', 'label', false)" prop="shiYanCanShu.range" :show-message="false">
-                            <el-select
-                                v-model="pageInfo.range"
-                                clearable
-                                :disabled="readonly"
-                                placeholder="请选择"
-                            >
-                                <el-option
-                                    v-for="(item, index) in rangeOption"
-                                    :key="index"
-                                    :label="item.label"
-                                    :value="item.value"
-                                />
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
                     <el-col v-if="isShow('rejectionRate')" :span="12">
                         <el-form-item :label="getAttrs('rejectionRate', 'label', false)" prop="rejectionRate" :show-message="false">
                             <el-select
@@ -180,18 +175,6 @@
                                     :value="item.value"
                                 />
                             </el-select>
-                        </el-form-item>
-                    </el-col>
-                    <el-col v-if="isShow('claimValue')" :span="12">
-                        <el-form-item :label="getAttrs('claimValue', 'label', false)" prop="claimValue" :show-message="false">
-                            <el-input-number
-                                v-model="pageInfo.claimValue"
-                                type="number"
-                                :min="0"
-                                :precision="2"
-                                :disabled="readonly"
-                                placeholder="请输入"
-                            />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -348,6 +331,47 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
+                <el-row :gutter="20" class="form-row">
+                    <el-col v-if="isShow('allowableR2')" :span="12">
+                        <el-form-item :label="getAttrs('allowableR2', 'label', false)" prop="shiYanCanShu.allowableR2" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.allowableR2"
+                                type="number"
+                                :min="getAttrs('allowableR2', 'min')"
+                                :max="getAttrs('allowableR2', 'max')"
+                                :step="0.001"
+                                :precision="getAttrs('allowableR2', 'precision')"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
+                    <el-col v-if="isShow('range')" :span="12">
+                        <el-form-item prop="shiYanCanShu.range" :show-message="false">
+                            <template slot="label">
+                                <span>{{ getAttrs('range', 'label', false) }}</span>
+                                <el-tooltip
+                                    class="item"
+                                    effect="dark"
+                                    content="注：填写范围为0.00~1.00，若值为0.10，则可接受范围为：90%~110%"
+                                    placement="top"
+                                >
+                                    <i class="el-icon-question" />
+                                </el-tooltip>
+                            </template>
+                            <el-input-number
+                                v-model="pageInfo.range"
+                                type="number"
+                                :min="getAttrs('range', 'min')"
+                                :max="getAttrs('range', 'max')"
+                                :step="0.01"
+                                :precision="getAttrs('range', 'precision')"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
             </div>
         </div>
     </div>
@@ -408,8 +432,10 @@ export default {
             temp.allowableSDr = []
             temp.allowableSDl = []
             temp.targetValue = []
+            temp.claimValue = []
+            temp.rangeValue = temp.range ? [100 - parseFloat(temp.range) * 100, 100 + parseFloat(temp.range) * 100] : []
         }
-        this.pageInfo = temp || { model: [], targetValue: [], specimensName: [], claimValue: [] }
+        this.pageInfo = temp || { model: [], targetValue: [], specimensName: [] }
     },
     methods: {
         isShow (props) {

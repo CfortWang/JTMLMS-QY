@@ -133,7 +133,7 @@ export default {
                 bianZhiRen: '',
                 createBy: userId,
                 jieGuoDanWei: '',
-                baoLiuXiaoShu: 2,
+                baoLiuXiaoShu: 3,
                 beiZhu: '',
                 reagentPoList: [],
                 shiYanCanShu: {},
@@ -369,7 +369,7 @@ export default {
                 bianZhiRen: '1166772479054577664',
                 createBy: '1166771426615623680',
                 jieGuoDanWei: 'mmol/L',
-                baoLiuXiaoShu: 2,
+                baoLiuXiaoShu: 3,
                 beiZhu: '测试数据',
                 reagentPoList: [
                     {
@@ -399,7 +399,7 @@ export default {
                     repeatNum: 3,
                     days: 5,
                     isConvert: false,
-                    standard: '允许总误差Tea',
+                    standard: '基于允许总误差TEa',
                     tea: 10,
                     batchCVS: 0.25,
                     batchCVSValue: 2.50,
