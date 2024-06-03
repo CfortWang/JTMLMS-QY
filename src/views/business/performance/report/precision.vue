@@ -148,6 +148,7 @@ export default {
                 title: k,
                 id: chartDataDTO[k].name,
                 data: chartDataDTO[k].data,
+                note: chartDataDTO[k].note,
                 option: chartDataDTO[k].option
             })).sort((a, b) => a.title.localeCompare(b.title)) : []
             this.chartData = chartData
@@ -169,7 +170,6 @@ export default {
                 return {
                     rowspan: rowIndex === firstSameRowIndex ? this.getRowSpanCount(list, rowIndex, column.property) : 0,
                     colspan: 1
-                    // colspan: firstSameColIndex === -1 ? 1 : columnIndex - firstSameColIndex + 1
                 }
             }
             return {

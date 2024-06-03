@@ -9,6 +9,7 @@
                 <el-row :gutter="20" class="form-row">
                     <el-col v-for="(chart, index) in chartData" :key="index" :xl="12" :lg="12" :md="24">
                         <div :id="chart.id" class="chart-item" />
+                        <div class="note">{{ chart.note }}</div>
                     </el-col>
                 </el-row>
             </div>

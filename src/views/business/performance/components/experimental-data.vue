@@ -21,41 +21,43 @@
                 </template>
             </div>
             <div class="content">
-                <el-table
-                    v-if="expData && $utils.isNotEmpty(expData.dataDTO)"
-                    :data="expData.dataDTO.list"
-                    border
-                    stripe
-                    highlight-current-row
-                    style="width: 100%"
-                    max-height="250px"
-                >
-                    <el-table-column
-                        v-for="(h, hIndex) in expData.dataDTO.header"
-                        :key="h.children && h.children.length ? hIndex : h.prop"
-                        :prop="h.prop"
-                        :label="h.label"
-                        width="80"
-                        header-align="center"
-                        align="center"
+                <template v-if="expData && $utils.isNotEmpty(expData.dataDTO)">
+                    <div class="note" v-html="expData.dataDTO.note" />
+                    <el-table
+                        :data="expData.dataDTO.list"
+                        border
+                        stripe
+                        highlight-current-row
+                        style="width: 100%"
+                        max-height="250px"
                     >
-                        <template slot="header" slot-scope="scope">
-                            <span v-html="scope.column.label" />
-                        </template>
                         <el-table-column
-                            v-for="c in h.children"
-                            :key="c.prop"
-                            :prop="c.prop"
-                            :label="c.label"
+                            v-for="(h, hIndex) in expData.dataDTO.header"
+                            :key="h.children && h.children.length ? hIndex : h.prop"
+                            :prop="h.prop"
+                            :label="h.label"
+                            width="80"
                             header-align="center"
                             align="center"
                         >
                             <template slot="header" slot-scope="scope">
                                 <span v-html="scope.column.label" />
                             </template>
+                            <el-table-column
+                                v-for="c in h.children"
+                                :key="c.prop"
+                                :prop="c.prop"
+                                :label="c.label"
+                                header-align="center"
+                                align="center"
+                            >
+                                <template slot="header" slot-scope="scope">
+                                    <span v-html="scope.column.label" />
+                                </template>
+                            </el-table-column>
                         </el-table-column>
-                    </el-table-column>
-                </el-table>
+                    </el-table>
+                </template>
                 <el-empty v-else description="暂无数据，请导出模板填写后导入" />
             </div>
         </div>
@@ -221,6 +223,9 @@ export default {
             .content {
                 padding: 10px;
                 position: relative;
+                .note {
+                    margin-bottom: 10px;
+                }
             }
         }
     }
