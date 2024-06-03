@@ -524,7 +524,8 @@ export default {
             ueditorConfig: {
                 autoHeightEnabled: false,
                 initialFrameHeight: 300,
-                initialFrameWidth: '100%'
+                initialFrameWidth: '100%',
+                initialStyle: 'body { font-size: 14px; }'
             },
             initMethod: {
                 methodName: '方法',

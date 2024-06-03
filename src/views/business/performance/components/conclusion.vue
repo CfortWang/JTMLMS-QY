@@ -63,7 +63,8 @@ export default {
             ueditorConfig: {
                 autoHeightEnabled: true,
                 initialFrameHeight: 240,
-                initialFrameWidth: '100%'
+                initialFrameWidth: '100%',
+                initialStyle: 'body { font-size: 14px; }'
             }
         }
     },
