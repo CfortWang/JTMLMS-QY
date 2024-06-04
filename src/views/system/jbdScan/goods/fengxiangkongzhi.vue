@@ -1,6 +1,6 @@
 <template>
     <div class="bg">
-        <el-dialog width="70vw" height="50vh" :modal-append-to-body="false" title="风险评估进度查询" :visible.sync="scan">
+        <el-dialog width="80vw" height="50vh" :modal-append-to-body="false" title="风险评估进度查询" :visible.sync="scan" top style="margin-top:70px">
             <!-- 表单是否显示 -->
             <div ref="childComponent" style="height: 75vh; width: 100%">
                 <div id="box">
@@ -399,7 +399,8 @@ export default {
             const cdData = []
             for (const item of riskCD) {
                 const findData = riskCount.find(i => i.fen_ji_ === item.yan_zhong_cheng_d)
-                cdData.push({ name: findData.fen_ji_ + '、' + findData.yan_zhong_cheng_d, value: item.total })
+                // cdData.push({ name: findData.fen_ji_ + '、' + findData.yan_zhong_cheng_d, value: item.total })
+                cdData.push({ name: findData.yan_zhong_cheng_d, value: item.total })
             }
             this.remainingRiskCD = {
                 data: cdData,
@@ -416,7 +417,8 @@ export default {
                 data: djData,
                 idSelector: 'remainingRiskDJ',
                 title: '风险等级分布',
-                color: ['#d72828', '#2077b5', '#ff7f0d']
+                // color: ['#d72828', '#2077b5', '#ff7f0d']
+                color: ['#2077b5', '#ff7f0d', '#d72828']
             }
             const riskYD = await this.countApi(this.zongid, 'SYFX_YD')
             const ydData = []
@@ -427,7 +429,8 @@ export default {
                 data: ydData,
                 title: '风险应对分布',
                 idSelector: 'remainingRiskYD',
-                color: ['#d72828', '#2077b5', '#ff7f0d']
+                // color: ['#d72828', '#2077b5', '#ff7f0d']
+                color: ['#ff7f0d', '#d72828', '#2077b5']
             }
             this.$refs.remainingRiskCD.getMiddleLeft('remainingRiskCD', this.remainingRiskCD)
             this.$refs.remainingRiskDJ.getMiddleLeft('remainingRiskDJ', this.remainingRiskDJ)

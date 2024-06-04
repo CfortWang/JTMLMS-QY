@@ -20,6 +20,7 @@ export default {
             var myChart = echarts.init(chartDom)
             const radius = '50%'
             const inData = info.data
+            var leftDistance = info.title ? '50%' : '60%'
             var option
             option = {
                 title: {
@@ -40,14 +41,16 @@ export default {
                 },
                 label: {
                     formatter: '{b}\n{d}%',
-                    edgeDistance: '20%'
+                    edgeDistance: '20%',
+                    fontSize: 12,
+                    color: '#1f1f1f'
                 },
                 legend: {
                     show: true,
                     orient: orient || 'vertical',
                     itemGap: 6,
                     z: 3,
-                    left: '20',
+                    left: '10',
                     textStyle: {
                         color: '#1f1f1f'
                     }
@@ -56,7 +59,7 @@ export default {
                     {
                         type: 'pie',
                         radius: radius,
-                        center: ['50%', '50%'],
+                        center: [leftDistance, '50%'],
                         data: inData,
                         emphasis: {
                             itemStyle: {
