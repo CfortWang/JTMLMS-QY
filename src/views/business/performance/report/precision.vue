@@ -1,6 +1,6 @@
 <template>
     <div class="info-container">
-        <div class="experimental-result info-item">
+        <div v-if="reportData && reportData.length" class="experimental-result info-item">
             <div class="title">
                 <i class="ibps-icon-star" />
                 <span>计算结果</span>
@@ -138,12 +138,12 @@ export default {
         initData (index) {
             const { sheetDTO } = this.info || {}
             const { reportDataDTO, chartDataDTO } = sheetDTO[index] || {}
-            const reportData = Object.keys(reportDataDTO).map(k => ({
+            const reportData = reportDataDTO ? Object.keys(reportDataDTO).map(k => ({
                 title: k,
                 header: reportDataDTO[k].header || this.getTableHeader(reportDataDTO[k].list),
                 hideHeader: this.$utils.isEmpty(reportDataDTO[k].header),
                 list: reportDataDTO[k].list
-            })).sort((a, b) => a.title.localeCompare(b.title))
+            })).sort((a, b) => a.title.localeCompare(b.title)) : []
             const chartData = chartDataDTO ? Object.keys(chartDataDTO).map(k => ({
                 title: k,
                 id: chartDataDTO[k].name,

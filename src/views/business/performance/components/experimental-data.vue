@@ -22,7 +22,6 @@
             </div>
             <div class="content">
                 <template v-if="expData && $utils.isNotEmpty(expData.dataDTO)">
-                    <div class="note" v-html="expData.dataDTO.note" />
                     <el-table
                         :data="expData.dataDTO.list"
                         border
@@ -57,6 +56,7 @@
                             </el-table-column>
                         </el-table-column>
                     </el-table>
+                    <div class="note" v-html="expData.dataDTO.note" />
                 </template>
                 <el-empty v-else description="暂无数据，请导出模板填写后导入" />
             </div>
@@ -224,7 +224,7 @@ export default {
                 padding: 10px;
                 position: relative;
                 .note {
-                    margin-bottom: 10px;
+                    margin-top: 10px;
                 }
             }
         }

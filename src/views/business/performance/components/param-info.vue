@@ -346,10 +346,10 @@
                             />
                         </el-form-item>
                     </el-col>
-                    <el-col v-if="isShow('range')" :span="12">
-                        <el-form-item prop="shiYanCanShu.range" :show-message="false">
+                    <el-col v-if="isShow('rangeValue')" :span="12">
+                        <el-form-item prop="shiYanCanShu.rangeValue" :show-message="false">
                             <template slot="label">
-                                <span>{{ getAttrs('range', 'label', false) }}</span>
+                                <span>{{ getAttrs('rangeValue', 'label', false) }}</span>
                                 <el-tooltip
                                     class="item"
                                     effect="dark"
@@ -360,12 +360,12 @@
                                 </el-tooltip>
                             </template>
                             <el-input-number
-                                v-model="pageInfo.range"
+                                v-model="pageInfo.rangeValue"
                                 type="number"
-                                :min="getAttrs('range', 'min')"
-                                :max="getAttrs('range', 'max')"
+                                :min="getAttrs('rangeValue', 'min')"
+                                :max="getAttrs('rangeValue', 'max')"
                                 :step="0.01"
-                                :precision="getAttrs('range', 'precision')"
+                                :precision="getAttrs('rangeValue', 'precision')"
                                 :disabled="readonly"
                                 placeholder="请输入"
                             />
@@ -433,7 +433,7 @@ export default {
             temp.allowableSDl = []
             temp.targetValue = []
             temp.claimValue = []
-            temp.rangeValue = temp.range ? [100 - parseFloat(temp.range) * 100, 100 + parseFloat(temp.range) * 100] : []
+            temp.range = temp.rangeValue ? [100 - parseFloat(temp.rangeValue) * 100, 100 + parseFloat(temp.rangeValue) * 100] : []
         }
         this.pageInfo = temp || { model: [], targetValue: [], specimensName: [] }
     },
@@ -453,6 +453,10 @@ export default {
                 this.pageInfo.specimensName = s.concat(Array.from({ length: v - s.length }, (_, index) => `水平${index + s.length + 1}`))
             } else {
                 this.pageInfo.specimensName.splice(v)
+                this.pageInfo.allowableSDr.splice(v)
+                this.pageInfo.allowableSDl.splice(v)
+                this.pageInfo.targetValue.splice(v)
+                this.pageInfo.claimValue.splice(v)
             }
         },
         handleCvsChange () {
@@ -490,6 +494,7 @@ export default {
                             .el-form-item__content {
                                 display: flex;
                                 justify-content: flex-start;
+                                flex-wrap: wrap;
                                 > .el-input {
                                     max-width: 120px;
                                     margin-right: 10px;
@@ -500,11 +505,11 @@ export default {
                             }
                         }
                         .inline-input {
-                            width: 100px;
+                            width: 120px;
                             vertical-align: bottom;
                         }
                         .inline-number {
-                            width: 140px;
+                            width: 120px;
                             margin-right: 10px;
                             &:last-of-type {
                                 margin-right: 0;

@@ -54,9 +54,12 @@ export default {
             default: () => []
         }
     },
-    data () {
-        return {
-
+    watch: {
+        chartData: {
+            handler (val) {
+                this.initChart()
+            },
+            deep: true
         }
     },
     mounted () {
@@ -64,7 +67,7 @@ export default {
     },
     methods: {
         initChart () {
-            console.log(LROption, SPOption)
+            // console.log(LROption, SPOption)
             this.chartData.forEach(item => {
                 const chart = echarts.init(document.getElementById(item.id))
                 console.log(item.option)
@@ -86,9 +89,17 @@ export default {
                 // color: #606266;
                 // font-size: 14px;
                 // line-height: 1.5;
-                .chart-item {
-                    height: 300px;
-                    width: 100%;
+                .form-row {
+                    display: flex;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    .chart-item {
+                        height: 300px;
+                        width: 100%;
+                    }
+                    .note {
+                        text-align: center;
+                    }
                 }
             }
         }

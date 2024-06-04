@@ -151,7 +151,8 @@ export default {
                 // { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
-            ]
+            ],
+            validateList: ['targetValue', 'allowableSDr', 'allowableSDl', 'claimValue']
         }
     },
     watch: {
@@ -246,8 +247,27 @@ export default {
         handleGenerate () {
             this.$message.info('waiting...')
         },
+        judgeArrayData (data) {
+            if (!data || !data.length) {
+                return true
+            }
+            return data.length === data.filter(i => this.$utils.isNotEmpty(i)).length
+        },
         submitForm (key, showMsg, callback) {
             const { shiYanCanShu, shiYanShuJu, jiSuanJieGuo, ...rest } = this.form || {}
+            const { rangeValue } = shiYanCanShu || {}
+            shiYanCanShu.range = rangeValue ? [100 - parseFloat(rangeValue) * 100, 100 + parseFloat(rangeValue) * 100] : []
+            // 校验数组数据
+            for (let i = 0; i <= this.validateList.length; i++) {
+                const item = this.validateList[i]
+                if (this.judgeArrayData(shiYanCanShu[item])) {
+                    continue
+                }
+                const t = this.configData.params.find(p => p.key === item)
+                const msg = t ? `${t.label}填写不完整，请补充后再提交` : '性能验证实验参数部分信息填写不完整，请补充后再提交'
+                return this.$message.warning(msg)
+            }
+            // 组装提交数据
             const submitData = {
                 ...rest,
                 shiYanCanShu: this.$utils.isNotEmpty(shiYanCanShu) ? JSON.stringify(shiYanCanShu) : null,
@@ -394,18 +414,7 @@ export default {
                         youXiaoQi: '2025-05-01'
                     }
                 ],
-                shiYanCanShu: {
-                    specimensNum: 2,
-                    repeatNum: 3,
-                    days: 5,
-                    isConvert: false,
-                    standard: '基于允许总误差TEa',
-                    tea: 10,
-                    batchCVS: 0.25,
-                    batchCVSValue: 2.50,
-                    dailyCVS: 0.33,
-                    dailyCVSValue: 3.33
-                },
+                shiYanCanShu: {},
                 shiYanShuJu: [],
                 shiYanJieLun: '测试达标',
                 shenHeRen: '1166673437578493952',

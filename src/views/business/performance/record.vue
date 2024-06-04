@@ -80,8 +80,8 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'xingNengZhiBia', label: '性能指标', tags: [], minWidth: 110 },
-                    { prop: 'fangAnLeiXing', label: '方案类型', tags: [], width: 125 },
+                    { prop: 'xingNengZhiBia', label: '性能指标', tags: [], width: 120 },
+                    { prop: 'fangAnLeiXing', label: '方案类型', tags: [], minWidth: 125 },
                     { prop: 'shiYanXiangMu', label: '实验项目', width: 120 },
                     { prop: 'shiYanFangFa', label: '实验方法', width: 120 },
                     { prop: 'yangBenLeiXing', label: '样本类型', width: 100 },
