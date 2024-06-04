@@ -251,7 +251,7 @@
                                     </el-button>
                                 </div>
                                 <el-table
-                                    :ref="`configTable${mIndex}`"
+                                    ref="configTable"
                                     :data="method.params"
                                     border
                                     stripe
@@ -317,7 +317,7 @@
                                     </el-button>
                                 </div>
                                 <el-table
-                                    :ref="`formulaTable${mIndex}`"
+                                    ref="formulaTable"
                                     :data="method.formulas"
                                     border
                                     stripe
@@ -398,7 +398,7 @@
                                     </el-button>
                                 </div>
                                 <el-table
-                                    :ref="`chartTable${mIndex}`"
+                                    ref="chartTable"
                                     :data="method.chartOption"
                                     border
                                     stripe
@@ -577,19 +577,19 @@ export default {
             })
         },
         handleTabClick (tab) {
-            const t = this.methodTabs.findIndex(item => item.methodName === tab.methodName)
+            const t = this.methodTabs.findIndex(item => item.methodName === tab.name)
             // 外层tab切换清除选中数据
             if (t !== this.activeTabIndex) {
                 this.$nextTick(() => {
-                    this.activeTabIndex = t
                     this.selectionIndex = {
                         params: [],
                         formulas: [],
                         chartOption: []
                     }
-                    this.$refs[`configTable${this.activeTabIndex}`].clearSelection()
-                    this.$refs[`formulaTable${this.activeTabIndex}`].clearSelection()
-                    this.$refs[`chartOption${this.activeTabIndex}`].clearSelection()
+                    this.$refs.configTable[this.activeTabIndex].clearSelection()
+                    this.$refs.formulaTable[this.activeTabIndex].clearSelection()
+                    this.$refs.chartTable[this.activeTabIndex].clearSelection()
+                    this.activeTabIndex = t
                 })
             }
         },
