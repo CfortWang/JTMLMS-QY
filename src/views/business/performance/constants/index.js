@@ -95,7 +95,7 @@ export const formRules = {
         message: '请输入',
         trigger: 'change'
     }],
-    'shiYanCanShu.range': [{
+    'shiYanCanShu.rangeValue': [{
         required: false,
         message: '请输入',
         trigger: 'change'
@@ -345,18 +345,182 @@ export const methodKeyOption = [
     }
 ]
 
+export const basicParam = [
+    {
+        label: '浓度水平数',
+        key: 'specimensNum',
+        type: 'number',
+        min: 0,
+        precision: 0,
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '重复次数',
+        key: 'repeatNum',
+        type: 'number',
+        min: 0,
+        precision: 0,
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '实验天数',
+        key: 'days',
+        type: 'number',
+        min: 0,
+        precision: 0,
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '对数转换',
+        key: 'isConvert',
+        type: 'switch',
+        fieldOption: {
+            activeText: '是',
+            inactiveText: '否',
+            activeValue: true,
+            inactiveValue: false
+        },
+        default: false,
+        isVisible: false,
+        isReadonly: false
+    },
+    {
+        label: '浓度水平名',
+        key: 'specimensName',
+        type: 'string',
+        isVisible: true,
+        isReadonly: false
+    }
+]
+
+export const paramList = [
+    ...basicParam,
+    {
+        label: '方法数',
+        key: 'methodNum',
+        type: 'number',
+        default: 2,
+        min: 0,
+        precision: 0,
+        isVisible: false,
+        isReadonly: false
+    },
+    {
+        label: 'TEa数值',
+        key: 'tea',
+        type: 'number',
+        min: 0,
+        precision: 0,
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '性能标准',
+        key: 'standard',
+        type: 'select',
+        fieldOption: {
+            selectOptions: standardOption
+        },
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '批内CVs',
+        key: 'batchCVS',
+        type: 'select',
+        fieldOption: {
+            selectOptions: batchOption
+        },
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '批间CVs',
+        key: 'dailyCVS',
+        type: 'select',
+        fieldOption: {
+            selectOptions: batchOption
+        },
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '偏倚',
+        key: 'batchCVS',
+        type: 'select',
+        fieldOption: {
+            selectOptions: batchOption
+        },
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '假失控率',
+        key: 'rejectionRate',
+        type: 'select',
+        fieldOption: {
+            selectOptions: rateOption
+        },
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '靶值',
+        key: 'targetValue',
+        type: 'number',
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '厂商声明差值（偏倚）',
+        key: 'claimValue',
+        type: 'string',
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '不确定度',
+        key: 'claimValue',
+        type: 'string',
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '判断标准R2≥',
+        key: 'allowableR2',
+        type: 'number',
+        default: 0.995,
+        min: 0,
+        precision: 3,
+        isVisible: true,
+        isReadonly: false
+    },
+    {
+        label: '稀释回收率',
+        key: 'rangeValue',
+        type: 'number',
+        default: 0.1,
+        min: 0,
+        max: 1,
+        precision: 2,
+        isVisible: true,
+        isReadonly: false
+    }
+]
+
 export const paramColumn = [
-    { label: '名称', key: 'label', width: '180px' },
-    { label: '编码', key: 'key', width: '150px' },
-    { label: '默认值', key: 'default', minWidth: '120px' },
+    { label: '参数', key: 'key', width: '180px', type: 'select', options: paramList },
+    { label: '名称', key: 'label', minWidth: '120px' },
+    { label: '默认值', key: 'default', width: '200px' },
     { label: '最小值', key: 'min', type: 'number', min: 0, precision: 0, width: '150px' },
     { label: '最大值', key: 'max', type: 'number', min: 0, precision: 0, width: '150px' },
     { label: '精度', key: 'precision', type: 'number', min: 0, max: 4, width: '120px' },
     { label: '是否显示', key: 'isVisible', type: 'switch', width: '100px' },
     { label: '是否只读', key: 'isReadonly', type: 'switch', width: '100px' }
 ]
-
-export const paramList = []
 
 export const formulaList = [
     {

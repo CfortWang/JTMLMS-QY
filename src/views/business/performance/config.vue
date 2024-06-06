@@ -274,25 +274,95 @@
                                         align="center"
                                     >
                                         <template slot-scope="scope">
-                                            <el-switch
-                                                v-if="item.type === 'switch'"
-                                                v-model="scope.row[item.key]"
-                                                :disabled="readonly && method.isBasic === 'Y'"
-                                            />
-                                            <el-input-number
-                                                v-else-if="item.type === 'number'"
-                                                v-model="scope.row[item.key]"
-                                                type="number"
-                                                :disabled="readonly && method.isBasic === 'Y'"
-                                                :min="item.min"
-                                                :max="item.max"
-                                                :precision="item.precision"
-                                            />
-                                            <el-input
-                                                v-else
-                                                v-model="scope.row[item.key]"
-                                                :disabled="readonly && method.isBasic === 'Y'"
-                                            />
+                                            <template v-if="item.key === 'default' && scope.row.key">
+                                                <!-- 对 default 列进行特殊处理 -->
+                                                <el-input-number
+                                                    v-if="paramListMap[scope.row.key].type === 'number'"
+                                                    v-model="scope.row[item.key]"
+                                                    type="number"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                    :min="paramListMap[scope.row.key].min"
+                                                    :max="paramListMap[scope.row.key].max"
+                                                    :precision="paramListMap[scope.row.key].precision"
+                                                />
+                                                <el-select
+                                                    v-else-if="paramListMap[scope.row.key].type === 'select'"
+                                                    v-model="scope.row[item.key]"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                    placeholder="请选择"
+                                                    filterable
+                                                >
+                                                    <el-option
+                                                        v-for="(f, index) in paramListMap[scope.row.key].fieldOption.selectOptions"
+                                                        :key="index"
+                                                        :label="f.label"
+                                                        :value="f.value"
+                                                    />
+                                                </el-select>
+                                                <el-switch
+                                                    v-else-if="paramListMap[scope.row.key].type === 'switch'"
+                                                    v-model="scope.row[item.key]"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                    :active-text="paramListMap[scope.row.key].fieldOption.activeText"
+                                                    :inactive-text="paramListMap[scope.row.key].fieldOption.inactiveText"
+                                                    :active-value="paramListMap[scope.row.key].fieldOption.activeValue"
+                                                    :inactive-value="paramListMap[scope.row.key].fieldOption.inactiveValue"
+                                                />
+                                                <el-input
+                                                    v-else
+                                                    v-model="scope.row[item.key]"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                />
+                                            </template>
+                                            <template v-else-if="['min', 'max', 'precision'].includes(item.key) && scope.row.key">
+                                                <el-input-number
+                                                    v-if="paramListMap[scope.row.key].type === 'number'"
+                                                    v-model="scope.row[item.key]"
+                                                    type="number"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                    :min="paramListMap[scope.row.key].min"
+                                                    :max="paramListMap[scope.row.key].max"
+                                                    :precision="paramListMap[scope.row.key].precision"
+                                                />
+                                                <div v-else>/</div>
+                                            </template>
+                                            <template v-else>
+                                                <el-switch
+                                                    v-if="item.type === 'switch'"
+                                                    v-model="scope.row[item.key]"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                />
+                                                <el-input-number
+                                                    v-else-if="item.type === 'number'"
+                                                    v-model="scope.row[item.key]"
+                                                    type="number"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                    :min="item.min"
+                                                    :max="item.max"
+                                                    :precision="item.precision"
+                                                />
+                                                <el-select
+                                                    v-else-if="item.type === 'select'"
+                                                    v-model="scope.row[item.key]"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                    placeholder="请选择"
+                                                    filterable
+                                                    @change="handleFieldChange(mIndex, scope, item.key, 'params')"
+                                                >
+                                                    <el-option
+                                                        v-for="(f, index) in item.options"
+                                                        :key="index"
+                                                        :label="f.key"
+                                                        :value="f.key"
+                                                        :disabled="method.params.map(i => i.key).includes(f.key)"
+                                                    />
+                                                </el-select>
+                                                <el-input
+                                                    v-else
+                                                    v-model="scope.row[item.key]"
+                                                    :disabled="readonly && method.isBasic === 'Y'"
+                                                />
+                                            </template>
                                         </template>
                                     </el-table-column>
                                     <el-table-column v-if="!readonly" fixed="right" label="操作" width="50" header-align="center" align="center">
@@ -336,7 +406,6 @@
                                         :label="item.label"
                                         :width="item.width"
                                         :min-width="item.minWidth"
-                                        :style="item.visible === false ? 'display: none;' : ''"
                                         header-align="center"
                                         align="center"
                                     >
@@ -353,7 +422,7 @@
                                                 placeholder="请选择"
                                                 allow-create
                                                 filterable
-                                                @change="handleFormulaChange(mIndex, scope, item.key, 'formulas', ['key', 'value'])"
+                                                @change="handleFieldChange(mIndex, scope, item.key, 'formulas')"
                                             >
                                                 <el-option
                                                     v-for="(f, index) in item.options"
@@ -417,7 +486,6 @@
                                         :label="item.label"
                                         :width="item.width"
                                         :min-width="item.minWidth"
-                                        :style="item.visible === false ? 'display: none;' : ''"
                                         header-align="center"
                                         align="center"
                                     >
@@ -544,6 +612,14 @@ export default {
                 templateDesc: '',
                 chartOption: []
             }
+        }
+    },
+    computed: {
+        paramListMap () {
+            return this.paramList.reduce((acc, cur) => {
+                acc[cur.key] = cur
+                return acc
+            }, {})
         }
     },
     watch: {
@@ -701,9 +777,19 @@ export default {
         handleSelectionChange (v, data, type) {
             this.selectionIndex[type] = v.map(item => data.indexOf(item))
         },
-        handleFormulaChange (methodIndex, { $index, row }, key, type, args) {
-            const t = formulaList.find(i => i[key] === row[key])
-            args.forEach(i => {
+        handleFieldChange (methodIndex, { $index, row }, key, type) {
+            const args = {
+                params: ['label', 'default', 'max', 'min', 'precision', 'isVisible', 'isReadonly'],
+                formulas: ['key', 'value'],
+                chartOption: []
+            }
+            const dataset = {
+                params: this.paramList,
+                formulas: this.formulaList,
+                chartOption: this.chartList
+            }
+            const t = dataset[type].find(i => i[key] === row[key])
+            args[type].forEach(i => {
                 this.methodTabs[methodIndex][type][$index][i] = t ? t[i] : ''
             })
         },
@@ -847,6 +933,9 @@ export default {
                                 .edui-editor {
                                     width: auto !important;
                                 }
+                            }
+                            .hidden-column {
+                                display: none;
                             }
                         }
                     }
