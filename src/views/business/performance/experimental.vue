@@ -43,7 +43,7 @@
                 </div>
                 <div class="right">
                     <experimental-data
-                        :exp-data="form.jiSuanJieGuo"
+                        :exp="form.jiSuanJieGuo"
                         :form-id="formId"
                         :readonly="readonly"
                         @export="handleExport"
@@ -254,7 +254,7 @@ export default {
             return data.length === data.filter(i => this.$utils.isNotEmpty(i)).length
         },
         submitForm (key, showMsg, callback) {
-            const { shiYanCanShu, shiYanShuJu, jiSuanJieGuo, ...rest } = this.form || {}
+            const { kaiShiShiJian, jieShuShiJian, shiYanCanShu, shiYanShuJu, jiSuanJieGuo, ...rest } = this.form || {}
             const { rangeValue } = shiYanCanShu || {}
             shiYanCanShu.range = rangeValue ? [100 - parseFloat(rangeValue) * 100, 100 + parseFloat(rangeValue) * 100] : []
             // 校验数组数据
@@ -266,6 +266,9 @@ export default {
                 const t = this.configData.params.find(p => p.key === item)
                 const msg = t ? `${t.label}填写不完整，请补充后再提交` : '性能验证实验参数部分信息填写不完整，请补充后再提交'
                 return this.$message.warning(msg)
+            }
+            if (new Date(kaiShiShiJian) > new Date(jieShuShiJian)) {
+                return this.$message.warning('实验开始时间不能大于实验结束时间！')
             }
             // 组装提交数据
             const submitData = {
@@ -318,7 +321,7 @@ export default {
         handleExport () {
             this.handleSubmit('beforeExport', false, () => {
                 exportTemplate({ id: this.formId }).then(res => {
-                    ActionUtils.download(res.data, `${this.form.fangAnLeiXing}-${this.form.shiYanXiangMu}.xlsx`)
+                    ActionUtils.download(res.data, `${this.configData.methodName}-${this.form.shiYanXiangMu}.xlsx`)
                 })
             })
         },
@@ -341,6 +344,7 @@ export default {
                     importTemplate(data).then(res => {
                         this.$message.success('实验数据导入成功')
                         this.form.jiSuanJieGuo = res.data
+                        this.form.shiYanJieLun = res.data.reportResult
                     }).catch(({ state, cause }) => {
                         const errMsg = JSON.parse(cause)
                         let msgContent = ''
@@ -414,14 +418,16 @@ export default {
                         youXiaoQi: '2025-05-01'
                     }
                 ],
-                shiYanCanShu: {},
-                shiYanShuJu: [],
-                shiYanJieLun: '测试达标',
                 shenHeRen: '1166673437578493952',
                 baoGaoShiJian: '2024-05-06',
                 fuJian: '1239940596743798784'
             }
-            this.form = JSON.parse(JSON.stringify(o))
+            const t = JSON.parse(JSON.stringify(o))
+            this.form = {
+                ...this.form,
+                ...t,
+                shiYanCanShu: this.form.shiYanCanShu
+            }
         }
     }
 }

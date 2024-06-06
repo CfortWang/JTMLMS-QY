@@ -23,6 +23,7 @@
                 <el-select
                     v-model="reagentForm.leiBie"
                     filterable
+                    allow-create
                     clearable
                     :disabled="readonly"
                     placeholder="请选择"

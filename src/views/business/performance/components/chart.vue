@@ -85,14 +85,12 @@ export default {
     .info-container {
         .chart {
             .chart-container {
-                // white-space: pre-wrap;
-                // color: #606266;
-                // font-size: 14px;
-                // line-height: 1.5;
                 .form-row {
                     display: flex;
-                    justify-content: center;
                     flex-wrap: wrap;
+                    > *:only-child {
+                        margin: 0 auto;
+                    }
                     .chart-item {
                         height: 300px;
                         width: 100%;

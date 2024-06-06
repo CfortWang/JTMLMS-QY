@@ -102,7 +102,7 @@
                 </el-row>
                 <el-row v-if="isShow('targetValue')" :gutter="20" class="form-row">
                     <el-col :span="24">
-                        <el-form-item prop="targetValue" :show-message="false" class="inline-item">
+                        <el-form-item prop="shiYanCanShu.targetValue" :show-message="false" class="inline-item">
                             <template slot="label">
                                 <span>{{ getAttrs('targetValue', 'label', false) }}</span>
                                 <el-tooltip
@@ -129,7 +129,7 @@
                 </el-row>
                 <el-row v-if="isShow('claimValue')" :gutter="20" class="form-row">
                     <el-col :span="24">
-                        <el-form-item prop="claimValue" :show-message="false" class="inline-item">
+                        <el-form-item prop="shiYanCanShu.claimValue" :show-message="false" class="inline-item">
                             <template slot="label">
                                 <span>{{ getAttrs('claimValue', 'label', false) }}</span>
                                 <el-tooltip
@@ -165,7 +165,7 @@
                 </el-row>
                 <el-row :gutter="20" class="form-row">
                     <el-col v-if="isShow('rejectionRate')" :span="12">
-                        <el-form-item :label="getAttrs('rejectionRate', 'label', false)" prop="rejectionRate" :show-message="false">
+                        <el-form-item :label="getAttrs('rejectionRate', 'label', false)" prop="shiYanCanShu.rejectionRate" :show-message="false">
                             <el-select
                                 v-model="pageInfo.rejectionRate"
                                 clearable
@@ -202,7 +202,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col v-if="pageInfo.standard === '基于允许总误差TEa' && isShow('tea')" :span="12">
-                        <el-form-item label="TEa数值" prop="tea" :show-message="false">
+                        <el-form-item label="TEa数值" prop="shiYanCanShu.tea" :show-message="false">
                             <el-input-number
                                 v-model="pageInfo.tea"
                                 type="number"

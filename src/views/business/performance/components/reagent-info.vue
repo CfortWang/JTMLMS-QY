@@ -163,14 +163,28 @@ export default {
                 results.forEach(item => {
                     const obj = {}
                     Object.keys(item).forEach(key => {
-                        console.log(key)
                         if (keys[key]) {
                             obj[keys[key]] = item[key]
                         }
                     })
                     list.push(obj)
                 })
-                this.reagentData = Array.from(this.reagentData.concat(list))
+                const keysValue = Object.values(keys)
+                const isError = list.some(item => keysValue.some(key => !item[key]))
+                if (isError || !list.length) {
+                    return this.$message.warning('导出模板中的每一项都需填写，请检查您的数据！')
+                }
+                const dateRegex = /^(\d{4})[-/](\d{2})(?:[-/](\d{2}))?$/
+                const isDateError = list.some(item => {
+                    return !dateRegex.test(item.youXiaoQi)
+                })
+                if (isDateError) {
+                    return this.$message.warning('有效期格式支持【2024-01】、【2024/01】、【2024-01-01】、【2024/01/01】，请检查您的数据！')
+                }
+                list.forEach(item => {
+                    item.youXiaoQi = item.youXiaoQi.replace(/\//g, '-')
+                })
+                this.reagentData.push(...list)
                 this.showImportTable = false
             })
         },

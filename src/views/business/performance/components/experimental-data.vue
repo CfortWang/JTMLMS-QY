@@ -79,7 +79,7 @@ export default {
         ImportTable: () => import('@/business/platform/form/formrender/dynamic-form/components/import-table')
     },
     props: {
-        expData: {
+        exp: {
             type: Object,
             default: () => {}
         },
@@ -94,12 +94,21 @@ export default {
     },
     data () {
         return {
+            expData: this.exp,
             showImportTable: false,
             toolbars: [
                 { key: 'export', icon: 'ibps-icon-cloud-download', label: '导出模板', type: 'info', hidden: this.readonly },
                 { key: 'import', icon: 'ibps-icon-cloud-upload', label: '导入数据', type: 'warning', hidden: this.readonly },
                 { key: 'generate', icon: 'ibps-icon-file-text-o', label: '查看实验报告', type: 'success', hidden: true }
             ]
+        }
+    },
+    watch: {
+        exp: {
+            handler (val) {
+                this.expData = val
+            },
+            deep: true
         }
     },
     methods: {

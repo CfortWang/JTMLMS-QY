@@ -69,6 +69,7 @@
                                     </el-table-column>
                                 </el-table-column>
                             </el-table>
+                            <div class="note" v-html="table.note" />
                         </div>
                     </div>
                 </el-tab-pane>
@@ -142,7 +143,8 @@ export default {
                 title: k,
                 header: reportDataDTO[k].header || this.getTableHeader(reportDataDTO[k].list),
                 hideHeader: this.$utils.isEmpty(reportDataDTO[k].header),
-                list: reportDataDTO[k].list
+                list: reportDataDTO[k].list,
+                note: reportDataDTO[k].note
             })).sort((a, b) => a.title.localeCompare(b.title)) : []
             const chartData = chartDataDTO ? Object.keys(chartDataDTO).map(k => ({
                 title: k,
@@ -238,6 +240,9 @@ export default {
                             margin-top: 0;
                         }
                     }
+                }
+                .note {
+                    margin-top: 10px;
                 }
             }
         }

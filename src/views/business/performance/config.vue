@@ -322,7 +322,7 @@
                                                     :disabled="readonly && method.isBasic === 'Y'"
                                                     :min="paramListMap[scope.row.key].min"
                                                     :max="paramListMap[scope.row.key].max"
-                                                    :precision="paramListMap[scope.row.key].precision"
+                                                    :precision="item.key === 'precision' ? 0 : paramListMap[scope.row.key].precision"
                                                 />
                                                 <div v-else>/</div>
                                             </template>
@@ -737,15 +737,20 @@ export default {
             const { methods = [] } = data
             var msg = ''
             for (const item of methods) {
-                const { methodName, step, criterion, params = [], formulas = [], template, chartOption = [] } = item
-                if (!step || !criterion || !template || !params.length) {
+                const { methodName, step, criterion, params = [], formulas = [], template, chartOption = [], isDisabled } = item
+                if (!step || !criterion || !template) {
                     msg = `【${methodName}】实验步骤、判定标准、结论模板、实验参数为必填信息，请补充完整`
                     break
                 }
-                const pE = params.some(i => !i.key || !i.label)
+                const pE1 = !(params && params.length) && isDisabled === 'N'
+                const pE2 = params.some(i => !i.key || !i.label)
                 const fE = formulas && formulas.length && formulas.some(i => !i.key || !i.label || !i.value)
                 const cE = chartOption && chartOption.length && chartOption.some(i => !i.key || !i.label || !i.value)
-                if (pE) {
+                if (pE1) {
+                    msg = `【${methodName}】未配置实验参数，请配置实验参数或将方法禁用！`
+                    break
+                }
+                if (pE2) {
                     msg = `【${methodName}】实验参数中的参数、名称为必填信息，请补充完整`
                     break
                 }

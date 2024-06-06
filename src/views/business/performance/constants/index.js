@@ -85,7 +85,42 @@ export const formRules = {
         message: '请输入',
         trigger: 'change'
     }],
+    'shiYanCanShu.specimensName': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
     'shiYanCanShu.model': [{
+        required: true,
+        message: '请选择',
+        trigger: 'change'
+    }],
+    'shiYanCanShu.tea': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'shiYanCanShu.targetValue': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'shiYanCanShu.claimValue': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
+    'shiYanCanShu.rejectionRate': [{
+        required: true,
+        message: '请选择',
+        trigger: 'change'
+    }],
+    'shiYanCanShu.batchCVS': [{
+        required: true,
+        message: '请选择',
+        trigger: 'change'
+    }],
+    'shiYanCanShu.dailyCVS': [{
         required: true,
         message: '请选择',
         trigger: 'change'
@@ -418,7 +453,7 @@ export const paramList = [
         key: 'tea',
         type: 'number',
         min: 0,
-        precision: 0,
+        precision: 2,
         isVisible: true,
         isReadonly: false
     },
@@ -453,16 +488,6 @@ export const paramList = [
         isReadonly: false
     },
     {
-        label: '偏倚',
-        key: 'batchCVS',
-        type: 'select',
-        fieldOption: {
-            selectOptions: batchOption
-        },
-        isVisible: true,
-        isReadonly: false
-    },
-    {
         label: '假失控率',
         key: 'rejectionRate',
         type: 'select',
@@ -476,20 +501,17 @@ export const paramList = [
         label: '靶值',
         key: 'targetValue',
         type: 'number',
-        isVisible: true,
-        isReadonly: false
-    },
-    {
-        label: '厂商声明差值（偏倚）',
-        key: 'claimValue',
-        type: 'string',
+        min: 0,
+        precision: 2,
         isVisible: true,
         isReadonly: false
     },
     {
         label: '不确定度',
         key: 'claimValue',
-        type: 'string',
+        type: 'number',
+        min: 0,
+        precision: 2,
         isVisible: true,
         isReadonly: false
     },
