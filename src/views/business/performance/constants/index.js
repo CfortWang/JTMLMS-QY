@@ -342,6 +342,11 @@ export const methodKeyOption = [
         type: 'linearRange',
         label: '线性稀释回收法',
         value: '线性区间:线性稀释回收法'
+    },
+    {
+        type: 'linearRange',
+        label: 'WST408线性评价',
+        value: '线性区间:WST408线性评价'
     }
 ]
 

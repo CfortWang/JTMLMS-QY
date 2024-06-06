@@ -129,7 +129,7 @@
                         </template>
                         <el-row :gutter="20" class="form-row">
                             <el-col :span="8">
-                                <el-form-item label="方法名称" :prop="`methods[${mIndex}].methodName`" :show-message="false">
+                                <el-form-item label="方法名称" :prop="`methods[${mIndex}].methodName`" required :show-message="false">
                                     <el-input
                                         v-model="method.methodName"
                                         type="text"
@@ -141,7 +141,7 @@
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8">
-                                <el-form-item label="方法类型" :prop="`methods[${mIndex}].methodType`" :show-message="false">
+                                <el-form-item label="方法类型" :prop="`methods[${mIndex}].methodType`" required :show-message="false">
                                     <el-select
                                         v-model="method.methodType"
                                         :disabled="readonly && method.isBasic === 'Y'"
@@ -157,7 +157,7 @@
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8">
-                                <el-form-item label="方法KEY" :prop="`methods[${mIndex}].methodKey`" :show-message="false">
+                                <el-form-item label="方法KEY" :prop="`methods[${mIndex}].methodKey`" required :show-message="false">
                                     <el-select
                                         v-model="method.methodKey"
                                         :disabled="readonly && method.isBasic === 'Y'"
@@ -733,14 +733,50 @@ export default {
                     break
             }
         },
+        validate (data) {
+            const { methods = [] } = data
+            var msg = ''
+            for (const item of methods) {
+                const { methodName, step, criterion, params = [], formulas = [], template, chartOption = [] } = item
+                if (!step || !criterion || !template || !params.length) {
+                    msg = `【${methodName}】实验步骤、判定标准、结论模板、实验参数为必填信息，请补充完整`
+                    break
+                }
+                const pE = params.some(i => !i.key || !i.label)
+                const fE = formulas && formulas.length && formulas.some(i => !i.key || !i.label || !i.value)
+                const cE = chartOption && chartOption.length && chartOption.some(i => !i.key || !i.label || !i.value)
+                if (pE) {
+                    msg = `【${methodName}】实验参数中的参数、名称为必填信息，请补充完整`
+                    break
+                }
+                if (fE) {
+                    msg = `【${methodName}】实验公式中的名称、编码及表达式为必填信息，请补充完整或删除空数据`
+                    break
+                }
+                if (cE) {
+                    msg = `【${methodName}】图表配置中的名称、编码及配置项为必填信息，请补充完整或删除空数据`
+                    break
+                }
+            }
+            if (msg) {
+                this.$message.warning(msg)
+                return false
+            }
+            return true
+        },
         handleSave () {
             this.$refs.configForm.validate((valid) => {
                 if (!valid) {
                     return this.$message.warning('请完善表单必填项信息！')
                 }
+                const isValidate = this.validate(this.formData)
+                if (!isValidate) {
+                    return
+                }
                 const submitData = JSON.parse(JSON.stringify(this.formData))
                 submitData.methods.forEach(item => {
-                    item.params = JSON.stringify(item.params)
+                    const temp = this.getNumberStep(item.params)
+                    item.params = JSON.stringify(temp)
                     item.formulas = JSON.stringify(item.formulas)
                     item.chartOption = JSON.stringify(item.chartOption)
                 })
@@ -814,6 +850,19 @@ export default {
                     this.formData.methods[methodIndex][type].splice(i, 1)
                 })
             }).catch(() => {})
+        },
+        // 获取数值类型参数步长
+        getNumberStep (data) {
+            if (!data || !data.length) {
+                return []
+            }
+            return data.map(item => {
+                if (this.$utils.isNotEmpty(item.precision)) {
+                    return { ...item, step: 10 ** -item.precision }
+                } else {
+                    return item
+                }
+            })
         },
         // 提交数据
         submitForm (data) {
@@ -910,7 +959,7 @@ export default {
                     .el-tabs__nav-wrap.is-scrollable {
                         width: calc(100% - 100px);
                     }
-                    .outer-tabs {
+                                        .outer-tabs {
                         .el-tabs__content {
                             height: calc(100vh - 290px);
                             overflow: auto;
