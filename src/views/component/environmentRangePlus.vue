@@ -133,22 +133,23 @@ export default {
         packageObj() {
             const obj = {
                 temperature: {
-                    min: this.environmentInfo.temperatureMin || this.environmentInfo.minTemperature,
-                    max: this.environmentInfo.temperatureMax || this.environmentInfo.maxTemperature,
+                    min: this.environmentInfo.temperatureMin, // || this.environmentInfo.minTemperature,
+                    max: this.environmentInfo.temperatureMax // || this.environmentInfo.maxTemperature,
                 },
                 humidity: {
-                    min: this.environmentInfo.humidityMin || this.environmentInfo.minHumidity,
-                    max: this.environmentInfo.humidityMax || this.environmentInfo.maxHumidity,
+                    min: this.environmentInfo.humidityMin, // || this.environmentInfo.minHumidity,
+                    max: this.environmentInfo.humidityMax // || this.environmentInfo.maxHumidity,
                 },
             };
             return JSON.stringify(obj);
         },
         resolveObj(jsonString = "") {
             const data = jsonString.trim() !== "" && JSON.parse(jsonString);
-            this.environmentInfo.temperatureMin = data?.temperature?.min || this.environmentInfo.temperatureMin;
-            this.environmentInfo.temperatureMax = data?.temperature?.max || this.environmentInfo.temperatureMax;
-            this.environmentInfo.humidityMin = data?.humidity?.min || this.environmentInfo.humidityMin;
-            this.environmentInfo.humidityMax = data?.humidity?.max || this.environmentInfo.humidityMax;
+            this.environmentInfo.temperatureMin = data?.temperature?.min // || this.environmentInfo.temperatureMin;
+            this.environmentInfo.temperatureMax = data?.temperature?.max // || this.environmentInfo.temperatureMax;
+            this.environmentInfo.humidityMin = data?.humidity?.min // || this.environmentInfo.humidityMin;
+            this.environmentInfo.humidityMax = data?.humidity?.max // || this.environmentInfo.humidityMax;
+            console.log(data,this.environmentInfo)
         },
         // 关闭当前窗口
         closeDialog() {
