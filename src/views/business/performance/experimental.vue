@@ -146,13 +146,13 @@ export default {
             loading: false,
             loadCompleted: false,
             toolbars: [
-                // { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
+                { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success', hidden: this.readonly },
                 // { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ],
-            validateList: ['targetValue', 'allowableSDr', 'allowableSDl', 'claimValue']
+            validateList: ['specimensName', 'targetValue', 'allowableSDr', 'allowableSDl', 'claimValue']
         }
     },
     watch: {

@@ -201,9 +201,9 @@
                             <el-select
                                 v-model="pageInfo.standard"
                                 filterable
-                                clearable
                                 :disabled="readonly"
                                 placeholder="请选择"
+                                @change="handleStandardChange"
                             >
                                 <el-option
                                     v-for="(item, index) in standardOption"
@@ -220,7 +220,7 @@
                                 v-model="pageInfo.tea"
                                 type="number"
                                 :min="0"
-                                :step="getAttrs('standard', 'step')"
+                                :step="getAttrs('tea', 'step')"
                                 :precision="2"
                                 :disabled="readonly"
                                 placeholder="请输入"
@@ -475,6 +475,18 @@ export default {
                 this.pageInfo.allowableSDl.splice(v)
                 this.pageInfo.targetValue.splice(v)
                 this.pageInfo.claimValue.splice(v)
+            }
+        },
+        handleStandardChange (v) {
+            const temp = {
+                tea: null,
+                batchCVS: null,
+                allowableSDl: [],
+                allowableSDr: []
+            }
+            this.pageInfo = {
+                ...this.pageInfo,
+                ...temp
             }
         },
         handleCvsChange () {

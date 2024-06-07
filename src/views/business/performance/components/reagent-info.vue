@@ -203,6 +203,9 @@ export default {
             } else {
                 indexList = index
             }
+            if (!indexList.length) {
+                return this.$message.warning('请选择要删除的试剂！')
+            }
             indexList.sort((a, b) => b - a)
             this.$confirm('确定要删除选中试剂吗？', '提示', {
                 confirmButtonText: '确定',
@@ -212,6 +215,7 @@ export default {
                 indexList.forEach(i => {
                     this.reagentData.splice(i, 1)
                 })
+                this.selectionIndex = []
             }).catch(() => {})
         },
         updates (params) {
