@@ -146,7 +146,7 @@ export default {
             loading: false,
             loadCompleted: false,
             toolbars: [
-                { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
+                // { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success', hidden: this.readonly },
                 // { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
@@ -273,6 +273,8 @@ export default {
             // 组装提交数据
             const submitData = {
                 ...rest,
+                kaiShiShiJian,
+                jieShuShiJian,
                 shiYanCanShu: this.$utils.isNotEmpty(shiYanCanShu) ? JSON.stringify(shiYanCanShu) : null,
                 shiYanShuJu: this.$utils.isNotEmpty(shiYanShuJu) ? JSON.stringify(shiYanShuJu) : null,
                 jiSuanJieGuo: this.$utils.isNotEmpty(jiSuanJieGuo) ? JSON.stringify(jiSuanJieGuo) : null,

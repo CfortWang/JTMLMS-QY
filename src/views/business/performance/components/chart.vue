@@ -63,7 +63,9 @@ export default {
         }
     },
     mounted () {
-        this.initChart()
+        this.$nextTick(() => {
+            this.initChart()
+        })
     },
     methods: {
         initChart () {
@@ -75,6 +77,13 @@ export default {
                 // eslint-disable-next-line no-eval
                 const option = eval('(' + item.option + ')')
                 option.title.text = item.title
+                option.grid = option.grid || {
+                    left: '8%',
+                    right: '4%',
+                    bottom: '6%',
+                    top: '12%',
+                    containLabel: true
+                }
                 chart.setOption(option)
             })
         }

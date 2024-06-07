@@ -164,6 +164,19 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="form-row">
+                    <el-col v-if="isShow('uncertainty')" :span="12">
+                        <el-form-item :label="getAttrs('uncertainty', 'label', false)" prop="shiYanCanShu.uncertainty" :show-message="false">
+                            <el-input-number
+                                v-model="pageInfo.uncertainty"
+                                type="number"
+                                :min="0"
+                                :step="getAttrs('uncertainty', 'step')"
+                                :precision="getAttrs('uncertainty', 'precision')"
+                                :disabled="readonly"
+                                placeholder="请输入"
+                            />
+                        </el-form-item>
+                    </el-col>
                     <el-col v-if="isShow('rejectionRate')" :span="12">
                         <el-form-item :label="getAttrs('rejectionRate', 'label', false)" prop="shiYanCanShu.rejectionRate" :show-message="false">
                             <el-select

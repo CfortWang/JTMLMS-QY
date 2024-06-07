@@ -58,7 +58,7 @@
                                 />
                             </el-form-item>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="6">
                             <el-form-item label="指标类型" prop="targetKey" :show-message="false">
                                 <el-input
                                     v-model="formData.targetKey"
@@ -71,7 +71,7 @@
                                 />
                             </el-form-item>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="6">
                             <el-form-item label="排序" prop="sn" :show-message="false">
                                 <el-input-number
                                     v-model="formData.sn"
@@ -83,7 +83,7 @@
                                 />
                             </el-form-item>
                         </el-col>
-                        <el-col :span="4">
+                        <!-- <el-col :span="4">
                             <el-form-item label="图标" prop="icon">
                                 <el-input
                                     v-model="formData.icon"
@@ -94,7 +94,7 @@
                                     placeholder="请输入"
                                 />
                             </el-form-item>
-                        </el-col>
+                        </el-col> -->
                     </el-row>
                 </div>
             </div>
@@ -687,7 +687,7 @@ export default {
         copyMethod (index) {
             const copyData = JSON.parse(JSON.stringify(this.formData.methods[index]))
             copyData.sn = this.methodTabs.length + 1
-            copyData.id = ''
+            copyData.id = this.$utils.guid()
             copyData.methodName += ' (复制)'
             copyData.isBasic = 'N'
             copyData.isDisabled = 'N'
@@ -709,6 +709,12 @@ export default {
             const data = JSON.parse(JSON.stringify(this.initMethod))
             data.sn = this.methodTabs.length + 1
             data.methodName += data.sn
+            data.id = this.$utils.guid()
+            data.isBasic = 'N'
+            data.isDisabled = 'N'
+            data.params = []
+            data.formulas = []
+            data.chartOption = []
             this.formData.methods.push(data)
             this.activeTab = data.methodName
         },

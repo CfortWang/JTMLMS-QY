@@ -135,6 +135,11 @@ export const formRules = {
         message: '请输入',
         trigger: 'change'
     }],
+    'shiYanCanShu.uncertainty': [{
+        required: true,
+        message: '请输入',
+        trigger: 'change'
+    }],
     'shiYanCanShu.standard': [{
         required: true,
         message: '请选择',
@@ -458,6 +463,15 @@ export const paramList = [
         isReadonly: false
     },
     {
+        label: '不确定度',
+        key: 'uncertainty',
+        type: 'number',
+        min: 0,
+        precision: 2,
+        isVisible: true,
+        isReadonly: false
+    },
+    {
         label: '性能标准',
         key: 'standard',
         type: 'select',
@@ -507,7 +521,7 @@ export const paramList = [
         isReadonly: false
     },
     {
-        label: '不确定度',
+        label: '厂商声明差值（偏移）',
         key: 'claimValue',
         type: 'number',
         min: 0,
