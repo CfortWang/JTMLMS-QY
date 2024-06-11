@@ -418,10 +418,6 @@ export function buildComponent (name, column, preview, vm) {
                 handleUnreadMessage (id, tableId, tableName) {
                     this.$emit('action-event', 'unRead', { id, tableId, tableName })
                 },
-                // 日程提醒
-                handleCalendarAlert (calendarAlertData) {
-                    this.$emit('action-event', 'calendarAlert', calendarAlertData)
-                },
                 // 处理全屏
                 handleFullscreen () {
                     this.emitActionEventHandler('fullscreen', { id: this.attrs.id })
