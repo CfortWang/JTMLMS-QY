@@ -61,7 +61,11 @@
                     @input="data => employee.posItemList = data"
                 />
             </el-tab-pane>
-            <el-tab-pane v-if="!infoIncludes('role-info')" label="角色信息" name="role-info">
+            <el-tab-pane
+                v-if="!infoIncludes('role-info')"
+                label="角色信息"
+                name="role-info"
+            >
                 <!-- <span slot="label">角色信息
                     <el-tooltip
                         v-if="!readonly"
@@ -101,6 +105,7 @@
             v-if="qrcodeVisible"
             :visible.sync="qrcodeVisible"
             :content="personalInfo"
+            :photo="employee.photo"
             @close="visible => (qrcodeVisible = visible)"
         />
     </el-dialog>
