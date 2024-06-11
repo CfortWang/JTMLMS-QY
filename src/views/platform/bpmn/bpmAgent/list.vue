@@ -33,7 +33,14 @@
                 />
             </template>
         </ibps-crud>
-        <edit :id="editId" :title="title" :visible="dialogFormVisible" :readonly="readonly" @callback="search" @close="(visible) => (dialogFormVisible = visible)" />
+        <edit
+            :id="editId"
+            :title="title"
+            :visible="dialogFormVisible"
+            :readonly="readonly"
+            @callback="search"
+            @close="(visible) => (dialogFormVisible = visible)"
+        />
     </div>
 </template>
 
@@ -45,6 +52,7 @@ import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import { statusOptions, agentTypeOptions } from './constants'
 import Edit from './edit'
+import { mapGetters } from 'vuex'
 
 export default {
     components: {
@@ -112,10 +120,30 @@ export default {
                     { prop: 'title', label: '标题' },
                     { prop: 'delegatorName', label: '委托人', width: '100' },
                     { prop: 'agenterName', label: '代理人', width: '100' },
-                    { prop: 'isEnabled', label: '是否启用', tags: statusOptions, width: '100' },
-                    { prop: 'effectiveTime', label: '生效时间', sortable: 'custom', width: '100' },
-                    { prop: 'expiryTime', label: '失效时间', sortable: 'custom', width: '100' },
-                    { prop: 'agentType', label: '代理类型', tags: agentTypeOptions, width: '150' }
+                    {
+                        prop: 'isEnabled',
+                        label: '是否启用',
+                        tags: statusOptions,
+                        width: '100'
+                    },
+                    {
+                        prop: 'effectiveTime',
+                        label: '生效时间',
+                        sortable: 'custom',
+                        width: '100'
+                    },
+                    {
+                        prop: 'expiryTime',
+                        label: '失效时间',
+                        sortable: 'custom',
+                        width: '100'
+                    },
+                    {
+                        prop: 'agentType',
+                        label: '代理类型',
+                        tags: agentTypeOptions,
+                        width: '150'
+                    }
                 ],
                 rowHandle: {
                     effect: 'display',
@@ -142,7 +170,8 @@ export default {
                         {
                             key: 'detail',
                             label: '查阅'
-                        }]
+                        }
+                    ]
                 }
             },
             // 委托人和代理人 选择器修改通用选择器，需要这些参数
@@ -164,6 +193,9 @@ export default {
             readonlyText: 'null'
         }
     },
+    computed: {
+        ...mapGetters(['isSuper', 'userId'])
+    },
     created () {
         this.getInit()
         this.loadData()
@@ -177,20 +209,17 @@ export default {
             this.searchDelegatorId = value
         },
         callbackAgenterInfo (value, data, type) {
-            console.log(value)
             this.searchDelegatorId = value
         },
         // 加载数据
         loadData () {
             this.loading = true
-            queryPageList(this.getSearcFormData())
-                .then((response) => {
-                    ActionUtils.handleListData(this, response.data)
-                    this.loading = false
-                })
-                .catch(() => {
-                    this.loading = false
-                })
+            queryPageList(this.getSearcFormData()).then((response) => {
+                ActionUtils.handleListData(this, response.data)
+                this.loading = false
+            }).catch(() => {
+                this.loading = false
+            })
         },
         /**
          * 获取格式化参数
@@ -234,27 +263,24 @@ export default {
                     this.title = '事务代理设置'
                     break
                 case 'edit': // 编辑
-                    ActionUtils.selectedRecord(selection)
-                        .then((id) => {
-                            this.handleEdit(id)
-                            this.title = '编辑流程代理'
-                        })
-                        .catch(() => {})
+                    ActionUtils.selectedRecord(selection).then((id) => {
+                        if (!this.isSuper && this.userId !== data[0].delegatorId) {
+                            return ActionUtils.noPowerMessage()
+                        }
+                        this.handleEdit(id)
+                        this.title = '编辑流程代理'
+                    }).catch(() => {})
                     break
                 case 'detail': // 明细
-                    ActionUtils.selectedRecord(selection)
-                        .then((id) => {
-                            this.handleEdit(id, true)
-                            this.title = '流程代理明细'
-                        })
-                        .catch(() => {})
+                    ActionUtils.selectedRecord(selection).then((id) => {
+                        this.handleEdit(id, true)
+                        this.title = '流程代理明细'
+                    }).catch(() => {})
                     break
                 case 'remove': // 删除
-                    ActionUtils.removeRecord(selection)
-                        .then((ids) => {
-                            this.handleRemove(ids)
-                        })
-                        .catch(() => {})
+                    ActionUtils.removeRecord(selection).then((ids) => {
+                        this.handleRemove(ids)
+                    }).catch(() => {})
                     break
                 case 'enabled': // 启用
                     this.handleSetEnable(data.id, 'enabled')
@@ -278,21 +304,17 @@ export default {
          * 处理删除
          */
         handleRemove (ids) {
-            remove({ ids: ids })
-                .then((response) => {
-                    ActionUtils.removeSuccessMessage()
-                    this.search()
-                })
-                .catch(() => {})
+            remove({ ids: ids }).then((response) => {
+                ActionUtils.removeSuccessMessage()
+                this.search()
+            }).catch(() => {})
         },
         handleSetEnable (id, status) {
             const params = { id: id, isEnabled: status }
-            setEnable(params)
-                .then((response) => {
-                    ActionUtils.removeSuccessMessage(response.message)
-                    this.search()
-                })
-                .catch(() => {})
+            setEnable(params).then((response) => {
+                ActionUtils.removeSuccessMessage(response.message)
+                this.search()
+            }).catch(() => {})
         }
     }
 }

@@ -27,10 +27,7 @@
                     <el-col :span="24">
                         <el-form-item label="代理人参考图片：">
                             <div class="imageListClass">
-                                <div
-                                    v-for="(item, index) in srcList"
-                                    :key="index"
-                                >
+                                <div v-for="(item, index) in srcList" :key="index">
                                     <el-image
                                         :src="item"
                                         class="sinImageList"
@@ -94,14 +91,8 @@
                             />
                             <el-tag
                                 v-else
-                                :type="
-                                    bpmAgent.isEnabled
-                                        | optionsFilter(statusOptions, 'type')
-                                "
-                            >{{
-                                bpmAgent.isEnabled
-                                    | optionsFilter(statusOptions, "label")
-                            }}</el-tag>
+                                :type="bpmAgent.isEnabled | optionsFilter(statusOptions, 'type')"
+                            >{{ bpmAgent.isEnabled | optionsFilter(statusOptions, "label") }}</el-tag>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -121,7 +112,7 @@
                                 :multiple="multiple"
                                 :filtrate="filtrate"
                                 :store="store"
-                                :disabled="disabled"
+                                :disabled="delegatorDisabled"
                                 :readonly-text="readonlyText"
                                 placeholder="请选择委托人"
                                 @change-link-data="callbackDelegatorrInfo"
@@ -131,10 +122,7 @@
                     </el-col>
                     <el-col :span="12">
                         <el-form-item
-                            v-if="
-                                bpmAgent.agentType === 'all' ||
-                                    bpmAgent.agentType === 'part'
-                            "
+                            v-if="bpmAgent.agentType === 'all' || bpmAgent.agentType === 'part'"
                             label="代理人："
                             prop="agenterId"
                         >
@@ -157,9 +145,7 @@
                 </el-row>
                 <el-row :gutter="20">
                     <el-col :span="24">
-                        <el-form-item
-                            prop="bpmAgentRoleList"
-                        >
+                        <el-form-item prop="bpmAgentRoleList">
                             <template slot="label">
                                 委托人角色
                                 <help-tip
@@ -177,12 +163,7 @@
                                     :label="item.id"
                                 >{{ item.name }}</el-checkbox>
                             </el-checkbox-group>
-                            <span v-else>{{
-                                getWeiTuoName(
-                                    bpmAgent.bpmAgentRoleList,
-                                    roleList
-                                )
-                            }}</span>
+                            <span v-else>{{ getWeiTuoName(bpmAgent.bpmAgentRoleList, roleList) }}</span>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -202,10 +183,7 @@
                 <el-row :gutter="20">
                     <el-col :span="24" col>
                         <el-form-item label="代理类型：" prop="agentType">
-                            <el-radio-group
-                                v-if="!readonly"
-                                v-model="bpmAgent.agentType"
-                            >
+                            <el-radio-group v-if="!readonly" v-model="bpmAgent.agentType">
                                 <el-radio
                                     v-for="option in agentTypeOptions"
                                     :key="option.value"
@@ -214,20 +192,8 @@
                             </el-radio-group>
                             <el-tag
                                 v-else
-                                :type="
-                                    bpmAgent.agentType
-                                        | optionsFilter(
-                                            agentTypeOptions,
-                                            'type'
-                                        )
-                                "
-                            >{{
-                                bpmAgent.agentType
-                                    | optionsFilter(
-                                            agentTypeOptions,
-                                            "label"
-                                        )
-                            }}</el-tag>
+                                :type="bpmAgent.agentType | optionsFilter(agentTypeOptions, 'type')"
+                            >{{ bpmAgent.agentType | optionsFilter(agentTypeOptions, "label") }}</el-tag>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -260,34 +226,17 @@
                             style="width: 100%"
                             @selection-change="handleSelectionChange"
                         >
-                            <el-table-column
-                                v-if="!readonly"
-                                type="selection"
-                                width="45"
-                            />
+                            <el-table-column v-if="!readonly" type="selection" width="45" />
                             <el-table-column label="流程名称">
-                                <template slot-scope="scope">{{
-                                    scope.row.procDefName
-                                        ? scope.row.procDefName
-                                        : scope.row.name
-                                }}</template>
+                                <template slot-scope="scope">{{ scope.row.procDefName ? scope.row.procDefName : scope.row.name }}</template>
                             </el-table-column>
-                            <el-table-column
-                                v-if="!readonly"
-                                label="操作"
-                                width="55"
-                            >
+                            <el-table-column v-if="!readonly" label="操作" width="55">
                                 <template slot-scope="scope">
                                     <el-button
                                         type="danger"
                                         icon="el-icon-delete"
                                         circle
-                                        @click="
-                                            handleDelete(
-                                                scope.$index,
-                                                scope.row
-                                            )
-                                        "
+                                        @click="handleDelete(scope.$index, scope.row)"
                                     />
                                 </template>
                             </el-table-column>
@@ -330,14 +279,10 @@
                         >
                             <el-table-column type="selection" width="55" />
                             <el-table-column label="代理人">
-                                <template slot-scope="scope">{{
-                                    scope.row.agenterName
-                                }}</template>
+                                <template slot-scope="scope">{{ scope.row.agenterName }}</template>
                             </el-table-column>
                             <el-table-column label="条件名称">
-                                <template slot-scope="scope">{{
-                                    scope.row.name
-                                }}</template>
+                                <template slot-scope="scope">{{ scope.row.name }}</template>
                             </el-table-column>
                             <el-table-column
                                 prop="address"
@@ -355,9 +300,7 @@
                                     type="danger"
                                     icon="el-icon-delete"
                                     circle
-                                    @click="
-                                        handleRemove(scope.$index, scope.row)
-                                    "
+                                    @click="handleRemove(scope.$index, scope.row)"
                                 />
                             </el-table-column>
                         </el-table>
@@ -367,10 +310,7 @@
         </div>
 
         <div slot="footer" class="el-dialog--center">
-            <ibps-toolbar
-                :actions="toolbars"
-                @action-event="handleActionEvent"
-            />
+            <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
         </div>
 
         <!-- 添加规则弹窗 -->
@@ -395,6 +335,7 @@ import helpTip from '@/business/platform/form/formbuilder/right-aside/components
 import Condition from './condition'
 import { load } from '@/api/platform/org/employee'
 import { setTimeout } from 'timers'
+import { mapGetters } from 'vuex'
 
 export default {
     components: {
@@ -485,7 +426,6 @@ export default {
             ],
             url: '',
             srcList: [],
-
             // 委托人和代理人 选择器修改通用选择器，需要这些参数
             type: 'user',
             filter: [
@@ -504,6 +444,7 @@ export default {
             filtrate: true,
             store: 'id',
             disabled: false,
+            delegatorDisabled: false,
             readonlyText: 'null',
             roleList: [],
             // checkRoleList: [],
@@ -519,7 +460,11 @@ export default {
     computed: {
         formId () {
             return this.id
-        }
+        },
+        isMyself () {
+            return this.$store.getters.userId === this.bpmAgent.delegatorId
+        },
+        ...mapGetters(['isSuper'])
     },
     watch: {
         visible: {
@@ -530,6 +475,7 @@ export default {
         },
         'bpmAgent.delegatorId': {
             handler: function () {
+                this.delegatorDisabled = !this.isSuper && this.isMyself
                 this.getWeiTuo(this.bpmAgent.delegatorId, 1)
             },
             immediate: true,
@@ -558,8 +504,7 @@ export default {
     methods: {
         // 初始化
         getInit () {
-            this.filter[0].partyId =
-                this.$store.getters.userInfo.employee.positions || ''
+            this.filter[0].partyId = this.$store.getters.userInfo.employee.positions || ''
         },
         handleEdit () {
             this.rowLoading = true
@@ -579,7 +524,7 @@ export default {
         handleDelete (index, arr) {
             this.rowLoading = true
             setTimeout(() => {
-                if (arr !== []) {
+                if (Array.isArray(arr)) {
                     this.bpmAgent.bpmAgentDefPoList.splice(index, 1)
                 } else {
                     arr.forEach((i) => {
@@ -643,37 +588,30 @@ export default {
         // 提交保存数据
         saveData () {
             const data = JSON.parse(JSON.stringify(this.bpmAgent))
-            data.effectiveTime =
-                new Date(this.bpmAgent.effectiveTime).getTime() || ''
-            data.expiryTime =
-                new Date(this.bpmAgent.expiryTime).getTime() || ''
+            data.effectiveTime = new Date(this.bpmAgent.effectiveTime).getTime() || ''
+            data.expiryTime = new Date(this.bpmAgent.expiryTime).getTime() || ''
             // 检测生效时间日期是否发布日期在之前。
             if (data.effectiveTime > data.expiryTime) {
                 ActionUtils.error('生效时间与失效时间范围不合法!')
                 return
             }
-            if (
-                this.$utils.isEmpty(this.bpmAgent.bpmAgentDefPoList) &&
-                this.bpmAgent.agentType === 'part'
-            ) {
+            if (this.$utils.isEmpty(this.bpmAgent.bpmAgentDefPoList) && this.bpmAgent.agentType === 'part') {
                 ActionUtils.error('流程定义数据不能为空！')
                 return
             }
-            save(this.bpmAgent)
-                .then((response) => {
-                    this.$emit('callback', this)
-                    ActionUtils.saveSuccessMessage(response.message, (rtn) => {
-                        if (this.$utils.isEmpty(this.formId)) {
-                            this.$refs[this.formName].resetFields()
-                        }
-                        if (rtn) {
-                            this.closeDialog()
-                        }
-                    })
+            save(this.bpmAgent).then((response) => {
+                this.$emit('callback', this)
+                ActionUtils.saveSuccessMessage(response.message, (rtn) => {
+                    if (this.$utils.isEmpty(this.formId)) {
+                        this.$refs[this.formName].resetFields()
+                    }
+                    if (rtn) {
+                        this.closeDialog()
+                    }
                 })
-                .catch(() => {
-                    ActionUtils.error('无法保存，请稍后检查数据重新再试')
-                })
+            }).catch(() => {
+                ActionUtils.error('无法保存，请稍后检查数据重新再试')
+            })
         },
         // 关闭当前窗口
         closeDialog () {
@@ -703,32 +641,28 @@ export default {
                 return
             }
             this.dialogLoading = true
-            get({
-                id: this.formId
+            get({ id: this.formId }).then((response) => {
+                this.bpmAgent = response.data
+                // this.checkRoleList = response.data.bpmAgentRoleList || []
+                this.bpmAgent.bpmAgentRoleList = response.data.bpmAgentRoleList || []
+                this.formValidate()
+                this.dialogLoading = false
+            }).catch(() => {
+                this.dialogLoading = false
             })
-                .then((response) => {
-                    this.bpmAgent = response.data
-
-                    // this.checkRoleList = response.data.bpmAgentRoleList || []
-                    this.bpmAgent.bpmAgentRoleList =
-                        response.data.bpmAgentRoleList || []
-                    this.formValidate()
-                    this.dialogLoading = false
-                })
-                .catch(() => {
-                    this.dialogLoading = false
-                })
         },
         addDef () {
             alert('打开流程选择器')
         },
         callbackDelegatorrInfo (data) {
             // this.checkRoleList = []
+            this.bpmAgent.bpmAgentRoleList = []
             this.bpmAgent.delegatorName = data.name
             this.getVerification()
         },
         callbackAgenterInfo (data) {
             // this.checkRoleList = []
+            this.bpmAgent.bpmAgentRoleList = []
             this.bpmAgent.agenterName = data.name
             this.getVerification()
         },
@@ -747,8 +681,7 @@ export default {
                 if (this.$utils.isEmpty(this.bpmAgent.bpmAgentDefPoList)) {
                     this.bpmAgent.bpmAgentDefPoList = arr
                 } else {
-                    this.bpmAgent.bpmAgentDefPoList =
-                        this.bpmAgent.bpmAgentDefPoList.concat(arr)
+                    this.bpmAgent.bpmAgentDefPoList = this.bpmAgent.bpmAgentDefPoList.concat(arr)
                 }
                 this.rowLoading = false
             })
@@ -797,22 +730,20 @@ export default {
         getWeiTuo (id, type = 1, formId = '') {
             if (!id) return
             return new Promise((resolve) => {
-                load({ employeeId: id })
-                    .then((response) => {
-                        const data = response
-                        const partyRole = response.variables.partyRoles
-                        if (type === 1) {
-                            this.yuanRoleList = partyRole || []
-                        }
-                        if (type === 2) {
-                            this.daiRoleList = partyRole || []
-                            const roleName = partyRole.map((item) => item.name)
-                            this.daiRoleName = roleName.join('，')
-                        }
-                        this.getRoleList()
-                        resolve(data)
-                    })
-                    .catch(() => {})
+                load({ employeeId: id }).then((response) => {
+                    const data = response
+                    const partyRole = response.variables.partyRoles
+                    if (type === 1) {
+                        this.yuanRoleList = partyRole || []
+                    }
+                    if (type === 2) {
+                        this.daiRoleList = partyRole || []
+                        const roleName = partyRole.map((item) => item.name)
+                        this.daiRoleName = roleName.join('，')
+                    }
+                    this.getRoleList()
+                    resolve(data)
+                }).catch(() => {})
             })
         },
         // 获取委托人角色信息

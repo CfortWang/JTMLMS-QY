@@ -39,6 +39,7 @@
 		"copyright": "版权所有",
 		"dialog": {
 			"multipleSelected": "已经选择了多项,请选择一项进行操作!",
+			"noPower":"非管理员没有权限编辑他人数据!",
 			"operateSuccess": "操作成功",
 			"removeRecord": "此操作将永久删除该数据, 是否确定?",
 			"removeSuccess": "删除成功!",

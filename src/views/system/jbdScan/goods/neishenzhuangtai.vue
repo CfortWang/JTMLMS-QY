@@ -1,8 +1,8 @@
 <template>
     <div class="bg">
-        <el-dialog width="70vw" height="50vh" :modal-append-to-body="false" title="内审进度查询" :visible.sync="scanVisible">
+        <el-dialog width="80vw" :modal-append-to-body="false" title="内审进度查询" :visible.sync="scanVisible" top style="margin-top:50px;overflow:auto">
             <!-- 表单是否显示 -->
-            <div style="height: 75vh; width: 98%">
+            <div style="height: 80vh; width: 98% ; overflow:auto">
                 <div id="box">
                     <div class="overall">
                         <!-- 步骤条盒子 -->
@@ -546,10 +546,10 @@ export default {
             var chartDom = document.getElementById('in-echarts')
             let width, height
             if (window.innerWidth > 1600) {
-                width = 590
+                width = 720
                 height = 450
             } else {
-                width = 480
+                width = 570
                 height = 400
             }
             const setEchartWH = {
@@ -567,9 +567,8 @@ export default {
                 grid: {
                 // 让图表占满容器
                     top: '50px',
-                    left: '100px',
-                    right: '80px',
-                    bottom: '40px'
+                    left: '0',
+                    containLabel: true
                 },
                 xAxis: {
                     name: '  条数',
@@ -578,6 +577,9 @@ export default {
                     nameRotate: 0,
                     nameTextStyle: {
                         fontSize: 10
+                    },
+                    axisLine: {
+                        show: true
                     }
                 },
                 yAxis: {
@@ -736,7 +738,9 @@ export default {
 
                 label: {
                     formatter: '{b}\n({c}项)',
-                    edgeDistance: '20%'
+                    edgeDistance: '20%',
+                    fontSize: 12,
+                    color: '#1f1f1f'
                 },
                 legend: {
                     orient: 'vertical',
@@ -1180,23 +1184,26 @@ export default {
     margin: 10px auto;
   }
   .table-echarts {
-    width: 90%;
-     margin: 10px auto 0px;
-  }
-  .table-echarts {
+    margin: 16px auto;
     width: 90%;
     display: flex;
     justify-content: space-between;
     .in-echarts {
-      width: 400px;
-      height: 300px;
-    }
-    #in-echarts {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      #in-CMAecharts {
       width: 100%;
       height: 100%;
     }
+    }
+
     .department {
-      margin-left: 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     // #department {
     //   width: 400px;

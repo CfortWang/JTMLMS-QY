@@ -29,7 +29,9 @@ export default {
   watch: {
     'activeHeader': {
       handler(val) {
-        this.active = this.activeHeader
+        if(this.$route.name !== 'dashboard') {
+            this.active = this.activeHeader
+        }
       },
       immediate: true
     }

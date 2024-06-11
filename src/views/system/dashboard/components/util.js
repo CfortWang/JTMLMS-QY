@@ -9,7 +9,7 @@ import { isEqual } from 'lodash'
 import Bus from '@/utils/EventBus'
 import newPng from '@/assets/images/homepage/new.png'
 import { BASE_URL } from '@/constant'
-
+import dayjs from 'dayjs'
 /**
  * 创建组件
  */
@@ -146,7 +146,8 @@ export function buildComponent (name, column, preview, vm) {
                         animation: 200,
                         axis: 'y'
                     },
-                    calendarToolbar: this.fullScreen ? [{ key: 'refresh' }] : [{ key: 'refresh' }, { key: 'fullscreen' }, { key: 'collapse' }]
+                    calendarToolbar: this.fullScreen ? [{ key: 'refresh' }] : [{ key: 'refresh' }, { key: 'fullscreen' }, { key: 'collapse' }],
+                    isFirstAlert: true // 是否首次日程提醒
                 }
             },
             computed: {
@@ -172,6 +173,10 @@ export function buildComponent (name, column, preview, vm) {
                         const { getFormatDate, getDate } = this.$common
                         findAllByCurrUserId().then(res => {
                             const { data = [] } = res || {}
+                            if (this.isFirstAlert) {
+                                this.isFirstAlert = false
+                                this.showAlert(data)
+                            }
                             this.data = data.map(i => ({
                                 id: i.id,
                                 title: i.title,
@@ -214,6 +219,38 @@ export function buildComponent (name, column, preview, vm) {
                             this.loading = false
                         })
                     }
+                },
+                // 过滤日程提醒数据
+                filterAlertData (data, dayNumber = 3) {
+                    if (dayNumber <= 0) return
+                    const today = dayjs()
+                    const tempCalendarAlertData = data.filter(day => {
+                        const startTime = dayjs(day.startTime)
+                        const endTime = dayjs(day.endTime)
+                        if (day.popUp) {
+                            if ((startTime.diff(today, 'day') <= 0 && endTime.diff(today, 'day') >= 0) || (startTime.diff(today, 'day') <= dayNumber - 2 && startTime.diff(today, 'day') >= 0)) {
+                                return true
+                            }
+                        }
+                    })
+                    tempCalendarAlertData.sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+                    const calendarIds = tempCalendarAlertData.map(item => item.id)
+
+                    const calendarAlertData = {}
+                    tempCalendarAlertData.forEach(item => {
+                        if (calendarAlertData[item.startTime]) {
+                            calendarAlertData[item.startTime].push(item)
+                        } else {
+                            calendarAlertData[item.startTime] = []
+                            calendarAlertData[item.startTime].push(item)
+                        }
+                    })
+                    return { calendarAlertData, calendarIds }
+                },
+                // 日程提醒
+                showAlert (data) {
+                    const calendarAlertData = this.filterAlertData(data)
+                    this.$emit('action-event', 'calendarAlert', calendarAlertData)
                 },
                 getPhoto (photo) {
                     return getFile(photo)
@@ -380,6 +417,10 @@ export function buildComponent (name, column, preview, vm) {
                 },
                 handleUnreadMessage (id, tableId, tableName) {
                     this.$emit('action-event', 'unRead', { id, tableId, tableName })
+                },
+                // 日程提醒
+                handleCalendarAlert (calendarAlertData) {
+                    this.$emit('action-event', 'calendarAlert', calendarAlertData)
                 },
                 // 处理全屏
                 handleFullscreen () {

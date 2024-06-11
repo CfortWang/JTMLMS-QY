@@ -141,3 +141,16 @@
     max-height: 320px;
     overflow: auto;
 }
+
+.ibps-theme-header-menu__content{
+    .el-menu .el-menu-item:hover{
+        background: #e0f0ee !important;
+    }
+    .el-menu .el-menu-item.is-active {
+        background: #e0f0ee !important;
+    }
+    .el-submenu .el-submenu__title:hover {
+        background: #e0f0ee !important;
+    }
+}
+

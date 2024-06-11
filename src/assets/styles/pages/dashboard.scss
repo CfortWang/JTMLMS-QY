@@ -30,6 +30,52 @@ $transition: all .5s;
                     font-weight: bold;
                 }
             }
+            @media (max-width: 1688px) {
+                .item-header > p {
+                    font-size: 16px;
+                }
+                .item-body {
+                    & > span {
+                        font-size: 32px;
+                        font-weight: bold;
+                    }
+                }
+            }
+            @media (max-width: 1580px) {
+                .item-header > p {
+                    font-size: 14px;
+                }
+                .item-body {
+                    & > span {
+                        font-size: 30px;
+                    }
+                }
+                
+            }
+            @media (max-width: 1450px) {
+                .item-header > p {
+                    font-size: 12px;
+                }
+                .item-body {
+                    & > span {
+                        font-size: 28px;
+                    }
+                }
+            }
+            @media (max-width: 1288px) {
+                .item-header > p {
+                    white-space: normal;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+                .item-body {
+                    & > span {
+                        font-size: 26px;
+                    }
+                }
+            }
         }
         
         // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .2) !important;

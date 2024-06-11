@@ -52,7 +52,7 @@
         <div v-if="initLoading">
             <template v-if="localSystem">
                 <ibps-grid-layout
-                    v-if="layout && layout.length >0"
+                    v-if="layout && layout.length > 0"
                     :layout.sync="layout"
                     :col-num="colNum"
                     :row-height="rowHeight"
@@ -64,7 +64,7 @@
                     :use-css-transforms="useCssTransforms"
                 >
                     <ibps-grid-item
-                        v-for="(item,index) in layout"
+                        v-for="(item, index) in layout"
                         :key="item.i"
                         :x="item.x"
                         :y="item.y"
@@ -73,7 +73,7 @@
                         :i="item.i"
                     >
                         <component
-                            :is="'ibps-desktop-'+item.alias"
+                            :is="'ibps-desktop-' + item.alias"
                             v-if="hasComponent(item.alias)"
                             :id="item.i"
                             :ref="item.alias"
@@ -91,7 +91,7 @@
                     :closable="false"
                     type="warning"
                     show-icon
-                    style="height:50px"
+                    style="height: 50px"
                 >
                     <span slot="title">未设置个人桌面布局，可以通过“<a href="javascript:void(0)" @click="goMyLayout">个人办公-》个人桌面布局</a>”进行设置</span>
                 </el-alert>
@@ -121,8 +121,12 @@
             @saveData="handleSaveData"
             @delData="handleDelData"
         />
+        <CalendarAlert
+            ref="calendarRef"
+            :calendar-alert-data="calendarAlertData"
+            @onCalendarAlert="onCalendarAlert"
+        />
     </ibps-container>
-
 </template>
 
 <script>
@@ -141,6 +145,11 @@ import IbpsMessageDialog from '@/views/platform/message/inner/detail/dialog'
 import { getToken } from '@/utils/auth'
 import ScheduleAdd from '@/views/system/dashboard/templates/scheduleAdd'
 
+// 标记日历已读
+import { markReadCalendar } from '@/api/detection/newHomeApi'
+// 日程提醒弹窗组件
+import CalendarAlert from '@/views/system/dashboard/components/calendar-alert.vue'
+
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
 export default {
     components: {
@@ -151,7 +160,8 @@ export default {
         BpmnFormrender,
         'ibps-grid-layout': GridLayout,
         'ibps-grid-item': GridItem,
-        ScheduleAdd
+        ScheduleAdd,
+        CalendarAlert
     },
     data () {
         return {
@@ -203,7 +213,9 @@ export default {
             scheduledTask: false,
             calendarDialogVisible: false,
             calendarDialogForm: {},
-            addComponentDatas: {}
+            addComponentDatas: {},
+            calendarAlertData: {}, // 日程
+            calendarIds: [] // 日程 id 数组
         }
     },
     computed: {
@@ -345,9 +357,33 @@ export default {
                 case 'unRead':
                     this.handleUnreadMessage(params)
                     break
-
+                case 'calendarAlert':
+                    this.handleCalendarAlert(params)
+                    break
                 default:
                     break
+            }
+        },
+        /**
+         * 日程提醒
+         */
+        handleCalendarAlert ({ calendarAlertData, calendarIds }) {
+            this.calendarAlertData = calendarAlertData
+            this.calendarIds = calendarIds
+            if (this.calendarIds.length) {
+                this.$refs.calendarRef.open()
+            }
+        },
+        /**
+         * 标记日程已读
+         */
+        onCalendarAlert (checked) {
+            if (checked) {
+                markReadCalendar({
+                    calendarIds: this.calendarIds + ''
+                }).then(() => {}).catch((err) => {
+                    console.log(err)
+                })
             }
         },
         /**

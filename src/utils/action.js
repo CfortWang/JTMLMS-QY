@@ -58,6 +58,13 @@ const action = {
         this.success(message)
     },
     /**
+    * 没有权限编辑提示
+    * @param {*} message
+    */
+    noPowerMessage: function (message = I18n.t('common.dialog.noPower')) {
+        this.warning(message)
+    },
+    /**
      * 获取选择行的id
      * @param {*} rows
      * @param {*} pkKey

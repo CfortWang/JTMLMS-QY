@@ -93,6 +93,17 @@ export function removeCalendarInfos (params) {
         params: params
     })
 }
+/**
+ * 标记该日历为已读
+ * @param {*} params
+ */
+export function markReadCalendar (params) {
+    return request({
+        url: NEWHOME_URL + '/desktop/facade/calendar/markRead',
+        method: 'post',
+        params: params
+    })
+}
 
 /**
  * 添加快捷导航，带参数
