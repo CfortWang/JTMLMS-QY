@@ -55,6 +55,8 @@
         <bpmn-formrender
             :visible="dialogFormVisible"
             :task-id="taskId"
+            :wai-jian="waiJian"
+            :title="flowName"
             @callback="search"
             @close="visible => dialogFormVisible = visible"
         />
@@ -100,6 +102,7 @@ export default {
             delegateVisible: false,
             action: '',
             title: '',
+            waiJian: '',
             listConfig: {
                 // 工具栏
                 toolbars: [
@@ -261,6 +264,15 @@ export default {
                     console.error(err)
                 })
             })
+        },
+        /**
+         * 点击表格
+         */
+        handleLinkClick (data) {
+            this.taskId = data.taskId || ''
+            this.waiJian = data.waiJian || ''
+            this.flowName = data.name || ''
+            this.dialogFormVisible = true
         },
         handleDelegate (id) {
             this.taskId = id

@@ -46,6 +46,7 @@
         <bpmn-formrender
             :visible="dialogFormVisible"
             :task-id="taskId"
+            :wai-jian="waiJian"
             :title="flowName"
             @callback="search"
             @close="visible => dialogFormVisible = visible"
@@ -94,6 +95,7 @@ export default {
             delegateVisible: false,
             action: '',
             title: '',
+            waiJian: '',
             listConfig: {
                 // 工具栏
                 toolbars: [
@@ -196,6 +198,7 @@ export default {
          */
         handleLinkClick (data, columns) {
             this.taskId = data.taskId || ''
+            this.waiJian = data.waiJian || ''
             this.flowName = data.name
             this.dialogFormVisible = true
         },
