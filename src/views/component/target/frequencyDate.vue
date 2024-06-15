@@ -1,10 +1,10 @@
 <template>
     <div class="frequency">
-        <el-row :gutter="20">
+        <el-row :gutter="20" class="page-row">
             <el-col :span="12" class="inline-item">
                 <div class="label">月度指标统计时间</div>
                 <el-select
-                    v-model="pageData.month"
+                    v-model="pageData.month[1]"
                     clearable
                     :disabled="readonly"
                     placeholder="请选择"
@@ -47,7 +47,7 @@
                 </el-select>
             </el-col>
         </el-row>
-        <el-row :gutter="20" class="form-row">
+        <el-row :gutter="20" class="page-row">
             <el-col :span="12" class="inline-item">
                 <div class="label">半年指标统计时间</div>
                 <el-select
@@ -124,7 +124,7 @@ export default {
     data () {
         return {
             pageData: {
-                month: '',
+                month: [0, null],
                 quarter: [],
                 halfYear: [],
                 year: []
@@ -164,18 +164,25 @@ export default {
 <style lang="scss" scoped>
     .frequency {
         margin-top: 20px;
-        .inline-item {
-            display: flex;
-            margin-bottom: 16px;
-            > div {
-                flex-grow: 1;
-                flex-shrink: 1;
-                margin-left: 10px;
+        color: #606266;
+        .page-row {
+            margin-bottom: 12px;
+            &:last-child {
+                margin-bottom: 4px;
             }
-            .label {
-                width: 130px;
-                flex-grow: 0;
-                flex-shrink: 0;
+            .inline-item {
+                display: flex;
+                padding-left: 30px !important;
+                > div {
+                    flex-grow: 1;
+                    flex-shrink: 1;
+                    margin-left: 10px;
+                }
+                .label {
+                    width: 130px;
+                    flex-grow: 0;
+                    flex-shrink: 0;
+                }
             }
         }
     }
