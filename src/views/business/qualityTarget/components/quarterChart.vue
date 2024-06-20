@@ -2,26 +2,26 @@
     <div :class="$style.container">
         <template v-for="(row, rowIndex) in rowData">
             <dv-decoration-10 v-if="rowIndex === 1" :key="`lineOne${rowIndex}`" />
-            <div :key="`row${rowIndex}`" :class="$style.row" :style="`width: ${row.length / 4 * 100}%;`">
+            <div :key="`row${rowIndex}`" :class="$style.row" :style="`width: ${row.length / 2 * 100}%;`">
                 <template v-for="(item, index) in row">
-                    <div :key="`${rowIndex * 4 + index}`" :class="$style.column" :style="`width: ${1 / row.length * 100}%;`">
-                        <div :id="`card${rowIndex * 4 + index}`" />
+                    <div :key="`${rowIndex * 2 + index}`" :class="$style.column" :style="`width: ${1 / row.length * 100}%;`">
+                        <div :id="`card${rowIndex * 2 + index}`" />
                     </div>
                     <dv-decoration-2
                         v-if="index !== row.length - 1"
-                        :key="`line${rowIndex * 4 + index}`"
+                        :key="`line${rowIndex * 2 + index}`"
                         :reverse="true"
-                        :dur="4 + index * 2"
+                        :dur="2 + index * 2"
                     />
                 </template>
             </div>
-            <dv-decoration-10 v-if="rowIndex === 1" :key="`lineTwo${rowIndex}`" />
+            <!-- <dv-decoration-10 v-if="rowIndex === 1" :key="`lineTwo${rowIndex}`" /> -->
         </template>
     </div>
 </template>
 <script>
 import * as echarts from 'echarts'
-import { chartOption } from './option'
+import { quarterChartOption } from './option'
 export default {
     name: 'chart',
     components: {},
@@ -45,8 +45,8 @@ export default {
     computed: {
         rowData () {
             const data = []
-            for (let i = 0; i < this.info.length; i += 4) {
-                data.push(this.info.slice(i, i + 4))
+            for (let i = 0; i < this.info.length; i += 2) {
+                data.push(this.info.slice(i, i + 2))
             }
             return data
         }
@@ -66,35 +66,23 @@ export default {
     methods: {
         init () {
             const D = new Date()
-            // 控制数据显示，历史数据显示整年，本年度数据显示到当前月
-            const y = parseInt(D.toJSON().slice(0, 4))
-            const m = parseInt(this.chooseYear) < y ? 12 : parseInt(D.toJSON().split('-')[1])
             const w = window.innerWidth
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
             setTimeout(() => {
                 this.info.forEach((item, index) => {
                     const chart = echarts.init(document.getElementById(`card${index}`))
-                    const option = JSON.parse(JSON.stringify(chartOption))
-                    const xData = item.data.map((i, index) => index + 1).slice(0, m)
-                    const yData = item.data.map(i => i.result || 0).slice(0, m)
+                    const option = JSON.parse(JSON.stringify(quarterChartOption))
+                    const xData = item.data.map((i, dIndex) => i.statisticalTime.replace('第', '\n第'))
+                    const yData = item.data.map(i => this.$utils.isEmpty(i.result) ? null : i.result)
                     const yMax = Math.max(...yData)
                     const yMin = Math.min(...yData)
-                    const limit = item.data.map(i => i.limit).filter(i => i !== undefined)[0]
-                    const limitValue = item.data.map(i => i.limitValue).filter(i => i)[0]
-                    // if (parseFloat(limit) > parseFloat(yMax)) {
-                    //     // console.log('>', parseFloat(limit), parseFloat(yMax), item.title)
-                    //     option.yAxis.max = limit
-                    // }
-                    // if (parseFloat(limit) < parseFloat(yMin)) {
-                    //     // console.log('<', parseFloat(limit), parseFloat(yMax), item.title)
-                    //     option.yAxis.min = limit
-                    // }
-                    // console.log(option.yAxis.max, option.yAxis.min, item.title)
-
-                    // console.log(item.title, yData)
+                    const limit = item.data.map(i => i.limitValue).filter(i => i !== undefined)[0]
+                    const limitValue = item.data.map(i => i.originalData).filter(i => i)[0]
+                    option.yAxis.max = Math.max(parseFloat(limit), parseFloat(yMax))
+                    // option.yAxis.min = Math.min(parseFloat(limit), parseFloat(yMin))
                     option.title.text = item.title
                     option.title.textStyle.fontSize = this.fontSize
-                    option.title.subtext = `限值${limitValue}`
+                    option.title.subtext = `限值${limitValue.replace(/@/g, '')}`
                     option.xAxis.data = xData
                     option.series[0].data = yData
                     option.series[0].markLine.data[0].yAxis = limit
@@ -116,10 +104,10 @@ export default {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            height: calc((100% - 70px) / 3);
+            height: calc((100% - 40px) / 2);
             // margin: 15px 0 15px;
             .column {
-                width: 24%;
+                width: 48%;
                 height: 100%;
                 background-color: rgba(6, 30, 93, 0.5);
                 > div {

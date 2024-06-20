@@ -21,15 +21,15 @@
                         @change="updateAll"
                     />
                 </dv-border-box-8>
-                <dv-decoration-7 :class="$style.dept">
-                    <el-dropdown @command="changeDept">
-                        <span class="el-dropdown-link" :style="`font-size: ${fontSize}px;`">{{ selectedDept }}</span>
+                <dv-decoration-7 :class="$style.cycle">
+                    <el-dropdown @command="changeCycle">
+                        <span class="el-dropdown-link" :style="`font-size: ${fontSize}px;`">{{ selectedCycle }}</span>
                         <el-dropdown-menu slot="dropdown" class="dept-dropdown">
                             <el-dropdown-item
-                                v-for="(item, index) in deptList"
-                                :key="item.positionId"
+                                v-for="(item, index) in cycleList"
+                                :key="index"
                                 :command="index"
-                            >{{ item.positionName }}</el-dropdown-item>
+                            >{{ item }}</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </dv-decoration-7>
@@ -43,7 +43,9 @@
             </div>
             <!-- 图表区域 -->
             <dv-border-box-1>
-                <container v-if="renderData.length" :info="renderData" :font-size="fontSize" :choose-year="year" />
+                <month-chart v-if="renderData.length && selectedCycle === '每月'" :info="renderData" :font-size="fontSize" :choose-year="year" />
+                <quarter-chart v-if="renderData.length && selectedCycle === '每季度'" :info="renderData" :font-size="fontSize" :choose-year="year" />
+                <year-chart v-if="renderData.length && selectedCycle === '每年'" :info="renderData" :font-size="fontSize" :choose-year="year" />
             </dv-border-box-1>
         </dv-full-screen-container>
     </div>
@@ -52,21 +54,27 @@
 import screenfull from 'screenfull'
 export default {
     components: {
-        container: () => import('./components/container.vue')
+        MonthChart: () => import('./components/monthChart.vue'),
+        QuarterChart: () => import('./components/quarterChart.vue'),
+        YearChart: () => import('./components/yearChart.vue')
     },
     data () {
         const d = new Date()
         return {
-            deptList: [],
-            // selectedDept: '',
             level: '',
             title: '质量指标统计',
             year: d.toJSON().slice(0, 4),
+            cycleList: [],
+            sizeMap: {
+                '每月': 12,
+                '每季度': 4,
+                '每年': 4
+            },
             // year: '2023',
             initData: {},
             renderData: [],
             fontSize: 18,
-            deptIndex: 0,
+            itemIndex: 0,
             chartIndex: 0,
             dataFetchTimer: null,
             autoPlayTimer: null,
@@ -74,13 +82,19 @@ export default {
         }
     },
     computed: {
-        selectedDept () {
-            return this.deptList[this.deptIndex].positionName
+        selectedCycle () {
+            return this.cycleList[this.itemIndex] || '每月'
+        },
+        size () {
+            return this.sizeMap[this.selectedCycle]
         }
     },
     watch: {
         chartIndex (v) {
-            this.renderData = this.initData[this.selectedDept] ? this.initData[this.selectedDept].slice(v * 12, (v + 1) * 12) : []
+            this.renderData = this.initData[this.selectedCycle] ? this.initData[this.selectedCycle].slice(v * this.size, (v + 1) * this.size) : []
+        },
+        itemIndex (v) {
+            this.renderData = this.initData[this.selectedCycle] ? this.initData[this.selectedCycle].slice(this.chartIndex * this.size, (this.chartIndex + 1) * this.size) : []
         }
     },
     // beforeRouteEnter (to, from, next) {
@@ -108,16 +122,10 @@ export default {
     methods: {
         initializeData () {
             const w = window.innerWidth
-            const special = ['综合', '样品', '科研', '医疗', '教学', '急诊', 'test', '测试']
-            const { deptList = [] } = this.$store.getters || {}
-            const poct = deptList.find(item => item.positionName.includes('poct') || item.positionName.includes('POCT') && item.depth === 3) || {}
-            const deptFilter = deptList.filter(item => { return !special.some(i => item.positionName.includes(i)) && item.depth === 4 && !item.path.includes(poct.positionId) }).sort(i => i.sn)
             const { first = '', second = '' } = this.$store.getters.level || {}
 
             this.initData = {}
-            this.deptList = deptFilter
-            this.dept = deptFilter[0].positionName
-            this.deptIndex = 0
+            this.itemIndex = 0
             this.chartIndex = 0
             this.level = second || first
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
@@ -127,45 +135,66 @@ export default {
             this.fetchData().then(() => {
                 this.startAutoPlay()
                 this.setupTimer()
-                this.renderData = this.initData[this.selectedDept] ? this.initData[this.selectedDept].slice(this.chartIndex * 12, (this.chartIndex + 1) * 12) : []
+                this.renderData = this.initData[this.selectedCycle] ? this.initData[this.selectedCycle].slice(this.chartIndex * this.size, (this.chartIndex + 1) * this.size) : []
             })
         },
         async fetchData () {
-            const sql = `select a.id_ as aid, a.di_dian_ as place, a.bian_zhi_bu_men_ as dept, a.tong_ji_yue_fen_ as months, a.create_time_ as createTime, b.id_ as bid, b.zhi_liang_mu_biao as goal, b.zhi_liang_zhi_bia as target, b.zhi_biao_xian_zhi as limitValue, b.shi_ji_shu_zhi_ as result, b.yuan_shi_shu_ju_ as originalData from t_zlzbpjb a inner join (select bian_zhi_bu_men_, tong_ji_yue_fen_, max(create_time_) as max from t_zlzbpjb group by bian_zhi_bu_men_, tong_ji_yue_fen_) a_latest on a.bian_zhi_bu_men_ = a_latest.bian_zhi_bu_men_ and a.tong_ji_yue_fen_ = a_latest.tong_ji_yue_fen_ and a.create_time_ = a_latest.max left join t_zlzbpjzb b on a.id_ = b.parent_id_ where a.shi_fou_guo_shen_ = '已完成' and a.di_dian_ = '${this.level}' and a.tong_ji_yue_fen_ like '${this.year}%'`
+            // 月度指标统计本年度，季度指标统计今年和去年，年度指标统计所有
+            const sql = `select a.id_ as aid, a.di_dian_ as place, a.bian_zhi_bu_men_ as dept, a.tong_ji_pin_lv_ as cycle, a.tong_ji_yue_fen_ as statisticalTime, a.create_time_ as createTime, b.id_ as bid, b.zhi_liang_mu_biao as goal, b.zhi_liang_zhi_bia as target, b.zhi_biao_xian_zhi as limitValue, b.shi_ji_shu_zhi_ as result, b.yuan_shi_shu_ju_ as originalData from t_zlzbpjb a inner join (select tong_ji_yue_fen_, max(create_time_) as max from t_zlzbpjb group by tong_ji_yue_fen_) a_latest on a.tong_ji_yue_fen_ = a_latest.tong_ji_yue_fen_ and a.create_time_ = a_latest.max left join t_zlzbpjzb b on a.id_ = b.parent_id_ where a.shi_fou_guo_shen_ = '已完成' and a.di_dian_ = '${this.level}' and ((a.tong_ji_pin_lv_ = '每月' and a.tong_ji_yue_fen_ like '${this.year}%') or (a.tong_ji_pin_lv_ = '每季度' and (a.tong_ji_yue_fen_ like '${this.year}%' or a.tong_ji_yue_fen_ like '${this.year - 1}%')) or a.tong_ji_pin_lv_ = '每年')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
-                    data.forEach(item => {
-                        const { dept, months, target } = item
-                        item.deptName = this.tranformData(dept)
-                        item.month = parseInt(months.split('-')[1])
-                        // 截取指标限值
-                        item.limit = parseFloat(item.limitValue.match(/(\d+(\.\d+)?)/))
-                        // 创建组装后的数据结构
-                        if (!this.initData[item.deptName]) {
-                            this.initData[item.deptName] = []
+                    const dataMap = {
+                        '每月': new Array(12).fill({}),
+                        '每季度': this.generateQuarter(),
+                        '每年': this.generateYear()
+                    }
+                    // 组装数据
+                    const result = {}
+                    data.forEach((item, index) => {
+                        const { cycle, statisticalTime, target, result: targetValue, limitValue } = item
+                        if (!result[cycle]) {
+                            result[cycle] = []
                         }
-                        const index = this.initData[item.deptName].findIndex(i => i.title === target)
-                        // if (!this.initData[item.deptName][target]) {
-                        //     this.initData[item.deptName][target] = new Array(12).fill({})
-                        // }
-                        if (index === -1) {
-                            const t = {
+                        let targetIndex = result[cycle].findIndex(i => i.title === target)
+                        if (targetIndex === -1) {
+                            result[cycle].push({
                                 title: target,
-                                data: new Array(12).fill({})
-                            }
-                            t.data[item.month - 1] = item
-                            this.initData[item.deptName].push(t)
-                        } else {
-                            this.initData[item.deptName][index].data[item.month - 1] = item
+                                data: dataMap[cycle].map(d => ({ ...d }))
+                            })
+                            targetIndex = result[cycle].length - 1
                         }
+                        const dataIndex = cycle === '每月' ? parseInt(statisticalTime.split('年')[1].split('月')[0]) - 1 : result[cycle][targetIndex].data.findIndex(i => i.statisticalTime === statisticalTime)
+                        result[cycle][targetIndex].data[dataIndex] = { ...item, result: parseFloat(targetValue), limitValue: parseFloat(limitValue) }
                     })
+                    this.initData = result
+                    this.cycleList = Object.keys(this.initData)
                     console.log(this.initData)
                     resolve()
                 }).catch(error => {
                     reject(error)
                 })
             })
+        },
+        generateQuarter () {
+            const result = []
+            const prevYear = this.year - 1
+            // 生成上一年的季度对象
+            for (let i = 1; i <= 4; i++) {
+                result.push({ statisticalTime: `${prevYear}年第${i}季度` })
+            }
+            // 生成当前年的季度对象
+            for (let i = 1; i <= 4; i++) {
+                result.push({ statisticalTime: `${this.year}年第${i}季度` })
+            }
+            return result
+        },
+        generateYear () {
+            const result = []
+            for (let year = this.year - 8; year < this.year; year++) {
+                result.push({ statisticalTime: `${year}年度` })
+            }
+            return result
         },
         startAutoPlay () {
             this.autoPlay = true
@@ -174,7 +203,7 @@ export default {
             }
             this.autoPlayTimer = setInterval(() => {
                 this.showNextData()
-            }, 3000)
+            }, 5000)
         },
         stopAutoPlay () {
             this.autoPlay = false
@@ -185,17 +214,17 @@ export default {
             if (!this.autoPlay) {
                 return
             }
-            if (!this.initData[this.selectedDept]) {
+            if (!this.initData[this.selectedCycle]) {
                 this.clenUp()
                 return
             }
-            if ((this.chartIndex + 1) * 12 < this.initData[this.selectedDept].length) {
+            if ((this.chartIndex + 1) * this.size < this.initData[this.selectedCycle].length) {
                 this.chartIndex++
-            } else if (this.deptIndex < this.deptList.length - 1) {
-                this.deptIndex++
+            } else if (this.itemIndex < this.cycleList.length - 1) {
+                this.itemIndex++
                 this.chartIndex = 0
             } else {
-                this.deptIndex = 0
+                this.itemIndex = 0
                 this.chartIndex = 0
             }
         },
@@ -206,17 +235,17 @@ export default {
             }
             this.dataFetchTimer = setInterval(() => {
                 this.fetchData()
-            }, 10 * 1000)
+            }, 180 * 1000)
         },
         clenUp () {
             clearInterval(this.dataFetchTimer)
             clearInterval(this.autoPlayTimer)
         },
-        changeDept (e) {
-            // 手动切换部门
+        changeCycle (e) {
+            // 手动切换
             this.stopAutoPlay()
             // 更新当前指标
-            this.deptIndex = e
+            this.itemIndex = e
             this.chartIndex = 0
             this.startAutoPlay()
         },
@@ -225,13 +254,6 @@ export default {
         },
         goBack () {
             this.$router.back(-1)
-        },
-        tranformData (v) {
-            if (!v) {
-                return v
-            }
-            const t = this.deptList.find(i => i.positionId === v)
-            return t ? t.positionName : v
         }
     }
 }
@@ -307,7 +329,7 @@ export default {
                 top: 15px;
                 transform: translateX(-50%);
             }
-            .year, .dept, .back, .parse {
+            .year, .cycle, .back, .parse {
                 width: 8%;
                 max-width: 180px;
                 cursor: pointer;
@@ -338,7 +360,7 @@ export default {
                     }
                 }
             }
-            .dept {
+            .cycle {
                 display: flex;
                 min-width: 150px;
                 justify-content: flex-end;
@@ -374,7 +396,7 @@ export default {
                 }
             }
             @media only screen and (max-width: 1680px) {
-                .year, .dept, .back, .parse {
+                .year, .cycle, .back, .parse {
                     height: 2.5rem;
                     line-height: 2.5rem;
                     margin-top: 2.5%;
@@ -382,7 +404,7 @@ export default {
                 .year {
                     right: 82%;
                 }
-                .dept {
+                .cycle {
                     width: 5%;
                     min-width: 120px;
                     font-size: 18px;
@@ -396,7 +418,7 @@ export default {
                 .year {
                     right: 80%;
                 }
-                .dept {
+                .cycle {
                     right: 70%;
                     min-width: 140px;
                     font-size: 16px;
