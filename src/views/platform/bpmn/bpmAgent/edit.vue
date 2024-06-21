@@ -405,6 +405,9 @@ export default {
                 agenterId: [
                     { required: true, message: this.$t('validate.required') }
                 ],
+                bpmAgentRoleList: [
+                    { required: true, message: this.$t('validate.required') }
+                ],
                 effectiveTime: [
                     { required: true, message: this.$t('validate.required') }
                 ],

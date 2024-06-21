@@ -14,8 +14,8 @@
         append-to-body
         custom-class="ibps-file-preview-dialog"
     >
-        <div @mousemove="startTimer" @mouseleave="pauseTimer">
-            <fView ref="fvView" :option-file="optionFile" :operation_status="operation_status" @hadLoadedFile="hadLoadedFile" />
+        <div>
+            <fView v-if="refresh" ref="fvView" :option-file="optionFile" :operation_status="operation_status" @hadLoadedFile="hadLoadedFile" />
         </div>
     </el-dialog>
 </template>
@@ -67,7 +67,8 @@ export default {
             upFunc: () => {},
             height: 0,
             out: false, // 记录鼠标是否离开过被监听的位置，未离开过则startTimer不启用
-            hadLoad: false
+            hadLoad: false,
+            refresh: false
         }
     },
     watch: {
@@ -91,6 +92,11 @@ export default {
                 this.optionFile.fileType = data.ext // 类型
                 this.optionFile.data = data // 记录编制的位置，需要替换。
                 this.optionFile.data.index = data.index
+                // 使用 v-if 实现组件刷新功能
+                this.refresh = false
+                this.$nextTick(() => {
+                    this.refresh = true
+                })
             }
         },
         browseTime: {
@@ -113,8 +119,17 @@ export default {
     },
     mounted () {
         this.height = this.getDialogHeightHeight()
+        // 页面切换时改变计时状态
+        document.addEventListener('visibilitychange', this.handlePageChange)
     },
     methods: {
+        handlePageChange () {
+            if (document.visibilityState === 'hidden') {
+                this.pauseTimer()
+            } else {
+                this.startTimer()
+            }
+        },
         closeDialog () {
             const fvView = this.$refs.fvView
             // 销毁子组件方法

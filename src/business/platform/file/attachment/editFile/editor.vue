@@ -137,7 +137,8 @@ export default {
                 },
                 width: '100%',
                 token: getToken(),
-                height: document.body.clientHeight + 'px'
+                // 减去弹窗的顶部标题区域
+                height: document.body.clientHeight - 56 + 'px'
             }
             const docEditor = new DocsAPI.DocEditor('editorDiv', config)
             this.configKey = config.document.key

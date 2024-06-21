@@ -1,0 +1,1438 @@
+<template>
+    <el-dialog
+        :title="title"
+        :visible.sync="dialogVisible"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+        append-to-body
+        fullscreen
+        class="dialog paper-detail-dialog"
+        top="0"
+    >
+        <div class="container">
+            <div class="main">
+                <div class="form">
+                    <el-form ref="form" :model="form" label-width="80px" :rules="rules">
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="类型：" label-width="100px" prop="lei_xing_">
+                                    <el-select v-model="form.lei_xing_" placeholder="请选择">
+                                        <el-option
+                                            v-for="(value,key) in config"
+                                            :key="key"
+                                            :label="key.split('-')[1]"
+                                            :value="key"
+                                        />
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row v-if="isShowDevice">
+                            <el-col :span="12">
+                                <el-form-item label="设备编号：" label-width="100px">
+                                    <ibps-custom-dialog
+                                        v-model="form.she_bei_bian_hao_"
+                                        size="small"
+                                        template-key="sbxzmcgl"
+                                        :multiple="true"
+                                        :disabled="false"
+                                        type="dialog"
+                                        class="custom-dialog"
+                                        placeholder="请选择设备"
+                                    />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-alert
+                            title="默认数据，配置详情中的同名字段为空则使用以下默认数据"
+                            type="success"
+                        />
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="部门：" label-width="100px">
+                                    <ibps-user-selector
+                                        v-model="form.bian_zhi_bu_men_"
+                                        type="position"
+                                        readonly-text="text"
+                                        :disabled="false"
+                                        :multiple="false"
+                                    />
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="监测岗位：" label-width="100px">
+                                    <el-select v-model="form.gang_wei_" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in jianCeGangWeiList"
+                                            :key="item.id_"
+                                            :label="item.wei_hu_gang_wei_"
+                                            :value="item.wei_hu_gang_wei_"
+                                        />
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="监测周期：" label-width="100px">
+                                    <el-select v-model="form.zhou_qi_" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in period"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value"
+                                        />
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row v-if="form.zhou_qi_!==''">
+                            <el-col :span="12">
+                                <el-form-item :label="labelShow" label-width="100px">
+                                    <el-checkbox-group v-if="form.zhou_qi_==='每日'" v-model="dayCheck">
+                                        <el-checkbox :label="1">周一</el-checkbox>
+                                        <el-checkbox :label="2">周二</el-checkbox>
+                                        <el-checkbox :label="3">周三</el-checkbox>
+                                        <el-checkbox :label="4">周四</el-checkbox>
+                                        <el-checkbox :label="5">周五</el-checkbox>
+                                        <el-checkbox :label="6">周六</el-checkbox>
+                                        <el-checkbox :label="7">周日</el-checkbox>
+                                    </el-checkbox-group>
+                                    <template v-if="form.zhou_qi_==='每周'">
+                                        <el-radio v-model="weekCheck" :label="1">周一</el-radio>
+                                        <el-radio v-model="weekCheck" :label="2">周二</el-radio>
+                                        <el-radio v-model="weekCheck" :label="3">周三</el-radio>
+                                        <el-radio v-model="weekCheck" :label="4">周四</el-radio>
+                                        <el-radio v-model="weekCheck" :label="5">周五</el-radio>
+                                        <el-radio v-model="weekCheck" :label="6">周六</el-radio>
+                                        <el-radio v-model="weekCheck" :label="7">周日</el-radio>
+                                    </template>
+                                    <el-select v-if="form.zhou_qi_==='每月'" v-model="monthCheck" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in 28"
+                                            :key="item"
+                                            :label="`第${item}天`"
+                                            :value="item"
+                                        />
+                                    </el-select>
+                                    <el-select v-if="form.zhou_qi_==='每季度'" v-model="quarterCheck" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in 3"
+                                            :key="item"
+                                            :label="`第${item}个月`"
+                                            :value="item"
+                                        />
+                                    </el-select>
+                                    <el-select v-if="form.zhou_qi_==='每半年'" v-model="halfYearCheck" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in 6"
+                                            :key="item"
+                                            :label="`第${item}个月`"
+                                            :value="item"
+                                        />
+                                    </el-select>
+                                    <el-select v-if="form.zhou_qi_==='每年'" v-model="yearCheck" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in 12"
+                                            :key="item"
+                                            :label="`第${item}个月`"
+                                            :value="item"
+                                        />
+                                    </el-select>
+                                </el-form-item>
+
+                            </el-col>
+                            <el-col v-if="nextDate" :span="12">
+                                <el-form-item label="下次监测日期为：" label-width="120px">
+                                    <el-tag>{{ nextDate }}</el-tag>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="控制条件：" label-width="100px">
+                                    <el-input v-model="form.tiao_jian_" type="textarea" :rows="2" />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item v-if="labelText.label1" :label="labelText.label1" label-width="120px">
+                                    <el-input-number v-model="form.temperatureMin" size="small" controls-position="right" :min="-100" :max="form.temperatureMax" :step="1" />
+                                    至
+                                    <el-input-number v-model="form.temperatureMax" size="small" controls-position="right" :min="form.temperatureMin" :max="100" :step="1" />
+                                    (℃)
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item v-if="labelText.label2" :label="labelText.label2" label-width="120px">
+                                    <el-input-number v-model="form.humidityMin" size="small" controls-position="right" :min="-100" :max="form.humidityMax" :step="1" />
+                                    至
+                                    <el-input-number v-model="form.humidityMax" size="small" controls-position="right" :min="form.humidityMin" :max="100" :step="1" />
+                                    (%)
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                    </el-form>
+                </div>
+                <div class="table">
+                    <div class="btn">
+                        <el-upload
+                            ref="uploadRef"
+                            class="upload-demo"
+                            action=""
+                            accept=".xlsx,.xls"
+                            :auto-upload="false"
+                            :show-file-list="false"
+                            :on-change="handleUploadChange"
+                        >
+                            <el-button type="primary" size="mini" icon="el-icon-upload2">导入</el-button>
+                        </el-upload>
+                        <el-button type="primary" size="mini" icon="el-icon-download" @click="exportExcel">导出</el-button>
+                        <el-button type="success" size="mini" icon="el-icon-plus" @click="openDialog">添加</el-button>
+
+                        <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeItem">删除</el-button>
+                        <el-button v-if="subForm.length>0" type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
+                    </div>
+                    <el-table
+                        :data="showPaperList"
+                        style="width: 100%"
+                        @selection-change="handleSelectionChange"
+                    >
+                        <el-table-column
+                            width="50"
+                            type="selection"
+                        />
+                        <el-table-column
+                            prop=""
+                            label="序号"
+                            width="50"
+                            type="index"
+                            :index="showIndex"
+                        />
+                        <el-table-column
+                            prop="bu_men_"
+                            label="部门"
+                            width="100"
+                        >
+                            <template slot-scope="{row}">
+                                <ibps-user-selector
+                                    type="position"
+                                    :value="row.bu_men_"
+                                    readonly-text="text"
+                                    :disabled="true"
+                                    :multiple="true"
+                                />
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                            prop="qu_yu_"
+                            label="区域"
+                        />
+                        <el-table-column
+                            prop="fang_jian_"
+                            label="房间"
+                        />
+                        <el-table-column
+                            v-if="isShowDevice"
+                            prop="deviceno1_"
+                            label="被控设备编号"
+                        />
+                        <el-table-column
+                            v-if="isShowDevice"
+                            prop="devicename1_"
+                            label="被控设备名称"
+                        />
+                        <el-table-column
+                            prop="deviceno2_"
+                            label="监控设备"
+                        />
+                        <el-table-column
+                            prop="jian_ce_zhou_qi_"
+                            label="监测周期"
+                            width="80"
+                        />
+                        <el-table-column
+                            prop="jian_ce_ri_qi_"
+                            label="监测日期"
+                            width="110"
+                        />
+                        <el-table-column
+                            prop="jian_ce_gang_wei_"
+                            label="监测岗位"
+                        />
+                        <el-table-column
+                            prop="shi_fou_qi_yong_"
+                            label="是否启用"
+                            width="80"
+                        >
+                            <template slot-scope="{row}">
+                                <el-tag v-if="row.shi_fou_qi_yong_==='1'">启用</el-tag>
+                                <el-tag v-if="row.shi_fou_qi_yong_==='0'" type="danger">停用</el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                            fixed="right"
+                            prop=""
+                            label="操作栏目"
+                        >
+                            <template slot-scope="{row}">
+                                <el-button type="primary" icon="el-icon-edit" size="mini" @click="openDialog(row)">编辑</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                        style="margin-top: 5px; padding-bottom: 10px"
+                        :current-page="currentPage"
+                        :page-sizes="[10, 20,30, 50]"
+                        :page-size="pageSize"
+                        layout="prev,pager,next,jumper,sizes,->,total"
+                        :total="subForm.length"
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                    />
+                </div>
+            </div>
+
+        </div>
+        <div slot="footer" class="el-dialog--center">
+            <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
+        </div>
+
+        <FecDialog ref="FecDialogRef" @onSubmit="sonSubmit" />
+    </el-dialog>
+</template>
+
+<script>
+import IbpsAttachment from '@/business/platform/file/attachment/selector'
+import ibpsUserSelector from '@/business/platform/org/selector'
+import xlsx from 'xlsx'
+import fs from 'file-saver'
+import FecDialog from './fecDialog.vue'
+export default {
+    components: {
+        ibpsUserSelector,
+        IbpsAttachment,
+        FecDialog,
+        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
+    },
+    props: {
+        parentData: {
+            type: [Object, Array],
+            default: () => {}
+        },
+        visible: {
+            type: Boolean,
+            default: false
+        }
+    },
+    data () {
+        const { userId, level = {}} = this.$store.getters || {}
+        return {
+            level: level.second || level.first,
+            userId: userId,
+            pageSize: 10,
+            currentPage: 1,
+            multipleSelection: [],
+            nextDate: '',
+            rules: {
+                lei_xing_: [
+                    { required: true, message: '请选择类型', trigger: 'blur' }
+                ]
+            },
+            jianCeGangWeiList: [],
+            dialogVisible: true,
+            title: '设施环境配置表',
+            toolbars: [{ key: 'save', label: '保存' }, { key: 'cancel', label: '退出' }],
+            dayCheck: [],
+            weekCheck: '',
+            monthCheck: '',
+            quarterCheck: '',
+            halfYearCheck: '',
+            yearCheck: '',
+            form: {
+                temperatureMin: 0,
+                temperatureMax: 0,
+                humidityMin: 0,
+                humidityMax: 0,
+
+                di_dian_: level.second || level.first,
+                bian_zhi_ren_: userId,
+                lei_xing_: '',
+                bian_zhi_bu_men_: '',
+                zhou_qi_: '',
+                gang_wei_: '',
+                tiao_jian_: '',
+                default_environme: '',
+                she_bei_bian_hao_: '', // 设备编号
+                jian_ce_ri_qi_: '',
+                ri_qi_lie_biao_: '',
+                mo_kuai_lu_jing_: ''
+            },
+            subForm: [
+
+            ],
+            period: [
+                { label: '日监测', value: '每日' },
+                { label: '周监测', value: '每周' },
+                { label: '月监测', value: '每月' },
+                { label: '季度监测', value: '每季度' },
+                { label: '半年监测', value: '每半年' },
+                { label: '年监测', value: '每年' }
+            ],
+            config: {
+                '01-室内温湿度监控': {
+                    keyword: '',
+                    path: '/sshjgl/wdjc/snwsdjkcd'
+                },
+                '02-冰箱温度监控': {
+                    keyword: '冰箱，冰柜，冷藏，冷冻，低温，恒温，生化培养箱',
+                    path: '/sshjgl/wdjc/bxwdjc',
+                    showDevice: true
+                },
+                '03-温浴箱温度监控': {
+                    keyword: '',
+                    path: '/sshjgl/wdjc/wyxwdjkywh',
+                    showDevice: true
+                },
+                '04-阴凉柜温度监控': {
+                    keyword: '',
+                    path: '/sshjgl/wdjc/ylgwdjc',
+                    showDevice: true
+                },
+                '05-纯水机水质监测': {
+                    keyword: '',
+                    path: '/sshjgl/csjszjcb',
+                    showDevice: true
+                },
+                '06-每日安全检查': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/mraqjc'
+                },
+                // '07-每月安全检查': {
+                //     keyword: '',
+                //     path: '/sshjgl/aqgl/myaqjc'
+                // },
+                '08-含氯有效性监测': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/hlyxxjc'
+                },
+                // '09-紫外灯辐照测定': {
+                //     keyword: '',
+                //     path: '/sshjgl/aqgl/zwdfzd',
+                //     showDevice: true
+                // },
+                '10-洗眼器检查': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/xyqjc',
+                    showDevice: true
+                },
+                '11-紧急淋浴器检查': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/jjlyqjc',
+                    showDevice: true
+                },
+                '12-紫外灯消毒': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/jykzwdxdjlb',
+                    showDevice: true
+                },
+                '13-高压灭菌': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/gymjjlb',
+                    showDevice: true
+                },
+                '14-空气消毒机': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/xdjsyjlb',
+                    showDevice: true
+                }
+            },
+            listHander: {
+                bu_men_: '部门',
+                qu_yu_: '区域',
+                fang_jian_: '房间',
+                jian_ce_zhou_qi_: '监测周期',
+                jian_ce_ri_qi_: '监测日期',
+                jian_ce_gang_wei_: '监测岗位',
+                kong_zhi_tiao_jia: '控制条件',
+                xiu_zheng_shi_du_: '湿度修正值',
+                xiu_zheng_wen_du_: '温度修正值',
+                deviceno1_: '被控设备编号',
+                devicename1_: '被控设备名称',
+                deviceno2_: '监控设备编号'
+            },
+            subIdList: [],
+            isFirstDevice: true
+        }
+    },
+    computed: {
+        showPaperList () {
+            const start = (this.currentPage - 1) * this.pageSize
+            const end = start + this.pageSize
+            return this.subForm.slice(start, end)
+        },
+        isShowDevice () {
+            return this.form.lei_xing_ !== '01-室内温湿度监控' && this.form.lei_xing_ !== '06-每日安全检查' && this.form.lei_xing_ !== '08-含氯有效性监测'
+        },
+        isEdit () {
+            return this.parentData instanceof Object && this.parentData.mainId
+        },
+        labelShow () {
+            return this.form.zhou_qi_.split('每')[1] + '监测日期：'
+        },
+        labelText () {
+            switch (this.form.lei_xing_) {
+                case '02-冰箱温度监控':
+                    return { label1: '冷藏温度范围限值', label2: '冷冻温度范围限值' }
+                case '03-温浴箱温度监控':
+                case '04-阴凉柜温度监控':
+                    return { label1: '温度范围限值', label2: '' }
+                case '05-纯水机水质监测':
+                case '06-每日安全检查':
+                case '08-含氯有效性监测':
+                case '10-洗眼器检查':
+                case '11-紧急淋浴器检查':
+                case '13-高压灭菌':
+                case '14-空气消毒机':
+                case '12-紫外灯消毒':
+                    return { label1: '', label2: '' }
+                default:
+                    return { label1: '温度范围限值', label2: '湿度范围限值' }
+            }
+        }
+
+    },
+    watch: {
+        'form.temperatureMin' (val) {
+            this.form.default_environme = this.formatEnv(this.form.temperatureMax, this.form.temperatureMin, this.form.humidityMax, this.form.humidityMin)
+        },
+        'form.temperatureMax' (val) {
+            this.form.default_environme = this.formatEnv(this.form.temperatureMax, this.form.temperatureMin, this.form.humidityMax, this.form.humidityMin)
+        },
+        'form.humidityMin' (val) {
+            this.form.default_environme = this.formatEnv(this.form.temperatureMax, this.form.temperatureMin, this.form.humidityMax, this.form.humidityMin)
+        },
+        'form.humidityMax' (val) {
+            this.form.default_environme = this.formatEnv(this.form.temperatureMax, this.form.temperatureMin, this.form.humidityMax, this.form.humidityMin)
+        },
+        'form.she_bei_bian_hao_' (val) {
+            if (!this.isFirstDevice) {
+                const sql = `select yuan_she_bei_bian,she_bei_ming_cheng_ from t_sbdj where find_in_set(id_, '${val}')`
+                this.$common.request('sql', sql).then(res => {
+                    const { data = [] } = res.variables || {}
+                    data.forEach(item => {
+                        const bianHao = item.yuan_she_bei_bian
+                        const mingChneg = item.she_bei_ming_cheng_
+                        const t = this.subForm.find(sub => sub.deviceno1_ === bianHao)
+                        if (!t) {
+                            this.subForm.push({
+                                deviceno1_: bianHao,
+                                devicename1_: mingChneg,
+
+                                shi_fou_qi_yong_: '1',
+                                bu_men_: this.form.bian_zhi_bu_men_,
+                                jian_ce_gang_wei_: this.form.gang_wei_,
+                                jian_ce_zhou_qi_: this.form.zhou_qi_,
+                                kong_zhi_tiao_jia: this.form.tiao_jian_,
+                                environment_range: this.form.default_environme,
+                                xiu_zheng_shi_du_: '',
+                                xiu_zheng_wen_du_: '',
+                                fang_jian_: '',
+                                qu_yu_: '',
+                                deviceno2_: '',
+                                jian_ce_ri_qi_: this.form.jian_ce_ri_qi_,
+                                ri_qi_lie_biao_: this.form.ri_qi_lie_biao_,
+                                zi_wai_deng_wai_j: this.$utils.guid()
+                            })
+                        }
+                    })
+                })
+            }
+        },
+        'form.lei_xing_' (val) {
+            this.form.mo_kuai_lu_jing_ = this.config[val].path
+        },
+        'form.zhou_qi_' (val) {
+            this.dayCheck = []
+            this.weekCheck = ''
+            this.monthCheck = ''
+            this.quarterCheck = ''
+            this.halfYearCheck = ''
+            this.yearCheck = ''
+            this.nextDate = ''
+        },
+        dayCheck: {
+            handler: function (val, oldVal) {
+                this.formatRiQi()
+                if (val.length === 0) {
+                    this.nextDate = ''
+                    return
+                }
+                const temp_val = JSON.parse(JSON.stringify(val))
+                const today = new Date()
+                temp_val.sort(function (a, b) {
+                    return a - b
+                })
+                const num = temp_val.findIndex(e => e > today.getDay())
+                if (temp_val.length > 0 && num !== -1) {
+                    this.nextDate = this.getDayDate(temp_val[num], 0)
+                } else if (temp_val.length > 0 && num === -1) {
+                    this.nextDate = this.getDayDate(temp_val[0], 1)
+                } else {
+                    this.nextDate = ''
+                }
+            },
+            immediate: true
+        },
+        weekCheck: {
+            handler: function (val, oldVal) {
+                this.formatRiQi()
+                if (val === '') {
+                    this.nextDate = ''
+                    return
+                }
+                const today = new Date()
+                const weekNum = []
+                weekNum.push(val)
+                const num = weekNum.findIndex(e => e > today.getDay())
+                if (val !== '' && num !== -1) {
+                    this.nextDate = this.getDayDate(weekNum[0], 0)
+                } else if (val !== '' && num === -1) {
+                    this.nextDate = this.getDayDate(weekNum[0], 1)
+                } else {
+                    this.nextDate = ''
+                }
+            },
+            immediate: true
+        },
+        monthCheck: {
+            handler: function (val, oldVal) {
+                this.formatRiQi()
+                if (val === '') {
+                    this.nextDate = ''
+                    return
+                }
+                const today = new Date()
+                const day = today.getDate()
+                const nextMonth = this.getNextMonthDate(today, val, 1)
+                const currentMonth = this.getNextMonthDate(today, val, 0)
+                this.nextDate = val > day ? currentMonth : nextMonth
+            }
+            // immediate: true
+        },
+        quarterCheck: {
+            handler: function (val, oldVal) {
+                this.formatRiQi()
+                if (val === '') {
+                    this.nextDate = ''
+                    return
+                }
+                const quarterList = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]
+                const today = new Date()
+                const month = today.getMonth() + 1
+                const qu = this.getQuarter(today)
+                const nowM = quarterList[qu - 1][val - 1]
+                const nextM = quarterList[qu][val - 1]
+
+                const endMonth = month >= nowM ? nextM : nowM
+                const yearPJ = today.getFullYear()
+                const monthPJ = endMonth > 9 ? endMonth : '0' + endMonth
+
+                this.nextDate = yearPJ + '-' + monthPJ + '-01'
+            }
+            // immediate: true
+        },
+        halfYearCheck: {
+            handler: function (val, oldVal) {
+                this.formatRiQi()
+                if (val === '') {
+                    this.nextDate = ''
+                    return
+                }
+                const midList = [[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12]]
+                const today = new Date()
+                const month = today.getMonth() + 1
+                const qu = month > 6 ? 2 : 1
+                const nowM = midList[qu - 1][val - 1]
+                const nextM = midList[qu][val - 1]
+
+                const endMonth = month >= nowM ? nextM : nowM
+                const yearPJ = today.getFullYear()
+                const monthPJ = endMonth > 9 ? endMonth : '0' + endMonth
+
+                this.nextDate = yearPJ + '-' + monthPJ + '-01'
+            }
+            // immediate: true
+        },
+        yearCheck: {
+            handler: function (val, oldVal) {
+                this.formatRiQi()
+                if (val === '') {
+                    this.nextDate = ''
+                    return
+                }
+                const today = new Date()
+                const month = today.getMonth() + 1
+                const year = today.getFullYear()
+                const qu = month >= val ? year + 1 : year
+                const monthPJ = val > 9 ? val : '0' + val
+
+                this.nextDate = qu + '-' + monthPJ + '-01'
+            }
+            // immediate: true
+        }
+    },
+    mounted () {
+        this.init()
+        if (this.isEdit) {
+            this.loadData()
+            this.loadSubData()
+        } else {
+            this.isFirstDevice = false
+        }
+    },
+    methods: {
+        init () {
+            this.loadSelectorData()
+        },
+        loadSelectorData () {
+            const pos = this.$store.getters.level.second ? this.$store.getters.level.second : this.$store.getters.level.first
+            const sql = `select * from t_sbwhgwpzb where di_dian_='${pos}'`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                this.jianCeGangWeiList = data
+            })
+        },
+        loadData () {
+            const sql = `select * from t_sshjpzb where id_=${this.parentData.mainId}`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                // console.log('主表', data)
+                if (!data.length) {
+                    return this.$message.warning(``)
+                }
+                this.form = data[0]
+                const jian_ce_ri_qi_ = data[0].jian_ce_ri_qi_
+                if (this.form.default_environme) {
+                    const { humidity, temperature } = JSON.parse(this.form.default_environme)
+                    this.$set(this.form, 'temperatureMin', +temperature.min)
+                    this.$set(this.form, 'temperatureMax', +temperature.max)
+                    this.$set(this.form, 'humidityMin', +humidity.min)
+                    this.$set(this.form, 'humidityMax', +humidity.max)
+                }
+                if (this.form.jian_ce_ri_qi_) {
+                    this.$nextTick(() => {
+                        switch (this.form.zhou_qi_) {
+                            case '每日':
+                                if (jian_ce_ri_qi_ === '每天') {
+                                    this.dayCheck = [1, 2, 3, 4, 5, 6, 7]
+                                } else {
+                                    this.dayCheck = jian_ce_ri_qi_.split('每周')[1].split(',').map(item => +item)
+                                }
+                                break
+                            case '每周':
+                                this.weekCheck = +jian_ce_ri_qi_.split('每周')[1]
+                                break
+                            case '每月':
+                                this.monthCheck = +jian_ce_ri_qi_.split('每个月第')[1].split('天')[0]
+                                break
+                            case '每季度':
+                                this.quarterCheck = +jian_ce_ri_qi_.split('每季度第')[1].split('个月')[0]
+                                break
+                            case '每半年':
+                                this.halfYearCheck = +jian_ce_ri_qi_.split('每半年第')[1].split('个月')[0]
+                                break
+                            case '每年':
+                                this.yearCheck = +jian_ce_ri_qi_.split('每年第')[1].split('个月')[0]
+                                break
+                            default:
+                                break
+                        }
+                    })
+                }
+                this.$nextTick(() => {
+                    this.isFirstDevice = false
+                })
+            })
+        },
+        loadSubData () {
+            const sql = `select * from t_sshjpzxq where parent_id_=${this.parentData.mainId}`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                // console.log('子表', data)
+                if (!data.length) {
+                    return this.$message.warning(``)
+                }
+                this.subForm = data
+                this.subIdList = data.map(item => item.zi_wai_deng_wai_j)
+            })
+        },
+        formatEnv (temperatureMax, temperatureMin, humidityMax, humidityMin) {
+            const temp_environment_range = {
+                temperature: {
+                    max: temperatureMax,
+                    min: temperatureMin
+                },
+                humidity: {
+                    max: humidityMax,
+                    min: humidityMin
+                }
+            }
+            return JSON.stringify(temp_environment_range)
+        },
+        formatRiQi () {
+            switch (this.form.zhou_qi_) {
+                case '每日':
+                    if (!this.dayCheck || this.dayCheck.length === 0) {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    } else if (this.dayCheck.length === 7) {
+                        this.form.jian_ce_ri_qi_ = '每天'
+                        this.form.ri_qi_lie_biao_ = '1,2,3,4,5,6,7'
+                    } else {
+                        const temp_dayCheck = JSON.parse(JSON.stringify(this.dayCheck))
+                        temp_dayCheck.sort(function (a, b) {
+                            return a - b
+                        })
+                        this.form.ri_qi_lie_biao_ = temp_dayCheck.join(',')
+                        this.form.jian_ce_ri_qi_ = '每周' + temp_dayCheck.join(',')
+                    }
+                    break
+                case '每周':
+                    if (this.weekCheck) {
+                        this.form.jian_ce_ri_qi_ = '每周' + this.weekCheck
+                        this.form.ri_qi_lie_biao_ = this.weekCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+
+                    break
+                case '每月':
+                    if (this.monthCheck) {
+                        this.form.jian_ce_ri_qi_ = '每个月第' + this.monthCheck + '天'
+                        this.form.ri_qi_lie_biao_ = this.monthCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+
+                    break
+                case '每季度':
+                    if (this.quarterCheck) {
+                        this.form.jian_ce_ri_qi_ = '每季度第' + this.quarterCheck + '个月'
+                        this.form.ri_qi_lie_biao_ = this.quarterCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+
+                    break
+                case '每半年':
+                    if (this.halfYearCheck) {
+                        this.form.jian_ce_ri_qi_ = '每半年第' + this.halfYearCheck + '个月'
+                        this.form.ri_qi_lie_biao_ = this.halfYearCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+
+                    break
+                case '每年':
+                    if (this.yearCheck) {
+                        this.form.jian_ce_ri_qi_ = '每年第' + this.yearCheck + '个月'
+                        this.form.ri_qi_lie_biao_ = this.yearCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+
+                    break
+                default:
+                    this.form.jian_ce_ri_qi_ = ''
+                    this.form.ri_qi_lie_biao_ = ''
+                    break
+            }
+        },
+        // 当前页码改变
+        handleCurrentChange (val) {
+            this.currentPage = val
+        },
+        // 页码选择器改变
+        handleSizeChange (val) {
+            this.pageSize = val
+            this.currentPage = 1
+        },
+        // 分页连续序号
+        showIndex (index) {
+            return index + 1 + (this.currentPage - 1) * this.pageSize
+        },
+        handleActionEvent ({ key }) {
+            switch (key) {
+                case 'cancel':
+                    this.dialogVisible = false
+                    break
+                case 'save':
+                    this.saveResult()
+                    break
+                default:
+                    break
+            }
+        },
+        // 使用默认数据
+        settingData () {
+            this.$confirm('使用默认数据后子表中为空的字段将会被以上数据代替，是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            })
+                .then(() => {
+                    this.subForm.forEach(item => {
+                        if (item.bu_men_ === '') {
+                            item.bu_men_ = this.form.bian_zhi_bu_men_
+                        }
+                        if (item.jian_ce_gang_wei_ === '') {
+                            item.jian_ce_gang_wei_ = this.form.gang_wei_
+                        }
+                        if (item.kong_zhi_tiao_jia === '') {
+                            item.kong_zhi_tiao_jia = this.form.tiao_jian_
+                        }
+                        if (item.environment_range === '' || item.environment_range === this.formatEnv(0, 0, 0, 0)) {
+                            item.environment_range = this.form.default_environme
+                        }
+
+                        if (item.jian_ce_ri_qi_ === '') {
+                            item.jian_ce_ri_qi_ = this.form.jian_ce_ri_qi_
+                        }
+                        if (item.ri_qi_lie_biao_ === '') {
+                            item.ri_qi_lie_biao_ = this.form.ri_qi_lie_biao_
+                        }
+                        if (item.jian_ce_zhou_qi_ === '') {
+                            item.jian_ce_zhou_qi_ = this.form.zhou_qi_
+                        }
+                    })
+                })
+        },
+        // 子表单添加/编辑按钮
+        openDialog (row) {
+            if (this.form.lei_xing_ === '') {
+                return this.$message.warning('请先选择类型！')
+            }
+            this.$refs.FecDialogRef.open(row, this.jianCeGangWeiList, this.form, { dayCheck: this.dayCheck, weekCheck: this.weekCheck, monthCheck: this.monthCheck, quarterCheck: this.quarterCheck, halfYearCheck: this.halfYearCheck, yearCheck: this.yearCheck })
+        },
+        // 子表的提交事件
+        sonSubmit (data) {
+            const { dayCheck, weekCheck, monthCheck, quarterCheck, halfYearCheck, yearCheck, form, isEdit, row } = data
+            const temp_form = JSON.parse(JSON.stringify(form))
+            const temp_environment_range = {
+                temperature: {
+                    max: temp_form.temperatureMax,
+                    min: temp_form.temperatureMin
+                },
+                humidity: {
+                    max: temp_form.humidityMax,
+                    min: temp_form.humidityMin
+                }
+            }
+            // 温度湿度格式化
+            temp_form.environment_range = JSON.stringify(temp_environment_range)
+            // 监测日期格式化
+            switch (temp_form.jian_ce_zhou_qi_) {
+                case '每日':
+                    if (!dayCheck || dayCheck.length === 0) {
+                        temp_form.jian_ce_ri_qi_ = ''
+                        temp_form.ri_qi_lie_biao_ = ''
+                    } else if (dayCheck.length === 7) {
+                        temp_form.jian_ce_ri_qi_ = '每天'
+                        temp_form.ri_qi_lie_biao_ = '1,2,3,4,5,6,7'
+                    } else {
+                        dayCheck.sort(function (a, b) {
+                            return a - b
+                        })
+                        temp_form.jian_ce_ri_qi_ = '每周' + dayCheck.join(',')
+                        temp_form.ri_qi_lie_biao_ = dayCheck.join(',')
+                    }
+                    break
+                case '每周':
+                    if (weekCheck) {
+                        temp_form.jian_ce_ri_qi_ = '每周' + weekCheck
+                        temp_form.ri_qi_lie_biao_ = weekCheck + ''
+                    } else {
+                        temp_form.jian_ce_ri_qi_ = ''
+                        temp_form.ri_qi_lie_biao_ = ''
+                    }
+
+                    break
+                case '每月':
+
+                    if (monthCheck) {
+                        temp_form.jian_ce_ri_qi_ = '每个月第' + monthCheck + '天'
+                        temp_form.ri_qi_lie_biao_ = monthCheck + ''
+                    } else {
+                        temp_form.jian_ce_ri_qi_ = ''
+                        temp_form.ri_qi_lie_biao_ = ''
+                    }
+                    break
+                case '每季度':
+
+                    if (quarterCheck) {
+                        temp_form.jian_ce_ri_qi_ = '每季度第' + [quarterCheck] + '个月'
+                        temp_form.ri_qi_lie_biao_ = quarterCheck + ''
+                    } else {
+                        temp_form.jian_ce_ri_qi_ = ''
+                        temp_form.ri_qi_lie_biao_ = ''
+                    }
+                    break
+                case '每半年':
+
+                    if (halfYearCheck) {
+                        temp_form.jian_ce_ri_qi_ = '每半年第' + [halfYearCheck] + '个月'
+                        temp_form.ri_qi_lie_biao_ = halfYearCheck + ''
+                    } else {
+                        temp_form.jian_ce_ri_qi_ = ''
+                        temp_form.ri_qi_lie_biao_ = ''
+                    }
+                    break
+                case '每年':
+
+                    if (yearCheck) {
+                        temp_form.jian_ce_ri_qi_ = '每年第' + [yearCheck] + '个月'
+                        temp_form.ri_qi_lie_biao_ = yearCheck + ''
+                    } else {
+                        temp_form.jian_ce_ri_qi_ = ''
+                        temp_form.ri_qi_lie_biao_ = ''
+                    }
+                    break
+                default:
+                    break
+            }
+            // 是否启用格式化
+            temp_form.shi_fou_qi_yong_ = temp_form.shi_fou_qi_yong_ ? '1' : '0'
+            // 删除多余项
+            delete temp_form.temperatureMax
+            delete temp_form.humidityMax
+            delete temp_form.temperatureMin
+            delete temp_form.humidityMin
+            if (isEdit === true) {
+                Object.assign(row, temp_form)
+            } else {
+                this.subForm.push(temp_form)
+            }
+            this.$refs.FecDialogRef.close()
+        },
+        // 关闭当前窗口
+        closeDialog () {
+            this.dialogVisible = false
+            this.$emit('close', false)
+        },
+        // 子表删除
+        removeItem () {
+            if (this.multipleSelection.length === 0) {
+                return this.$message.warning('请选择要删除的数据！')
+            } else {
+                this.$confirm('请确认是否删除所选项?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.multipleSelection.forEach(item => {
+                        const index = this.subForm.indexOf(item)
+                        this.subForm.splice(index, 1)
+                    })
+                    this.$message.success('删除成功！')
+                    this.multipleSelection = []
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    })
+                })
+            }
+        },
+        // table复选框
+        handleSelectionChange (val) {
+            this.multipleSelection = val
+        },
+        submit () {
+            if (this.subForm.length === 0) {
+                return this.$message.warning('请添加子表数据')
+            }
+            for (var i = 0; i < this.subForm.length; i++) {
+                const item = this.subForm[i]
+                if (item.bu_men_ === '') {
+                    return this.$message.warning(`子表第${i + 1}行部门信息缺失！`)
+                }
+                if (item.jian_ce_ri_qi_ === '') {
+                    return this.$message.warning(`子表第${i + 1}行监测日期信息缺失！`)
+                }
+                if (item.jian_ce_gang_wei_ === '') {
+                    return this.$message.warning(`子表第${i + 1}行监测岗位信息缺失！`)
+                }
+            }
+            delete this.form.temperatureMax
+            delete this.form.humidityMax
+            delete this.form.temperatureMin
+            delete this.form.humidityMin
+            // console.log('主表', this.form)
+            // console.log('子表', this.subForm)
+            const allUid = this.subForm.map(item => item.zi_wai_deng_wai_j)
+            const existUid = this.subIdList
+            const addList = this.subForm.filter(item => !existUid.includes(item.zi_wai_deng_wai_j))
+            const deleteList = existUid.filter(item => !allUid.includes(item))
+            const updateList = this.subForm.filter(item => existUid.includes(item.zi_wai_deng_wai_j))
+            // console.log('原来数据', existUid)
+            // console.log('全部数据', allUid)
+            // console.log('需要添加', addList)
+            // console.log('需要更新', updateList)
+            // console.log('需要删除', deleteList)
+            // return
+            // 主表修改
+            if (this.isEdit) {
+                const params = {
+                    tableName: 't_sshjpzb',
+                    updList: [
+                        {
+                            where: {
+                                id_: this.parentData.mainId
+                            },
+                            param: {
+                                lei_xing_: this.form.lei_xing_,
+                                bian_zhi_bu_men_: this.form.bian_zhi_bu_men_,
+                                zhou_qi_: this.form.zhou_qi_,
+                                gang_wei_: this.form.gang_wei_,
+                                tiao_jian_: this.form.tiao_jian_,
+                                default_environme: this.form.default_environme,
+                                she_bei_bian_hao_: this.form.she_bei_bian_hao_,
+                                jian_ce_ri_qi_: this.form.jian_ce_ri_qi_,
+                                ri_qi_lie_biao_: this.form.ri_qi_lie_biao_,
+                                mo_kuai_lu_jing_: this.form.mo_kuai_lu_jing_
+                            }
+
+                        }
+                    ]
+                }
+                this.$common.request('update', params).then(() => {
+                    console.log('主表更新数据成功')
+                    if (addList.length) {
+                        const params = {
+                            tableName: 't_sshjpzxq',
+                            paramWhere: addList.map(item => {
+                                return { ...item, parent_id_: this.parentData.mainId }
+                            })
+                        }
+                        this.$common.request('add', params).then(() => { console.log('子表添加数据成功') })
+                    }
+                    if (updateList.length) {
+                        const params = {
+                            tableName: 't_sshjpzxq',
+                            updList: updateList.map(item => ({
+                                where: {
+                                    zi_wai_deng_wai_j: item.zi_wai_deng_wai_j
+                                },
+                                param: {
+                                    qu_yu_: item.qu_yu_,
+                                    fang_jian_: item.fang_jian_,
+                                    bu_men_: item.bu_men_,
+                                    deviceno1_: item.deviceno1_,
+                                    devicename1_: item.devicename1_,
+                                    deviceno2_: item.deviceno2_, // 监控设备
+                                    jian_ce_zhou_qi_: item.jian_ce_zhou_qi_,
+                                    jian_ce_gang_wei_: item.jian_ce_gang_wei_,
+                                    shi_fou_qi_yong_: item.shi_fou_qi_yong_,
+                                    kong_zhi_tiao_jia: item.kong_zhi_tiao_jia,
+                                    environment_range: item.environment_range,
+                                    xiu_zheng_shi_du_: item.xiu_zheng_shi_du_,
+                                    xiu_zheng_wen_du_: item.xiu_zheng_wen_du_,
+                                    jian_ce_ri_qi_: item.jian_ce_ri_qi_,
+                                    ri_qi_lie_biao_: item.ri_qi_lie_biao_
+                                }
+                            }))
+                        }
+                        this.$common.request('update', params).then(() => { console.log('子表更新数据成功') })
+                    }
+                    if (deleteList.length) {
+                        const params = {
+                            tableName: 't_sshjpzxq',
+                            paramWhere: { zi_wai_deng_wai_j: deleteList.join(',') }
+                        }
+                        this.$common.request('delete', params).then(() => { console.log('子表删除数据成功') })
+                    }
+                    this.$nextTick(() => {
+                        this.$message.success('修改成功！')
+                        this.closeDialog()
+                    })
+                })
+            } else {
+                const params = {
+                    tableName: 't_sshjpzb',
+                    paramWhere: [this.form]
+                }
+                this.$common.request('add', params).then((res) => {
+                    console.log('主表新增数据成功')
+                    const { cont = [] } = res.variables || {}
+                    if (addList.length) {
+                        const params = {
+                            tableName: 't_sshjpzxq',
+                            paramWhere: addList.map(item => {
+                                return { ...item, parent_id_: cont[0].id_ }
+                            })
+                        }
+                        this.$common.request('add', params).then(() => {
+                            this.$message.success('添加成功！')
+                            console.log('子表添加数据成功')
+                            this.closeDialog()
+                        })
+                    }
+                })
+            }
+
+            // 紫外灯数据同步更新紫外灯消毒记录表
+            if (this.form.lei_xing_.includes('12')) {
+                const tableName = 't_jykzwdxdjlbsc'
+                // 生成添加请求参数
+                const addParams = addList.length ? {
+                    tableName,
+                    paramWhere: addList.map(item => ({
+                        di_dian_: this.level,
+                        bian_zhi_bu_men_: item.bu_men_,
+                        bian_zhi_ren_: this.userId,
+                        zi_wai_deng_ming_: item.deviceName1,
+                        she_shi_id_: item.zi_wai_deng_wai_j
+                    }))
+                } : null
+
+                // 生成更新请求参数
+                const updateParams = updateList.length ? {
+                    tableName,
+                    updList: updateList.map(item => ({
+                        where: {
+                            she_shi_id_: item.zi_wai_deng_wai_j
+                        },
+                        param: {
+                            bian_zhi_bu_men_: item.bu_men_,
+                            zi_wai_deng_ming_: item.deviceName1
+                        }
+                    }))
+                } : null
+
+                // 生成删除请求参数
+                const deleteParams = deleteList.length ? {
+                    tableName,
+                    paramWhere: { she_shi_id_: deleteList.map(item => item.sheShiId).join(',') }
+                } : null
+
+                // 合并所有请求
+                const allRequests = []
+
+                if (addParams) {
+                    allRequests.push(this.$common.request('add', addParams).then(() => console.log('添加紫外灯数据成功')))
+                }
+
+                if (updateParams) {
+                    allRequests.push(this.$common.request('update', updateParams).then(() => console.log('更新紫外灯数据成功')))
+                }
+
+                if (deleteParams) {
+                    allRequests.push(this.$common.request('delete', deleteParams).then(() => console.log('删除紫外灯数据成功')))
+                }
+
+                // 执行所有请求
+                Promise.all(allRequests)
+                    .then(() => console.log('所有请求完成'))
+                    .catch(error => console.error('请求出错：', error))
+            }
+        },
+        saveResult () {
+            this.$refs.form.validate((valid) => {
+                if (valid) {
+                    this.submit()
+                } else {
+                    this.$message.warning('请填写必填项')
+                    return false
+                }
+            })
+        },
+        /* 读取文件 */
+        readFile (file) {
+            return new Promise(resolve => {
+                const reader = new FileReader()
+                reader.readAsBinaryString(file)
+                reader.onload = ev => {
+                    resolve(ev.target.result)
+                }
+            })
+        },
+        // 获取 excel 的 json 数据
+        async handleUploadChange (file) {
+            const dataBinary = await this.readFile(file.raw)
+            const workBook = xlsx.read(dataBinary, { type: 'binary', cellDates: true })
+            const workSheet = workBook.Sheets[workBook.SheetNames[0]]
+            const data = xlsx.utils.sheet_to_json(workSheet)
+            if (data.length === 0) {
+                return this.$message.warning('文件内容为空！')
+            }
+            data.forEach(item => {
+                this.subForm.push({
+                    deviceno1_: item['被控设备编号'] || '',
+                    devicename1_: item['被控设备名称'] || '',
+                    shi_fou_qi_yong_: '1',
+                    bu_men_: this.switchDeptid(item['部门']),
+                    jian_ce_gang_wei_: item['监测岗位'] || '',
+                    jian_ce_zhou_qi_: item['监测周期'] || '',
+                    kong_zhi_tiao_jia: item['控制条件'] || '',
+                    environment_range: '',
+                    xiu_zheng_shi_du_: item['湿度修正值'] || '',
+                    xiu_zheng_wen_du_: item['温度修正值'] || '',
+                    fang_jian_: item['房间'] || '',
+                    qu_yu_: item['区域'] || '',
+                    deviceno2_: item['监控设备编号'] || '',
+                    jian_ce_ri_qi_: '',
+                    ri_qi_lie_biao_: '',
+                    zi_wai_deng_wai_j: this.$utils.guid()
+                })
+            })
+            this.$message.success('导入成功！')
+        },
+        // 部门id转部门
+        switchDept (dep) {
+            const userList = this.$store.getters.userList
+            for (let i = 0; i < userList.length; i++) {
+                const user = userList[i]
+                const positionId = user.positionId.split(',')
+                const positions = user.positions.split(',')
+                const pos = positionId.findIndex(p => p === dep)
+                if (pos >= 0) {
+                    return positions[pos]
+                }
+            }
+        },
+        // id 转部门
+        switchDeptid (id) {
+            const userList = this.$store.getters.userList
+            for (let i = 0; i < userList.length; i++) {
+                const user = userList[i]
+                const positionId = user.positionId.split(',')
+                const positions = user.positions.split(',')
+                const pos = positions.findIndex(p => p === id)
+                if (pos >= 0) {
+                    return positionId[pos]
+                }
+            }
+            return ''
+        },
+        // 导出
+        exportExcel () {
+            const temp_subForm = JSON.parse(JSON.stringify(this.subForm))
+            temp_subForm.forEach(item => {
+                item.bu_men_ = this.switchDept(item.bu_men_)
+            })
+            this.xlsx(temp_subForm, this.listHander, '设施环境配置表')
+            this.$message.success('导出成功！')
+        },
+        xlsx (json, fields, filename = '.xlsx') { // 导出xlsx
+            json.forEach(item => {
+                for (const i in item) {
+                    if (fields.hasOwnProperty(i)) {
+                        item[fields[i]] = item[i]
+                    }
+                    delete item[i] // 删除原先的对象属性
+                }
+            })
+            const sheetName = filename // excel的文件名称
+            const wb = xlsx.utils.book_new() // 工作簿对象包含一SheetNames数组，以及一个表对象映射表名称到表对象。XLSX.utils.book_new实用函数创建一个新的工作簿对象。
+            const ws = xlsx.utils.json_to_sheet(json, { header: Object.values(fields) }) // 将JS对象数组转换为工作表。
+            wb.SheetNames.push(sheetName)
+            wb.Sheets[sheetName] = ws
+            const defaultCellStyle = { font: { name: 'Verdana', sz: 13, color: 'FF00FF88' }, fill: { fgColor: { rgb: 'FFFFAA00' }}}// 设置表格的样式
+            const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary', cellStyles: true, defaultCellStyle: defaultCellStyle, showGridLines: false } // 写入的样式
+            const wbout = xlsx.write(wb, wopts)
+            const blob = new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' })
+            fs.saveAs(blob, filename + '.xlsx')
+        },
+
+        s2ab (s) {
+            let buf
+            if (typeof ArrayBuffer !== 'undefined') {
+                buf = new ArrayBuffer(s.length)
+                const view = new Uint8Array(buf)
+                for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
+                return buf
+            } else {
+                buf = new Array(s.length)
+                for (let i = 0; i !== s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF
+                return buf
+            }
+        },
+        getDayDate (type, dates) {
+            const now = new Date()
+            const nowTime = now.getTime()
+            const day = now.getDay()
+            const longTime = 24 * 60 * 60 * 1000
+            const n = longTime * 7 * (dates || 0)
+            let dd = nowTime - (day - type) * longTime + n
+            dd = new Date(dd)
+            const y = dd.getFullYear()
+            let m = dd.getMonth() + 1
+            let d = dd.getDate()
+            m = m < 10 ? '0' + m : m
+            d = d < 10 ? '0' + d : d
+            const daynow = y + '-' + m + '-' + d
+            return daynow
+        },
+        // 获取往后几个月相应的日期
+        // currentDate：当前日期
+        // dayOfMonth：获取几号
+        // val：往后几个月
+        getNextMonthDate (currentDate, dayOfMonth, val) {
+            const currentYear = currentDate.getFullYear()
+            const currentMonth = currentDate.getMonth()
+            const nextMonth = currentMonth + val
+
+            const nextMonthDate = new Date(currentYear, nextMonth, dayOfMonth)
+            const formattedDate = nextMonthDate.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-')
+            return formattedDate
+        },
+        // 获取当前季度
+        getQuarter (date) {
+            return Math.floor(date.getMonth() / 3) + 1
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+.paper-detail-dialog {
+    ::v-deep {
+        .el-dialog__header {
+            text-align: center;
+        }
+    }
+.container {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+
+        .main{
+            width: 80%;
+            height: calc(100vh - 135px);
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            padding:20px;
+            // overflow-y: auto;
+            .form{
+                .el-row{
+                    margin: 10px 0;
+                }
+            }
+            .btn{
+                display: flex;
+                .upload-demo{
+                    margin-right: 10px;
+                }
+            }
+        }
+
+    }
+}
+</style>

@@ -46,10 +46,11 @@
                             slot-scope="scope"
                         >
                             <div>
-                                <img
+                                <!-- <img
                                     :src="wordPng"
                                     style="vertical-align: middle; height: 20px;"
-                                >
+                                > -->
+                                <i class="el-icon-document" />
                                 <el-tag
                                     type="info"
                                     style="cursor: pointer;"

@@ -154,3 +154,17 @@
     }
 }
 
+.ibps-layout-header-aside-menu-side{
+    .is-active > .el-submenu__title{
+        background: #e0f0ee !important;
+    }
+    .el-menu .el-menu-item:hover{
+        background: #e0f0ee !important;
+    }
+    .el-submenu .el-submenu__title:hover {
+        background: #e0f0ee !important;
+    }
+    .el-menu .el-menu-item.is-active {
+        color: #67afa9 !important;
+    }
+}

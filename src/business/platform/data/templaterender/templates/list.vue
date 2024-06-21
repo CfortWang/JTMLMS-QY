@@ -105,7 +105,7 @@
                     :dynamic-params="getLinkDynamicParams(scope.column.field_options, scope.row)"
                     :icon="scope.column.field_options.icon ? 'ibps-icon-' + scope.column.field_options.icon : ''"
                     :type="scope.column.field_options.dialog_type"
-                    :temp-search="true"
+                    :temp-search="false"
                     readonly-text="text"
                     disabled
                 />

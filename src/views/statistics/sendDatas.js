@@ -49,7 +49,7 @@ export default {
                         }
                         barData.push(e)
                         return {
-                                "t_mjsbjdxzjhzbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "val": e},
+                                "t_mjsbjdxzjhzbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "val": e>100?100:e},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
@@ -64,10 +64,12 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.jiaoyanMGObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.jiaoyanMGObj[i].NAME_ )
-                                mid[midI].numA = this.jiaoyanMGObj[i].numA
-                                mid[midI].num = this.jiaoyanMGObj[i].num
-                                mid[midI].wnum = this.jiaoyanMGObj[i].numA-this.jiaoyanMGObj[i].num
+                                mid[midI].numA = this.jiaoyanMGObj[i].numA < 0 ? 0 : this.jiaoyanMGObj[i].numA
+                                mid[midI].num = this.jiaoyanMGObj[i].num < 0 ? 0 : this.jiaoyanMGObj[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.jiaoyanMGObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -85,7 +87,7 @@ export default {
                         }
                         barData.push(e)
                         return {
-                                "t_sbhcjlbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "val": e},
+                                "t_sbhcjlbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "val": e>100?100:e},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
@@ -100,10 +102,12 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.hechaMGObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.hechaMGObj[i].NAME_ )
-                                mid[midI].numA = this.hechaMGObj[i].numA
-                                mid[midI].num = this.hechaMGObj[i].num
-                                mid[midI].wnum = this.hechaMGObj[i].numA-this.hechaMGObj[i].num
+                                mid[midI].numA = this.hechaMGObj[i].numA < 0 ? 0 : this.hechaMGObj[i].numA 
+                                mid[midI].num = this.hechaMGObj[i].num < 0 ? 0 : this.hechaMGObj[i].num 
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.hechaMGObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -121,7 +125,7 @@ export default {
                         }
                         barData.push(e)
                         return {
-                                "Num" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val": e},
+                                "Num" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val": e>100?100:e},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
@@ -136,10 +140,12 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.waibuObjfb.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.waibuObjfb[i].NAME_ )
-                                mid[midI].numA = this.waibuObjfb[i].numA
-                                mid[midI].num = this.waibuObjfb[i].num
-                                mid[midI].wnum = this.waibuObjfb[i].numA-this.waibuObjfb[i].num
+                                mid[midI].numA = this.waibuObjfb[i].numA <0?0:this.waibuObjfb[i].numA
+                                mid[midI].num = this.waibuObjfb[i].num<0?0:this.waibuObjfb[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.waibuObjfb[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -282,10 +288,12 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.gaijinxiangObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.gaijinxiangObj[i].NAME_ )
-                                mid[midI].numA = this.gaijinxiangObj[i].numA
-                                mid[midI].num = this.gaijinxiangObj[i].num
-                                mid[midI].wnum = this.gaijinxiangObj[i].numA-this.gaijinxiangObj[i].num
+                                mid[midI].numA = this.gaijinxiangObj[i].numA<0?0:this.gaijinxiangObj[i].numA
+                                mid[midI].num = this.gaijinxiangObj[i].num<0?0:this.gaijinxiangObj[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.gaijinxiangObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -366,7 +374,7 @@ export default {
                         }
                         barData.push(e)
                         return {
-                                "t_jchzbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e},
+                                "t_jchzbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e>100?100:e},
                                 "config":this.getMyConfig("检测") //返回需要的对应参数
                         }
                 },
@@ -381,10 +389,13 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.guanshenfbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.guanshenfbObj[i].NAME_ )
-                                mid[midI].numA = this.guanshenfbObj[i].numA
-                                mid[midI].num = this.guanshenfbObj[i].num
-                                mid[midI].wnum = this.guanshenfbObj[i].numA-this.guanshenfbObj[i].num
+                                mid[midI].numA = this.guanshenfbObj[i].numA < 0? 0:this.guanshenfbObj[i].numA 
+                                mid[midI].num = this.guanshenfbObj[i].num < 0? 0:this.guanshenfbObj[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.guanshenfbObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
+
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -454,7 +465,7 @@ export default {
                                 // "t_myddc5End" :{"date": this.endDate,"number": this.relData['t_myddc5'+this.endDate]},
                                 // "t_myddc6Begin" :{"date": this.BeginDate,"number": this.relData['t_myddc6'+this.BeginDate]},
                                 // "t_myddc6End" :{"date": this.endDate,"number": this.relData['t_myddc6'+this.endDate]},
-                                "t_khmydtjbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e},
+                                "t_khmydtjbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e>100?100:e},
                                 "config":this.getMyConfig("客户满意度") //返回需要的对应参数
                         }
                 },
@@ -469,10 +480,13 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.neishenfbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.neishenfbObj[i].NAME_ )
-                                mid[midI].numA = this.neishenfbObj[i].numA
-                                mid[midI].num = this.neishenfbObj[i].num
-                                mid[midI].wnum = this.neishenfbObj[i].numA-this.neishenfbObj[i].num
+                                mid[midI].numA = this.neishenfbObj[i].numA<0?0:this.neishenfbObj[i].numA
+                                mid[midI].num = this.neishenfbObj[i].num<0?0:this.neishenfbObj[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.neishenfbObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
+
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -491,7 +505,7 @@ export default {
                         barData.push(e)
                         
                         return {
-                                "t_complaintNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e,"title":"应急预案演练完成率"},
+                                "t_complaintNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e>100?100:e,"title":"应急预案演练完成率"},
                                 // "t_mjwtsqbNum" :{"date": this.dataScope,"number": mjwtsqbNum},
                                 "config":this.getMyConfig("客户投诉率") //返回需要的对应参数
                         }
@@ -507,10 +521,13 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.yingjifbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.yingjifbObj[i].NAME_ )
-                                mid[midI].numA = this.yingjifbObj[i].numA
-                                mid[midI].num = this.yingjifbObj[i].num
-                                mid[midI].wnum = this.yingjifbObj[i].numA-this.yingjifbObj[i].num
+                                mid[midI].numA = this.yingjifbObj[i].numA<0?0:this.yingjifbObj[i].numA
+                                mid[midI].num = this.yingjifbObj[i].num<0?0:this.yingjifbObj[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.yingjifbObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
+
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"应急预案演练各部门完成率"},
@@ -529,7 +546,7 @@ export default {
                         barData.push(e)
                         
                         return {
-                                "t_complaintNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e,"title":"室内质控完成率"},
+                                "t_complaintNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val":e>100?100:e,"title":"室内质控完成率"},
                                 // "t_mjwtsqbNum" :{"date": this.dataScope,"number": mjwtsqbNum},
                                 "config":this.getMyConfig("客户投诉率") //返回需要的对应参数
                         }
@@ -545,10 +562,13 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.yingjifbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.yingjifbObj[i].NAME_ )
-                                mid[midI].numA = this.yingjifbObj[i].numA
-                                mid[midI].num = this.yingjifbObj[i].num
-                                mid[midI].wnum = this.yingjifbObj[i].numA-this.yingjifbObj[i].num
+                                mid[midI].numA = this.yingjifbObj[i].numA<0?0:this.yingjifbObj[i].numA
+                                mid[midI].num = this.yingjifbObj[i].num<0?0:this.yingjifbObj[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.yingjifbObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
+
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title,'tutitle':"室内质控各部门完成率"},
@@ -586,10 +606,13 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.zaigangrenyuanfb.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.zaigangrenyuanfb[i].NAME_ )
-                                mid[midI].numA = this.zaigangrenyuanfb[i].numA
-                                mid[midI].num = this.zaigangrenyuanfb[i].num
-                                mid[midI].wnum = this.zaigangrenyuanfb[i].numA-this.zaigangrenyuanfb[i].num
+                                mid[midI].numA = this.zaigangrenyuanfb[i].numA<0?0:this.zaigangrenyuanfb[i].numA
+                                mid[midI].num = this.zaigangrenyuanfb[i].num<0?0:this.zaigangrenyuanfb[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.zaigangrenyuanfb[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
+
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -630,10 +653,13 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.gangqianpeixunfb.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.gangqianpeixunfb[i].NAME_ )
-                                mid[midI].numA = this.gangqianpeixunfb[i].numA
-                                mid[midI].num = this.gangqianpeixunfb[i].num
-                                mid[midI].wnum = this.gangqianpeixunfb[i].numA-this.gangqianpeixunfb[i].num
+                                mid[midI].numA = this.gangqianpeixunfb[i].numA<0?0:this.gangqianpeixunfb[i].numA
+                                mid[midI].num = this.gangqianpeixunfb[i].num<0?0:this.gangqianpeixunfb[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
                                 mid[midI].chu = Math.floor(this.gangqianpeixunfb[i].chu*10)/10
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
+
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -694,7 +720,7 @@ export default {
                         }
                         barData.push(e)
                         return {
-                                "t_mjzlkzxbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val": e},
+                                "t_mjzlkzxbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val": e>100?100:e},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -709,10 +735,13 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.neibuObjfb.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.neibuObjfb[i].NAME_ )
-                                mid[midI].numA = this.neibuObjfb[i].numA
-                                mid[midI].num = this.neibuObjfb[i].num
-                                mid[midI].wnum = this.neibuObjfb[i].numA-this.neibuObjfb[i].num
+                                mid[midI].numA = this.neibuObjfb[i].numA<0?0:this.neibuObjfb[i].numA
+                                mid[midI].num = this.neibuObjfb[i].num<0?0:this.neibuObjfb[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.neibuObjfb[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
+
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -729,7 +758,7 @@ export default {
                                 e =Math.floor(ryywpxjNum[1].num/ryywpxjNum[0].num * 1000) / 10
                         }
                         return {
-                                "t_mjsyshdfxsbykzjhxbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val": e},
+                                "t_mjsyshdfxsbykzjhxbNum" :{"date": this.endDate,"number": ryywpxjNum[1].num, "numberAll": ryywpxjNum[0].num, "res": barData,"val": e>100?100:e},
                                 "config":this.getMyConfig("内部质量") //返回需要的对应参数
                         }
                 },
@@ -744,10 +773,12 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.fengxianfbObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.fengxianfbObj[i].NAME_ )
-                                mid[midI].numA = this.fengxianfbObj[i].numA
-                                mid[midI].num = this.fengxianfbObj[i].num
-                                mid[midI].wnum = this.fengxianfbObj[i].numA-this.fengxianfbObj[i].num
+                                mid[midI].numA = this.fengxianfbObj[i].numA<0?0:this.fengxianfbObj[i].numA
+                                mid[midI].num = this.fengxianfbObj[i].num<0?0:this.fengxianfbObj[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.fengxianfbObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},
@@ -765,10 +796,12 @@ export default {
                         let mid = JSON.parse(JSON.stringify(this.allBuMen))
                         for (let i = 0; i < this.bufuheObj.length; i++) {
                                 let midI = mid.findIndex(v => v.NAME_ == this.bufuheObj[i].NAME_ )
-                                mid[midI].numA = this.bufuheObj[i].numA
-                                mid[midI].num = this.bufuheObj[i].num
-                                mid[midI].wnum = this.bufuheObj[i].numA-this.bufuheObj[i].num
+                                mid[midI].numA = this.bufuheObj[i].numA<0?0:this.bufuheObj[i].numA
+                                mid[midI].num = this.bufuheObj[i].num<0?0:this.bufuheObj[i].num
+                                mid[midI].wnum = mid[midI].numA-mid[midI].num
                                 mid[midI].chu = Math.floor(this.bufuheObj[i].chu*10)/10
+                                mid[midI].wnum = mid[midI].wnum<0?0:mid[midI].wnum
+                                mid[midI].chu = mid[midI].chu > 100 ? 100 : mid[midI].chu
                         }
                         return {
                                 "num" :{"date": this.endDate,"number": mid,"title":title},

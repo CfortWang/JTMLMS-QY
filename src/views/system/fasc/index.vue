@@ -2,22 +2,35 @@
     <div class="fasc-card-container">
         <el-card
             v-for="card in cardInfos"
-            :key="card.type"
-            :header="card.type"
+            :key="card.facs_type"
+            :class="isComplete(card.children)?'completed' : 'incomplete'"
             class="fasc-card"
-            :class="card.isComplete ? 'completed' : 'incomplete'"
-            @click.native="goToDetailPage(card)"
         >
-            <div
-                v-for="item in card.detail"
-                :key="item.name"
-                class="card-item"
-            >
-                <el-tag size="medium" effect="dark" :type="item.status">{{ item.name }}</el-tag>
-                今日已监测：{{ item.done }}，剩余：{{ item.todo }}
-                <!-- 【{{ item.name }}】今日已监测：{{ item.done }}，剩余：{{ item.todo }} -->
+            <div slot="header" class="clearfix fasc-card-hearder">
+                <span>{{ card.facs_type.split('-')[1] }}</span>
+                <el-button size="medium" @click="goToDetailPage(card)">管理</el-button>
             </div>
+
+            <el-collapse v-model="card.activeName" accordion>
+                <el-collapse-item v-for="time in card.children" :key="time.jian_ce_zhou_qi_" :name="time.jian_ce_zhou_qi_">
+                    <template slot="title">
+                        <el-tag size="medium" effect="dark" style="margin-right:10px" :type="isFinish(time.children)?'success':'warning'">{{ time.jian_ce_zhou_qi_ }}</el-tag>
+                        <span style="font-size:16px">{{ todoTitle(time.children) }}</span>
+                    </template>
+                    <div
+                        v-for="item in time.children"
+                        :key="item.name_"
+                        class="card-item"
+                        style="margin-left:20px;"
+                    >
+                        <el-tag size="mini" effect="dark" :type="item.todo===0?'success':'warning'">{{ item.name_ }}</el-tag>
+                        已监测：{{ item.done }}，待监测：{{ item.todo }}
+                    </div>
+                </el-collapse-item>
+            </el-collapse>
+
         </el-card>
+
     </div>
 </template>
 
@@ -31,30 +44,39 @@ export default {
     },
     mounted () {
         getFacsDaily().then(res => {
+            const list = { '每日': 1, '每周': 2, '每月': 3, '每季度': 4, '每半年': 5, '每年': 6 }
             const data = res.data || []
+            // 先按照 日 周 月 季度 半年 年 排序
+            data.sort((a, b) => {
+                if (list[a.jian_ce_zhou_qi_] && list[b.jian_ce_zhou_qi_]) { return list[a.jian_ce_zhou_qi_] - list[b.jian_ce_zhou_qi_] }
+            })
+            console.log('接口数据', data)
+            const result = []
             data.forEach(item => {
-                const index = this.cardInfos.findIndex(i => item.facs_type.includes(i.type))
-                if (index !== -1) {
-                    this.cardInfos[index].detail.push({
-                        name: item.name_,
-                        done: item.done,
-                        todo: item.todo,
-                        status: item.todo === 0 ? 'success' : 'warning'
-                    })
-                } else {
-                    this.cardInfos.push({
-                        type: item.facs_type.split('-')[1],
-                        detail: [{
-                            name: item.name_,
-                            done: item.done,
-                            todo: item.todo,
-                            status: item.todo === 0 ? 'success' : 'warning'
-                        }],
-                        isComplete: !data.some(i => i.facs_type === item.facs_type && i.todo !== 0),
-                        pagePath: item.pagePath
-                    })
+                const { facs_type, jian_ce_zhou_qi_, name_, pagePath } = item
+                if (facs_type && jian_ce_zhou_qi_ && name_) {
+                    // 查找现有的分类项
+                    let facsTypeObj = result.find(obj => obj.facs_type === facs_type)
+                    if (!facsTypeObj) {
+                        facsTypeObj = { facs_type, children: [], pagePath }
+                        result.push(facsTypeObj)
+                    }
+                    let jianCeObj = facsTypeObj.children.find(obj => obj.jian_ce_zhou_qi_ === jian_ce_zhou_qi_)
+                    if (!jianCeObj) {
+                        jianCeObj = { jian_ce_zhou_qi_, children: [] }
+                        facsTypeObj.children.push(jianCeObj)
+                    }
+                    const name_Obj = jianCeObj.children.find(obj => obj.name_ === item.name_)
+                    if (!name_Obj) {
+                        jianCeObj.children.push({ ...item })
+                    } else {
+                        name_Obj.done += item.done
+                        name_Obj.todo += item.todo
+                    }
                 }
             })
+            console.log('格式化数据', result)
+            this.cardInfos = result
         })
     },
     methods: {
@@ -64,6 +86,35 @@ export default {
                 return
             }
             this.$router.push(card.pagePath)
+        },
+        // 计算已监测总数 和 待监测总数
+        todoTitle (data) {
+            let done = 0
+            let todo = 0
+            data.forEach(item => {
+                done += item.done
+                todo += item.todo
+            })
+            return `已监测：${done}，待监测：${todo}`
+        },
+        // 是否已完成
+        isFinish (data) {
+            let todo = 0
+            data.forEach(item => {
+                todo += item.todo
+            })
+            return todo === 0
+        },
+
+        // 所有年份已完成
+        isComplete (data) {
+            let todo = 0
+            data.forEach(item => {
+                item.children.forEach(i => {
+                    todo += i.todo
+                })
+            })
+            return todo === 0
         }
     }
 }
@@ -75,6 +126,14 @@ export default {
         justify-content: flex-start;
         max-height: calc(100vh - 90px);
         overflow: auto;
+        .fasc-card-hearder{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .el-button{
+                padding: 2px 10px;
+            }
+        }
         .fasc-card {
             width: 300px;
             margin: 20px;

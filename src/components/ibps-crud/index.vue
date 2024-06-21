@@ -56,19 +56,22 @@
                                 </search-form>
                             </template>
                         </div>
-                        <div v-if="$slots.searchForm" class="buttons">
-                            <ibps-toolbar
-                                :actions="toolbars"
-                                :socpe="thatSocpe"
-                                @action-event="handleActionEvent"
-                            />
-                        </div>
-                        <div v-else-if="searchFormSlot.length<1" class="buttons">
-                            <ibps-toolbar
-                                :actions="toolbars"
-                                :socpe="thatSocpe"
-                                @action-event="handleActionEvent"
-                            />
+                        <!-- 按钮 -->
+                        <div class="btns">
+                            <div v-if="$slots.searchForm" class="buttons">
+                                <ibps-toolbar
+                                    :actions="toolbars"
+                                    :socpe="thatSocpe"
+                                    @action-event="handleActionEvent"
+                                />
+                            </div>
+                            <div v-else-if="searchFormSlot.length<1" class="buttons">
+                                <ibps-toolbar
+                                    :actions="toolbars"
+                                    :socpe="thatSocpe"
+                                    @action-event="handleActionEvent"
+                                />
+                            </div>
                         </div>
                     </div>
                     <!-- 下拉隐藏-->
@@ -464,7 +467,21 @@ export default {
         displayField,
         utils
     ],
-    props: ['contorlLength']
+    props: ['contorlLength'],
+    updated () {
+        this.changeBtnPosition()
+    },
+    methods: {
+        // 将模版对话框中的按钮调整至form表单内 紧跟input后面
+        changeBtnPosition () {
+            const form = document.querySelectorAll('div[template-type-name="ibps-data-template-list"] .ibps-container-crud__header .ibps-crud-search-form')
+            const btns = document.querySelectorAll('div[template-type-name="ibps-data-template-list"] .ibps-container-crud__header .btns')
+            const size = form.length === btns.length ? form.length : 0
+            for (let i = 0; i < size; i++) {
+                form[i].append(btns[i])
+            }
+        }
+    }
 }
 </script>
 <style>
@@ -517,5 +534,9 @@ export default {
     }
     .el-table .vertical-bottom {
         vertical-align: bottom;
+    }
+    .ibps-crud-search-form{
+        display: flex;
+        flex-wrap: wrap;
     }
 </style>

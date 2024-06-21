@@ -97,7 +97,7 @@
               radius: '50%',
               label: {
                 formatter: '{b}: {d}%',
-                color: '#fff',
+                color: this.colorw,
                 fontSize: '12px'
               },
               data: [

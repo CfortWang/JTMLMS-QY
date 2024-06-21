@@ -126,10 +126,14 @@
               fontSize: 12
             },
             axisLine:{
+              show:true,
               lineStyle:{
                 color:this.colorw,
                 width:1, //x轴线的宽度
               }
+            },
+            axisTick:{
+              show:true
             }
           }
         let zong = {
@@ -144,10 +148,14 @@
               fontSize: 12
             },
             axisLine:{
+              show:true,
               lineStyle:{
                 color:this.colorw,
                 width:1, //x轴线的宽度
               }
+            },
+            axisTick:{
+              show:true
             }
           }
         option = {
