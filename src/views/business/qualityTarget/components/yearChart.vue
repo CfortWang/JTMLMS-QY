@@ -21,7 +21,7 @@
 </template>
 <script>
 import * as echarts from 'echarts'
-import { quarterChartOption } from './option'
+import { quarterChartOption } from '../constants/option'
 export default {
     name: 'chart',
     components: {},
