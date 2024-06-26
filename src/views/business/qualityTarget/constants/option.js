@@ -31,7 +31,7 @@ const basicChart = {
         subtext: '',
         textStyle: {
             color: '#fff',
-            fontSize: 18,
+            fontSize: 24,
             fontWeight: '600'
         },
         subtextStyle: {
@@ -86,7 +86,7 @@ const basicChart = {
     },
     series: [{
         type: 'line',
-        name: '',
+        name: '合格率',
         data: [],
         markLine: {
             data: [
@@ -296,5 +296,44 @@ export const lineChartOption = {
         bottom: '30px',
         left: '30px',
         right: '30px'
-    }
+    },
+    series: [
+        {
+            type: 'bar',
+            name: '中位数',
+            data: [],
+            barMaxWidth: '35px',
+            barStyle: {
+                fill: 'rgba(0, 186, 255, 0.4)'
+            },
+            itemStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: "#83bff6" },
+                    { offset: 0.5, color: "#188df0" },
+                    { offset: 1, color: "#188df0" },
+                ])
+            },
+            emphasis: {
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: "#2378f7" },
+                        { offset: 0.7, color: "#2378f7" },
+                        { offset: 1, color: "#83bff6" },
+                    ])
+                }
+            },
+            label: {
+                show: true,
+                position: 'top',
+                textStyle: {
+                    color: '#fff',
+                    fontSize: 14
+                },
+                formatter (params) {
+                    return params.value ? params.value : ''
+                }
+            }
+        },
+        ...basicChart.series
+    ]
 }
