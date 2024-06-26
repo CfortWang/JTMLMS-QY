@@ -142,6 +142,31 @@ const basicChart = {
     }
 }
 
+export const colors = [
+    '#d20962',
+    '#f47721',
+    '#7ac143',
+    '#00a78e',
+    '#00bce4',
+    '#7d3f98',
+    '#037ef3',
+    '#f85a40',
+    '#00c16e',
+    '#12CBC4',
+    '#b4a996',
+    '#7552cc',
+    '#67809f',
+    '#f19066'
+]
+
+export function* getRandomColor (shuffledColors) {
+    let index = 0
+    while (index < shuffledColors.length) {
+        yield shuffledColors[index]
+        index++
+    }
+}
+
 export const monthChartOption = basicChart
 
 export const quarterChartOption = {
@@ -261,5 +286,15 @@ export const yearChartOption = {
         show: true,
         trigger: 'axis',
         formatter: '指标详情<br/>{b}年度：{c}'
+    }
+}
+
+export const lineChartOption = {
+    ...basicChart,
+    grid: {
+        top: '80px',
+        bottom: '30px',
+        left: '30px',
+        right: '30px'
     }
 }

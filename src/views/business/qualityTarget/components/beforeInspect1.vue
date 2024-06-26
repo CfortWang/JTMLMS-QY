@@ -26,7 +26,7 @@
             </div>
             <!-- 图表区域 -->
             <dv-border-box-1>
-                123123
+                <chart-item1 :list="renderData" :range="statRange" :font-size="fontSize" />
             </dv-border-box-1>
         </dv-full-screen-container>
     </div>
@@ -35,7 +35,7 @@
 import screenfull from 'screenfull'
 export default {
     components: {
-        chartItem1: () => import('./chartItem1.vue')
+        ChartItem1: () => import('./chartItem1.vue')
     },
     data () {
         const now = this.$common.getDateNow()
@@ -45,7 +45,7 @@ export default {
             title: '检验科质量指标-检验前',
             statRange: [before, now],
             initData: {},
-            renderData: [],
+            renderData: [1, 2],
             fontSize: 18,
             chartIndex: 0,
             dataFetchTimer: null,
@@ -56,7 +56,7 @@ export default {
     computed: {},
     watch: {
         chartIndex (v) {
-            this.renderData = this.initData[this.selectedCycle] ? this.initData[this.selectedCycle].slice(v * this.size, (v + 1) * this.size) : []
+            this.renderData = [1, 2]
         }
     },
     // beforeRouteEnter (to, from, next) {
@@ -162,7 +162,7 @@ export default {
         z-index: 999;
         :global {
             #dv-full-screen-container {
-                background-image: url('~@/assets/images/screen/bg.png');
+                background-image: url('~@/assets/images/screen/stars.png');
                 background-size: 100% 100%;
                 box-shadow: 0 0 3px blue;
                 display: flex;
