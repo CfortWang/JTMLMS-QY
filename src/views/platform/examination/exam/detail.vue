@@ -43,26 +43,30 @@
                     <span class="value">{{ paperData.limitCount }}</span>
                 </div>
                 <div class="info-item">
-                    <span class="label">参考人数：</span>
-                    <span class="value">{{ paperList.length }}</span>
-                </div>
-                <div class="info-item">
                     <span class="label">题库名称：</span>
                     <span class="value">{{ paperData.bankName }}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">题目数量：</span>
-                    <span class="value">{{ paperData.questionCount }}</span>
+                    <span class="value">{{ paperData.isRand==='1'?paperData.randTotal:paperData.questionCount }}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">总分：</span>
-                    <span class="value">{{ paperData.totalScore }}分</span>
+                    <span class="value">{{ paperData.isRand==='1'?paperData.randScore:paperData.totalScore }}分</span>
                 </div>
                 <div class="info-item">
-                    <el-tooltip effect="dark" content="达标分值占总分的比率" placement="top">
+                    <el-tooltip
+                        effect="dark"
+                        content="达标分值占总分的比率"
+                        placement="top"
+                    >
                         <span class="label">达标占比：</span>
                     </el-tooltip>
                     <span class="value">{{ paperData.qualifiedRadio }}%</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">是否随机：</span>
+                    <span class="value">{{ paperData.isRand==='1'?'是':'否' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">最高分：</span>
@@ -81,14 +85,49 @@
                     <span class="value">{{ paperData.scoringType }}</span>
                 </div>
                 <div class="info-item">
+                    <span class="label">应参考人数：</span>
+                    <span class="value">{{ paperList.length }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">实参考人数：</span>
+                    <span class="value">{{ joinRate.count }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">参考率：</span>
+                    <span class="value">{{ joinRate.rate }}</span>
+                </div>
+                <div class="info-item">
                     <span class="label">达标率：</span>
                     <span class="value">{{ passRate }}</span>
                 </div>
             </div>
+            <div class="paper-status">
+                <div>
+                    考试状态：<el-select
+                        v-model="selectValue"
+                        placeholder="请选择查询状态"
+                        @change="onSelectChange"
+                    >
+                        <el-option
+                            v-for="item in paperOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        />
+                    </el-select>
+                </div>
+
+                <el-button
+                    type="primary"
+                    size="mini"
+                    icon="el-icon-s-data"
+                    @click="showStatistics"
+                >各部门数据统计</el-button>
+            </div>
             <div class="paper-table">
                 <el-table
                     ref="elTable"
-                    :data="paperList"
+                    :data="showPaperList"
                     border
                     stripe
                     highlight-current-row
@@ -97,50 +136,34 @@
                     class="exam-table"
                     @row-dblclick="handleRowDblclick"
                 >
-                    <el-table-column label="序号" type="index" width="50" />
-                    <el-table-column
-                        prop="userName"
-                        label="考生姓名"
-                        width="100"
-                    />
-                    <el-table-column
-                        prop="count"
-                        label="参考次数/完成次数"
-                        width="90"
-                    />
-                    <el-table-column
-                        prop=""
-                        label="考试成绩"
-                    >
-                        <el-table-column
-                            prop="max"
-                            label="最高得分"
-                            width="90"
-                        />
-                        <el-table-column
-                            prop="min"
-                            label="最低得分"
-                            width="90"
-                        />
-                        <el-table-column
-                            prop="avg"
-                            label="平均得分"
-                            width="90"
-                        />
-                        <el-table-column
-                            prop="latest"
-                            label="最近得分"
-                            width="90"
-                        />
+                    <el-table-column label="序号" type="index" :index="showIndex" width="50" />
+                    <el-table-column prop="userName" label="考生姓名" width="100" />
+                    <el-table-column prop="positionId" label="部门" width="100">
+                        <template slot-scope="{ row }">
+                            <ibps-user-selector
+                                type="position"
+                                :value="row.positionId"
+                                readonly-text="text"
+                                :disabled="true"
+                                :multiple="true"
+                            />
+                        </template>
                     </el-table-column>
-                    <el-table-column
-                        prop="latest"
-                        label="最终成绩"
-                        width="90"
-                    />
+                    <el-table-column prop="count" label="参考次数/完成次数" width="90" />
+                    <el-table-column prop="" label="考试成绩">
+                        <el-table-column prop="max" label="最高得分" width="90" />
+                        <el-table-column prop="min" label="最低得分" width="90" />
+                        <el-table-column prop="avg" label="平均得分" width="90" />
+                        <el-table-column prop="latest" label="最近得分" width="90" />
+                    </el-table-column>
+                    <el-table-column prop="resultScore" label="最终成绩" width="90" />
                     <el-table-column prop="isQualified" label="是否达标">
                         <template slot-scope="scope">
-                            <el-tag :type="getTagType(scope.row)" size="medium" class="score">{{ scope.row.isQualified }}</el-tag>
+                            <el-tag
+                                :type="getTagType(scope.row)"
+                                size="medium"
+                                class="score"
+                            >{{ scope.row.isQualified }}</el-tag>
                         </template>
                     </el-table-column>
                     <!-- <el-table-column
@@ -153,13 +176,21 @@
                         </template>
                     </el-table-column> -->
                 </el-table>
+
+                <el-pagination
+                    style="margin-top: 5px; padding-bottom: 10px"
+                    :current-page="currentPage"
+                    :page-sizes="[10, 15, 20, 25, 30, 50]"
+                    :page-size="pageSize"
+                    layout="prev,pager,next,jumper,sizes,->,total"
+                    :total="filterPaperList.length"
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                />
             </div>
         </div>
         <div slot="footer" class="el-dialog--center">
-            <ibps-toolbar
-                :actions="toolbars"
-                @action-event="handleActionEvent"
-            />
+            <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
         </div>
         <paper-detail
             v-if="paperDialogVisible"
@@ -170,10 +201,17 @@
             :examinee-id="examineeId"
             @close="paperDialogVisible = false"
         />
+        <Statistics
+            ref="statisticsRef"
+            :department-data="departmentData"
+        />
     </el-dialog>
 </template>
 
 <script>
+import IbpsUserSelector from '@/business/platform/org/selector'
+// 数据统计组件
+import Statistics from './statistics.vue'
 import { max, min, mean, sum, maxBy, minBy, meanBy, round } from 'lodash'
 const qualifiedType = [
     {
@@ -192,7 +230,9 @@ const qualifiedType = [
 export default {
     components: {
         IbpsImage: () => import('@/business/platform/file/image'),
-        PaperDetail: () => import('../questionBank/detail')
+        PaperDetail: () => import('../questionBank/detail'),
+        IbpsUserSelector,
+        Statistics
     },
     props: {
         visible: {
@@ -217,9 +257,7 @@ export default {
             title: '考试详情',
             dialogVisible: this.visible,
             paperDialogVisible: false,
-            toolbars: [
-                { key: 'cancel', label: '退出' }
-            ],
+            toolbars: [{ key: 'cancel', label: '退出' }],
             paperList: [],
             paperData: [],
             paperId: '',
@@ -227,7 +265,55 @@ export default {
             maxScore: '',
             minScore: '',
             avgScore: '',
-            passRate: ''
+            passRate: '',
+            paperOptions: [
+                {
+                    value: 'all',
+                    label: '全部'
+                },
+                {
+                    value: 'good',
+                    label: '达标'
+                },
+                {
+                    value: 'bad',
+                    label: '未达标'
+                },
+                {
+                    value: 'noFinish',
+                    label: '考试未结束'
+                }
+            ],
+            selectValue: 'all',
+            pageSize: 10,
+            currentPage: 1,
+            departmentData: [] // 数据统计
+        }
+    },
+    computed: {
+        filterPaperList () {
+            return this.paperList.filter((paper) => {
+                if (this.selectValue === 'all') return this.paperList
+                const { label } = this.paperOptions.find((option) => option.value === this.selectValue)
+                return paper.isQualified === label
+            })
+        },
+        showPaperList () {
+            const start = (this.currentPage - 1) * this.pageSize
+            const end = start + this.pageSize
+            return this.filterPaperList.slice(start, end)
+        },
+        joinRate () {
+            let count = 0
+            this.paperList.forEach((item) => {
+                if (item.count && item.count.split('/')[1] !== '0') {
+                    count++
+                }
+            })
+            return {
+                count,
+                rate: ((count / this.paperList.length) * 100).toFixed(2) + '%'
+            }
         }
     },
     watch: {
@@ -256,6 +342,14 @@ export default {
             this.paperList = await this.getQuestionData()
             console.log(this.paperList)
             this.paperData = this.paperList[0]
+            this.posData()
+        },
+        // 获取部门数据
+        posData () {
+            this.paperList.forEach((item) => {
+                const user = this.$store.getters.userList.find((u) => u.userName === item.userName)
+                item.positionId = user.positionId
+            })
         },
         handleActionEvent ({ key }) {
             switch (key) {
@@ -292,7 +386,7 @@ export default {
             return (passList.length / list.length * 100).toFixed(2) + '%'
         },
         getQuestionData () {
-            const sql = `select qb.ti_ku_ming_cheng_ as bankName, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex, t_question_bank qb, t_examination e where ex.ti_ku_id_ = qb.id_ and e.exam_id_ = ex.id_ and ex.id_ = '${this.examId}' order by e.kao_shi_ren_ desc, e.jie_shu_shi_jian_ desc`
+            const sql = `select qb.ti_ku_ming_cheng_ as bankName, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc,ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber,ex.chou_ti_zong_fen_ as randScore,ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex, t_question_bank qb, t_examination e where ex.ti_ku_id_ = qb.id_ and e.exam_id_ = ex.id_ and ex.id_ = '${this.examId}' order by e.kao_shi_ren_ desc, e.jie_shu_shi_jian_ desc`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -313,7 +407,7 @@ export default {
                             result.push({
                                 ...item,
                                 totalCount: data.length,
-                                totalScore: parseFloat(item.totalScore),
+                                totalScore: item.isRand === '1' ? parseFloat(item.randScore) : parseFloat(item.totalScore),
                                 statusList: [item.paperState],
                                 scoreList: [parseFloat(item.score || -1)]
                             })
@@ -358,6 +452,140 @@ export default {
         closeDialog () {
             window.removeEventListener('keyup', this.handleKeyPress)
             this.$emit('close', false)
+        },
+        // 选择器状态改变
+        onSelectChange (select) {
+            this.pageSize = 10
+            this.currentPage = 1
+        },
+        // 当前页码改变
+        handleCurrentChange (val) {
+            this.currentPage = val
+        },
+        // 页码选择器改变
+        handleSizeChange (val) {
+            this.pageSize = val
+            this.currentPage = 1
+        },
+        // 分页连续序号
+        showIndex (index) {
+            return index + 1 + (this.currentPage - 1) * this.pageSize
+        },
+        // position部门所有应参考人数
+        filterdepartmentData (position) {
+            let count = 0
+            this.paperList.forEach((paper) => {
+                const pos = paper.positions.split(',')
+                for (let i = 0; i < pos.length; i++) {
+                    if (position === pos[i]) {
+                        count++
+                        break
+                    }
+                }
+            })
+            return count
+        },
+        // position部门所有已参考人数
+        filterJoindepartmentData (position) {
+            let count = 0
+            this.paperList.forEach((paper) => {
+                const pos = paper.positions.split(',')
+                for (let i = 0; i < pos.length; i++) {
+                    if (position === pos[i] && paper.count.split('/')[1] !== '0') {
+                        count++
+                        break
+                    }
+                }
+            })
+            return count
+        },
+        // position部门最高分
+        departmentMaxScore (pos) {
+            let res = 0
+            this.paperList.forEach((paper) => {
+                const positionsArr = paper.positions.split(',')
+                const position = positionsArr.find((item) => item === pos)
+                if (position && paper.resultScore !== '/') {
+                    res = Math.max(res, +paper.resultScore)
+                }
+            })
+            return res
+        },
+        departmentMinScore (pos) {
+            let res = 1e9
+            this.paperList.forEach((paper) => {
+                const positionsArr = paper.positions.split(',')
+                const position = positionsArr.find((item) => item === pos)
+                if (position && paper.resultScore !== '/') {
+                    res = Math.min(res, +paper.resultScore)
+                }
+            })
+            return res === 1e9 ? 0 : res
+        },
+        // position部门达标人数
+        departmentPassRate (pos) {
+            let count = 0
+            this.paperList.forEach((paper) => {
+                const positionsArr = paper.positions.split(',')
+                const position = positionsArr.find((item) => item === pos)
+                if (position && paper.isQualified === '达标') {
+                    count++
+                }
+            })
+            return count
+        },
+        // position部门分数和
+        departmentScoreSum (pos) {
+            let count = 0
+            this.paperList.forEach((paper) => {
+                const positionsArr = paper.positions.split(',')
+                const position = positionsArr.find((item) => item === pos)
+                if (position && paper.resultScore !== '/') {
+                    count += +paper.resultScore
+                }
+            })
+            return count
+        },
+        // 数据统计
+        showStatistics () {
+            this.paperList.forEach((paper) => {
+                const user = this.$store.getters.userList.find(
+                    (user) => paper.userName === user.userName
+                )
+                if (user) {
+                    paper['positions'] = user.positions
+                }
+            })
+
+            let departmentData = []
+            this.paperList.forEach((paper) => {
+                const pos = paper.positions.split(',')
+                for (let i = 0; i < pos.length; i++) {
+                    departmentData.push(pos[i])
+                }
+            })
+
+            departmentData = [...new Set(departmentData)]
+            this.departmentData = departmentData.map((item) => {
+                const plannedAttendees = this.filterdepartmentData(item)
+                const actualAttendees = this.filterJoindepartmentData(item)
+                const minScore = this.departmentMinScore(item)
+                const maxScore = this.departmentMaxScore(item)
+                const PassPeople = this.departmentPassRate(item)
+                const sumScore = this.departmentScoreSum(item)
+
+                return {
+                    department: item,
+                    plannedAttendees,
+                    actualAttendees,
+                    joinRate: actualAttendees / plannedAttendees,
+                    minScore,
+                    maxScore,
+                    passRate: actualAttendees === 0 ? 0 : PassPeople / actualAttendees,
+                    avgScore: actualAttendees === 0 ? 0 : sumScore / actualAttendees
+                }
+            })
+            this.$refs.statisticsRef.open()
         }
     }
 }
@@ -462,6 +690,11 @@ export default {
                         }
                     }
                 }
+            }
+            .paper-status {
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
             }
         }
     }

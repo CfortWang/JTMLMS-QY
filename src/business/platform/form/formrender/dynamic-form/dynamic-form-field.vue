@@ -1125,7 +1125,24 @@ export default {
                         this.changeFormData(fieldName, data[item.name] || '')
                     }
                 }
+
+                // 自定义数据联动
+                const showRule = item.showRule
+                if (this.$utils.isNotEmpty(showRule)) {
+                    const fieldName = fieldObj.length > 1 ? fieldObj[1] : fieldObj[0]
+                    if (this.$utils.isNotEmpty(fieldName) && this.models.hasOwnProperty(fieldName)) {
+                        this.changeFormData(fieldName, this.replacePlaceholders(data, showRule) || '')
+                    }
+                }
             }
+        },
+        // 自定义数据格式转换
+        replacePlaceholders (data, showRule) {
+            // 使用正则表达式找到所有${...}的占位符
+            return showRule.replace(/\$\{([^}]+)\}/g, (_, placeholder) => {
+                // 尝试从variables对象中获取对应变量的值
+                return data[placeholder] || `${placeholder}` // 如果找不到，就返回占位符本身
+            })
         },
         // 联动属性
         handleLinkageAttr (value, data) {

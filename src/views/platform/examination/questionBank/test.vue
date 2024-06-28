@@ -15,66 +15,72 @@
     >
         <div class="container">
             <div class="question">
-                <div
-                    v-for="(item, index) in questionList"
-                    v-show="showIndex === index + 1"
-                    :key="index"
-                    class="question-item"
-                >
-                    <div class="type">{{ item.questionType }}</div>
-                    <div class="stem">
-                        <span>{{ `【${index + 1}】${item.stem}` }}</span>
-                        <el-tag type="info" size="small">{{ `${item.score}分` }}</el-tag>
-                    </div>
-                    <div v-if="item.img && item.img.length" class="img">
-                        <ibps-image
-                            v-model="item.img"
-                            height="100"
-                            width="100"
-                            accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
-                            download
-                            disabled
-                        />
-                    </div>
-                    <div class="answer">
-                        <el-radio-group v-if="item.questionType === '单选题'" v-model="item.answer" @change="goNext">
-                            <el-radio
-                                v-for="(o, i) in item.options"
-                                :key="`${index}${i}`"
-                                :label="o.label"
-                            >{{ `${o.label}.${o.value}` }}</el-radio>
-                        </el-radio-group>
-                        <el-checkbox-group v-else-if="item.questionType === '多选题'" v-model="item.answer" @change="changeOptions">
-                            <el-checkbox
-                                v-for="(o, i) in item.options"
-                                :key="`${index}${i}`"
-                                :label="o.label"
-                            >{{ `${o.label}.${o.value}` }}</el-checkbox>
-                        </el-checkbox-group>
-                        <el-radio-group v-else-if="item.questionType === '判断题'" v-model="item.answer" @change="goNext">
-                            <el-radio-button label="√">√</el-radio-button>
-                            <el-radio-button label="×">×</el-radio-button>
-                        </el-radio-group>
-                        <template v-else-if="item.questionType === '填空题'">
+                <template v-for="(item, index) in questionList">
+                    <div
+                        v-if="showIndex === index + 1"
+                        :key="index"
+                        class="question-item"
+                    >
+                        <div class="type">{{ item.questionType }}</div>
+                        <div class="stem">
+                            <span>{{ `【${index + 1}】${item.stem}` }}</span>
+                            <el-tag type="info" size="small">{{ `${item.score}分` }}</el-tag>
+                        </div>
+                        <div v-if="item.img && item.img.length" class="img">
+                            <ibps-image
+                                v-model="item.img"
+                                height="100"
+                                width="100"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
+                                download
+                                disabled
+                            />
+                        </div>
+                        <div class="answer">
+                            <el-radio-group v-if="item.questionType === '单选题'" v-model="item.answer" @change="goNext">
+                                <el-radio
+                                    v-for="(o, i) in item.options"
+                                    :key="`${index}${i}`"
+                                    :label="o.label"
+                                >{{ `${o.label}.${o.value}` }}</el-radio>
+                            </el-radio-group>
+                            <el-checkbox-group v-else-if="item.questionType === '多选题'" v-model="item.answer" @change="changeOptions">
+                                <el-checkbox
+                                    v-for="(o, i) in item.options"
+                                    :key="`${index}${i}`"
+                                    :label="o.label"
+                                >{{ `${o.label}.${o.value}` }}</el-checkbox>
+                            </el-checkbox-group>
+                            <el-radio-group v-else-if="item.questionType === '判断题'" v-model="item.answer" @change="goNext">
+                                <el-radio-button label="√">√</el-radio-button>
+                                <el-radio-button label="×">×</el-radio-button>
+                            </el-radio-group>
+                            <template v-else-if="item.questionType === '填空题'">
+                                <el-input
+                                    v-for="(o, i) in item.options"
+                                    :key="`${index}${i}`"
+                                    v-model="o.answer"
+                                    type="text"
+                                    placeholder="请输入您的答案"
+                                />
+                            </template>
                             <el-input
-                                v-for="(o, i) in item.options"
-                                :key="`${index}${i}`"
-                                v-model="o.answer"
-                                type="text"
+                                v-else-if="item.questionType === '简答题'"
+                                v-model="item.answer"
+                                type="textarea"
+                                :autosize="{ minRows: 4, maxRows: 8}"
                                 placeholder="请输入您的答案"
                             />
-                        </template>
-                        <el-input
-                            v-else-if="item.questionType === '简答题'"
-                            v-model="item.answer"
-                            type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 8}"
-                            placeholder="请输入您的答案"
-                        />
+                        </div>
                     </div>
-                </div>
+                </template>
             </div>
             <div class="question-link">
+                <div class="tabs">
+                    <el-tabs v-model="activeName">
+                        <el-tab-pane v-for="(item) in pageTotal" :key="item" :label="pageLabel(item)" :name="item+''" />
+                    </el-tabs>
+                </div>
                 <el-progress
                     type="line"
                     class="progress"
@@ -82,13 +88,19 @@
                     :stroke-width="20"
                     :percentage="getProgress()"
                 />
-                <div
-                    v-for="(item, index) in questionList"
-                    :key="index"
-                    class="link-item"
-                    :class="setClassName(item, index)"
-                    @click="showIndex = index + 1"
-                >{{ index + 1 }}</div>
+                <div class="question">
+                    <template v-for="(item, index) in questionList">
+                        <div
+                            v-if="index+1>=pageRange(pagination.currentPage).start &&index+1<=pageRange(pagination.currentPage).end"
+                            :key="index"
+                            class="link-item"
+                            :class="setClassName(item, index)"
+                            @click="showIndex = index + 1"
+                        >{{ index + 1 }}</div>
+                    </template>
+
+                </div>
+
             </div>
         </div>
         <div class="tips">
@@ -119,6 +131,7 @@
 
 <script>
 // import Watermark from '@/layout/header-aside/components/header-message/watermark/watermark-cont'
+import { shuffle } from 'lodash'
 import { round } from 'lodash'
 export default {
     components: {
@@ -147,6 +160,11 @@ export default {
         const { duration } = this.examData || {}
         const countdown = duration === '不限' ? 0 : parseInt(duration / 1000)
         return {
+            pagination: {
+                currentPage: 1,
+                pageSize: 100
+            },
+            activeName: '1',
             countdown,
             title: this.examData.examName || '参加考试',
             dialogVisible: this.visible,
@@ -181,12 +199,17 @@ export default {
             questionList: [],
             showIndex: 1,
             userId,
-            countdownNotify: false
+            countdownNotify: false,
+            lastKey: '', // 存储上一次的按键
+            lastLastKey: '' // 存储上上次的按键
         }
     },
     computed: {
         formData () {
             return this.data
+        },
+        pageTotal () {
+            return Math.ceil(this.questionList.length / this.pagination.pageSize)
         },
         formattedCountdown () {
             const h = this.formatNum(parseInt(this.countdown / 60 / 60))
@@ -196,6 +219,11 @@ export default {
         }
     },
     watch: {
+        activeName: {
+            handler (val) {
+                this.pagination.currentPage = +val
+            }
+        },
         visible: {
             handler (val, oldVal) {
                 this.dialogVisible = this.visible
@@ -204,6 +232,8 @@ export default {
         },
         showIndex: {
             handler (val, oldVal) {
+                this.pagination.currentPage = Math.ceil(val / this.pagination.pageSize)
+                this.activeName = this.pagination.currentPage + ''
                 const temp = this.questionList[oldVal - 1]
                 if (['填空题'].includes(temp.questionType)) {
                     temp.answer = temp.options.map(item => item.answer)
@@ -226,6 +256,16 @@ export default {
         // Watermark.set('', '')
     },
     methods: {
+        pageRange (pageNo) {
+            return {
+                start: (pageNo - 1) * this.pagination.pageSize + 1,
+                end: pageNo * this.pagination.pageSize > this.questionList.length ? this.questionList.length : pageNo * this.pagination.pageSize
+            }
+        },
+        pageLabel (pageNo) {
+            const { start, end } = this.pageRange(pageNo)
+            return `${start}-${end}`
+        },
         // 获取题库数据
         async loadData () {
             if (!this.bankId) {
@@ -235,6 +275,7 @@ export default {
             }
             this.questionList = await this.getQuestionData()
             // console.log(this.questionList)
+            // console.log(this.examData)
         },
         startCountdown () {
             const timer = setInterval(() => {
@@ -277,16 +318,40 @@ export default {
         formatNum (num) {
             return num < 10 ? `0${num}` : num
         },
+        // 随机题目
+        getRandQuestionData (data) {
+            data = shuffle(data)
+            const temp = []
+            const type = ['单选题', '多选题', '判断题', '填空题', '简答题']
+            this.examData.randNumber = this.examData.randNumber.split(',')
+            for (let i = 0; i < this.examData.randNumber.length; i++) {
+                let t = +this.examData.randNumber[i]
+                // console.log(t)
+                if (t !== 0) {
+                    for (let j = 0; j < data.length && t; j++) {
+                        const item = data[j]
+                        if (item.questionType === type[i]) {
+                            temp.push(item)
+                            t--
+                        }
+                    }
+                }
+            }
+            return temp
+        },
         getQuestionData () {
             this.loading = true
             const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey from t_questions where parent_id_ = '${this.bankId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
-                    const { data = [] } = res.variables || {}
+                    let { data = [] } = res.variables || {}
                     if (!data.length) {
                         this.$message.error('获取题目信息失败！')
                         this.closeDialog()
                         return
+                    }
+                    if (this.examData.isRand === '1') {
+                        data = this.getRandQuestionData(data)
                     }
                     data.map(item => {
                         if (item.options) {
@@ -354,21 +419,61 @@ export default {
             return result.join(' ')
         },
         handleKeyPress (event) {
+            // console.log(event.keyCode, event.key)
+            // 这四种符号在中文模式下会自动补全 导致左右键混入的情况  《 “ {} 【  （
             if (event.keyCode === 37 || event.key === 'ArrowLeft') {
-                if (this.showIndex === 1) {
-                    this.$message.warning('已经是第一题了！')
-                    return
+                const ignoreConditions = [
+                    ['(', 'Shift'],
+                    ['{', 'Shift'],
+                    ['<', 'Shift'],
+                    ['9', 'Shift'],
+                    ['[', 'Shift'],
+                    ['Process', '['],
+                    ['Process', '9'],
+                    ['Process', ','],
+                    ['Process', "'"],
+                    ['ArrowLeft', 'Shift'],
+                    ['[', 'ArrowLeft'],
+                    ['ArrowLeft', '['],
+                    ['[', '['],
+                    ["'", '['],
+                    [',', 'Shift']
+                ]
+
+                if (!ignoreConditions.some(([llk, lk]) => this.lastLastKey === llk && this.lastKey === lk)) {
+                    if (this.showIndex === 1) {
+                        this.$message.warning('已经是第一题了！')
+                    } else {
+                        this.showIndex--
+                    }
                 }
-                this.showIndex--
             } else if (event.keyCode === 39 || event.key === 'ArrowRight') {
-                if (this.showIndex === this.questionList.length) {
-                    this.$message.warning('已经是最后一题了！')
-                    return
+                const ignoreConditions = [
+                    ['[', 'ArrowLeft'],
+                    ["'", 'ArrowLeft'],
+                    ['ArrowLeft', 'Shift'],
+                    ['Process', 'ArrowLeft'],
+                    ['ArrowLeft', '['],
+                    ['{', 'Shift'],
+                    ['<', 'Shift'],
+                    ['(', 'Shift'],
+                    ['9', 'Shift']
+                ]
+
+                if (!ignoreConditions.some(([llk, lk]) => this.lastLastKey === llk && this.lastKey === lk)) {
+                    if (this.showIndex === this.questionList.length) {
+                        this.$message.warning('已经是最后一题了！')
+                    } else {
+                        this.showIndex++
+                    }
                 }
-                this.showIndex++
-            } else if (event.keyCode === 27 || event.key === 'Esc') {
+            } else if (event.keyCode === 27 || event.key === 'Escape') {
                 this.handleCancel()
             }
+
+            // 更新键盘状态
+            this.lastLastKey = this.lastKey
+            this.lastKey = event.key
         },
         handleBeforeUnload (event) {
             const confirmationMessage = '离开将自动提交当前数据，确定要离开吗？';
@@ -385,7 +490,9 @@ export default {
             if (this.showIndex === this.questionList.length) {
                 return
             }
-            this.showIndex++
+            setTimeout(() => {
+                this.showIndex++
+            }, 200)
         },
         getScore ({ questionType, answer, rightKey, score }) {
             if (questionType === '多选题') {
@@ -396,29 +503,42 @@ export default {
             }
         },
         handleSubmit () {
-            let incompleteList = []
-            this.questionList.forEach((item, index) => {
-                if (item.questionType === '填空题') {
-                    const t = item.answer && !item.answer.some(i => i === '' || i === null)
-                    incompleteList.push(!t ? index + 1 : '')
-                } else if (item.questionType === '多选题') {
-                    const t = item.answer && item.answer.length
-                    incompleteList.push(!t ? index + 1 : '')
+            const nextHandle = () => {
+                let incompleteList = []
+                this.questionList.forEach((item, index) => {
+                    if (item.questionType === '填空题') {
+                        const t = item.answer && !item.answer.some(i => i === '' || i === null)
+                        incompleteList.push(!t ? index + 1 : '')
+                    } else if (item.questionType === '多选题') {
+                        const t = item.answer && item.answer.length
+                        incompleteList.push(!t ? index + 1 : '')
+                    } else {
+                        incompleteList.push(!item.answer ? index + 1 : '')
+                    }
+                })
+                incompleteList = incompleteList.filter(i => i)
+                const tip = incompleteList.length ? `还有第${incompleteList.join('、')}题未作答，您确定要直接交卷吗？` : '您已完成作答，确定要交卷吗？'
+                this.$confirm(tip, '提示', {
+                    type: incompleteList.length ? 'warning' : 'info',
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false
+                }).then(() => {
+                    this.submitForm(this.dealFormData())
+                }).catch(() => {})
+            }
+            // 处理最后一题无法自动提交的bug
+            if (this.questionList[this.questionList.length - 1] !== '判断题' && this.questionList[this.questionList.length - 1] !== '单选题') {
+                if (this.showIndex !== this.questionList.length) {
+                    this.showIndex = this.questionList.length
                 } else {
-                    incompleteList.push(!item.answer ? index + 1 : '')
+                    this.showIndex = 1
                 }
-            })
-            incompleteList = incompleteList.filter(i => i)
-            const tip = incompleteList.length ? `还有第${incompleteList.join('、')}题未作答，您确定要直接交卷吗？` : '您已完成作答，确定要交卷吗？'
-            this.$confirm(tip, '提示', {
-                type: incompleteList.length ? 'warning' : 'info',
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                showClose: false,
-                closeOnClickModal: false
-            }).then(() => {
-                this.submitForm(this.dealFormData())
-            }).catch(() => {})
+                this.$nextTick(nextHandle)
+            } else {
+                nextHandle()
+            }
         },
         dealFormData () {
             const submitData = []
@@ -433,7 +553,7 @@ export default {
                     ti_gan_: item.stem,
                     ti_xing_: item.questionType,
                     fen_zhi_: item.score,
-                    fu_tu_: item.img,
+                    fu_tu_: item.img instanceof Array ? JSON.stringify(item.img) : item.img,
                     xuan_xiang_lei_xi: item.optionType,
                     xuan_xiang_: selectType ? JSON.stringify(item.options) : '',
                     can_kao_da_an_: item.rightKey,
@@ -480,16 +600,29 @@ export default {
             })
         },
         handleCancel () {
-            this.$confirm('中途退出将自动提交考试数据，是否确认操作？', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning',
-                showClose: false,
-                closeOnClickModal: false,
-                closeOnPressEscape: false
-            }).then(() => {
-                this.submitForm(this.dealFormData())
-            })
+            const nextHandle = () => {
+                this.$confirm('中途退出将自动提交考试数据，是否确认操作？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false
+                }).then(() => {
+                    this.submitForm(this.dealFormData())
+                })
+            }
+            // 处理最后一题无法自动提交的bug
+            if (this.questionList[this.questionList.length - 1] !== '判断题' && this.questionList[this.questionList.length - 1] !== '单选题') {
+                if (this.showIndex !== this.questionList.length) {
+                    this.showIndex = this.questionList.length
+                } else {
+                    this.showIndex = 1
+                }
+                this.$nextTick(nextHandle)
+            } else {
+                nextHandle()
+            }
         },
         hilarity () {
             this.$notify({
@@ -571,11 +704,17 @@ export default {
             }
             .question-link {
                 display: flex;
-                flex-wrap: wrap;
-                justify-content: flex-start;
+                flex-direction: column;
                 position: absolute;
                 width: calc(100% - 40px);
                 bottom: 20px;
+                .question{
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-content: flex-start;
+                    height: 120px;
+                    overflow-y: auto;
+                }
                 .progress {
                     width: 100%;
                     margin-bottom: 10px;

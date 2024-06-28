@@ -15,89 +15,100 @@
     >
         <div class="container">
             <div class="question">
-                <div
-                    v-for="(item, index) in questionList"
-                    v-show="showIndex === index + 1"
-                    :key="index"
-                    class="question-item"
-                >
-                    <div class="type">{{ item.questionType }}</div>
-                    <div class="stem">
-                        <span>{{ `【${index + 1}】${item.stem}` }}</span>
-                        <el-tag type="info" size="small">{{ `${item.score}分` }}</el-tag>
-                    </div>
-                    <div v-if="item.img && item.img.length" class="img">
-                        <ibps-image
-                            v-model="item.img"
-                            height="100"
-                            width="100"
-                            accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
-                            download
-                            disabled
-                        />
-                    </div>
-                    <div class="answer">
-                        <div class="mine">
-                            <div class="title">考生答案：</div>
-                            <div class="content">
-                                <el-input
-                                    v-for="(o, i) in item.answer"
-                                    :key="`${index}${i}`"
-                                    :value="o"
-                                    :type="item.questionType === '简答题' ? 'textarea' : 'text'"
-                                    :rows="item.questionType === '简答题' ? 12 : 1"
-                                    readonly
-                                />
+                <template v-for="(item, index) in questionList">
+                    <div
+                        v-if="showIndex === index + 1"
+                        :key="item.dataId"
+                        class="question-item"
+                    >
+                        <div class="type">{{ item.questionType }}</div>
+                        <div class="stem">
+                            <span>{{ `【${index + 1}】${item.stem}` }}</span>
+                            <el-tag type="info" size="small">{{ `${item.score}分` }}</el-tag>
+                        </div>
+                        <div v-if="item.img && item.img.length" class="img">
+                            <ibps-image
+                                :value="item.img"
+                                height="100"
+                                width="100"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
+                                download
+                                disabled
+                            />
+                        </div>
+                        <div class="answer">
+                            <div class="mine">
+                                <div class="title">考生答案：</div>
+                                <div class="content">
+                                    <el-input
+                                        v-for="(o, i) in item.answer"
+                                        :key="`${index}${i}`"
+                                        :value="o"
+                                        :type="item.questionType === '简答题' ? 'textarea' : 'text'"
+                                        :rows="item.questionType === '简答题' ? 12 : 1"
+                                        readonly
+                                    />
+                                </div>
+                            </div>
+                            <div class="right">
+                                <div class="title">参考答案：</div>
+                                <div class="content">
+                                    <el-input
+                                        v-for="(o, i) in item.rightKey"
+                                        :key="`${index}${i}`"
+                                        :value="o"
+                                        :type="item.questionType === '简答题' ? 'textarea' : 'text'"
+                                        :rows="item.questionType === '简答题' ? 12 : 1"
+                                        readonly
+                                    />
+                                </div>
                             </div>
                         </div>
-                        <div class="right">
-                            <div class="title">参考答案：</div>
-                            <div class="content">
-                                <el-input
-                                    v-for="(o, i) in item.rightKey"
-                                    :key="`${index}${i}`"
-                                    :value="o"
-                                    :type="item.questionType === '简答题' ? 'textarea' : 'text'"
-                                    :rows="item.questionType === '简答题' ? 12 : 1"
-                                    readonly
-                                />
+                        <div class="result">
+                            <div class="title">试题得分
+                                <el-tooltip effect="dark" content="请输入根据考生答案与参考答案给出题目得分" placement="top">
+                                    <i class="el-icon-question" />
+                                </el-tooltip>
                             </div>
-                        </div>
-                    </div>
-                    <div class="result">
-                        <div class="title">试题得分
-                            <el-tooltip effect="dark" content="请输入根据考生答案与参考答案给出题目得分" placement="top">
-                                <i class="el-icon-question" />
+                            <el-tooltip effect="dark" content="错误，该题计0分" placement="top">
+                                <el-button type="danger" icon="el-icon-close" circle @click="changeScore(index, 0)" />
+                            </el-tooltip>
+                            <el-input-number
+                                v-model="item.resultScore"
+                                :min="0"
+                                :max="item.score"
+                                :precision="1"
+                                class="score-input"
+                                placeholder=""
+                            />
+                            <el-tooltip effect="dark" content="正确，该题计满分" placement="top">
+                                <el-button type="success" icon="el-icon-check" circle @click="changeScore(index, item.score)" />
+                            </el-tooltip>
+                            <el-tooltip effect="dark" content="取消已有评分，未评分的题目不会被提交" placement="top">
+                                <el-button type="warning" icon="el-icon-delete" @click="changeScore(index, undefined)">取消评分</el-button>
                             </el-tooltip>
                         </div>
-                        <el-tooltip effect="dark" content="错误，该题计0分" placement="top">
-                            <el-button type="danger" icon="el-icon-close" circle @click="changeScore(index, 0)" />
-                        </el-tooltip>
-                        <el-input-number
-                            v-model="item.resultScore"
-                            :min="0"
-                            :max="item.score"
-                            :precision="1"
-                            class="score-input"
-                            placeholder=""
-                        />
-                        <el-tooltip effect="dark" content="正确，该题计满分" placement="top">
-                            <el-button type="success" icon="el-icon-check" circle @click="changeScore(index, item.score)" />
-                        </el-tooltip>
-                        <el-tooltip effect="dark" content="取消已有评分，未评分的题目不会被提交" placement="top">
-                            <el-button type="warning" icon="el-icon-delete" @click="changeScore(index, undefined)">取消评分</el-button>
-                        </el-tooltip>
                     </div>
-                </div>
+                </template>
             </div>
+
             <div class="question-link">
-                <div
-                    v-for="(item, index) in questionList"
-                    :key="index"
-                    class="link-item"
-                    :class="setClassName(item, index)"
-                    @click="showIndex = index + 1"
-                >{{ index + 1 }}</div>
+                <div class="tabs">
+                    <el-tabs v-model="activeName">
+                        <el-tab-pane v-for="(item) in pageTotal" :key="item" :label="pageLabel(item)" :name="item+''" />
+                    </el-tabs>
+                </div>
+                <div class="question">
+                    <template v-for="(item, index) in questionList">
+                        <div
+                            v-if="index+1>=pageRange(pagination.currentPage).start &&index+1<=pageRange(pagination.currentPage).end"
+                            :key="item.dataId"
+                            class="link-item"
+                            :class="setClassName(item, index)"
+                            @click="showIndex = index + 1"
+                        >{{ index + 1 }}</div>
+                    </template>
+                </div>
             </div>
         </div>
         <div slot="footer" class="el-dialog--center">
@@ -127,6 +138,11 @@ export default {
     data () {
         const { userId } = this.$store.getters || {}
         return {
+            pagination: {
+                currentPage: 1,
+                pageSize: 100
+            },
+            activeName: '1',
             title: '试题评阅',
             dialogVisible: this.visible,
             loading: false,
@@ -165,9 +181,17 @@ export default {
     computed: {
         formData () {
             return this.data
+        },
+        pageTotal () {
+            return Math.ceil(this.questionList.length / this.pagination.pageSize)
         }
     },
     watch: {
+        activeName: {
+            handler (val) {
+                this.pagination.currentPage = +val
+            }
+        },
         visible: {
             handler (val, oldVal) {
                 this.dialogVisible = this.visible
@@ -176,6 +200,8 @@ export default {
         },
         showIndex: {
             handler (val, oldVal) {
+                this.pagination.currentPage = Math.ceil(val / this.pagination.pageSize)
+                this.activeName = this.pagination.currentPage + ''
                 const temp = this.questionList[oldVal - 1]
             }
         }
@@ -189,6 +215,16 @@ export default {
         window.removeEventListener('keyup', this.handleKeyPress)
     },
     methods: {
+        pageRange (pageNo) {
+            return {
+                start: (pageNo - 1) * this.pagination.pageSize + 1,
+                end: pageNo * this.pagination.pageSize > this.questionList.length ? this.questionList.length : pageNo * this.pagination.pageSize
+            }
+        },
+        pageLabel (pageNo) {
+            const { start, end } = this.pageRange(pageNo)
+            return `${start}-${end}`
+        },
         // 获取题库数据
         async loadData () {
             this.questionList = await this.getQuestionData()
@@ -475,13 +511,19 @@ export default {
             }
             .question-link {
                 display: flex;
-                flex-wrap: wrap;
-                justify-content: flex-start;
+                flex-direction: column;
                 position: absolute;
                 width: calc(100% - 40px);
                 bottom: 20px;
-                height: 80px;
-                overflow-y: auto;
+
+                .question{
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-content: flex-start;
+                    height: 80px;
+                    overflow-y: auto;
+                }
+
                 .el-progress {
                     width: 100%;
                     margin-bottom: 10px;

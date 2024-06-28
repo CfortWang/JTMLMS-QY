@@ -231,11 +231,12 @@
                 />
             </div>
             <div class="table-title">
-                题库试题信息
+                <span>题库试题信息</span>
+                <el-button v-if="!readonly" type="danger" size="mini" icon="el-icon-delete" @click="removeItems">删除</el-button>
             </div>
             <el-table
                 ref="elTable"
-                :data="questionData"
+                :data="showPaperList"
                 border
                 stripe
                 highlight-current-row
@@ -243,8 +244,14 @@
                 max-height="400px"
                 class="exam-table"
                 @row-dblclick="handleRowDblclick"
+                @selection-change="handleSelectionChange"
             >
-                <el-table-column label="序号" type="index" width="50" />
+                <el-table-column
+                    v-if="!readonly"
+                    width="50"
+                    type="selection"
+                />
+                <el-table-column label="序号" type="index" :index="showIndex" width="60" />
                 <el-table-column
                     prop="content"
                     label="题干"
@@ -253,30 +260,41 @@
                     <template slot-scope="scope">
                         <el-popover trigger="hover" placement="top">
                             <div class="question-info">
-                                <div class="question-info-item">
-                                    <div class="label">出题人</div>
-                                    <div class="value">{{ transformUser(scope.row.creator) }}</div>
+                                <div class="left">
+                                    <div class="question-info-item">
+                                        <div class="label">出题人</div>
+                                        <div class="value">{{ transformUser(scope.row.creator) }}</div>
+                                    </div>
+                                    <div class="question-info-item">
+                                        <div class="label">选项类型</div>
+                                        <div class="value">{{ scope.row.optionType || '—' }}</div>
+                                    </div>
+                                    <div class="question-info-item">
+                                        <div class="label">评分方式</div>
+                                        <div class="value">{{ scope.row.rateType }}</div>
+                                    </div>
+                                    <div class="question-info-item">
+                                        <div class="label">评分人</div>
+                                        <div class="value">{{ transformUser(scope.row.rater) }}</div>
+                                    </div>
+                                    <div class="question-info-item">
+                                        <div class="label">标签</div>
+                                        <div class="value">{{ scope.row.quesTag }}</div>
+                                    </div>
+                                    <div class="question-info-item">
+                                        <div class="label">状态</div>
+                                        <div class="value">{{ scope.row.quesState }}</div>
+                                    </div>
                                 </div>
-                                <div class="question-info-item">
-                                    <div class="label">选项类型</div>
-                                    <div class="value">{{ scope.row.optionType || '—' }}</div>
+                                <div class="right">
+                                    <ibps-image
+                                        :value="showImgs(scope,3)"
+                                        height="180"
+                                        width="180"
+                                        :disabled="true"
+                                    />
                                 </div>
-                                <div class="question-info-item">
-                                    <div class="label">评分方式</div>
-                                    <div class="value">{{ scope.row.rateType }}</div>
-                                </div>
-                                <div class="question-info-item">
-                                    <div class="label">评分人</div>
-                                    <div class="value">{{ transformUser(scope.row.rater) }}</div>
-                                </div>
-                                <div class="question-info-item">
-                                    <div class="label">标签</div>
-                                    <div class="value">{{ scope.row.quesTag }}</div>
-                                </div>
-                                <div class="question-info-item">
-                                    <div class="label">状态</div>
-                                    <div class="value">{{ scope.row.quesState }}</div>
-                                </div>
+
                             </div>
                             <div slot="reference" class="name-wrapper">{{ scope.row.content }}</div>
                         </el-popover>
@@ -311,13 +329,13 @@
                             size="medium"
                             @click="handleColumnAction(scope.row, false)"
                         >修改</el-button>
-                        <el-button
+                        <!-- <el-button
                             v-if="!readonly"
                             type="text"
                             style="color: #f56c6c;"
                             size="medium"
                             @click="handleRemove(scope.row)"
-                        >删除</el-button>
+                        >删除</el-button> -->
                         <el-button
                             v-if="readonly"
                             type="text"
@@ -328,6 +346,18 @@
                     </template>
                 </el-table-column>
             </el-table>
+
+            <el-pagination
+                style="margin-top: 5px; padding-bottom: 10px"
+                :current-page="currentPage"
+                :page-sizes="[10, 20,30, 50,100]"
+                :page-size="pageSize"
+                layout="prev,pager,next,jumper,sizes,->,total"
+                :total="questionData.length"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+            />
+
         </div>
         <div slot="footer" class="el-dialog--center">
             <ibps-toolbar
@@ -355,7 +385,8 @@ import { paperTypeOptions } from '../constants'
 export default {
     components: {
         QuesEdit: () => import('../question/edit'),
-        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
+        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog'),
+        IbpsImage: () => import('@/business/platform/file/image')
     },
     props: {
         visible: {
@@ -374,6 +405,9 @@ export default {
     data () {
         const { userList = [], deptList = [], userId, level = {}} = this.$store.getters || {}
         return {
+            multipleSelection: [],
+            pageSize: 10,
+            currentPage: 1,
             userList,
             paperTypeOptions,
             level: level.second || level.first,
@@ -436,6 +470,11 @@ export default {
     computed: {
         formId () {
             return this.id
+        },
+        showPaperList () {
+            const start = (this.currentPage - 1) * this.pageSize
+            const end = start + this.pageSize
+            return this.questionData.slice(start, end)
         }
     },
     watch: {
@@ -455,6 +494,26 @@ export default {
         this.getQuestionData()
     },
     methods: {
+        // 默认展示三张图片
+        showImgs (scope, showNumber = 3) {
+            if (scope.row.img) {
+                return JSON.parse(scope.row.img).slice(0, showNumber)
+            }
+            return ''
+        },
+        // 分页连续序号
+        showIndex (index) {
+            return index + 1 + (this.currentPage - 1) * this.pageSize
+        },
+        // 当前页码改变
+        handleCurrentChange (val) {
+            this.currentPage = val
+        },
+        // 页码选择器改变
+        handleSizeChange (val) {
+            this.pageSize = val
+            this.currentPage = 1
+        },
         changeLimit (e) {
             this.form.xian_kao_ci_shu_ = e === '1' ? 1 : '不限'
         },
@@ -543,7 +602,7 @@ export default {
                 const bank = bankData[0]
                 bank.isLimit = bank.xian_kao_ci_shu_ === '不限' ? '0' : '1'
                 bank.ping_fen_ren_ = bank.ping_fen_ren_ ? bank.ping_fen_ren_.split(',') : []
-                bank.suo_shu_fan_wei_ = bank.suo_shu_fan_wei_ === '不限' ? '不限' : '科级'
+                // bank.suo_shu_fan_wei_ = bank.suo_shu_fan_wei_ === '不限' ? '不限' : '科级'
                 if (bank.kao_shi_shi_chang === '不限') {
                     bank.limitTime = '0'
                     bank.hours = null
@@ -698,6 +757,24 @@ export default {
                 this.$message.success(this.formId ? '保存题库信息成功' : '新增题库成功')
             })
         },
+        // table复选框
+        handleSelectionChange (val) {
+            this.multipleSelection = val
+        },
+        // 批量删除
+        removeItems () {
+            if (this.multipleSelection.length === 0) {
+                return this.$message.warning('请选择需要删除的题目！')
+            }
+            this.$confirm('确定要删除所选中的题目吗？删除操作将在题库信息保存后生效', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.questionData = this.questionData.filter(item => !this.multipleSelection.includes(item))
+                this.multipleSelection = []
+            })
+        },
         // 关闭当前窗口
         closeDialog () {
             this.$emit('close', false)
@@ -788,10 +865,16 @@ export default {
                 font-size: 16px;
                 font-weight: 600;
                 margin: 20px 0 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
         }
     }
     .question-info {
+        overflow:auto;
+        max-width: 536px;
+        display: flex;
         .question-info-item {
             display: flex;
             margin-bottom: 10px;
@@ -808,6 +891,19 @@ export default {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+            }
+        }
+        .right{
+            display: flex;
+            margin-left: 20px;
+            .ibps-image{
+                font-size: 0;
+                ::v-deep{
+                    .list-group{
+                        display: flex;
+                    }
+                }
+
             }
         }
     }

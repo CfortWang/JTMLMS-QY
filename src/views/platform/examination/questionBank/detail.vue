@@ -59,13 +59,31 @@
                     <span class="value">{{ paperData.dept }}</span>
                 </div> -->
             </div>
+            <div class="select">
+                答题状态：<el-select v-model="paperStatus" placeholder="请选择">
+                    <el-option
+                        v-for="item in paperoptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    />
+                </el-select>
+            </div>
+
             <div class="question">
                 <div
-                    v-for="(item, index) in paperData.list"
+                    v-for="(item, index) in showPaperData.list"
                     :key="index"
                     class="question-item"
                 >
-                    <div class="type">{{ item.type }}<el-tag type="primary" size="small" class="score">{{ `共${item.totalScore}分` }}</el-tag></div>
+                    <div v-if="item.questions.length > 0" class="type">
+                        {{ item.type }}<el-tag
+                            v-if="paperStatus === 'all'"
+                            type="primary"
+                            size="small"
+                            class="score"
+                        >{{ `共${item.totalScore}分` }}</el-tag>
+                    </div>
                     <div
                         v-for="(q, qIndex) in item.questions"
                         :key="`${index}${qIndex}`"
@@ -87,7 +105,15 @@
                         </div>
                         <div class="answer">
                             <div class="mine">
-                                <div class="title">考生答案：<el-tag :type="!q.score && q.score !== '0' ? 'warning' : 'success'" size="small" class="score">{{ !q.score && q.score !== '0' ? '未评分' : `得${q.score}分` }}</el-tag></div>
+                                <div class="title">
+                                    考生答案：<el-tag
+                                        :type="q.score && q.score !== '0' ? 'success' : 'danger'"
+                                        size="small"
+                                        class="score"
+                                    >{{
+                                        !q.score && q.score !== "0" ? "未评分" : `得${q.score}分`
+                                    }}</el-tag>
+                                </div>
                                 <div class="answer-content">
                                     <el-radio-group v-if="q.questionType === '单选题'" :value="q.answer">
                                         <el-radio
@@ -168,29 +194,45 @@
                     placement="top"
                     size="large"
                 >
-                    <el-card class="timeline-card" :class="paper.dataId === showPaperId ? 'active-card' : ''" @click.native="changePaper(paper.dataId)">
+                    <el-card
+                        class="timeline-card"
+                        :class="paper.dataId === showPaperId ? 'active-card' : ''"
+                        @click.native="changePaper(paper.dataId,paper.status)"
+                    >
                         <div class="card-item">{{ `开始时间：${paper.startTime}` }}</div>
                         <div class="card-item">{{ `结束时间：${paper.endTime}` }}</div>
                         <div v-if="paper.status === '已完成'" class="card-item">
                             <span>{{ `得分：${paper.resultScore}` }}</span>
-                            <el-tag :type="paper.isQualified ? 'success' : 'danger'" size="mini" class="score">{{ paper.isQualified ? `达标` : '未达标' }}</el-tag>
-                            <el-tag v-if="paper.resultScore === maxScore" type="success" size="mini" class="score">{{ `最高分` }}</el-tag>
-                            <el-tag v-if="paper.resultScore === minScore" type="warning" size="mini" class="score">{{ `最低分` }}</el-tag>
+                            <el-tag
+                                :type="paper.isQualified ? 'success' : 'danger'"
+                                size="mini"
+                                class="score"
+                            >{{ paper.isQualified ? `达标` : "未达标" }}</el-tag>
+                            <el-tag
+                                v-if="paper.resultScore === maxScore"
+                                type="success"
+                                size="mini"
+                                class="score"
+                            >{{ `最高分` }}</el-tag>
+                            <el-tag
+                                v-if="paper.resultScore === minScore"
+                                type="warning"
+                                size="mini"
+                                class="score"
+                            >{{ `最低分` }}</el-tag>
                         </div>
                     </el-card>
                 </el-timeline-item>
             </el-timeline>
         </div>
         <div slot="footer" class="el-dialog--center">
-            <ibps-toolbar
-                :actions="toolbars"
-                @action-event="handleActionEvent"
-            />
+            <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
         </div>
     </el-dialog>
 </template>
 
 <script>
+import { cloneDeep } from 'lodash'
 export default {
     components: {
         IbpsImage: () => import('@/business/platform/file/image')
@@ -221,19 +263,47 @@ export default {
         return {
             title: '考试详情',
             dialogVisible: this.visible,
-            toolbars: [
-                { key: 'cancel', label: '退出' }
-            ],
+            toolbars: [{ key: 'cancel', label: '退出' }],
             paperList: [],
             paperData: [],
             maxScore: '',
             minScore: '',
-            showPaperId: ''
+            showPaperId: '',
+            paperoptions: [
+                { value: 'all', label: '全部' },
+                { value: 'false', label: '错误' },
+                { value: 'true', label: '正确' },
+                { value: 'noFinished', label: '未评分' }
+            ],
+            paperStatus: 'all'
         }
     },
     computed: {
         formData () {
             return this.data
+        },
+        showPaperData: {
+            set () {}, // 解决报错
+            get () {
+                const showPaperData = cloneDeep(this.paperData)
+                showPaperData.list?.forEach((papers) => {
+                    papers.questions = papers.questions.filter((paper) => {
+                        switch (this.paperStatus) {
+                            case 'all':
+                                return true
+                            case 'false':
+                                return paper.score && paper.score === '0'
+                            case 'true':
+                                return paper.score && paper.score !== '0'
+                            case 'noFinished':
+                                return paper.score === ''
+                            default:
+                                break
+                        }
+                    })
+                })
+                return showPaperData
+            }
         }
     },
     watch: {
@@ -262,6 +332,13 @@ export default {
             this.paperList = await this.getQuestionData()
             this.paperData = this.paperList.find(i => i.dataId === this.id) || this.paperList[0]
             this.showPaperId = this.paperData.dataId
+
+            const isAllNotFinish = this.paperList.every(item => item.status !== '已完成')
+            if (isAllNotFinish) {
+                this.$message.error('考试未完成或未评分，请稍后再试！')
+                this.closeDialog()
+                return
+            }
         },
         handleActionEvent ({ key }) {
             switch (key) {
@@ -326,7 +403,7 @@ export default {
                                 paperName,
                                 totalScore: parseFloat(totalScore),
                                 resultScore: parseFloat(resultScore),
-                                totalCount: data.length,
+                                // totalCount: data.length,
                                 scoringType,
                                 list: [{
                                     type: item.questionType,
@@ -346,9 +423,12 @@ export default {
                         }
                     })
                     result.forEach(item => {
+                        let count = 0
                         item.list.forEach(i => {
+                            count += i.questions.length
                             i.totalScore = i.questions.reduce((a, b) => a + parseFloat(b.questionScore), 0)
                         })
+                        item.totalCount = count
                     })
                     // 获取最高分最低分
                     const { maxScore, minScore } = result.filter(i => i.status === '已完成').reduce((acc, curr) => {
@@ -368,10 +448,15 @@ export default {
                 })
             })
         },
-        changePaper (id) {
+        changePaper (id, status) {
+            if (status !== '已完成') {
+                this.$message.error('考试未完成或未评分，暂时无法查看！')
+                return
+            }
             this.showPaperId = id
             this.paperData = this.paperList.find(i => i.dataId === id)
             console.log(id)
+            this.paperStatus = 'all'
         },
         // 关闭当前窗口
         closeDialog () {

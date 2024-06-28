@@ -45,25 +45,89 @@
                 </el-select>
             </el-form-item> -->
             <el-form-item label="考试题库：" prop="ti_ku_id_">
-                <ibps-custom-dialog
-                    v-model="form.ti_ku_id_"
-                    size="small"
-                    template-key="tkdhk"
-                    :multiple="false"
-                    :disabled="isDisabled"
-                    type="dialog"
-                    class="custom-dialog"
-                    placeholder="请选择考试题库"
-                />
+                <div class="tiku">
+                    <div>
+                        <ibps-custom-dialog
+                            v-model="form.ti_ku_id_"
+                            size="small"
+                            template-key="tkdhk"
+                            :multiple="false"
+                            :disabled="isDisabled"
+                            type="dialog"
+                            class="custom-dialog"
+                            placeholder="请选择考试题库"
+                        />
+                    </div>
+
+                    <!-- <el-button
+            type="primary"
+            @click="randTiku"
+            :disabled="randButtonDisabled"
+            >随机题库</el-button
+          > -->
+                </div>
+            </el-form-item>
+            <el-form-item>
+                <template slot="label">
+                    随机抽题
+                    <el-tooltip
+                        effect="dark"
+                        content="是否开启从题库中随机抽题。"
+                        placement="top"
+                    >
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
+                <el-radio-group v-model="form.sui_ji_chou_ti_" :disabled="isDisabled">
+                    <el-radio label="0">关闭</el-radio>
+                    <el-radio label="1" :disabled="!(!!form.ti_ku_id_)">开启</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="form.sui_ji_chou_ti_ === '1'" class="handrand">
+                <template slot="label">
+                    抽题规则
+                    <el-tooltip
+                        effect="dark"
+                        content="设置每类题型的抽题数量，相同题型相同分值可以自由选择抽题数量，相同题型不同分值只能全抽或不抽。"
+                        placement="top"
+                    >
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
+                <div v-for="item in handList" :key="item.itemType" class="hand-item">
+                    <template v-if="item.list.length>0">
+                        <span>{{ item.itemType }}：</span>
+                        <el-input-number
+                            v-model="item.questionNumber"
+                            style="width:120px"
+                            :min="0"
+                            :max="item.list.length"
+                            :precision="0"
+                            :disabled="form.sui_ji_chou_ti_ === '0' || isDisabled"
+                            placeholder="请输入抽题数量"
+                            :step="item.step"
+                            step-strictly
+                        />
+                    </template>
+
+                </div>
+
             </el-form-item>
             <el-form-item prop="xian_kao_shi_jian">
                 <template slot="label">
                     限考时间
-                    <el-tooltip effect="dark" content="设置该考试的提交截至时间。" placement="top">
+                    <el-tooltip
+                        effect="dark"
+                        content="设置该考试的提交截至时间。"
+                        placement="top"
+                    >
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
-                <el-radio-group v-model="form.isDateLimit" @change="changeLimit(form.isDateLimit, 'xian_kao_shi_jian', null)">
+                <el-radio-group
+                    v-model="form.isDateLimit"
+                    @change="changeLimit(form.isDateLimit, 'xian_kao_shi_jian', null)"
+                >
                     <el-radio label="0">不限</el-radio>
                     <el-radio label="1">限制</el-radio>
                 </el-radio-group>
@@ -93,7 +157,11 @@
             <el-form-item prop="isCountLimit" class="inline-item">
                 <template slot="label">
                     限考次数
-                    <el-tooltip effect="dark" content="限制是否可重复参加，以及可参加考试的最大次数。" placement="top">
+                    <el-tooltip
+                        effect="dark"
+                        content="限制是否可重复参加，以及可参加考试的最大次数。"
+                        placement="top"
+                    >
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -119,7 +187,11 @@
             <el-form-item v-if="form.isCountLimit === '0' || form.isCountLimit === '1' && form.xian_kao_ci_shu_ > 1" prop="ji_fen_fang_shi_">
                 <template slot="label">
                     计分方式
-                    <el-tooltip effect="dark" content="设置对于可重复参加的考试，最终得分的计算方式（仅限考次数大于1时有效）。" placement="top">
+                    <el-tooltip
+                        effect="dark"
+                        content="设置对于可重复参加的考试，最终得分的计算方式（仅限考次数大于1时有效）。"
+                        placement="top"
+                    >
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -132,7 +204,11 @@
             <el-form-item prop="isTimeLimit" class="inline-item">
                 <template slot="label">
                     考试时长
-                    <el-tooltip effect="dark" content="设置该考试单次作答的最大时长。" placement="top">
+                    <el-tooltip
+                        effect="dark"
+                        content="设置该考试单次作答的最大时长。"
+                        placement="top"
+                    >
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -166,7 +242,11 @@
             <el-form-item prop="da_biao_zhan_bi_">
                 <template slot="label">
                     达标分值占比
-                    <el-tooltip effect="dark" content="设置该考试的达标分数线占试题总分的百分比。" placement="top">
+                    <el-tooltip
+                        effect="dark"
+                        content="设置该考试的达标分数线占试题总分的百分比。"
+                        placement="top"
+                    >
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -183,7 +263,11 @@
             <el-form-item prop="yun_xu_bao_ming_">
                 <template slot="label">
                     允许自主报名
-                    <el-tooltip effect="dark" content="限制非本考试的参考人员是否可报名参加该考试。" placement="top">
+                    <el-tooltip
+                        effect="dark"
+                        content="限制非本考试的参考人员是否可报名参加该考试。"
+                        placement="top"
+                    >
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
                 </template>
@@ -210,7 +294,11 @@
                     placeholder="请选择培训记录"
                 />
             </el-form-item>
-            <el-form-item v-if="!isDisabled || form.kao_shi_miao_shu_" label="考试描述：" prop="kao_shi_miao_shu_">
+            <el-form-item
+                v-if="!isDisabled || form.kao_shi_miao_shu_"
+                label="考试描述："
+                prop="kao_shi_miao_shu_"
+            >
                 <el-input
                     v-model="form.kao_shi_miao_shu_"
                     type="textarea"
@@ -222,10 +310,7 @@
             </el-form-item>
         </el-form>
         <div slot="footer" class="el-dialog--center">
-            <ibps-toolbar
-                :actions="toolbars"
-                @action-event="handleActionEvent"
-            />
+            <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
         </div>
     </el-dialog>
 </template>
@@ -252,15 +337,29 @@ export default {
         }
     },
     data () {
-        const { userList = [], deptList = [], userId, level } = this.$store.getters || {}
+        const {
+            userList = [],
+            deptList = [],
+            userId,
+            level
+        } = this.$store.getters || {}
         return {
+            handList: [
+                { itemType: '单选题', questionNumber: 0, list: [], step: 1 },
+                { itemType: '多选题', questionNumber: 0, list: [], step: 1 },
+                { itemType: '判断题', questionNumber: 0, list: [], step: 1 },
+                { itemType: '填空题', questionNumber: 0, list: [], step: 1 },
+                { itemType: '简答题', questionNumber: 0, list: [], step: 1 }
+            ],
             userList,
             examTypeOptions,
-            deptList: deptList.filter(i => i.depth === 4),
+            deptList: deptList.filter((i) => i.depth === 4),
             title: this.id ? '编辑考试' : '新建考试',
             formLabelWidth: '150px',
             dialogVisible: this.visible,
             dialogLoading: false,
+            randButtonDisabled: false,
+            isFirst: true,
             form: {
                 di_dian_: level.second || level.first,
                 chuang_jian_shi_j: '',
@@ -280,6 +379,10 @@ export default {
                 isCountLimit: '0',
                 isTimeLimit: '0',
                 isDateLimit: '0',
+                sui_ji_chou_ti_: '0',
+                chou_ti_zong_fen_: 0,
+                ti_mu_zong_shu_: 0,
+                sui_ji_ti_shu_: [],
                 hours: 2,
                 minutes: 30
             },
@@ -301,16 +404,27 @@ export default {
                 { key: 'cancel', label: '关闭' }
             ],
             rules: {
-                kao_shi_ming_chen: [{ required: true, message: this.$t('validate.required') }],
+                kao_shi_ming_chen: [
+                    { required: true, message: this.$t('validate.required') }
+                ],
                 // kao_shi_lei_xing_: [{ required: true, message: this.$t('validate.required') }],
                 ti_ku_id_: [{ required: true, message: this.$t('validate.required') }],
-                xian_kao_shi_jian: [{ required: true, message: this.$t('validate.required') }],
-                xian_kao_ci_shu_: [{ required: true, message: this.$t('validate.required') }],
-                can_kao_ren_yuan_: [{ required: true, message: this.$t('validate.required') }],
-                kao_shi_shi_chang: [{ required: true, message: this.$t('validate.required') }],
-                da_biao_zhan_bi_: [{ required: true, message: this.$t('validate.required') }]
+                xian_kao_shi_jian: [
+                    { required: true, message: this.$t('validate.required') }
+                ],
+                xian_kao_ci_shu_: [
+                    { required: true, message: this.$t('validate.required') }
+                ],
+                can_kao_ren_yuan_: [
+                    { required: true, message: this.$t('validate.required') }
+                ],
+                kao_shi_shi_chang: [
+                    { required: true, message: this.$t('validate.required') }
+                ],
+                da_biao_zhan_bi_: [
+                    { required: true, message: this.$t('validate.required') }
+                ]
             }
-
         }
     },
     watch: {
@@ -319,12 +433,53 @@ export default {
                 this.dialogVisible = this.visible
             }
             // immediate: true
+        },
+        'form.ti_ku_id_': {
+            handler (val) {
+                if (val) {
+                    const sql = `select * from t_questions where parent_id_ = '${val}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+                    this.$common.request('sql', sql).then((res) => {
+                        const { data = [] } = res.variables || {}
+                        this.getHandList(data)
+                    })
+                }
+            }
         }
     },
     mounted () {
         this.getExamData()
     },
     methods: {
+        // 题型分类
+        getHandList (data) {
+            // 确定每种类型的题目
+            this.handList.forEach(hand => {
+                hand.list = data.filter(item => item.ti_xing_ === hand.itemType)
+            })
+
+            if (this.$utils.isEmpty(this.id)) {
+                // 设置每种类型题目的默认题数
+                this.handList.forEach(hand => {
+                    hand.questionNumber = hand.list.length
+                })
+            } else {
+                if (!this.isFirst) {
+                    this.handList.forEach(hand => {
+                        hand.questionNumber = hand.list.length
+                    })
+                } else {
+                    this.isFirst = false
+                }
+            }
+
+            // 设置每种类型题目的步数
+            this.handList.forEach(hand => {
+                if (hand.list.length > 0) {
+                    const isSame = hand.list.every(item => item.fen_zhi_ === hand.list[0].fen_zhi_)
+                    hand.step = isSame ? 1 : hand.list.length
+                }
+            })
+        },
         changeLimit (e, type, defaultValue) {
             this.form[type] = e === '1' ? defaultValue : '不限'
         },
@@ -346,10 +501,11 @@ export default {
                 return
             }
             if (this.isDisabled) {
+                this.randButtonDisabled = true
                 this.$message.info('非未发布状态的考试仅可修改限考时间！')
             }
-            const sql = `select id_, create_by_, ti_ku_id_, guan_lian_id_, kao_shi_ming_chen, kao_shi_lei_xing_, chuang_jian_shi_j, fa_bu_shi_jian_, fa_bu_ren_, xian_kao_shi_jian, xian_kao_ci_shu_, kao_shi_shi_chang, can_kao_ren_yuan_, zhuang_tai_, da_biao_zhan_bi_, ji_fen_fang_shi_, kao_shi_miao_shu_, yun_xu_bao_ming_ from t_exams where id_ = '${this.id}'`
-            this.$common.request('sql', sql).then(res => {
+            const sql = `select id_, create_by_, ti_ku_id_, guan_lian_id_, kao_shi_ming_chen, kao_shi_lei_xing_, chuang_jian_shi_j, fa_bu_shi_jian_, fa_bu_ren_, xian_kao_shi_jian, xian_kao_ci_shu_, kao_shi_shi_chang, can_kao_ren_yuan_, zhuang_tai_, da_biao_zhan_bi_, ji_fen_fang_shi_, kao_shi_miao_shu_, yun_xu_bao_ming_, sui_ji_chou_ti_, sui_ji_ti_shu_,chou_ti_zong_fen_,ti_mu_zong_shu_ from t_exams where id_ = '${this.id}'`
+            this.$common.request('sql', sql).then((res) => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     this.$message.error('数据不存在')
@@ -367,11 +523,53 @@ export default {
                     data[0].minutes = (data[0].kao_shi_shi_chang % (1000 * 60 * 60)) / (60 * 1000)
                 }
                 this.form = data[0]
+                if (this.form.sui_ji_chou_ti_ === '1') {
+                    this.form.sui_ji_ti_shu_ = this.form.sui_ji_ti_shu_.split(',')
+                    this.form.sui_ji_ti_shu_.forEach((item, index) => {
+                        this.handList[index].questionNumber = item
+                    })
+                }
+            })
+        },
+        // 随机题库 弃用
+        randTiku () {
+            this.randButtonDisabled = true
+            const sql = `select id_ from t_question_bank where ti_ku_zhuang_tai_='可用'`
+            this.$common.request('sql', sql).then((res) => {
+                const { data = [] } = res.variables || {}
+                const randNumber = Math.floor(Math.random() * data.length)
+                this.form.ti_ku_id_ = data[randNumber].id_
+                this.randButtonDisabled = false
             })
         },
         handleSubmit () {
             this.$refs.form.validate((valid) => {
                 if (valid) {
+                    this.form.sui_ji_ti_shu_ = []
+                    this.form.chou_ti_zong_fen_ = 0
+                    this.form.ti_mu_zong_shu_ = 0
+                    if (this.form.sui_ji_chou_ti_ === '1') {
+                        // 计算总分 总数量
+                        this.handList.forEach(item => {
+                            if (item.list.length > 0) {
+                                this.form.sui_ji_ti_shu_.push(item.questionNumber)
+                                this.form.ti_mu_zong_shu_ += item.questionNumber
+                                this.form.chou_ti_zong_fen_ += item.list.slice(0, item.questionNumber).reduce((pre, cur) => {
+                                    return pre + +cur.fen_zhi_
+                                }, 0)
+                            } else {
+                                this.form.sui_ji_ti_shu_.push(0)
+                            }
+                        })
+
+                        if (this.form.ti_mu_zong_shu_ === 0) {
+                            return this.$message.warning('请填写需要抽取的题目数量！')
+                        }
+                    }
+                    this.form.chou_ti_zong_fen_ += ''
+                    this.form.ti_mu_zong_shu_ += ''
+                    this.form.sui_ji_ti_shu_ = this.form.sui_ji_ti_shu_.join(',')
+
                     const { isTimeLimit, xian_kao_shi_jian = '' } = this.form || {}
                     // 转换考试时长
                     if (isTimeLimit === '0') {
@@ -430,7 +628,7 @@ export default {
                 max-width: 1080px;
             }
             .el-dialog__body {
-                height: calc(88vh - 200px);
+                height: calc(88vh - 150px);
             }
             .el-form-item {
                 margin-bottom: 14px !important;
@@ -475,6 +673,22 @@ export default {
         .unit {
             display: inline-block;
             margin: 0 20px 0 5px;
+        }
+        .handrand{
+            ::v-deep .el-form-item__content{
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .hand-item{
+                display: flex;
+                margin-right: 20px;
+                margin-bottom: 10px;
+            }
+        }
+    }
+    .tiku {
+        .el-button {
+            margin-left: 20px;
         }
     }
 </style>
