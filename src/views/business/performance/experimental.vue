@@ -231,6 +231,14 @@ export default {
                 if (!valid) {
                     return this.$message.warning('请完善表单必填项后再进行操作！')
                 }
+                // Excel sheet 不支持正反斜杆，需提前转化
+                const { shiYanXiangMu } = this.form
+                const regex = /[\/\\]/g
+
+                if (regex.test(shiYanXiangMu)) {
+                    this.form.shiYanXiangMu = shiYanXiangMu.replace(regex, '_')
+                    this.$message.warning('【实验项目】中的【\\】与【/】已被转化为【_】')
+                }
                 this.submitForm(key, showMsg, callback)
                 // this.$confirm('确定要提交数据吗？', '提示', {
                 //     confirmButtonText: '确定',
@@ -276,7 +284,7 @@ export default {
                 kaiShiShiJian,
                 jieShuShiJian,
                 shiYanCanShu: this.$utils.isNotEmpty(shiYanCanShu) ? JSON.stringify(shiYanCanShu) : null,
-                shiYanShuJu: this.$utils.isNotEmpty(shiYanShuJu) ? JSON.stringify(shiYanShuJu) : null,
+                shiYanShuJu: this.$utils.isNotEmpty(shiYanShuJu) ? shiYanShuJu instanceof Array ? JSON.stringify(shiYanShuJu) : shiYanShuJu : null,
                 jiSuanJieGuo: this.$utils.isNotEmpty(jiSuanJieGuo) ? JSON.stringify(jiSuanJieGuo) : null,
                 xingNengZhiBia: this.configData.target,
                 fangAnLeiXing: this.configData.methodName,
@@ -347,6 +355,7 @@ export default {
                         this.$message.success('实验数据导入成功')
                         this.form.jiSuanJieGuo = res.data
                         this.form.shiYanJieLun = res.data.reportResult
+                        this.form.shiYanShuJu = res.data.shiYanShuJu
                     }).catch(({ state, cause }) => {
                         const errMsg = JSON.parse(cause)
                         let msgContent = ''
@@ -377,6 +386,8 @@ export default {
                 recalculate({ id: this.formId }).then(res => {
                     this.$message.success('重新计算成功')
                     this.form.jiSuanJieGuo = res.data
+                    this.form.shiYanJieLun = res.data.reportResult
+                    this.form.shiYanShuJu = res.data.shiYanShuJu
                 })
             })
         },
