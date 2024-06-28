@@ -34,7 +34,7 @@
 </template>
 <script>
 import * as echarts from 'echarts'
-import { colors, getRandomColor, lineChartOption } from '../constants/option'
+import { colors, getRandomColor, barChartOption } from '../constants/option'
 export default {
     components: {},
     props: {
@@ -218,11 +218,10 @@ export default {
             const D = new Date()
             const w = window.innerWidth
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
-            console.log(lineChartOption)
             setTimeout(() => {
                 this.chartList.forEach((item, index) => {
                     const chart = echarts.init(document.getElementById(`chart${index}`))
-                    const option = JSON.parse(JSON.stringify(lineChartOption))
+                    const option = JSON.parse(JSON.stringify(barChartOption))
                     const xData = this.getDatesInRange(this.range[0], this.range[1])
                     const yData1 = Array.from({ length: xData.length }, () => Math.floor(Math.random() * 100) + 1)
                     const yData2 = Array.from({ length: xData.length }, () => Math.floor(Math.random() * 100) + 1)

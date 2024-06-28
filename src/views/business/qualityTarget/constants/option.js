@@ -296,6 +296,16 @@ export const lineChartOption = {
         bottom: '30px',
         left: '30px',
         right: '30px'
+    }
+}
+
+export const barChartOption = {
+    ...basicChart,
+    grid: {
+        top: '80px',
+        bottom: '30px',
+        left: '30px',
+        right: '30px'
     },
     series: [
         {
