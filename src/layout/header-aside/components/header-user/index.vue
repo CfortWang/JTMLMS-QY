@@ -72,7 +72,6 @@
                                 effect="light"
                                 content="双击下方部门可切换主部门"
                                 placement="top"
-                                :enterable="true"
                             >
                                 <ibps-icon name="help" style="color: #dd5b44;" />
                             </el-tooltip>

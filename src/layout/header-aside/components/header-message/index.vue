@@ -135,7 +135,7 @@ export default {
     },
     computed: {
         tooltipContent () {
-            return this.messageCount === 0 ? this.$t('layout.header-aside.header-message.empty') : ''
+            return this.messageCount === 0 ? this.$t('layout.header-aside.header-message.empty') : '系统消息'
         }
     },
     mounted () {
@@ -261,7 +261,7 @@ export default {
             this.subId = message.subId
             this.editId = message.id
             this.dialogFormVisible = true
-            //   this.type = message.tableName ? message.tableName : ''
+            // this.type = message.tableName ? message.tableName : ''
             this.tableName = message.tableName ? message.tableName : ''
             this.tableId = message.tableId ? message.tableId : ''
             this.readonly = !!message.tableName
