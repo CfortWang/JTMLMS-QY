@@ -70,7 +70,7 @@
                 </el-col>
             </el-row>
         </el-form-item>
-        <el-form-item prop="remember">
+        <!-- <el-form-item prop="remember">
             <el-row :span="24">
                 <el-col :span="14">
                     <el-checkbox v-model="loginForm.remember">{{ $t('login.remember') }}</el-checkbox>
@@ -104,7 +104,7 @@
                     >{{ $t('login.tenantRegister') }}</el-button>
                 </el-col>
             </el-row>
-        </el-form-item>
+        </el-form-item> -->
 
         <el-button
             :loading="loading"
