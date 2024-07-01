@@ -72,10 +72,10 @@
                                 effect="light"
                                 content="双击下方部门可切换主部门"
                                 placement="top"
+                                style="z-index: 9999;"
                             >
-                                <ibps-icon name="help" style="color: #dd5b44;" />
+                                <i class="el-icon-info" style="color: #dd5b44;" />
                             </el-tooltip>
-                            <!-- <el-button type="text" icon="el-icon-edit" size="mini" circle @click="changeMainposiVisible = true" /> -->
                         </div>
                         <div
                             v-for="item in positions"
