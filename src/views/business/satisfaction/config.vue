@@ -109,10 +109,8 @@ export default {
             }
         },
         addConfig (index) {
-            console.log(index)
             if (!index || !this.configData.length) {
                 this.configData.push({ name: '' })
-                console.log(this.configData)
             } else {
                 this.configData.splice(index + 1, 0, { name: '' })
             }
