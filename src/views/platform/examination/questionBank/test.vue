@@ -62,6 +62,8 @@
                                     v-model="o.answer"
                                     type="text"
                                     placeholder="请输入您的答案"
+                                    @focus="textareaFocused=true"
+                                    @blur="textareaFocused=false"
                                 />
                             </template>
                             <el-input
@@ -70,6 +72,8 @@
                                 type="textarea"
                                 :autosize="{ minRows: 4, maxRows: 8}"
                                 placeholder="请输入您的答案"
+                                @focus="textareaFocused=true"
+                                @blur="textareaFocused=false"
                             />
                         </div>
                     </div>
@@ -200,8 +204,7 @@ export default {
             showIndex: 1,
             userId,
             countdownNotify: false,
-            lastKey: '', // 存储上一次的按键
-            lastLastKey: '' // 存储上上次的按键
+            textareaFocused: false // input 聚焦状态
         }
     },
     computed: {
@@ -420,52 +423,19 @@ export default {
         },
         handleKeyPress (event) {
             // console.log(event.keyCode, event.key)
-            // 这四种符号在中文模式下会自动补全 导致左右键混入的情况  《 “ {} 【  （
             if (event.keyCode === 37 || event.key === 'ArrowLeft') {
-                const ignoreConditions = [
-                    ['(', 'Shift'],
-                    ['{', 'Shift'],
-                    ['<', 'Shift'],
-                    ['9', 'Shift'],
-                    ['[', 'Shift'],
-                    ['Process', '['],
-                    ['Process', '9'],
-                    ['Process', ','],
-                    ['Process', "'"],
-                    ['ArrowLeft', 'Shift'],
-                    ['[', 'ArrowLeft'],
-                    ['ArrowLeft', '['],
-                    ['[', '['],
-                    ["'", '['],
-                    [',', 'Shift']
-                ]
-
-                if (!ignoreConditions.some(([llk, lk]) => this.lastLastKey === llk && this.lastKey === lk)) {
-                    if (this.showIndex === 1) {
-                        this.$message.warning('已经是第一题了！')
-                    } else {
-                        this.showIndex--
-                    }
+                if (this.textareaFocused === true) return // 如果是聚焦状态 那么键盘的左键不应该执行上一题操作
+                if (this.showIndex === 1) {
+                    this.$message.warning('已经是第一题了！')
+                } else {
+                    this.showIndex--
                 }
             } else if (event.keyCode === 39 || event.key === 'ArrowRight') {
-                const ignoreConditions = [
-                    ['[', 'ArrowLeft'],
-                    ["'", 'ArrowLeft'],
-                    ['ArrowLeft', 'Shift'],
-                    ['Process', 'ArrowLeft'],
-                    ['ArrowLeft', '['],
-                    ['{', 'Shift'],
-                    ['<', 'Shift'],
-                    ['(', 'Shift'],
-                    ['9', 'Shift']
-                ]
-
-                if (!ignoreConditions.some(([llk, lk]) => this.lastLastKey === llk && this.lastKey === lk)) {
-                    if (this.showIndex === this.questionList.length) {
-                        this.$message.warning('已经是最后一题了！')
-                    } else {
-                        this.showIndex++
-                    }
+                if (this.textareaFocused === true) return // 如果是聚焦状态 那么键盘的右键不应该执行下一题操作
+                if (this.showIndex === this.questionList.length) {
+                    this.$message.warning('已经是最后一题了！')
+                } else {
+                    this.showIndex++
                 }
             } else if (event.keyCode === 27 || event.key === 'Escape') {
                 this.handleCancel()

@@ -22,7 +22,7 @@
             :width="width"
             :height="height"
             :dialog-height="dialogHeight"
-            :label-key="labelKey"
+            :label-key="showLabel"
             :toolbars="toolbars"
             :preview="preview"
             :temp-search="tempSearch"
@@ -43,7 +43,7 @@ import ButtonsConstants from '@/business/platform/data/constants/buttons'
 import TemplateDefault from './types/default'
 import TemplateDialog from './types/dialog'
 import TemplateValueSource from './types/value-source'
-
+import { buildLabelTitle } from '../utils'
 export default {
     components: {
         TemplateDefault,
@@ -90,13 +90,22 @@ export default {
             height: null,
             dialogHeight: null,
             toolbars: [],
-            selectedValue: this.multiple ? [] : {}
+            selectedValue: this.multiple ? [] : {},
+            showLabel: this.labelKey
         }
     },
     watch: {
         visible: {
             handler: function (val, oldVal) {
                 this.dialogVisible = val
+            },
+            immediate: true
+        },
+        labelKey: {
+            handler: function (val, oldVal) {
+                if (val) {
+                    this.showLabel = val
+                }
             },
             immediate: true
         },
@@ -137,6 +146,9 @@ export default {
 
                 this.dialogHeight = h - 130 - (this.multiple ? 60 : 40) - vh
                 this.toolbars = this.handleToolbars(dialogs.buttons ? dialogs.buttons.dialog_buttons : [])
+            }
+            if (this.$utils.isEmpty(this.labelKey)) {
+                this.showLabel = buildLabelTitle(dataTemplate)
             }
         },
         handleToolbars (buttons) {
