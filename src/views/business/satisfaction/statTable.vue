@@ -34,36 +34,22 @@
         >
             <el-table-column width="50" />
             <el-table-column>
-                <template slot-scope="scope">
-                    <div v-if="scope.$index === 0">
-                        调查表数量
-                    </div>
-                </template>
+                <div>调查表数量</div>
             </el-table-column>
             <el-table-column>
-                <template slot-scope="scope">
-                    <div v-html="timesInfo['住院患者']" />
-                </template>
+                <div v-html="timesInfo['住院患者']" />
             </el-table-column>
             <el-table-column>
-                <template slot-scope="scope">
-                    <div v-html="timesInfo['门诊患者']" />
-                </template>
+                <div v-html="timesInfo['门诊患者']" />
             </el-table-column>
             <el-table-column>
-                <template slot-scope="scope">
-                    <div v-html="timesInfo['医务人员']" />
-                </template>
+                <div v-html="timesInfo['医务人员']" />
             </el-table-column>
             <el-table-column>
-                <template slot-scope="scope">
-                    <div v-html="timesInfo['员工']" />
-                </template>
+                <div v-html="timesInfo['员工']" />
             </el-table-column>
             <el-table-column>
-                <template slot-scope="scope">
-                    <div>N/A</div>
-                </template>
+                <div>N/A</div>
             </el-table-column>
         </el-table>
     </div>
@@ -86,19 +72,54 @@ export default {
             isInitialized: false
         }
     },
+    computed: {
+        statDataWatcher () {
+            return this.formData.statData
+        },
+        timesDataWatcher () {
+            return this.formData.timesData
+        }
+    },
     watch: {
-        formData: {
+        statDataWatcher: {
             handler (val) {
-                this.statData = this.$utils.isEmpty(val.statData) ? [] : val.statData
-                this.timesData = this.$utils.isEmpty(val.timesData) ? [] : val.timesData
+                this.statData = this.$utils.isEmpty(val) ? [] : val
+            },
+            deep: true,
+            immediate: true
+        },
+        timesDataWatcher: {
+            handler (val) {
+                this.timesData = this.$utils.isEmpty(val) ? [] : val
+                // this.updateTimesInfo()
                 this.timesInfo = {}
+                let countDetail = ''
                 Object.keys(this.timesData).forEach(key => {
                     const t = this.timesData[key]
-                    this.timesInfo[key] = `共：${t['总数']}份，其中：<br/>纸质调查表：${t['纸质调查表']}份<br/>电话：${t['电话']}份<br/>手机客户端：${t['手机客户端']}份`
+                    this.timesInfo[key] = `共${t['总数']}份，其中：<br/>纸质调查表${t['纸质调查表']}份<br/>电话${t['电话']}份<br/>手机客户端${t['手机客户端']}份`
+                    countDetail += this.timesInfo[key].replace(/<br\s*\/?>/gi, '，')
                 })
+                this.emitChangeData('shuLiangMingXi', countDetail)
             },
-            deep: true
+            deep: true,
+            immediate: true
         }
+        // formData: {
+        //     handler (val) {
+        //         this.statData = this.$utils.isEmpty(val.statData) ? [] : val.statData
+        //         this.timesData = this.$utils.isEmpty(val.timesData) ? [] : val.timesData
+        //         this.timesInfo = {}
+        //         let countDetail = ''
+        //         Object.keys(this.timesData).forEach(key => {
+        //             const t = this.timesData[key]
+        //             this.timesInfo[key] = `共${t['总数']}份，其中：<br/>纸质调查表${t['纸质调查表']}份<br/>电话${t['电话']}份<br/>手机客户端${t['手机客户端']}份`
+        //             countDetail += this.timesInfo[key].replace(/<br\s*\/?>/gi, '，')
+        //         })
+        //         console.log(countDetail)
+        //         // this.$emit('change-data', 'shuLiangMingXi', countDetail)
+        //     },
+        //     deep: true
+        // }
     },
     mounted () {
 
@@ -134,7 +155,17 @@ export default {
                 }, 0)
                 sums[index] = (sums[index] / (this.timesData[column.label]['总记录数']) * 10).toFixed(2) + '%'
             })
+            const rateDetail = `住院患者满意度：${sums[2]}\n门诊患者满意度：${sums[3]}\n医务人员满意度：${sums[4]}\n员工满意度：${sums[5]}\n`
+            this.emitChangeData('tongJiXiangQing', rateDetail)
             return sums
+        },
+        emitChangeData (event, data) {
+            // 深拷贝 formData
+            const formDataCopy = JSON.parse(JSON.stringify(this.formData))
+            // 确保 formData 需要更新时才进行
+            if (formDataCopy[event] !== data) {
+                this.$emit('change-data', event, data)
+            }
         }
     }
 }
