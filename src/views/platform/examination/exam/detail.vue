@@ -116,13 +116,20 @@
                         />
                     </el-select>
                 </div>
-
-                <el-button
-                    type="primary"
-                    size="mini"
-                    icon="el-icon-s-data"
-                    @click="showStatistics"
-                >各部门数据统计</el-button>
+                <div class="table-bar">
+                    <el-button
+                        type="primary"
+                        size="mini"
+                        icon="ibps-icon-sign-out"
+                        @click="exportData()"
+                    >导出数据</el-button>
+                    <el-button
+                        type="success"
+                        size="mini"
+                        icon="el-icon-s-data"
+                        @click="showStatistics"
+                    >数据统计</el-button>
+                </div>
             </div>
             <div class="paper-table">
                 <el-table
@@ -212,6 +219,8 @@
 import IbpsUserSelector from '@/business/platform/org/selector'
 // 数据统计组件
 import Statistics from './statistics.vue'
+import IbpsExport from '@/plugins/export'
+import ActionUtils from '@/utils/action'
 import { max, min, mean, sum, maxBy, minBy, meanBy, round } from 'lodash'
 const qualifiedType = [
     {
@@ -253,7 +262,9 @@ export default {
         }
     },
     data () {
+        const { userList } = this.$store.getters || {}
         return {
+            userList,
             title: '考试详情',
             dialogVisible: this.visible,
             paperDialogVisible: false,
@@ -347,8 +358,9 @@ export default {
         // 获取部门数据
         posData () {
             this.paperList.forEach((item) => {
-                const user = this.$store.getters.userList.find((u) => u.userName === item.userName)
+                const user = this.userList.find((u) => u.userName === item.userName)
                 item.positionId = user.positionId
+                item.positionName = user.positions
             })
         },
         handleActionEvent ({ key }) {
@@ -370,8 +382,7 @@ export default {
             return temp ? temp.type : 'default'
         },
         transformUser (userId) {
-            const { userList = [] } = this.$store.getters
-            const user = userList.find(u => u.userId === userId) || {}
+            const user = this.userList.find(u => u.userId === userId) || {}
             return user.userName || '-'
         },
         transformTime (timeStamp) {
@@ -471,121 +482,122 @@ export default {
         showIndex (index) {
             return index + 1 + (this.currentPage - 1) * this.pageSize
         },
-        // position部门所有应参考人数
-        filterdepartmentData (position) {
-            let count = 0
-            this.paperList.forEach((paper) => {
-                const pos = paper.positions.split(',')
-                for (let i = 0; i < pos.length; i++) {
-                    if (position === pos[i]) {
-                        count++
-                        break
-                    }
-                }
-            })
-            return count
+        // 部门参考人数
+        deptJoined (dept) {
+            return this.paperList.filter(paper => paper.positionName.split(',').includes(dept)).length
         },
-        // position部门所有已参考人数
-        filterJoindepartmentData (position) {
-            let count = 0
-            this.paperList.forEach((paper) => {
-                const pos = paper.positions.split(',')
-                for (let i = 0; i < pos.length; i++) {
-                    if (position === pos[i] && paper.count.split('/')[1] !== '0') {
-                        count++
-                        break
-                    }
-                }
-            })
-            return count
+        // 部门已考人数
+        deptFinished (dept) {
+            return this.paperList.filter(paper => paper.positionName.split(',').includes(dept) && paper.finishCount !== 0).length
         },
-        // position部门最高分
-        departmentMaxScore (pos) {
-            let res = 0
-            this.paperList.forEach((paper) => {
-                const positionsArr = paper.positions.split(',')
-                const position = positionsArr.find((item) => item === pos)
-                if (position && paper.resultScore !== '/') {
-                    res = Math.max(res, +paper.resultScore)
-                }
-            })
-            return res
+        // 部门达标人数
+        deptPassRate (dept) {
+            return this.paperList.filter(paper => paper.positionName.split(',').includes(dept) && paper.isQualified === '达标').length
         },
-        departmentMinScore (pos) {
-            let res = 1e9
-            this.paperList.forEach((paper) => {
-                const positionsArr = paper.positions.split(',')
-                const position = positionsArr.find((item) => item === pos)
-                if (position && paper.resultScore !== '/') {
-                    res = Math.min(res, +paper.resultScore)
-                }
-            })
-            return res === 1e9 ? 0 : res
+        // 部门分数，最高分、最低分、总分
+        deptScore (dept) {
+            const validPapers = this.paperList.filter(paper => paper.positionName.split(',').includes(dept) && paper.resultScore !== '/')
+            const scores = validPapers.map(paper => +paper.resultScore)
+            return {
+                max: Math.max(...scores, 0),
+                min: scores.length ? Math.min(...scores) : 0,
+                sum: validPapers.reduce((sum, paper) => sum + +paper.resultScore, 0)
+            }
         },
-        // position部门达标人数
-        departmentPassRate (pos) {
-            let count = 0
-            this.paperList.forEach((paper) => {
-                const positionsArr = paper.positions.split(',')
-                const position = positionsArr.find((item) => item === pos)
-                if (position && paper.isQualified === '达标') {
-                    count++
-                }
-            })
-            return count
-        },
-        // position部门分数和
-        departmentScoreSum (pos) {
-            let count = 0
-            this.paperList.forEach((paper) => {
-                const positionsArr = paper.positions.split(',')
-                const position = positionsArr.find((item) => item === pos)
-                if (position && paper.resultScore !== '/') {
-                    count += +paper.resultScore
-                }
-            })
-            return count
+        departmentMinScore (dept) {
+            const validPapers = this.paperList.filter(paper => paper.positionName.split(',').includes(dept) && paper.resultScore !== '/')
+            const scores = validPapers.map(paper => +paper.resultScore)
+            return scores.length ? Math.min(...scores) : 0
         },
         // 数据统计
         showStatistics () {
-            this.paperList.forEach((paper) => {
-                const user = this.$store.getters.userList.find(
-                    (user) => paper.userName === user.userName
-                )
-                if (user) {
-                    paper['positions'] = user.positions
-                }
-            })
-
-            let departmentData = []
-            this.paperList.forEach((paper) => {
-                const pos = paper.positions.split(',')
-                for (let i = 0; i < pos.length; i++) {
-                    departmentData.push(pos[i])
-                }
-            })
-
-            departmentData = [...new Set(departmentData)]
-            this.departmentData = departmentData.map((item) => {
-                const plannedAttendees = this.filterdepartmentData(item)
-                const actualAttendees = this.filterJoindepartmentData(item)
-                const minScore = this.departmentMinScore(item)
-                const maxScore = this.departmentMaxScore(item)
-                const PassPeople = this.departmentPassRate(item)
-                const sumScore = this.departmentScoreSum(item)
+            let deptList = this.paperList.map(paper => paper.positionName).join(',').split(',')
+            deptList = [...new Set(deptList)]
+            this.departmentData = deptList.map(item => {
+                const plannedAttendees = this.deptJoined(item)
+                const actualAttendees = this.deptFinished(item)
+                const PassPeople = this.deptPassRate(item)
+                const score = this.deptScore(item)
 
                 return {
                     department: item,
                     plannedAttendees,
                     actualAttendees,
                     joinRate: actualAttendees / plannedAttendees,
-                    minScore,
-                    maxScore,
+                    minScore: score.min,
+                    maxScore: score.max,
                     passRate: actualAttendees === 0 ? 0 : PassPeople / actualAttendees,
-                    avgScore: actualAttendees === 0 ? 0 : sumScore / actualAttendees
+                    avgScore: actualAttendees === 0 ? 0 : score.sum / actualAttendees
                 }
             })
             this.$refs.statisticsRef.open()
+        },
+        // 导出统计数据
+        exportData () {
+            const exportColumns = [
+                {
+                    field_name: 'userName',
+                    label: '考生姓名',
+                    name: 'userName'
+                },
+                {
+                    field_name: 'positionName',
+                    label: '部门',
+                    name: 'positionName'
+                },
+                {
+                    field_name: 'examCount',
+                    label: '参考次数',
+                    name: 'examCount'
+                },
+                {
+                    field_name: 'finishCount',
+                    label: '完成次数',
+                    name: 'finishCount'
+                },
+                {
+                    field_name: 'max',
+                    label: '最高得分',
+                    name: 'max'
+                },
+                {
+                    field_name: 'min',
+                    label: '最低得分',
+                    name: 'min'
+                },
+                {
+                    field_name: 'avg',
+                    label: '平均得分',
+                    name: 'avg'
+                },
+                {
+                    field_name: 'latest',
+                    label: '最近得分',
+                    name: 'latest'
+                },
+                {
+                    field_name: 'resultScore',
+                    label: '最终成绩',
+                    name: 'resultScore'
+                },
+                {
+                    field_name: 'isQualified',
+                    label: '是否达标',
+                    name: 'isQualified'
+                }
+            ]
+            this.handleExport(exportColumns, this.filterPaperList, `考试【${this.paperData.examName}】统计数据`)
+        },
+        handleExport (columns, data, title, message, nameKey = 'name') {
+            IbpsExport.excel({
+                columns: columns,
+                data: data,
+                nameKey: nameKey,
+                title: title
+            }).then(() => {
+                const msg = message || '导出成功'
+                ActionUtils.success(msg)
+            })
         }
     }
 }
