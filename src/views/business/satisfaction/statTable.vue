@@ -15,14 +15,14 @@
             :cell-style="{ textAlign: 'center' }"
         >
             <el-table-column type="index" label="序号" width="50" />
-            <el-table-column label="调查项" prop="surveyItem" />
+            <el-table-column label="调查项" prop="xiangMu" />
             <el-table-column prop="" label="用户打分">
-                <el-table-column label="住院患者" prop="inpatient" />
-                <el-table-column label="门诊患者" prop="outpatient" />
-                <el-table-column label="医务人员" prop="medical" />
-                <el-table-column label="员工" prop="employee" />
+                <el-table-column label="住院患者" prop="zhuYuan" />
+                <el-table-column label="门诊患者" prop="menZhen" />
+                <el-table-column label="医务人员" prop="yiWu" />
+                <el-table-column label="员工" prop="yuanGong" />
             </el-table-column>
-            <el-table-column label="小计" prop="count" />
+            <el-table-column label="小计" prop="xiaoJi" />
         </el-table>
         <el-table
             v-if="statData.length"
@@ -68,16 +68,17 @@ export default {
             maxHeight: '600px',
             statData: [],
             timesData: {},
+            timesInfo: {},
             readonly: true,
             isInitialized: false
         }
     },
     computed: {
         statDataWatcher () {
-            return this.formData.statData
+            return this.formData.mydtjzb
         },
         timesDataWatcher () {
-            return this.formData.timesData
+            return this.formData.jiSuanShuJu
         }
     },
     watch: {
@@ -90,16 +91,16 @@ export default {
         },
         timesDataWatcher: {
             handler (val) {
-                this.timesData = this.$utils.isEmpty(val) ? [] : val
+                this.timesData = this.$utils.isEmpty(val) ? {} : JSON.parse(val)
                 // this.updateTimesInfo()
                 this.timesInfo = {}
                 let countDetail = ''
                 Object.keys(this.timesData).forEach(key => {
                     const t = this.timesData[key]
-                    this.timesInfo[key] = `共${t['总数']}份，其中：<br/>纸质调查表${t['纸质调查表']}份<br/>电话${t['电话']}份<br/>手机客户端${t['手机客户端']}份`
-                    countDetail += this.timesInfo[key].replace(/<br\s*\/?>/gi, '，')
+                    this.timesInfo[key] = `共${t['总数']}份，来源分布为：<br/>纸质调查表${t['纸质调查表']}份<br/>电话${t['电话']}份<br/>手机客户端${t['手机客户端']}份`
+                    countDetail += `【${key}】类型` + this.timesInfo[key] + '\n'
                 })
-                this.emitChangeData('shuLiangMingXi', countDetail)
+                this.emitChangeData('shuLiangMingXi', countDetail.replace(/<br\s*\/?>/gi, '，').replace(/：，/gi, '：'))
             },
             deep: true,
             immediate: true
@@ -126,7 +127,7 @@ export default {
     },
     methods: {
         getSummaries (param) {
-            if (!this.statData.length) {
+            if (!this.statData.length || this.$utils.isEmpty(this.timesData)) {
                 return []
             }
             const { columns, data } = param
@@ -155,7 +156,7 @@ export default {
                 }, 0)
                 sums[index] = (sums[index] / (this.timesData[column.label]['总记录数']) * 10).toFixed(2) + '%'
             })
-            const rateDetail = `住院患者满意度：${sums[2]}\n门诊患者满意度：${sums[3]}\n医务人员满意度：${sums[4]}\n员工满意度：${sums[5]}\n`
+            const rateDetail = `住院患者满意率：${sums[2]}\n门诊患者满意率：${sums[3]}\n医务人员满意率：${sums[4]}\n员工满意率：${sums[5]}\n`
             this.emitChangeData('tongJiXiangQing', rateDetail)
             return sums
         },
@@ -173,6 +174,18 @@ export default {
 <style lang="scss" scoped>
     .stat-table {
         ::v-deep {
+            thead.is-group th.el-table__cell {
+                background: #84d5cf !important;
+                font-size: 14px;
+                font-weight: bold;
+                color: #000;
+            }
+            .el-table__row {
+                background: #f9ffff;
+            }
+            .el-table__row--striped {
+                background: #e0f0ee;
+            }
             .el-table__footer-wrapper {
                 .cell {
                     text-align: center;
