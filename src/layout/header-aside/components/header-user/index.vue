@@ -129,6 +129,7 @@ import { getFile } from '@/utils/avatar'
 import setting from '@/setting.js'
 import ChangePassword from '@/views/platform/org/employee/change-password'
 import UserInfo from '@/views/platform/org/employee/edit'
+import request from '@/utils/request'
 
 export default {
     components: {
@@ -255,32 +256,52 @@ export default {
             this.$router.replace('/tenantSelect')
         },
         handleMainChange (item) {
+            if (this.$utils.isEmpty(this.mainPosition)) {
+                this.setMainPosition(item.id)
+                return
+            }
             if (this.mainPosition && this.mainPosition.id === item.id) {
                 return
             }
-            this.setMainPosition(this.mainPosition.id, item.id)
+            this.updateMainPosition(this.mainPosition.id, item.id)
         },
-        setMainPosition (oldId, newId) {
-            const { userId } = this.$store.getters || {}
+        setMainPosition (mid) {
+            request({
+                url: '/platform/v3/rel/save',
+                method: 'post',
+                isLoading: true,
+                data: {
+                    biz: 'mainPost',
+                    mainType: 'position',
+                    subType: 'employee',
+                    mainPid: mid,
+                    subPid: this.userId
+                }
+            }).then(res => {
+                this.$message.success('设置主部门成功!')
+                location.reload()
+            })
+        },
+        updateMainPosition (oldId, newId) {
             const updateParams = {
                 tableName: 'ibps_party_rel',
                 updList: [
                     {
                         where: {
-                            biz_: 'mainPost',
-                            main_type_: 'position',
-                            sub_type_: 'employee',
-                            main_pid_: oldId,
-                            sub_pid_: userId
+                            BIZ_: 'mainPost',
+                            MAIN_TYPE_: 'position',
+                            SUB_TYPE_: 'employee',
+                            MAIN_PID_: oldId,
+                            SUB_PID_: this.userId
                         },
                         param: {
-                            main_pid_: newId
+                            MAIN_PID_: newId
                         }
                     }
                 ]
             }
             this.$common.request('update', updateParams).then(() => {
-                this.$message.success('切换成功!')
+                this.$message.success('切换主部门成功!')
                 location.reload()
             })
         }
