@@ -7,28 +7,16 @@
             width="70%"
             append-to-body
             top
-            style="margin-top:100px"
+            style="margin-top:5vh"
             :close-on-click-modal="false"
             :show-close="false"
             :close-on-press-escape="false"
         >
             <div v-if="refresh" v-loading="loading" class="contain">
                 <div class="selector">
-
-                    <div>
-                        培训状态：
-                        <el-select v-model="selectItem1" placeholder="请选择" @change="onSelectorChange">
-                            <el-option
-                                v-for="item in ['全部','进行中','已结束','未发布','未开始','已删除']"
-                                :key="item"
-                                :label="item"
-                                :value="item"
-                            />
-                        </el-select>
-                    </div>
                     <div>
                         签到状态：
-                        <el-select v-model="selectItem2" placeholder="请选择" @change="onSelectorChange">
+                        <el-select v-model="selectItem2" placeholder="请选择" size="mini" style="width:100px" @change="onSelectorChange">
                             <el-option
                                 v-for="item in ['全部','已签到','未签到','已补签']"
                                 :key="item"
@@ -41,24 +29,35 @@
                         培训时间：
                         <el-date-picker
                             v-model="selectItem3"
-                            type="datetimerange"
+                            size="mini"
+                            type="daterange"
                             :picker-options="pickerOptions"
                             range-separator="至"
                             start-placeholder="开始日期"
                             end-placeholder="结束日期"
                             align="right"
-                            value-format="timestamp"
+                            value-format="yyyy-MM-dd"
+                            style="width:240px"
                         />
+                    </div>
+                    <div>
+                        <span style="width:110px">培训主题：</span>
+                        <el-input v-model="selectItem1" placeholder="请输入培训主题" size="mini" />
                     </div>
                 </div>
                 <div class="table">
-                    <el-table :data="showPaperList" row-key="id_">
+                    <el-table :data="showPaperList" row-key="id_" border>
                         <el-table-column
                             prop=""
                             label="序号"
                             type="index"
                             width="100"
                             :index="showIndex"
+                        />
+                        <el-table-column
+                            prop="pei_xun_nei_rong_"
+                            label="培训主题"
+                            show-overflow-tooltip
                         />
                         <el-table-column
                             prop="bian_zhi_ren_"
@@ -75,11 +74,7 @@
                                 />
                             </template>
                         </el-table-column>
-                        <el-table-column
-                            prop="bian_zhi_shi_jian"
-                            label="创建时间"
-                            width="150"
-                        />
+
                         <el-table-column
                             prop="pei_xun_shi_jian_"
                             label="培训时间"
@@ -110,7 +105,7 @@
                             width="100"
                         >
                             <template slot-scope="{row}">
-                                <el-button type="primary" size="mini" :disabled="row.shi_fou_guo_shen_!=='已结束' || row.status!=='未签到'" :title="showTitle(row)" icon="el-icon-finished" @click="onRegister(row)">补签</el-button>
+                                <el-button type="primary" size="mini" :disabled="row.status!=='未签到'" :title="showTitle(row)" icon="el-icon-finished" @click="onRegister(row)">补签</el-button>
                             </template>
                         </el-table-column>
 
@@ -166,7 +161,7 @@ export default {
 
             dialogVisible: true,
             tableList: [],
-            selectItem1: '全部',
+            selectItem1: '',
             selectItem2: '全部',
             selectItem3: '',
             pickerOptions: {
@@ -203,8 +198,8 @@ export default {
             const list = { '已签到': 1, '已补签': 2, '未签到': 3 }
             let tempList = this.tableList
             // 第一次过滤
-            if (this.selectItem1 !== '全部') {
-                tempList = tempList.filter(item => item.shi_fou_guo_shen_ === this.selectItem1)
+            if (this.selectItem1) {
+                tempList = tempList.filter(item => item.pei_xun_nei_rong_.indexOf(this.selectItem1) >= 0)
             }
             // 第二次过滤
             if (this.selectItem2 !== '全部') {
@@ -213,9 +208,11 @@ export default {
             // 第三次过滤
             if (this.selectItem3 && this.selectItem3.length > 0) {
                 tempList = tempList.filter(item => {
-                    const start = this.selectItem3[0]
-                    const end = this.selectItem3[1]
-                    return start <= new Date(item.pei_xun_shi_jian_).getTime() && new Date(item.pei_xun_shi_jian_).getTime() <= end
+                    let [start, end] = this.selectItem3
+                    const now = new Date(item.pei_xun_shi_jian_).getTime()
+                    start = new Date(start)
+                    end = new Date(end)
+                    return start <= now && now <= end
                 })
             }
 
@@ -234,10 +231,12 @@ export default {
     },
     async mounted () {
         this.loading = true
+        if (this.params.time && this.params.time.length) {
+            this.selectItem3 = this.params.time
+        }
         this.getTitle()
         await this.fetchPaperList()
         await this.fetchRegisterList()
-        console.log(this.tableList)
         this.loading = false
     },
     methods: {
@@ -258,7 +257,13 @@ export default {
             }
         },
 
-        onRegister (row) {
+        async onRegister (row) {
+            const sql = `select * from t_qdxxb where ren_yuan_id_='${this.params.peixunrenyuan}' and guan_lian_id_='${row.id_}'`
+            const { variables: { data }} = await this.$common.request('sql', sql)
+            if (data.length > 0) {
+                return this.$message.warning('已签到，请不要重复签到！')
+            }
+
             const peiXunRen = row.pei_xun_ren_yuan_
             const buQianRen = row.bu_qian_ren_yuan_
             // 1.签到表补签操作
@@ -378,17 +383,19 @@ export default {
         },
         // 查询指定人员的培训记录
         async fetchPaperList () {
-            const sql = `select * from t_rypxcjb where FIND_IN_SET('${this.params.peixunrenyuan}', pei_xun_ren_yuan_) > 0`
+            const sql = `select * from t_rypxcjb where FIND_IN_SET('${this.params.peixunrenyuan}', pei_xun_ren_yuan_) > 0 and shi_fou_guo_shen_='已结束'`
             const { variables: { data }} = await this.$common.request('sql', sql)
             this.tableList = data
         },
         // 获取签到状态
         async fetchRegisterList () {
-            this.tableList.forEach(async item => {
-                const sql = `select * from t_qdxxb where guan_lian_id_='${item.id_}' and ren_yuan_id_='${this.params.peixunrenyuan}'`
-                const { variables: { data }} = await this.$common.request('sql', sql)
-                this.$set(item, 'status', data.length > 0 ? '已签到' : '未签到')
-                if (item.shi_fou_guo_shen_ === '已结束' && item.bu_qian_ren_yuan_) {
+            const sql = `select guan_lian_id_,ren_yuan_id_ from t_qdxxb where ren_yuan_id_='${this.params.peixunrenyuan}'`
+            const { variables: { data }} = await this.$common.request('sql', sql)
+            this.tableList.forEach(item => {
+                const id_ = item.id_
+                const index = data.findIndex(i => i.guan_lian_id_ === id_)
+                this.$set(item, 'status', index >= 0 ? '已签到' : '未签到')
+                if (item.bu_qian_ren_yuan_) {
                     const person = item.bu_qian_ren_yuan_.split(',').find(i => i === this.params.peixunrenyuan)
                     if (person) {
                         item.status = '已补签'
@@ -430,7 +437,7 @@ export default {
 .contain{
     padding: 20px;
     .table{
-        height:440px;
+        height:436px;
         overflow: auto;
         margin-top: 20px;
     }
@@ -438,6 +445,8 @@ export default {
         display: flex;
         align-items: center;
         div{
+            display: flex;
+            align-items: center;
             margin: 0 10px;
         }
     }

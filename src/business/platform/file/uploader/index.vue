@@ -272,3 +272,9 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.uploader-tab{
+    padding: 0 10px;
+}
+</style>

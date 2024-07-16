@@ -83,6 +83,9 @@ export default {
     },
     methods: {
         actionEvent (command) {
+            if (command === 'calendarAlert') {
+                return
+            }
             if (this.screen) {
                 this.closeDialog()
                 return
@@ -142,7 +145,7 @@ export default {
             }
         },
         // 打开指定弹框
-        handleOpen (state, dateArr, events,clickId) {
+        handleOpen (state, dateArr, events, clickId) {
             const status = ['急', '重', '轻', '缓']
             const eventTrees = []
             switch (state) {

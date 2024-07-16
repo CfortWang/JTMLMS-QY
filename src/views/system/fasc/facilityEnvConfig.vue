@@ -13,11 +13,11 @@
         <div class="container">
             <div class="main">
                 <div class="form">
-                    <el-form ref="form" :model="form" label-width="80px" :rules="rules">
+                    <el-form ref="form" :model="form" label-width="120px" :rules="rules">
                         <el-row>
-                            <el-col :span="12">
-                                <el-form-item label="类型：" label-width="100px" prop="lei_xing_">
-                                    <el-select v-model="form.lei_xing_" placeholder="请选择">
+                            <el-col :span="8">
+                                <el-form-item label="类型：" prop="lei_xing_">
+                                    <el-select v-model="form.lei_xing_" placeholder="请选择" size="mini" style="width:80%">
                                         <el-option
                                             v-for="(value,key) in config"
                                             :key="key"
@@ -30,16 +30,18 @@
                         </el-row>
                         <el-row v-if="isShowDevice">
                             <el-col :span="12">
-                                <el-form-item label="设备编号：" label-width="100px">
+                                <el-form-item label="设备编号：">
                                     <ibps-custom-dialog
                                         v-model="form.she_bei_bian_hao_"
-                                        size="small"
+                                        size="mini"
                                         template-key="sbxzmcgl"
                                         :multiple="true"
                                         :disabled="false"
                                         type="dialog"
                                         class="custom-dialog"
                                         placeholder="请选择设备"
+                                        icon="el-icon-search"
+                                        style="width:80%"
                                     />
                                 </el-form-item>
                             </el-col>
@@ -47,22 +49,25 @@
                         <el-alert
                             title="默认数据，配置详情中的同名字段为空则使用以下默认数据"
                             type="success"
+                            :closable="false"
                         />
                         <el-row>
                             <el-col :span="12">
-                                <el-form-item label="部门：" label-width="100px">
+                                <el-form-item label="部门：">
                                     <ibps-user-selector
                                         v-model="form.bian_zhi_bu_men_"
+                                        size="mini"
                                         type="position"
                                         readonly-text="text"
                                         :disabled="false"
                                         :multiple="false"
+                                        style="width:80%"
                                     />
                                 </el-form-item>
                             </el-col>
                             <el-col :span="12">
-                                <el-form-item label="监测岗位：" label-width="100px">
-                                    <el-select v-model="form.gang_wei_" placeholder="请选择">
+                                <el-form-item label="监测岗位：">
+                                    <el-select v-model="form.gang_wei_" placeholder="请选择" size="mini" style="width:80%">
                                         <el-option
                                             v-for="item in jianCeGangWeiList"
                                             :key="item.id_"
@@ -75,8 +80,8 @@
                         </el-row>
                         <el-row>
                             <el-col :span="12">
-                                <el-form-item label="监测周期：" label-width="100px">
-                                    <el-select v-model="form.zhou_qi_" placeholder="请选择">
+                                <el-form-item label="监测周期：">
+                                    <el-select v-model="form.zhou_qi_" placeholder="请选择" size="mini" style="width:80%">
                                         <el-option
                                             v-for="item in period"
                                             :key="item.value"
@@ -89,7 +94,7 @@
                         </el-row>
                         <el-row v-if="form.zhou_qi_!==''">
                             <el-col :span="12">
-                                <el-form-item :label="labelShow" label-width="100px">
+                                <el-form-item :label="labelShow">
                                     <el-checkbox-group v-if="form.zhou_qi_==='每日'" v-model="dayCheck">
                                         <el-checkbox :label="1">周一</el-checkbox>
                                         <el-checkbox :label="2">周二</el-checkbox>
@@ -144,32 +149,32 @@
 
                             </el-col>
                             <el-col v-if="nextDate" :span="12">
-                                <el-form-item label="下次监测日期为：" label-width="120px">
+                                <el-form-item label="下次监测日期为：">
                                     <el-tag>{{ nextDate }}</el-tag>
                                 </el-form-item>
                             </el-col>
                         </el-row>
                         <el-row>
                             <el-col :span="12">
-                                <el-form-item label="控制条件：" label-width="100px">
-                                    <el-input v-model="form.tiao_jian_" type="textarea" :rows="2" />
+                                <el-form-item label="控制条件：">
+                                    <el-input v-model="form.tiao_jian_" type="textarea" :rows="2" size="mini" style="width:80%" />
                                 </el-form-item>
                             </el-col>
                         </el-row>
                         <el-row>
                             <el-col :span="12">
-                                <el-form-item v-if="labelText.label1" :label="labelText.label1" label-width="120px">
-                                    <el-input-number v-model="form.temperatureMin" size="small" controls-position="right" :min="-100" :max="form.temperatureMax" :step="1" />
+                                <el-form-item v-if="labelText.label1" :label="labelText.label1">
+                                    <el-input-number v-model="form.temperatureMin" size="mini" controls-position="right" :min="-100" :max="form.temperatureMax" :step="1" />
                                     至
-                                    <el-input-number v-model="form.temperatureMax" size="small" controls-position="right" :min="form.temperatureMin" :max="100" :step="1" />
+                                    <el-input-number v-model="form.temperatureMax" size="mini" controls-position="right" :min="form.temperatureMin" :max="100" :step="1" />
                                     (℃)
                                 </el-form-item>
                             </el-col>
                             <el-col :span="12">
-                                <el-form-item v-if="labelText.label2" :label="labelText.label2" label-width="120px">
-                                    <el-input-number v-model="form.humidityMin" size="small" controls-position="right" :min="-100" :max="form.humidityMax" :step="1" />
+                                <el-form-item v-if="labelText.label2" :label="labelText.label2">
+                                    <el-input-number v-model="form.humidityMin" size="mini" controls-position="right" :min="-100" :max="form.humidityMax" :step="1" />
                                     至
-                                    <el-input-number v-model="form.humidityMax" size="small" controls-position="right" :min="form.humidityMin" :max="100" :step="1" />
+                                    <el-input-number v-model="form.humidityMax" size="mini" controls-position="right" :min="form.humidityMin" :max="100" :step="1" />
                                     (%)
                                 </el-form-item>
                             </el-col>
@@ -198,6 +203,7 @@
                     <el-table
                         :data="showPaperList"
                         style="width: 100%"
+                        border
                         @selection-change="handleSelectionChange"
                     >
                         <el-table-column
@@ -485,10 +491,10 @@ export default {
         labelText () {
             switch (this.form.lei_xing_) {
                 case '02-冰箱温度监控':
-                    return { label1: '冷藏温度范围限值', label2: '冷冻温度范围限值' }
+                    return { label1: '冷藏温度范围限值：', label2: '冷冻温度范围限值：' }
                 case '03-温浴箱温度监控':
                 case '04-阴凉柜温度监控':
-                    return { label1: '温度范围限值', label2: '' }
+                    return { label1: '温度范围限值：', label2: '' }
                 case '05-纯水机水质监测':
                 case '06-每日安全检查':
                 case '08-含氯有效性监测':
@@ -499,7 +505,7 @@ export default {
                 case '12-紫外灯消毒':
                     return { label1: '', label2: '' }
                 default:
-                    return { label1: '温度范围限值', label2: '湿度范围限值' }
+                    return { label1: '温度范围限值：', label2: '湿度范围限值：' }
             }
         }
 

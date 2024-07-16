@@ -387,6 +387,7 @@
             :media="fieldOptions.media"
             :style="{ width: width }"
             v-on="$listeners"
+            @input="resetFileId"
         />
         <!-- 选择器-->
         <div v-else-if="(fieldType === 'selector' || fieldType === 'currentUser' || fieldType === 'currentOrg' || fieldType === 'currentPosition') && readonlyText && !dataModel" :class="isTable ? '' : 'ibps-field-text-no'">/</div>
@@ -979,6 +980,7 @@ export default {
         },
         dataModel: {
             handler (val) {
+                if (this.fieldType === 'attachment') return
                 this.$emit('update:value', val)
             },
             deep: true
@@ -1250,6 +1252,13 @@ export default {
         proceedCont () {
             // 防止恶意查询 。 为空表示可以点击了
             this.watchKey = false
+        },
+        // 解决同一个附件重复上传的问题
+        resetFileId (val) {
+            if (val) {
+                this.dataModel = [...new Set(val.split(','))].join(',')
+            }
+            this.$emit('update:value', this.dataModel)
         }
     }
 }

@@ -143,6 +143,10 @@ export default {
                 if (this.field.field_type === 'checkbox') {
                     this.handleModels(this.field.name, Array.isArray(val) ? val.join(',') : val)
                 }
+                // 对附件的处理
+                if (this.field.field_type === 'attachment') {
+                    this.handleModels(this.field.name, val)
+                }
                 this.$nextTick(() => {
                     // 值改变进行公式计算
                     this.runCalFormula()

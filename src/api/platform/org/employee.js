@@ -338,3 +338,17 @@ export function removeRoleUser (params) {
         params: params
     })
 }
+
+// ===================内部培训人员============================================
+
+/**
+ * 内部培训统计
+ * @param {*} params
+ */
+export function getUserStatisticList (params) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/employee/train/statistic',
+        method: 'get',
+        params
+    })
+}

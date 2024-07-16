@@ -162,9 +162,9 @@ export default {
                 if (item.status === '已补签') laterSignIn++
             })
 
-            const signInRate = signIn / total * 100
-            const noSignInRate = noSignIn / total * 100
-            const laterSignInRate = laterSignIn / total * 100
+            const signInRate = total === 0 ? 0 : signIn / total * 100
+            const noSignInRate = total === 0 ? 0 : noSignIn / total * 100
+            const laterSignInRate = total === 0 ? 0 : laterSignIn / total * 100
             return {
                 total,
                 signIn,
@@ -235,15 +235,25 @@ export default {
                 }
             })
         },
-        // 获取全部培训人员
+        // 获取全部培训人员  7.15通用性调整
         async getAllPeople () {
-            const sql = `select * from t_rypxcjb where id_='${this.params.guan_lian_id_}'`
+            const sql = `select * from ${this.params.tableName} where id_='${this.params.guan_lian_id_}'`
             const { variables: { data }} = await this.$common.request('sql', sql)
             if (data.length <= 0) {
                 return this.$message.warning('数据异常！')
             }
             // console.log('全部人员', data)
-            const peopleList = data[0].pei_xun_ren_yuan_?.split(',')
+            let peopleList = []
+            switch (this.params.tableName) {
+                case 't_fwxyhyqdb':
+                    peopleList = data[0].bian_zhi_can_hui_?.split(',')
+                    break
+                case 't_rypxcjb':
+                    peopleList = data[0].pei_xun_ren_yuan_?.split(',')
+                    break
+                default:
+                    break
+            }
             peopleList.forEach(person => {
                 if (person) {
                     this.tableList.push({
@@ -254,22 +264,28 @@ export default {
                 }
             })
             await this.getRegisterPeople()
-            if (data[0].shi_fou_guo_shen_ === '进行中') {
-                this.addPeople()
-            }
-            if (data[0].shi_fou_guo_shen_ === '已结束' && data[0].bu_qian_ren_yuan_) {
-                data[0].bu_qian_ren_yuan_.split(',').forEach(person => {
-                    const p = this.tableList.find(item => item.ren_yuan_id_ === person)
-                    if (p) {
-                        p.status = '已补签'
-                    } else {
-                        this.tableList.push({
-                            ren_yuan_id_: person,
-                            status: '已补签',
-                            qian_dao_shi_jian: ''
-                        })
-                    }
-                })
+            if (this.params.tableName === 't_rypxcjb') {
+                if (data[0].shi_fou_guo_shen_ === '进行中') {
+                    this.addPeople()
+                }
+                if (data[0].shi_fou_guo_shen_ === '已结束' && data[0].bu_qian_ren_yuan_) {
+                    data[0].bu_qian_ren_yuan_.split(',').forEach(person => {
+                        const p = this.tableList.find(item => item.ren_yuan_id_ === person)
+                        if (p) {
+                            p.status = '已补签'
+                        } else {
+                            this.tableList.push({
+                                ren_yuan_id_: person,
+                                status: '已补签',
+                                qian_dao_shi_jian: ''
+                            })
+                        }
+                    })
+                }
+            } else if (this.params.tableName === 't_fwxyhyqdb' || this.params.tableName === 't_nshyjyb' || this.params.tableName === 't_gshyjyb') {
+                if (data[0].shi_fou_guo_shen_ !== '已完成') {
+                    this.addPeople()
+                }
             }
         },
 
