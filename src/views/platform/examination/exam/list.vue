@@ -19,17 +19,29 @@
             @row-dblclick="handleRowDblclick"
         >
             <!-- 查询参数插槽 -->
-            <template slot="examBank">
+            <template slot="examBankId">
                 <ibps-custom-dialog
-                    v-model="parameters.examBank"
+                    v-model="examBankId"
                     size="mini"
                     template-key="tkdhk"
                     :multiple="true"
+                    :temp-search="true"
                     type="dialog"
                     class="custom-dialog"
                     placeholder="请选择"
                     icon="ibps-icon-search"
                     style="width: 150px;"
+                />
+            </template>
+            <template slot="examBank" slot-scope="scope">
+                <ibps-custom-dialog
+                    v-model="scope.row.bankId"
+                    size="mini"
+                    template-key="tkdhk"
+                    :multiple="true"
+                    :readonly="true"
+                    readonly-text="text"
+                    disabled
                 />
             </template>
             <template slot="time" slot-scope="scope">
@@ -44,7 +56,7 @@
 import { removeFormData } from '@/api/platform/data/dataTemplate'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
-import { max, min, mean, sum, maxBy, minBy, meanBy, round, keyBy } from 'lodash'
+import { max, min, mean, sum, maxBy, minBy, meanBy, round, keyBy, mapValues } from 'lodash'
 const qualifiedType = [
     {
         value: '达标',
@@ -61,8 +73,8 @@ const qualifiedType = [
 ]
 
 const sortField = {
-    chuang_jian_shi_j: 'ex.chuang_jian_shi_j',
-    fa_bu_shi_jian_: 'ex.fa_bu_shi_jian_'
+    CREATE_TIME_: 'ex.chuang_jian_shi_j',
+    PUBLISH_DATE_: 'ex.fa_bu_shi_jian_'
 }
 
 const paramsMap = {
@@ -98,9 +110,7 @@ export default {
             params: {},
             targetOption: [],
             methodOption: [],
-            parameters: {
-                examBank: ''
-            },
+            examBankId: '',
             listConfig: {
                 toolbars: [
                     { key: 'search' },
@@ -113,7 +123,7 @@ export default {
                     forms: [
                         { prop: 'examName', label: '考试名称', itemWidth: 150 },
                         { prop: 'examType', label: '考试类型', itemWidth: 150 },
-                        { prop: 'bankName', label: '考试题库', fieldType: 'slot', slotName: 'examBank', itemWidth: 150 },
+                        { prop: 'examBank', label: '考试题库', fieldType: 'slot', slotName: 'examBankId', itemWidth: 150 },
                         { prop: ['createTime0', 'createTime1'], label: '创建时间', fieldType: 'daterange' },
                         { prop: ['publishDate0', 'publishDate1'], label: '发布时间', fieldType: 'daterange' }
                     ]
@@ -122,7 +132,7 @@ export default {
                 columns: [
                     { prop: 'examName', label: '考试名称', minWidth: 200 },
                     { prop: 'examType', label: '考试类型', width: 90 },
-                    { prop: 'bankName', label: '考试题库', width: 160 },
+                    { prop: 'bankName', label: '考试题库', slotName: 'examBank', width: 160 },
                     { prop: 'duration', label: '考试时长', width: 100 },
                     { prop: 'limitCount', label: '限考次数', width: 85 },
                     { prop: 'qualifiedRadio', label: '达标占比', width: 65 },
@@ -204,12 +214,11 @@ export default {
         loadData () {
             this.loading = true
             this.getData(this.getSearchFormData()).then(res => {
-                ActionUtils.handleListData(this, res.data)
                 this.loading = false
+                ActionUtils.handleListData(this, res.data)
             })
         },
         getData ({ parameters, requestPage, sorts }) {
-            console.log({ parameters, requestPage, sorts })
             const { pageNo = 1, limit = 20 } = requestPage || {}
             let sortParams = ''
             if (sorts && sorts.length) {
@@ -217,30 +226,21 @@ export default {
             } else {
                 sortParams = 'ex.chuang_jian_shi_j desc, ex.fa_bu_shi_jian_ desc'
             }
-            let params = ''
-            parameters.forEach(p => {
-                if (p.value) {
-                    params += ` and ${paramsMap[p.key]} like '%${p.value}%'`
-                }
-            })
-            const temp = keyBy(parameters, 'key')
-            console.log(temp)
-            const createTimeParam = parameters.find(i => i.key.includes('createTime'))
-            const publishDateParam = parameters.find(i => i.key.includes('publishDate'))
-            if (createTimeParam) {
-                params += `and (ex.chuang_jian_shi_j >= '${temp.createTime0}' and ex.chuang_jian_shi_j <= '${temp.createTime1}' null)`
-            }
-            if (publishDateParam) {
-                params += `and (ex.fa_bu_shi_jian_ >= '${temp.publishDate0}' and ex.fa_bu_shi_jian_ <= '${temp.publishDate1}' or ex.fa_bu_shi_jian_ is null)`
-            }
-            if (parameters.find(i => i.key.includes('fa_bu_shi_jian_'))) {
-                params += `and (ex.fa_bu_shi_jian_ >= '${parameters.find(i => i.key.includes('fa_bu_shi_jian_')).value}' or ex.fa_bu_shi_jian_ is null)`
-            }
-            const sql = `select qb.ti_ku_ming_cheng_ as bankName, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.kao_shi_lei_xing_ as examType, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.fa_bu_ren_ as publisher, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc, ex.shu_ju_yong_tu_ as dataType, ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber, ex.chou_ti_zong_fen_ as randScore, ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex, t_question_bank qb, t_examination e where ex.ti_ku_id_ = qb.id_ and e.exam_id_ = ex.id_ ${params} order by ${sortParams}`
+            const params = this.getParams(parameters)
+            const sql = `select qb.ti_ku_ming_cheng_ as bankName, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.kao_shi_lei_xing_ as examType, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.fa_bu_ren_ as publisher, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc, ex.shu_ju_yong_tu_ as dataType, ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber, ex.chou_ti_zong_fen_ as randScore, ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex left join t_question_bank qb on ex.ti_ku_id_ = qb.id_ left join t_examination e on e.exam_id_ = ex.id_ where ex.id_ is not null${params} order by ${sortParams}`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
                     if (!data.length) {
+                        resolve({
+                            dataResult: [],
+                            pageResult: {
+                                limit: 20,
+                                page: 1,
+                                totalCount: 0,
+                                totalPages: 0
+                            }
+                        })
                         return
                     }
                     const archiveData = []
@@ -334,6 +334,34 @@ export default {
                     reject(error)
                 })
             })
+        },
+        // 组装SQL查询参数
+        getParams (parameters) {
+            const temp = mapValues(keyBy(parameters, 'key'), 'value')
+            let params = ''
+            if (this.$utils.isNotEmpty(temp.examName)) {
+                params += ` and ex.kao_shi_ming_chen like '%${temp.examName}%'`
+            }
+            if (this.$utils.isNotEmpty(temp.examType)) {
+                params += ` and ex.kao_shi_lei_xing_ like '%${temp.examType}%'`
+            }
+            if (this.examBankId) {
+                const t = []
+                this.examBankId.split(',').forEach(p => {
+                    t.push(`ex.ti_ku_id_ = '${p}'`)
+                })
+                params += ` and (${t.join(' or ')})`
+            }
+            const createTimeParam = parameters.find(i => i.key.includes('createTime'))
+            const publishDateParam = parameters.find(i => i.key.includes('publishDate'))
+            if (createTimeParam) {
+                params += ` and (ex.chuang_jian_shi_j >= '${temp.createTime0}' and ex.chuang_jian_shi_j <= '${temp.createTime1}'  or ex.chuang_jian_shi_j is null)`
+            }
+            if (publishDateParam) {
+                params += ` and (ex.fa_bu_shi_jian_ >= '${temp.publishDate0}' and ex.fa_bu_shi_jian_ <= '${temp.publishDate1}' or ex.fa_bu_shi_jian_ is null)`
+            }
+            console.log(params)
+            return params
         },
         /**
          * 获取格式化参数
