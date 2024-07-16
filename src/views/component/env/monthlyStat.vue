@@ -143,6 +143,10 @@ export default {
             }
         },
         handleSave () {
+            const paramValues = Object.values(this.paramForm)
+            if (!paramValues.length || paramValues.some(i => !i)) {
+                return this.$message.warning('请完整填写查询参数！')
+            }
             this.$emit('confirm', this.paramForm)
         },
         closeDialog () {
