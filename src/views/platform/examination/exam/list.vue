@@ -44,9 +44,8 @@
                     disabled
                 />
             </template>
-            <template slot="time" slot-scope="scope">
-                <div>起：{{ scope.row.kaiShiShiJian }}</div>
-                <div>止：{{ scope.row.jieShuShiJian }}</div>
+            <template slot="isRand" slot-scope="scope">
+                <div>{{ scope.row.isRand ? '是' : '否' }}</div>
             </template>
         </ibps-crud>
         <exam-edit
@@ -74,34 +73,14 @@
 </template>
 
 <script>
-import { removeFormData } from '@/api/platform/data/dataTemplate'
+import { examTypeOptions, statusOption, qualifiedType } from '../constants'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import { max, min, mean, sum, maxBy, minBy, meanBy, round, keyBy, mapValues } from 'lodash'
-const qualifiedType = [
-    {
-        value: '达标',
-        type: 'success'
-    },
-    {
-        value: '未达标',
-        type: 'danger'
-    },
-    {
-        value: '考试未结束',
-        type: 'warning'
-    }
-]
 
 const sortField = {
     CREATE_TIME_: 'ex.chuang_jian_shi_j',
     PUBLISH_DATE_: 'ex.fa_bu_shi_jian_'
-}
-
-const paramsMap = {
-    examName: 'ex.kao_shi_ming_chen',
-    examType: 'ex.kao_shi_lei_xing_',
-    bankId: 'ex.ti_ku_id_'
 }
 
 export default {
@@ -154,8 +133,9 @@ export default {
                 searchForm: {
                     forms: [
                         { prop: 'examName', label: '考试名称', itemWidth: 150 },
-                        { prop: 'examType', label: '考试类型', itemWidth: 150 },
+                        { prop: 'examType', label: '考试类型', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: examTypeOptions },
                         { prop: 'examBank', label: '考试题库', fieldType: 'slot', slotName: 'examBankId', itemWidth: 150 },
+                        { prop: 'examState', label: '考试状态', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: statusOption },
                         { prop: ['createTime0', 'createTime1'], label: '创建时间', fieldType: 'daterange' },
                         { prop: ['publishDate0', 'publishDate1'], label: '发布时间', fieldType: 'daterange' }
                     ]
@@ -169,12 +149,12 @@ export default {
                     { prop: 'limitCount', label: '限考次数', width: 85 },
                     { prop: 'qualifiedRadio', label: '达标占比', width: 65 },
                     { prop: 'scoringType', label: '计分方式', width: 85 },
-                    { prop: 'isRand', label: '是否随机', width: 65 },
+                    { prop: 'isRand', label: '是否随机', slotName: 'isRand', width: 65 },
                     { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 120 },
                     { prop: 'publishDate', label: '发布时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 120 },
                     { prop: 'limitDate', label: '限考时间', width: 120 },
                     { prop: 'createBy', label: '创建人', tags: userOption, width: 90 },
-                    { prop: 'examState', label: '状态', width: 80 }
+                    { prop: 'examState', label: '状态', width: 80, tags: statusOption }
                 ],
                 rowHandle: {
                     // effect: 'display',
@@ -204,7 +184,7 @@ export default {
                             icon: 'ibps-icon-bookmark',
                             hidden: (row, index) => {
                                 // 未发布且未报名
-                                return row.examState !== '未发布' || row.examinee.includes(this.userId)
+                                return row.examState !== '未发布' || row.examinee.includes(this.userId) || row.allowRegist !== '是'
                             }
                         },
                         {
@@ -229,7 +209,10 @@ export default {
                             key: 'info',
                             label: '考试明细',
                             type: 'primary',
-                            icon: 'ibps-icon-list-alt'
+                            icon: 'ibps-icon-list-alt',
+                            hidden: (row, index) => {
+                                return ['已取消', '未发布'].includes(row.examState)
+                            }
                         }
                     ]
                 }
@@ -299,11 +282,12 @@ export default {
                                 examType: item.examType,
                                 examState: item.examState,
                                 bankId: item.bankId,
-                                examBank: item.examBank,
+                                bankName: item.bankName,
                                 examinee: item.examinee,
                                 questionCount: item.isRand === '1' ? parseFloat(item.randNumber) : parseFloat(item.questionCount),
                                 duration: item.duration,
                                 limitCount: item.limitCount,
+                                limitDate: item.limitDate,
                                 qualifiedRadio: item.qualifiedRadio,
                                 scoringType: item.scoringType,
                                 allowRegist: item.allowRegist,
@@ -368,30 +352,77 @@ export default {
             })
         },
         // 组装SQL查询参数
+        // getParams (parameters) {
+        //     console.log(parameters)
+        //     const temp = mapValues(keyBy(parameters, 'key'), 'value')
+        //     let params = ''
+        //     if (this.$utils.isNotEmpty(temp.examName)) {
+        //         params += ` and ex.kao_shi_ming_chen like '%${temp.examName}%'`
+        //     }
+        //     if (this.$utils.isNotEmpty(temp.examType)) {
+        //         const t = []
+        //         temp.examType.forEach(p => {
+        //             t.push(`ex.kao_shi_lei_xing_ = '${p}'`)
+        //         })
+        //         params += ` and (${t.join(' or ')})`
+        //     }
+        //     if (this.$utils.isNotEmpty(temp.examState)) {
+        //         const t = []
+        //         this.examState.forEach(p => {
+        //             t.push(`ex.zhuang_tai_ = '${p}'`)
+        //         })
+        //         params += ` and (${t.join(' or ')})`
+        //     }
+        //     if (this.examBankId) {
+        //         const t = []
+        //         this.examBankId.split(',').forEach(p => {
+        //             t.push(`ex.ti_ku_id_ = '${p}'`)
+        //         })
+        //         params += ` and (${t.join(' or ')})`
+        //     }
+        //     const createTimeParam = parameters.find(i => i.key.includes('createTime'))
+        //     const publishDateParam = parameters.find(i => i.key.includes('publishDate'))
+        //     if (createTimeParam) {
+        //         params += ` and (ex.chuang_jian_shi_j >= '${temp.createTime0}' and ex.chuang_jian_shi_j <= '${temp.createTime1}'  or ex.chuang_jian_shi_j is null)`
+        //     }
+        //     if (publishDateParam) {
+        //         params += ` and (ex.fa_bu_shi_jian_ >= '${temp.publishDate0}' and ex.fa_bu_shi_jian_ <= '${temp.publishDate1}' or ex.fa_bu_shi_jian_ is null)`
+        //     }
+        //     console.log(params)
+        //     return params
+        // },
         getParams (parameters) {
+            console.log(parameters)
             const temp = mapValues(keyBy(parameters, 'key'), 'value')
             let params = ''
-            if (this.$utils.isNotEmpty(temp.examName)) {
-                params += ` and ex.kao_shi_ming_chen like '%${temp.examName}%'`
+
+            const addCondition = (condition, value, isArray = false) => {
+                if (this.$utils.isNotEmpty(value)) {
+                    if (isArray) {
+                        const conditions = value.map(v => `${condition} = '${v}'`).join(' or ')
+                        params += ` and (${conditions})`
+                    } else {
+                        params += ` and ${condition} like '%${value}%'`
+                    }
+                }
             }
-            if (this.$utils.isNotEmpty(temp.examType)) {
-                params += ` and ex.kao_shi_lei_xing_ like '%${temp.examType}%'`
-            }
+            addCondition('ex.kao_shi_ming_chen', temp.examName)
+            addCondition('ex.kao_shi_lei_xing_', temp.examType, true)
+            addCondition('ex.zhuang_tai_', temp.examState, true)
+
             if (this.examBankId) {
-                const t = []
-                this.examBankId.split(',').forEach(p => {
-                    t.push(`ex.ti_ku_id_ = '${p}'`)
-                })
-                params += ` and (${t.join(' or ')})`
+                const conditions = this.examBankId.split(',').map(id => `ex.ti_ku_id_ = '${id}'`).join(' or ')
+                params += ` and (${conditions})`
             }
-            const createTimeParam = parameters.find(i => i.key.includes('createTime'))
-            const publishDateParam = parameters.find(i => i.key.includes('publishDate'))
-            if (createTimeParam) {
-                params += ` and (ex.chuang_jian_shi_j >= '${temp.createTime0}' and ex.chuang_jian_shi_j <= '${temp.createTime1}'  or ex.chuang_jian_shi_j is null)`
+
+            const addDateCondition = (key, field) => {
+                const dateParam = parameters.find(i => i.key.includes(key))
+                if (dateParam) {
+                    params += ` and (${field} >= '${temp[key + '0']}' and ${field} <= '${temp[key + '1']}' or ${field} is null)`
+                }
             }
-            if (publishDateParam) {
-                params += ` and (ex.fa_bu_shi_jian_ >= '${temp.publishDate0}' and ex.fa_bu_shi_jian_ <= '${temp.publishDate1}' or ex.fa_bu_shi_jian_ is null)`
-            }
+            addDateCondition('createTime', 'ex.chuang_jian_shi_j')
+            addDateCondition('publishDate', 'ex.fa_bu_shi_jian_')
             console.log(params)
             return params
         },
@@ -425,11 +456,18 @@ export default {
         search () {
             this.loadData()
         },
+        handleRowDblclick (row) {
+            this.examInfo = {
+                examId: row.examId,
+                bankId: row.bankId
+            }
+            this.showDetailDialog = true
+        },
         /**
          * 处理按钮事件
          */
         handleAction (command, position, selection, data) {
-            const ids = data.map(i => i.examId)
+            const ids = data && data.length ? data.map(i => i.examId) : []
             switch (command) {
                 case 'search':
                     ActionUtils.setFirstPagination(this.pagination)
@@ -447,52 +485,230 @@ export default {
                     break
                 case 'judge':
                     this.selection = ids.join(',')
-                    console.log(this.selection)
                     this.showJudgeDialog = true
                     break
                 case 'change':
-                    this.handleReport(data)
+                    this.handleColumnChange(data)
                     break
                 case 'publish':
-                    this.handleReport(data)
+                    this.handlePublish(data)
                     break
                 case 'close':
-                    this.handleReport(data)
+                    this.handleClose(data)
                     break
                 case 'attend':
-                    this.handleReport(data)
+                    this.handleAttend(data)
                     break
                 case 'cancel':
-                    this.handleReport(data)
+                    this.handleCancel(data)
                     break
                 case 'modify':
-                    this.handleReport(data)
+                    if (!this.hasRole && this.userId !== data.createBy) {
+                        return this.$message.warning('您无权编辑这场考试，请联系考试创建人或系统管理员！')
+                    }
+                    this.examInfo = {
+                        examId: data.examId,
+                        state: data.examState
+                    }
+                    this.showEditDialog = true
                     break
                 case 'info':
-                    this.handleReport(data)
+                    this.examInfo = {
+                        examId: data.examId,
+                        bankId: data.bankId
+                    }
+                    this.showDetailDialog = true
                     break
                 default:
                     break
             }
         },
         /**
-         * 处理编辑
+         * 切换显示信息
          */
-        async handleEdit ({ id, zhiBiaoId, fangFaId, fangFaKey }, key) {
-            this.params = {
-                targetId: zhiBiaoId,
-                methodId: fangFaId,
-                methodKey: fangFaKey,
-                recordId: id
-            }
-            this.readonly = key === 'detail'
-            this.showConfig = true
-        },
-        handleReport (data) {
-            console.log('wwww')
+        handleColumnChange () {
+            console.log('handleColumnChange')
         },
         /**
-         * 处理删除
+         * 发布考试
+         */
+        async handlePublish (data) {
+            const { examId, bankId, bankName, questionCount, totalScore, examName, limitCount, limitDate, duration, examinee, qualifiedRadio, scoringType, allowRegist, createBy } = data || {}
+            if (!this.hasRole && this.userId !== createBy) {
+                return this.$message.warning('您无权发布这场考试，请联系考试创建人或系统管理员！')
+            }
+            const examNameDesc = `<div><span style="font-weight: 600;">考试名称：</span><span style="color: #f56c6c;">${examName}</span></div>`
+            const bankNameDesc = `<div><span style="font-weight: 600;">考试题库：</span><span style="color: #f56c6c;">${bankName}</span></div>`
+            const quesitonCountDesc = `<div><span style="font-weight: 600;">题目数量：</span><span style="color: #f56c6c;">${questionCount || 0}</span></div>`
+            const scoreDesc = `<div><span style="font-weight: 600;">考试总分：</span><span style="color: #f56c6c;">${totalScore || 0}</span></div>`
+            const examineeDesc = `<div><span style="font-weight: 600;">考试人数：</span><span style="color: #f56c6c;">${examinee ? examinee.split(',').length : 0}</span></div>`
+            const limitDateDesc = `<div><span style="font-weight: 600;">限考时间：</span><span style="color: #f56c6c;">${limitDate}</span></div>`
+            const limitCountDesc = `<div><span style="font-weight: 600;">限考次数：</span><span style="color: #f56c6c;">${limitCount}</span></div>`
+            const temp = duration === '不限' || !duration ? '不限' : this.transformTime(duration)
+            const durationDesc = `<div><span style="font-weight: 600;">考试时长：</span><span style="color: #f56c6c;">${temp}</span></div>`
+            const qualifiedRadioDesc = `<div><span style="font-weight: 600;">达标分数占比：</span><span style="color: #f56c6c;">${qualifiedRadio}%</span></div>`
+            const scoringTypeDesc = `<div><span style="font-weight: 600;">计分方式：</span><span style="color: #f56c6c;">${scoringType}</span></div>`
+            const allowRegistDesc = `<div><span style="font-weight: 600;">是否允许报名：</span><span style="color: #f56c6c;">${allowRegist}</span></div>`
+            const tip = `<div style="font-size: 16px;">发布后将为所有参考人员发放试卷并通知考试，考试发布后不可取消，是否确认</div>`
+            this.$confirm(`<p style="font-size: 16px;font-weight: 600;">当前考试信息如下：</p>${examNameDesc}${bankNameDesc}${quesitonCountDesc}${scoreDesc}${examineeDesc}${limitDateDesc}${limitCountDesc}${durationDesc}${qualifiedRadioDesc}${scoringTypeDesc}${allowRegistDesc}${tip}`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info',
+                showClose: false,
+                closeOnClickModal: false,
+                dangerouslyUseHTMLString: true
+            }).then(() => {
+                const params = {
+                    tableName: 't_exams',
+                    updList: [{
+                        where: {
+                            id_: examId
+                        },
+                        param: {
+                            fa_bu_ren_: this.userId,
+                            fa_bu_shi_jian_: this.$common.getDateNow(19),
+                            zhuang_tai_: '已发布'
+                        }
+                    }]
+                }
+                // 更新考试状态
+                this.$common.request('update', params).then(() => {
+                    this.$message.success('发布考试成功！')
+                    this.search()
+                    // 发放试卷
+                    this.createPaper(data, examinee)
+                })
+            }).catch(() => {})
+        },
+        /**
+         * 创建试卷
+         */
+        createPaper (data, examinees) {
+            const { first, second } = this.$store.getters.level || {}
+            const { examId, bankId, examName, questionCount, totalScore, duration, qualifiedRadio, limitDate, limitCount } = data || {}
+            const examineeList = examinees.split(',')
+            const currentTime = this.$common.getDateNow(19)
+            const paramWhere = examineeList.map(i => ({
+                exam_id_: examId,
+                ti_ku_id_: bankId,
+                di_dian_: second || first,
+                kao_shi_ren_: i,
+                bu_men_: '',
+                bao_ming_shi_jian: currentTime,
+                ti_ku_zong_fen_: totalScore,
+                zhuang_tai_: '未开始',
+                sheng_yu_shi_chan: duration,
+                da_biao_zhan_bi_: qualifiedRadio
+            }))
+            const addParams = {
+                tableName: 't_examination',
+                paramWhere
+            }
+            this.$common.request('add', addParams).then(() => {
+                // 发送通知
+                const limitTime = duration === '不限' || !duration ? '不限' : this.transformTime(duration)
+                const msgContent = `您参加的考试【${examName}】已发布，该考试限考时间【${limitDate}】，限考次数【${limitCount}】，考试时长【${limitTime}】，题数【${questionCount}】，总分【${totalScore}】，请及时完成考试！`
+                examineeList.map(i => this.$common.sendMsg({
+                    subject: '考试信息提醒',
+                    content: msgContent,
+                    receiverId: i,
+                    canreplay: '0'
+                }))
+                // 添加日程
+                const now = this.$common.getDateNow(10)
+                const paramsList = examineeList.map(i => ({
+                    title_: `考试【${examName}】`,
+                    content_: `考试名称：【${examName}】\n开始时间：【${now}】\n结束时间：【${limitDate}】\n限考次数：【${limitCount}】\n考试时长：【${limitTime}】\n题数：【${questionCount}】\n总分：【${totalScore}】`,
+                    start_time_: now,
+                    end_time_: limitDate !== '不限' ? limitDate.slice(0, 10) : now,
+                    emergency_state_: '2',
+                    user_id_: i,
+                    user_name_: this.transformUser(i)
+                }))
+                this.$common.request('add', {
+                    tableName: 'ibps_party_user_calendar',
+                    paramWhere: paramsList
+                }).then(() => {
+                    console.log('添加日程数据成功')
+                })
+            })
+        },
+        /**
+         * 取消考试
+         */
+        handleClose ({ examId, createBy }) {
+            if (!this.hasRole && this.userId !== createBy) {
+                return this.$message.warning('您无权取消这场考试，请联系考试创建人或系统管理员！')
+            }
+            const params = {
+                tableName: 't_exams',
+                updList: [{
+                    where: {
+                        id_: examId
+                    },
+                    param: {
+                        examState: '已取消'
+                    }
+                }]
+            }
+            this.$common.request('update', params).then(() => {
+                this.$message.success('取消考试成功！')
+                this.search()
+            })
+        },
+        /**
+         * 报名考试
+         */
+        handleAttend (data) {
+            const { examId, examState, examinee } = data
+            const examineeList = examinee ? examinee.split(',') : []
+            examineeList.push(this.userId)
+            const params = {
+                tableName: 't_exams',
+                updList: [{
+                    where: {
+                        id_: examId
+                    },
+                    param: {
+                        can_kao_ren_yuan_: examineeList.join(',')
+                    }
+                }]
+            }
+            // 更新参考人员
+            this.$common.request('update', params).then(() => {
+                if (examState === '未发布') {
+                    this.$message.success('报名考试成功！该考试还未发布，请等待考试发布后再开始考试~')
+                } else {
+                    this.createPaper(data, this.userId)
+                    this.$message.success('报名考试成功！请前往【我的考试】开始考试')
+                }
+                this.search()
+            })
+        },
+        /**
+         * 取消报名
+         */
+        handleCancel (data) {
+            const { examId, examinee } = data
+            const examineeList = examinee.split(',').filter(item => item !== this.userId).join(',')
+            const params = {
+                tableName: 't_exams',
+                updList: [{
+                    where: {
+                        id_: examId
+                    },
+                    param: {
+                        can_kao_ren_yuan_: examineeList
+                    }
+                }]
+            }
+            this.$common.request('update', params).then(() => {
+                this.$message.success('取消报名成功！')
+                this.search()
+            })
+        },
+        /**
+         * 删除考试
          */
         handleRemove (ids) {
             if (!ids || !ids.length) {
@@ -513,9 +729,6 @@ export default {
                     this.search()
                 })
             })
-        },
-        handleRowDblclick (row) {
-            this.handleEdit(row, 'detail')
         },
         transformUser (userId) {
             const user = this.userList.find(u => u.userId === userId) || {}
