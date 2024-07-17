@@ -96,6 +96,7 @@
 
                     <ibps-header-clean-cache v-if="isSuper" type="platform" />
                     <ibps-header-clean-cache v-if="isSuper" type="form" />
+                    <ibps-header-tools v-if="isSuper" />
                     <!-- <ibps-header-clean-cache v-if="isSuper" type="oauth" />
                     <ibps-header-clean-cache v-if="isSuper" type="office" /> -->
 
@@ -198,6 +199,7 @@ import IbpsHeaderUser from './components/header-user'
 import IbpsHeaderErrorLog from './components/header-error-log'
 import IbpsHeaderBaseUrl from './components/header-base-url'
 import IbpsHeaderCleanCache from './components/header-clean-cache'
+import IbpsHeaderTools from './components/header-tools'
 // import IbpsHeaderDownload from './components/header-download'
 import IbpsNotifyMonitor from '@/business/platform/socket/notify-monitor'
 import { mapState, mapGetters, mapActions } from 'vuex'
@@ -229,6 +231,7 @@ export default {
         IbpsHeaderErrorLog,
         IbpsHeaderBaseUrl,
         IbpsHeaderCleanCache,
+        IbpsHeaderTools,
         // IbpsHeaderDownload,
         IbpsNotifyMonitor
     },
