@@ -238,8 +238,6 @@
 
 <script>
 import dayjs from 'dayjs'
-import Tab from './tab.vue'
-import Recognition from './recognition.vue'
 import RiskPeopleTable from './riskPeopleTable.vue'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import RiskDetail from './riskDetail.vue'
@@ -252,8 +250,6 @@ export default {
     components: {
         RiskDetail,
         RiskPeopleTable,
-        Tab,
-        Recognition,
         ibpsUserSelector,
         IbpsAttachment,
         DataFormrender,
