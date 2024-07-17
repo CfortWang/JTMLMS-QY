@@ -49,6 +49,27 @@
                 <div>止：{{ scope.row.jieShuShiJian }}</div>
             </template>
         </ibps-crud>
+        <exam-edit
+            v-if="showEditDialog"
+            :id="examInfo.examId"
+            :visible.sync="showEditDialog"
+            :is-disabled="examInfo.state !== '未发布'"
+            @callback="search"
+            @close="visible => showEditDialog = visible"
+        />
+        <exam-detail
+            v-if="showDetailDialog"
+            :visible.sync="showDetailDialog"
+            :bank-id="examInfo.bankId"
+            :exam-id="examInfo.examId"
+            @close="visible => showDetailDialog = visible"
+        />
+        <exam-judge
+            v-if="showJudgeDialog"
+            :id="selection"
+            :visible.sync="showJudgeDialog"
+            @close="visible => showJudgeDialog = visible"
+        />
     </div>
 </template>
 
@@ -85,6 +106,9 @@ const paramsMap = {
 
 export default {
     components: {
+        ExamEdit: () => import('./edit'),
+        ExamDetail: () => import('./detail'),
+        ExamJudge: () => import('../question/judge'),
         IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
     },
     mixins: [FixHeight],
@@ -105,11 +129,19 @@ export default {
             listData: [],
             pagination: {},
             sorts: {},
-            showConfig: false,
+            showEditDialog: false,
+            showDetailDialog: false,
+            showJudgeDialog: false,
             readonly: false,
             params: {},
             targetOption: [],
             methodOption: [],
+            selection: '',
+            examInfo: {
+                examId: '',
+                bankId: '',
+                state: ''
+            },
             examBankId: '',
             listConfig: {
                 toolbars: [
@@ -397,22 +429,26 @@ export default {
          * 处理按钮事件
          */
         handleAction (command, position, selection, data) {
+            const ids = data.map(i => i.examId)
             switch (command) {
                 case 'search':
                     ActionUtils.setFirstPagination(this.pagination)
                     this.search()
                     break
                 case 'create':
-                    ActionUtils.setFirstPagination(this.pagination)
-                    this.search()
+                    this.examInfo = {
+                        examId: '',
+                        state: '未发布'
+                    }
+                    this.showEditDialog = true
                     break
                 case 'remove':
-                    ActionUtils.removeRecord(selection).then((ids) => {
-                        this.handleRemove(ids)
-                    }).catch(() => {})
+                    this.handleRemove(ids)
                     break
                 case 'judge':
-                    this.handleEdit(data, command)
+                    this.selection = ids.join(',')
+                    console.log(this.selection)
+                    this.showJudgeDialog = true
                     break
                 case 'change':
                     this.handleReport(data)
@@ -459,10 +495,24 @@ export default {
          * 处理删除
          */
         handleRemove (ids) {
-            removeFormData({ ids }).then(() => {
-                ActionUtils.removeSuccessMessage()
-                this.search()
-            }).catch(() => {})
+            if (!ids || !ids.length) {
+                return this.$message.warning('请选择要删除的考试！')
+            }
+            this.$confirm('数据一旦删除无法恢复，确定要删除选中的考试吗？', '提示', {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type: 'warning',
+                showClose: false,
+                closeOnClickModal: false
+            }).then(() => {
+                this.$common.request('delete', {
+                    tableName: 't_exams',
+                    paramWhere: { id_: ids.join(',') }
+                }).then(() => {
+                    ActionUtils.removeSuccessMessage()
+                    this.search()
+                })
+            })
         },
         handleRowDblclick (row) {
             this.handleEdit(row, 'detail')

@@ -24,3 +24,15 @@ export const encryptByAes = pwd => {
     }
     return encrypted.ciphertext.toString(CryptoJS.enc.Base64)
 }
+
+export const decryptByAes = encryptedText => {
+    const options = {
+        iv: iv,
+        mode: CryptoJS.mode.CBC, // 使用CBC模式
+        padding: CryptoJS.pad.Pkcs7 // 使用PKCS7填充
+    }
+    const encryptedData = CryptoJS.enc.Base64.parse(encryptedText)
+    const decryptedData = CryptoJS.AES.decrypt({ ciphertext: encryptedData }, key, options)
+    const decryptedText = decryptedData.toString(CryptoJS.enc.Utf8)
+    return decryptedText.trim()
+}

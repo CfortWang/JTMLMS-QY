@@ -1,6 +1,6 @@
 // 通用工具类，定义通用函数及常用接口
 import { mapValues } from 'lodash'
-import { encryptByAes } from '@/utils/encrypt'
+import { encryptByAes, decryptByAes } from '@/utils/encrypt'
 import { preview } from '@/business/platform/form/utils/custom/preview'
 import request from '@/business/platform/form/utils/custom/joinCURD'
 import pinyin4js from 'pinyin4js'
@@ -163,6 +163,7 @@ export default {
     getNextIdByAlias,
     decode,
     encryptByAes,
+    decryptByAes,
     downloadByBlob,
     sendMsg,
     saveNews,

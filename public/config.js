@@ -67,7 +67,9 @@
         // 系统名称
         SYSTEM_NAME: '金通医学实验室标准化数智化管理平台',
         // 润乾报表根目录
-        REPORT_PATH: '金通医学实验室管理系统'
+        REPORT_PATH: '金通医学实验室管理系统',
+        // 是否显示开启明文SQL
+        SHOW_PLAINTEXT: false
     }
 
 })(window)

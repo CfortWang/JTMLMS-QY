@@ -59,3 +59,5 @@ export const I18N_FALLBACK_LOCALE = __IBPS_CONFIG__.I18N_FALLBACK_LOCALE || 'zh-
 export const ELEMENT_COLOR = __IBPS_CONFIG__.ELEMENT_COLOR || '#409EFF'
 export const SYSTEM_NAME = __IBPS_CONFIG__.SYSTEM_NAME || '金通医学实验室标准化数智化管理平台'
 export const REPORT_PATH = __IBPS_CONFIG__.REPORT_PATH || '金通医学实验室管理系统'
+// 是否显示明文SQL，开发环境默认显示
+export const SHOW_PLAINTEXT = __IBPS_CONFIG__.SHOW_PLAINTEXT || env.NODE_ENV === 'development'
