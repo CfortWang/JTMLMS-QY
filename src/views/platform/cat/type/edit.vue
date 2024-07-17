@@ -245,19 +245,12 @@ export default {
         randomNum: [String, Number] // 时间戳，用于保证点击请求数据
     },
     data () {
-        const rules = {
-            name: [{ required: true, message: this.$t('validate.required') }],
-            typeKey: [{ required: true, validator: validateKey }]
-        }
         const level = this.firstDiDian || this.secondDiDian
-        if (this.categoryKey === 'FILE_TYPE') {
-            rules.authorityObject = {
-                chaYue: [{ required: true, message: this.$t('validate.required') }],
-                shenCha: [{ required: true, message: this.$t('validate.required') }],
-                shenHeZouXiang: [{ required: true, message: this.$t('validate.required') }]
-            }
-        }
         return {
+            rules: {
+                name: [{ required: true, message: this.$t('validate.required') }],
+                typeKey: [{ required: true, validator: validateKey }]
+            },
             formName: 'typeForm',
             formLabelWidth: '120px',
             dialogVisible: false,
@@ -279,7 +272,6 @@ export default {
                     shenHeZouXiang: ''
                 }
             },
-            rules,
             toolbars: [
                 { key: 'save', hidden: () => { return this.readonly } },
                 { key: 'cancel' }
@@ -303,6 +295,19 @@ export default {
         }
     },
     watch: {
+        categoryKey: {
+            handler (val) {
+                if (val === 'FILE_TYPE') {
+                    this.rules.authorityObject = {
+                        chaYue: [{ required: true, message: this.$t('validate.required') }],
+                        shenCha: [{ required: true, message: this.$t('validate.required') }],
+                        shenHeZouXiang: [{ required: true, message: this.$t('validate.required') }]
+                    }
+                } else {
+                    delete this.rules.authorityObject
+                }
+            }
+        },
         random () {
             if (this.displayType !== 'dialog') {
                 this.getFormData()
