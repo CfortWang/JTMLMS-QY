@@ -209,13 +209,13 @@
                     </el-descriptions-item>
                 </el-descriptions>
 
-                <div v-if="isEdit && userId===infoFxssbData.zu_chang_id_" style="margin-top:20px">
+                <div v-if="isEdit && isZuZhang" style="margin-top:20px">
                     <el-alert
                         title="根据评估人员选定的风险识别项给每个措施制定人推送风险改进流程"
                         type="success"
                         :closable="false"
                     />
-                    <RiskPeopleTable ref="RiskPeopleTableRef" :params="params" :people-ids="infoFxssbData.ping_gu_ren_yuan_" />
+                    <RiskPeopleTable ref="RiskPeopleTableRef" :params="params" :people-ids="infoFxssbData.ping_gu_ren_yuan_" @goBack="goRefresh" />
                 </div>
 
             </div>
@@ -231,7 +231,7 @@
             :readonly="readonly"
             @close="visible => DialogVisible = visible"
         /> -->
-        <RiskDetail ref="RiskDetailRef" />
+        <RiskDetail ref="RiskDetailRef" @close="goRefresh" />
 
     </el-dialog>
 </template>
@@ -267,6 +267,7 @@ export default {
     data () {
         const { userId, position, level } = this.$store.getters
         return {
+            isFirst: true,
             userId: userId,
             position: position,
             level: level.second || level.first,
@@ -277,11 +278,11 @@ export default {
             dialogVisible: true,
             title: '风险评估与措施',
             toolbars: [
-                { key: 'refresh', label: '刷新', hidden: () => { return this.userId !== this.infoFxssbData.zu_chang_id_ || !this.isEdit || (this.params && this.params.shi_fou_guo_shen_ === '已完成') } },
-                { key: 'save', label: '保存', hidden: () => { return this.userId !== this.infoFxssbData.zu_chang_id_ || (this.params && this.params.shi_fou_guo_shen_ === '已完成') } },
-                { key: 'sendMsg', label: '提醒评估人', icon: 'el-icon-bell', hidden: () => { return this.userId !== this.infoFxssbData.zu_chang_id_ || !this.isEdit || (this.params && this.params.shi_fou_guo_shen_ === '已完成') } },
-                { key: 'peizhifengxian', label: '更新风险库', type: 'info', icon: 'el-icon-setting', hidden: () => { return this.userId !== this.infoFxssbData.zu_chang_id_ || !this.isEdit } },
-                { key: 'submit', label: '提交', icon: 'el-icon-finished', type: 'success', hidden: () => { return this.userId !== this.infoFxssbData.zu_chang_id_ || !this.isEdit || (this.params && this.params.shi_fou_guo_shen_ === '已完成') } },
+                { key: 'refresh', label: '刷新', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
+                { key: 'save', label: '保存', hidden: () => { return !this.isZuZhang || this.isFinished } },
+                { key: 'sendMsg', label: '提醒评估人', icon: 'el-icon-bell', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
+                { key: 'peizhifengxian', label: '更新风险库', type: 'info', icon: 'el-icon-setting', hidden: () => { return !this.isZuZhang || !this.isEdit } },
+                { key: 'submit', label: '提交', icon: 'el-icon-finished', type: 'success', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
                 { key: 'cancel', label: '退出' }
             ],
             infoFxssbData: {
@@ -312,6 +313,9 @@ export default {
             initWidth: '1280px',
             isEdit: false,
             isPingGuRen: false,
+            isZuZhang: true,
+            isFinished: false,
+            preParams: {},
             Ids: []
         }
     },
@@ -343,6 +347,19 @@ export default {
                     }
                 }
             }
+        },
+        'infoFxssbData.feng_xian_lei_xin': {
+            handler (val) {
+                if (val) {
+                    if (this.isFirst) {
+                        this.isFirst = false
+                    } else {
+                        this.infoFxssbData.fan_wei_ = `本实验室与${val}相关所有活动`
+                        this.infoFxssbData.mu_di_ = `通过对实验室（${val}活动）进行风险评估，识别实验室在（${val}活动）方面存在的潜在风险，评估风险影响程度，制定风险管理策略，减少不利后果发生的概率和影响程度。`
+                        this.infoFxssbData.shi_wu_shuo_ming_ = `年度：${this.infoFxssbData.nian_du_}；组长：${this.infoFxssbData.zu_chang_}；评估开始日期：${this.infoFxssbData.kai_shi_ri_qi_}；风险类型：${val}`
+                    }
+                }
+            }
         }
     },
 
@@ -357,17 +374,24 @@ export default {
     methods: {
         // 提交
         async goSubmit () {
+            if (!this.checkRequired(true)) {
+                return this.$message.warning('请先保存后再提交！')
+            }
             // 先检查状态
             const sql2 = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
             const { variables: { data: data2 }} = await this.$common.request('sql', sql2)
             if (data2.length > 0 && data2[0].shi_fou_guo_shen_ === '已完成') {
-                return this.$message('已结束，不可再次提交！')
+                return this.$message.warning('已结束，不可再次提交！')
             }
-
+            if (!data2[0].ping_gu_ren_yuan_) {
+                return this.$message.warning('请先指定评估人！')
+            }
+            const pinGuRenNum = data2[0].ping_gu_ren_yuan_.split(',').length
             const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
             const { variables: { data }} = await this.$common.request('sql', sql)
-            if (data.length > 0 && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
-                this.$confirm('提交后不可再次更改，是否继续?', '提示', {
+            const submitNum = new Set(data.map(item => item.bian_zhi_ren_)).size
+            if (submitNum === pinGuRenNum && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
+                this.$confirm('请仔细检查并保存后再提交，一旦提交不可再更改，是否继续?', '提示', {
                     confirmButtonText: '继续',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -400,28 +424,15 @@ export default {
                                     bian_zhi_bu_men_: this.getPersonPosition(item.zhi_ding_ren_),
                                     bian_zhi_shi_jian: dayjs().format('YYYY-MM-DD HH:mm:ss'),
                                     gai_jin_bian_hao_: ('FXGJ-' + dayjs().format('YYYYMMDDHHmmss')) + count,
-                                    // zheng_gai_qi_xian:'',
                                     yao_su_tiao_kuan_: item.yao_su_tiao_kuan_,
                                     gong_zuo_huan_jie: item.gong_zuo_huan_jie,
                                     gong_zuo_miao_shu: item.gong_zuo_miao_shu,
                                     feng_xian_miao_sh: item.feng_xian_miao_sh,
-                                    // gai_jin_cuo_shi_:item.gai_jin_cuo_shi_,
-                                    // wan_cheng_shi_jia
-                                    // ping_gu_ren_:item.bian_zhi_ren_,
-                                    // ping_gu_shi_jian_:
                                     zu_chang_: this.infoFxssbData.zu_chang_,
                                     zu_chang_id_: this.infoFxssbData.zu_chang_id_,
                                     shi_wu_shuo_ming_: this.infoFxssbData.shi_wu_shuo_ming_,
-                                    // yan_zhong_cheng_d: item.yan_zhong_cheng_d,
-                                    // fa_sheng_pin_du_: item.fa_sheng_pin_du_,
-                                    // feng_xian_zhi_shu: item.feng_xian_zhi_shu,
-                                    // feng_xian_deng_ji: item.feng_xian_deng_ji,
-                                    // feng_xian_ying_du: item.feng_xian_ying_du,
                                     yuan_zhi_shu_: item.feng_xian_zhi_shu,
-                                    // deng_ji_shuo_ming:'',
                                     kong_zhi_fang_fa_: item.xian_xing_kong_zh,
-                                    // gai_lv_shuo_ming_:'',
-                                    // cuo_shi_shuo_ming:'',
                                     feng_xian_lei_xin: this.infoFxssbData.feng_xian_lei_xin,
                                     qian_fu_jian_: this.infoFxssbData.yi_ju_wen_jian_id,
                                     ji_hua_bian_hao_: this.infoFxssbData.ji_hua_bian_hao_,
@@ -519,6 +530,9 @@ export default {
             if (data2.length > 0 && data2[0].shi_fou_guo_shen_ === '已完成') {
                 return this.$message('已结束，不可推送消息！')
             }
+            if (!data2[0].ping_gu_ren_yuan_) {
+                return this.$message.warning('请先指定评估人！')
+            }
             this.$confirm('此操作将通知所有评估人，是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -562,8 +576,12 @@ export default {
                 return bianzhiUserid.positionId
             }
         },
-        checkRequired () {
-            return this.infoFxssbData.nian_du_ && this.infoFxssbData.kai_shi_ri_qi_ && this.infoFxssbData.jie_shu_ri_qi_ && this.infoFxssbData.bao_gao_shi_jian_ && this.infoFxssbData.hui_yi_shi_jian_ && this.infoFxssbData.can_hui_ren_yuan_ && this.infoFxssbData.ping_gu_ren_yuan_
+        checkRequired (flag) {
+            if (flag) {
+                return this.preParams.nian_du_ && this.preParams.kai_shi_ri_qi_ && this.preParams.jie_shu_ri_qi_ && this.preParams.bao_gao_shi_jian_ && this.preParams.hui_yi_shi_jian_ && this.preParams.can_hui_ren_yuan_ && this.preParams.ping_gu_ren_yuan_
+            } else {
+                return this.infoFxssbData.nian_du_ && this.infoFxssbData.kai_shi_ri_qi_ && this.infoFxssbData.jie_shu_ri_qi_ && this.infoFxssbData.bao_gao_shi_jian_ && this.infoFxssbData.hui_yi_shi_jian_ && this.infoFxssbData.can_hui_ren_yuan_ && this.infoFxssbData.ping_gu_ren_yuan_
+            }
         },
         async goAdd () {
             try {
@@ -649,7 +667,13 @@ export default {
         // 刷新
         async goRefresh () {
             this.loading = true
-            await this.$refs.RiskPeopleTableRef.getPeopleList()
+            if (this.msg) {
+                this.msg.close()
+            }
+            await this.init()
+            if (this.$refs.RiskPeopleTableRef) {
+                await this.$refs.RiskPeopleTableRef.getPeopleList()
+            }
             this.loading = false
         },
         // 关闭当前窗口
@@ -662,28 +686,48 @@ export default {
                 this.msg.close()
             }
         },
-        init () {
-            // console.log(this.params)
+        // 弹出提醒
+        async showAlert () {
+            if (!this.isPingGuRen || this.isFinished) return
+            // 判断是否已经填写风险识别项
+            const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.userId}'`
+            const { variables: { data }} = await this.$common.request('sql', sql)
+            let status = '填写'
+            let type = 'warning'
+            if (data.length > 0) {
+                if (data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
+                    return
+                } else {
+                    status = '提交'
+                    type = 'success'
+                }
+            }
+            this.msg = this.$notify({
+                type: type,
+                title: `您有一份风险识别评估表待${status}！`,
+                message: `点击前去${status}`,
+                showClose: false,
+                duration: 0,
+                onClick: () => {
+                    this.$refs.RiskDetailRef.open(this.params)
+                }
+            })
+        },
+        async init () {
             this.isEdit = this.params && this.params.id_
             if (this.isEdit) {
                 this.infoFxssbData = this.params
+                this.preParams = JSON.parse(JSON.stringify(this.params))
+                this.isPingGuRen = this.params.ping_gu_ren_yuan_.indexOf(this.userId) >= 0
+                this.isZuZhang = this.userId === this.infoFxssbData.zu_chang_id_
+                this.isFinished = this.params && this.params.shi_fou_guo_shen_ === '已完成'
+                this.readonly = !!((!this.isZuZhang || this.isFinished))
                 if (this.params.ping_gu_ren_yuan_) {
                     this.Ids = this.params.ping_gu_ren_yuan_.split(',')
+                } else {
+                    this.Ids = []
                 }
-                this.readonly = this.infoFxssbData.zu_chang_id_ !== this.userId
-                if (this.params.shi_fou_guo_shen_ === '已完成') this.readonly = true
-                this.isPingGuRen = this.params.ping_gu_ren_yuan_.indexOf(this.userId) >= 0
-                if (!this.msg && this.isPingGuRen && this.params && this.params.shi_fou_guo_shen_ !== '已完成') {
-                    this.msg = this.$notify.warning({
-                        title: '您有一份风险识别评估表待填写！',
-                        message: '点击前往填写',
-                        showClose: false,
-                        duration: 0,
-                        onClick: () => {
-                            this.$refs.RiskDetailRef.open(this.params)
-                        }
-                    })
-                }
+                await this.showAlert()
             } else {
                 this.readonly = false
                 this.infoFxssbData.di_dian_ = this.level

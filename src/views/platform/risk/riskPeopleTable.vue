@@ -168,11 +168,11 @@ export default {
                 console.log(params)
                 await this.$common.request('update', params)
                 console.log('退回成功')
-                await this.getPeopleList()
                 this.$message({
                     type: 'success',
                     message: '退回成功!'
                 })
+                this.$emit('goBack')
             }).catch(() => {
 
             })

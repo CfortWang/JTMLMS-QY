@@ -356,7 +356,11 @@ export default {
                                     yao_su_tiao_kuan_: item.tiao_kuan_,
                                     gong_zuo_huan_jie: item.huan_jie_,
                                     gong_zuo_miao_shu: item.gong_zuo_miao_shu,
-                                    feng_xian_miao_sh: item.feng_xian_miao_sh
+                                    feng_xian_miao_sh: item.feng_xian_miao_sh,
+
+                                    xian_xing_kong_zh: '',
+                                    ni_cai_qu_cuo_shi: '',
+                                    zhi_ding_ren_: ''
                                 })
                             }
                         }
@@ -465,6 +469,7 @@ export default {
         },
         close () {
             this.dialogVisible = false
+            this.$emit('close')
             setTimeout(() => {
                 this.rowParams = {}
                 this.params = {}
