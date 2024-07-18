@@ -34,17 +34,6 @@
                     style="width: 150px;"
                 />
             </template>
-            <template slot="examBank" slot-scope="scope">
-                <ibps-custom-dialog
-                    v-model="scope.row.bankId"
-                    size="mini"
-                    template-key="tkdhk"
-                    :multiple="true"
-                    :readonly="true"
-                    readonly-text="text"
-                    disabled
-                />
-            </template>
             <template slot="isRand" slot-scope="scope">
                 <div>{{ scope.row.isRand ? '是' : '否' }}</div>
             </template>
@@ -95,6 +84,7 @@ export default {
     data () {
         const roleList = ['xtgljs', 'pxglxzfzr']
         const { isSuper, role, userId, userList = [] } = this.$store.getters || {}
+        const { first, second } = this.$store.getters.level || {}
         const hasRole = isSuper || role.some(r => roleList.includes(r.alias))
         const userOption = userList.map(item => ({ label: item.userName, value: item.userId }))
         const endColumn = [
@@ -110,6 +100,7 @@ export default {
             hasRole,
             showType,
             endColumn,
+            level: second || first,
             title: '考试管理',
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: true,
@@ -239,7 +230,7 @@ export default {
                 sortParams = 'ex.chuang_jian_shi_j desc, ex.fa_bu_shi_jian_ desc'
             }
             const params = this.getParams(parameters)
-            const sql = `select qb.ti_ku_ming_cheng_ as bankName, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.kao_shi_lei_xing_ as examType, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.fa_bu_ren_ as publisher, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc, ex.shu_ju_yong_tu_ as dataType, ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber, ex.chou_ti_zong_fen_ as randScore, ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex left join t_question_bank qb on ex.ti_ku_id_ = qb.id_ left join t_examination e on e.exam_id_ = ex.id_ where ex.id_ is not null${params} order by ${sortParams}`
+            const sql = `select qb.ti_ku_ming_cheng_ as bankName, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.kao_shi_lei_xing_ as examType, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.fa_bu_ren_ as publisher, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc, ex.shu_ju_yong_tu_ as dataType, ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber, ex.chou_ti_zong_fen_ as randScore, ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex left join t_question_bank qb on ex.ti_ku_id_ = qb.id_ left join t_examination e on e.exam_id_ = ex.id_ where ex.di_dian_ = '${this.level}'${params} order by ${sortParams}`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -352,7 +343,6 @@ export default {
         },
         // 组装SQL查询参数
         getParams (parameters) {
-            console.log(parameters)
             const temp = mapValues(keyBy(parameters, 'key'), 'value')
             let params = ''
 
@@ -503,10 +493,22 @@ export default {
                 ...temp,
                 ...this.endColumn
             ]
+            this.updateToolbarLabel()
             this.showTable = false
             setTimeout(() => {
                 this.showTable = true
             }, 10)
+        },
+        /**
+         * 更新按钮名称
+         */
+        updateToolbarLabel () {
+            this.listConfig.toolbars = this.listConfig.toolbars.map(toolbar => {
+                if (toolbar.key === 'change') {
+                    toolbar.label = this.showType === 'info' ? '考试结果' : '考试信息'
+                }
+                return toolbar
+            })
         },
         /**
          * 发布考试
@@ -563,14 +565,13 @@ export default {
          * 创建试卷
          */
         createPaper (data, examinees) {
-            const { first, second } = this.$store.getters.level || {}
             const { examId, bankId, examName, questionCount, totalScore, duration, qualifiedRadio, limitDate, limitCount } = data || {}
             const examineeList = examinees.split(',')
             const currentTime = this.$common.getDateNow(19)
             const paramWhere = examineeList.map(i => ({
                 exam_id_: examId,
                 ti_ku_id_: bankId,
-                di_dian_: second || first,
+                di_dian_: this.level,
                 kao_shi_ren_: i,
                 bu_men_: '',
                 bao_ming_shi_jian: currentTime,

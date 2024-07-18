@@ -149,7 +149,7 @@ const qualifiedType = [
 export const basicColumn = [
     { prop: 'examName', label: '考试名称', minWidth: 200 },
     { prop: 'examType', label: '考试类型', width: 90 },
-    { prop: 'bankName', label: '考试题库', slotName: 'examBank', width: 160 },
+    { prop: 'bankName', label: '考试题库', width: 160 },
     { prop: 'examState', label: '状态', width: 80, tags: statusOption },
     { prop: 'totalScore', label: '总分', width: 65 }
 ]
