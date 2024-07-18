@@ -1,6 +1,7 @@
 <template>
     <div class="main-container">
         <ibps-crud
+            v-if="showTable"
             ref="crud"
             :display-field="title"
             :height="height"
@@ -73,7 +74,7 @@
 </template>
 
 <script>
-import { examTypeOptions, statusOption, qualifiedType } from '../constants'
+import { examTypeOptions, statusOption, basicColumn, infoColumn, resultColumn } from '../constants'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import { max, min, mean, sum, maxBy, minBy, meanBy, round, keyBy, mapValues } from 'lodash'
@@ -96,11 +97,19 @@ export default {
         const { isSuper, role, userId, userList = [] } = this.$store.getters || {}
         const hasRole = isSuper || role.some(r => roleList.includes(r.alias))
         const userOption = userList.map(item => ({ label: item.userName, value: item.userId }))
+        const endColumn = [
+            { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 120 },
+            { prop: 'publishDate', label: '发布时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 120 },
+            { prop: 'createBy', label: '创建人', tags: userOption, width: 90 }
+        ]
+        const showType = 'info'
         return {
             userId,
             userList,
             userOption,
             hasRole,
+            showType,
+            endColumn,
             title: '考试管理',
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: true,
@@ -111,10 +120,7 @@ export default {
             showEditDialog: false,
             showDetailDialog: false,
             showJudgeDialog: false,
-            readonly: false,
             params: {},
-            targetOption: [],
-            methodOption: [],
             selection: '',
             examInfo: {
                 examId: '',
@@ -122,13 +128,14 @@ export default {
                 state: ''
             },
             examBankId: '',
+            showTable: true,
             listConfig: {
                 toolbars: [
                     { key: 'search' },
                     { key: 'create', label: '新建考试', type: 'success', icon: 'ibps-icon-plus' },
                     { key: 'remove' },
                     { key: 'judge', label: '试题评阅', type: 'info', icon: 'ibps-icon-adjust' },
-                    { key: 'change', label: '考试结果', type: 'warning', icon: 'el-icon-s-operation' }
+                    { key: 'change', label: `${this.showType === 'info' ? '考试结果' : '考试信息'}`, type: 'warning', icon: 'el-icon-s-operation' }
                 ],
                 searchForm: {
                     forms: [
@@ -142,19 +149,9 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'examName', label: '考试名称', minWidth: 200 },
-                    { prop: 'examType', label: '考试类型', width: 90 },
-                    { prop: 'bankName', label: '考试题库', slotName: 'examBank', width: 160 },
-                    { prop: 'duration', label: '考试时长', width: 100 },
-                    { prop: 'limitCount', label: '限考次数', width: 85 },
-                    { prop: 'qualifiedRadio', label: '达标占比', width: 65 },
-                    { prop: 'scoringType', label: '计分方式', width: 85 },
-                    { prop: 'isRand', label: '是否随机', slotName: 'isRand', width: 65 },
-                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 120 },
-                    { prop: 'publishDate', label: '发布时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 120 },
-                    { prop: 'limitDate', label: '限考时间', width: 120 },
-                    { prop: 'createBy', label: '创建人', tags: userOption, width: 90 },
-                    { prop: 'examState', label: '状态', width: 80, tags: statusOption }
+                    ...basicColumn,
+                    ...infoColumn,
+                    ...endColumn
                 ],
                 rowHandle: {
                     // effect: 'display',
@@ -332,6 +329,8 @@ export default {
                         item.minScore = finishList.length ? minBy(finishList, 'min').min : nodatadesc
                         item.avgScore = finishList.length ? meanBy(finishList, 'avg').toFixed(2) : nodatadesc
                         item.passRate = finishList.length ? this.getPassRate(finishList) : nodatadesc
+                        item.examineeCount = item.examinee ? item.examinee.split(',').length : 0
+                        item.examFinishCount = item.paperList.filter(i => i.examStatus === '已完成').length
                     })
                     const page = {
                         limit,
@@ -352,45 +351,6 @@ export default {
             })
         },
         // 组装SQL查询参数
-        // getParams (parameters) {
-        //     console.log(parameters)
-        //     const temp = mapValues(keyBy(parameters, 'key'), 'value')
-        //     let params = ''
-        //     if (this.$utils.isNotEmpty(temp.examName)) {
-        //         params += ` and ex.kao_shi_ming_chen like '%${temp.examName}%'`
-        //     }
-        //     if (this.$utils.isNotEmpty(temp.examType)) {
-        //         const t = []
-        //         temp.examType.forEach(p => {
-        //             t.push(`ex.kao_shi_lei_xing_ = '${p}'`)
-        //         })
-        //         params += ` and (${t.join(' or ')})`
-        //     }
-        //     if (this.$utils.isNotEmpty(temp.examState)) {
-        //         const t = []
-        //         this.examState.forEach(p => {
-        //             t.push(`ex.zhuang_tai_ = '${p}'`)
-        //         })
-        //         params += ` and (${t.join(' or ')})`
-        //     }
-        //     if (this.examBankId) {
-        //         const t = []
-        //         this.examBankId.split(',').forEach(p => {
-        //             t.push(`ex.ti_ku_id_ = '${p}'`)
-        //         })
-        //         params += ` and (${t.join(' or ')})`
-        //     }
-        //     const createTimeParam = parameters.find(i => i.key.includes('createTime'))
-        //     const publishDateParam = parameters.find(i => i.key.includes('publishDate'))
-        //     if (createTimeParam) {
-        //         params += ` and (ex.chuang_jian_shi_j >= '${temp.createTime0}' and ex.chuang_jian_shi_j <= '${temp.createTime1}'  or ex.chuang_jian_shi_j is null)`
-        //     }
-        //     if (publishDateParam) {
-        //         params += ` and (ex.fa_bu_shi_jian_ >= '${temp.publishDate0}' and ex.fa_bu_shi_jian_ <= '${temp.publishDate1}' or ex.fa_bu_shi_jian_ is null)`
-        //     }
-        //     console.log(params)
-        //     return params
-        // },
         getParams (parameters) {
             console.log(parameters)
             const temp = mapValues(keyBy(parameters, 'key'), 'value')
@@ -457,6 +417,9 @@ export default {
             this.loadData()
         },
         handleRowDblclick (row) {
+            if (['已取消', '未发布'].includes(row.examState)) {
+                return this.$message.info('暂无详情数据！')
+            }
             this.examInfo = {
                 examId: row.examId,
                 bankId: row.bankId
@@ -488,7 +451,7 @@ export default {
                     this.showJudgeDialog = true
                     break
                 case 'change':
-                    this.handleColumnChange(data)
+                    this.handleColumnChange()
                     break
                 case 'publish':
                     this.handlePublish(data)
@@ -527,7 +490,23 @@ export default {
          * 切换显示信息
          */
         handleColumnChange () {
-            console.log('handleColumnChange')
+            let temp = []
+            if (this.showType === 'info') {
+                temp = resultColumn
+                this.showType = 'result'
+            } else {
+                temp = infoColumn
+                this.showType = 'info'
+            }
+            this.listConfig.columns = [
+                ...basicColumn,
+                ...temp,
+                ...this.endColumn
+            ]
+            this.showTable = false
+            setTimeout(() => {
+                this.showTable = true
+            }, 10)
         },
         /**
          * 发布考试

@@ -40,6 +40,8 @@
                 v-model="params[item.modelValue]"
                 :size="item.size ? item.size : size"
                 :disabled="item.disabled"
+                :multiple="item.multiple === 'Y'"
+                :collapse-tags="item.multiple === 'Y'"
                 :placeholder="item.placeholder?item.placeholder:'请选择'"
                 :style="itemStyle + (item.itemWidth ? `width: ${item.itemWidth}px;` : '')"
                 clearable

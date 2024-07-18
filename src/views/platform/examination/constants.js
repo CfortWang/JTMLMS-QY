@@ -19,16 +19,16 @@ export const paperTypeOptions = [
 
 export const examTypeOptions = [
     {
-        label: '培训',
-        value: '培训'
+        label: '培训考试',
+        value: '培训考试'
     },
     {
-        label: '发布',
-        value: '发布'
+        label: '自主考核',
+        value: '自主考核'
     },
     {
-        label: '自主',
-        value: '自主'
+        label: '常规',
+        value: '常规'
     }
 ]
 
@@ -103,4 +103,72 @@ export const defaultOptions = [
         checkbox: [],
         content: ''
     }
+]
+
+export const statusOption = [
+    {
+        label: '未发布',
+        value: '未发布',
+        type: 'info'
+    },
+    {
+        label: '已取消',
+        value: '已取消',
+        type: 'warning'
+    },
+    {
+        label: '已发布',
+        value: '已发布',
+        type: 'primary'
+    },
+    {
+        label: '已结束',
+        value: '已结束',
+        type: 'success'
+    }
+]
+
+const qualifiedType = [
+    {
+        label: '达标',
+        value: '达标',
+        type: 'success'
+    },
+    {
+        label: '未达标',
+        value: '未达标',
+        type: 'danger'
+    },
+    {
+        label: '考试未结束',
+        value: '考试未结束',
+        type: 'warning'
+    }
+]
+
+export const basicColumn = [
+    { prop: 'examName', label: '考试名称', minWidth: 200 },
+    { prop: 'examType', label: '考试类型', width: 90 },
+    { prop: 'bankName', label: '考试题库', slotName: 'examBank', width: 160 },
+    { prop: 'examState', label: '状态', width: 80, tags: statusOption },
+    { prop: 'totalScore', label: '总分', width: 65 }
+]
+
+export const infoColumn = [
+    { prop: 'questionCount', label: '题数', width: 65 },
+    { prop: 'duration', label: '考试时长', width: 100 },
+    { prop: 'limitCount', label: '限考次数', width: 85 },
+    { prop: 'limitDate', label: '限考时间', width: 120 },
+    { prop: 'isRand', label: '是否随机', slotName: 'isRand', width: 65 }
+]
+
+export const resultColumn = [
+    { prop: 'qualifiedRadio', label: '达标分值占比', width: 75 },
+    { prop: 'scoringType', label: '计分方式', width: 85 },
+    { prop: 'examineeCount', label: '考试人数', width: 65 },
+    { prop: 'examFinishCount', label: '完考人数', width: 65 },
+    { prop: 'maxScore', label: '最高分 ', width: 70 },
+    { prop: 'minScore', label: '最低分', width: 70 },
+    { prop: 'avgScore', label: '平均分', width: 70 },
+    { prop: 'passRate', label: '达标率', width: 70 }
 ]

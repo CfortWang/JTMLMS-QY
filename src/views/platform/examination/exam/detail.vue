@@ -255,10 +255,6 @@ export default {
         examId: {
             type: String,
             default: ''
-        },
-        id: {
-            type: String,
-            default: ''
         }
     },
     data () {

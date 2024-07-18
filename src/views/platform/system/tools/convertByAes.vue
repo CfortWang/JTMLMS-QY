@@ -112,18 +112,26 @@ export default {
             if (!this.plaintext) {
                 return this.$message.warning('明文为空！')
             }
-            const temp = JSON.parse(this.plaintext)
-            const hasSql = temp.hasOwnProperty('sql')
-            // if (!temp.sql) {
-            //     return this.$message.warning('明文中不含SQL！')
-            // }
-            navigator.clipboard.writeText(temp.sql || this.plaintext).then(() => {
-                const msg = hasSql ? '明文SQL已复制到剪贴板！' : '明文中不含SQL，已复制所有内容到剪贴板！'
-                this.$message.success(msg)
-            }).catch(error => {
-                this.$message.success('复制失败！')
-                console.log(error)
-            })
+            try {
+                const temp = JSON.parse(this.plaintext)
+                const hasSql = temp.hasOwnProperty('sql')
+                // 明文是 JSON 格式
+                navigator.clipboard.writeText(temp.sql || this.plaintext).then(() => {
+                    const msg = hasSql ? '明文SQL已复制到剪贴板！' : '明文中不含SQL，已复制所有内容到剪贴板！'
+                    this.$message.success(msg)
+                }).catch(error => {
+                    this.$message.error('复制失败！')
+                    console.log(error)
+                })
+            } catch (e) {
+                // 明文不是 JSON 格式
+                navigator.clipboard.writeText(this.plaintext).then(() => {
+                    this.$message.success('明文内容已复制到剪贴板！')
+                }).catch(error => {
+                    this.$message.error('复制失败！')
+                    console.log(error)
+                })
+            }
         },
         closeDialog () {
             this.$emit('close', false)
