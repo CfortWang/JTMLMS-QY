@@ -61,7 +61,7 @@ export default {
                         const params = this.$route.params
                         this.dataTemplateId = params.id
                     }
-                    if (this.$utils.isEmpty(this.dataTemplateId)) {
+                    if (this.$utils.isEmpty(this.dataTemplateId) && this.$utils.isEmpty(this.templateId)) {
                         this.$alert('参数错误，未获取模版ID')
                         return
                     }
