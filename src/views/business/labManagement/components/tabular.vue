@@ -72,7 +72,7 @@ export default {
                     i.data = {
                         number: [i.value],
                         content: '{nt}',
-                        textAlign: 'right',
+                        textAlign: 'center',
                         style: {
                             fill: colorGenerator.next().value,
                             fontWeight: 'bold'
@@ -132,17 +132,16 @@ export default {
                     width: 33%;
                     .label{
                         text-align: center;
-                        font-size: 16px;
+                        font-size: 14px;
                     }
                     .count {
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         .flop {
-                            width: 60px;
-                            height: 40px;
-                            margin-left: -20px;
-                            font-size: 18px;
+                            width: 88px;
+                            height: 35px;
+                            font-size: 14px;
                         }
                         .unit {
                             margin-left: 10px;

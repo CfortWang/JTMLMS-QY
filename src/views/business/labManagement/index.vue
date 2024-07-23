@@ -184,12 +184,12 @@ export default {
             .dv-border-box-1 .border-box-content{
                 height: calc(100vh - 90px);
                 .vessel{
-                    width: 98%;
+                    width: 100%;
                     height: 98%;
-                    padding: 30px 1%;
+                    padding: 30px 0;
                     display: flex;
                     .tabular{
-                        width: 20%;
+                        width: 30%;
                     }
                     .merge{
                         width: 80%;

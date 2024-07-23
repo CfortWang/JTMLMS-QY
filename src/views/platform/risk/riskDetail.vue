@@ -43,7 +43,7 @@
                         <el-date-picker
                             v-model="time"
                             type="datetime"
-                            placeholder="选择日期时间"
+                            placeholder="未编制"
                             :readonly="true"
                             value-format="yyyy-MM-dd HH:mm:ss"
                             size="mini"
@@ -93,7 +93,7 @@
                             prop=""
                             label="序号"
                             type="index"
-                            width="100"
+                            width="50"
                             :index="showIndex"
                         />
                         <el-table-column
@@ -110,13 +110,22 @@
                                 <el-input v-model="row.gong_zuo_huan_jie" type="textarea" :rows="2" size="mini" :readonly="readonly" />
                             </template>
                         </el-table-column>
-                        <el-table-column
+                        <!-- <el-table-column
                             prop="gong_zuo_miao_shu"
                             label="工作描述"
                             width="150"
                         >
                             <template slot-scope="{row}">
                                 <el-input v-model="row.gong_zuo_miao_shu" type="textarea" :rows="2" size="mini" :readonly="readonly" />
+                            </template>
+                        </el-table-column> -->
+                        <el-table-column
+                            prop="ni_cai_qu_cuo_shi"
+                            label="拟采取控制措施"
+                            width="150"
+                        >
+                            <template slot-scope="{row}">
+                                <el-input v-model="row.ni_cai_qu_cuo_shi" type="textarea" :rows="2" size="mini" :readonly="readonly" />
                             </template>
                         </el-table-column>
                         <el-table-column
@@ -173,7 +182,7 @@
                         <el-table-column
                             prop="feng_xian_zhi_shu"
                             label="风险指数"
-                            width="100"
+                            width="70"
                         />
                         <el-table-column
                             prop="feng_xian_deng_ji"
@@ -213,20 +222,6 @@
                                 />
                             </template>
                         </el-table-column>
-                        <el-table-column
-                            prop="ni_cai_qu_cuo_shi"
-                            label="拟采取控制措施"
-                            width="120"
-                        >
-                            <template slot-scope="{row}">
-                                <el-input v-model="row.ni_cai_qu_cuo_shi" type="textarea" :rows="2" size="mini" :readonly="readonly" />
-                            </template>
-                        </el-table-column>
-                        <!-- <el-table-column prop="" label="操作" width="100" fixed="right">
-                            <template slot-scope="{row}">
-                                <el-button type="primary" size="mini">编辑</el-button>
-                            </template>
-                        </el-table-column> -->
                     </el-table>
                 </div>
 
@@ -243,9 +238,9 @@
             </div>
 
             <span slot="footer" class="dialog-footer">
-                <el-button v-if="!readonly" type="primary" size="mini" @click="submit">提 交</el-button>
-                <el-button v-if="!readonly" type="primary" size="mini" @click="save">保 存</el-button>
-                <el-button size="mini" @click="close">关 闭</el-button>
+                <el-button v-if="!readonly" type="primary" size="mini" icon="el-icon-takeaway-box" @click="save">保 存</el-button>
+                <el-button v-if="!readonly" type="success" size="mini" icon="el-icon-finished" @click="submit">提 交</el-button>
+                <el-button size="mini" icon="el-icon-close" @click="close">退 出</el-button>
             </span>
         </el-dialog>
     </div>
@@ -355,11 +350,11 @@ export default {
                                     shi_bie_xiang_: item.id_,
                                     yao_su_tiao_kuan_: item.tiao_kuan_,
                                     gong_zuo_huan_jie: item.huan_jie_,
-                                    gong_zuo_miao_shu: item.gong_zuo_miao_shu,
+                                    // gong_zuo_miao_shu: item.gong_zuo_miao_shu,
                                     feng_xian_miao_sh: item.feng_xian_miao_sh,
 
                                     xian_xing_kong_zh: '',
-                                    ni_cai_qu_cuo_shi: '',
+                                    ni_cai_qu_cuo_shi: item.gong_zuo_miao_shu,
                                     zhi_ding_ren_: ''
                                 })
                             }
@@ -390,11 +385,19 @@ export default {
             const { variables: { data }} = await this.$common.request('sql', sql)
             if (data.length > 0) {
                 // console.log('data', data)
+                this.position = data[0].bian_zhi_bu_men_
+                this.userId = data[0].bian_zhi_ren_
+                this.time = data[0].bian_zhi_shi_jian
                 this.form.xuan_ze_feng_xian = data[0].xuan_ze_feng_xian
                 this.tableList = data
                 // 存储原始数据的 id 数组
                 this.Ids = this.tableList.map(item => item.shi_bie_xiang_)
             } else {
+                if (this.rowParams.bian_zhi_ren_) {
+                    this.position = this.rowParams.bian_zhi_bu_men_
+                    this.userId = this.rowParams.bian_zhi_ren_
+                    this.time = ''
+                }
                 this.tableList = []
                 this.Ids = []
             }
@@ -521,51 +524,31 @@ export default {
         },
         check () {
             if (this.tableList.length === 0) {
-                this.$message.warning('请选择风险项！')
-                return false
+                throw new Error('请选择风险项！')
             }
             for (let i = 0; i < this.tableList.length; i++) {
                 const item = this.tableList[i]
                 if (!item.feng_xian_zhi_shu) {
-                    this.$message.warning(`请检查第${i + 1}行数据是否填写完整！`)
-                    return false
+                    throw new Error(`第${i + 1}请选择严重程度和发生频度！`)
                 }
                 if (item.feng_xian_ying_du !== '风险接受' && !item.zhi_ding_ren_) {
-                    this.$message.warning(`第${i + 1}行缺少措施指定人！`)
-                    return false
+                    throw new Error(`第${i + 1}行缺少措施制定人！`)
                 }
                 // 格式化成需要的数据
                 item.xuan_ze_feng_xian = this.form.xuan_ze_feng_xian
                 delete item.create_by_
                 delete item.create_time_
             }
-            return true
         },
         submit () {
             // console.log(this.Ids)
-            if (this.Ids.length === 0) return this.$message.warning('请填写风险识别项保存后再提交！')
-            this.$confirm('提交后不可再修改，请再次确认并保存后进行提交操作，时是否继续?', '提示', {
+            this.$confirm('提交后不可再修改，是否确认保存并提交?', '提示', {
                 confirmButtonText: '继续',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(async () => {
-                // 先查询状态
-                let sql = ''
-                if (this.readonly) {
-                    sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.rowParams.bian_zhi_ren_}'`
-                } else {
-                    sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.userId}'`
-                }
-                const { variables: { data }} = await this.$common.request('sql', sql)
-                if (data.length > 0 && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
-                    return this.$message('已提交，不可再次提交！')
-                }
-                const sql2 = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
-                const { variables: { data: data2 }} = await this.$common.request('sql', sql2)
-                if (data2.length > 0 && data2[0].shi_fou_guo_shen_ === '已完成') {
-                    return this.$message('已结束，不可再次提交！')
-                }
-
+                // 提交时自动保存
+                await this.save()
                 const params = {
                     tableName: 't_fxsbpgb2',
                     updList: this.Ids.map(item => ({
@@ -581,6 +564,25 @@ export default {
                 }
                 console.log(params)
                 await this.$common.request('update', params)
+                // 判断是否是最后一个提交的评估人
+                const pinGuRenNum = this.params.ping_gu_ren_yuan_.split(',').length
+                const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
+                const { variables: { data }} = await this.$common.request('sql', sql)
+                const submitNum = new Set(data.map(item => item.bian_zhi_ren_)).size
+                if (submitNum === pinGuRenNum && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
+                    // 提醒组长
+                    await this.$common.sendMsg({
+                        subject: '风险评估与措施表单待提交',
+                        content: `您有一份评估与措施表单待提交，请前往-风险控制-风险评估与措施页面提交，计划编号：${this.params.ji_hua_bian_hao_}。`,
+                        receiverId: this.params.zu_chang_id_,
+                        canreplay: '0',
+                        skipTypeMsg: JSON.stringify({
+                            skipType: 3,
+                            pathInfo: '/tygl/fxkzV2/fxpgycslb' // 路由
+                        })
+                    })
+                    console.log('通知组长成功')
+                }
                 console.log('提交成功')
                 this.$message({
                     type: 'success',
@@ -591,8 +593,8 @@ export default {
 
             })
         },
-        async save () {
-            if (!this.check()) return
+        // 判断状态是否已完成
+        async getIsFinish () {
             let sql = ''
             if (this.readonly) {
                 sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.rowParams.bian_zhi_ren_}'`
@@ -601,73 +603,80 @@ export default {
             }
             const { variables: { data }} = await this.$common.request('sql', sql)
             if (data.length > 0 && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
-                return this.$message('已提交，不可再次提交！')
+                throw new Error('已提交，不可再次提交！')
             }
             const sql2 = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
             const { variables: { data: data2 }} = await this.$common.request('sql', sql2)
             if (data2.length > 0 && data2[0].shi_fou_guo_shen_ === '已完成') {
-                return this.$message('已结束，不可再次提交！')
+                throw new Error('已结束，不可再次提交！')
             }
+        },
+        async save () {
+            try {
+                this.check()
+                await this.getIsFinish()
+                const curIds = this.tableList.map(item => item.shi_bie_xiang_)
 
-            // console.log(this.tableList)
-            const curIds = this.tableList.map(item => item.shi_bie_xiang_)
+                // 计算需要增加项
+                const addedIds = this.tableList.filter(item => !this.Ids.includes(item.shi_bie_xiang_))
+                // 计算需要更新项
+                const updatedIds = this.tableList.filter(item => this.Ids.includes(item.shi_bie_xiang_))
+                // 计算需要删除项
+                const deletedIds = this.Ids.filter(id => !curIds.includes(id))
+                console.log(addedIds, updatedIds, deletedIds)
 
-            // 计算需要增加项
-            const addedIds = this.tableList.filter(item => !this.Ids.includes(item.shi_bie_xiang_))
-            // 计算需要更新项
-            const updatedIds = this.tableList.filter(item => this.Ids.includes(item.shi_bie_xiang_))
-            // 计算需要删除项
-            const deletedIds = this.Ids.filter(id => !curIds.includes(id))
-            console.log(addedIds, updatedIds, deletedIds)
-
-            // 新增
-            if (addedIds.length > 0) {
-                const params = {
-                    tableName: 't_fxsbpgb2',
-                    paramWhere: addedIds
-                }
-                console.log(params)
-                await this.$common.request('add', params)
-                console.log('添加成功')
-            }
-            // 更新
-            if (updatedIds.length > 0) {
-                const params = {
-                    tableName: 't_fxsbpgb2',
-                    updList: updatedIds.map(item => ({
-                        where: {
-                            id_: item.id_
-                        },
-                        param: {
-                            ...item,
-                            xuan_ze_feng_xian: this.form.xuan_ze_feng_xian
-                        }
-                    }))
-                }
-                console.log(params)
-                await this.$common.request('update', params)
-                console.log('更新成功')
-            }
-            // 删除
-            if (deletedIds.length > 0) {
-                const sql3 = `select * from t_fxsbpgb2 where bian_zhi_ren_='${this.userId}' and parent_id_='${this.params.id_}' and shi_bie_xiang_ in (${deletedIds.map(id => `'${id}'`).join(', ')})`
-                const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
-                if (data3.length > 0) {
-                    // console.log('data3', data3)
+                // 新增
+                if (addedIds.length > 0) {
                     const params = {
                         tableName: 't_fxsbpgb2',
-                        paramWhere: {
-                            id_: data3.map(item => item.id_).join(',')
-                        }
+                        paramWhere: addedIds
                     }
                     console.log(params)
-                    await this.$common.request('delete', params)
-                    console.log('删除成功')
+                    await this.$common.request('add', params)
+                    console.log('添加成功')
                 }
-            }
-            await this.getTableData()
-            this.$message.success('保存成功')
+                // 更新
+                if (updatedIds.length > 0) {
+                    const params = {
+                        tableName: 't_fxsbpgb2',
+                        updList: updatedIds.map(item => ({
+                            where: {
+                                id_: item.id_
+                            },
+                            param: {
+                                ...item,
+                                xuan_ze_feng_xian: this.form.xuan_ze_feng_xian
+                            }
+                        }))
+                    }
+                    console.log(params)
+                    await this.$common.request('update', params)
+                    console.log('更新成功')
+                }
+                // 删除
+                if (deletedIds.length > 0) {
+                    const sql3 = `select * from t_fxsbpgb2 where bian_zhi_ren_='${this.userId}' and parent_id_='${this.params.id_}' and shi_bie_xiang_ in (${deletedIds.map(id => `'${id}'`).join(', ')})`
+                    const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
+                    if (data3.length > 0) {
+                    // console.log('data3', data3)
+                        const params = {
+                            tableName: 't_fxsbpgb2',
+                            paramWhere: {
+                                id_: data3.map(item => item.id_).join(',')
+                            }
+                        }
+                        console.log(params)
+                        await this.$common.request('delete', params)
+                        console.log('删除成功')
+                    }
+                }
+                await this.getTableData()
+                this.$message.success('保存成功')
             // this.close()
+            } catch (error) {
+                this.$message.warning(error.message)
+                throw new Error(error.message)
+            }
         }
     }
 

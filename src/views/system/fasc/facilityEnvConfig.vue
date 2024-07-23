@@ -459,15 +459,15 @@ export default {
                 bu_men_: '部门',
                 qu_yu_: '区域',
                 fang_jian_: '房间',
+                deviceno1_: '被控设备编号',
+                devicename1_: '被控设备名称',
+                deviceno2_: '监控设备编号',
                 jian_ce_zhou_qi_: '监测周期',
                 jian_ce_ri_qi_: '监测日期',
                 jian_ce_gang_wei_: '监测岗位',
                 kong_zhi_tiao_jia: '控制条件',
                 xiu_zheng_shi_du_: '湿度修正值',
-                xiu_zheng_wen_du_: '温度修正值',
-                deviceno1_: '被控设备编号',
-                devicename1_: '被控设备名称',
-                deviceno2_: '监控设备编号'
+                xiu_zheng_wen_du_: '温度修正值'
             },
             subIdList: [],
             isFirstDevice: true
@@ -640,7 +640,7 @@ export default {
                 const month = today.getMonth() + 1
                 const qu = this.getQuarter(today)
                 const nowM = quarterList[qu - 1][val - 1]
-                const nextM = quarterList[qu][val - 1]
+                const nextM = quarterList[qu % 4][val - 1]
 
                 const endMonth = month >= nowM ? nextM : nowM
                 const yearPJ = today.getFullYear()
@@ -662,7 +662,7 @@ export default {
                 const month = today.getMonth() + 1
                 const qu = month > 6 ? 2 : 1
                 const nowM = midList[qu - 1][val - 1]
-                const nextM = midList[qu][val - 1]
+                const nextM = midList[qu % 2][val - 1]
 
                 const endMonth = month >= nowM ? nextM : nowM
                 const yearPJ = today.getFullYear()

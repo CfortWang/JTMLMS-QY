@@ -68,13 +68,14 @@
                         <el-date-picker
                             v-model="monthValues"
                             style="width: 75%"
-                            type="monthrange"
+                            type="daterange"
                             align="right"
                             unlink-panels
                             range-separator="至"
-                            start-placeholder="开始月份"
-                            end-placeholder="结束月份"
+                            start-placeholder="开始时间"
+                            end-placeholder="结束时间"
                             :picker-options="pickerOptions"
+                            value-format="yyyy-MM-dd"
                             @change="changeDate"
                         />
 
@@ -138,10 +139,12 @@
                         style="width: 1%; height: 100%"
                     />
                     <div class="viewRight">
-                        <BarChart
+                        <!-- <BarChart
                             :info="optionPerson"
                             :config="optionPersonConfig"
-                        />
+                        /> -->
+                        <TrainingStatistics :config="optionTrainingStatisticsConfig" />
+                        <ExamStatistics :config="optionExamStatisticsConfig" />
                     </div>
                 </div>
             </dv-border-box-1>
@@ -154,7 +157,7 @@ import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import CarouselTabl from '@/views/system/jbdHome/board/component/CarouselTabl'
 import SelectPositions from '@/views/component/selectPositions'
 import screenfull from 'screenfull'
-
+import { getUserStatisticList } from '@/api/platform/org/employee'
 export default {
     name: 'check-board1',
     components: {
@@ -162,14 +165,18 @@ export default {
         SelectPositions,
         RingChart: () => import('../personComcont/RingChart'),
         BarChart: () => import('../personComcont/BarChart'),
-        PieView: () => import('../personComcont/GetPieView')
+        PieView: () => import('../personComcont/GetPieView'),
+        TrainingStatistics: () => import('../personComcont/TrainingStatistics'),
+        ExamStatistics: () => import('../personComcont/ExamStatistics')
     },
     data () {
+        const { level } = this.$store.getters
         const colorGroup1 = ['#d20962', '#f47721', '#00bce4', '#7552cc']
         const colorGroup2 = ['#00a78e', '#7d3f98', '#f85a40']
         return {
+            level: level.second || level.first,
             monthValues: [],
-            startDate: '2023-03-01',
+            startDate: '',
             endDate: '',
             employeeNum: 0,
             //   employeeInfo: [],
@@ -183,36 +190,199 @@ export default {
             initOnLoad: 0,
             // 人员id
             personIds: '',
+            // 部门数组
+            positionsIdArr: [],
             // 日期选择配置
             pickerOptions: {
-                shortcuts: [
+                shortcuts: [{
+                    text: '最近一周',
+                    onClick (picker) {
+                        const end = new Date()
+                        const start = new Date()
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+                        picker.$emit('pick', [start, end])
+                    }
+                }, {
+                    text: '最近一个月',
+                    onClick (picker) {
+                        const end = new Date()
+                        const start = new Date()
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+                        picker.$emit('pick', [start, end])
+                    }
+                }, {
+                    text: '最近三个月',
+                    onClick (picker) {
+                        const end = new Date()
+                        const start = new Date()
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+                        picker.$emit('pick', [start, end])
+                    }
+                }]
+            },
+            // 培训统计图配置
+            optionTrainingStatisticsConfig: {
+                dataZoom: [
                     {
-                        text: '本月',
-                        onClick (picker) {
-                            const start = new Date()
-                            start.setDate(1)
-                            picker.$emit('pick', [start, new Date()])
-                        }
+                        type: 'inside'
+                    }
+                ],
+                title: {
+                    text: '部门培训统计',
+                    textStyle: {
+                        color: '#ffffff', // 设置标题文字颜色为白色
+                        fontSize: 14 // 设置标题文字字体大小
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow' // 鼠标悬停时的提示框阴影效果
+                    }
+                },
+                legend: {
+                    data: ['应参数', '实参数'],
+                    textStyle: {
+                        color: '#ffffff' // 图例文字颜色为白色
+                    }
+                },
+                xAxis: {
+                    data: [],
+                    type: 'category',
+                    axisLabel: {
+                        rotate: 50
                     },
-                    {
-                        text: '今年至今',
-                        onClick (picker) {
-                            const end = new Date()
-                            const start = new Date(new Date().getFullYear(), 0)
-                            picker.$emit('pick', [start, end])
-                        }
-                    },
-                    {
-                        text: '最近六个月',
-                        onClick (picker) {
-                            const end = new Date()
-                            const start = new Date()
-                            start.setMonth(start.getMonth() - 6)
-                            start.setDate(1)
-                            picker.$emit('pick', [start, end])
+                    axisLine: {
+                        lineStyle: {
+                            color: '#ffffff' // x 轴轴线颜色为白色
                         }
                     }
-                ]
+                },
+                yAxis: [
+                    {
+                        axisLine: {
+                            lineStyle: {
+                                color: '#ffffff' // y 轴轴线颜色为白色
+                            }
+                        },
+                        type: 'value',
+                        name: '数量（次）',
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        minInterval: 1 // 人数最少为1 不能为小数
+                    }
+                ],
+                series: [{
+                    name: '应参数',
+                    type: 'bar',
+                    data: [],
+                    itemStyle: {
+                        color: colorGroup2[0] // 设置柱状图颜色为蓝色
+                    }
+                },
+                {
+                    name: '实参数',
+                    type: 'bar',
+                    data: [],
+                    itemStyle: {
+                        color: colorGroup2[1] // 设置柱状图颜色为蓝色
+                    }
+                },
+                {
+                    name: '参训率', // 单独添加一个 series 用于 tooltip 显示
+                    type: 'line',
+                    data: [],
+                    itemStyle: {
+                        opacity: 0 // 设置透明度为0，使柱状图不可见
+                    },
+                    lineStyle: {
+                        opacity: 0 // 设置折线透明度为0，使其在图表中不可见
+                    }
+                }]
+
+            },
+            // 考试统计图配置
+            optionExamStatisticsConfig: {
+                dataZoom: [
+                    {
+                        type: 'inside'
+                    }
+                ],
+                title: {
+                    text: '部门考试统计',
+                    textStyle: {
+                        color: '#ffffff', // 设置标题文字颜色为白色
+                        fontSize: 14 // 设置标题文字字体大小
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow' // 鼠标悬停时的提示框阴影效果
+                    }
+                },
+                legend: {
+                    data: ['参考数', '达标数'],
+                    textStyle: {
+                        color: '#ffffff' // 图例文字颜色为白色
+                    }
+                },
+                xAxis: {
+                    data: [],
+                    type: 'category',
+                    axisLabel: {
+                        rotate: 50
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#ffffff' // x 轴轴线颜色为白色
+                        }
+                    }
+                },
+                yAxis: [
+                    {
+                        axisLine: {
+                            lineStyle: {
+                                color: '#ffffff' // y 轴轴线颜色为白色
+                            }
+                        },
+                        type: 'value',
+                        name: '数量（次）',
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        minInterval: 1 // 人数最少为1 不能为小数
+                    }
+                ],
+                series: [{
+                    name: '参考数',
+                    type: 'bar',
+                    data: [],
+                    itemStyle: {
+                        color: colorGroup1[0] // 设置柱状图颜色为蓝色
+                    }
+                },
+                {
+                    name: '达标数',
+                    type: 'bar',
+                    data: [],
+                    itemStyle: {
+                        color: colorGroup1[1] // 设置柱状图颜色为蓝色
+                    }
+                },
+                {
+                    name: '达标率', // 单独添加一个 series 用于 tooltip 显示
+                    type: 'line',
+                    data: [],
+                    itemStyle: {
+                        opacity: 0 // 设置透明度为0，使柱状图不可见
+                    },
+                    lineStyle: {
+                        opacity: 0 // 设置折线透明度为0，使其在图表中不可见
+                    }
+                }]
+
             },
             // 学位统计图配置
             degreePieData: {
@@ -651,28 +821,29 @@ export default {
     },
     created () {
         const initendDate = new Date()
-        this.endDate =
-            initendDate.getFullYear() +
-            '-' +
-            (initendDate.getMonth() + 1 > 9
-                ? initendDate.getMonth() + 1
-                : '0' + (initendDate.getMonth() + 1)) +
-            '-' +
-            (initendDate.getDate() > 9
-                ? initendDate.getDate()
-                : '0' + initendDate.getDate()) +
-            ' 23:59:59'
-        this.startDate = this.preDate(this.endDate, 60) + ' 00:00:00'
-        this.monthValues = [
-            new Date(this.startDate),
-            new Date(
-                initendDate.getFullYear() +
-                    '-' +
-                    (initendDate.getMonth() + 1) +
-                    '-' +
-                    initendDate.getDate()
-            )
-        ]
+        // this.endDate =
+        //     initendDate.getFullYear() +
+        //     '-' +
+        //     (initendDate.getMonth() + 1 > 9
+        //         ? initendDate.getMonth() + 1
+        //         : '0' + (initendDate.getMonth() + 1)) +
+        //     '-' +
+        //     (initendDate.getDate() > 9
+        //         ? initendDate.getDate()
+        //         : '0' + initendDate.getDate()) +
+        //     ' 23:59:59'
+        // this.startDate = this.preDate(this.endDate, 60) + ' 00:00:00'
+
+        // this.monthValues = [
+        //     new Date(this.startDate),
+        //     new Date(
+        //         initendDate.getFullYear() +
+        //             '-' +
+        //             (initendDate.getMonth() + 1) +
+        //             '-' +
+        //             initendDate.getDate()
+        //     )
+        // ]
         if (screenfull.isEnabled && !screenfull.isFullscreen) {
             this.allView()
         }
@@ -688,34 +859,44 @@ export default {
     },
     methods: {
         changeDate (value) {
-            const year = value[1].getFullYear()
-            const month = value[1].getMonth() + 1
-            // 这里传入的是整数时间，返回的是下个月的第一天，因为月份是0-11
-            const nextMonthFirthDay = new Date(year, month, 1) // 下个月的第一天
-            const oneDay = 1000 * 60 * 60 * 24 // 一天的时间毫秒数
-            const endDay = new Date(nextMonthFirthDay - oneDay)
-            const day = endDay.getDate() // 本月最后一天
-            this.endDate =
-                value[1].getFullYear() +
-                '-' +
-                (value[1].getMonth() + 1 > 9
-                    ? value[1].getMonth() + 1
-                    : '0' + (value[1].getMonth() + 1)) +
-                '-' +
-                (day > 9 ? day : '0' + day) +
-                ' 23:59:59'
-            this.startDate =
-                value[0].getFullYear() +
-                '-' +
-                (value[0].getMonth() + 1 > 9
-                    ? value[0].getMonth() + 1
-                    : '0' + (value[0].getMonth() + 1)) +
-                '-' +
-                (value[0].getDate() > 9
-                    ? value[0].getDate()
-                    : '0' + value[0].getDate()) +
-                ' 00:00:00'
-            this.getTtaskMattersData()
+            // const year = value[1].getFullYear()
+            // const month = value[1].getMonth() + 1
+            // // 这里传入的是整数时间，返回的是下个月的第一天，因为月份是0-11
+            // const nextMonthFirthDay = new Date(year, month, 1) // 下个月的第一天
+            // const oneDay = 1000 * 60 * 60 * 24 // 一天的时间毫秒数
+            // const endDay = new Date(nextMonthFirthDay - oneDay)
+            // const day = endDay.getDate() // 本月最后一天
+            // this.endDate =
+            //     value[1].getFullYear() +
+            //     '-' +
+            //     (value[1].getMonth() + 1 > 9
+            //         ? value[1].getMonth() + 1
+            //         : '0' + (value[1].getMonth() + 1)) +
+            //     '-' +
+            //     (day > 9 ? day : '0' + day) +
+            //     ' 23:59:59'
+            // this.startDate =
+            //     value[0].getFullYear() +
+            //     '-' +
+            //     (value[0].getMonth() + 1 > 9
+            //         ? value[0].getMonth() + 1
+            //         : '0' + (value[0].getMonth() + 1)) +
+            //     '-' +
+            //     (value[0].getDate() > 9
+            //         ? value[0].getDate()
+            //         : '0' + value[0].getDate()) +
+            //     ' 00:00:00'
+            // this.getTtaskMattersData()
+            if (value && value.length) {
+                this.startDate = value[0]
+                this.endDate = value[1]
+            } else {
+                this.startDate = ''
+                this.endDate = ''
+            }
+            // console.log(this.startDate, this.endDate)
+            this.getTrainingStatisticsData()
+            this.getExamStatisticsData()
         },
         // 人员基本信息 轮播表数据
         async employeeInfoData () {
@@ -962,13 +1143,86 @@ export default {
                 this.degreeGradeInfoData()
             }
         },
+        // 通过部门 id 获取部门人员
+        getPositionPeopleIds (positionId) {
+            const { userList } = this.$store.getters
+            return userList.filter(user => user.positionId.indexOf(positionId) > -1)
+        },
+        // 根据部门和时间获取考试统计数据
+        async getExamStatisticsData () {
+            if (this.positionsIdArr.length) {
+                const users = this.getPositionPeopleIds(this.positionsIdArr[0])
+                const userIds = users.map(user => user.userId)
+                const sql = `select * from t_examination where  kao_shi_ren_ in (${userIds.map(i => `'${i}'`).join(',')}) and zhuang_tai_ = '已完成'`
+                let { variables: { data }} = await this.$common.request('sql', sql)
+                if (this.startDate && this.endDate) {
+                    data = data.filter(item => {
+                        return new Date(item.jie_shu_shi_jian_).getTime() >= new Date(this.startDate).getTime() && new Date(item.jie_shu_shi_jian_).getTime() <= new Date(this.endDate).getTime()
+                    })
+                }
+                // console.log('考试1', data)
+                const resultData = users.map(user => {
+                    let count = 0
+                    let passCount = 0
+                    data.forEach(item => {
+                        if (item.kao_shi_ren_ === user.userId) {
+                            count++
+                            if (+item.de_fen_ * 100 >= +item.ti_ku_zong_fen_ * +item.da_biao_zhan_bi_) {
+                                passCount++
+                            }
+                        }
+                    })
+                    return {
+                        ...user,
+                        count,
+                        passCount,
+                        passRate: (count === 0 ? 0 : (passCount / count * 100).toFixed(2)) + '%'
+                    }
+                })
+                resultData.sort((a, b) => {
+                    return a.userId - b.userId
+                })
+                // console.log('考试', resultData)
+                // 格式化统计图需要的数据
+                this.optionExamStatisticsConfig.xAxis.data = resultData.map(item => item.userName)
+                this.optionExamStatisticsConfig.series[0].data = resultData.map(item => item.count)
+                this.optionExamStatisticsConfig.series[1].data = resultData.map(item => item.passCount)
+                this.optionExamStatisticsConfig.series[2].data = resultData.map(item => item.passRate)
+            }
+        },
+        // 根据部门和时间获取培训统计数据
+        async getTrainingStatisticsData () {
+            const params = { diDian: this.level }
+            if (this.startDate && this.endDate) {
+                params.startTime = this.startDate
+                params.endTime = this.endDate
+            }
+            if (this.positionsIdArr.length) {
+                params.deptId = this.positionsIdArr[0]
+            }
+            const { data } = await getUserStatisticList(params)
+            data.sort((a, b) => {
+                return a.id_ - b.id_
+            })
+            // console.log('培训', data)
+            // 格式化统计图需要的数据
+            this.optionTrainingStatisticsConfig.xAxis.data = data.map(item => item.name_)
+            this.optionTrainingStatisticsConfig.series[0].data = data.map(item => item.planedjoin)
+            this.optionTrainingStatisticsConfig.series[1].data = data.map(item => item.truejoin)
+            this.optionTrainingStatisticsConfig.series[2].data = data.map(item => item.participationRate)
+        },
         handleFunc (e) {
             this.sqlPositionsDatasIni = e.i
             this.positionIni = e.v
             this.simplifyPosition(e.v)
             this.handleAllGetFunc()
-            clearInterval(this.interval)
-            this.intervalHandle()
+            // clearInterval(this.interval)
+            // this.intervalHandle()
+            if (e.v.length >= 2) {
+                this.positionsIdArr = [e.v[1]]
+            }
+            this.getTrainingStatisticsData()
+            this.getExamStatisticsData()
         },
         handleInt (e) {
             // 找到对应id的部门信息
@@ -1103,6 +1357,9 @@ export default {
     //     box-sizing: border-box;
     //   }
     .viewRight {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         width: 40%;
         height: 100%;
         overflow: hidden;

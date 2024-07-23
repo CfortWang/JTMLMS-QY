@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import { SYSTEM_URL } from '@/api/baseUrl'
+import { SYSTEM_URL, FORM_URL } from '@/api/baseUrl'
 /**
  * 查询列表数据
  * @param {*} params
@@ -45,5 +45,28 @@ export function get(params) {
     url: SYSTEM_URL() + '/system/news/get',
     method: 'get',
     params
+  })
+}
+
+/**
+ * 推送管理评审通知
+ * @param {*} params
+ */
+export function manage(params) {
+  return request({
+    url: FORM_URL() + '/audit/notice/manage',
+    method: 'post',
+    data: params
+  })
+}
+ /**
+ * 推送内审实施计划通知
+ * @param {*} params
+ */
+export function internal(params) {
+  return request({
+    url: FORM_URL() + '/audit/notice/internal',
+    method: 'post',
+    data: params
   })
 }

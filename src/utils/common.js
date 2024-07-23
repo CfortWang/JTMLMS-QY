@@ -7,7 +7,7 @@ import pinyin4js from 'pinyin4js'
 import { snapshoot } from '@/api/platform/file/attachment'
 import { getNextIdByAlias } from '@/api/platform/system/identity'
 import { save as sendMsg } from '@/api/platform/message/innerMessage'
-import { save as saveNews } from '@/api/platform/system/news'
+import { save as saveNews, manage, internal } from '@/api/platform/system/news'
 import { bpmTaskSave } from '@/api/platform/bpmn/bpmTask'
 import { onlyOfficeToPdf } from '@/api/platform/form/seal'
 import { downloadFile as download } from '@/business/platform/file/utils'
@@ -167,6 +167,8 @@ export default {
     downloadByBlob,
     sendMsg,
     saveNews,
+    internal,
+    manage,
     bpmTaskSave,
     getDate,
     getDateNow,

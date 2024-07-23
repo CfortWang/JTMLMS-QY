@@ -191,7 +191,7 @@ export default {
         }
     },
     async mounted () {
-        // console.log(this.params)
+        console.log(this.params)
         await this.getAllPeople()
     },
     methods: {
@@ -282,7 +282,7 @@ export default {
                         }
                     })
                 }
-            } else if (this.params.tableName === 't_fwxyhyqdb' || this.params.tableName === 't_nshyjyb' || this.params.tableName === 't_gshyjyb') {
+            } else if (this.params.tableName === 't_fwxyhyqdb' || this.params.tableName === 't_nshyjyb' || this.params.tableName === 't_gshyjyb' || this.params.tableName === 't_jykzjbdjb') {
                 if (data[0].shi_fou_guo_shen_ !== '已完成') {
                     this.addPeople()
                 }

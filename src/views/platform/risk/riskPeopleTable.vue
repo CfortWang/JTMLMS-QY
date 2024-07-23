@@ -42,7 +42,7 @@
             </el-table-column>
             <el-table-column prop="" label="操作" width="200">
                 <template slot-scope="{row}">
-                    <el-button type="primary" size="mini" :disabled="row.shi_fou_guo_shen_!=='已完成' || (params&&params.shi_fou_guo_shen_==='已完成')" @click="goBack(row)">退回</el-button>
+                    <el-button v-if="isZuZhang" type="primary" size="mini" :disabled="row.shi_fou_guo_shen_!=='已完成' || (params&&params.shi_fou_guo_shen_==='已完成')" @click="goBack(row)">退回</el-button>
                     <el-button type="primary" size="mini" @click="goDetail(row)">详情</el-button>
                 </template>
             </el-table-column>
@@ -71,9 +71,12 @@ export default {
         }
     },
     data () {
+        const { userId } = this.$store.getters
         return {
             tableList: [],
-            detail: []
+            detail: [],
+            isZuZhang: false,
+            userId: userId
         }
     },
     watch: {
@@ -125,6 +128,7 @@ export default {
         async getPeopleList () {
             // console.log('zi', data)
             // this.tableList = data
+            this.isZuZhang = this.userId === this.params.zu_chang_id_
             if (this.peopleIds) {
                 const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
                 const { variables: { data }} = await this.$common.request('sql', sql)

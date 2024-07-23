@@ -43,18 +43,6 @@
                     </el-row>
                     <el-row>
                         <el-col :span="12">
-                            <el-form-item label="房间：">
-                                <el-select v-model="form.fang_jian_" placeholder="请选择" size="mini" style="width:80%">
-                                    <el-option
-                                        v-for="item in fangJianList"
-                                        :key="item.id_"
-                                        :label="item.fang_jian_ming_ha"
-                                        :value="item.fang_jian_ming_ha"
-                                    />
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
                             <el-form-item label="区域：">
                                 <el-select v-model="form.qu_yu_" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
@@ -62,6 +50,18 @@
                                         :key="item.id_"
                                         :label="item.qu_yu_ming_cheng_"
                                         :value="item.qu_yu_ming_cheng_"
+                                    />
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="房间：">
+                                <el-select v-model="form.fang_jian_" placeholder="请选择" size="mini" style="width:80%">
+                                    <el-option
+                                        v-for="item in fangJianList"
+                                        :key="item.id_"
+                                        :label="item.fang_jian_ming_ha"
+                                        :value="item.fang_jian_ming_ha"
                                     />
                                 </el-select>
                             </el-form-item>
@@ -407,7 +407,7 @@ export default {
                 const month = today.getMonth() + 1
                 const qu = this.getQuarter(today)
                 const nowM = quarterList[qu - 1][val - 1]
-                const nextM = quarterList[qu][val - 1]
+                const nextM = quarterList[qu % 4][val - 1]
 
                 const endMonth = month >= nowM ? nextM : nowM
                 const yearPJ = today.getFullYear()
@@ -428,7 +428,7 @@ export default {
                 const month = today.getMonth() + 1
                 const qu = month > 6 ? 2 : 1
                 const nowM = midList[qu - 1][val - 1]
-                const nextM = midList[qu][val - 1]
+                const nextM = midList[qu % 2][val - 1]
 
                 const endMonth = month >= nowM ? nextM : nowM
                 const yearPJ = today.getFullYear()
