@@ -50,6 +50,7 @@
                             v-model="paramForm[field.key]"
                             size="small"
                             :template-key="field.templateKey"
+                            :store="field.store || 'id'"
                             :multiple="false"
                             type="dialog"
                             class="custom-dialog"
