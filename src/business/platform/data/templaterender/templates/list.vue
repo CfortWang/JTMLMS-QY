@@ -470,7 +470,7 @@ export default {
             importTableDialogVisible: false,
             position: null,
             importList: [],
-            importVlaue: null,
+            importValue: null,
             snapshotFile: '',
 
             generalShow: false,
@@ -1795,19 +1795,19 @@ export default {
         // 自定义导入  小林
         handleImport (data = []) {
             this.importList = data
-            this.importVlaue = this.getKeys(this.importList)
+            this.importValue = this.getKeys(this.importList)
             this.importTableDialogVisible = true
         },
         handleImportTableActionEvent (file, options) {
             this.loading = false
-            const formData = this.setValue(this.importVlaue)
+            const formData = this.setValue(this.importValue)
             IbpsImport.xlsx(file, options).then(({ header, results }) => {
                 const list = []
                 results.forEach((item) => {
                     const data = JSON.parse(JSON.stringify(formData))
                     for (const key in item) {
-                        if (this.importVlaue[key]) {
-                            data[this.importVlaue[key]] = item[key]
+                        if (this.importValue[key]) {
+                            data[this.importValue[key]] = item[key]
                         }
                     }
                     list.push(data)

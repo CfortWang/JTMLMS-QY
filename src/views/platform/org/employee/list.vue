@@ -57,21 +57,32 @@
             @close="(visible) => (dialogMoreSearchVisible = visible)"
             @action-event="handleMoreSearchAction"
         />
+        <import-table
+            :visible="importTableDialogVisible"
+            title="导入"
+            @close="(visible) => (importTableDialogVisible = visible)"
+            @action-event="handleImportTableActionEvent"
+        />
     </div>
 </template>
 
 <script>
 import { queryPageList, remove, active, disable } from '@/api/platform/org/employee'
+import { queryRoleScope } from '@/api/platform/org/role'
+import { create } from '@/api/platform/org/employee'
 import ActionUtils from '@/utils/action'
 import { statusOptions, genderOptions, typeOptions } from './constants'
 import { mapActions, mapMutations } from 'vuex'
 import Edit from './edit/index'
 import ChangePassword from './change-password'
 import CustomDataDisplayMixin from '@/business/platform/system/mixins/customDataDisplay'
+import importTable from '@/business/platform/form/formrender/dynamic-form/components/import-table'
 import MoreSearch from './more-search'
+import IbpsImport from '@/plugins/import'
 export default {
     components: {
         Edit,
+        importTable,
         ChangePassword,
         MoreSearch
     },
@@ -96,6 +107,8 @@ export default {
             readonly: false, // 是否只读
             formType: 'add',
 
+            importTableDialogVisible: false,
+            defaultPwd: 'ISO15189',
             changePasswordIds: '',
             changePasswordVisible: false,
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
@@ -115,7 +128,8 @@ export default {
                             'platform.org.employee.button.changePassword'
                         ),
                         icon: 'el-icon-refresh'
-                    }
+                    },
+                    { key: 'import' }
                     // { key: 'more', icon: 'ibps-icon-ellipsis-h' }
                 ],
                 searchForm: {
@@ -495,6 +509,9 @@ export default {
                         this.handlereChangePassword(ids)
                     }).catch(() => {})
                     break
+                case 'import':
+                    this.importTableDialogVisible = true
+                    break
                 case 'detail': // 明细
                     ActionUtils.selectedRecord(selection).then((id) => {
                         this.handleEdit(id, true, 'detail')
@@ -596,6 +613,211 @@ export default {
                     this[type] = data
                     this.listConfig.searchForm.forms[index].options = data
                     resolve()
+                })
+            })
+        },
+        setValue (data) {
+            return Object.values(data).reduce((obj, item) => {
+                obj[item] = ''
+                return obj
+            }, {})
+        },
+        getKeys (data) {
+            return data.reduce((obj, item) => {
+                obj[item.label] = item.name
+                return obj
+            }, {})
+        },
+        // 导入用户
+        handleImportTableActionEvent (file, options) {
+            this.loading = false
+            const column = {
+                account: '账号',
+                username: '姓名',
+                gender: '性别',
+                post: '职称',
+                number: '工号',
+                dept: '所在部门',
+                role: '岗位角色',
+                email: '邮箱',
+                mobile: '手机号码',
+                address: '地址',
+                unit: '单位名称'
+            }
+            const importColumn = Object.keys(column).map(key => {
+                return {
+                    label: column[key],
+                    name: key
+                }
+            })
+            const importKeys = this.getKeys(importColumn)
+            const importValue = this.setValue(importKeys)
+            IbpsImport.xlsx(file, options).then(({ header, results }) => {
+                const list = []
+                results.forEach((item) => {
+                    const data = JSON.parse(JSON.stringify(importValue))
+                    for (const key in item) {
+                        if (importKeys[key]) {
+                            data[importKeys[key]] = item[key]
+                        }
+                    }
+                    list.push(data)
+                })
+                this.importTableDialogVisible = false
+                this.handleImportData(list)
+            })
+        },
+        // 组装导入数据
+        async handleImportData (list) {
+            const hasError = list.some(i => !i.dept || !i.role)
+            if (hasError) {
+                return this.$message.error('存在【所属部门】或【岗位角色】为空的数据，请检查后再尝试！')
+            }
+            console.log(list)
+            const roleList = await this.getRoleList()
+            const { deptList = [] } = this.$store.getters || {}
+            const roleItem = {
+                pk: '',
+                ip: null,
+                createBy: null,
+                createTime: null,
+                updateBy: null,
+                updateTime: null,
+                tenantId: null,
+                dataStatus: null,
+                dbType: null,
+                dsAlias: null,
+                partyType: null,
+                alias: null,
+                parentId: '266946423468851203',
+                path: null,
+                depth: null,
+                sn: null,
+                roleType: '普通员工',
+                subSystemId: '266946423468851203',
+                subSystemName: '金通医学实验室管理系统',
+                subSystemAlias: null,
+                icon: null,
+                type: 'role',
+                nocheck: false,
+                chkDisabled: false,
+                click: true,
+                title: '',
+                open: 'true',
+                source: '自有'
+            }
+            const posItem = {
+                isMainPost: 'N',
+                isPrincipal: 'N',
+                hasChild: false
+            }
+            const createParams = []
+            list.forEach(item => {
+                const userItem = {
+                    id: '',
+                    account: item.account,
+                    password: this.defaultPwd,
+                    isSuper: 'N',
+                    name: item.username,
+                    status: 'actived',
+                    gender: item.gender === '男' ? 'male' : 'female',
+                    email: item.email,
+                    photo: '',
+                    mobile: item.mobile,
+                    createTime: '',
+                    attrItemList: [],
+                    groupID: '',
+                    userGroupItemList: [],
+                    orgItem: {},
+                    wxyhId: '',
+                    jiNengZhiCheng: 'inside',
+                    qq: item.unit,
+                    jianDingZiGeZ: item.number,
+                    address: item.address
+                }
+                const roleName = item.role.split('\r\n')
+                const deptName = item.dept.split('\r\n')
+                const roleItemList = []
+                const posItemList = []
+                roleName.forEach(r => {
+                    const temp = roleList.find(i => i.name === r)
+                    if (temp) {
+                        roleItemList.push({
+                            ...roleItem,
+                            name: r,
+                            id: temp.id,
+                            roleNote: temp.roleNote,
+                            roleAlias: temp.roleAlias
+                        })
+                    }
+                })
+                deptName.map(d => {
+                    const temp = deptList.find(i => i.positionName === d)
+                    if (temp) {
+                        posItemList.push({
+                            ...posItem,
+                            name: d,
+                            id: temp.positionId,
+                            posAlias: temp.alias
+                        })
+                    }
+                })
+                const user = {
+                    ...userItem,
+                    positions: posItemList.map(i => i.id).join(','),
+                    job: roleItemList.map(i => i.id).join(','),
+                    posItemList,
+                    roleItemList
+                }
+                const employee = {
+                    partyEmployeePo: user,
+                    user,
+                    positionVoList: posItemList.map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        isMainPost: false,
+                        isPrincipal: false
+                    })),
+                    roleVoList: roleItemList.map(r => ({
+                        id: r.id,
+                        name: r.name,
+                        subSystemName: r.subSystemName,
+                        source: r.source,
+                        canDelete: true
+                    })),
+                    attrValueVoList: [],
+                    userGroupPoList: []
+                }
+                createParams.push(employee)
+            })
+            console.log(createParams)
+            this.createEmployee(createParams)
+        },
+        createEmployee (paramList) {
+            if (!paramList || !paramList.length) {
+                this.search()
+                return
+            }
+            create(paramList.shift()).then(res => {
+                this.createEmployee(paramList)
+            })
+            // paramList.forEach(vo => {
+            //     create(vo)
+            // })
+        },
+        getRoleList () {
+            return new Promise((resolve, reject) => {
+                queryRoleScope({
+                    parameters: [],
+                    requestPage: {
+                        pageNo: 1,
+                        limit: 2000
+                    },
+                    sorts: []
+                }).then(response => {
+                    resolve(response.data.dataResult || [])
+                }).catch(error => {
+                    reject(error)
                 })
             })
         }
