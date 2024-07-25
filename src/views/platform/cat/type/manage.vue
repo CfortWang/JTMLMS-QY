@@ -42,8 +42,6 @@
                 :parent-data="nodeData"
                 :is-private="isPrivate"
                 :random-num="randomNum"
-                :first-di-dian="firstDiDian"
-                :second-di-dian="secondDiDian"
                 display-type="edit"
                 @callback="loadTreeData"
             />
@@ -69,7 +67,6 @@
             :visible="sortFormVisible"
             title="分类排序"
             :category-key="categoryKey"
-            :di-dian="diDian"
             @callback="callback"
             @close="visible => sortFormVisible = visible"
         />
@@ -92,12 +89,10 @@ export default {
     },
     mixins: [FixHeight],
     data () {
-        const { first, second } = this.$store.getters.level
+        const { first, second } = this.$store.getters.level || {}
         return {
             width: 200,
-            diDian: second || first,
-            firstDiDian: first,
-            secondDiDian: second,
+            level: second || first,
             height: document.clientHeight,
             importFormVisible: false,
             sortFormVisible: false,
@@ -188,12 +183,13 @@ export default {
             if (this.$router.currentRoute.fullPath === '/zlgl/wjkzgl/wjjflsz') {
                 this.categoryKey = 'FILE_TYPE'
                 whereParams = {
-                    'parameters': [
+                    parameters: [
                         {
-                            'key': 'Q^category_key_^SL',
-                            'value': 'FILE_TYPE'
+                            key: 'Q^category_key_^SL',
+                            value: 'FILE_TYPE'
                         }
-                    ] }
+                    ]
+                }
             } else {
                 this.categoryKey = 'FLOW_TYPE'
             }
@@ -211,7 +207,7 @@ export default {
                 'categoryKey': this.categoryKey
             }
             if (this.categoryKey === 'FILE_TYPE') {
-                whereParams.diDian = this.diDian
+                whereParams.diDian = this.level
             }
             findTreeData(whereParams).then(response => {
                 const data = response.data
@@ -222,7 +218,7 @@ export default {
         handleTreeAction (command, position, selection, data) {
             if (data.sn === 0 && data.name === '文件分类') {
                 const object = {
-                    diDian: this.diDian,
+                    diDian: this.level,
                     buMen: '',
                     chaYue: '公用查阅',
                     shenCha: '不需要',

@@ -78,11 +78,12 @@ export default {
         },
         id: String,
         title: String,
-        categoryKey: String,
-        diDian: String
+        categoryKey: String
     },
     data () {
+        const { first, second } = this.$store.getters.level || {}
         return {
+            level: second || first,
             formName: 'dictionaryForm',
             formLabelWidth: '120px',
             dialogVisible: this.visible,
@@ -158,8 +159,8 @@ export default {
             this.$emit('close', false)
         },
         /**
-     * 获取表单数据
-     */
+         * 获取表单数据
+         */
         getFormData () {
             if (this.$utils.isEmpty(this.formId)) {
                 return
@@ -169,7 +170,7 @@ export default {
                 typeId: this.formId
             }
             if (this.categoryKey === 'FILE_TYPE') {
-                whererParams.diDian = this.diDian
+                whererParams.diDian = this.level
             }
             sortList(whererParams).then(response => {
                 this.data = response.data
@@ -212,17 +213,17 @@ export default {
 </script>
 <style lang="scss">
 .type-sort-dialog {
-  // .el-dialog__body{
-  //   height:  calc(27vh - 120px) !important;
-  // }
-  .button-padding {
-    height: 5px;
-  }
-  .el-main {
-    border: 1px #d4d4de solid;
-  }
-  .el-aside {
-    padding-left: 20px;
-  }
+    // .el-dialog__body{
+    //     height:  calc(27vh - 120px) !important;
+    // }
+    .button-padding {
+        height: 5px;
+    }
+    .el-main {
+        border: 1px #d4d4de solid;
+    }
+    .el-aside {
+        padding-left: 20px;
+    }
 }
 </style>

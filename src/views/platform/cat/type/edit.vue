@@ -21,29 +21,22 @@
             :label-width="formLabelWidth"
             @submit.native.prevent
         >
-            <!-- <el-form-item  v-show="!formId" label="父节点名称:">
-        <span>{{ parentData.name }}</span>
-      </el-form-item> -->
+            <!-- <el-form-item v-show="!formId" label="父节点名称:">
+                <span>{{ parentData.name }}</span>
+            </el-form-item> -->
 
-            <el-form-item
-                label="分类名称："
-                prop="name"
-            >
+            <el-form-item label="分类名称：" prop="name">
                 <el-input
                     v-model="type.name"
                     v-pinyin="{vm:type,key:'typeKey'}"
                 />
             </el-form-item>
-            <el-form-item
-                label="分类Key："
-                prop="typeKey"
-            >
+            <el-form-item label="分类Key：" prop="typeKey">
                 <el-input
                     v-model="type.typeKey"
                     :disabled="$utils.isNotEmpty(formId)"
                 />
             </el-form-item>
-
             <el-form-item
                 v-show="categoryKey==='DIC_TYPE'"
                 label="分类类型："
@@ -59,10 +52,7 @@
                 </el-radio-group>
             </el-form-item>
         </el-form>
-        <div
-            slot="footer"
-            class="el-dialog--center"
-        >
+        <div slot="footer" class="el-dialog--center">
             <ibps-toolbar
                 :actions="toolbars"
                 @action-event="handleActionEvent"
@@ -70,14 +60,8 @@
         </div>
     </el-dialog>
     <!--默认形式-->
-    <div
-        v-else
-        class="main-container"
-    >
-        <ibps-container
-            type="full"
-            class="page"
-        >
+    <div v-else class="main-container">
+        <ibps-container type="full" class="page">
             <template slot="header">
                 <el-button
                     type="primary"
@@ -95,16 +79,10 @@
                 <el-form-item label="分类：">
                     <span>{{ isPrivateLocal ? '私有分类' : '普通分类' }}</span>
                 </el-form-item>
-                <el-form-item
-                    v-show="!formId"
-                    label="父节点名称："
-                >
+                <el-form-item v-show="!formId" label="父节点名称：">
                     <span>{{ parentData.name }}</span>
                 </el-form-item>
-                <el-form-item
-                    label="分类名称："
-                    prop="name"
-                >
+                <el-form-item label="分类名称：" prop="name">
                     <el-input
                         v-if="!readonly"
                         v-model="type.name"
@@ -112,10 +90,7 @@
                     />
                     <span v-else>{{ type.name }}</span>
                 </el-form-item>
-                <el-form-item
-                    label="分类Key："
-                    prop="typeKey"
-                >
+                <el-form-item label="分类Key：" prop="typeKey">
                     <el-input
                         v-if="!readonly"
                         v-model="type.typeKey"
@@ -228,12 +203,6 @@ export default {
         title: {
             type: String
         },
-        firstDiDian: {
-            type: String
-        },
-        secondDiDian: {
-            type: String
-        },
         readonly: {
             type: Boolean,
             default: false
@@ -245,8 +214,12 @@ export default {
         randomNum: [String, Number] // 时间戳，用于保证点击请求数据
     },
     data () {
-        const level = this.firstDiDian || this.secondDiDian
+        const { first, second } = this.$store.getters.level || {}
+        const level = second || first
         return {
+            first,
+            second,
+            level,
             rules: {
                 name: [{ required: true, message: this.$t('validate.required') }],
                 typeKey: [{ required: true, validator: validateKey }]
@@ -306,7 +279,8 @@ export default {
                 } else {
                     delete this.rules.authorityObject
                 }
-            }
+            },
+            immediate: true
         },
         random () {
             if (this.displayType !== 'dialog') {
@@ -333,12 +307,12 @@ export default {
             },
             immediate: true
         },
-        /* formId() {
-       if (this.displayType !== 'dialog') {
-         this.getFormData()
-         if (!this.id) this.type = JSON.parse(JSON.stringify(this.defaultForm))
-       }
-    }, */
+        // formId () {
+        //     if (this.displayType !== 'dialog') {
+        //         this.getFormData()
+        //         if (!this.id) this.type = JSON.parse(JSON.stringify(this.defaultForm))
+        //     }
+        // },
         isPrivate: {
             handler: function (val, oldVal) {
                 this.isPrivateLocal = this.isPrivate
@@ -369,7 +343,8 @@ export default {
         // 保存数据
         handleSave () {
             if (this.categoryKey === 'FILE_TYPE') {
-                if (this.type.authorityObject.chaYue === '部门查阅' && (!this.type.authorityObject.buMen || this.type.authorityObject.buMen.length === 0)) {
+                const { chaYue, buMen } = this.type.authorityObject
+                if (chaYue === '部门查阅' && this.$utils.isEmpty(buMen)) {
                     this.rules.authorityObject.buMen = [{ required: true, message: '部门选择不得为空！' }]
                 } else {
                     this.rules.authorityObject.buMen = [{ required: false }]
@@ -425,8 +400,8 @@ export default {
             })
         },
         /**
-     * 表单验证
-     */
+         * 表单验证
+         */
         formValidate () {
             if (this.readonly) return
             this.$nextTick(() => {
@@ -434,8 +409,8 @@ export default {
             })
         },
         /**
-     * 获取表单数据
-     */
+         * 获取表单数据
+         */
         getFormData () {
             if (this.$utils.isEmpty(this.formId)) {
                 // 重置表单
@@ -443,9 +418,7 @@ export default {
                 this.formValidate()
                 return
             }
-            get({
-                typeId: this.formId
-            }).then(response => {
+            get({ typeId: this.formId }).then(response => {
                 this.$refs[this.formName].clearValidate()
                 this.type = response.data
                 this.type.authorityObject = JSON.parse(response.data.authorityObject)
@@ -454,7 +427,7 @@ export default {
         },
         getRadioOptions () {
             this.type.authorityObject.buMen = ''
-            const sql = `select * FROM  ibps_party_entity WHERE party_type_='position' and (path_ like '%${this.secondDiDian}%' or path_ = '${this.firstDiDian}.')`
+            const sql = `select * FROM  ibps_party_entity WHERE party_type_='position' and (path_ like '%${this.second}%' or path_ = '${this.first}.')`
             curdPost('sql', sql).then(res => {
                 const datas = res.variables.data
                 const treeDatas = this.buildTree(datas, 'ID_', 'PARENT_ID_')
@@ -505,32 +478,32 @@ export default {
 </script>
 <style lang="scss">
 .el-cascader {
-  width: 100%;
+    width: 100%;
 }
 .gy-cascader {
-  max-width: 500px;
-  overflow-x: auto;
-  &::-webkit-scrollbar-track-piece {
-    background-color: #f8f8f800;
-  }
-  &::-webkit-scrollbar {
-    transition: all 2s;
-    height: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #ebeaef;
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: #bbb;
-  }
-  &::-webkit-scrollbar-track {
-    background: #ffffff;
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-corner {
-    background-color: rgba(255, 255, 255, 0);
-  }
+    max-width: 500px;
+    overflow-x: auto;
+    &::-webkit-scrollbar-track-piece {
+        background-color: #f8f8f800;
+    }
+    &::-webkit-scrollbar {
+        transition: all 2s;
+        height: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #ebeaef;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: #bbb;
+    }
+    &::-webkit-scrollbar-track {
+        background: #ffffff;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-corner {
+        background-color: rgba(255, 255, 255, 0);
+    }
 }
 </style>
 
