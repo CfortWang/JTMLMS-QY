@@ -12,7 +12,7 @@
         top="0"
     >
         <div slot="title" class="dialog-title">
-            <span>{{ title }}</span>
+            <span class="dialogtitle">{{ title }}</span>
             <div>
                 <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
             </div>
@@ -22,7 +22,7 @@
                 <el-form ref="form" inline :model="form" label-width="120px" :rules="rules">
                     <el-row>
                         <el-col>
-                            <h3 class="title">交班内容</h3>
+                            <el-alert type="success" :closable="false" title="交班内容" class="title" />
                         </el-col>
                     </el-row>
                     <el-row>
@@ -55,7 +55,7 @@
                     </el-row>
                     <el-row>
                         <el-col>
-                            <h3 class="title">夜班标本处理情况</h3>
+                            <el-alert type="success" :closable="false" title="夜班标本处理情况" class="title" />
                         </el-col>
                     </el-row>
                     <el-row>
@@ -98,7 +98,7 @@
                     </el-row>
                     <el-row>
                         <el-col>
-                            <h3 class="title">危急值报告</h3>
+                            <el-alert type="success" :closable="false" title="危急值报告" class="title" />
                         </el-col>
                     </el-row>
                     <el-row>
@@ -148,7 +148,7 @@
                     </el-row>
                     <el-row>
                         <el-col>
-                            <h3 class="title">标本漏检漏发查询</h3>
+                            <el-alert type="success" :closable="false" title="标本漏检漏发查询" class="title" />
                         </el-col>
                     </el-row>
                     <el-row>
@@ -179,7 +179,7 @@
                     </el-row>
                     <el-row>
                         <el-col>
-                            <h3 class="title">夜班安全巡查有无特殊情况</h3>
+                            <el-alert type="success" :closable="false" title="夜班安全巡查有无特殊情况" class="title" />
                         </el-col>
                     </el-row>
                     <el-row>
@@ -197,7 +197,7 @@
                     </el-row>
                     <el-row>
                         <el-col>
-                            <h3 class="title">特殊结果或临床沟通</h3>
+                            <el-alert type="success" :closable="false" title="特殊结果或临床沟通" class="title" />
                         </el-col>
                     </el-row>
                     <el-row>
@@ -231,7 +231,7 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                    <el-alert v-if="!isEdit" type="success" :closable="false" style="margin-top:10px">表单填写完成并保存后会开启早会签到</el-alert>
+                    <el-alert v-if="!isEdit" type="success" :closable="false" class="title">表单填写完成并保存后会开启早会签到</el-alert>
                     <el-row>
                         <el-col :span="24">
                             <el-form-item label="早会内容：" prop="zao_hui_nei_rong_">
@@ -841,6 +841,9 @@ export default {
         position: absolute;
         right:20px;
     }
+    .dialogtitle{
+        font-weight: 900;
+    }
 }
 .container {
         display: flex;
@@ -850,15 +853,13 @@ export default {
         .left{
             height: calc(100vh - 70px);
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-            padding:20px 10px 0 10px;
+            padding:20px 10px 0 40px;
             overflow-y: auto;
             .item{
                 width: 100%;
             }
             .title{
-                font-size: 16px;
-                font-weight: bold;
-                margin: 16px 0 6px 10px;
+                margin: 16px 0 6px -16px;
             }
         }
         .right{
@@ -872,4 +873,9 @@ export default {
         }
     }
 }
+
+    .el-form-item__label{
+        text-align: left
+    }
+
 </style>

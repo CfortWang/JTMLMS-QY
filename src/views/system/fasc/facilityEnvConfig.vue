@@ -10,6 +10,12 @@
         class="dialog paper-detail-dialog"
         top="0"
     >
+        <div slot="title" class="dialog-title">
+            <span>{{ title }}</span>
+            <div>
+                <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
+            </div>
+        </div>
         <div class="container">
             <div class="main">
                 <div class="form">
@@ -181,24 +187,68 @@
                         </el-row>
                     </el-form>
                 </div>
+                <el-divider />
                 <div class="table">
-                    <div class="btn">
-                        <el-upload
-                            ref="uploadRef"
-                            class="upload-demo"
-                            action=""
-                            accept=".xlsx,.xls"
-                            :auto-upload="false"
-                            :show-file-list="false"
-                            :on-change="handleUploadChange"
-                        >
-                            <el-button type="primary" size="mini" icon="el-icon-upload2">导入</el-button>
-                        </el-upload>
-                        <el-button type="primary" size="mini" icon="el-icon-download" @click="exportExcel">导出</el-button>
-                        <el-button type="success" size="mini" icon="el-icon-plus" @click="openDialog">添加</el-button>
+                    <div class="hearder">
+                        <div v-if="isEdit" class="search">
+                            <div class="search-item">
+                                <span>部门</span>
+                                <ibps-user-selector
+                                    v-model="search.buMen"
+                                    type="position"
+                                    readonly-text="text"
+                                    :disabled="false"
+                                    :multiple="false"
+                                    style="width:100%"
+                                    size="mini"
+                                />
+                            </div>
+                            <div class="search-item">
+                                <span>区域</span>
+                                <el-input v-model="search.quYu" size="mini" style="width:100%" placeholder="请输入" />
+                            </div>
+                            <div class="search-item">
+                                <span>房间</span>
+                                <el-input v-model="search.fangJian" size="mini" style="width:100%" placeholder="请输入" />
+                            </div>
+                            <div class="search-item">
+                                <span>监测周期</span>
+                                <el-input v-model="search.zhouQi" size="mini" style="width:66%" placeholder="请输入" />
+                            </div>
+                            <div class="search-item">
+                                <span>监测岗位</span>
+                                <el-select v-model="search.gangWei" placeholder="请选择" size="mini" style="width:66%" :clearable="true">
+                                    <el-option
+                                        v-for="item in jianCeGangWeiList"
+                                        :key="item.id_"
+                                        :label="item.wei_hu_gang_wei_"
+                                        :value="item.wei_hu_gang_wei_"
+                                    />
+                                </el-select>
+                            </div>
+                            <div class="search-item">
+                                <el-button size="mini" type="primary" icon="el-icon-search" @click="goSearch">查询</el-button>
+                            </div>
 
-                        <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeItem">删除</el-button>
-                        <el-button v-if="subForm.length>0" type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
+                        </div>
+                        <div class="btn">
+                            <el-upload
+                                ref="uploadRef"
+                                class="upload-demo"
+                                action=""
+                                accept=".xlsx,.xls"
+                                :auto-upload="false"
+                                :show-file-list="false"
+                                :on-change="handleUploadChange"
+                            >
+                                <el-button type="primary" size="mini" icon="el-icon-upload2">导入</el-button>
+                            </el-upload>
+                            <el-button type="primary" size="mini" icon="el-icon-download" @click="exportExcel">导出</el-button>
+                            <el-button type="success" size="mini" icon="el-icon-plus" @click="openDialog">添加</el-button>
+
+                            <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeItem">删除</el-button>
+                            <el-button v-if="trueList.length>0" type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
+                        </div>
                     </div>
                     <el-table
                         :data="showPaperList"
@@ -294,7 +344,7 @@
                         :page-sizes="[10, 20,30, 50]"
                         :page-size="pageSize"
                         layout="prev,pager,next,jumper,sizes,->,total"
-                        :total="subForm.length"
+                        :total="trueList.length"
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                     />
@@ -302,10 +352,6 @@
             </div>
 
         </div>
-        <div slot="footer" class="el-dialog--center">
-            <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
-        </div>
-
         <FecDialog ref="FecDialogRef" @onSubmit="sonSubmit" />
     </el-dialog>
 </template>
@@ -336,6 +382,15 @@ export default {
     data () {
         const { userId, level = {}} = this.$store.getters || {}
         return {
+            search: {
+                buMen: '',
+                quYu: '',
+                fangJian: '',
+                gangWei: '',
+                zhouQi: ''
+            },
+            searchData: [],
+            isSearch: false,
             level: level.second || level.first,
             userId: userId,
             pageSize: 10,
@@ -474,10 +529,15 @@ export default {
         }
     },
     computed: {
+        // 分页结果
         showPaperList () {
             const start = (this.currentPage - 1) * this.pageSize
             const end = start + this.pageSize
-            return this.subForm.slice(start, end)
+            return this.trueList.slice(start, end)
+        },
+        // 过滤结果
+        trueList () {
+            return this.isSearch ? this.searchData : this.subForm
         },
         isShowDevice () {
             return this.form.lei_xing_ !== '01-室内温湿度监控' && this.form.lei_xing_ !== '06-每日安全检查' && this.form.lei_xing_ !== '08-含氯有效性监测'
@@ -1026,6 +1086,7 @@ export default {
             } else {
                 this.subForm.push(temp_form)
             }
+            this.isEdit && this.goSearch()
             this.$refs.FecDialogRef.close()
         },
         // 关闭当前窗口
@@ -1047,6 +1108,7 @@ export default {
                         const index = this.subForm.indexOf(item)
                         this.subForm.splice(index, 1)
                     })
+                    this.isEdit && this.goSearch()
                     this.$message.success('删除成功！')
                     this.multipleSelection = []
                 }).catch(() => {
@@ -1403,6 +1465,23 @@ export default {
         // 获取当前季度
         getQuarter (date) {
             return Math.floor(date.getMonth() / 3) + 1
+        },
+        // 查询
+        goSearch () {
+            console.log(this.search)
+            if (!this.search.buMen && !this.search.quYu && !this.search.fangJian && !this.search.zhouQi && !this.search.gangWei) {
+                this.isSearch = false
+            } else {
+                // 条件过滤
+                const searchData = this.subForm
+                    .filter(item => item.bu_men_.indexOf(this.search.buMen) > -1)
+                    .filter(item => item.qu_yu_.indexOf(this.search.quYu) > -1)
+                    .filter(item => item.fang_jian_.indexOf(this.search.fangJian) > -1)
+                    .filter(item => item.jian_ce_zhou_qi_.indexOf(this.search.zhouQi) > -1)
+                    .filter(item => item.jian_ce_gang_wei_.indexOf(this.search.gangWei) > -1)
+                this.isSearch = true
+                this.searchData = searchData
+            }
         }
     }
 }
@@ -1415,6 +1494,15 @@ export default {
             text-align: center;
         }
     }
+    .dialog-title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    div{
+        position: absolute;
+        right:20px;
+    }
+}
 .container {
         display: flex;
         width: 100%;
@@ -1422,7 +1510,7 @@ export default {
 
         .main{
             width: 80%;
-            height: calc(100vh - 135px);
+            height: calc(100vh - 70px);
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding:20px;
             // overflow-y: auto;
@@ -1435,6 +1523,22 @@ export default {
                 display: flex;
                 .upload-demo{
                     margin-right: 10px;
+                }
+            }
+        }
+        .table{
+            .search{
+                display: flex;
+                align-items: center;
+                .search-item{
+                    span{
+                        width: 60px;
+                        margin-right: 10px;
+                    }
+                    display: flex;
+                    align-items: center;
+                    width: 200px;
+                    margin: 0 10px 0 10px;
                 }
             }
         }
