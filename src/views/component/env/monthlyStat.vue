@@ -52,6 +52,7 @@
                             :template-key="field.templateKey"
                             :store="field.store || 'id'"
                             :multiple="false"
+                            :dynamic-params="field.dynamicParams"
                             type="dialog"
                             class="custom-dialog"
                             placeholder="请选择"
