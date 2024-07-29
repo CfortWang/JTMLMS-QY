@@ -120,15 +120,6 @@
                             </template>
                         </el-table-column> -->
                         <el-table-column
-                            prop="ni_cai_qu_cuo_shi"
-                            label="拟采取控制措施"
-                            width="150"
-                        >
-                            <template slot-scope="{row}">
-                                <el-input v-model="row.ni_cai_qu_cuo_shi" type="textarea" :rows="2" size="mini" :readonly="readonly" />
-                            </template>
-                        </el-table-column>
-                        <el-table-column
                             prop="feng_xian_miao_sh"
                             label="风险描述"
                             width="150"
@@ -222,6 +213,15 @@
                                 />
                             </template>
                         </el-table-column>
+                        <el-table-column
+                            prop="ni_cai_qu_cuo_shi"
+                            label="拟采取控制措施"
+                            width="150"
+                        >
+                            <template slot-scope="{row}">
+                                <el-input v-model="row.ni_cai_qu_cuo_shi" type="textarea" :rows="2" size="mini" :readonly="readonly" />
+                            </template>
+                        </el-table-column>
                     </el-table>
                 </div>
 
@@ -239,8 +239,8 @@
 
             <span slot="footer" class="dialog-footer">
                 <el-button v-if="!readonly" type="primary" size="mini" icon="el-icon-takeaway-box" @click="save">保 存</el-button>
-                <el-button v-if="!readonly" type="success" size="mini" icon="el-icon-finished" @click="submit">提 交</el-button>
-                <el-button size="mini" icon="el-icon-close" @click="close">退 出</el-button>
+                <el-button v-if="!readonly" type="primary" size="mini" icon="el-icon-finished" @click="submit">提 交</el-button>
+                <el-button size="mini" icon="el-icon-close" type="danger" @click="close">退 出</el-button>
             </span>
         </el-dialog>
     </div>
@@ -353,8 +353,8 @@ export default {
                                     // gong_zuo_miao_shu: item.gong_zuo_miao_shu,
                                     feng_xian_miao_sh: item.feng_xian_miao_sh,
 
-                                    xian_xing_kong_zh: '',
-                                    ni_cai_qu_cuo_shi: item.gong_zuo_miao_shu,
+                                    xian_xing_kong_zh: item.gong_zuo_miao_shu,
+                                    ni_cai_qu_cuo_shi: '',
                                     zhi_ding_ren_: ''
                                 })
                             }

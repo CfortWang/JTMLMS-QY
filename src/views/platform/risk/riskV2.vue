@@ -12,7 +12,7 @@
         top="0"
     >
         <div slot="title" class="dialog-title">
-            <span>{{ title }}</span>
+            <span class="dialogtitle">{{ title }}</span>
             <div>
                 <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
             </div>
@@ -285,8 +285,8 @@ export default {
                 { key: 'save', label: '保存', hidden: () => { return !this.isZuZhang || this.isFinished } },
                 // { key: 'sendMsg', label: '提醒评估人', icon: 'el-icon-bell', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
                 { key: 'peizhifengxian', label: '更新风险库', type: 'info', icon: 'el-icon-setting', hidden: () => { return !this.isZuZhang || !this.isEdit } },
-                { key: 'submit', label: '提交', icon: 'el-icon-finished', type: 'success', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
-                { key: 'cancel', label: '退出' }
+                { key: 'submit', label: '提交', icon: 'el-icon-finished', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
+                { key: 'cancel', label: '退出', type: 'danger' }
             ],
             infoFxssbData: {
                 nian_du_: '',
@@ -869,6 +869,9 @@ export default {
     div{
         position: absolute;
         right:20px;
+    }
+    .dialogtitle{
+        font-weight: 900;
     }
 }
 </style>

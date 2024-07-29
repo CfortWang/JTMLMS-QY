@@ -362,8 +362,8 @@ export default {
                 { key: 'scanRegister', label: '二维码签到', hidden: () => { return !this.isEdit || this.isFinished } },
                 { key: 'gunRegister', label: '扫码枪签到', hidden: () => { return !this.isEdit || this.isFinished } },
                 { key: 'registerInfo', label: '签到信息', hidden: () => { return !this.isEdit } },
-                { key: 'submit', label: '提交', icon: 'el-icon-finished', type: 'success', hidden: () => { return !this.isEdit || this.isFinished } },
-                { key: 'cancel', label: '退出' }
+                { key: 'submit', label: '提交', icon: 'el-icon-finished', hidden: () => { return !this.isEdit || this.isFinished } },
+                { key: 'cancel', label: '退出', type: 'danger' }
             ],
             initWidth: '1280px',
             isEdit: false,
@@ -819,6 +819,8 @@ export default {
                 this.form.bian_zhi_bu_men_ = this.position
                 this.form.bian_zhi_ren_ = this.userId
                 this.form.bian_zhi_shi_jian = dayjs().format('YYYY-MM-DD HH:mm:ss')
+                this.form.biao_ben_cha_lou_ = '是'
+                this.form.xun_cha_qing_kuan = '无'
             }
         }
     }
@@ -873,9 +875,10 @@ export default {
         }
     }
 }
-
-    .el-form-item__label{
+    ::v-deep {
+        .el-form-item__label{
         text-align: left
+        }
     }
 
 </style>

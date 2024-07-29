@@ -171,6 +171,18 @@ export default {
                 }
                 console.log(params)
                 await this.$common.request('update', params)
+                // 发消息给评估人退回消息
+                await this.$common.sendMsg({
+                    subject: '风险评估与措施表单退回提醒',
+                    content: `您有一份评估与措施表单已退回，请前往-风险控制-风险评估与措施页面重新提交，计划编号：${this.params.ji_hua_bian_hao_}，组长：${this.params.zu_chang_}。`,
+                    receiverId: row.bian_zhi_ren_,
+                    canreplay: '0',
+                    skipTypeMsg: JSON.stringify({
+                        skipType: 3,
+                        pathInfo: '/tygl/fxkzV2/fxpgycslb' // 路由
+                    })
+                })
+                console.log('退回提醒成功')
                 console.log('退回成功')
                 this.$message({
                     type: 'success',

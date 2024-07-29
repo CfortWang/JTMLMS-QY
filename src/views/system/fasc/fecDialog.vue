@@ -617,4 +617,9 @@ export default {
         display: flex;
         justify-content: center;
     }
+    ::v-deep {
+        .el-form-item__label{
+        text-align: left
+        }
+    }
 </style>

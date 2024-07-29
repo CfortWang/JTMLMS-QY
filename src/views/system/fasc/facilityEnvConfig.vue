@@ -11,7 +11,7 @@
         top="0"
     >
         <div slot="title" class="dialog-title">
-            <span>{{ title }}</span>
+            <span class="dialogtitle">{{ title }}</span>
             <div>
                 <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
             </div>
@@ -21,7 +21,7 @@
                 <div class="form">
                     <el-form ref="form" :model="form" label-width="120px" :rules="rules">
                         <el-row>
-                            <el-col :span="8">
+                            <el-col :span="12">
                                 <el-form-item label="类型：" prop="lei_xing_">
                                     <el-select v-model="form.lei_xing_" placeholder="请选择" size="mini" style="width:80%">
                                         <el-option
@@ -35,7 +35,7 @@
                             </el-col>
                         </el-row>
                         <el-row v-if="isShowDevice">
-                            <el-col :span="12">
+                            <el-col :span="24">
                                 <el-form-item label="设备编号：">
                                     <ibps-custom-dialog
                                         v-model="form.she_bei_bian_hao_"
@@ -47,7 +47,7 @@
                                         class="custom-dialog"
                                         placeholder="请选择设备"
                                         icon="el-icon-search"
-                                        style="width:80%"
+                                        style="width:90%"
                                     />
                                 </el-form-item>
                             </el-col>
@@ -187,12 +187,12 @@
                         </el-row>
                     </el-form>
                 </div>
-                <el-divider />
+                <!-- <el-divider /> -->
                 <div class="table">
                     <div class="hearder">
-                        <div v-if="isEdit" class="search">
-                            <div class="search-item">
-                                <span>部门</span>
+                        <div class="search" :style="isEdit?{}:{justifyContent: 'flex-end'}">
+                            <div v-if="isEdit" class="search-item">
+                                <span>部门：</span>
                                 <ibps-user-selector
                                     v-model="search.buMen"
                                     type="position"
@@ -203,20 +203,27 @@
                                     size="mini"
                                 />
                             </div>
-                            <div class="search-item">
-                                <span>区域</span>
+                            <div v-if="isEdit" class="search-item">
+                                <span>区域：</span>
                                 <el-input v-model="search.quYu" size="mini" style="width:100%" placeholder="请输入" />
                             </div>
-                            <div class="search-item">
-                                <span>房间</span>
+                            <div v-if="isEdit" class="search-item">
+                                <span>房间：</span>
                                 <el-input v-model="search.fangJian" size="mini" style="width:100%" placeholder="请输入" />
                             </div>
-                            <div class="search-item">
-                                <span>监测周期</span>
-                                <el-input v-model="search.zhouQi" size="mini" style="width:66%" placeholder="请输入" />
+                            <div v-if="isEdit" class="search-item">
+                                <span>监测周期：</span>
+                                <el-select v-model="search.zhouQi" placeholder="请选择" size="mini" style="width:66%" :clearable="true">
+                                    <el-option
+                                        v-for="item in ['每日','每周','每月','每季度','每半年','每年']"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item"
+                                    />
+                                </el-select>
                             </div>
-                            <div class="search-item">
-                                <span>监测岗位</span>
+                            <div v-if="isEdit" class="search-item">
+                                <span>监测岗位：</span>
                                 <el-select v-model="search.gangWei" placeholder="请选择" size="mini" style="width:66%" :clearable="true">
                                     <el-option
                                         v-for="item in jianCeGangWeiList"
@@ -226,34 +233,39 @@
                                     />
                                 </el-select>
                             </div>
-                            <div class="search-item">
+                            <div v-if="isEdit" class="search-item" style="width:60px">
                                 <el-button size="mini" type="primary" icon="el-icon-search" @click="goSearch">查询</el-button>
                             </div>
-
-                        </div>
-                        <div class="btn">
-                            <el-upload
-                                ref="uploadRef"
-                                class="upload-demo"
-                                action=""
-                                accept=".xlsx,.xls"
-                                :auto-upload="false"
-                                :show-file-list="false"
-                                :on-change="handleUploadChange"
-                            >
-                                <el-button type="primary" size="mini" icon="el-icon-upload2">导入</el-button>
-                            </el-upload>
-                            <el-button type="primary" size="mini" icon="el-icon-download" @click="exportExcel">导出</el-button>
-                            <el-button type="success" size="mini" icon="el-icon-plus" @click="openDialog">添加</el-button>
-
-                            <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeItem">删除</el-button>
-                            <el-button v-if="trueList.length>0" type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
+                            <div class="search-item" style="width:60px">
+                                <el-button type="success" size="mini" icon="el-icon-plus" @click="openDialog">添加</el-button>
+                            </div>
+                            <div class="search-item" style="width:60px">
+                                <el-upload
+                                    ref="uploadRef"
+                                    class="upload-demo"
+                                    action=""
+                                    accept=".xlsx,.xls"
+                                    :auto-upload="false"
+                                    :show-file-list="false"
+                                    :on-change="handleUploadChange"
+                                >
+                                    <el-button type="primary" size="mini" icon="el-icon-upload2">导入</el-button>
+                                </el-upload>
+                            </div>
+                            <div class="search-item" style="width:60px">
+                                <el-button type="primary" size="mini" icon="el-icon-download" @click="exportExcel">导出</el-button>
+                            </div>
+                            <div v-if="trueList.length>0" class="search-item" style="width:110px">
+                                <el-button type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
+                            </div>
+                            <div class="search-item" style="width:60px">
+                                <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeItem">删除</el-button>
+                            </div>
                         </div>
                     </div>
                     <el-table
                         :data="showPaperList"
                         style="width: 100%"
-                        border
                         @selection-change="handleSelectionChange"
                     >
                         <el-table-column
@@ -405,7 +417,7 @@ export default {
             jianCeGangWeiList: [],
             dialogVisible: true,
             title: '设施环境配置表',
-            toolbars: [{ key: 'save', label: '保存' }, { key: 'cancel', label: '退出' }],
+            toolbars: [{ key: 'save', label: '保存' }, { key: 'cancel', label: '退出', type: 'danger' }],
             dayCheck: [],
             weekCheck: '',
             monthCheck: '',
@@ -540,7 +552,7 @@ export default {
             return this.isSearch ? this.searchData : this.subForm
         },
         isShowDevice () {
-            return this.form.lei_xing_ !== '01-室内温湿度监控' && this.form.lei_xing_ !== '06-每日安全检查' && this.form.lei_xing_ !== '08-含氯有效性监测'
+            return this.form.lei_xing_ !== '' && this.form.lei_xing_ !== '01-室内温湿度监控' && this.form.lei_xing_ !== '06-每日安全检查' && this.form.lei_xing_ !== '08-含氯有效性监测'
         },
         isEdit () {
             return this.parentData instanceof Object && this.parentData.mainId
@@ -550,22 +562,15 @@ export default {
         },
         labelText () {
             switch (this.form.lei_xing_) {
+                case '01-室内温湿度监控':
+                    return { label1: '温度范围限值：', label2: '湿度范围限值：' }
                 case '02-冰箱温度监控':
                     return { label1: '冷藏温度范围限值：', label2: '冷冻温度范围限值：' }
                 case '03-温浴箱温度监控':
                 case '04-阴凉柜温度监控':
                     return { label1: '温度范围限值：', label2: '' }
-                case '05-纯水机水质监测':
-                case '06-每日安全检查':
-                case '08-含氯有效性监测':
-                case '10-洗眼器检查':
-                case '11-紧急淋浴器检查':
-                case '13-高压灭菌':
-                case '14-空气消毒机':
-                case '12-紫外灯消毒':
-                    return { label1: '', label2: '' }
                 default:
-                    return { label1: '温度范围限值：', label2: '湿度范围限值：' }
+                    return { label1: '', label2: '' }
             }
         }
 
@@ -1502,6 +1507,9 @@ export default {
         position: absolute;
         right:20px;
     }
+    .dialogtitle{
+        font-weight: 900;
+    }
 }
 .container {
         display: flex;
@@ -1519,30 +1527,32 @@ export default {
                     margin: 10px 0;
                 }
             }
-            .btn{
-                display: flex;
-                .upload-demo{
-                    margin-right: 10px;
-                }
-            }
         }
         .table{
+            margin-top: 40px;
             .search{
                 display: flex;
+                flex-wrap: wrap;
                 align-items: center;
                 .search-item{
                     span{
-                        width: 60px;
-                        margin-right: 10px;
+                        font-size: 12px;
+                        width: 70px;
+                        margin-right: 5px;
                     }
                     display: flex;
                     align-items: center;
-                    width: 200px;
-                    margin: 0 10px 0 10px;
+                    width: 220px;
+                    margin: 0 10px 10px 10px;
                 }
             }
         }
 
     }
 }
+    ::v-deep {
+        .el-form-item__label{
+        text-align: left
+        }
+    }
 </style>

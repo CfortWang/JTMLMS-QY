@@ -13,7 +13,7 @@
     >
         <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
             <!-- 主表选择 -->
-            <el-row>
+            <el-row :gutter="50">
                 <el-col :span="8"> <el-form-item label="部门：" prop="deng_ji_bu_men_">
                     <ibps-user-selector
                         v-model="ruleForm.deng_ji_bu_men_"
@@ -30,12 +30,12 @@
                     <el-date-picker v-model="ruleForm.deng_ji_shi_jian_" type="date" placeholder="选择日期" style="width: 100%;" :disabled="!editPermissions" />
                 </el-form-item></el-col>
             </el-row>
-            <el-form-item label="班次：" prop="ban_ci_">
+            <el-form-item label="班次：" prop="ban_ci_" >
                 <span v-if="editPermissions">早班</span>
-                <span v-else>{{ parentData.zhuang_tai_ === '已早交班' ? '午班' : this.parentData.zhuang_tai_ === '已午交班' ? '晚班' : '' }}</span>
+                <span v-else>{{ parentData.zhuang_tai_ === '已早交班' ? '午班' : parentData.zhuang_tai_ === '已午交班' ? '晚班' : '' }}</span>
                 <!-- <span v-else>{{ ruleForm.ban_ci_ }}</span> -->
             </el-form-item>
-            <el-row>
+            <el-row :gutter="50">
                 <el-col :span="8"><div class="grid-content bg-purple-dark">  <el-form-item label="交班标本：" prop="jiao_ban_biao_ben">
                     <el-input v-model.number="ruleForm.jiao_ban_biao_ben" style="width:30%" /><span>例</span>
                 </el-form-item></div></el-col>
@@ -46,7 +46,7 @@
                     <el-input v-model.number="ruleForm.wei_fa_bao_gao_" style="width:30%" /><span>例</span>
                 </el-form-item></div></el-col>
             </el-row>
-            <el-row>
+            <el-row :gutter="50">
                 <el-col :span="8">
                     <div class="grid-content bg-purple-dark">
                         <el-form-item label="是否查漏：" prop="shi_fou_cha_lou_" required>
@@ -66,7 +66,7 @@
             <el-form-item label="其他异常情况：" prop="qi_ta_qing_kuang_">
                 <el-input v-model="ruleForm.qi_ta_qing_kuang_" type="textarea" />
             </el-form-item>
-            <el-row>
+            <el-row :gutter="50">
                 <el-col :span="8">
                     <div class="grid-content bg-purple-dark">
                         <el-form-item label="接班人：" prop="jie_ban_ren_">
@@ -387,7 +387,7 @@ export default {
 </script>
 <style scoped lang="less">
 .demo-ruleForm{
-   padding: 1% 5% 1% 1%;
+   padding: 1% 5% 1% 5%;
    .el-form-item {
     padding: 1% 0;
    }
@@ -395,5 +395,7 @@ export default {
     text-align: center;
    }
 }
-
+/deep/ .el-form-item__label{
+    text-align: left;
+}
 </style>
