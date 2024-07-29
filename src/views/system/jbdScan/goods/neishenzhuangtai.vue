@@ -445,7 +445,7 @@ export default {
                             color: 'auto',
                             top: '100%'
                         },
-                        data: [{ value: 100, top: '100%' }]
+                        data: [{ value: 0, top: '100%' }]
                     }
                 ]
             }
@@ -522,7 +522,7 @@ export default {
                             color: 'auto',
                             top: '100%'
                         },
-                        data: [{ value: 50, top: '100%' }]
+                        data: [{ value: 0, top: '100%' }]
                     }
                 ]
             }
