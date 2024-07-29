@@ -165,6 +165,9 @@ export default {
                 .el-input {
                     width: calc(100% - 100px);
                 }
+                .el-select {
+                    width: 100%;
+                }
             }
         }
         .toolbar {
