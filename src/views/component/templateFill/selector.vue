@@ -7,7 +7,8 @@
                     v-model="pageData.approver1"
                     clearable
                     multiple
-                    :disabled="readonly || rights.approver1"
+                    required
+                    :disabled="(readonly || rights.approver1) || nodeId !== 'Activity_1r6j5ip'"
                     placeholder="请选择"
                 >
                     <el-option
@@ -18,13 +19,13 @@
                     />
                 </el-select>
             </el-col>
-            <el-col v-if="nodeList.length > 1" :span="12" class="inline-item">
+            <el-col v-if="nodeList.length > 1 && (!nodeId || !nodeIdList.slice(0, 1).includes(nodeId))" :span="12" class="inline-item">
                 <div class="label">审批人2</div>
                 <el-select
                     v-model="pageData.approver2"
                     clearable
                     multiple
-                    :disabled="readonly || rights.approver2"
+                    :disabled="(readonly || rights.approver2) || nodeId !== 'Activity_0agpylp'"
                     placeholder="请选择"
                 >
                     <el-option
@@ -37,13 +38,13 @@
             </el-col>
         </el-row>
         <el-row :gutter="20" class="page-row">
-            <el-col v-if="nodeList.length > 2" :span="12" class="inline-item">
+            <el-col v-if="nodeList.length > 2 && (!nodeId || !nodeIdList.slice(0, 2).includes(nodeId))" :span="12" class="inline-item">
                 <div class="label">审批人3</div>
                 <el-select
                     v-model="pageData.approver3"
                     clearable
                     multiple
-                    :disabled="readonly || rights.approver3"
+                    :disabled="(readonly || rights.approver3) || nodeId !== 'Activity_0l2ri14'"
                     placeholder="请选择"
                 >
                     <el-option
@@ -54,13 +55,13 @@
                     />
                 </el-select>
             </el-col>
-            <el-col v-if="nodeList.length > 3" :span="12" class="inline-item">
+            <el-col v-if="nodeList.length > 3 && (!nodeId || !nodeIdList.slice(0, 3).includes(nodeId))" :span="12" class="inline-item">
                 <div class="label">审批人4</div>
                 <el-select
                     v-model="pageData.approver4"
                     clearable
                     multiple
-                    :disabled="readonly || rights.approver4"
+                    :disabled="(readonly || rights.approver4) || nodeId !== 'Activity_0jrg9vp'"
                     placeholder="请选择"
                 >
                     <el-option
@@ -95,6 +96,7 @@ export default {
         return {
             userList,
             roleList,
+            nodeIdList: ['Activity_1r6j5ip', 'Activity_0agpylp', 'Activity_0l2ri14', 'Activity_0jrg9vp'],
             pageData: {
                 approver1: [],
                 approver2: [],
@@ -109,6 +111,7 @@ export default {
                 approver4: []
             },
             nodeList: [],
+            nodeId: '',
             rights: {},
             isInitialized: false,
             lastApproval: '',
@@ -118,9 +121,12 @@ export default {
     watch: {
         formData: {
             handler (val) {
-                console.log(this.params)
+                console.log(val, this.params)
                 if ((!this.isInitialized || this.lastApproval !== val.peiZhi) &&  val.peiZhi) {
-                    this.initApprover(val.peiZhi)
+                    // this.initApprover(val)
+                    setTimeout(() => {
+                        this.initApprover(val)
+                    }, 200)
                 }
             },
             deep: true
@@ -134,20 +140,25 @@ export default {
     },
     mounted () {
         if (this.formData.peiZhi) {
-            this.initApprover(this.formData.peiZhi)
+            setTimeout(() => {
+                this.initApprover(this.formData)
+            }, 200)
         }
     },
     methods: {
-        initApprover (data) {
+        initApprover (formData) {
+            const { shenPiRen1, shenPiRen2, shenPiRen3, shenPiRen4, peiZhi } = formData || {}
             this.pageData = {
-                approver1: [],
-                approver2: [],
-                approver3: [],
-                approver4: []
+                approver1: shenPiRen1 ? shenPiRen1.split(',') : [],
+                approver2: shenPiRen2 ? shenPiRen2.split(',') : [],
+                approver3: shenPiRen3 ? shenPiRen3.split(',') : [],
+                approver4: shenPiRen4 ? shenPiRen4.split(',') : []
             }
-            const approverData = JSON.parse(data)
+            console.log(this.pageData)
+            const approverData = JSON.parse(peiZhi)
             this.showApprover = approverData.hasProcess === 'Y'
             this.nodeList = approverData.nodeList
+            this.nodeId = this.params ? this.params.nodeId : ''
             approverData.nodeList.forEach(item => {
                 const x = `approver${item.sn}`
                 if (item.executeType === 'employee') {
@@ -164,7 +175,7 @@ export default {
                 }
             })
             this.isInitialized = true
-            this.lastApproval = data
+            this.lastApproval = peiZhi
             this.changeFormData(this.pageData)
         },
         changeFormData (val) {
