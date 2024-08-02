@@ -735,12 +735,12 @@ export default {
                     jianDingZiGeZ: item.number,
                     address: item.address
                 }
-                const roleName = item.role.split('\r\n')
-                const deptName = item.dept.split('\r\n')
+                const roleName = item.role.split('\n')
+                const deptName = item.dept.split('\n')
                 const roleItemList = []
                 const posItemList = []
                 roleName.forEach(r => {
-                    const temp = roleList.find(i => i.name === r)
+                    const temp = roleList.find(i => i.name === r.trim().replace(/\r/g, ''))
                     if (temp) {
                         roleItemList.push({
                             ...roleItem,
@@ -752,7 +752,7 @@ export default {
                     }
                 })
                 deptName.map(d => {
-                    const temp = deptList.find(i => i.positionName === d)
+                    const temp = deptList.find(i => i.positionName === d.trim().replace(/\r/g, ''))
                     if (temp) {
                         posItemList.push({
                             ...posItem,
