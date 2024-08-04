@@ -181,7 +181,7 @@
                                     <el-input-number v-model="form.humidityMin" size="mini" controls-position="right" :min="-100" :max="form.humidityMax" :step="1" />
                                     至
                                     <el-input-number v-model="form.humidityMax" size="mini" controls-position="right" :min="form.humidityMin" :max="100" :step="1" />
-                                    (%)
+                                    (℃)
                                 </el-form-item>
                             </el-col>
                         </el-row>

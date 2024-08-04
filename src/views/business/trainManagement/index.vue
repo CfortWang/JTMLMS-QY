@@ -7,7 +7,7 @@
                 <dv-decoration-5 :class="$style.center" :dur="5" />
                 <dv-decoration-8 :class="$style.right" :reverse="true" />
                 <div :class="$style.title">{{ title }}</div>
-                <div :class="$style.daterange" style="width:10%">
+                <div :class="$style.daterange">
                     <el-row style="display:flex">
                         <el-button type="text" size="mini">部门</el-button>
                     </el-row>
@@ -23,14 +23,18 @@
                         </el-select>
                     </dv-border-box-8>
                 </div>
-                <div :class="$style.daterange" style="width:20%;right:60%">
-                    <el-row style="display:flex">
+                <div :class="$style.daterange" style="right:68%">
+                    <!-- <el-row style="display:flex">
                         <el-button :class="hoverClassAdd === 'w'? 'hoverClass' : ''" type="text" @click="changeDate('week')" size="mini">本周</el-button>
                         <el-button :class="hoverClassAdd === 'm'? 'hoverClass' : ''" type="text" @click="changeDate('month')" size="mini">本月</el-button>
                         <el-button :class="hoverClassAdd === 'y'? 'hoverClass' : ''" type="text" @click="changeDate('year')" size="mini">全年</el-button>
+                    </el-row> -->
+                    <el-row style="display:flex">
+                        <el-button type="text" size="mini">日期</el-button>
                     </el-row>
                     <dv-border-box-8>
-                        <el-date-picker
+                        <el-cascader v-model="dateVal" :options="options" :show-all-levels="false"></el-cascader>
+                        <!-- <el-date-picker
                             v-model="daterange"
                             type="daterange"
                             format="yyyy-MM-dd"
@@ -39,29 +43,12 @@
                             start-placeholder="开始日期"
                             end-placeholder="结束日期"
                             @change="changeDate"
-                        />
+                        /> -->
                     </dv-border-box-8>  
                 </div>
-                
-                <!-- <dv-decoration-7 :class="$style.cycle">
-                    <el-dropdown @command="changeCycle">
-                        <span class="el-dropdown-link" :style="`font-size: ${fontSize}px;`">{{ selectedCycle }}</span>
-                        <el-dropdown-menu slot="dropdown" class="dept-dropdown">
-                            <el-dropdown-item
-                                v-for="(item, index) in cycleList"
-                                :key="index"
-                                :command="index"
-                            >{{ item }}</el-dropdown-item>
-                        </el-dropdown-menu>
-                    </el-dropdown>
-                </dv-decoration-7> -->
                 <div :class="$style.back" @click.prevent="goBack()">
                     <dv-border-box-8>返回</dv-border-box-8>
                 </div>
-                <!-- <div :class="$style.parse" @click="toggleAutoPlay">
-                    <img v-if="autoPlay" src="~@/assets/images/icons/parse.png">
-                    <img v-else src="~@/assets/images/icons/play.png">
-                </div> -->
             </div>
             <!-- 图表区域 -->
             <dv-border-box-1>
@@ -100,7 +87,6 @@
 import screenfull from 'screenfull'
 import data from './constants/simulated.js'
 import { getFormatDate } from './utils/config.js'
-import PreWorkChart from './components/preWorkChart.vue'
 
 // import { labsDashBoard } from '@/api/platform/spectaculars/lab'
 export default {
@@ -120,7 +106,7 @@ export default {
             chooseDept,
             deptVal: ' ',
             level: '',
-            title: '培训',
+            title: '科研培训整体情况',
             year: d.toJSON().slice(0, 4),
             cycleList: [],
             initData: {},
@@ -132,7 +118,9 @@ export default {
             tabularArr2:[],
             daterange: [],
             nowWeekData: [],
+            dateVal: ["week","nowWeek"],
             show: true,
+            options: data.options,
             hoverClassAdd:'w',
             mergeData:[
                 {
@@ -434,8 +422,8 @@ export default {
                 color: #ffffff;
             }
             .daterange {
-                width: 8%;
-                right: 83%;
+                width: 10%;
+                right: 80%;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -478,6 +466,10 @@ export default {
                         .el-range-separator{
                             color: #fff;
                         }
+                    }
+                    .el-cascader .el-input--suffix .el-input__inner{
+                        font-size: 12px;
+                        color: #fff;
                     }
                 }
             }
@@ -523,7 +515,7 @@ export default {
                     margin-top: 2.5%;
                 }
                 .daterange {
-                    right: 82%;
+                    right: 79%;
                 }
                 .cycle {
                     width: 5%;
@@ -537,7 +529,7 @@ export default {
             }
             @media only screen and (max-width: 1366px) {
                 .daterange {
-                    right: 80%;
+                    right: 78%;
                 }
                 .cycle {
                     right: 70%;

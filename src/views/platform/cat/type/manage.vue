@@ -180,21 +180,30 @@ export default {
         loadCategoryData () {
             this.loading = true
             let whereParams = {}
+            const allRequests = []
             if (this.$router.currentRoute.fullPath === '/zlgl/wjkzgl/wjjflsz') {
                 this.categoryKey = 'FILE_TYPE'
-                whereParams = {
-                    parameters: [
-                        {
-                            key: 'Q^category_key_^SL',
-                            value: 'FILE_TYPE'
-                        }
-                    ]
-                }
+                const keys = ['FILE_TYPE', 'FLOW_TYPE']
+                keys.forEach(item => {
+                    whereParams = {
+                        parameters: [
+                            {
+                                key: 'Q^category_key_^SL',
+                                value: item
+                            }
+                        ]
+                    }
+                    allRequests.push(queryPageList(whereParams))
+                })
             } else {
                 this.categoryKey = 'FLOW_TYPE'
+                allRequests.push(queryPageList(whereParams))
             }
-            queryPageList(whereParams).then(response => {
-                this.categoryOptions = response.data.dataResult
+            Promise.all(allRequests).then(responses => {
+                this.categoryOptions = []
+                responses.forEach(response => {
+                    this.categoryOptions.push(...response.data.dataResult)
+                })
                 this.loading = false
             }).catch(() => {
                 this.loading = false

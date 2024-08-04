@@ -980,7 +980,8 @@ export default {
             this_.CMAtable = []
             // const sql = "select * FROM t_nsbfhxjlhzzb WHERE parent_id_ =(SELECT id_  FROM t_nsbfhxjlhzbzc WHERE ji_hua_zong_wai_j ='" + id + "' ORDER BY create_time_ DESC LIMIT 1)"
             const sql = `select DISTINCT a.id_,a.shen_he_lei_xing_,a.miao_shu_,a.tiao_kuan_bian_ha,a.nei_shen_yuan_,a.ze_ren_shi_,a.fu_ze_ren_,a.bu_fu_he_cheng_du,c.shi_fou_guo_shen_ FROM t_nsbfhxjlhzzb AS a  JOIN  (select b.bei_shen_bu_men_,b.ji_hua_zong_wai_j,b.shi_fou_guo_shen_, b.lai_zi_he_chu_    FROM t_bfhhjzcsjlb AS b WHERE b.ji_hua_zong_wai_j ='${id}') AS c ON a.id_ = c.lai_zi_he_chu_   WHERE a.parent_id_ =(select d.id_  FROM t_nsbfhxjlhzbzc AS d WHERE d.ji_hua_zong_wai_j ='${id}' ORDER BY d.create_time_ DESC LIMIT 1) ORDER BY a.create_time_,a.id_ DESC `
-            await curdPost('sql', sql).then((res) => {
+            const sql2 = `select distinct a.id_, a.shen_he_lei_xing_, a.miao_shu_, a.tiao_kuan_bian_ha, a.nei_shen_yuan_, a.ze_ren_shi_, a.fu_ze_ren_, a.bu_fu_he_cheng_du, c.shi_fou_guo_shen_ from t_nsbfhxjlhzzb as a join (select b.bei_shen_bu_men_, b.ji_hua_zong_wai_j, b.shi_fou_guo_shen_, b.lai_zi_he_chu_ from t_bfhhjzcsjlb as b where b.ji_hua_zong_wai_j ='${id}') as c on a.id_ = c.lai_zi_he_chu_ where a.parent_id_ = (select d.id_ from t_nsbfhxjlhzbzc as d where d.ji_hua_zong_wai_j = '${id}' order by d.create_time_ desc limit 1) order by a.create_time_ desc, a.id_ desc`
+            await curdPost('sql', sql2).then((res) => {
                 const data = res.variables.data
                 data.forEach((item) => {
                     if (item.shen_he_lei_xing_.includes('CMA')) {

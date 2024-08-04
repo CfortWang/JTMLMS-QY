@@ -134,6 +134,20 @@ export default {
                 if (this.hasPermission) {
                     this.treeData = this.treeData.filter(i => i.isShow !== '1')
                 }
+                // 按照分类过滤
+                const routeName = this.$route.name
+                const routeMap = { 'jssllb': '体系分类', 'ywtxyxjl': '模板分类' }
+                this.treeData = this.treeData.filter(i => {
+                    const authorityName = JSON.parse(i.authorityName)
+                    if (authorityName) {
+                        if (authorityName.fenLei) {
+                            return authorityName.fenLei === routeMap[routeName] || authorityName.fenLei === '通用'
+                        } else {
+                            return true
+                        }
+                    }
+                    return true
+                })
                 this.$emit('treeData', response.data)
             })
         },

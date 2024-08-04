@@ -5,16 +5,16 @@
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         append-to-body
-        width="50%"
+        width="60%"
         class="dialog enrolled-dialog"
         top="6vh"
         @close="closeDialog"
         @open="getShiftHandoverData"
     >
-        <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="110px" class="demo-ruleForm">
             <!-- 主表选择 -->
             <el-row :gutter="50">
-                <el-col :span="8"> <el-form-item label="部门：" prop="deng_ji_bu_men_">
+                <el-col :span="8"> <el-form-item label="部门" prop="deng_ji_bu_men_">
                     <ibps-user-selector
                         v-model="ruleForm.deng_ji_bu_men_"
                         type="position"
@@ -23,33 +23,33 @@
                         :multiple="false"
                     />
                 </el-form-item></el-col>
-                <el-col :span="8">  <el-form-item label="岗位：" prop="gang_wei_">
+                <el-col :span="8">  <el-form-item label="岗位" prop="gang_wei_">
                     <el-input v-model="ruleForm.gang_wei_" type="text" :disabled="!editPermissions" />
                 </el-form-item></el-col>
-                <el-col :span="8"> <el-form-item label="日期：" prop="deng_ji_shi_jian_">
+                <el-col :span="8"> <el-form-item label="日期" prop="deng_ji_shi_jian_">
                     <el-date-picker v-model="ruleForm.deng_ji_shi_jian_" type="date" placeholder="选择日期" style="width: 100%;" :disabled="!editPermissions" />
                 </el-form-item></el-col>
             </el-row>
-            <el-form-item label="班次：" prop="ban_ci_" >
+            <el-form-item label=" 班次" prop="ban_ci_">
                 <span v-if="editPermissions">早班</span>
                 <span v-else>{{ parentData.zhuang_tai_ === '已早交班' ? '午班' : parentData.zhuang_tai_ === '已午交班' ? '晚班' : '' }}</span>
                 <!-- <span v-else>{{ ruleForm.ban_ci_ }}</span> -->
             </el-form-item>
             <el-row :gutter="50">
-                <el-col :span="8"><div class="grid-content bg-purple-dark">  <el-form-item label="交班标本：" prop="jiao_ban_biao_ben">
-                    <el-input v-model.number="ruleForm.jiao_ban_biao_ben" style="width:30%" /><span>例</span>
+                <el-col :span="8"><div class="grid-content bg-purple-dark">  <el-form-item label="交班标本(例)" prop="jiao_ban_biao_ben">
+                    <el-input v-model.number="ruleForm.jiao_ban_biao_ben" style="width:100%" />
                 </el-form-item></div></el-col>
-                <el-col :span="8"><div class="grid-content bg-purple-dark">  <el-form-item label="未处理标本：" prop="wei_chu_li_biao_b">
-                    <el-input v-model.number="ruleForm.wei_chu_li_biao_b" style="width:30%" /><span>例</span>
+                <el-col :span="8"><div class="grid-content bg-purple-dark">  <el-form-item label="未处理标本(例)" prop="wei_chu_li_biao_b">
+                    <el-input v-model.number="ruleForm.wei_chu_li_biao_b" style="width:100%" />
                 </el-form-item></div></el-col>
-                <el-col :span="8"><div class="grid-content bg-purple-dark">  <el-form-item label="未发报告：" prop="wei_fa_bao_gao_">
-                    <el-input v-model.number="ruleForm.wei_fa_bao_gao_" style="width:30%" /><span>例</span>
+                <el-col :span="8"><div class="grid-content bg-purple-dark">  <el-form-item label="未发报告(例)" prop="wei_fa_bao_gao_">
+                    <el-input v-model.number="ruleForm.wei_fa_bao_gao_" style="width:100%" />
                 </el-form-item></div></el-col>
             </el-row>
             <el-row :gutter="50">
                 <el-col :span="8">
                     <div class="grid-content bg-purple-dark">
-                        <el-form-item label="是否查漏：" prop="shi_fou_cha_lou_" required>
+                        <el-form-item label="是否查漏" prop="shi_fou_cha_lou_" required>
                             <el-radio-group v-model="ruleForm.shi_fou_cha_lou_">
                                 <el-radio label="否" />
                                 <el-radio label="是" />
@@ -57,13 +57,13 @@
                         </el-form-item>
                     </div>
                 </el-col>
-                <el-col :span="8"><div class="grid-content bg-purple-dark">
-                    <el-form-item label="漏发漏检：" prop="lou_fa_lou_jian_">
-                        <el-input v-model.number="ruleForm.lou_fa_lou_jian_" style="width:30%" /><span>例</span>
+                <el-col v-show="ruleForm.shi_fou_cha_lou_=='是'" :span="8"><div class="grid-content bg-purple-dark">
+                    <el-form-item label="漏发漏检(例)" prop="lou_fa_lou_jian_">
+                        <el-input v-model.number="ruleForm.lou_fa_lou_jian_" style="width:100%" />
                     </el-form-item>
                 </div></el-col>
             </el-row>
-            <el-form-item label="其他异常情况：" prop="qi_ta_qing_kuang_">
+            <el-form-item label="其他异常情况" prop="qi_ta_qing_kuang_">
                 <el-input v-model="ruleForm.qi_ta_qing_kuang_" type="textarea" />
             </el-form-item>
             <el-row :gutter="50">
@@ -76,6 +76,7 @@
                                 readonly-text="text"
                                 :disabled="false"
                                 :multiple="true"
+                                :temp-search="true"
                             />
                         </el-form-item>
                     </div>
@@ -83,21 +84,32 @@
                 <el-col :span="8">
                     <div class="grid-content bg-purple-dark">
                         <el-form-item label="交班人：" prop="jiao_ban_ren_">
+                            <!-- const roleList = ['xtgljs']
+        const { isSuper, role, userId, userList = [] } = this.$store.getters || {}
+        this.userId = userId
+        this.userList = userList
+        this.hasRole = isSuper || role.some(r => roleList.includes(r.alias)) -->
+
                             <ibps-user-selector
                                 v-model="ruleForm.jiao_ban_ren_"
                                 type="user"
                                 readonly-text="text"
-                                :disabled="!$store.getters.isSuper"
+                                :disabled="!hasRole"
                                 :multiple="false"
                             />
                         </el-form-item>
                     </div>
                 </el-col>
             </el-row>
-            <el-form-item class="footer-btn">
+            <!-- <el-form-item class="footer-btn">
                 <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
                 <el-button @click="dialogVisible=false">取消</el-button>
-            </el-form-item></el-form>
+            </el-form-item> -->
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+            <el-button @click="dialogVisible=false">取消</el-button>
+        </span>
     </el-dialog>
 </template>
 <script>
@@ -145,6 +157,7 @@ export default {
                 jiao_ban_ren_: ''
             },
             rules: {
+                ban_ci_: [{ required: false, message: this.$t('validate.required') }],
                 deng_ji_bu_men_: [{ required: true, message: this.$t('validate.required') }],
                 gang_wei_: [{ required: true, message: this.$t('validate.required') }],
                 deng_ji_shi_jian_: [{ required: true, message: this.$t('validate.required') }],
@@ -204,6 +217,13 @@ export default {
             },
             masterReport: ['已早交班', '已午交班', '已晚交班', '已完成'],
             subReport: ['早班', '午班', '晚班']
+        }
+    },
+    computed: {
+        hasRole () {
+            const roleList = ['xtgljs']
+            const { isSuper, role } = this.$store.getters || {}
+            return isSuper || role.some(r => roleList.includes(r.alias))
         }
     },
     watch: {
@@ -395,7 +415,34 @@ export default {
     text-align: center;
    }
 }
-/deep/ .el-form-item__label{
-    text-align: left;
+/* 使标签文本左对齐 */
+/deep/ .el-form-item__label {
+  text-align: left;
+  position: relative; /* 使星号能够相对于标签定位 */
+  padding-left: 1em; /* 为星号预留一些空间 */
 }
+
+/* 使用绝对定位让星号不占据空间，并且显示在标签的右侧 */
+/deep/ .el-form-item__label::before {
+  content: '*';
+  color: #f56c6c; /* 星号颜色 */
+  position: absolute;
+  left: 0; /* 星号靠右 */
+  top: 50%; /* 垂直居中 */
+  transform: translateY(-50%); /* 垂直居中修正 */
+  margin: 0;
+}
+
+/* 只有当标签是必填项时才显示星号 */
+/deep/ .el-form-item__label:not(.is-required)::before {
+  content: '';
+}
+/deep/ .el-form-item__content{
+    margin: 0;
+}
+/deep/ .el-dialog__footer{
+ display: flex;
+    justify-content: center;
+}
+
 </style>

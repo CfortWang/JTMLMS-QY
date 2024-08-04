@@ -174,6 +174,14 @@
                     </el-radio-group>
                     <span v-else>{{ zouXiang[type.authorityObject.shenHeZouXiang] }}</span>
                 </el-form-item>
+
+                <el-form-item v-show="categoryKey==='FLOW_TYPE'" label="分类类型：" prop="authorityObject.fenLei">
+                    <el-radio-group v-model="type.authorityObject.fenLei" :disabled="readonly">
+                        <el-radio label="通用">通用</el-radio>
+                        <el-radio label="体系分类">体系分类</el-radio>
+                        <el-radio label="模板分类">模板分类</el-radio>
+                    </el-radio-group>
+                </el-form-item>
             </el-form>
         </ibps-container>
     </div>
@@ -242,7 +250,8 @@ export default {
                     chaYue: '',
                     buMen: '',
                     shenCha: '',
-                    shenHeZouXiang: ''
+                    shenHeZouXiang: '',
+                    fenLei: '通用'
                 }
             },
             toolbars: [

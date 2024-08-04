@@ -17,31 +17,31 @@ export const dataObj = [
 
 export const jobPlanObj = [
     {
-        date: '2024-07-22',
+        date: '2024-07-29',
         value: 15
     },
     {
-        date: '2024-07-23',
+        date: '2024-07-30',
         value: 13
     },
     {
-        date: '2024-07-24',
+        date: '2024-07-31',
         value: 3
     },
     {
-        date: '2024-07-25',
+        date: '2024-08-01',
         value: 8
     },
     {
-        date: '2024-07-26',
+        date: '2024-08-02',
         value: 8
     },
     {
-        date: '2024-07-27',
+        date: '2024-08-03',
         value: 0
     },
     {
-        date: '2024-07-28',
+        date: '2024-08-04',
         value: 10
     }
 ]
@@ -263,6 +263,53 @@ export const preData = [
         num: 60
     }
 ]
+export const options = [
+    {
+        value: 'week',
+        label: '周',
+        children: [{
+            value: 'lastWeek',
+            label: '上周'
+        }, {
+            value: 'nowWeek',
+            label: '本周'
+        }, {
+            value: 'nextWeek',
+            label: '下周'
+        }]
+    },
+    {
+        value: 'month',
+        label: '月',
+        children: [{
+            value: 'lastMonth',
+            label: '上月'
+        }, {
+            value: 'nowMonth',
+            label: '本月'
+        }, {
+            value: 'nextMonth',
+            label: '下月'
+        }]
+    },
+    {
+        value: 'year',
+        label: '年',
+        children: [{
+            value: 'lastYear',
+            label: '去年'
+        }, {
+            value: 'nowYear',
+            label: '今年'
+        }
+        // , {
+        //     value: 'nextWeek',
+        //     label: '下周'
+        // }
+        ]
+    }
+]
+
 export default {
     dataObj,
     hospitalSection,
@@ -271,5 +318,6 @@ export default {
     personList,
     staffWeek,
     staffYear,
-    preData
+    preData,
+    options
 }
