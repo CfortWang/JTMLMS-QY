@@ -1,80 +1,30 @@
 <template>
     <div class="template-fill" v-show="showApprover">
         <el-row :gutter="20" class="page-row">
-            <el-col v-if="nodeList.length" :span="12" class="inline-item">
-                <div class="label">审批人1</div>
-                <el-select
-                    v-model="pageData.approver1"
-                    clearable
-                    multiple
-                    required
-                    :disabled="(readonly || rights.approver1) || nodeId !== 'Activity_1r6j5ip'"
-                    placeholder="请选择"
-                >
-                    <el-option
-                        v-for="item in options.approver1"
-                        :key="item.userId"
-                        :label="item.userName"
-                        :value="item.userId"
-                    />
-                </el-select>
-            </el-col>
-            <el-col v-if="nodeList.length > 1 && (!nodeId || !nodeIdList.slice(0, 1).includes(nodeId))" :span="12" class="inline-item">
-                <div class="label">审批人2</div>
-                <el-select
-                    v-model="pageData.approver2"
-                    clearable
-                    multiple
-                    :disabled="(readonly || rights.approver2) || nodeId !== 'Activity_0agpylp'"
-                    placeholder="请选择"
-                >
-                    <el-option
-                        v-for="item in options.approver2"
-                        :key="item.userId"
-                        :label="item.userName"
-                        :value="item.userId"
-                    />
-                </el-select>
-            </el-col>
-        </el-row>
-        <el-row :gutter="20" class="page-row">
-            <el-col v-if="nodeList.length > 2 && (!nodeId || !nodeIdList.slice(0, 2).includes(nodeId))" :span="12" class="inline-item">
-                <div class="label">审批人3</div>
-                <el-select
-                    v-model="pageData.approver3"
-                    clearable
-                    multiple
-                    :disabled="(readonly || rights.approver3) || nodeId !== 'Activity_0l2ri14'"
-                    placeholder="请选择"
-                >
-                    <el-option
-                        v-for="item in options.approver3"
-                        :key="item.userId"
-                        :label="item.userName"
-                        :value="item.userId"
-                    />
-                </el-select>
-            </el-col>
-            <el-col v-if="nodeList.length > 3 && (!nodeId || !nodeIdList.slice(0, 3).includes(nodeId))" :span="12" class="inline-item">
-                <div class="label">审批人4</div>
-                <el-select
-                    v-model="pageData.approver4"
-                    clearable
-                    multiple
-                    :disabled="(readonly || rights.approver4) || nodeId !== 'Activity_0jrg9vp'"
-                    placeholder="请选择"
-                >
-                    <el-option
-                        v-for="item in options.approver4"
-                        :key="item.userId"
-                        :label="item.userName"
-                        :value="item.userId"
-                    />
-                </el-select>
+            <el-col v-for="(approver, index) in approvers" :key="index" :span="12" class="inline-item">
+                <template v-if="shouldShowApprover(index)" >
+                    <div class="label">审批人{{ index + 1 }}</div>
+                    <el-select
+                        v-model="pageData[`approver${index + 1}`]"
+                        clearable
+                        multiple
+                        required
+                        :disabled="isApproverDisabled(index)"
+                        placeholder="请选择"
+                    >
+                        <el-option
+                            v-for="item in options[`approver${index + 1}`]"
+                            :key="item.userId"
+                            :label="item.userName"
+                            :value="item.userId"
+                        />
+                    </el-select>
+                </template>
             </el-col>
         </el-row>
     </div>
 </template>
+
 <script>
 export default {
     props: {
@@ -92,10 +42,9 @@ export default {
         }
     },
     data () {
-        const { userList, role: roleList } = this.$store.getters || {}
+        const { userList } = this.$store.getters || {}
         return {
             userList,
-            roleList,
             nodeIdList: ['Activity_1r6j5ip', 'Activity_0agpylp', 'Activity_0l2ri14', 'Activity_0jrg9vp'],
             pageData: {
                 approver1: [],
@@ -103,7 +52,6 @@ export default {
                 approver3: [],
                 approver4: []
             },
-            approverData: [],
             options: {
                 approver1: [],
                 approver2: [],
@@ -116,14 +64,14 @@ export default {
             isInitialized: false,
             lastApproval: '',
             showApprover: false,
+            approvers: [1, 2, 3, 4] // 审批人数组
         }
     },
     watch: {
         formData: {
             handler (val) {
                 console.log(val, this.params)
-                if ((!this.isInitialized || this.lastApproval !== val.peiZhi) &&  val.peiZhi) {
-                    // this.initApprover(val)
+                if (val.peiZhi && (!this.isInitialized || this.lastApproval !== val.peiZhi)) {
                     setTimeout(() => {
                         this.initApprover(val)
                     }, 200)
@@ -159,6 +107,9 @@ export default {
             this.showApprover = approverData.hasProcess === 'Y'
             this.nodeList = approverData.nodeList
             this.nodeId = this.params ? this.params.nodeId : ''
+            this.setApproverOptions(approverData, peiZhi)
+        },
+        setApproverOptions(approverData, peiZhi) {
             approverData.nodeList.forEach(item => {
                 const x = `approver${item.sn}`
                 if (item.executeType === 'employee') {
@@ -180,35 +131,42 @@ export default {
         },
         changeFormData (val) {
             const t = JSON.parse(JSON.stringify(val))
-            this.$emit('change-data', 'shenPiRen1', t.approver1 ? t.approver1.join(',') : '')
-            this.$emit('change-data', 'shenPiRen2', t.approver2 ? t.approver2.join(',') : '')
-            this.$emit('change-data', 'shenPiRen3', t.approver3 ? t.approver3.join(',') : '')
-            this.$emit('change-data', 'shenPiRen4', t.approver4 ? t.approver4.join(',') : '')
+            this.approvers.forEach((_, index) => {
+                this.$emit('change-data', `shenPiRen${index + 1}`, t[`approver${index + 1}`] ? t[`approver${index + 1}`].join(',') : '')
+            })
+        },
+        shouldShowApprover(index) {
+            return this.nodeList.length > index && (!this.nodeId || !this.nodeIdList.slice(0, index).includes(this.nodeId));
+        },
+        isApproverDisabled(index) {
+            return (this.readonly || this.rights[`approver${index + 1}`]) || this.nodeId !== this.nodeIdList[index];
         }
     }
 }
 </script>
+
 <style lang="scss" scoped>
-    .template-fill {
-        color: #606266;
-        .page-row {
-            margin-bottom: 12px;
-            &:last-child {
-                margin-bottom: 4px;
+.template-fill {
+    color: #606266;
+    .page-row {
+        margin-bottom: 4px;
+        .inline-item {
+            display: flex;
+            margin-top: 12px;
+            &:nth-child(-n+2) {
+                margin-top: 0px;
             }
-            .inline-item {
-                display: flex;
-                > div {
-                    flex-grow: 1;
-                    flex-shrink: 1;
-                }
-                .label {
-                    width: calc(110px - 42px);
-                    padding: 0 12px 0 30px;
-                    flex-grow: 0;
-                    flex-shrink: 0;
-                }
+            > div {
+                flex-grow: 1;
+                flex-shrink: 1;
+            }
+            .label {
+                width: calc(110px - 42px);
+                padding: 0 12px 0 30px;
+                flex-grow: 0;
+                flex-shrink: 0;
             }
         }
     }
+}
 </style>
