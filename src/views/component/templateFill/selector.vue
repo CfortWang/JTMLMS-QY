@@ -1,8 +1,8 @@
 <template>
-    <div class="template-fill" v-show="showApprover">
+    <div v-show="showApprover" class="template-fill">
         <el-row :gutter="20" class="page-row">
             <el-col v-for="(approver, index) in approvers" :key="index" :span="12" class="inline-item">
-                <template v-if="shouldShowApprover(index)" >
+                <template v-if="shouldShowApprover(index)">
                     <div class="label">审批人{{ index + 1 }}</div>
                     <el-select
                         v-model="pageData[`approver${index + 1}`]"
@@ -70,7 +70,7 @@ export default {
     watch: {
         formData: {
             handler (val) {
-                console.log(val, this.params)
+                // console.log(val, this.params)
                 if (val.peiZhi && (!this.isInitialized || this.lastApproval !== val.peiZhi)) {
                     setTimeout(() => {
                         this.initApprover(val)
@@ -102,14 +102,14 @@ export default {
                 approver3: shenPiRen3 ? shenPiRen3.split(',') : [],
                 approver4: shenPiRen4 ? shenPiRen4.split(',') : []
             }
-            console.log(this.pageData)
+            // console.log(this.pageData)
             const approverData = JSON.parse(peiZhi)
             this.showApprover = approverData.hasProcess === 'Y'
             this.nodeList = approverData.nodeList
             this.nodeId = this.params ? this.params.nodeId : ''
             this.setApproverOptions(approverData, peiZhi)
         },
-        setApproverOptions(approverData, peiZhi) {
+        setApproverOptions (approverData, peiZhi) {
             approverData.nodeList.forEach(item => {
                 const x = `approver${item.sn}`
                 if (item.executeType === 'employee') {
@@ -135,11 +135,11 @@ export default {
                 this.$emit('change-data', `shenPiRen${index + 1}`, t[`approver${index + 1}`] ? t[`approver${index + 1}`].join(',') : '')
             })
         },
-        shouldShowApprover(index) {
-            return this.nodeList.length > index && (!this.nodeId || !this.nodeIdList.slice(0, index).includes(this.nodeId));
+        shouldShowApprover (index) {
+            return this.nodeList.length > index && (!this.nodeId || !this.nodeIdList.slice(0, index).includes(this.nodeId))
         },
-        isApproverDisabled(index) {
-            return (this.readonly || this.rights[`approver${index + 1}`]) || this.nodeId !== this.nodeIdList[index];
+        isApproverDisabled (index) {
+            return (this.readonly || this.rights[`approver${index + 1}`]) || this.nodeId !== this.nodeIdList[index]
         }
     }
 }
