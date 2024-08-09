@@ -117,7 +117,7 @@ export default {
         },
         // 获取文件分类信息
         async getCascaderOptions () {
-            const sql = `select *FROM ibps_cat_type WHERE  authority_name like '%${this.levelInfos}%' ORDER BY sn_ ASC`
+            const sql = `select *FROM ibps_cat_type WHERE  authority_name like '%${this.levelInfos}%' and CATEGORY_KEY_='FILE_TYPE' ORDER BY sn_ ASC`
             curdPost('sql', sql).then((res) => {
                 if (res.state === 200) {
                     const datas = res.variables.data

@@ -136,7 +136,7 @@ export default {
                 }
                 // 按照分类过滤
                 const routeName = this.$route.name
-                const routeMap = { 'jssllb': '体系分类', 'ywtxyxjl': '模板分类' }
+                const routeMap = { 'jssllb': '体系分类', 'ywtxyxjl': '模板分类', 'wjkzgl-ywyxjlsc': '模板分类' }
                 this.treeData = this.treeData.filter(i => {
                     const authorityName = JSON.parse(i.authorityName)
                     if (authorityName) {

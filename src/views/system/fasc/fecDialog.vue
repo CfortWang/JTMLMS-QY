@@ -98,40 +98,8 @@
 
                     <el-row>
                         <el-col :span="12">
-                            <el-form-item v-if="labelText.label1" :label="labelText.label1+'范围限值：'">
-                                <el-input-number v-model="form.temperatureMin" size="mini" controls-position="right" :min="-100" :max="form.temperatureMax" :step="1" />
-                                至
-                                <el-input-number v-model="form.temperatureMax" size="mini" controls-position="right" :min="form.temperatureMin" :max="100" :step="1" />
-                                (℃)
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item v-if="labelText.label2" :label="labelText.label2+'范围限值：'">
-                                <el-input-number v-model="form.humidityMin" size="mini" controls-position="right" :min="-100" :max="form.humidityMax" :step="1" />
-                                至
-                                <el-input-number v-model="form.humidityMax" size="mini" controls-position="right" :min="form.humidityMin" :max="100" :step="1" />
-                                (℃)
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-
-                        <el-col :span="12">
-                            <el-form-item v-if="labelText.label1" :label="labelText.label1+'修正值：'">
-                                <el-input v-model="form.xiu_zheng_wen_du_" size="mini" style="width:80%" />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item v-if="labelText.label2" :label="labelText.label2+'修正值：'">
-                                <el-input v-model="form.xiu_zheng_shi_du_" size="mini" style="width:80%" />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-
-                    <el-row>
-                        <el-col :span="12">
                             <el-form-item label="监测周期：">
-                                <el-select v-model="form.jian_ce_zhou_qi_" placeholder="请选择" size="mini" style="width:60%">
+                                <el-select v-model="form.jian_ce_zhou_qi_" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
                                         v-for="item in period"
                                         :key="item.value"
@@ -149,6 +117,8 @@
                                     inactive-color="#ff4949"
                                     active-text="启用"
                                     inactive-text="停用"
+                                    active-value="1"
+                                    inactive-value="0"
                                 />
                             </el-form-item>
                         </el-col>
@@ -174,7 +144,7 @@
                                     <el-radio v-model="weekCheck" :label="6" size="mini">周六</el-radio>
                                     <el-radio v-model="weekCheck" :label="7" size="mini">周日</el-radio>
                                 </template>
-                                <el-select v-if="form.jian_ce_zhou_qi_==='每月'" v-model="monthCheck" placeholder="请选择" size="mini">
+                                <el-select v-if="form.jian_ce_zhou_qi_==='每月'" v-model="monthCheck" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
                                         v-for="item in 28"
                                         :key="item"
@@ -182,7 +152,7 @@
                                         :value="item"
                                     />
                                 </el-select>
-                                <el-select v-if="form.jian_ce_zhou_qi_==='每季度'" v-model="quarterCheck" placeholder="请选择" size="mini">
+                                <el-select v-if="form.jian_ce_zhou_qi_==='每季度'" v-model="quarterCheck" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
                                         v-for="item in 3"
                                         :key="item"
@@ -190,7 +160,7 @@
                                         :value="item"
                                     />
                                 </el-select>
-                                <el-select v-if="form.jian_ce_zhou_qi_==='每半年'" v-model="halfYearCheck" placeholder="请选择" size="mini">
+                                <el-select v-if="form.jian_ce_zhou_qi_==='每半年'" v-model="halfYearCheck" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
                                         v-for="item in 6"
                                         :key="item"
@@ -198,7 +168,7 @@
                                         :value="item"
                                     />
                                 </el-select>
-                                <el-select v-if="form.jian_ce_zhou_qi_==='每年'" v-model="yearCheck" placeholder="请选择" size="mini">
+                                <el-select v-if="form.jian_ce_zhou_qi_==='每年'" v-model="yearCheck" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
                                         v-for="item in 12"
                                         :key="item"
@@ -222,6 +192,11 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                            <FacilityData v-if="form.lie_biao_shu_ju_" :is-cul="false" :form-data="{lieBiaoShuJu:form.lie_biao_shu_ju_}" @change-data="onFacilityData" />
+                        </el-col>
+                    </el-row>
                 </el-form>
             </div>
         </div>
@@ -235,24 +210,21 @@
 <script>
 import ibpsUserSelector from '@/business/platform/org/selector'
 import IbpsLinkData from '@/business/platform/data/templaterender/link-data'
+import FacilityData from '@/views/component/facility/facilityData.vue'
 
 export default {
     components: {
+        FacilityData,
         ibpsUserSelector,
         IbpsLinkData
     },
     data () {
         return {
-            dialogVisible: false,
+            dialogVisible: true,
             title: '配置详情',
             jianCeGangWeiList: [],
             lei_xing_: '',
             form: {
-                temperatureMin: 0,
-                temperatureMax: 0,
-                humidityMin: 0,
-                humidityMax: 0,
-
                 qu_yu_: '',
                 fang_jian_: '',
                 bu_men_: '',
@@ -261,14 +233,12 @@ export default {
                 deviceno2_: '', // 监控设备
                 jian_ce_zhou_qi_: '',
                 jian_ce_gang_wei_: '',
-                shi_fou_qi_yong_: true,
+                shi_fou_qi_yong_: '1',
                 kong_zhi_tiao_jia: '',
-                environment_range: '',
-                xiu_zheng_shi_du_: '',
-                xiu_zheng_wen_du_: '',
                 jian_ce_ri_qi_: '',
                 ri_qi_lie_biao_: '',
-                zi_wai_deng_wai_j: '' // 紫外灯外键
+                zi_wai_deng_wai_j: '', // 紫外灯外键
+                lie_biao_shu_ju_: ''
             },
             isEdit: false,
             quYuList: [],
@@ -287,15 +257,10 @@ export default {
                 { label: '季度监测', value: '每季度' },
                 { label: '半年监测', value: '每半年' },
                 { label: '年监测', value: '每年' }
-            ],
-            row: {}
-
+            ]
         }
     },
     computed: {
-        // isEdit () {
-        //     return this.parentData instanceof Object && this.parentData.mainId
-        // },
         isShowDevice () {
             return this.lei_xing_ !== '01-室内温湿度监控' && this.lei_xing_ !== '06-每日安全检查' && this.lei_xing_ !== '08-含氯有效性监测'
         },
@@ -304,33 +269,9 @@ export default {
                 return this.form.jian_ce_zhou_qi_.split('每')[1] + '监测日期：'
             }
             return ''
-        },
-        labelText () {
-            switch (this.lei_xing_) {
-                case '02-冰箱温度监控':
-                    return { label1: '冷藏温度', label2: '冷冻温度' }
-                case '03-温浴箱温度监控':
-                case '04-阴凉柜温度监控':
-                    return { label1: '温度', label2: '' }
-                case '05-纯水机水质监测':
-                case '06-每日安全检查':
-                case '08-含氯有效性监测':
-                case '10-洗眼器检查':
-                case '11-紧急淋浴器检查':
-                case '13-高压灭菌':
-                case '14-空气消毒机':
-                case '12-紫外灯消毒':
-                    return { label1: '', label2: '' }
-                default:
-                    return { label1: '温度', label2: '湿度' }
-            }
         }
-
     },
     watch: {
-        // 'form.lei_xing_' (val) {
-        //     this.mo_kuai_lu_jing_ = this.config[val].path
-        // },
         'form.jian_ce_zhou_qi_' (val) {
             this.dayCheck = []
             this.weekCheck = ''
@@ -459,6 +400,12 @@ export default {
         this.init()
     },
     methods: {
+        // 接收自定义组件数据
+        onFacilityData (...arg) {
+            if (arg.length > 1) {
+                this.form.lie_biao_shu_ju_ = arg[1]
+            }
+        },
         init () {
             const pos = this.$store.getters.level.second ? this.$store.getters.level.second : this.$store.getters.level.first
             const sql1 = `select * from t_qypzb where di_dian_='${pos}'`
@@ -472,98 +419,159 @@ export default {
                 this.fangJianList = data
             })
         },
+        // 格式化数据
+        formatForm () {
+            // 监测日期格式化
+            switch (this.form.jian_ce_zhou_qi_) {
+                case '每日':
+                    if (!this.dayCheck || this.dayCheck.length === 0) {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    } else if (this.dayCheck.length === 7) {
+                        this.form.jian_ce_ri_qi_ = '每天'
+                        this.form.ri_qi_lie_biao_ = '1,2,3,4,5,6,7'
+                    } else {
+                        this.dayCheck.sort(function (a, b) {
+                            return a - b
+                        })
+                        this.form.jian_ce_ri_qi_ = '每周' + this.dayCheck.join(',')
+                        this.form.ri_qi_lie_biao_ = this.dayCheck.join(',')
+                    }
+                    break
+                case '每周':
+                    if (this.weekCheck) {
+                        this.form.jian_ce_ri_qi_ = '每周' + this.weekCheck
+                        this.form.ri_qi_lie_biao_ = this.weekCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+
+                    break
+                case '每月':
+                    if (this.monthCheck) {
+                        this.form.jian_ce_ri_qi_ = '每个月第' + this.monthCheck + '天'
+                        this.form.ri_qi_lie_biao_ = this.monthCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+                    break
+                case '每季度':
+                    if (this.quarterCheck) {
+                        this.form.jian_ce_ri_qi_ = '每季度第' + [this.quarterCheck] + '个月'
+                        this.form.ri_qi_lie_biao_ = this.quarterCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+                    break
+                case '每半年':
+                    if (this.halfYearCheck) {
+                        this.form.jian_ce_ri_qi_ = '每半年第' + [this.halfYearCheck] + '个月'
+                        this.form.ri_qi_lie_biao_ = this.halfYearCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+                    break
+                case '每年':
+                    if (this.yearCheck) {
+                        this.form.jian_ce_ri_qi_ = '每年第' + [this.yearCheck] + '个月'
+                        this.form.ri_qi_lie_biao_ = this.yearCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+                    break
+                default:
+                    break
+            }
+        },
+        checkForm () {
+            if (this.form.bu_men_ === '') {
+                throw new Error('部门信息缺失！')
+            }
+            if (this.form.jian_ce_ri_qi_ === '') {
+                throw new Error('监测日期信息缺失！')
+            }
+            if (this.form.jian_ce_gang_wei_ === '') {
+                throw new Error('监测岗位信息缺失！')
+            }
+            if (this.form.lie_biao_shu_ju_) {
+                const lie_biao_shu_ju_ = JSON.parse(this.form.lie_biao_shu_ju_)
+                for (let i = 0; i < lie_biao_shu_ju_.length; i++) {
+                    const item = lie_biao_shu_ju_[i]
+                    if (!item.label && (item.range.length !== 2 || item.range[0] === null || item.range[1] === null) && (!item.fixValue)) {
+                        throw new Error(`第${i + 1}行数据非法！`)
+                    }
+                }
+            }
+        },
         submit () {
-            this.$emit('onSubmit', { dayCheck: this.dayCheck, weekCheck: this.weekCheck, monthCheck: this.monthCheck, quarterCheck: this.quarterCheck, halfYearCheck: this.halfYearCheck, yearCheck: this.yearCheck, form: this.form, isEdit: this.isEdit, row: this.row })
+            try {
+                this.formatForm()
+                this.checkForm()
+                this.$emit('onSubmit', { form: this.form, isEdit: this.isEdit })
+            } catch (error) {
+                this.$message.warning(error.message)
+            }
         },
         close () {
-            this.dialogVisible = false
-            // 初始化操作
-            this.form.bu_men_ = ''
-            this.form.shi_fou_qi_yong_ = true
-            this.form.xiu_zheng_shi_du_ = ''
-            this.form.xiu_zheng_wen_du_ = ''
-            this.form.kong_zhi_tiao_jia = ''
-            this.form.fang_jian_ = ''
-            this.form.qu_yu_ = ''
-            this.form.deviceno2_ = ''
-            this.form.temperatureMin = 0
-            this.form.temperatureMax = 0
-            this.form.humidityMin = 0
-            this.form.humidityMax = 0
-            this.form.deviceno1_ = ''
-            this.form.devicename1_ = ''
-            this.form.jian_ce_zhou_qi_ = ''
-            this.form.jian_ce_gang_wei_ = ''
-            this.form.environment_range = ''
-            this.form.jian_ce_ri_qi_ = ''
-            this.form.ri_qi_lie_biao_ = ''
-            this.form.zi_wai_deng_wai_j = ''
-
-            this.dayCheck = []
-            this.weekCheck = ''
-            this.monthCheck = ''
-            this.quarterCheck = ''
-            this.halfYearCheck = ''
-            this.yearCheck = ''
+            this.$emit('onClose')
         },
-        open (row, jianCeGangWeiList, parentForm, dateCheck) {
+        // 格式化监测日期
+        formatData () {
+            if (this.form.jian_ce_ri_qi_) {
+                this.$nextTick(() => {
+                    switch (this.form.jian_ce_zhou_qi_) {
+                        case '每日':
+                            if (this.form.jian_ce_ri_qi_ === '每天') {
+                                this.dayCheck = [1, 2, 3, 4, 5, 6, 7]
+                            } else {
+                                this.dayCheck = this.form.jian_ce_ri_qi_.split('每周')[1].split(',').map(item => +item)
+                            }
+                            break
+                        case '每周':
+                            this.weekCheck = +this.form.jian_ce_ri_qi_.split('每周')[1]
+                            break
+                        case '每月':
+                            this.monthCheck = +this.form.jian_ce_ri_qi_.split('每个月第')[1].split('天')[0]
+                            break
+                        case '每季度':
+                            this.quarterCheck = +this.form.jian_ce_ri_qi_.split('每季度第')[1].split('个月')[0]
+                            break
+                        case '每半年':
+                            this.halfYearCheck = +this.form.jian_ce_ri_qi_.split('每半年第')[1].split('个月')[0]
+                            break
+                        case '每年':
+                            this.yearCheck = +this.form.jian_ce_ri_qi_.split('每年第')[1].split('个月')[0]
+                            break
+                        default:
+                            break
+                    }
+                })
+            }
+        },
+        open (row, jianCeGangWeiList, parentForm) {
             this.dialogVisible = true
             this.jianCeGangWeiList = jianCeGangWeiList
             this.lei_xing_ = parentForm.lei_xing_
-            this.row = row
+            this.isEdit = !!(row && row.zi_wai_deng_wai_j)
             // 编辑
-            if (row instanceof PointerEvent === false) {
-                this.isEdit = true
+            if (this.isEdit) {
                 this.form = JSON.parse(JSON.stringify(row))
-                if (row.shi_fou_qi_yong_ === '1') {
-                    this.form.shi_fou_qi_yong_ = true
-                }
-                if (row.shi_fou_qi_yong_ === '0') {
-                    this.form.shi_fou_qi_yong_ = false
-                }
-
-                if (this.form.jian_ce_ri_qi_) {
-                    this.$nextTick(() => {
-                        switch (this.form.jian_ce_zhou_qi_) {
-                            case '每日':
-                                if (this.form.jian_ce_ri_qi_ === '每天') {
-                                    this.dayCheck = [1, 2, 3, 4, 5, 6, 7]
-                                } else {
-                                    this.dayCheck = this.form.jian_ce_ri_qi_.split('每周')[1].split(',').map(item => +item)
-                                }
-                                break
-                            case '每周':
-                                this.weekCheck = +this.form.jian_ce_ri_qi_.split('每周')[1]
-                                break
-                            case '每月':
-                                this.monthCheck = +this.form.jian_ce_ri_qi_.split('每个月第')[1].split('天')[0]
-                                break
-                            case '每季度':
-                                this.quarterCheck = +this.form.jian_ce_ri_qi_.split('每季度第')[1].split('个月')[0]
-                                break
-                            case '每半年':
-                                this.halfYearCheck = +this.form.jian_ce_ri_qi_.split('每半年第')[1].split('个月')[0]
-                                break
-                            case '每年':
-                                this.yearCheck = +this.form.jian_ce_ri_qi_.split('每年第')[1].split('个月')[0]
-                                break
-                            default:
-                                break
-                        }
-                    })
-                }
-
-                if (this.form.environment_range) {
-                    const { humidity, temperature } = JSON.parse(this.form.environment_range)
-                    this.$set(this.form, 'temperatureMin', +temperature.min)
-                    this.$set(this.form, 'temperatureMax', +temperature.max)
-                    this.$set(this.form, 'humidityMin', +humidity.min)
-                    this.$set(this.form, 'humidityMax', +humidity.max)
-                }
             } else {
-                this.isEdit = false
                 this.form.zi_wai_deng_wai_j = this.$utils.guid()
+                this.form.bu_men_ = parentForm.bian_zhi_bu_men_
+                this.form.jian_ce_gang_wei_ = parentForm.gang_wei_
+                this.form.jian_ce_ri_qi_ = parentForm.jian_ce_ri_qi_
+                this.form.kong_zhi_tiao_jia = parentForm.tiao_jian_
+                this.form.jian_ce_zhou_qi_ = parentForm.zhou_qi_
+                this.form.ri_qi_lie_biao_ = parentForm.ri_qi_lie_biao_
+                this.form.lie_biao_shu_ju_ = parentForm.lie_biao_shu_ju_
             }
+            this.formatData()
         },
         getDayDate (type, dates) {
             const now = new Date()

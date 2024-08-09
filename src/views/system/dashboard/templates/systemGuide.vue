@@ -97,8 +97,14 @@ export default {
             }
         }
     },
+
     mounted () {
-        this.getData()
+        const timer = setInterval(() => {
+            if (this.$refs.guide) {
+                this.getData()
+                clearInterval(timer)
+            }
+        }, 200)
     },
     methods: {
         getGuide ({ parameters, requestPage, sorts }) {

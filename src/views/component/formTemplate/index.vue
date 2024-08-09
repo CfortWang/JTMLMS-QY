@@ -391,11 +391,12 @@ export default {
                 const liu_cheng_shu_ju_ = JSON.parse(this.form.liu_cheng_shu_ju_)
                 console.log(liu_cheng_shu_ju_.nodeList)
                 liu_cheng_shu_ju_.nodeList.forEach((item, index) => {
-                    this.subForm[index] = {}
-                    this.subForm[index].jie_dian_ming_cheng_ = item.nodeName
-                    this.subForm[index].chu_li_ren_ = item.executor
-                    this.subForm[index].fang_shi_ = item.conditionType
-                    this.subForm[index].yong_hu_lei_xing_ = item.executeType
+                    this.$set(this.subForm, index, {
+                        jie_dian_ming_cheng_: item.nodeName,
+                        chu_li_ren_: item.executor,
+                        fang_shi_: item.conditionType,
+                        yong_hu_lei_xing_: item.executeType
+                    })
                 })
             } else {
                 this.form.di_dian_ = this.level

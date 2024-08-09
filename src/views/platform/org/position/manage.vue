@@ -127,21 +127,24 @@ export default {
         *  如果是测试账号，则获取全部数据
         *  否则，获取当前用户所在医院的数据
         */
-        getTreeData({
-            type: 1
-        }).then(res => {
-            const firstData = res.data || []
-            if (firstData.length) {
-                firstData[0].name = '部门树'
-            }
-            findAllPosition().then(res => {
-                const nextData = res.data || []
-                this.treeData = this.toTree([...firstData, ...nextData])
-            }).catch(res => {
-            })
-        })
+        this.init()
     },
     methods: {
+        init () {
+            getTreeData({
+                type: 1
+            }).then(res => {
+                const firstData = res.data || []
+                if (firstData.length) {
+                    firstData[0].name = '部门树'
+                }
+                findAllPosition().then(res => {
+                    const nextData = res.data || []
+                    this.treeData = this.toTree([...firstData, ...nextData])
+                }).catch(res => {
+                })
+            })
+        },
         // loadNode (node, resolve) {
         //     this.loading = true
         //     const first = this.$store.getters.level.first
@@ -181,8 +184,9 @@ export default {
             })
         },
         refreshTree () {
-            this.parentId = '0'
-            this.search()
+            this.init()
+            // this.parentId = '0'
+            // this.search()
         },
         // 返回右明细模块未显示
         back () {
@@ -267,7 +271,8 @@ export default {
             this.width = isExpand ? 230 : 30
         },
         loadTreeData () {
-            this.search()
+            this.refreshTree()
+            // this.search()
         },
         // 查询
         search () {

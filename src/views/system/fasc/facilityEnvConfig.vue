@@ -168,30 +168,18 @@
                             </el-col>
                         </el-row>
                         <el-row>
-                            <el-col :span="12">
-                                <el-form-item v-if="labelText.label1" :label="labelText.label1">
-                                    <el-input-number v-model="form.temperatureMin" size="mini" controls-position="right" :min="-100" :max="form.temperatureMax" :step="1" />
-                                    至
-                                    <el-input-number v-model="form.temperatureMax" size="mini" controls-position="right" :min="form.temperatureMin" :max="100" :step="1" />
-                                    (℃)
-                                </el-form-item>
+                            <el-col :span="24">
+                                <FacilityData v-if="form.lie_biao_shu_ju_" :form-data="{lieBiaoShuJu:form.lie_biao_shu_ju_}" :is-cul="false" @change-data="onFacilityData" />
                             </el-col>
-                            <el-col :span="12">
-                                <el-form-item v-if="labelText.label2" :label="labelText.label2">
-                                    <el-input-number v-model="form.humidityMin" size="mini" controls-position="right" :min="-100" :max="form.humidityMax" :step="1" />
-                                    至
-                                    <el-input-number v-model="form.humidityMax" size="mini" controls-position="right" :min="form.humidityMin" :max="100" :step="1" />
-                                    (℃)
-                                </el-form-item>
-                            </el-col>
+
                         </el-row>
                     </el-form>
                 </div>
                 <!-- <el-divider /> -->
                 <div class="table">
                     <div class="hearder">
-                        <div class="search" :style="isEdit?{}:{justifyContent: 'flex-end'}">
-                            <div v-if="isEdit" class="search-item">
+                        <div class="search">
+                            <div class="search-item">
                                 <span>部门：</span>
                                 <ibps-user-selector
                                     v-model="search.buMen"
@@ -203,15 +191,15 @@
                                     size="mini"
                                 />
                             </div>
-                            <div v-if="isEdit" class="search-item">
+                            <div class="search-item">
                                 <span>区域：</span>
                                 <el-input v-model="search.quYu" size="mini" style="width:100%" placeholder="请输入" />
                             </div>
-                            <div v-if="isEdit" class="search-item">
+                            <div class="search-item">
                                 <span>房间：</span>
                                 <el-input v-model="search.fangJian" size="mini" style="width:100%" placeholder="请输入" />
                             </div>
-                            <div v-if="isEdit" class="search-item">
+                            <div class="search-item">
                                 <span>监测周期：</span>
                                 <el-select v-model="search.zhouQi" placeholder="请选择" size="mini" style="width:66%" :clearable="true">
                                     <el-option
@@ -222,7 +210,7 @@
                                     />
                                 </el-select>
                             </div>
-                            <div v-if="isEdit" class="search-item">
+                            <div class="search-item">
                                 <span>监测岗位：</span>
                                 <el-select v-model="search.gangWei" placeholder="请选择" size="mini" style="width:66%" :clearable="true">
                                     <el-option
@@ -233,7 +221,7 @@
                                     />
                                 </el-select>
                             </div>
-                            <div v-if="isEdit" class="search-item" style="width:60px">
+                            <div class="search-item" style="width:60px">
                                 <el-button size="mini" type="primary" icon="el-icon-search" @click="goSearch">查询</el-button>
                             </div>
                             <div class="search-item" style="width:60px">
@@ -364,20 +352,20 @@
             </div>
 
         </div>
-        <FecDialog ref="FecDialogRef" @onSubmit="sonSubmit" />
+        <FecDialog v-if="subDialogVisible" ref="FecDialogRef" @onSubmit="sonSubmit" @onClose="sonClose" />
     </el-dialog>
 </template>
 
 <script>
-import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import xlsx from 'xlsx'
 import fs from 'file-saver'
 import FecDialog from './fecDialog.vue'
+import FacilityData from '@/views/component/facility/facilityData.vue'
 export default {
     components: {
+        FacilityData,
         ibpsUserSelector,
-        IbpsAttachment,
         FecDialog,
         IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
     },
@@ -392,7 +380,7 @@ export default {
         }
     },
     data () {
-        const { userId, level = {}} = this.$store.getters || {}
+        const { userId, level = {}, position } = this.$store.getters || {}
         return {
             search: {
                 buMen: '',
@@ -416,6 +404,7 @@ export default {
             },
             jianCeGangWeiList: [],
             dialogVisible: true,
+            subDialogVisible: false,
             title: '设施环境配置表',
             toolbars: [{ key: 'save', label: '保存' }, { key: 'cancel', label: '退出', type: 'danger' }],
             dayCheck: [],
@@ -425,23 +414,18 @@ export default {
             halfYearCheck: '',
             yearCheck: '',
             form: {
-                temperatureMin: 0,
-                temperatureMax: 0,
-                humidityMin: 0,
-                humidityMax: 0,
-
                 di_dian_: level.second || level.first,
                 bian_zhi_ren_: userId,
                 lei_xing_: '',
-                bian_zhi_bu_men_: '',
+                bian_zhi_bu_men_: position && position.split(',')[0],
                 zhou_qi_: '',
                 gang_wei_: '',
                 tiao_jian_: '',
-                default_environme: '',
                 she_bei_bian_hao_: '', // 设备编号
                 jian_ce_ri_qi_: '',
                 ri_qi_lie_biao_: '',
-                mo_kuai_lu_jing_: ''
+                mo_kuai_lu_jing_: '',
+                lie_biao_shu_ju_: ''
             },
             subForm: [
 
@@ -532,12 +516,11 @@ export default {
                 jian_ce_zhou_qi_: '监测周期',
                 jian_ce_ri_qi_: '监测日期',
                 jian_ce_gang_wei_: '监测岗位',
-                kong_zhi_tiao_jia: '控制条件',
-                xiu_zheng_shi_du_: '湿度修正值',
-                xiu_zheng_wen_du_: '温度修正值'
+                kong_zhi_tiao_jia: '控制条件'
             },
             subIdList: [],
-            isFirstDevice: true
+            isFirstDevice: true,
+            isFirstLieBiao: true
         }
     },
     computed: {
@@ -559,35 +542,9 @@ export default {
         },
         labelShow () {
             return this.form.zhou_qi_.split('每')[1] + '监测日期：'
-        },
-        labelText () {
-            switch (this.form.lei_xing_) {
-                case '01-室内温湿度监控':
-                    return { label1: '温度范围限值：', label2: '湿度范围限值：' }
-                case '02-冰箱温度监控':
-                    return { label1: '冷藏温度范围限值：', label2: '冷冻温度范围限值：' }
-                case '03-温浴箱温度监控':
-                case '04-阴凉柜温度监控':
-                    return { label1: '温度范围限值：', label2: '' }
-                default:
-                    return { label1: '', label2: '' }
-            }
         }
-
     },
     watch: {
-        'form.temperatureMin' (val) {
-            this.form.default_environme = this.formatEnv(this.form.temperatureMax, this.form.temperatureMin, this.form.humidityMax, this.form.humidityMin)
-        },
-        'form.temperatureMax' (val) {
-            this.form.default_environme = this.formatEnv(this.form.temperatureMax, this.form.temperatureMin, this.form.humidityMax, this.form.humidityMin)
-        },
-        'form.humidityMin' (val) {
-            this.form.default_environme = this.formatEnv(this.form.temperatureMax, this.form.temperatureMin, this.form.humidityMax, this.form.humidityMin)
-        },
-        'form.humidityMax' (val) {
-            this.form.default_environme = this.formatEnv(this.form.temperatureMax, this.form.temperatureMin, this.form.humidityMax, this.form.humidityMin)
-        },
         'form.she_bei_bian_hao_' (val) {
             if (!this.isFirstDevice) {
                 const sql = `select yuan_she_bei_bian,she_bei_ming_cheng_ from t_sbdj where find_in_set(id_, '${val}')`
@@ -601,21 +558,18 @@ export default {
                             this.subForm.push({
                                 deviceno1_: bianHao,
                                 devicename1_: mingChneg,
-
                                 shi_fou_qi_yong_: '1',
                                 bu_men_: this.form.bian_zhi_bu_men_,
                                 jian_ce_gang_wei_: this.form.gang_wei_,
                                 jian_ce_zhou_qi_: this.form.zhou_qi_,
                                 kong_zhi_tiao_jia: this.form.tiao_jian_,
-                                environment_range: this.form.default_environme,
-                                xiu_zheng_shi_du_: '',
-                                xiu_zheng_wen_du_: '',
                                 fang_jian_: '',
                                 qu_yu_: '',
                                 deviceno2_: '',
                                 jian_ce_ri_qi_: this.form.jian_ce_ri_qi_,
                                 ri_qi_lie_biao_: this.form.ri_qi_lie_biao_,
-                                zi_wai_deng_wai_j: this.$utils.guid()
+                                zi_wai_deng_wai_j: this.$utils.guid(),
+                                lie_biao_shu_ju_: this.form.lie_biao_shu_ju_
                             })
                         }
                     })
@@ -624,6 +578,37 @@ export default {
         },
         'form.lei_xing_' (val) {
             this.form.mo_kuai_lu_jing_ = this.config[val].path
+            if (!this.isFirstLieBiao) {
+                switch (val) {
+                    case '01-室内温湿度监控':
+                        this.form.lie_biao_shu_ju_ = JSON.stringify([
+                            { label: '上午温度', range: [], fixValue: '', value: '', result: '', status: '' },
+                            { label: '上午湿度', range: [], fixValue: '', value: '', result: '', status: '' },
+                            { label: '下午温度', range: [], fixValue: '', value: '', result: '', status: '' },
+                            { label: '下午湿度', range: [], fixValue: '', value: '', result: '', status: '' }
+                        ])
+                        break
+                    case '02-冰箱温度监控':
+                        this.form.lie_biao_shu_ju_ = JSON.stringify([
+                            { label: '冷藏', range: [], fixValue: '', value: '', result: '', status: '' },
+                            { label: '冷冻', range: [], fixValue: '', value: '', result: '', status: '' }
+                        ])
+                        break
+                    case '03-温浴箱温度监控':
+                        this.form.lie_biao_shu_ju_ = JSON.stringify([
+                            { label: '温度', range: [], fixValue: '', value: '', result: '', status: '' }
+                        ])
+                        break
+                    case '04-阴凉柜温度监控':
+                        this.form.lie_biao_shu_ju_ = JSON.stringify([
+                            { label: '温度', range: [], fixValue: '', value: '', result: '', status: '' }
+                        ])
+                        break
+                    default:
+                        delete this.form.lie_biao_shu_ju_
+                        break
+                }
+            }
         },
         'form.zhou_qi_' (val) {
             this.dayCheck = []
@@ -762,9 +747,16 @@ export default {
             this.loadSubData()
         } else {
             this.isFirstDevice = false
+            this.isFirstLieBiao = false
         }
     },
     methods: {
+        // 接收自定义组件数据
+        onFacilityData (...arg) {
+            if (arg.length > 1) {
+                this.form.lie_biao_shu_ju_ = arg[1]
+            }
+        },
         init () {
             this.loadSelectorData()
         },
@@ -786,13 +778,6 @@ export default {
                 }
                 this.form = data[0]
                 const jian_ce_ri_qi_ = data[0].jian_ce_ri_qi_
-                if (this.form.default_environme) {
-                    const { humidity, temperature } = JSON.parse(this.form.default_environme)
-                    this.$set(this.form, 'temperatureMin', +temperature.min)
-                    this.$set(this.form, 'temperatureMax', +temperature.max)
-                    this.$set(this.form, 'humidityMin', +humidity.min)
-                    this.$set(this.form, 'humidityMax', +humidity.max)
-                }
                 if (this.form.jian_ce_ri_qi_) {
                     this.$nextTick(() => {
                         switch (this.form.zhou_qi_) {
@@ -825,6 +810,7 @@ export default {
                 }
                 this.$nextTick(() => {
                     this.isFirstDevice = false
+                    this.isFirstLieBiao = false
                 })
             })
         },
@@ -839,19 +825,6 @@ export default {
                 this.subForm = data
                 this.subIdList = data.map(item => item.zi_wai_deng_wai_j)
             })
-        },
-        formatEnv (temperatureMax, temperatureMin, humidityMax, humidityMin) {
-            const temp_environment_range = {
-                temperature: {
-                    max: temperatureMax,
-                    min: temperatureMin
-                },
-                humidity: {
-                    max: humidityMax,
-                    min: humidityMin
-                }
-            }
-            return JSON.stringify(temp_environment_range)
         },
         formatRiQi () {
             switch (this.form.zhou_qi_) {
@@ -927,6 +900,49 @@ export default {
                     break
             }
         },
+        // 使用默认数据
+        settingData () {
+            this.$confirm('使用默认数据后子表中为空的字段将会被以上数据代替，是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            })
+                .then(() => {
+                    this.subForm.forEach(item => {
+                        if (item.bu_men_ === '') {
+                            item.bu_men_ = this.form.bian_zhi_bu_men_
+                        }
+                        if (item.jian_ce_gang_wei_ === '') {
+                            item.jian_ce_gang_wei_ = this.form.gang_wei_
+                        }
+                        if (item.kong_zhi_tiao_jia === '') {
+                            item.kong_zhi_tiao_jia = this.form.tiao_jian_
+                        }
+                        if (item.jian_ce_ri_qi_ === '') {
+                            item.jian_ce_ri_qi_ = this.form.jian_ce_ri_qi_
+                        }
+                        if (item.ri_qi_lie_biao_ === '') {
+                            item.ri_qi_lie_biao_ = this.form.ri_qi_lie_biao_
+                        }
+                        if (item.jian_ce_zhou_qi_ === '') {
+                            item.jian_ce_zhou_qi_ = this.form.zhou_qi_
+                        }
+                        if (item.lie_biao_shu_ju_ && this.form.lie_biao_shu_ju_) {
+                            const main = JSON.parse(this.form.lie_biao_shu_ju_)
+                            const sub = JSON.parse(item.lie_biao_shu_ju_)
+                            sub.forEach((i, index) => {
+                                if (i.range.length === 0 || i.range === [null, null]) {
+                                    i.range = main[index].range
+                                }
+                                if (i.fixValue === '') {
+                                    i.fixValue = main[index].fixValue
+                                }
+                            })
+                            item.lie_biao_shu_ju_ = JSON.stringify(sub)
+                        }
+                    })
+                })
+        },
         // 当前页码改变
         handleCurrentChange (val) {
             this.currentPage = val
@@ -952,147 +968,33 @@ export default {
                     break
             }
         },
-        // 使用默认数据
-        settingData () {
-            this.$confirm('使用默认数据后子表中为空的字段将会被以上数据代替，是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            })
-                .then(() => {
-                    this.subForm.forEach(item => {
-                        if (item.bu_men_ === '') {
-                            item.bu_men_ = this.form.bian_zhi_bu_men_
-                        }
-                        if (item.jian_ce_gang_wei_ === '') {
-                            item.jian_ce_gang_wei_ = this.form.gang_wei_
-                        }
-                        if (item.kong_zhi_tiao_jia === '') {
-                            item.kong_zhi_tiao_jia = this.form.tiao_jian_
-                        }
-                        if (item.environment_range === '' || item.environment_range === this.formatEnv(0, 0, 0, 0)) {
-                            item.environment_range = this.form.default_environme
-                        }
-
-                        if (item.jian_ce_ri_qi_ === '') {
-                            item.jian_ce_ri_qi_ = this.form.jian_ce_ri_qi_
-                        }
-                        if (item.ri_qi_lie_biao_ === '') {
-                            item.ri_qi_lie_biao_ = this.form.ri_qi_lie_biao_
-                        }
-                        if (item.jian_ce_zhou_qi_ === '') {
-                            item.jian_ce_zhou_qi_ = this.form.zhou_qi_
-                        }
-                    })
-                })
+        // 子表关闭事件
+        sonClose () {
+            this.subDialogVisible = false
         },
         // 子表单添加/编辑按钮
         openDialog (row) {
             if (this.form.lei_xing_ === '') {
                 return this.$message.warning('请先选择类型！')
             }
-            this.$refs.FecDialogRef.open(row, this.jianCeGangWeiList, this.form, { dayCheck: this.dayCheck, weekCheck: this.weekCheck, monthCheck: this.monthCheck, quarterCheck: this.quarterCheck, halfYearCheck: this.halfYearCheck, yearCheck: this.yearCheck })
+            this.subDialogVisible = true
+            this.$nextTick(() => {
+                this.$refs.FecDialogRef.open(row, this.jianCeGangWeiList, this.form)
+            })
         },
         // 子表的提交事件
         sonSubmit (data) {
-            const { dayCheck, weekCheck, monthCheck, quarterCheck, halfYearCheck, yearCheck, form, isEdit, row } = data
-            const temp_form = JSON.parse(JSON.stringify(form))
-            const temp_environment_range = {
-                temperature: {
-                    max: temp_form.temperatureMax,
-                    min: temp_form.temperatureMin
-                },
-                humidity: {
-                    max: temp_form.humidityMax,
-                    min: temp_form.humidityMin
+            const { form, isEdit } = data
+            if (isEdit) {
+                const sub = this.subForm.find(item => item.zi_wai_deng_wai_j === form.zi_wai_deng_wai_j)
+                if (sub) {
+                    Object.assign(sub, form)
                 }
-            }
-            // 温度湿度格式化
-            temp_form.environment_range = JSON.stringify(temp_environment_range)
-            // 监测日期格式化
-            switch (temp_form.jian_ce_zhou_qi_) {
-                case '每日':
-                    if (!dayCheck || dayCheck.length === 0) {
-                        temp_form.jian_ce_ri_qi_ = ''
-                        temp_form.ri_qi_lie_biao_ = ''
-                    } else if (dayCheck.length === 7) {
-                        temp_form.jian_ce_ri_qi_ = '每天'
-                        temp_form.ri_qi_lie_biao_ = '1,2,3,4,5,6,7'
-                    } else {
-                        dayCheck.sort(function (a, b) {
-                            return a - b
-                        })
-                        temp_form.jian_ce_ri_qi_ = '每周' + dayCheck.join(',')
-                        temp_form.ri_qi_lie_biao_ = dayCheck.join(',')
-                    }
-                    break
-                case '每周':
-                    if (weekCheck) {
-                        temp_form.jian_ce_ri_qi_ = '每周' + weekCheck
-                        temp_form.ri_qi_lie_biao_ = weekCheck + ''
-                    } else {
-                        temp_form.jian_ce_ri_qi_ = ''
-                        temp_form.ri_qi_lie_biao_ = ''
-                    }
-
-                    break
-                case '每月':
-
-                    if (monthCheck) {
-                        temp_form.jian_ce_ri_qi_ = '每个月第' + monthCheck + '天'
-                        temp_form.ri_qi_lie_biao_ = monthCheck + ''
-                    } else {
-                        temp_form.jian_ce_ri_qi_ = ''
-                        temp_form.ri_qi_lie_biao_ = ''
-                    }
-                    break
-                case '每季度':
-
-                    if (quarterCheck) {
-                        temp_form.jian_ce_ri_qi_ = '每季度第' + [quarterCheck] + '个月'
-                        temp_form.ri_qi_lie_biao_ = quarterCheck + ''
-                    } else {
-                        temp_form.jian_ce_ri_qi_ = ''
-                        temp_form.ri_qi_lie_biao_ = ''
-                    }
-                    break
-                case '每半年':
-
-                    if (halfYearCheck) {
-                        temp_form.jian_ce_ri_qi_ = '每半年第' + [halfYearCheck] + '个月'
-                        temp_form.ri_qi_lie_biao_ = halfYearCheck + ''
-                    } else {
-                        temp_form.jian_ce_ri_qi_ = ''
-                        temp_form.ri_qi_lie_biao_ = ''
-                    }
-                    break
-                case '每年':
-
-                    if (yearCheck) {
-                        temp_form.jian_ce_ri_qi_ = '每年第' + [yearCheck] + '个月'
-                        temp_form.ri_qi_lie_biao_ = yearCheck + ''
-                    } else {
-                        temp_form.jian_ce_ri_qi_ = ''
-                        temp_form.ri_qi_lie_biao_ = ''
-                    }
-                    break
-                default:
-                    break
-            }
-            // 是否启用格式化
-            temp_form.shi_fou_qi_yong_ = temp_form.shi_fou_qi_yong_ ? '1' : '0'
-            // 删除多余项
-            delete temp_form.temperatureMax
-            delete temp_form.humidityMax
-            delete temp_form.temperatureMin
-            delete temp_form.humidityMin
-            if (isEdit === true) {
-                Object.assign(row, temp_form)
             } else {
-                this.subForm.push(temp_form)
+                this.subForm.push(form)
             }
             this.isEdit && this.goSearch()
-            this.$refs.FecDialogRef.close()
+            this.sonClose()
         },
         // 关闭当前窗口
         closeDialog () {
@@ -1143,11 +1045,17 @@ export default {
                 if (item.jian_ce_gang_wei_ === '') {
                     return this.$message.warning(`子表第${i + 1}行监测岗位信息缺失！`)
                 }
+                if (item.lie_biao_shu_ju_) {
+                    const lie_biao_shu_ju_ = JSON.parse(item.lie_biao_shu_ju_)
+                    for (let i = 0; i < lie_biao_shu_ju_.length; i++) {
+                        const item = lie_biao_shu_ju_[i]
+                        if (!item.label && (item.range.length !== 2 || item.range[0] === null || item.range[1] === null) && (!item.fixValue)) {
+                            return this.$message.warning(`第${i + 1}行数据非法！`)
+                        }
+                    }
+                }
             }
-            delete this.form.temperatureMax
-            delete this.form.humidityMax
-            delete this.form.temperatureMin
-            delete this.form.humidityMin
+
             // console.log('主表', this.form)
             // console.log('子表', this.subForm)
             const allUid = this.subForm.map(item => item.zi_wai_deng_wai_j)
@@ -1155,12 +1063,6 @@ export default {
             const addList = this.subForm.filter(item => !existUid.includes(item.zi_wai_deng_wai_j))
             const deleteList = existUid.filter(item => !allUid.includes(item))
             const updateList = this.subForm.filter(item => existUid.includes(item.zi_wai_deng_wai_j))
-            // console.log('原来数据', existUid)
-            // console.log('全部数据', allUid)
-            // console.log('需要添加', addList)
-            // console.log('需要更新', updateList)
-            // console.log('需要删除', deleteList)
-            // return
             // 主表修改
             if (this.isEdit) {
                 const params = {
@@ -1176,11 +1078,11 @@ export default {
                                 zhou_qi_: this.form.zhou_qi_,
                                 gang_wei_: this.form.gang_wei_,
                                 tiao_jian_: this.form.tiao_jian_,
-                                default_environme: this.form.default_environme,
                                 she_bei_bian_hao_: this.form.she_bei_bian_hao_,
                                 jian_ce_ri_qi_: this.form.jian_ce_ri_qi_,
                                 ri_qi_lie_biao_: this.form.ri_qi_lie_biao_,
-                                mo_kuai_lu_jing_: this.form.mo_kuai_lu_jing_
+                                mo_kuai_lu_jing_: this.form.mo_kuai_lu_jing_,
+                                lie_biao_shu_ju_: this.form.lie_biao_shu_ju_
                             }
 
                         }
@@ -1192,7 +1094,23 @@ export default {
                         const params = {
                             tableName: 't_sshjpzxq',
                             paramWhere: addList.map(item => {
-                                return { ...item, parent_id_: this.parentData.mainId }
+                                return {
+                                    parent_id_: this.parentData.mainId,
+                                    bu_men_: item.bu_men_,
+                                    devicename1_: item.devicename1_,
+                                    deviceno1_: item.deviceno1_,
+                                    deviceno2_: item.deviceno2_,
+                                    fang_jian_: item.fang_jian_,
+                                    jian_ce_gang_wei_: item.jian_ce_gang_wei_,
+                                    jian_ce_ri_qi_: item.jian_ce_ri_qi_,
+                                    jian_ce_zhou_qi_: item.jian_ce_zhou_qi_,
+                                    kong_zhi_tiao_jia: item.kong_zhi_tiao_jia,
+                                    lie_biao_shu_ju_: item.lie_biao_shu_ju_,
+                                    qu_yu_: item.qu_yu_,
+                                    ri_qi_lie_biao_: item.ri_qi_lie_biao_,
+                                    shi_fou_qi_yong_: item.shi_fou_qi_yong_,
+                                    zi_wai_deng_wai_j: item.zi_wai_deng_wai_j
+                                }
                             })
                         }
                         this.$common.request('add', params).then(() => { console.log('子表添加数据成功') })
@@ -1215,11 +1133,9 @@ export default {
                                     jian_ce_gang_wei_: item.jian_ce_gang_wei_,
                                     shi_fou_qi_yong_: item.shi_fou_qi_yong_,
                                     kong_zhi_tiao_jia: item.kong_zhi_tiao_jia,
-                                    environment_range: item.environment_range,
-                                    xiu_zheng_shi_du_: item.xiu_zheng_shi_du_,
-                                    xiu_zheng_wen_du_: item.xiu_zheng_wen_du_,
                                     jian_ce_ri_qi_: item.jian_ce_ri_qi_,
-                                    ri_qi_lie_biao_: item.ri_qi_lie_biao_
+                                    ri_qi_lie_biao_: item.ri_qi_lie_biao_,
+                                    lie_biao_shu_ju_: item.lie_biao_shu_ju_
                                 }
                             }))
                         }
@@ -1240,7 +1156,9 @@ export default {
             } else {
                 const params = {
                     tableName: 't_sshjpzb',
-                    paramWhere: [this.form]
+                    paramWhere: [{
+                        ...this.form
+                    }]
                 }
                 this.$common.request('add', params).then((res) => {
                     console.log('主表新增数据成功')
@@ -1249,7 +1167,23 @@ export default {
                         const params = {
                             tableName: 't_sshjpzxq',
                             paramWhere: addList.map(item => {
-                                return { ...item, parent_id_: cont[0].id_ }
+                                return {
+                                    parent_id_: cont[0].id_,
+                                    bu_men_: item.bu_men_,
+                                    devicename1_: item.devicename1_,
+                                    deviceno1_: item.deviceno1_,
+                                    deviceno2_: item.deviceno2_,
+                                    fang_jian_: item.fang_jian_,
+                                    jian_ce_gang_wei_: item.jian_ce_gang_wei_,
+                                    jian_ce_ri_qi_: item.jian_ce_ri_qi_,
+                                    jian_ce_zhou_qi_: item.jian_ce_zhou_qi_,
+                                    kong_zhi_tiao_jia: item.kong_zhi_tiao_jia,
+                                    lie_biao_shu_ju_: item.lie_biao_shu_ju_,
+                                    qu_yu_: item.qu_yu_,
+                                    ri_qi_lie_biao_: item.ri_qi_lie_biao_,
+                                    shi_fou_qi_yong_: item.shi_fou_qi_yong_,
+                                    zi_wai_deng_wai_j: item.zi_wai_deng_wai_j
+                                }
                             })
                         }
                         this.$common.request('add', params).then(() => {
@@ -1271,7 +1205,7 @@ export default {
                         di_dian_: this.level,
                         bian_zhi_bu_men_: item.bu_men_,
                         bian_zhi_ren_: this.userId,
-                        zi_wai_deng_ming_: item.deviceName1,
+                        zi_wai_deng_ming_: item.devicename1_,
                         she_shi_id_: item.zi_wai_deng_wai_j
                     }))
                 } : null
@@ -1285,7 +1219,7 @@ export default {
                         },
                         param: {
                             bian_zhi_bu_men_: item.bu_men_,
-                            zi_wai_deng_ming_: item.deviceName1
+                            zi_wai_deng_ming_: item.devicename1_
                         }
                     }))
                 } : null
@@ -1293,7 +1227,7 @@ export default {
                 // 生成删除请求参数
                 const deleteParams = deleteList.length ? {
                     tableName,
-                    paramWhere: { she_shi_id_: deleteList.map(item => item.sheShiId).join(',') }
+                    paramWhere: { she_shi_id_: deleteList.join(',') }
                 } : null
 
                 // 合并所有请求
@@ -1343,6 +1277,9 @@ export default {
             const workBook = xlsx.read(dataBinary, { type: 'binary', cellDates: true })
             const workSheet = workBook.Sheets[workBook.SheetNames[0]]
             const data = xlsx.utils.sheet_to_json(workSheet)
+            if (!this.form.lei_xing_) {
+                return this.$message.warning('请先选择类型！')
+            }
             if (data.length === 0) {
                 return this.$message.warning('文件内容为空！')
             }
@@ -1355,15 +1292,13 @@ export default {
                     jian_ce_gang_wei_: item['监测岗位'] || '',
                     jian_ce_zhou_qi_: item['监测周期'] || '',
                     kong_zhi_tiao_jia: item['控制条件'] || '',
-                    environment_range: '',
-                    xiu_zheng_shi_du_: item['湿度修正值'] || '',
-                    xiu_zheng_wen_du_: item['温度修正值'] || '',
                     fang_jian_: item['房间'] || '',
                     qu_yu_: item['区域'] || '',
                     deviceno2_: item['监控设备编号'] || '',
                     jian_ce_ri_qi_: '',
                     ri_qi_lie_biao_: '',
-                    zi_wai_deng_wai_j: this.$utils.guid()
+                    zi_wai_deng_wai_j: this.$utils.guid(),
+                    lie_biao_shu_ju_: this.form.lie_biao_shu_ju_
                 })
             })
             this.$message.success('导入成功！')
