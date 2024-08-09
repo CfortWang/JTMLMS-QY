@@ -381,14 +381,6 @@ const frameOut = [
             title: 'sealCompleted'
         },
         component: _import('/remindPage/sealCompleted')
-    },
-    {
-        path: '/lhjcgl/pbglcd/pbsz',
-        name: 'schedule',
-        meta: {
-            title: 'schedule'
-        },
-        component: _import('/business/​scheduleManage/index')
     }
 ]
 
