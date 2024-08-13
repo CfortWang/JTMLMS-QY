@@ -50,8 +50,8 @@
                     <i class="ibps-icon-paperclip" />
                 </el-tooltip>
             </template>
-            <template slot="file" slot-scope="v">
-                <span> {{ v.fileMsg ? '有' : '无' }}</span>
+            <template slot="file" slot-scope="scope">
+                <span> {{ scope.row.fileMsg ? '有' : '无' }}</span>
             </template>
         </ibps-crud>
         <!-- 明细 -->
