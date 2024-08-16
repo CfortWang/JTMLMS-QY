@@ -19,13 +19,13 @@
         >
             1
         </ibps-crud>
-        <Experimental
-            v-if="showConfig"
-            :visible.sync="showConfig"
+        <schedule-config
+            v-if="showConfigDialog"
+            :visible.sync="showConfigDialog"
             :params="params"
             :readonly="readonly"
             @refresh="loadData"
-            @close="() => showConfig = false"
+            @close="() => showConfigDialog = false"
         />
     </div>
 </template>
@@ -45,54 +45,53 @@ export default {
         const userOption = userList.map(item => ({ label: item.userName, value: item.userId }))
         return {
             userOption,
-            title: '性能验证记录',
+            title: '排班记录',
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: true,
             height: document.clientHeight,
             listData: [],
             pagination: {},
             sorts: {},
-            showConfig: false,
+            showConfigDialog: false,
             readonly: false,
             params: {},
             targetOption: [],
             methodOption: [],
             listConfig: {
                 toolbars: [
-                    { key: 'search' },
-                    { key: 'remove' }
+                    { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary', hidden: false },
+                    { key: 'create', icon: 'ibps-icon-plus', label: '创建', type: 'success', hidden: false },
+                    { key: 'remove', icon: 'ibps-icon-close', label: '删除', type: 'danger', hidden: false },
+                    { key: 'config', icon: 'ibps-icon-cogs', label: '配置', type: 'info', hidden: false }
                 ],
                 searchForm: {
+                    labelWidth: 80,
+                    itemWidth: 150,
                     forms: [
                         // { prop: 'Q^name_^SL', label: '性能指标', fieldType: 'select', options: this.targetOption },
                         // { prop: 'Q^fang_an_lei_xing_^SL', label: '方案类型', fieldType: 'select', options: this.methodOption },
-                        { prop: 'Q^name_^SL', label: '性能指标' },
-                        { prop: 'Q^fang_an_lei_xing_^SL', label: '方案类型' },
-                        { prop: 'Q^shi_yan_xiang_mu_^SL', label: '实验项目' },
-                        { prop: 'Q^shi_yan_fang_fa_^SL', label: '实验方法' },
-                        { prop: 'Q^yang_ben_lei_xing^SL', label: '样本类型' },
-                        { prop: 'Q^shi_yan_yi_qi_^SL', label: '实验仪器' },
-                        { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '创建时间', fieldType: 'daterange' }
+                        { prop: 'Q^title_^SL', label: '排班名称' },
+                        { prop: 'Q^scope_^SL', label: '使用范围' },
+                        { prop: 'Q^cycle_^SL', label: '排班周期' },
+                        { prop: 'Q^status_^SL', label: '状态' },
+                        { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '创建时间', fieldType: 'daterange', itemWidth: 200 }
                     ]
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'xingNengZhiBia', label: '性能指标', tags: [], width: 120 },
-                    { prop: 'fangAnLeiXing', label: '方案类型', tags: [], minWidth: 125 },
-                    { prop: 'shiYanXiangMu', label: '实验项目', width: 120 },
-                    { prop: 'shiYanFangFa', label: '实验方法', width: 120 },
-                    { prop: 'yangBenLeiXing', label: '样本类型', width: 100 },
-                    { prop: 'shiYanYiQi', label: '实验仪器', width: 120 },
-                    { prop: 'timeRange', label: '实验时间', slotName: 'time', width: 140 },
-                    { prop: 'dataStatus', label: '状态', width: 80 },
-                    { prop: 'bianZhiRen', label: '实验人', tags: userOption, width: 90 },
-                    { prop: 'createBy', label: '评价人', tags: userOption, width: 90 },
+                    { prop: 'title', label: '排班名称', tags: [], minWidth: 150 },
+                    { prop: 'scope', label: '使用范围', tags: [], width: 120 },
+                    { prop: 'cycle', label: '排班周期', width: 120 },
+                    { prop: 'dateRange', label: '时间范围', slotName: 'time', width: 140 },
+                    { prop: 'status', label: '状态', width: 80 },
+                    { prop: 'createBy', label: '创建人', tags: userOption, width: 90 },
                     { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 130 }
                 ],
                 rowHandle: {
                     effect: 'display',
                     actions: [
-                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' }
+                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' },
+                        { key: 'preview', label: '查看', type: 'primary', icon: 'ibps-icon-eye' }
                         // { key: 'report', label: '实验报告', type: 'success', icon: 'ibps-icon-file-text-o' }
                     ]
                 }
@@ -152,11 +151,17 @@ export default {
                     ActionUtils.setFirstPagination(this.pagination)
                     this.search()
                     break
+                case 'create':
+                    this.handleEdit(data, command)
+                    break
+                case 'config':
+                    this.showConfigDialog = true
+                    break
                 case 'edit':
                     this.handleEdit(data, command)
                     break
-                case 'report':
-                    this.handleReport(data)
+                case 'preview':
+                    this.handlePreview(data)
                     break
                 case 'remove':
                     ActionUtils.removeRecord(selection).then((ids) => {
@@ -178,7 +183,7 @@ export default {
                 recordId: id
             }
             this.readonly = key === 'detail'
-            this.showConfig = true
+            // this.showConfigDialog = true
         },
         handleReport (data) {
             console.log('wwww')
