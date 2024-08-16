@@ -69,7 +69,7 @@ export default {
                     forms: [
                         // { prop: 'Q^name_^SL', label: '性能指标', fieldType: 'select', options: this.targetOption },
                         // { prop: 'Q^fang_an_lei_xing_^SL', label: '方案类型', fieldType: 'select', options: this.methodOption },
-                        { prop: 'Q^name_^SL', label: '性能指标' },
+                        { prop: 'Q^xing_neng_zhi_bia^SL', label: '性能指标' },
                         { prop: 'Q^fang_an_lei_xing_^SL', label: '方案类型' },
                         { prop: 'Q^shi_yan_xiang_mu_^SL', label: '实验项目' },
                         { prop: 'Q^shi_yan_fang_fa_^SL', label: '实验方法' },
