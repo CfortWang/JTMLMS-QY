@@ -32,6 +32,7 @@
         <el-form
             ref="configForm"
             :label-width="formLabelWidth"
+            lavel-position="left"
             :model.sync="formData"
             :rules="rules"
             class="config-form"
@@ -87,7 +88,7 @@
                                 <template slot="label">
                                     是否审批
                                     <el-tooltip effect="dark" content="设置调班申请是否需要额外审批，若设置为否，则调班申请仅需当事人同意即可生效" placement="top">
-                                        <i class="el-icon-question question-icon">：</i>
+                                        <i class="el-icon-question question-icon" />
                                     </el-tooltip>
                                 </template>
                                 <el-switch v-model="formData.isApproval" active-value="Y" inactive-value="N" />
@@ -260,7 +261,7 @@ export default {
             title: '排班信息配置',
             maxHeight: document.body.clientHeight - 438 + 'px',
             dialogVisible: this.visible,
-            formLabelWidth: '120px',
+            formLabelWidth: '110px',
             formData: {
                 schedule: [],
                 rules: []

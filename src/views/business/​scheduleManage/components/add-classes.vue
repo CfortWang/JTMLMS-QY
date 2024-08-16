@@ -78,7 +78,7 @@
                 <template slot="label">
                     <div class="custom-label">{{ `班次时间${index + 1}` }}</div>
                 </template>
-                <el-radio-group v-model="item.type">
+                <el-radio-group v-model="item.type" class="date-type">
                     <el-radio-button label="range">时间段</el-radio-button>
                     <el-radio-button label="allday" :disabled="dateRangeList.length !== 1">全天</el-radio-button>
                 </el-radio-group>
@@ -89,7 +89,7 @@
                             align="right"
                             class="date-picker"
                             :picker-options="item.pickerOptions"
-                            placeholder="请选择开始时间"
+                            placeholder="开始时间"
                         />
                     </div>
                     <div class="concat">至</div>
@@ -106,7 +106,7 @@
                             align="right"
                             class="date-picker"
                             :picker-options="item.pickerOptions"
-                            placeholder="请选择结束时间"
+                            placeholder="结束时间"
                         />
                     </div>
                 </div>
@@ -259,6 +259,7 @@ export default {
             })
         },
         submitForm (data, key) {
+            console.log(data)
             this.$emit('callback', { data, index: this.pageData.index })
             if (key === 'save') {
                 return this.closeDialog()
@@ -298,17 +299,28 @@ export default {
                 ::v-deep {
                     .el-form-item__content {
                         display: flex;
+                        .date-type {
+                            flex-shrink: 0;
+                        }
                         .range-item {
-                            flex: 1;
                             flex-shrink: 0;
                             display: flex;
+                            align-items: center;
                             margin: 0 20px;
                             .concat {
                                 margin: 0 20px;
                             }
-                        }
-                        .date-picker {
-                            width: auto;
+                            .end {
+                                display: flex;
+                                align-items: center;
+                                .el-switch {
+                                    width: 150px;
+                                    flex-shrink: 0;
+                                }
+                            }
+                            .date-picker {
+                                max-width: 120px;
+                            }
                         }
                     }
                 }
