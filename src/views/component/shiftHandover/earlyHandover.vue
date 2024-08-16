@@ -363,7 +363,7 @@ export default {
                 { key: 'gunRegister', label: '扫码枪签到', hidden: () => { return !this.isEdit || this.isFinished } },
                 { key: 'registerInfo', label: '签到信息', hidden: () => { return !this.isEdit } },
                 { key: 'submit', label: '提交', icon: 'el-icon-finished', hidden: () => { return !this.isEdit || this.isFinished } },
-                { key: 'cancel', label: '退出', type: 'danger' }
+                { key: 'cancel', label: '退出', type: 'danger',icon:'ibps-icon-close' }
             ],
             initWidth: '1280px',
             isEdit: false,
@@ -841,10 +841,13 @@ export default {
     div{
         z-index: 99999999;
         position: absolute;
-        right:20px;
+        right:8vw;
     }
     .dialogtitle{
-        font-weight: 900;
+        font-size: 22px;
+        font-family: SimHei;
+        font-weight: bold;
+        color: #222;
     }
 }
 .container {

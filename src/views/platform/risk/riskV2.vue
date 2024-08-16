@@ -286,7 +286,7 @@ export default {
                 // { key: 'sendMsg', label: '提醒评估人', icon: 'el-icon-bell', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
                 { key: 'peizhifengxian', label: '更新风险库', type: 'info', icon: 'el-icon-setting', hidden: () => { return !this.isZuZhang || !this.isEdit } },
                 { key: 'submit', label: '提交', icon: 'el-icon-finished', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
-                { key: 'cancel', label: '退出', type: 'danger' }
+                { key: 'cancel', label: '退出', type: 'danger', icon: 'ibps-icon-close' }
             ],
             infoFxssbData: {
                 nian_du_: '',
@@ -868,10 +868,13 @@ export default {
     justify-content: center;
     div{
         position: absolute;
-        right:20px;
+        right:8vw;
     }
     .dialogtitle{
-        font-weight: 900;
+        font-size: 22px;
+        font-family: SimHei;
+        font-weight: bold;
+        color: #222;
     }
 }
 </style>

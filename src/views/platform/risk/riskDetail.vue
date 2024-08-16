@@ -240,7 +240,7 @@
             <span slot="footer" class="dialog-footer">
                 <el-button v-if="!readonly" type="primary" size="mini" icon="el-icon-takeaway-box" @click="save">保 存</el-button>
                 <el-button v-if="!readonly" type="primary" size="mini" icon="el-icon-finished" @click="submit">提 交</el-button>
-                <el-button size="mini" icon="el-icon-close" type="danger" @click="close">退 出</el-button>
+                <el-button size="mini" icon="ibps-icon-close" type="danger" @click="close">退 出</el-button>
             </span>
         </el-dialog>
     </div>

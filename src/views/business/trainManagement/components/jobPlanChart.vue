@@ -1,9 +1,9 @@
 <template>
   <div class="statisticsPage" :style="{width:width,height:height}">
-    <div style="height:8%;font-size:28px;font-weight: 600;"> {{ title }} </div>
+    <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
     <div style="height:92%;display:flex">
       <div style="width:30%;display: flex;margin-top: 5%;">
-        <div style="width: 100%;display:flex;border: 1px solid #fff;padding: 5%;height: 50%;display: flex;align-items: center;flex-flow: column;">
+        <div class="leftSty">
           <div style="width: 100%;height:20%;font-size: 20px;">自动创建培训计划</div>
           <div style="display:flex;height: 90%;display: flex;align-items: center;width:100%">
             <div style="width: 46%;display:flex;flex-flow: column;height: 100%;font-size: 20px;">
@@ -89,6 +89,7 @@
           yData.push(e.value)
         })
         const that = this
+        echarts.dispose(document.getElementById('job'+this.id))
         let job = echarts.init(document.getElementById('job'+this.id))
         let option;
         option = {
@@ -149,6 +150,7 @@
       },
       drawLinePie(){
         const that = this
+        echarts.dispose(document.getElementById('jobPie'+this.id))
         let jobPie = echarts.init(document.getElementById('jobPie'+this.id))
         let option
         option = {
@@ -196,8 +198,19 @@
     transform:scale(1.03);
   } */
   .statisticsPage{
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      padding: 1%;
-      background-color: rgba(6, 30, 93, 0.5);
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 1%;
+    /* background-color: rgba(6, 30, 93, 0.5); */
+  }
+  .leftSty{
+    width: 100%;
+    display:flex;
+    background-color: rgba(84, 112, 198, 0.3);
+    border-radius: 10px;
+    padding: 5%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    flex-flow: column;
   }
 </style>

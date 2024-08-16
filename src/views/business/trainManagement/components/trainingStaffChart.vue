@@ -1,6 +1,6 @@
 <template>
   <div class="statisticsPage" :style="{width:width,height:height}">
-    <div style="height:8%;font-size:28px;font-weight: 600;"> {{title}} </div>
+    <div style="height:8%;font-size:24px;font-weight: 600;"> {{title}} </div>
     <div style="height:90%;display:flex;justify-content: space-between;">
       <div :id="'staff'+id" :style="{height:'100%',width:'76%'}"/>
       <staff-list v-model="data" :style="{height:'80%',width:'22%'}"></staff-list>
@@ -76,6 +76,7 @@
           yData2.push(e.numAll)
         })
         const that = this
+        echarts.dispose(document.getElementById('staff'+this.id))
         let staff = echarts.init(document.getElementById('staff'+this.id))
         let option
         option = {
@@ -187,6 +188,6 @@
   .statisticsPage{
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       padding: 1%;
-      background-color: rgba(6, 30, 93, 0.5);
+      /* background-color: rgba(6, 30, 93, 0.5); */
   }
 </style>

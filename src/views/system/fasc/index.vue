@@ -48,7 +48,14 @@ export default {
             const data = res.data || []
             // 先按照 日 周 月 季度 半年 年 排序
             data.sort((a, b) => {
-                if (list[a.jian_ce_zhou_qi_] && list[b.jian_ce_zhou_qi_]) { return list[a.jian_ce_zhou_qi_] - list[b.jian_ce_zhou_qi_] }
+                if (list[a.jian_ce_zhou_qi_] && list[b.jian_ce_zhou_qi_]) {
+                    if (a.jian_ce_zhou_qi_ === b.jian_ce_zhou_qi_) {
+                        // 对部门进行排序
+                        return a.name_.localeCompare(b.name_, 'zh') // 'zh' 指定中文排序
+                    } else {
+                        return list[a.jian_ce_zhou_qi_] - list[b.jian_ce_zhou_qi_]
+                    }
+                }
             })
             console.log('接口数据', data)
             const result = []
@@ -74,6 +81,10 @@ export default {
                         name_Obj.todo += item.todo
                     }
                 }
+            })
+            // 对类型进行排序
+            result.sort((a, b) => {
+                return a.facs_type.localeCompare(b.facs_type, 'zh')
             })
             console.log('格式化数据', result)
             this.cardInfos = result

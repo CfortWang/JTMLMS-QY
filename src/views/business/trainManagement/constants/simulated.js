@@ -17,31 +17,31 @@ export const dataObj = [
 
 export const jobPlanObj = [
     {
-        date: '2024-07-29',
+        date: '2024-08-12',
         value: 15
     },
     {
-        date: '2024-07-30',
+        date: '2024-08-13',
         value: 13
     },
     {
-        date: '2024-07-31',
+        date: '2024-08-14',
         value: 3
     },
     {
-        date: '2024-08-01',
+        date: '2024-08-15',
         value: 8
     },
     {
-        date: '2024-08-02',
+        date: '2024-08-16',
         value: 8
     },
     {
-        date: '2024-08-03',
+        date: '2024-08-17',
         value: 0
     },
     {
-        date: '2024-08-04',
+        date: '2024-08-18',
         value: 10
     }
 ]

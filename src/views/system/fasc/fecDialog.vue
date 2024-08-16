@@ -416,7 +416,7 @@ export default {
             const sql2 = `select * from t_jjqfjb where di_dian_='${pos}'`
             this.$common.request('sql', sql2).then(res => {
                 const { data = [] } = res.variables || {}
-                this.fangJianList = data
+                this.fangJianList = data.filter(item => item.fang_jian_ming_ha)
             })
         },
         // 格式化数据
@@ -502,7 +502,7 @@ export default {
                 const lie_biao_shu_ju_ = JSON.parse(this.form.lie_biao_shu_ju_)
                 for (let i = 0; i < lie_biao_shu_ju_.length; i++) {
                     const item = lie_biao_shu_ju_[i]
-                    if (!item.label && (item.range.length !== 2 || item.range[0] === null || item.range[1] === null) && (!item.fixValue)) {
+                    if (!item.label && (item.range.length !== 2 || item.range[0] === null || item.range[1] === null) && (!item.fixValue) && (!item.unit)) {
                         throw new Error(`第${i + 1}行数据非法！`)
                     }
                 }
@@ -619,7 +619,9 @@ export default {
             margin: 10px 0;
         }
     }
-
+    .el-row{
+            margin: 0 !important;
+    }
 }
 .dialog-footer{
         display: flex;

@@ -7,8 +7,8 @@
         <el-row type="flex">
             <el-col style="margin:0 0 5px 0">
                 <div class="button">
-                    <el-button v-if="!isCul" type="danger" size="mini" @click="goRemove">删除</el-button>
-                    <el-button v-if="!isCul" type="success" size="mini" @click="goAdd">添加</el-button>
+                    <el-button v-if="!isCul" type="danger" size="mini" icon="ibps-icon-close" @click="goRemove">删除</el-button>
+                    <el-button v-if="!isCul" type="success" size="mini" icon="ibps-icon-plus" @click="goAdd">添加</el-button>
                 </div>
             </el-col>
         </el-row>
@@ -23,6 +23,19 @@
                         <template slot-scope="{row}">
                             <el-input v-if="!readonly && !isCul" v-model="row.label" size="mini" placeholder="请输入" />
                             <span v-else>{{ row.label|| '/' }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="参数单位" prop="unit">
+                        <template slot-scope="{row}">
+                            <el-autocomplete
+                                v-if="!readonly"
+                                v-model="row.unit"
+                                class="inline-input"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请输入内容"
+                                size="mini"
+                            />
+                            <span v-else>{{ row.unit || '/' }}</span>
                         </template>
                     </el-table-column>
 
@@ -122,11 +135,17 @@ export default {
         // console.log('mounted', this.formData)
     },
     methods: {
+        // 默认单位
+        querySearch (queryString, cb) {
+            const units = [{ value: '℃' }, { value: '%' }, { value: 'Pa' }]
+            // 调用 callback 返回建议列表的数据
+            cb(units)
+        },
         // 计算状态
         getStatus (range, result) {
             let [min, max] = range
-            if (!min) min = -9999
-            if (!max) max = 9999
+            if (min === null || min === '' || typeof min === 'undefined') min = Number.MIN_VALUE
+            if (max === null || max === '' || typeof max === 'undefined') max = Number.MAX_VALUE
             // console.log(min, max, result)
             if (+min === 0 && +max === 0) {
                 return '正常'
@@ -139,6 +158,7 @@ export default {
         // 计算修正值
         culXiuZheng () {
             if (!this.isCul) return
+            if (this.readonly) return
             this.forms.forEach(item => {
                 if (item.value) {
                     if (item.fixValue) {
@@ -169,7 +189,8 @@ export default {
                 fixValue: '',
                 value: '',
                 result: '',
-                status: ''
+                status: '',
+                unit: ''
             })
         },
         goRemove () {

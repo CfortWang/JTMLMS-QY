@@ -19,10 +19,13 @@
         <div class="container">
             <div class="main">
                 <div class="form">
-                    <el-form ref="form" :model="form" label-width="120px" :rules="rules">
+                    <el-form ref="form" :model="form" label-width="74px" :rules="rules" :hide-required-asterisk="true">
                         <el-row>
                             <el-col :span="12">
                                 <el-form-item label="类型：" prop="lei_xing_">
+                                    <template slot="label">
+                                        <span class="required">类型</span>
+                                    </template>
                                     <el-select v-model="form.lei_xing_" placeholder="请选择" size="mini" style="width:80%">
                                         <el-option
                                             v-for="(value,key) in config"
@@ -225,7 +228,7 @@
                                 <el-button size="mini" type="primary" icon="el-icon-search" @click="goSearch">查询</el-button>
                             </div>
                             <div class="search-item" style="width:60px">
-                                <el-button type="success" size="mini" icon="el-icon-plus" @click="openDialog">添加</el-button>
+                                <el-button type="success" size="mini" icon="ibps-icon-plus" @click="openDialog">添加</el-button>
                             </div>
                             <div class="search-item" style="width:60px">
                                 <el-upload
@@ -247,7 +250,7 @@
                                 <el-button type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
                             </div>
                             <div class="search-item" style="width:60px">
-                                <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeItem">删除</el-button>
+                                <el-button type="danger" size="mini" icon="ibps-icon-close" @click="removeItem">删除</el-button>
                             </div>
                         </div>
                     </div>
@@ -350,9 +353,8 @@
                     />
                 </div>
             </div>
-
+            <FecDialog v-if="subDialogVisible" ref="FecDialogRef" @onSubmit="sonSubmit" @onClose="sonClose" />
         </div>
-        <FecDialog v-if="subDialogVisible" ref="FecDialogRef" @onSubmit="sonSubmit" @onClose="sonClose" />
     </el-dialog>
 </template>
 
@@ -406,7 +408,7 @@ export default {
             dialogVisible: true,
             subDialogVisible: false,
             title: '设施环境配置表',
-            toolbars: [{ key: 'save', label: '保存' }, { key: 'cancel', label: '退出', type: 'danger' }],
+            toolbars: [{ key: 'save', label: '保存' }, { key: 'cancel', label: '退出', type: 'danger', icon: 'ibps-icon-close' }],
             dayCheck: [],
             weekCheck: '',
             monthCheck: '',
@@ -582,26 +584,26 @@ export default {
                 switch (val) {
                     case '01-室内温湿度监控':
                         this.form.lie_biao_shu_ju_ = JSON.stringify([
-                            { label: '上午温度', range: [], fixValue: '', value: '', result: '', status: '' },
-                            { label: '上午湿度', range: [], fixValue: '', value: '', result: '', status: '' },
-                            { label: '下午温度', range: [], fixValue: '', value: '', result: '', status: '' },
-                            { label: '下午湿度', range: [], fixValue: '', value: '', result: '', status: '' }
+                            { label: '上午温度', range: [], fixValue: '', value: '', result: '', status: '', unit: '℃' },
+                            { label: '上午湿度', range: [], fixValue: '', value: '', result: '', status: '', unit: '%' },
+                            { label: '下午温度', range: [], fixValue: '', value: '', result: '', status: '', unit: '℃' },
+                            { label: '下午湿度', range: [], fixValue: '', value: '', result: '', status: '', unit: '%' }
                         ])
                         break
                     case '02-冰箱温度监控':
                         this.form.lie_biao_shu_ju_ = JSON.stringify([
-                            { label: '冷藏', range: [], fixValue: '', value: '', result: '', status: '' },
-                            { label: '冷冻', range: [], fixValue: '', value: '', result: '', status: '' }
+                            { label: '冷藏', range: [], fixValue: '', value: '', result: '', status: '', unit: '℃' },
+                            { label: '冷冻', range: [], fixValue: '', value: '', result: '', status: '', unit: '℃' }
                         ])
                         break
                     case '03-温浴箱温度监控':
                         this.form.lie_biao_shu_ju_ = JSON.stringify([
-                            { label: '温度', range: [], fixValue: '', value: '', result: '', status: '' }
+                            { label: '温度', range: [], fixValue: '', value: '', result: '', status: '', unit: '℃' }
                         ])
                         break
                     case '04-阴凉柜温度监控':
                         this.form.lie_biao_shu_ju_ = JSON.stringify([
-                            { label: '温度', range: [], fixValue: '', value: '', result: '', status: '' }
+                            { label: '温度', range: [], fixValue: '', value: '', result: '', status: '', unit: '℃' }
                         ])
                         break
                     default:
@@ -930,15 +932,25 @@ export default {
                         if (item.lie_biao_shu_ju_ && this.form.lie_biao_shu_ju_) {
                             const main = JSON.parse(this.form.lie_biao_shu_ju_)
                             const sub = JSON.parse(item.lie_biao_shu_ju_)
-                            sub.forEach((i, index) => {
-                                if (i.range.length === 0 || i.range === [null, null]) {
-                                    i.range = main[index].range
-                                }
-                                if (i.fixValue === '') {
-                                    i.fixValue = main[index].fixValue
-                                }
-                            })
-                            item.lie_biao_shu_ju_ = JSON.stringify(sub)
+                            if (sub.length === 0) {
+                                item.lie_biao_shu_ju_ = JSON.stringify(sub)
+                            }
+                            if (sub.length > 0) {
+                                sub.forEach((i, index) => {
+                                    if (i.label === main[index].label && (i.range.length === 0 || i.range.join(',') === [null, null].join(',') || i.range.join(',') === ['', ''].join(','))) {
+                                        i.range = main[index].range
+                                    }
+                                    if (i.label === main[index].label && i.fixValue === '') {
+                                        i.fixValue = main[index].fixValue
+                                    }
+                                    if (i.label === main[index].label && i.unit === '') {
+                                        i.unit = main[index].unit
+                                    }
+                                })
+                                item.lie_biao_shu_ju_ = JSON.stringify(sub)
+                            } else {
+                                item.lie_biao_shu_ju_ = this.form.lie_biao_shu_ju_
+                            }
                         }
                     })
                 })
@@ -1030,7 +1042,7 @@ export default {
         handleSelectionChange (val) {
             this.multipleSelection = val
         },
-        submit () {
+        async submit () {
             if (this.subForm.length === 0) {
                 return this.$message.warning('请添加子表数据')
             }
@@ -1049,7 +1061,7 @@ export default {
                     const lie_biao_shu_ju_ = JSON.parse(item.lie_biao_shu_ju_)
                     for (let i = 0; i < lie_biao_shu_ju_.length; i++) {
                         const item = lie_biao_shu_ju_[i]
-                        if (!item.label && (item.range.length !== 2 || item.range[0] === null || item.range[1] === null) && (!item.fixValue)) {
+                        if (!item.label && (item.range.length !== 2 || item.range[0] === null || item.range[1] === null) && (!item.fixValue) && (!item.unit)) {
                             return this.$message.warning(`第${i + 1}行数据非法！`)
                         }
                     }
@@ -1088,7 +1100,7 @@ export default {
                         }
                     ]
                 }
-                this.$common.request('update', params).then(() => {
+                await this.$common.request('update', params).then(async () => {
                     console.log('主表更新数据成功')
                     if (addList.length) {
                         const params = {
@@ -1113,7 +1125,7 @@ export default {
                                 }
                             })
                         }
-                        this.$common.request('add', params).then(() => { console.log('子表添加数据成功') })
+                        await this.$common.request('add', params).then(() => { console.log('子表添加数据成功') })
                     }
                     if (updateList.length) {
                         const params = {
@@ -1139,14 +1151,14 @@ export default {
                                 }
                             }))
                         }
-                        this.$common.request('update', params).then(() => { console.log('子表更新数据成功') })
+                        await this.$common.request('update', params).then(() => { console.log('子表更新数据成功') })
                     }
                     if (deleteList.length) {
                         const params = {
                             tableName: 't_sshjpzxq',
                             paramWhere: { zi_wai_deng_wai_j: deleteList.join(',') }
                         }
-                        this.$common.request('delete', params).then(() => { console.log('子表删除数据成功') })
+                        await this.$common.request('delete', params).then(() => { console.log('子表删除数据成功') })
                     }
                     this.$nextTick(() => {
                         this.$message.success('修改成功！')
@@ -1160,7 +1172,7 @@ export default {
                         ...this.form
                     }]
                 }
-                this.$common.request('add', params).then((res) => {
+                await this.$common.request('add', params).then(async (res) => {
                     console.log('主表新增数据成功')
                     const { cont = [] } = res.variables || {}
                     if (addList.length) {
@@ -1186,7 +1198,7 @@ export default {
                                 }
                             })
                         }
-                        this.$common.request('add', params).then(() => {
+                        await this.$common.request('add', params).then(() => {
                             this.$message.success('添加成功！')
                             console.log('子表添加数据成功')
                             this.closeDialog()
@@ -1206,7 +1218,8 @@ export default {
                         bian_zhi_bu_men_: item.bu_men_,
                         bian_zhi_ren_: this.userId,
                         zi_wai_deng_ming_: item.devicename1_,
-                        she_shi_id_: item.zi_wai_deng_wai_j
+                        she_shi_id_: item.zi_wai_deng_wai_j,
+                        gang_wei_: item.jian_ce_gang_wei_
                     }))
                 } : null
 
@@ -1219,7 +1232,8 @@ export default {
                         },
                         param: {
                             bian_zhi_bu_men_: item.bu_men_,
-                            zi_wai_deng_ming_: item.devicename1_
+                            zi_wai_deng_ming_: item.devicename1_,
+                            gang_wei_: item.jian_ce_gang_wei_
                         }
                     }))
                 } : null
@@ -1246,7 +1260,7 @@ export default {
                 }
 
                 // 执行所有请求
-                Promise.all(allRequests)
+                await Promise.all(allRequests)
                     .then(() => console.log('所有请求完成'))
                     .catch(error => console.error('请求出错：', error))
             }
@@ -1440,23 +1454,36 @@ export default {
     justify-content: center;
     div{
         position: absolute;
-        right:20px;
+        right:8vw;
     }
     .dialogtitle{
-        font-weight: 900;
+        font-size: 22px;
+        font-family: SimHei;
+        font-weight: bold;
+        color: #222;
     }
 }
 .container {
         display: flex;
         width: 100%;
         justify-content: center;
-
+        .el-row{
+            margin: 0 !important;
+        }
+        .required{
+            color: #606266 !important;
+            &::before{
+                content: '*';
+                margin: 0 4px 0 -7.5px;
+                color: #F56C6C;
+            }
+        }
         .main{
             width: 80%;
             height: calc(100vh - 70px);
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding:20px;
-            // overflow-y: auto;
+            overflow-y: auto;
             .form{
                 .el-row{
                     margin: 10px 0;

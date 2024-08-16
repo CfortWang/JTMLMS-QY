@@ -21,15 +21,15 @@
             <div class="left" :style="{width:initWidth}">
                 <div class="form">
                     <el-form ref="form" label-width="100px" :model="form" :rules="rules">
-                        <el-row type="flex" justify="center" :gutter="20">
-                            <el-col :span="22">
+                        <el-row>
+                            <el-col :span="24">
                                 <el-form-item label="表单名称：" prop="biao_dan_ming_che">
                                     <el-input v-model="form.biao_dan_ming_che" size="mini" placeholder="请输入" />
                                 </el-form-item>
                             </el-col>
                         </el-row>
-                        <el-row type="flex" justify="center" :gutter="20">
-                            <el-col :span="22">
+                        <el-row>
+                            <el-col :span="24">
                                 <el-form-item label="表单模板：" prop="biao_dan_mo_ban_">
                                     <ibps-attachment
                                         v-model="form.biao_dan_mo_ban_"
@@ -42,8 +42,8 @@
                                 </el-form-item>
                             </el-col>
                         </el-row>
-                        <el-row type="flex" justify="center" :gutter="20">
-                            <el-col :span="22">
+                        <el-row>
+                            <el-col :span="24">
                                 <el-form-item label="归档路径：" prop="gui_dang_lu_jing_">
                                     <ibps-custom-dialog
                                         v-model="form.gui_dang_lu_jing_"
@@ -58,8 +58,8 @@
                                 </el-form-item>
                             </el-col>
                         </el-row>
-                        <el-row type="flex" justify="center" :gutter="20">
-                            <el-col :span="22">
+                        <el-row>
+                            <el-col :span="24">
                                 <el-form-item label="审批流程" prop="shen_pi_liu_cheng">
                                     <el-radio-group v-model="form.shen_pi_liu_cheng">
                                         <el-radio label="无需审批">无需审批</el-radio>
@@ -71,16 +71,16 @@
                     </el-form>
                 </div>
                 <div v-show="form.shen_pi_liu_cheng==='需要审批'" class="table">
-                    <el-row type="flex" justify="end">
-                        <el-col :span="1" :pull="1">
-                            <el-button type="success" size="mini" @click="goSubAdd">添加</el-button>
-                        </el-col>
-                        <el-col :span="1" :pull="1" style="margin:0 5px 5px 10px">
-                            <el-button type="danger" size="mini" @click="goSubRemove">删除</el-button>
+                    <el-row>
+                        <el-col :span="24" style="margin:0 0 5px 0">
+                            <div class="button">
+                                <el-button type="danger" size="mini" icon="ibps-icon-close" @click="goSubRemove">删除</el-button>
+                                <el-button type="success" size="mini" icon="ibps-icon-plus" @click="goSubAdd">添加</el-button>
+                            </div>
                         </el-col>
                     </el-row>
-                    <el-row type="flex" justify="center" :gutter="20">
-                        <el-col :span="22">
+                    <el-row>
+                        <el-col :span="24">
                             <el-table border :data="subForm" @selection-change="handleSelectionChange">
                                 <el-table-column
                                     width="50"
@@ -140,14 +140,13 @@
                                             v-if="row.yong_hu_lei_xing_==='role'"
                                             v-model="row.chu_li_ren_"
                                             :disabled="false"
-                                            value-key="roleAlias"
                                             placeholder="请选择指定角色"
                                             :multiple="false"
                                         />
                                         <span v-if="row.yong_hu_lei_xing_==='all'">/</span>
                                     </template>
                                 </el-table-column>
-                                <!-- <el-table-column prop="zhi_xing_fang_shi_" label="执行方式" width="100">
+                            <!-- <el-table-column prop="zhi_xing_fang_shi_" label="执行方式" width="100">
                                     <template slot-scope="{row}">
                                         <el-select v-model="row.zhi_xing_fang_shi_" placeholder="请选择" size="mini">
                                             <el-option
@@ -201,7 +200,7 @@ export default {
             title: '表单模板配置',
             toolbars: [
                 { key: 'save', label: '保存' },
-                { key: 'cancel', label: '退出', type: 'danger' }
+                { key: 'cancel', label: '退出', type: 'danger', icon: 'ibps-icon-close' }
             ],
             initWidth: '1280px',
             isEdit: false,
@@ -423,10 +422,13 @@ export default {
     div{
         z-index: 99999999;
         position: absolute;
-        right:22px;
+        right:8vw;
     }
     .dialogtitle{
-        font-weight: 900;
+        font-size: 22px;
+        font-family: SimHei;
+        font-weight: bold;
+        color: #222;
     }
 }
 .container {
@@ -444,6 +446,13 @@ export default {
             }
             .title{
                 margin: 16px 0 6px -16px;
+            }
+            .button{
+                display: flex;
+                flex-direction: row-reverse;
+                .el-button{
+                    margin-left: 5px;
+                }
             }
         }
     }

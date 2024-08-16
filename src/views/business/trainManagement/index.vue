@@ -18,22 +18,22 @@
                             :key="item.positionId"
                             :label="item.positionName"
                             :value="item.positionId"
-                            @change="updatePart">
+                            @change="updateAll">
                             </el-option>
                         </el-select>
                     </dv-border-box-8>
                 </div>
-                <div :class="$style.daterange" style="right:68%">
-                    <!-- <el-row style="display:flex">
-                        <el-button :class="hoverClassAdd === 'w'? 'hoverClass' : ''" type="text" @click="changeDate('week')" size="mini">本周</el-button>
-                        <el-button :class="hoverClassAdd === 'm'? 'hoverClass' : ''" type="text" @click="changeDate('month')" size="mini">本月</el-button>
-                        <el-button :class="hoverClassAdd === 'y'? 'hoverClass' : ''" type="text" @click="changeDate('year')" size="mini">全年</el-button>
-                    </el-row> -->
+                <div :class="$style.daterange" style="right:65%;">
                     <el-row style="display:flex">
-                        <el-button type="text" size="mini">日期</el-button>
+                        <!-- <el-button :class="hoverClassAdd === 'w'? 'hoverClass' : ''" type="text" @click="changeDate('week')" size="mini">本周</el-button> -->
+                        <el-button :class="hoverClassAdd === 'm'? 'hoverClass' : ''" type="text" @click="changeDate('month')" size="mini">月</el-button>
+                        <el-button :class="hoverClassAdd === 'y'? 'hoverClass' : ''" type="text" @click="changeDate('year')" size="mini">年</el-button>
                     </el-row>
+                    <!-- <el-row style="display:flex">
+                        <el-button type="text" size="mini">日期</el-button>
+                    </el-row> -->
                     <dv-border-box-8>
-                        <el-cascader v-model="dateVal" :options="options" :show-all-levels="false"></el-cascader>
+                        <!-- <el-cascader v-model="dateVal" :options="options" :show-all-levels="false"></el-cascader> -->
                         <!-- <el-date-picker
                             v-model="daterange"
                             type="daterange"
@@ -44,6 +44,24 @@
                             end-placeholder="结束日期"
                             @change="changeDate"
                         /> -->
+                        <el-date-picker
+                            v-show="hoverClassAdd === 'm'"
+                            v-model="dateValM"
+                            type="month"
+                            format="yyyy-MM"
+                            value-format="yyyy-MM"
+                            placeholder="选择月"
+                            @change="updateAll"
+                        />
+                        <el-date-picker
+                            v-show="hoverClassAdd === 'y'"
+                            v-model="dateValY"
+                            type="year"
+                            format="yyyy"
+                            value-format="yyyy"
+                            placeholder="选择年"
+                            @change="updateAll"
+                        />
                     </dv-border-box-8>  
                 </div>
                 <div :class="$style.back" @click.prevent="goBack()">
@@ -66,7 +84,7 @@
                     <dv-decoration-2 :key="`line3`" :reverse="true" :dur="5" style="width:1%;height:44%;" />
                     <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :width="'37%'" :height="'44%'" :id="3"/>
                 </div> -->
-                <div class="vessel">
+                <!-- <div class="vessel">
                     <job-plan-chart class="merge" :title="mergeData[1].title" v-model="nowWeekData" :data="mergeData[1].numData" :width="'63%'" :height="'29%'" :id="1" />
                     <dv-decoration-2 :key="`line1`" :reverse="true" :dur="6" style="width:1%;height:33%;" />
                     <pie-chart class="tabular" :title="mergeData[0].title" v-model="mergeData[0].numData" :width="'32%'" :height="'29%'" :id="1"/>
@@ -78,6 +96,32 @@
                     <pre-work-chart class="merge" :title="mergeData[5].title" v-model="mergeData[5].numData" :width="'63%'" :height="'29%'" :id="1" />
                     <dv-decoration-2 :key="`line3`" :reverse="true" :dur="6" style="width:1%;height:33%;" />
                     <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :width="'32%'" :height="'29%'" :id="3"/>
+                </div> -->
+                <div class="vessel">
+                    <dv-border-box-12 class="areaTop" :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)">
+                    <!-- <dv-border-box-12 class="areaTop" :color="['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.9)']" backgroundColor="rgba(6, 30, 93, 0)"> -->
+                        <div class="area">
+                            <job-plan-chart class="merge" :title="mergeData[1].title" v-model="nowWeekData" :data="mergeData[1].numData" :width="'63%'" :height="'85%'" :id="1" />
+                            <dv-decoration-2  :color="['rgba(255, 255, 255, 0.5)']" :key="`line1`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
+                            <pie-chart class="tabular" :title="mergeData[0].title" v-model="mergeData[0].numData" :width="'32%'" :height="'85%'" :id="1"/>
+                        </div>
+                        <dv-decoration-2  :color="['rgba(255, 255, 255, 0.5)']" :key="`line4`" :dur="6" style="width:99%;height:4%;margin: auto;" />
+                        <!-- <dv-decoration-10 style="width:99%;height:4%;margin: auto;" /> -->
+                        <div class="area">
+                            <training-staff-chart class="merge"  :title="mergeData[2].title" v-model="mergeData[2].numData" :data="mergeData[2].perList" :width="'63%'" :height="'85%'" :id="1" />
+                            <dv-decoration-2  :color="['rgba(255, 255, 255, 0.5)']" :key="`line2`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
+                            <pie-chart class="tabular" :title="mergeData[3].title" v-model="mergeData[3].numData" :width="'32%'" :height="'85%'" :id="2"/>
+                        </div>
+                    </dv-border-box-12>
+                    <div style="width:100%;height:2.64%" />
+                    <dv-border-box-12 class="areaBottom" :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)">
+                    <!-- <dv-border-box-12 class="areaBottom" :color="['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.9)']" backgroundColor="rgba(6, 30, 93, 0)"> -->
+                        <div class="area" style="height:100%">
+                            <pre-work-chart class="merge" :title="mergeData[5].title" v-model="mergeData[5].numData" :width="'63%'" :height="'87%'" :id="1" />
+                            <dv-decoration-2 :color="['rgba(255, 255, 255, 0.5)']" :key="`line3`" :reverse="true" :dur="6" style="width:1%;height:87%;margin: auto;" />
+                            <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :width="'32%'" :height="'87%'" :id="3"/>
+                        </div>
+                    </dv-border-box-12>
                 </div>
             </dv-border-box-1>
         </dv-full-screen-container>
@@ -106,7 +150,7 @@ export default {
             chooseDept,
             deptVal: ' ',
             level: '',
-            title: '科研培训整体情况',
+            title: '培训统计看板',
             year: d.toJSON().slice(0, 4),
             cycleList: [],
             initData: {},
@@ -117,14 +161,16 @@ export default {
             tabularArr1:[],
             tabularArr2:[],
             daterange: [],
+            dateValM:'',
+            dateValY:'',
             nowWeekData: [],
             dateVal: ["week","nowWeek"],
             show: true,
             options: data.options,
-            hoverClassAdd:'w',
+            hoverClassAdd:'m',
             mergeData:[
                 {
-                    title: '培训类别占比',
+                    title: '在岗培训类别占比',
                     numData: data.dataObj
                 },
                 {
@@ -132,12 +178,12 @@ export default {
                     numData: data.jobPlanObjPie
                 },
                 {
-                    title: '培训人员统计情况',
+                    title: '在岗培训人员统计情况',
                     numData: data.staffWeek,
                     perList: data.personList
                 },
                 {
-                    title: '培训对象占比',
+                    title: '在岗培训对象占比',
                     numData: data.dataObj
                 },
                 {
@@ -159,14 +205,13 @@ export default {
             return this.sizeMap[this.selectedCycle]
         }
     },
-    watch: {
-    },
     created () {
         // 默认全屏展示
         if (screenfull.isEnabled && !screenfull.isFullscreen) {
             screenfull.request()
         }
-
+        this.dateValM = this.getYearMonth('m')
+        this.dateValY = this.getYearMonth('y')
         this.updateAll()
     },
     beforeDestroy () {
@@ -180,7 +225,6 @@ export default {
             const w = window.innerWidth
             const { first = '', second = '' } = this.$store.getters.level || {}
             this.nowWeekData = this.getNowWeek()
-            this.daterange = this.getCurrentWeek()
             this.initData = {}
             this.itemIndex = 0
             this.chartIndex = 0
@@ -189,16 +233,12 @@ export default {
             this.tabularArr1=[]
             this.tabularArr2=[]
         },
-        updateAll () {
+        updateAll (val) {
             this.initializeData()
-            // this.startAutoPlay()
             data.jobPlanObj.forEach(e => {
                 let mid = this.nowWeekData.find(i => i.date === e.date)
                 mid['value'] = e.value
             })
-        },
-        updatePart () {
-
         },
         async fetchData () {
         },
@@ -211,23 +251,25 @@ export default {
                     this.hoverClassAdd = 'w'
                     let w = this.getCurrentWeek()
                     this.daterange = w
-                    this.updatePart()
+                    this.updateAll()
                     break
                 case 'month':
                     this.hoverClassAdd = 'm'
-                    let m = this.getCurrentMonth()
-                    this.daterange = m
-                    this.updatePart()
+                    // let m = this.getCurrentMonth()
+                    // let m = this.getYearMonth('m')
+                    // this.dateValM = m
+                    this.updateAll()
                     break
                 case 'year':
                     this.hoverClassAdd = 'y'
-                    let y = this.getCurrentYear()
-                    this.daterange = y
-                    this.updatePart()
+                    // let y = this.getCurrentYear()
+                    // let y = this.getYearMonth('y')
+                    // this.dateValY = y
+                    this.updateAll()
                     break
                 default:
                     this.hoverClassAdd = 'A'
-                    this.updatePart()
+                    this.updateAll()
                     break
             }
         },
@@ -273,6 +315,14 @@ export default {
             const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
             const dayOfWeek = weekDays[date.getDay()]
             return dayOfWeek
+        },
+        getYearMonth(val){
+            let currentDate = new Date()
+            let currentYear = currentDate.getFullYear()
+            let currentMonth = currentDate.getMonth() + 1
+            let mon = currentMonth > 9 ? currentMonth : '0' + currentMonth
+            let currentYearMonth = currentYear + '-' + mon
+            return val === 'm' ? currentYearMonth : currentYear+''
         },
         toggleAutoPlay () {
             this.autoPlay ? this.stopAutoPlay() : this.startAutoPlay()
@@ -340,20 +390,35 @@ export default {
                 flex-direction: column;
             }
             .dv-border-box-1 .border-box-content{
-                height: calc(100vh - 90px);
+                // height: calc(100vh - 90px);
+                height: 100%;
                 .vessel{
                     width: 98%;
                     height: 96%;
                     padding: 1%;
-                    display: flex;
-                    flex-flow: wrap;
-                    justify-content: space-evenly;
-                    align-content: space-evenly;
+                    // display: flex;
+                    // flex-flow: wrap;
+                    // justify-content: space-evenly;
+                    // align-content: space-between;
                     .tabular{
                         width: 40%;
                     }
                     .merge{
                         width: 80%;
+                    }
+                    .area{
+                        width: 100%;
+                        height: 48%;
+                        display: flex;
+                        flex-flow: wrap;
+                    }
+                    .areaTop{
+                        width: 100%;
+                        height: 66%;
+                    }
+                    .areaBottom{
+                        width: 100%;
+                        height: 31%;
                     }
                 }
             }
@@ -428,12 +493,22 @@ export default {
                 justify-content: center;
                 align-items: center;
                 :global {
+                    .el-input--small{
+                        width: 100% !important;
+                        // background: rgba(255, 255, 255, 0);
+                        // border: none;
+                        // color: #fff;
+                        // font-size: 14px;
+                        // cursor: pointer;
+                        // // padding-left: 0;
+                        // padding-right: 0;
+                    }
                     .el-input--small .el-input__inner {
                         width: 100% !important;
                         background: rgba(255, 255, 255, 0);
                         border: none;
                         color: #fff;
-                        font-size: 16px;
+                        font-size: 14px;
                         cursor: pointer;
                         // padding-left: 0;
                         padding-right: 0;

@@ -1,14 +1,14 @@
 <!--onlyoffice 编辑器-->
 <template>
-    <div>
-        <div id="editorDiv" ref="editor" class="nav" />
-    </div>
+    <div id="editorDiv" ref="editor" class="nav" />
 </template>
 
 <script>
 import { handleDocType } from './editor/editor.js'
 import { showView } from '@/api/platform/file/attachment'
 import { getToken } from '@/utils/auth'
+import { ref } from 'vue'
+
 export default {
     name: 'editor',
     props: {
@@ -29,6 +29,7 @@ export default {
             newId: '',
             timer: '',
             configKey: ''
+
         }
     },
     watch: {
@@ -138,7 +139,7 @@ export default {
                 width: '100%',
                 token: getToken(),
                 // 减去弹窗的顶部标题区域
-                height: document.body.clientHeight - 56 + 'px'
+                height: document.body.clientHeight - 63 + 'px'
             }
             const docEditor = new DocsAPI.DocEditor('editorDiv', config)
             this.configKey = config.document.key

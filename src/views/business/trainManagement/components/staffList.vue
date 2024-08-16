@@ -76,7 +76,6 @@ export default {
 .box {
   padding: 20px;
   box-sizing: border-box;
-//   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
 .fontS{
@@ -90,7 +89,6 @@ export default {
 }
 ::v-deep .dv-scroll-board .header {
   background: transparent !important;
-//   border-bottom: 2px solid #9ca3b3 !important;
   border-radius: 0;
 }
 ::v-deep .rows .ceil{
@@ -98,8 +96,8 @@ export default {
     align-items: center;
 }
 ::v-deep .indexStyle {
-    background-color: #fff;
-    color: #A3A3A3 !important;
+    background-color: rgb(84, 112, 198);
+    border-color: rgb(84, 112, 198) !important;
 }
 ::v-deep .circleOption{ 
     align-items: center;
@@ -112,7 +110,6 @@ export default {
     height: 20px;
     justify-content: center;
     line-height: 25px;
-    // margin: 0 20px 30px;
     position: relative;
     width: 20px;
     border-color: #FAFAFA;

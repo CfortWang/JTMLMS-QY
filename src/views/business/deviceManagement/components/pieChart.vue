@@ -58,7 +58,6 @@
       drawLine(){
         const totality = GetTotality(this.value)
         const that = this
-        echarts.dispose(document.getElementById('pie'+this.id))
         let pie = echarts.init(document.getElementById('pie'+this.id))
         let option;
         option = {
@@ -115,7 +114,7 @@
               radius: ['45%', '70%'],
               center: ['20%', '55%'],
               label: {
-                show: true,
+                show: false,
                 formatter: (data, type) => {
                   let str = `{a|总培训数}\n\n {b|${totality}}` //这里对不同的内容进行标识 a，b，或者可以随便自己起个别的名字
                   return str;

@@ -13,7 +13,7 @@
     >
         <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="110px" class="demo-ruleForm">
             <!-- 主表选择 -->
-            <el-row :gutter="50">
+            <el-row :gutter="30">
                 <el-col :span="8"> <el-form-item label="部门" prop="deng_ji_bu_men_">
                     <ibps-user-selector
                         v-model="ruleForm.deng_ji_bu_men_"
@@ -24,8 +24,26 @@
                     />
                 </el-form-item></el-col>
                 <el-col :span="8">  <el-form-item label="岗位" prop="gang_wei_">
-                    <el-input v-model="ruleForm.gang_wei_" type="text" :disabled="!editPermissions" />
-                </el-form-item></el-col>
+                    <!-- <el-input v-model="ruleForm.gang_wei_" type="text" :disabled="!editPermissions" /> -->
+                    <el-select v-model="ruleForm.gang_wei_" placeholder="请选择" size="mini" style="width:100%"  :disabled="!editPermissions">
+                        <el-option
+                            v-for="item in filterData"
+                            :key="item.id_"
+                            :label="item.wei_hu_gang_wei_"
+                            :value="item.wei_hu_gang_wei_"
+                        />
+                    </el-select>
+                </el-form-item>
+
+                    <!-- <ibps-link-data
+                        v-model="ruleForm.gang_wei_"
+                        style="width:80%"
+                        size="mini"
+                        template-key="jcgwxz"
+                        :multiple="false"
+                        :temp-search="true"
+                    /> -->
+                </el-col>
                 <el-col :span="8"> <el-form-item label="日期" prop="deng_ji_shi_jian_">
                     <el-date-picker v-model="ruleForm.deng_ji_shi_jian_" type="date" placeholder="选择日期" style="width: 100%;" :disabled="!editPermissions" />
                 </el-form-item></el-col>
@@ -35,7 +53,7 @@
                 <span v-else>{{ parentData.zhuang_tai_ === '已早交班' ? '午班' : parentData.zhuang_tai_ === '已午交班' ? '晚班' : '' }}</span>
                 <!-- <span v-else>{{ ruleForm.ban_ci_ }}</span> -->
             </el-form-item>
-            <el-row :gutter="50">
+            <el-row :gutter="30">
                 <el-col :span="8"><div class="grid-content bg-purple-dark">  <el-form-item label="交班标本(例)" prop="jiao_ban_biao_ben">
                     <el-input v-model.number="ruleForm.jiao_ban_biao_ben" style="width:100%" />
                 </el-form-item></div></el-col>
@@ -46,13 +64,13 @@
                     <el-input v-model.number="ruleForm.wei_fa_bao_gao_" style="width:100%" />
                 </el-form-item></div></el-col>
             </el-row>
-            <el-row :gutter="50">
+            <el-row :gutter="30">
                 <el-col :span="8">
                     <div class="grid-content bg-purple-dark">
                         <el-form-item label="是否查漏" prop="shi_fou_cha_lou_" required>
                             <el-radio-group v-model="ruleForm.shi_fou_cha_lou_">
-                                <el-radio label="否" />
                                 <el-radio label="是" />
+                                <el-radio label="否" />
                             </el-radio-group>
                         </el-form-item>
                     </div>
@@ -66,7 +84,7 @@
             <el-form-item label="其他异常情况" prop="qi_ta_qing_kuang_">
                 <el-input v-model="ruleForm.qi_ta_qing_kuang_" type="textarea" />
             </el-form-item>
-            <el-row :gutter="50">
+            <el-row :gutter="30">
                 <el-col :span="8">
                     <div class="grid-content bg-purple-dark">
                         <el-form-item label="接班人：" prop="jie_ban_ren_">
@@ -150,7 +168,7 @@ export default {
                 jiao_ban_biao_ben: 0,
                 wei_chu_li_biao_b: 0,
                 wei_fa_bao_gao_: 0,
-                shi_fou_cha_lou_: '否',
+                shi_fou_cha_lou_: '是',
                 lou_fa_lou_jian_: 0,
                 qi_ta_qing_kuang_: '',
                 jie_ban_ren_: '',
@@ -215,6 +233,8 @@ export default {
                     { required: true, message: this.$t('validate.required') }
                 ]
             },
+            jianCeGangWeiList: [],
+            filterData: [],
             masterReport: ['已早交班', '已午交班', '已晚交班', '已完成'],
             subReport: ['早班', '午班', '晚班']
         }
@@ -232,7 +252,18 @@ export default {
                 this.dialogVisible = this.visible
             }
             // immediate: true
+        },
+        'ruleForm.deng_ji_bu_men_': {
+            handler (val) {
+                console.log(val)
+                this.filterData = this.jianCeGangWeiList.filter(i => i.suo_shu_bu_men_ === val)
+            },
+            deep: true
         }
+    },
+
+    mounted () {
+        this.loadSelectorData()
     },
     created () {
         if (this.parentData) {
@@ -253,6 +284,16 @@ export default {
         }
     },
     methods: {
+        // 修改
+        loadSelectorData () {
+            console.log('部门', this.ruleForm.deng_ji_bu_men_)
+            const pos = this.$store.getters.level.second ? this.$store.getters.level.second : this.$store.getters.level.first
+            const sql = `select * from t_sbwhgwpzb where di_dian_='${pos}'`
+            this.$common.request('sql', sql).then(res => {
+                const { data = [] } = res.variables || {}
+                this.jianCeGangWeiList = data
+            })
+        },
         closeDialog () {
             this.$emit('close', false)
         },

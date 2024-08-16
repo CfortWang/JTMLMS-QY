@@ -1,6 +1,9 @@
 <template>
   <div class="statisticsPage" :style="{width:width,height:height}">
-    <div :id="'prew'+id" :style="{height:'100%',width:'100%'}"/>
+    <!-- <div style="height:8%;font-size:28px;font-weight: 600;"> {{title}} </div> -->
+    <!-- <div style="height:90%;display:flex;justify-content: space-between;"> -->
+      <div :id="'staff'+id" :style="{height:'100%'}"/>
+    <!-- </div> -->
   </div>
 </template>
 
@@ -8,6 +11,8 @@
   import * as echarts from 'echarts'
   import { getFormatDate } from '../utils/config.js'
   export default {
+    components: {
+    },
     props: {
       value: {
         type: Array,
@@ -41,6 +46,13 @@
     },
     data () {
       return {
+        correspondence: {
+          numO: '1年以下',
+          numOT: '1-3年',
+          numTF: '3-5年',
+          numF: '5年以上',
+        },
+        color: ['rgb(78,203,115)', 'rgb(251,211,55)', 'rgb(16,142,233)']
       }
     },
     watch: {
@@ -58,19 +70,27 @@
     },
     methods: {
       drawLine(){
-        let xData = []
-        let yData = []
-        // let yData1 = []
-        // let yData2 = []
-        this.value.forEach(e => {
-          xData.push(e.date)
-          yData.push(e.num)
-          // yData1.push(e.numUn)
-          // yData2.push(e.numAll)
-        })
         const that = this
-        echarts.dispose(document.getElementById('prew'+this.id))
-        let pre = echarts.init(document.getElementById('prew'+this.id))
+        let xData = []
+        for (const key in this.value[0]) {
+          // if (this.value[0].hasOwnProperty.call(object, key)) {
+            xData.push(key)
+          // }
+        }
+        
+        let serArr = []
+        for (let i = 1; i < xData.length; i++) {
+          let ser = {
+            name: '',
+            type: 'bar',
+            barWidth: 10,
+            color: ''
+          }
+          ser.name = xData[i]
+          ser.color = this.color[i-1]
+          serArr.push(ser)
+        }
+        let staff = echarts.init(document.getElementById('staff'+this.id))
         let option
         option = {
           title: {
@@ -81,7 +101,8 @@
           grid: {
             left: '3%',
             right: '1%',
-            bottom: '10%'
+            bottom: '20%',
+            top: '10%'
           },
           tooltip: {
             trigger: 'axis',
@@ -91,11 +112,34 @@
                 color: '#999'
               }
             },
+            formatter: function (params) {
+              let str = `${that.value[params[0].dataIndex].org}`
+              params.forEach(item =>{
+                let nameNum = ''
+                nameNum = that.correspondence[item.seriesName]
+                str += `<br /> ${item.marker} ${nameNum}  ${item.data[item.seriesName]}`
+              })
+              return str
+            }
+          },
+          legend: {
+            data: xData,
+            textStyle: {
+              color: '#fff'
+            },
+            icon: 'circle',
+            bottom: 0,
+            formatter: function (name) {
+              return that.correspondence[name]
+            }
+          },
+          dataset: {
+            dimensions: xData,
+            source: this.value
           },
           xAxis: {
             type: 'category',
             boundaryGap: true,
-            data: xData,
             axisLabel: {
                 color: '#fff'
             },
@@ -116,17 +160,9 @@
               }
             }
           },
-          series: [
-            {
-              // name: 'num',
-              type: 'bar',
-              barWidth: 20,
-              color: 'rgb(16,142,233)',
-              data: yData
-            }
-          ]
+          series: serArr
        };
-       option && pre.setOption(option);
+       option && staff.setOption(option);
       },
     }
   }
@@ -138,7 +174,7 @@
   } */
   .statisticsPage{
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      padding: 1%;
+      /* padding: 1%; */
       /* background-color: rgba(6, 30, 93, 0.5); */
   }
 </style>
