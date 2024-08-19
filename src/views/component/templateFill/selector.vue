@@ -165,6 +165,14 @@ export default {
                 padding: 0 12px 0 30px;
                 flex-grow: 0;
                 flex-shrink: 0;
+                position: relative;
+                &::before {
+                    content: '*';
+                    color: #f56c6c;
+                    left: 24px;
+                    top: 0;
+                    position: absolute;
+                }
             }
         }
     }

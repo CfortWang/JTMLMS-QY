@@ -42,6 +42,7 @@
                         @pagination-change="handlePaginationChange"
                     >
                         <template
+                            v-if="scope.row.file_info_"
                             slot="wenjinachayue"
                             slot-scope="scope"
                         >
@@ -263,12 +264,12 @@ export default {
         }
         if (this.$route.name === 'wjkzgl-ywyxjlsc' || this.$route.name === 'ywtxyxjl') {
             this.listConfig.searchForm.forms = [
-                { prop: 'nian_du_', label: '年度:', fieldType: 'date', dateType: 'year', width: 50 },
-                { prop: 'bian_zhi_shi_jian', label: '上传时间:', fieldType: 'daterange', width: 200 }
+                { prop: 'nian_du_', label: '记录月份', fieldType: 'date', dateType: 'year', width: 50 },
+                { prop: 'bian_zhi_shi_jian', label: '上传时间', fieldType: 'daterange', width: 200 }
             ]
             this.listConfig.columns = [
                 // { prop: 'fen_lei_', label: '表单分类', width: 120 },
-                { prop: 'nian_du_', label: '年度', width: 100 },
+                { prop: 'nian_du_', label: '记录月份', width: 100 },
                 { prop: 'org_name', label: '部门', width: 100 },
                 { prop: 'biao_dan_ming_che', label: '表单名称', width: 210 },
                 { prop: 'shi_wu_shuo_ming_', label: '事务说明', minWidth: 250 },
