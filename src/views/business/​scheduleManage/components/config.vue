@@ -231,6 +231,7 @@
             :page-data="scheduleData"
             :readonly="readonly"
             :position-list="positionList"
+            @callback="handleRowData"
             @close="() => showSchedule = false"
         />
     </el-dialog>
@@ -356,6 +357,7 @@ export default {
             })
         },
         handleAddParam (type, data = {}) {
+            console.log(data)
             if (type === 'schedule') {
                 this.showSchedule = true
                 this.scheduleData = data
@@ -413,6 +415,13 @@ export default {
                 }
             })
             return res
+        },
+        handleRowData (row) {
+            if (this.$utils.isNotEmpty(row.index)) {
+                this.formData.schedule[row.index] = row.data
+            } else {
+                this.formData.schedule.push(row.data)
+            }
         },
         // 提交数据
         submitForm (data) {

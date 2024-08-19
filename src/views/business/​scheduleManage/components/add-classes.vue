@@ -95,7 +95,7 @@
                     <div class="concat">至</div>
                     <div class="end">
                         <el-switch
-                            v-model="item.isSecond"
+                            v-model="item.isSecondDay"
                             active-value="Y"
                             inactive-value="N"
                             active-text="第二天"
@@ -183,9 +183,9 @@ export default {
             rules: {},
             dateRangeList: [{
                 type: 'range',
-                start: '',
-                end: '',
-                isCurrent: 'N',
+                startTime: '',
+                endTime: '',
+                isSecondDay: 'N',
                 pickerOptions: {
                     start: '06:30',
                     step: '00:30',
@@ -222,9 +222,9 @@ export default {
         addOption () {
             this.dateRangeList.push({
                 type: 'range',
-                start: '',
-                end: '',
-                isSecond: 'N',
+                startTime: '',
+                endTime: '',
+                isSecondDay: 'N',
                 pickerOptions: {
                     start: '06:30',
                     step: '00:30',
@@ -259,12 +259,16 @@ export default {
             })
         },
         submitForm (data, key) {
-            console.log(data)
-            this.$emit('callback', { data, index: this.pageData.index })
+            const submitData = {
+                ...data,
+                dateRange: JSON.stringify(this.dateRangeList)
+            }
+            console.log(submitData)
+            this.$emit('callback', { data: submitData, index: this.pageData.index })
             if (key === 'save') {
                 return this.closeDialog()
             }
-            // this.$refs.form.resetFields()
+            this.$refs.form.resetFields()
             this.formData = {}
         },
         closeDialog () {

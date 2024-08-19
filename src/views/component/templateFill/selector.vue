@@ -70,7 +70,6 @@ export default {
     watch: {
         formData: {
             handler (val) {
-                // console.log(val, this.params)
                 if (val.peiZhi && (!this.isInitialized || this.lastApproval !== val.peiZhi)) {
                     setTimeout(() => {
                         this.initApprover(val)
@@ -81,6 +80,7 @@ export default {
         },
         pageData: {
             handler (val) {
+                if (!this.isInitialized) return
                 this.changeFormData(val)
             },
             deep: true
@@ -102,8 +102,9 @@ export default {
                 approver3: shenPiRen3 ? shenPiRen3.split(',') : [],
                 approver4: shenPiRen4 ? shenPiRen4.split(',') : []
             }
-            // console.log(this.pageData)
             const approverData = JSON.parse(peiZhi)
+            this.isInitialized = true
+            this.lastApproval = peiZhi
             this.showApprover = approverData.hasProcess === 'Y'
             this.nodeList = approverData.nodeList
             this.nodeId = this.params ? this.params.nodeId : ''
@@ -125,8 +126,6 @@ export default {
                     this.pageData[x] = this.options[x].map(i => i.userId)
                 }
             })
-            this.isInitialized = true
-            this.lastApproval = peiZhi
             this.changeFormData(this.pageData)
         },
         changeFormData (val) {
