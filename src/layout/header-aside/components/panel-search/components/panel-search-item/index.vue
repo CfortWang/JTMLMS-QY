@@ -1,38 +1,43 @@
 <template>
-  <div :class="hoverMode ? 'can-hover' : ''" class="ibps-panel-search-item" flex>
-    <div class="ibps-panel-search-item__icon" flex-box="0">
-      <div class="ibps-panel-search-item__icon-box" flex="main:center cross:center">
-        <ibps-icon v-if="item.icon" :name="item.icon" />
-        <ibps-icon-svg v-else-if="item.iconSvg" :name="item.iconSvg" />
-        <ibps-icon v-else name="file-o" />
-      </div>
+    <div :class="hoverMode ? 'can-hover' : ''" class="ibps-panel-search-item" flex>
+        <div class="ibps-panel-search-item__icon" flex-box="0">
+            <div class="ibps-panel-search-item__icon-box" flex="main:center cross:center">
+                <ibps-icon v-if="item.icon" :name="item.icon" />
+                <ibps-icon-svg v-else-if="item.iconSvg" :name="item.iconSvg" />
+                <ibps-icon v-else name="file-o" />
+            </div>
+        </div>
+        <div class="ibps-panel-search-item__info" flex-box="1" flex="dir:top">
+            <div class="ibps-panel-search-item__info-title" flex-box="1" flex="cross:center">
+                <span>{{ item.title }}</span>
+            </div>
+            <div class="ibps-panel-search-item__info-fullTitle" flex-box="0">
+                <span>{{ item.fullTitle }}</span>
+            </div>
+            <div v-if="isSuper" class="ibps-panel-search-item__info-path" flex-box="0">
+                <span>{{ item.path }}</span>
+            </div>
+        </div>
     </div>
-    <div class="ibps-panel-search-item__info" flex-box="1" flex="dir:top">
-      <div class="ibps-panel-search-item__info-title" flex-box="1" flex="cross:center">
-        <span>{{ item.title }}</span>
-      </div>
-      <div class="ibps-panel-search-item__info-fullTitle" flex-box="0">
-        <span>{{ item.fullTitle }}</span>
-      </div>
-      <div class="ibps-panel-search-item__info-path" flex-box="0">
-        <span>{{ item.path }}</span>
-      </div>
-    </div>
-  </div>
 </template>
-
 <script>
 export default {
-  props: {
-    item: {
-      type: Object,
-      default: () => ({})
+    props: {
+        item: {
+            type: Object,
+            default: () => ({})
+        },
+        hoverMode: {
+            type: Boolean,
+            default: false
+        }
     },
-    hoverMode: {
-      type: Boolean,
-      default: false
+    data () {
+        const isSuper = this.$store.getters.isSuper
+        return {
+            isSuper
+        }
     }
-  }
 }
 </script>
 
@@ -92,7 +97,8 @@ export default {
       color: $color-text-normal;
     }
     .ibps-panel-search-item__info-fullTitle {
-      font-size: 10px;
+    //   font-size: 10px;
+     font-size: 14px;
       line-height: 14px;
       color: $color-text-placehoder;
     }
