@@ -506,6 +506,10 @@ export default {
                     keyword: '',
                     path: '/sshjgl/aqgl/xdjsyjlb',
                     showDevice: true
+                },
+                '15-日常防护消毒': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/rcfhxd'
                 }
             },
             listHander: {
