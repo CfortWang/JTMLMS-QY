@@ -42,6 +42,21 @@
                         @pagination-change="handlePaginationChange"
                     >
                         <template
+                            v-if="scope.row.fu_jian_"
+                            slot="file"
+                            slot-scope="scope"
+                        >
+                            <ibps-attachment
+                                v-model="scope.row.fu_jian_"
+                                allow-download
+                                download
+                                multiple
+                                accept="*"
+                                store="id"
+                                readonly
+                            />
+                        </template>
+                        <template
                             v-if="scope.row.file_info_"
                             slot="wenjinachayue"
                             slot-scope="scope"
@@ -273,8 +288,7 @@ export default {
                 { prop: 'org_name', label: '部门', width: 100 },
                 { prop: 'biao_dan_ming_che', label: '表单名称', width: 210 },
                 { prop: 'shi_wu_shuo_ming_', label: '事务说明', minWidth: 250 },
-                { prop: 'fu_jian_', label: '附件', slotName: 'wenjinachayue', width: 250 },
-
+                { prop: 'fu_jian_', label: '附件', slotName: 'file', width: 250 },
                 { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 120 },
                 { prop: 'ry_name', label: '上传人', width: 70 }
             ]
