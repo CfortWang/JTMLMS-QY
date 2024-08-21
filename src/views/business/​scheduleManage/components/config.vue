@@ -46,16 +46,21 @@
                 <div class="form-container">
                     <el-row :gutter="20" class="form-row">
                         <el-col :span="12">
-                            <el-form-item label="排班类型" prop="scheduleType" :show-message="false">
-                                <el-input
+                            <el-form-item label="排班类型" prop="scheduleType" required :show-message="false">
+                                <el-select
                                     v-model="formData.scheduleType"
-                                    type="text"
-                                    clearable
-                                    show-word-limit
-                                    :maxlength="64"
                                     :disabled="readonly"
-                                    placeholder="请输入"
-                                />
+                                    clearable
+                                    filterable
+                                    placeholder="请选择排班类型"
+                                >
+                                    <el-option
+                                        v-for="item in scheduleType"
+                                        :key="item.key"
+                                        :label="item.value"
+                                        :value="item.key"
+                                    />
+                                </el-select>
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
@@ -76,7 +81,8 @@
                                         value: 'value',
                                         label: 'label',
                                         multiple: true,
-                                        checkStrictly: false
+                                        checkStrictly: false,
+                                        emitPath: false
                                     }"
                                 />
                             </el-form-item>
@@ -99,6 +105,7 @@
                                 <el-select
                                     v-model="formData.approver"
                                     :disabled="readonly"
+                                    multiple
                                     filterable
                                     placeholder="请选择"
                                 >
@@ -127,21 +134,21 @@
                         :icon="btn.icon"
                         :size="btn.size || 'mini'"
                         plain
-                        @click="handleActionEvent(btn.key, 'schedule')"
+                        @click="handleActionEvent(btn.key, 'scheduleShift')"
                     >
                         {{ btn.label }}
                     </el-button>
                 </div>
                 <el-table
                     ref="scheduleTable"
-                    :data="formData.schedule"
+                    :data="formData.scheduleShift"
                     border
                     stripe
                     highlight-current-row
                     style="width: 100%"
                     :max-height="maxHeight"
                     class="schedule-table"
-                    @selection-change="selection => handleSelectionChange(selection, 'schedule')"
+                    @selection-change="selection => handleSelectionChange(selection, 'scheduleShift')"
                 >
                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
@@ -154,7 +161,27 @@
                         :min-width="item.minWidth"
                         header-align="center"
                         align="center"
-                    />
+                    >
+                        <template slot-scope="scope">
+                            <template v-if="item.key === 'dateRange'">
+                                <div v-for="(d, di) in scope.row.dateRange" :key="di">
+                                    {{ d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`) }}
+                                </div>
+                            </template>
+                            <div v-else-if="item.key === 'positions'">
+                                <div v-for="(p, pi) in scope.row.positions" :key="pi">
+                                    <el-tag type="primary">{{ p }}</el-tag>
+                                </div>
+                            </div>
+                            <div v-else-if="item.key === 'isEnabled'">{{ scope.row.isEnabled === 'Y' ? '是' : '否' }}</div>
+                            <div v-else-if="item.key === 'color'">
+                                <div class="color-item" :style="`background-color: ${scope.row.color}; width: 20px; height: 20px; margin: 0 auto; border-radius: 2px;`" />
+                            </div>
+                            <div v-else>
+                                <span>{{ scope.row[item.key] }}</span>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         v-if="!readonly"
                         fixed="right"
@@ -164,7 +191,7 @@
                         align="center"
                     >
                         <template slot-scope="scope">
-                            <a><i class="el-icon-edit" @click="handleActionEvent('edit', 'schedule', { row: scope.row, index: scope.$index})" /></a>
+                            <a><i class="el-icon-edit" @click="handleActionEvent('edit', 'scheduleShift', { row: scope.row, index: scope.$index})" /></a>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -182,21 +209,21 @@
                         :icon="btn.icon"
                         :size="btn.size || 'mini'"
                         plain
-                        @click="handleActionEvent(btn.key, 'rules')"
+                        @click="handleActionEvent(btn.key, 'scheduleRule')"
                     >
                         {{ btn.label }}
                     </el-button>
                 </div>
                 <el-table
                     ref="ruleTable"
-                    :data="formData.rules"
+                    :data="formData.scheduleRule"
                     border
                     stripe
                     highlight-current-row
                     style="width: 100%"
                     :max-height="maxHeight"
                     class="rule-table"
-                    @selection-change="selection => handleSelectionChange(selection, 'rules')"
+                    @selection-change="selection => handleSelectionChange(selection, 'scheduleRule')"
                 >
                     <el-table-column type="selection" width="45" header-align="center" align="center" />
                     <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
@@ -238,8 +265,8 @@
 </template>
 
 <script>
-import { configFormRules, scheduleColumn, ruleColumn } from '@/views/constants/schedule'
-import { getConfigDetail, saveConfig } from '@/api/business/pv'
+import { configFormRules, scheduleColumn, ruleColumn, scheduleType } from '@/views/constants/schedule'
+import { getScheduleConfig, saveScheduleConfig } from '@/api/business/schedule'
 
 export default {
     components: {
@@ -249,6 +276,10 @@ export default {
         visible: {
             type: Boolean,
             default: false
+        },
+        params: {
+            type: Object,
+            default: () => {}
         }
     },
     data () {
@@ -259,21 +290,24 @@ export default {
             deptList,
             scheduleColumn,
             ruleColumn,
+            scheduleType,
             title: '排班信息配置',
             maxHeight: document.body.clientHeight - 438 + 'px',
             dialogVisible: this.visible,
             formLabelWidth: '110px',
             formData: {
-                schedule: [],
-                rules: []
+                scheduleShift: [],
+                scheduleRule: [],
+                isEffective: 'Y',
+                isApproval: 'Y'
             },
             rules: configFormRules,
             loading: false,
             readonly: !isSuper,
             showSchedule: false,
             selectionIndex: {
-                schedule: [],
-                rules: []
+                scheduleShift: [],
+                scheduleRule: []
             },
             scheduleData: {},
             toolbars: [
@@ -304,16 +338,25 @@ export default {
     methods: {
         // 获取数据
         async loadData () {
+            if (!this.params.configId) {
+                return
+            }
             this.loading = true
-            getConfigDetail({ id: '123' }).then(res => {
+            getScheduleConfig({ id: this.params.configId }).then(res => {
+                const { id, name, approver, isApproval, isEffective, scheduleRule, scheduleShift, scheduleStaff, scheduleType } = res.data || {}
+                this.formData = {
+                    id,
+                    name,
+                    approver: approver.split(','),
+                    scheduleType,
+                    isApproval,
+                    isEffective,
+                    scheduleRule: scheduleRule ? JSON.parse(scheduleRule) : [],
+                    scheduleShift: scheduleShift ? JSON.parse(scheduleShift) : [],
+                    scheduleStaff: scheduleStaff ? JSON.parse(scheduleStaff) : []
+                }
+                console.log(this.formData)
                 this.loading = false
-                const { config, experimentalConfigDetailPoList: methods, icon, sn, target, targetKey } = res.data
-                methods.forEach(item => {
-                    item.params = this.$utils.isNotEmpty(item.params) ? JSON.parse(item.params) : []
-                    item.formulas = this.$utils.isNotEmpty(item.formulas) ? JSON.parse(item.formulas) : []
-                    item.chartOption = this.$utils.isNotEmpty(item.chartOption) ? JSON.parse(item.chartOption) : []
-                })
-                this.formData = { icon, sn, target, targetKey, id: '123', methods }
             }).catch(() => {
                 this.loading = false
             })
@@ -354,11 +397,21 @@ export default {
                 if (!valid) {
                     return this.$message.warning('请完善表单必填项信息！')
                 }
+                const { first, second } = this.$store.getters.level || {}
+                const { scheduleStaff, scheduleRule, scheduleShift, approver, ...rest } = this.formData || {}
+                const submitData = {
+                    ...rest,
+                    diDian: second || first,
+                    approver: approver.join(','),
+                    scheduleStaff: JSON.stringify(scheduleStaff),
+                    scheduleRule: JSON.stringify(scheduleRule),
+                    scheduleShift: JSON.stringify(scheduleShift)
+                }
+                this.submitForm(submitData)
             })
         },
         handleAddParam (type, data = {}) {
-            console.log(data)
-            if (type === 'schedule') {
+            if (type === 'scheduleShift') {
                 this.showSchedule = true
                 this.scheduleData = data
                 return
@@ -416,16 +469,24 @@ export default {
             })
             return res
         },
+        transformData (dataset, data, from, to) {
+            const list = data.split(',')
+            const names = list.map(item => {
+                const temp = dataset.find(i => i[from] === item)
+                return temp ? temp[to] : ''
+            })
+            return names.filter(i => i).join(',')
+        },
         handleRowData (row) {
             if (this.$utils.isNotEmpty(row.index)) {
-                this.formData.schedule[row.index] = row.data
+                this.formData.scheduleShift[row.index] = row.data
             } else {
-                this.formData.schedule.push(row.data)
+                this.formData.scheduleShift.push(row.data)
             }
         },
         // 提交数据
         submitForm (data) {
-            saveConfig(data).then(res => {
+            saveScheduleConfig(data).then(res => {
                 this.$message.success('保存成功')
                 this.closeDialog()
                 this.$emit('callback')
@@ -479,6 +540,7 @@ export default {
                 }
                 .operate-btn {
                     text-align: right;
+                    margin-bottom: 5px;
                 }
                 .inline-operate {
                     display: flex;

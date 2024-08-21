@@ -2,14 +2,50 @@ import request from '@/utils/request'
 import { BUSINESS_BASE_URL } from '@/api/baseUrl'
 
 /**
- * 获取排班列表数据
+ * 获取排班记录详情
  * @param {*} params
  */
-export function querySchedule (data) {
+export function getStaffSchedule (params) {
     return request({
-        url: BUSINESS_BASE_URL() + '/pv/experimental/query',
+        url: BUSINESS_BASE_URL() + '/employee/staffSchedule/get',
+        method: 'get',
+        params
+    })
+}
+
+/**
+ * 获取排班记录列表
+ * @param {*} params
+ */
+export function queryStaffSchedule (data) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/employee/staffSchedule/query',
         method: 'post',
         data
+    })
+}
+
+/**
+ * 保存排班
+ * @param {*} params
+ */
+export function saveStaffSchedule (data) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/employee/staffSchedule/save',
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * 删除排班
+ * @param {*} params
+ */
+export function removeStaffSchedule (params) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/employee/staffSchedule/remove',
+        method: 'post',
+        params
     })
 }
 
@@ -19,7 +55,7 @@ export function querySchedule (data) {
  */
 export function getScheduleConfig (params) {
     return request({
-        url: BUSINESS_BASE_URL() + '/v3/employee/scheduleConfig/get',
+        url: BUSINESS_BASE_URL() + '/employee/scheduleConfig/get',
         method: 'get',
         params
     })
@@ -31,7 +67,7 @@ export function getScheduleConfig (params) {
  */
 export function queryScheduleConfig (data) {
     return request({
-        url: BUSINESS_BASE_URL() + '/v3/employee/scheduleConfig/query',
+        url: BUSINESS_BASE_URL() + '/employee/scheduleConfig/query',
         method: 'post',
         data
     })
@@ -43,7 +79,7 @@ export function queryScheduleConfig (data) {
  */
 export function saveScheduleConfig (data) {
     return request({
-        url: BUSINESS_BASE_URL() + '/v3/employee/scheduleConfig/save',
+        url: BUSINESS_BASE_URL() + '/employee/scheduleConfig/save',
         method: 'post',
         data
     })
@@ -55,7 +91,7 @@ export function saveScheduleConfig (data) {
  */
 export function removeScheduleConfig (params) {
     return request({
-        url: BUSINESS_BASE_URL() + '/v3/employee/scheduleConfig/remove',
+        url: BUSINESS_BASE_URL() + '/employee/scheduleConfig/remove',
         method: 'post',
         params
     })

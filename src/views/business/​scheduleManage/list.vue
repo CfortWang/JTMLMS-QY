@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { querySchedule } from '@/api/business/schedule'
+import { queryStaffSchedule, removeStaffSchedule, queryScheduleConfig } from '@/api/business/schedule'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 
@@ -55,8 +55,6 @@ export default {
             showConfigDialog: false,
             readonly: false,
             params: {},
-            targetOption: [],
-            methodOption: [],
             listConfig: {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary', hidden: false },
@@ -68,8 +66,6 @@ export default {
                     labelWidth: 80,
                     itemWidth: 150,
                     forms: [
-                        // { prop: 'Q^name_^SL', label: '性能指标', fieldType: 'select', options: this.targetOption },
-                        // { prop: 'Q^fang_an_lei_xing_^SL', label: '方案类型', fieldType: 'select', options: this.methodOption },
                         { prop: 'Q^title_^SL', label: '排班名称' },
                         { prop: 'Q^scope_^SL', label: '使用范围' },
                         { prop: 'Q^cycle_^SL', label: '排班周期' },
@@ -105,11 +101,15 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
-            querySchedule(this.getSearchFormData()).then(res => {
+            queryStaffSchedule(this.getSearchFormData()).then(res => {
                 ActionUtils.handleListData(this, res.data)
                 this.loading = false
             }).catch(() => {
                 this.loading = false
+            })
+            queryScheduleConfig(ActionUtils.formatParams({}, {}, {})).then(res => {
+                const { dataResult } = res.data
+                this.params.configId = dataResult[0].id
             })
         },
         /**
@@ -175,28 +175,22 @@ export default {
         /**
          * 处理编辑
          */
-        async handleEdit ({ id, zhiBiaoId, fangFaId, fangFaKey }, key) {
+        async handleEdit ({ id }, key) {
             this.params = {
-                targetId: zhiBiaoId,
-                methodId: fangFaId,
-                methodKey: fangFaKey,
-                recordId: id
+                configId: ''
             }
             this.readonly = key === 'detail'
             // this.showConfigDialog = true
-        },
-        handleReport (data) {
-            console.log('wwww')
         },
         /**
          * 处理删除
          */
         handleRemove (ids) {
             // return this.$message.warning('避免误删测试数据，联系开发删除')
-            // removeExperimental({ ids }).then(() => {
-            //     ActionUtils.removeSuccessMessage()
-            //     this.search()
-            // }).catch(() => {})
+            removeStaffSchedule({ ids }).then(() => {
+                ActionUtils.removeSuccessMessage()
+                this.search()
+            }).catch(() => {})
         },
         handleRowDblclick (row) {
             this.handleEdit(row, 'detail')
