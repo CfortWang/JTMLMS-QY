@@ -1,10 +1,11 @@
 <template>
   <div class="statisticsPage" :style="{width:width,height:height}">
-    <div style="height:8%;font-size:24px;font-weight: 600;"> {{title}} </div>
-    <div style="height:90%;display:flex;justify-content: space-between;">
+    <div style="height:10%;font-size:24px;font-weight: 600;"> {{title}} </div>
+    <div v-show="show" style="height:92%;display:flex;justify-content: space-between;">
       <div :id="'staff'+id" :style="{height:'100%',width:'76%'}"/>
-      <staff-list v-model="data" :style="{height:'80%',width:'22%'}"></staff-list>
+      <staff-list v-model="staffData" :style="{height:'80%',width:'22%'}"></staff-list>
     </div>
+    <div v-show="!show" class="nullShow">暂无数据</div>
   </div>
 </template>
 
@@ -48,20 +49,36 @@
     },
     data () {
       return {
+        valueArr:[],
+        show: false,
+        staffData: []
       }
     },
     watch: {
         value: {
-            handler () {
-                this.drawLine()
+            handler (val,old) {
+              if(val.length>0){
+                this.show = true
+                this.valueArr.length=0
+                val.forEach((item, i) => {
+                  let mid = {date: getFormatDate('string', 5, 10, item.date)+'\n'+ item.dayName, numAll: item.numAll, numReal: item.numReal, numUn: item.numUn}
+                  this.valueArr.push(mid)
+                })
+                setTimeout(() => {
+                  this.drawLine()
+                  this.staffData = this.data
+                }, 100)
+              }else{
+                this.show = false
+              }
             },
             deep: true
         }
     },
     mounted(){
-      setTimeout(() => {
-        this.drawLine()
-      }, 100);
+      // setTimeout(() => {
+      //   this.drawLine()
+      // }, 100);
     },
     methods: {
       drawLine(){
@@ -69,7 +86,7 @@
         let yData = []
         let yData1 = []
         let yData2 = []
-        this.value.forEach(e => {
+        this.valueArr.forEach(e => {
           xData.push(e.date)
           yData.push(e.numReal)
           yData1.push(e.numUn)
@@ -83,7 +100,7 @@
           grid: {
             left: '3%',
             right: '1%',
-            bottom: '20%',
+            bottom: '25%',
             top: '10%'
           },
           tooltip: {
@@ -95,7 +112,7 @@
               }
             },
             formatter: function (params) {
-              let str = `${that.value[params[0].dataIndex].date}`
+              let str = `${that.valueArr[params[0].dataIndex].date}`
               params.forEach(item =>{
                 let nameNum = ''
                 if(item.seriesName === 'numUn'){
@@ -187,7 +204,14 @@
   } */
   .statisticsPage{
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      padding: 1%;
+      padding: 1% 1% 0 1%;
       /* background-color: rgba(6, 30, 93, 0.5); */
+  }
+  .nullShow{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    height: 92%;
   }
 </style>

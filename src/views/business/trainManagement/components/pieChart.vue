@@ -1,6 +1,10 @@
 <template>
   <div class="statisticsPage" :style="{width:width,height:height}">
-    <div :id="'pie'+id" :style="{height:'100%'}"/>
+    <div v-show="show"  :id="'pie'+id" :style="{height:'100%'}"/>
+    <div v-show="!show"  :style="{height:'100%'}">
+      <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
+      <div class="nullShow">暂无数据</div>
+    </div>
   </div>
 </template>
 
@@ -34,29 +38,46 @@
       },
       title:{
         type: String
-      }
+      },
+      total:{
+        type: Number
+      },
     },
     data () {
       return {
+        valueArr:[],
+        show: false
       }
     },
     watch: {
         value: {
-            handler () {
-                this.drawLine()
+            handler (val,old) {
+              if(val.length>0){
+                this.show = true
+                this.valueArr.length=0
+                val.forEach((item, i) => {
+                  let mid = {name: item.typeName, value: item.typeNum * 1}
+                  this.valueArr.push(mid)
+                })
+                setTimeout(() => {
+                  this.drawLine()
+                }, 100)
+              }else{
+                this.show = false
+              }
             },
             deep: true
         }
     },
     mounted(){
-      setTimeout(() => {
-        this.drawLine()
-      }, 100);
+      // setTimeout(() => {
+      //   this.drawLine()
+      // }, 100);
       
     },
     methods: {
       drawLine(){
-        const totality = GetTotality(this.value)
+        const totality = this.total
         const that = this
         echarts.dispose(document.getElementById('pie'+this.id))
         let pie = echarts.init(document.getElementById('pie'+this.id))
@@ -80,8 +101,8 @@
             right: '0',
             top: '45',
             formatter: function (name) {
-                let mid = that.value.find(i => i.name === name)
-                let rate = ((mid.value/totality)*100).toFixed(2)
+                let mid = that.valueArr.find(i => i.name === name)
+                let rate = that.value.find(i => i.typeName === name).rate
                 let str = `{a|${name}} | {b|${rate}%}{c|${mid.value}}`
                 return str
             },
@@ -132,7 +153,7 @@
                 color: this.colorw,
                 position: 'center'
               },
-              data: this.value,
+              data: this.valueArr,
               labelLine: {
                 normal: {
                     show: false,
@@ -166,5 +187,12 @@
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       padding: 1%;
       /* background-color: rgba(6, 30, 93, 0.5); */
+  }
+  .nullShow{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    height: 92%;
   }
 </style>

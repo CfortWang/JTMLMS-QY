@@ -1,0 +1,1242 @@
+<template>
+    <el-dialog
+        v-loading="loading"
+        :title="title"
+        :visible.sync="dialogVisible"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+        append-to-body
+        fullscreen
+        class="dialog paper-detail-dialog"
+        top="0"
+    >
+        <div slot="title" class="dialog-title">
+            <span class="dialogtitle">{{ title }}</span>
+            <div>
+                <ibps-toolbar :actions="toolbars" @action-event="handleActionEvent" />
+            </div>
+        </div>
+        <div class="container">
+            <div class="left" :style="{width:initWidth}">
+                <div class="form">
+                    <el-form ref="form" label-width="100px" :model="form" :rules="rules" :hide-required-asterisk="false">
+                        <el-row type="flex" justify="center" :gutter="20">
+                            <el-col :span="16">
+                                <el-row :gutter="20">
+                                    <el-col v-if="isEdit" :span="8">
+                                        <el-form-item label="设备名称：" prop="sheBeiMingCheng">
+                                            <el-input v-model="form.sheBeiMingCheng" size="mini" />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col v-if="!isEdit" :span="8">
+                                        <el-form-item label="设备名称：" prop="sheBeiMingChen">
+                                            <ibps-custom-dialog
+                                                v-model="form.sheBeiMingChen"
+                                                size="mini"
+                                                template-key="sbysdhk"
+                                                :disabled="false"
+                                                type="dialog"
+                                                class="custom-dialog"
+                                                placeholder="请选择"
+                                                icon="el-icon-search"
+                                            />
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                                <el-row :gutter="20">
+                                    <el-col :span="8">
+                                        <el-form-item label="建档部门：" prop="bianZhiBuMen">
+                                            <ibps-user-selector
+                                                v-model="form.bianZhiBuMen"
+                                                type="position"
+                                                readonly-text="text"
+                                                :disabled="false"
+                                                :multiple="false"
+                                                size="mini"
+                                            />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="建档人：" prop="bianZhiRen">
+                                            <ibps-user-selector
+                                                v-model="form.bianZhiRen"
+                                                type="user"
+                                                readonly-text="text"
+                                                :disabled="true"
+                                                :multiple="false"
+                                                size="mini"
+                                            />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="建档时间：" prop="bianZhiShiJian">
+                                            <el-date-picker
+                                                v-model="form.bianZhiShiJian"
+                                                style="width:100%"
+                                                type="datetime"
+                                                placeholder="选择日期时间"
+                                                default-time="12:00:00"
+                                                :readonly="readonly"
+                                                value-format="yyyy-MM-dd HH:mm"
+                                                size="mini"
+                                            />
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                                <el-row :gutter="20">
+                                    <el-col :span="8">
+                                        <el-form-item label="设备编号：" prop="sheBeiShiBieH">
+                                            <template slot="label">
+                                                <span>设备编号</span>
+                                                <el-tooltip effect="dark" content="设备编号由系统自动生成。" placement="top">
+                                                    <i class="el-icon-question question-icon">：</i>
+                                                </el-tooltip>
+                                            </template>
+                                            <span>{{ form.sheBeiShiBieH }}</span>
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="原设备编号：" prop="yuanSheBeiBian">
+                                            <el-input v-model="form.yuanSheBeiBian" size="mini" />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="设备状态：" prop="sheBeiZhuangTa">
+                                            <span>{{ form.sheBeiZhuangTa }}</span>
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                                <el-row :gutter="20">
+                                    <el-col :span="8">
+                                        <el-form-item label="设备类型：" prop="sheBeiLeiXing">
+                                            <el-select v-model="form.sheBeiLeiXing" placeholder="请选择" size="mini" style="width:100%">
+                                                <el-option
+                                                    v-for="item in ['检验系统','通用设备','软件','信息系统']"
+                                                    :key="item"
+                                                    :label="item"
+                                                    :value="item"
+                                                />
+                                            </el-select>
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="规格型号：" prop="guiGeXingHao">
+                                            <el-input v-model="form.guiGeXingHao" size="mini" />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="接收时状态：" prop="jieShouZhuangTai">
+                                            <el-select v-model="form.jieShouZhuangTai" placeholder="请选择" size="mini" style="width:100%">
+                                                <el-option
+                                                    v-for="item in ['新设备','二手或翻新设备']"
+                                                    :key="item"
+                                                    :label="item"
+                                                    :value="item"
+                                                />
+                                            </el-select>
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                                <el-row :gutter="20">
+                                    <el-col :span="8">
+                                        <el-form-item label="保管人：" prop="guanLiRen">
+                                            <ibps-user-selector
+                                                v-model="form.guanLiRen"
+                                                type="user"
+                                                readonly-text="text"
+                                                :disabled="false"
+                                                :multiple="false"
+                                                size="mini"
+                                            />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="放置地点：" prop="cunFangWeiZhi">
+                                            <ibps-custom-dialog
+                                                v-model="form.cunFangWeiZhi"
+                                                size="mini"
+                                                template-key="fjxzkdd"
+                                                :disabled="false"
+                                                type="dialog"
+                                                class="custom-dialog"
+                                                placeholder="请选择"
+                                                icon="el-icon-search"
+                                            />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="是否校准：" prop="shiFouXiaoZhun">
+                                            <el-select v-model="form.shiFouXiaoZhun" placeholder="请选择" size="mini" style="width:100%">
+                                                <el-option
+                                                    v-for="item in ['是','否']"
+                                                    :key="item"
+                                                    :label="item"
+                                                    :value="item"
+                                                />
+                                            </el-select>
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                            </el-col>
+                            <el-col :span="8">
+                                <el-row v-if="photos.length>0">
+                                    <el-col>
+                                        <el-carousel trigger="click" height="250px" indicator-position="none">
+                                            <el-carousel-item v-if="photos.length==0">
+                                                <el-empty description="暂无图片" />
+                                            </el-carousel-item>
+                                            <template v-else>
+                                                <el-carousel-item v-for="item in photos" :key="item.id">
+                                                    <el-image
+                                                        style="width: 100%; height: 100%"
+                                                        :src="item.url"
+                                                        fit="contain"
+                                                        :preview-src-list="photos.map(item=>item.url)"
+                                                    />
+                                                </el-carousel-item>
+                                            </template>
+
+                                        </el-carousel>
+                                    </el-col>
+                                </el-row>
+                            </el-col>
+                        </el-row>
+                    </el-form>
+                </div>
+                <div class="tabs">
+                    <el-row>
+                        <el-col>
+                            <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+                                <el-tab-pane label="基本信息" name="one">
+                                    <el-form label-width="100px" :model="form" :hide-required-asterisk="true">
+                                        <el-row>
+                                            <el-row :gutter="20">
+                                                <el-col :span="8">
+                                                    <el-form-item label="固定资产号：">
+                                                        <el-input v-model="form.ziChanBianHao" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="厂家/品牌：">
+                                                        <el-input v-model="form.changShang" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="出厂编号：">
+                                                        <el-input v-model="form.jiShenXuHao" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-row :gutter="20">
+                                                <el-col :span="8">
+                                                    <el-form-item label="注册证号：">
+                                                        <el-input v-model="form.zhuCeZhengHao" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="出厂日期：">
+                                                        <template slot="label">
+                                                            <span class="required">出厂日期</span>
+                                                        </template>
+                                                        <el-date-picker
+                                                            v-model="form.chuChangRiQi"
+                                                            style="width:100%"
+                                                            type="date"
+                                                            placeholder="选择日期"
+                                                            :readonly="readonly"
+                                                            value-format="yyyy-MM-dd"
+                                                            size="mini"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="接收日期：">
+                                                        <el-date-picker
+                                                            v-model="form.jieShouRiQi"
+                                                            style="width:100%"
+                                                            type="date"
+                                                            placeholder="选择日期"
+                                                            :readonly="readonly"
+                                                            value-format="yyyy-MM-dd"
+                                                            size="mini"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-row :gutter="20">
+                                                <el-col :span="8">
+                                                    <el-form-item label="投入日期：">
+                                                        <el-date-picker
+                                                            v-model="form.qiYongRiQi"
+                                                            style="width:100%"
+                                                            type="date"
+                                                            placeholder="选择日期"
+                                                            :readonly="readonly"
+                                                            value-format="yyyy-MM-dd"
+                                                            size="mini"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="验收日期：">
+                                                        <el-date-picker
+                                                            v-model="form.yanShouRiQi"
+                                                            style="width:100%"
+                                                            type="date"
+                                                            placeholder="选择日期"
+                                                            :readonly="readonly"
+                                                            value-format="yyyy-MM-dd"
+                                                            size="mini"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="供应商：">
+                                                        <ibps-custom-dialog
+                                                            v-model="form.shiFouQiJianH"
+                                                            size="mini"
+                                                            template-key="gysxxdhk"
+                                                            :disabled="false"
+                                                            type="dialog"
+                                                            class="custom-dialog"
+                                                            placeholder="请选择"
+                                                            icon="el-icon-search"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-row :gutter="20">
+                                                <el-col :span="8">
+                                                    <el-form-item label="供应商电话：">
+                                                        <el-input v-model="form.lianXiFangShi" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col v-if="form.shiFouXiaoZhun==='是'" :span="8">
+                                                    <el-form-item label="校准证书编号：">
+                                                        <el-input v-model="form.zhengShuBianHa" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col v-if="form.shiFouXiaoZhun==='是'" :span="8">
+                                                    <el-form-item label="检定/校准周期(月)：" label-width="140">
+                                                        <el-input v-model="form.xiaoZhunZQ" size="mini" type="number" style="width:74%" />
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-row :gutter="20">
+                                                <el-col v-if="form.shiFouXiaoZhun==='是'" :span="8">
+                                                    <el-form-item label="最近校准时间：">
+                                                        <el-date-picker
+                                                            v-model="form.yiXiaoRiQi"
+                                                            style="width:100%"
+                                                            type="date"
+                                                            placeholder="选择日期"
+                                                            :readonly="readonly"
+                                                            value-format="yyyy-MM-dd"
+                                                            size="mini"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col v-if="form.shiFouXiaoZhun==='是'" :span="8">
+                                                    <el-form-item label="校准有效期至">
+                                                        <el-date-picker
+                                                            v-model="form.xiaoZhunYouXia"
+                                                            style="width:100%"
+                                                            type="date"
+                                                            placeholder="选择日期"
+                                                            :readonly="readonly"
+                                                            value-format="yyyy-MM-dd"
+                                                            size="mini"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="环境要求：">
+                                                        <el-input v-model="form.huanJingYaoQiu" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-row :gutter="20">
+                                                <el-col :span="8">
+                                                    <el-form-item label="电源要求：">
+                                                        <el-input v-model="form.dianYuanYaoQiu" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="是否限用：">
+                                                        <el-select v-model="form.xiaoZhunWuCha" placeholder="请选择" size="mini" style="width:100%">
+                                                            <el-option
+                                                                v-for="item in ['是','否']"
+                                                                :key="item"
+                                                                :label="item"
+                                                                :value="item"
+                                                            />
+                                                        </el-select>
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col v-if="form.xiaoZhunWuCha==='是'" :span="8">
+                                                    <el-form-item label="限用范围：">
+                                                        <el-input v-model="form.caiGouHeTong" size="mini" />
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-row :gutter="20">
+                                                <el-col :span="8">
+                                                    <el-form-item label="核查人：">
+                                                        <ibps-user-selector
+                                                            v-model="form.biXuDeHuanJin"
+                                                            type="user"
+                                                            readonly-text="text"
+                                                            :disabled="false"
+                                                            :multiple="false"
+                                                            size="mini"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="核查日期：">
+                                                        <el-date-picker
+                                                            v-model="form.biXuSheShi"
+                                                            style="width:100%"
+                                                            type="date"
+                                                            placeholder="选择日期"
+                                                            :readonly="readonly"
+                                                            value-format="yyyy-MM-dd"
+                                                            size="mini"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="是否维护：">
+                                                        <el-select v-model="form.shiFouWeiHu" placeholder="请选择" size="mini" style="width:100%">
+                                                            <el-option
+                                                                v-for="item in ['是','否']"
+                                                                :key="item"
+                                                                :label="item"
+                                                                :value="item"
+                                                            />
+                                                        </el-select>
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-row :gutter="20">
+                                                <el-col :span="8">
+                                                    <el-form-item label="设备分组：">
+                                                        <ibps-custom-dialog
+                                                            v-model="form.weiHuFangShi"
+                                                            size="mini"
+                                                            template-key="sbbqdhk"
+                                                            multiple
+                                                            :disabled="false"
+                                                            type="dialog"
+                                                            class="custom-dialog"
+                                                            placeholder="请选择"
+                                                            icon="el-icon-search"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="资产原值(元)：">
+                                                        <el-input v-model="form.ziChanYuanZhi" size="mini" type="number" />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <el-form-item label="使用年限(年)：">
+                                                        <el-input v-model="form.heChaXiaoZhun" size="mini" type="number" />
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-row :gutter="20">
+                                                <el-col :span="8">
+                                                    <el-form-item label="是否24H开机：">
+                                                        <el-select v-model="form.jianKongYiJu" placeholder="请选择" size="mini" style="width:100%">
+                                                            <el-option
+                                                                v-for="item in ['是','否']"
+                                                                :key="item"
+                                                                :label="item"
+                                                                :value="item"
+                                                            />
+                                                        </el-select>
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col v-if="form.jianKongYiJu==='是'" :span="8">
+                                                    <el-form-item label="开机时间：">
+                                                        <el-time-picker
+                                                            v-model="form.kaiShiShiYong"
+                                                            placeholder="任意时间点"
+                                                            size="mini"
+                                                            style="width:100%"
+                                                            value-format="HH:mm:ss"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col v-if="form.jianKongYiJu==='是'" :span="8">
+                                                    <el-form-item label="关机时间：">
+                                                        <el-time-picker
+                                                            v-model="form.shiJiShiYongF"
+                                                            placeholder="任意时间点"
+                                                            size="mini"
+                                                            style="width:100%"
+                                                            value-format="HH:mm:ss"
+                                                        />
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                        </el-row>
+                                        <el-row :gutter="20">
+                                            <el-col :span="24">
+                                                <el-alert :closable="false" type="success" style="margin-bottom:20px">设备照片及相关附件</el-alert>
+                                            </el-col>
+                                            <el-col :span="24">
+                                                <el-form-item label="设备图片：">
+                                                    <ibps-image
+                                                        v-model="form.beiZhu"
+                                                        height="160"
+                                                        width="160"
+                                                        accept=".jpg,.jpeg,.png,.gif,.bmp,.webp"
+                                                        multiple
+                                                        download
+                                                        :disabled="readonly"
+                                                        size=""
+                                                    />
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="24">
+                                                <el-form-item label="附件上传：">
+                                                    <ibps-attachment
+                                                        v-model="form.yqzp"
+                                                        :download="true"
+                                                        multiple
+                                                        accept="*"
+                                                        :readonly="false"
+                                                    />
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="24">
+                                                <el-form-item label="资质证书：">
+                                                    <ibps-attachment
+                                                        v-model="form.faPiao"
+                                                        :download="true"
+                                                        multiple
+                                                        accept="*"
+                                                        :readonly="false"
+                                                    />
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="24">
+                                                <el-form-item label="设备说明书：">
+                                                    <ibps-attachment
+                                                        v-model="form.fuJianShang"
+                                                        :download="true"
+                                                        multiple
+                                                        accept="*"
+                                                        :readonly="false"
+                                                    />
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="24">
+                                                <el-form-item label="说明书分类：">
+                                                    <SelectType :field="{}" @change-data="changeData" />
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="24">
+                                                <el-form-item label="附件细类：">
+                                                    <span>{{ form.wenJianXiLei }}</span>
+                                                </el-form-item>
+                                            </el-col>
+
+                                        </el-row>
+                                    </el-form>
+
+                                </el-tab-pane>
+                                <el-tab-pane label="维护项目" name="two">
+                                    <Maintenance ref="MaintenanceRef" :list-data="form.maintenanceItemPoList" />
+                                </el-tab-pane>
+                                <el-tab-pane label="附属设备及配件" name="three">
+                                    <MoreDevices ref="MoreDevicesRef" :list-data="form.accessoriesDevicePoList" />
+                                </el-tab-pane>
+                                <el-tab-pane label="使用与维护记录" name="four" :disabled="!isEdit">
+                                    <!-- 使用 v-if 配合 keep-alive 实现按需加载 -->
+                                    <keep-alive>
+                                        <MaintenanceRecord v-if="activeName==='four'" :params="form" />
+                                    </keep-alive>
+                                </el-tab-pane>
+                                <el-tab-pane label="校准记录" name="five" :disabled="!isEdit">
+                                    <keep-alive>
+                                        <CalibrationCheckRecord v-if="activeName==='five'" :params="form" />
+                                    </keep-alive>
+                                </el-tab-pane>
+                                <el-tab-pane label="维修记录" name="six" :disabled="!isEdit">
+                                    <keep-alive>
+                                        <RepairRecord v-if="activeName==='six'" :params="form" /></keep-alive>
+                                </el-tab-pane>
+                                <el-tab-pane label="停用、报废记录" name="seven" :disabled="!isEdit">
+                                    <keep-alive>
+                                        <ScrappedRecord v-if="activeName==='seven'" :params="form" />
+                                    </keep-alive>
+                                </el-tab-pane>
+                            </el-tabs>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+        </div>
+    </el-dialog>
+</template>
+
+<script>
+import dayjs from 'dayjs'
+import ibpsUserSelector from '@/business/platform/org/selector'
+import { getequipmentCard, saveEquipmentCard } from '@/api/platform/device/device'
+import Maintenance from './maintenance.vue'
+import MoreDevices from './moreDevices.vue'
+import ScrappedRecord from './scrappedRecord.vue'
+import MaintenanceRecord from './maintenanceRecord.vue'
+import RepairRecord from './repairRecord.vue'
+import CalibrationCheckRecord from './calibrationCheckRecord.vue'
+import IbpsAttachment from '@/business/platform/file/attachment/selector'
+import SelectType from '@/views/component/selectType.vue'
+import { getImage } from '@/api/platform/file/attachment'
+export default {
+    components: {
+        ibpsUserSelector, Maintenance, MoreDevices, ScrappedRecord, MaintenanceRecord, RepairRecord, CalibrationCheckRecord, IbpsAttachment, SelectType,
+        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog'),
+        IbpsImage: () => import('@/business/platform/file/image')
+    },
+    props: {
+        params: {
+            type: Object,
+            default: function () {
+                return {}
+            }
+        }
+    },
+    data () {
+        const { userId, position, level } = this.$store.getters
+        return {
+            readonly: false,
+            activeName: 'one',
+            dialogVisible: true,
+            userId: userId,
+            position: position,
+            level: level.second || level.first,
+            loading: false,
+            title: '设备档案卡',
+            toolbars: [
+                { key: 'save', label: '保存' },
+                { key: 'cancel', label: '退出', type: 'danger', icon: 'ibps-icon-close' }
+            ],
+            initWidth: '1480px',
+            isEdit: false,
+            isFinished: false,
+            preParams: {},
+            Ids: [],
+            form: {
+                changShang: '', // 厂家/品牌
+                guiGeXingHao: '', // 规格型号
+                jieShouRiQi: '', // 接收日期
+                qiYongRiQi: '', // 投入日期
+                cunFangDiDian: '',
+                cunFangWeiZhi: '', // 放置地点
+                jieShouZhuangTai: '', // 接收时状态
+                guanLiRen: '', // 保管人
+                weiHuFangShi: '', // 设备分组
+                bianZhiRen: '', // 建档人
+                bianZhiBuMen: '', // 建档部门
+                bianZhiShiJian: '', // 建档时间
+                shiFouGuoShen: '',
+                sheBeiLeiXing: '', // 设备类型
+                sheBeiZhuangTa: '', // 设备状态
+                sheBeiShiBieH: '', // 设备编号
+                shiFouXiaoZhun: '', // 是否校准
+                gongYingShang: '',
+                shiFouQiJianH: '', // 供应商id
+                lianXiFangShi: '', // 供应商电话
+                xiaoZhunYouXia: '', // 校准有效期至
+                chuChangRiQi: '', // 出厂日期
+                sheBeiMingCheng: '', // 设备名称
+                sheBeiMingChen: '', // 设备名称id
+                yiXiaoRiQi: '', // 最近校准时间
+                heChaXiaoZhun: '', // 使用年限
+                shiJiShiYongF: '', // 关机时间
+                kaiShiShiYong: '', // 开机时间
+                zhengShuBianHa: '', // 校准证书编号
+                xiaoZhunWuCha: '', // 是否限用
+                xiaoZhunZQ: '', // 检定/校准周期
+                yuanSheBeiBian: '', // 原设备编号
+                jianKongYiJu: '', // 是否24H开机
+                biXuDeHuanJin: '', // 核查人
+                biXuSheShi: '', // 核查日期
+                ziChanYuanZhi: '', // 资产原值
+                ziChanBianHao: '', // 固定资产号
+                shiFouWeiHu: '', // 是否维护
+                jiShenXuHao: '', // 出厂编号
+                yanShouRiQi: '', // 验收日期
+                huanJingYaoQiu: '', // 环境要求
+                dianYuanYaoQiu: '', // 电源要求
+                zhuCeZhengHao: '', // 注册证号
+                yqzp: '', // 附件上传
+                faPiao: '', // 资质证书
+                fuJianShang: '', // 设备使用说明书
+                beiZhu: '', // 设备图片
+                caiGouHeTong: '', // 限用范围
+                zhuanYeBuMen: '',
+                wenJianXiLei: '', // 附件细类
+                xiLeiId: '',
+                quanXianLeiXing: '',
+                diDian: ''
+                // ceLiangGongZuo: '', // 测量/工作范围
+                // jianDingXiao: '', // 检定/校准参数
+
+            },
+            rules: {
+                sheBeiMingCheng: [
+                    { required: true, message: '设备名称不能为空', trigger: 'blur' }
+                ],
+                sheBeiShiBieH: [
+                    { required: true, message: '设备编号不能为空', trigger: 'blur' }
+                ],
+                yuanSheBeiBian: [
+                    { required: true, message: '原设备编号不能为空', trigger: 'blur' }
+                ],
+                sheBeiLeiXing: [
+                    { required: true, message: '设备类型不能为空', trigger: 'blur' }
+                ],
+                sheBeiZhuangTa: [
+                    { required: true, message: '设备状态不能为空', trigger: 'blur' }
+                ],
+                guiGeXingHao: [
+                    { required: true, message: '规格型号不能为空', trigger: 'blur' }
+                ],
+                bianZhiBuMen: [
+                    { required: true, message: '建档部门不能为空', trigger: 'blur' }
+                ],
+                bianZhiRen: [
+                    { required: true, message: '建档人不能为空', trigger: 'blur' }
+                ],
+                bianZhiShiJian: [
+                    { required: true, message: '建档时间不能为空', trigger: 'blur' }
+                ],
+                jieShouZhuangTai: [
+                    { required: true, message: '接收时状态不能为空', trigger: 'blur' }
+                ],
+                guanLiRen: [
+                    { required: true, message: '保管人不能为空', trigger: 'blur' }
+                ],
+                cunFangWeiZhi: [
+                    { required: true, message: '放置地点不能为空', trigger: 'blur' }
+                ],
+                shiFouXiaoZhun: [
+                    { required: true, message: '是否校准不能为空', trigger: 'blur' }
+                ],
+                sheBeiMingChen: [
+                    { required: true, message: '请选择设备', trigger: 'blur' }
+                ]
+
+            }
+        }
+    },
+    computed: {
+        photos () {
+            if (this.form.beiZhu) {
+                const photos = JSON.parse(this.form.beiZhu)
+                photos.forEach(item => {
+                    item.url = getImage(item.id)
+                })
+                return photos
+            }
+            return []
+        }
+    },
+    watch: {
+        'form.xiaoZhunWuCha': {
+            handler (val, old) {
+                if (!old) return
+                if (val === '否') {
+                    this.form.sheBeiZhuangTa = '合格'
+                } else if (val === '是') {
+                    this.form.caiGouHeTong = ''
+                    this.form.sheBeiZhuangTa = '限用'
+                }
+            }
+        },
+        'form.cunFangWeiZhi': {
+            async handler (val) {
+                const sql = `select fang_jian_ming_ from t_jjqfjb where id_='${val}'`
+                const { variables: { data }} = await this.$common.request('sql', sql)
+                this.form.cunFangDiDian = data[0].fang_jian_ming_
+            }
+        },
+        'form.sheBeiMingChen': {
+            async handler (val) {
+                if (this.isEdit) return
+                const sql = `select * from t_yqsbysb where id_='${val}'`
+                const { variables: { data }} = await this.$common.request('sql', sql)
+                if (data.length > 0) {
+                    this.form.sheBeiMingCheng = data[0].ming_cheng_str_
+                    this.form.guiGeXingHao = data[0].xing_hao_gui_ge_
+                    this.form.jiShenXuHao = data[0].chu_chang_bian_ha
+                    this.form.changShang = data[0].sheng_chan_chang_
+                    this.form.yuanSheBeiBian = data[0].she_bei_bian_hao_
+                }
+            }
+        },
+        // 根据供应商自动带出供应商名称和电话
+        'form.shiFouQiJianH': {
+            async handler (val) {
+                const sql = `select * from t_gysxxb where id_='${val}'`
+                const { variables: { data }} = await this.$common.request('sql', sql)
+                if (data.length > 0) {
+                    this.form.lianXiFangShi = data[0].lian_xi_dian_hua_
+                    this.form.gongYingShang = data[0].gong_ying_shang_m
+                }
+            }
+        },
+        // 根据编制部门动态获取对应文件存放处数据
+        'form.bianZhiBuMen': {
+            handler (value) {
+                if (value) {
+                    this.handleData(value)
+                }
+            }
+        },
+        // 根据最近检定时间动态计算对应有效期至
+        'form.yiXiaoRiQi': {
+            handler (value) {
+                if (value) {
+                    const zhouQi = this.form.xiaoZhunZQ || 0
+                    const result = this.$common.getFormatDate('string', 10, this.$common.getDate('month', Number(zhouQi), value))
+                    this.form.xiaoZhunYouXia = result
+                }
+            }
+        }
+    },
+
+    mounted () {
+        console.log(this.params)
+        this.init()
+    },
+    methods: {
+        changeData (...args) {
+            this.form[args[0]] = args[1]
+        },
+        handleData (departmentId) {
+        // JSON_UNQUOTE( JSON_EXTRACT( AUTHORITY_NAME, '$.chaYue' ) )
+            const sql = `select
+                        id_ AS leiXingId,
+                        AUTHORITY_NAME AS chaYueValue 
+                    FROM
+                        ibps_cat_type 
+                    WHERE
+                        category_key_ = 'FILE_TYPE' 
+                        AND AUTHORITY_NAME LIKE '%"${departmentId}"%' 
+                        AND name_ = '设备使用说明书'`
+            // console.log(sql)
+            const { deptList = [] } = this.$store.getters || {}
+            const dept = deptList.find((i) => i.positionId === departmentId)
+            this.$common.request('sql', sql).then((res) => {
+                const { data = [] } = res.variables || {}
+                this.form.wenJianXiLei = `外部文件 / ${dept?.positionName} / 设备使用说明书`
+                if (!data.length) {
+                    return
+                }
+                const { leiXingId, chaYueValue } = data[0] || {}
+                this.form.xiLeiId = leiXingId
+                this.form.quanXianLeiXing = JSON.parse(chaYueValue).chaYue
+                this.form.zhuanYeBuMen = departmentId
+            })
+        },
+        handleClick () {
+
+        },
+        handleActionEvent ({ key }) {
+            switch (key) {
+                case 'cancel':
+                    this.closeDialog(true)
+                    break
+                case 'save':
+                    this.goSave('close')
+                    break
+                default:
+                    break
+            }
+        },
+
+        // 获取人员部门
+        getPersonPosition (id) {
+            const userList = this.$store.getters.userList
+            const bianzhiUserid = userList.find(i => i.userId === id)
+            if (bianzhiUserid) {
+                return bianzhiUserid.positionId
+            }
+        },
+        isDateMoreThenSecondDay (firstTime, secondTime) {
+            if (!firstTime || !secondTime) {
+                return false
+            }
+            return new Date(firstTime).getTime() > new Date(secondTime).getTime()
+        },
+        async checkRequired (flag) {
+            if (this.form.xiaoZhunWuCha === '是' && !this.form.caiGouHeTong) {
+                throw new Error('请填写限用范围！')
+            }
+            if (!this.form.chuChangRiQi) {
+                throw new Error('请填写出厂日期！')
+            }
+            if (this.form.accessoriesDevicePoList.length > 0) {
+                for (let i = 0; i < this.form.accessoriesDevicePoList.length; i++) {
+                    const item = this.form.accessoriesDevicePoList[i]
+                    if (!item.mingCheng) {
+                        throw new Error(`附属设备及配件第${i + 1}行名称缺失！`)
+                    }
+                    if (!item.guiGeXingHao1) {
+                        throw new Error(`附属设备及配件第${i + 1}行规格型号缺失！`)
+                    }
+                    if (!item.danWei) {
+                        throw new Error(`附属设备及配件第${i + 1}行单位缺失！`)
+                    }
+                    if (!item.shuLiang) {
+                        throw new Error(`附属设备及配件第${i + 1}行数量缺失！`)
+                    }
+                }
+            }
+
+            const sysDeviceNo = this.form.sheBeiShiBieH
+            const originalDeviceNo = this.form.yuanSheBeiBian
+            const position = this.form.diDian
+            const sql = `select count(1) as num from t_sbdj where yuan_she_bei_bian = '${originalDeviceNo}' and di_dian_ = '${position}' and she_bei_shi_bie_h <> '${sysDeviceNo}' limit 1`
+            const result = await this.$common.request('sql', sql)
+            const { data = [] } = result.variables || {}
+            if (data[0].num > 0) {
+                throw new Error(`系统当前已经存在此原设备编号,请更换另一个编号!`)
+            }
+
+            const exFactoryTime = this.form.chuChangRiQi
+            const reviceTime = this.form.jieShouRiQi
+            const useTime = this.form.qiYongRiQi
+            // 如果有出厂日期，则接收日期必须在出厂日期之后，投入日期必须在出厂日期之后
+            // 校验接收日期是否在投入日期之前
+            if (exFactoryTime && reviceTime) {
+                if (this.isDateMoreThenSecondDay(exFactoryTime, reviceTime)) {
+                    throw new Error(`该设备的接收日期不得早于出厂日期!`)
+                }
+            }
+            if (exFactoryTime && useTime) {
+                if (this.isDateMoreThenSecondDay(exFactoryTime, useTime)) {
+                    throw new Error(`该设备的投入日期不得早于出厂日期!`)
+                }
+            }
+            if (reviceTime && useTime) {
+                if (this.isDateMoreThenSecondDay(reviceTime, useTime)) {
+                    throw new Error(`该设备的投入日期不得早于接收日期!`)
+                }
+            }
+        },
+        async goAdd () {
+            try {
+                this.loading = true
+                await saveEquipmentCard(this.form)
+                // const paramsRecord = await this.formatForm()
+                // console.log(paramsRecord)
+                // const { variables: { cont }} = await this.$common.request('add', paramsRecord)
+                // if (cont.length > 0) {
+                //     this.$message.success('添加成功')
+                //     this.closeDialog(true)
+                // } else {
+                //     this.$message.warning('添加失败')
+                // }
+                this.$message.success('添加成功')
+                this.closeDialog(true)
+                this.loading = false
+            } catch (error) {
+                console.log(error)
+                this.$message.warning('添加失败')
+                this.loading = false
+            }
+        },
+        async formatForm () {
+            const resultForm = {
+                chang_shang_: this.form.changShang,
+                gui_ge_xing_hao_: this.form.guiGeXingHao,
+                jie_shou_ri_qi_: this.form.jieShouRiQi,
+                qi_yong_ri_qi_: this.form.qiYongRiQi,
+                cun_fang_di_dian_: this.form.cunFangDiDian, // 中文
+                cun_fang_wei_zhi_: this.form.cunFangWeiZhi, // id
+                jie_shou_zhuang_tai: this.form.jieShouZhuangTai,
+                guan_li_ren_: this.form.guanLiRen,
+                wei_hu_fang_shi_: this.form.weiHuFangShi,
+                bian_zhi_ren_: this.form.bianZhiRen,
+                bian_zhi_bu_men_: this.form.bianZhiBuMen,
+                bian_zhi_shi_jian: this.form.bianZhiShiJian,
+                shi_fou_guo_shen_: '已完成',
+                she_bei_lei_xing_: this.form.sheBeiLeiXing,
+                she_bei_zhuang_ta: this.form.sheBeiZhuangTa,
+                she_bei_shi_bie_h: this.form.sheBeiShiBieH,
+                shi_fou_xiao_zhun: this.form.shiFouXiaoZhun,
+                gong_ying_shang_: this.form.gongYingShang, // 中文
+                shi_fou_qi_jian_h: this.form.shiFouQiJianH, // id
+                lian_xi_fang_shi_: this.form.lianXiFangShi,
+                xiao_zhun_you_xia: this.form.xiaoZhunYouXia,
+                chu_chang_ri_qi_: this.form.chuChangRiQi,
+                she_bei_ming_cheng_: this.form.sheBeiMingCheng, // 中文
+                she_bei_ming_chen: this.form.sheBeiMingChen, // id
+                yi_xiao_ri_qi_: this.form.yiXiaoRiQi,
+                he_cha_xiao_zhun_: this.form.heChaXiaoZhun,
+                shi_ji_shi_yong_f: this.form.shiJiShiYongF,
+                kai_shi_shi_yong_: this.form.kaiShiShiYong,
+                zheng_shu_bian_ha: this.form.zhengShuBianHa,
+                xiao_zhun_wu_cha_: this.form.xiaoZhunWuCha,
+                xiao_zhun_z_q_: this.form.xiaoZhunZQ,
+                yuan_she_bei_bian: this.form.yuanSheBeiBian,
+                jian_kong_yi_ju_: this.form.jianKongYiJu,
+                bi_xu_de_huan_jin: this.form.biXuDeHuanJin,
+                bi_xu_she_shi_: this.form.biXuSheShi,
+                zi_chan_yuan_zhi_: this.form.ziChanYuanZhi,
+                zi_chan_bian_hao_: this.form.ziChanBianHao,
+                shi_fou_wei_hu_: this.form.shiFouWeiHu,
+                ji_shen_xu_hao_: this.form.jiShenXuHao,
+                yan_shou_ri_qi_: this.form.yanShouRiQi,
+                huan_jing_yao_qiu: this.form.huanJingYaoQiu,
+                dian_yuan_yao_qiu: this.form.dianYuanYaoQiu,
+                zhu_ce_zheng_hao_: this.form.zhuCeZhengHao,
+                yqzp: this.form.yqzp,
+                fa_piao_: this.form.faPiao,
+                fu_jian_shang: this.form.fuJianShang,
+                bei_zhu_: this.form.beiZhu,
+                cai_gou_he_tong_: this.form.caiGouHeTong,
+
+                zhuan_ye_bu_men_: this.form.zhuanYeBuMen,
+                wen_jian_xi_lei_: this.form.wenJianXiLei,
+                xi_lei_id_: this.form.xiLeiId,
+                quan_xian_lei_xin: this.form.quanXianLeiXing
+            }
+            const paramsRecord = { tableName: 't_sbdj' }
+            if (this.isEdit) {
+                paramsRecord.updList = [{
+                    where: {
+                        id_: this.params.id
+                    },
+                    param: resultForm
+                }]
+            } else {
+                paramsRecord.paramWhere = [{
+                    ...resultForm,
+                    di_dian_: this.level
+                }]
+            }
+            return paramsRecord
+        },
+        async subForm (id, table, parentData) {
+            const sql1 = `select id_ from ${table} where parent_id_='${id}'`
+            const { variables: { data }} = await this.$common.request('sql', sql1)
+            const pre_list = data.length > 0 ? data.map(item => item.id_) : []
+            const update_list = []
+            const add_list = []
+            parentData.forEach(item => {
+                if (item.id) {
+                    update_list.push(item)
+                } else {
+                    add_list.push(item)
+                }
+            })
+            const delete_list = pre_list.filter(id => !update_list.map(item => item.id).includes(id))
+            return {
+                add_list,
+                update_list,
+                delete_list
+            }
+        },
+        async goEdit (flag) {
+            try {
+                this.loading = true
+                await saveEquipmentCard(this.form)
+                // const paramsRecord = await this.formatForm()
+                // console.log(paramsRecord)
+                // const list1 = await this.subForm(this.params.id, 't_whzqjxm', this.$refs.MaintenanceRef.listDataCopy)
+                // const list2 = await this.subForm(this.params.id, 't_fssbjpjb', this.$refs.MoreDevicesRef.listDataCopy)
+                // console.log('维护项目', list1)
+                // console.log('附属设备', list2)
+                // 1.更新主表
+
+                // await this.$common.request('update', paramsRecord)
+                this.$message.success('修改成功')
+                this.closeDialog(true)
+                this.loading = false
+                // 2.更改维护项目表
+                // if (list1.add_list.length > 0) {
+                //     const addParams = {
+                //         tableName: 't_whzqjxm',
+                //         paramWhere: list1.add_list.map(item => {
+                //             return {
+                //                 parent_id_: this.params.id,
+                //                 wei_hu_xiang_mu_c: item.weiHuXiangMuC,
+                //                 wei_hu_ri_qi_: item.weiHuRiQi,
+                //                 wei_hu_lei_xing_: item.weiHuLeiXing,
+                //                 ri_qi_shu_zi_: item.riQiShuZi
+                //             }
+                //         })
+                //     }
+                //     await this.$common.request('add', addParams)
+                //     console.log('维护项目新增成功')
+                // }
+                // if (list1.update_list.length > 0) {
+                //     const updateParamsRecord = {
+                //         tableName: 't_whzqjxm',
+                //
+                //     }
+                // }
+            } catch (error) {
+                this.$message.warning(error.message)
+                this.loading = false
+                throw new Error(error.message)
+            }
+        },
+        goSave (flag) {
+            this.$refs.form.validate(async (valid) => {
+                if (valid) {
+                    try {
+                        // 维护项目
+                        this.form.maintenanceItemPoList = this.$refs.MaintenanceRef.listDataCopy
+                        // 附属设备及配件
+                        this.form.accessoriesDevicePoList = this.$refs.MoreDevicesRef.listDataCopy
+                        await this.checkRequired()
+                        if (this.isEdit) {
+                            this.goEdit(flag)
+                        } else {
+                            this.goAdd()
+                        }
+                    } catch (error) {
+                        this.$message.warning(error.message)
+                    }
+                } else {
+                    console.log('error submit!!')
+                    return false
+                }
+            })
+        },
+        // 刷新
+        async goRefresh () {
+        },
+        // 关闭当前窗口
+        closeDialog (needRefresh) {
+            this.dialogVisible = false
+            if (needRefresh) {
+                this.$emit('close')
+            }
+        },
+        // 检查设备编号是否重复
+        async checkIsRepeat (id) {
+            const sql = `select id_ from t_sbdj where she_bei_shi_bie_h='${id}' limit 1`
+            const { variables: { data }} = await this.$common.request('sql', sql)
+            return data.length > 0
+        },
+        generateRandomString () {
+            return `JKY-${Math.floor(Math.random() * 88888) + 10000}`
+        },
+        async init () {
+            this.loading = true
+            this.isEdit = !!(this.params && this.params.id)
+            if (this.isEdit) {
+                const { data } = await getequipmentCard({ id: this.params.id })
+                this.form = data
+            } else {
+                // 随机生成一个不重复的设备编号
+                this.form.sheBeiShiBieH = this.generateRandomString()
+                for (; await this.checkIsRepeat(this.form.sheBeiShiBieH);) {
+                    this.form.sheBeiShiBieH = this.generateRandomString()
+                }
+                this.form.jieShouRiQi = dayjs().format('YYYY-MM-DD')
+                this.form.qiYongRiQi = dayjs().format('YYYY-MM-DD')
+                this.form.xiaoZhunWuCha = '否'
+                this.form.jieShouZhuangTai = '新设备'
+                this.form.bianZhiRen = this.userId
+                const pos = this.position.split(',')
+                this.form.bianZhiBuMen = pos[pos.length - 1]
+                this.form.bianZhiShiJian = dayjs().format('YYYY-MM-DD HH:mm')
+                this.form.shiFouGuoShen = '已完成'
+                this.form.sheBeiLeiXing = '检验系统'
+                this.form.sheBeiZhuangTa = '合格'
+                this.form.shiFouXiaoZhun = '是'
+                this.form.jianKongYiJu = '否'
+                this.form.shiFouWeiHu = '是'
+                this.form.diDian = this.level
+            }
+            this.loading = false
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+.paper-detail-dialog {
+    ::v-deep {
+        .el-dialog__header {
+            text-align: center;
+        }
+    }
+.dialog-title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    div{
+        z-index: 99999999;
+        position: absolute;
+        right:8vw;
+    }
+    .dialogtitle{
+        font-size: 22px;
+        font-family: SimHei;
+        font-weight: bold;
+        color: #222;
+    }
+}
+.container {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        .el-row{
+            margin: 0 !important;
+        }
+        .required{
+            color: #606266 !important;
+            &::before{
+                content: '*';
+                margin: 0 4px 0 -7.5px;
+                color: #F56C6C;
+            }
+        }
+        .left{
+            height: calc(100vh - 70px);
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            padding:20px;
+            overflow-y: auto;
+            .form{
+                margin-left: -20px;
+            }
+            .item{
+                width: 100%;
+            }
+            .title{
+                margin: 16px 0 6px -16px;
+            }
+            .tabs{
+                margin-top: 40px;
+            }
+            .question-icon{
+                margin-left: 2px;
+            }
+
+        }
+    }
+}
+    ::v-deep {
+        .el-form-item__label{
+            text-align: left;
+            font-size: 12px !important;
+        }
+        .el-tabs__item{
+            background-color: #f5f7fa;
+        }
+    }
+
+</style>

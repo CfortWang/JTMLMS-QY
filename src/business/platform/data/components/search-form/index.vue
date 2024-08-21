@@ -147,7 +147,7 @@
                     :editable="item.editable"
                     :placeholder="item.placeholder"
                     :style="itemStyle + (item.itemWidth ? `width: ${item.itemWidth}px;` : '')"
-                    :picker-options="item.pickerOptions || {}"
+                    :picker-options="item.pickerOptions || defaultPickerOptions"
                     :type="item.fieldType"
                     :value-format="item.field_options.datefmt"
                     :format="item.field_options.datefmt"
@@ -330,6 +330,33 @@ export default {
             }
         })
         return {
+            defaultPickerOptions: {
+                shortcuts: [{
+                    text: '最近一周',
+                    onClick (picker) {
+                        const end = new Date()
+                        const start = new Date()
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+                        picker.$emit('pick', [start, end])
+                    }
+                }, {
+                    text: '最近一个月',
+                    onClick (picker) {
+                        const end = new Date()
+                        const start = new Date()
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+                        picker.$emit('pick', [start, end])
+                    }
+                }, {
+                    text: '最近三个月',
+                    onClick (picker) {
+                        const end = new Date()
+                        const start = new Date()
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+                        picker.$emit('pick', [start, end])
+                    }
+                }]
+            },
             params,
             nameParams,
             datePrefix,

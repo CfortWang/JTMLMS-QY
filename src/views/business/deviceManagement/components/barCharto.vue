@@ -1,15 +1,11 @@
 <template>
   <div class="statisticsPage" :style="{width:width,height:height}">
-    <!-- <div style="height:8%;font-size:28px;font-weight: 600;"> {{title}} </div> -->
-    <!-- <div style="height:90%;display:flex;justify-content: space-between;"> -->
       <div :id="'staff'+id" :style="{height:'100%'}"/>
-    <!-- </div> -->
   </div>
 </template>
 
 <script>
   import * as echarts from 'echarts'
-  import { getFormatDate } from '../utils/config.js'
   export default {
     components: {
     },
@@ -119,9 +115,9 @@
           },
           grid: { // 让图表占满容器
               top: '80px',
-              left: '65px',
-              right: '60px',
-              bottom: '40px'
+              left: '40px',
+              right: '20px',
+              bottom: '30px'
           },
           tooltip: {
             trigger: 'axis',

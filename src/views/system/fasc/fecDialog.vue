@@ -84,13 +84,13 @@
                     </el-row>
                     <el-row v-if="isShowDevice">
                         <el-col :span="12">
-                            <el-form-item label="被控设备编号：">
-                                <el-input v-model="form.deviceno1_" size="mini" style="width:80%" />
+                            <el-form-item label="被控设备/设施编号：" label-width="140">
+                                <el-input v-model="form.deviceno1_" size="mini" style="width:62%" />
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
-                            <el-form-item label="被控设备名称：">
-                                <el-input v-model="form.devicename1_" size="mini" style="width:80%" />
+                            <el-form-item label="被控设备/设施名称：" label-width="140">
+                                <el-input v-model="form.devicename1_" size="mini" style="width:62%" />
                             </el-form-item>
                         </el-col>
 
@@ -111,15 +111,14 @@
                         </el-col>
                         <el-col :span="12">
                             <el-form-item label="是否启用：">
-                                <el-switch
-                                    v-model="form.shi_fou_qi_yong_"
-                                    active-color="#13ce66"
-                                    inactive-color="#ff4949"
-                                    active-text="启用"
-                                    inactive-text="停用"
-                                    active-value="1"
-                                    inactive-value="0"
-                                />
+                                <template slot="label">
+                                    <span>是否启用</span>
+                                    <el-tooltip effect="dark" content="是否启用，停用后将过滤掉与此相关的业务。" placement="top">
+                                        <i class="el-icon-question question-icon">：</i>
+                                    </el-tooltip>
+                                </template>
+                                <el-radio v-model="form.shi_fou_qi_yong_" label="1">启用</el-radio>
+                                <el-radio v-model="form.shi_fou_qi_yong_" label="0">停用</el-radio>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -372,7 +371,7 @@ export default {
                 const nextM = midList[qu % 2][val - 1]
 
                 const endMonth = month >= nowM ? nextM : nowM
-                const yearPJ = today.getFullYear()
+                const yearPJ = month >= nowM ? today.getFullYear() + 1 : today.getFullYear()
                 const monthPJ = endMonth > 9 ? endMonth : '0' + endMonth
 
                 this.nextDate = yearPJ + '-' + monthPJ + '-01'
@@ -621,6 +620,9 @@ export default {
     }
     .el-row{
             margin: 0 !important;
+    }
+    .question-icon{
+            margin-left: 2px;
     }
 }
 .dialog-footer{

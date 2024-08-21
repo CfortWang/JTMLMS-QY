@@ -15,39 +15,39 @@
             <dv-border-box-1>
                 <div class="vessel">
                     <div class="area">
-                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0.5)" style="width:100%;height:32%;">
+                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)" style="width:100%;height:31.66%;">
                             <middleCard v-if="mergeData[0].numData.length>0" v-model="mergeData[0].numData" :title="mergeData[0].title" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
-                        <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2%;" />
-                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0.5)" style="width:100%;height:32%;">
+                        <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2.5%;" />
+                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)" style="width:100%;height:31.66%;">
                             <pie-chart v-if="mergeData[1].numData.length>0" :title="mergeData[1].title" v-model="mergeData[1].numData" :width="'98%'" :height="'98%'" :id="1"/>
                         </dv-border-box-7>
-                        <dv-decoration-2 :key="`line2`" :dur="6" style="width:100%;height:2%;" />
-                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0.5)" style="width:100%;height:32%;">
+                        <dv-decoration-2 :key="`line2`" :dur="6" style="width:100%;height:2.5%;" />
+                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)" style="width:100%;height:31.33%;">
                             <bar-chart v-if="mergeData[2].numData.length>0" :title="mergeData[2].title" v-model="mergeData[2].numData" :width="'98%'" :height="'98%'" :id="1" />
                         </dv-border-box-7>
                     </div>
                     <dv-decoration-2 :key="`line3`" :reverse="true" :dur="6" style="width:1%;height:100%;" />
                     <div class="area midArea">
-                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0.5)" style="width:100%;height:42%;">
+                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)" style="width:100%;height:41.5%;">
                             <entirety :title="mergeData[7].title" v-model="mergeData[7].numData" :width="'98%'" :height="'98%'"/>
                         </dv-border-box-7>
-                        <dv-decoration-2 :key="`line5`" :dur="6" style="width:100%;height:2%;" />
-                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0.5)" style="width:100%;height:56.26%;">
+                        <dv-decoration-2 :key="`line5`" :dur="6" style="width:100%;height:2.5%;" />
+                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)" style="width:100%;height:55.9%;">
                             <bar-chart v-if="mergeData[3].numData.length>0" :title="mergeData[3].title" v-model="mergeData[3].numData" :width="'98%'" :height="'98%'" :id="2" />
                         </dv-border-box-7>
                     </div>
                     <dv-decoration-2 :key="`line4`" :reverse="true" :dur="6" style="width:1%;height:100%;" />
                     <div class="area">
-                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0.5)" style="width:100%;height:32%;">
+                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)" style="width:100%;height:31.66%;">
                             <bar-chart v-if="mergeData[4].numData.length>0" :title="mergeData[4].title" v-model="mergeData[4].numData" :width="'98%'" :height="'98%'" :id="3" />
                         </dv-border-box-7>
-                        <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2%;" />
-                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0.5)" style="width:100%;height:32%;">
+                        <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2.5%;" />
+                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)" style="width:100%;height:31.66%;">
                             <bar-chart v-if="mergeData[5].numData.length>0" :title="mergeData[5].title" v-model="mergeData[5].numData" :width="'98%'" :height="'98%'" :id="4" />
                         </dv-border-box-7>
-                        <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2%;" />
-                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0.5)" style="width:100%;height:32%;">
+                        <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2.5%;" />
+                        <dv-border-box-7 :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)" style="width:100%;height:31.66%;">
                             <CarouselTabl v-if="mergeData[6].numData.data.length>0" :title="mergeData[6].title" v-model="mergeData[6].numData"/> 
                         </dv-border-box-7>
                     </div>
@@ -109,9 +109,11 @@ export default {
                     title: '检验科设备停用/报废列表',
                     numData: {
                         header: ['部门', '设备名称', '设备编号', '状态'],
+                        headerBGC: 'rgba(0,0,0,0)',
                         data: dataobj.scrapData,
                         columnWidth: ['120', '250', '180', '110'],
-                        rowNum: 5
+                        rowNum: 5,
+                        hoverPause: true
                     }
                 },
                 {
@@ -188,7 +190,7 @@ export default {
                 height: 98%;
                 .vessel{
                     width: 98%;
-                    height: 98%;
+                    height: 96%;
                     padding: 1% 1% 0 1%;
                     display: flex;
                     flex-flow: wrap;

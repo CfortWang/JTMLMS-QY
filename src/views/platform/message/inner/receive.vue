@@ -373,8 +373,8 @@ export default {
             }).catch(() => { })
         },
         closeDetail (visible) {
-            this.dialogFormVisible = visible
             this.search()
+            this.dialogFormVisible = visible
         }
     }
 }

@@ -3,6 +3,7 @@
         <!-- 外部 -->
         <div slot="west">
             <div class="box">
+                <!-- 选择内外部文件的侧边栏 -->
                 <ibps-type-tree
                     :width="width"
                     :height="height"
@@ -24,6 +25,7 @@
                     show-icon
                     style="height:50px;"
                 />
+                <!-- 选择文件，展示在右边 -->
                 <template v-else>
                     <ibps-crud
                         key="istree"
@@ -75,6 +77,7 @@
                             </div>
 
                         </template>
+                        <!-- 阅览/收藏具名插槽 -->
                         <template
                             slot="readStatus"
                             slot-scope="scope"
@@ -87,6 +90,12 @@
                                 :src="scope.row.sc_id_ ? hadColetcPng : noColectPng"
                                 style="vertical-align: middle; height: 30px;"
                             >
+                        </template>
+                        <template v-if="showCaoZuoColumn" slot="caozuo" slot-scope="scope">
+                            <div style="color:#1E90FF; " class="hover-hand" @click="updateDate(scope)">
+                                <i class="el-icon-edit-outline" style="cursor: pointer;" />
+                                <span style="cursor: pointer;"> 更新</span>
+                            </div>
                         </template>
                     </ibps-crud>
                 </template>
@@ -119,12 +128,92 @@
                     scrolling="no"
                 />
             </el-dialog>
-            <file-lookup
+            <!-- <file-lookup
                 :visible="dialogVisible"
                 :file-infos="fileInfos"
+            /> -->
+            <!-- 本人修改 -->
+            <file-lookup
+                v-if="dialogVisible"
+                :visible="dialogVisible"
+                :file-infos="fileArray"
             />
         </div>
+        <!-- 文件更新的内容 -->
+        <el-dialog
+            :visible.sync="dialogVisible1"
+            width="55%"
+        >
+            <!-- <updateFille :son-data="sonData" /> -->
+            <template #title>
+                <div style="width:100%;color:#555;text-align:center; font-size:20px;font-weight:600;">更新文件信息</div>
+            </template>
+            <div class="motaikuan">
+                <el-form ref="dialogForm" :model="dialogForm" label-width="120px" :rules="rules">
+                    <el-row :gutter="80" style="margin:2% 0">
+                        <el-col :span="12"> <el-form-item label="文件类型：">
+                            <div>{{ dialogForm.wen_jian_lei_xing?dialogForm.wen_jian_lei_xing:'/' }}</div>
+                        </el-form-item></el-col>
+                        <el-col :span="12"> <el-form-item label="文件编号：">
+                            <div>{{ dialogForm.wen_jian_bian_hao?dialogForm.wen_jian_bian_hao:'/' }}</div>
+                        </el-form-item></el-col>
+                    </el-row>
+                    <el-row :gutter="80" style="margin:2% 0">
+                        <el-col :span="12"> <el-form-item label="原文件名称：">
+                            <div>{{ dialogForm.yuan_wen_jian_min?dialogForm.yuan_wen_jian_min:'/' }}</div>
+                        </el-form-item></el-col>
+                        <el-col :span="12"> <el-form-item label="新文件名称：">
+                            <el-input v-model="dialogForm.xin_wen_jian_ming" placeholder="请输入内容" />
+                        </el-form-item></el-col>
+                    </el-row>
+                    <el-row :gutter="80" style="margin:2% 0">
+                        <el-col :span="12"> <el-form-item label="发布时间：" prop="fa_bu_shi_jian_">
+                            <el-date-picker
+                                v-model="dialogForm.fa_bu_shi_jian_"
+                                :picker-options="{ disabledDate(time) { return time.getTime() > Date.now(); } }"
+                                type="datetime"
+                                placeholder="选择日期时间"
+                                format="yyyy-MM-dd HH:mm"
+                                value-format="yyyy-MM-dd HH:mm"
+                                style="width:100%"
+                            />
+                        </el-form-item></el-col>
+                        <el-col :span="12"> <el-form-item label="生效时间：" prop="sheng_xiao_shi_">
+                            <el-date-picker v-model="dialogForm.sheng_xiao_shi_" :picker-options="{ disabledDate(time) { return time.getTime() <= Date.now(); } }" type="date" placeholder="选择日期" style="width:100%" />
+                        </el-form-item></el-col>
+                    </el-row>
+                    <!--  :multiple="false" -->
+                    <el-row :gutter="80" style="margin:2% 0">
+                        <el-col :span="12"> <el-form-item label="上传文件：" prop="wen_jian_fu_jian_">
+                            <ibps-attachment
+                                v-model="dialogForm.wen_jian_fu_jian_"
+                                allow-download
+                                download
+                                accept="*"
+                                store="id"
+                                :readonly="false"
+                            />
+                        </el-form-item></el-col>
 
+                    </el-row>
+                    <el-row :gutter="80" style="margin:2% 0">
+                        <el-col :span="12"> <el-form-item label="更新内容：">
+                            <el-input v-model="dialogForm.geng_xin_nei_rong" placeholder="请输入内容" />
+                        </el-form-item></el-col>
+
+                    </el-row>
+                    <el-row :gutter="80" style="margin:2% 0">
+                        <el-col :span="12"> <el-form-item label="更新原因：">
+                            <el-input v-model="dialogForm.geng_xin_yuan_yin" placeholder="请输入内容" />
+                        </el-form-item></el-col>
+                    </el-row>
+                </el-form>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="dialogVisibleClick('dialogForm')">确定</el-button>
+                <el-button @click="dialogVisible1 = false">取消</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -142,6 +231,8 @@ import hadColetcPng from '@/assets/images/icons/hadColetc.png'
 import noColectPng from '@/assets/images/icons/noColect.png'
 import wordPng from '@/assets/images/icons/word.png'
 import fileTraining from '@/views/component/fileTraining'
+import column from '@/components/ibps-crud/mixin/column'
+// import updateFille from './updateFile.vue'
 
 export default {
     components: {
@@ -166,6 +257,28 @@ export default {
             }
         }
         return {
+            fileLookShow: false,
+            rules: {
+                fa_bu_shi_jian_: [{ required: true, message: this.$t('validate.required') }],
+                sheng_xiao_shi_: [{ required: true, message: this.$t('validate.required') }],
+                wen_jian_fu_jian_: [{ required: true, message: this.$t('validate.required') }]
+            },
+            sonData: '',
+            dialogVisible1: false,
+            showCaoZuoColumn: false,
+            dialogForm: {
+                yuan_wen_jian_id_: '',
+                wen_jian_lei_xing: '',
+                wen_jian_bian_hao: '',
+                yuan_wen_jian_min: '',
+                xin_wen_jian_ming: '',
+                fa_bu_shi_jian_: '',
+                sheng_xiao_shi_: '',
+                wen_jian_fu_jian_: '',
+                geng_xin_nei_rong: '',
+                geng_xin_yuan_yin: '',
+                ji_lu_id_: ''
+            },
             //   treeData: [],
             show: '',
             //   rightsArr: ['join', 'delete'],
@@ -239,12 +352,17 @@ export default {
             openFilePng,
             wordPng,
             dialogVisible: false,
-            fileInfos: {}
+            fileInfos: {},
+            // 本人修改
+            fileArray: []
         }
     },
     watch: {
         filterText (val) {
             this.$refs.tree.filter(val)
+        },
+        showCaoZuoColumn (val) {
+            this.showCaoZuoColumn = val
         }
     },
     created () {
@@ -296,6 +414,55 @@ export default {
     },
     mounted () { },
     methods: {
+        dataShow (times) {
+            const timeDate = new Date(times)
+            const year = timeDate.getFullYear()
+            const month = ('0' + (timeDate.getMonth() + 1)).slice(-2) // 月份从0开始，所以加1
+            const day = ('0' + timeDate.getDate()).slice(-2)
+            return `${year}-${month}-${day}`
+        },
+        dialogVisibleClick (dialogForm) {
+            this.$refs[dialogForm]?.validate((valid) => {
+                if (valid) {
+                    const params = {
+                        tableName: 't_wjxxgxb',
+                        paramWhere: [this.dialogForm]
+                    }
+                    this.dialogForm.sheng_xiao_shi_ = this.dataShow(this.dialogForm.sheng_xiao_shi_)
+                    this.$common.request('add', params).then(res => {
+                        this.$message.success('添加成功！')
+                        this.dialogVisible1 = false
+                    }).catch(err => {
+                        console.log(err)
+                        this.$message.error('添加失败')
+                    })
+                }
+            })
+        },
+        // 外部文件更新
+        updateDate (data) {
+            this.sonData = data
+            console.log('data', data)
+            this.dialogVisible1 = true
+            this.dialogForm.wen_jian_lei_xing = data.row.wen_jian_xi_lei_
+            this.dialogForm.wen_jian_bian_hao = data.row.wen_jian_bian_hao
+            this.dialogForm.yuan_wen_jian_min = data.row.wen_jian_ming_che
+            this.dialogForm.yuan_wen_jian_id_ = data.row.id
+            this.dialogForm.xin_wen_jian_ming = ''
+            this.dialogForm.wen_jian_fu_jian_ = ''
+            this.dialogForm.geng_xin_nei_rong = ''
+            this.dialogForm.geng_xin_yuan_yin = ''
+            this.dialogForm.fa_bu_shi_jian_ = ''
+            this.dialogForm.sheng_xiao_shi_ = ''
+            this.dialogForm.ji_lu_id_ = data.row.id
+        },
+        handleClose (done) {
+            this.$confirm('确认关闭？')
+                .then(_ => {
+                    done()
+                })
+                .catch(_ => {})
+        },
         handleExpandCollapse (isExpand, readonly = false) {
             this.width = isExpand ? 200 : 50
         },
@@ -305,6 +472,7 @@ export default {
         },
         getDatas () {
             const { comAuthority, buMenAuthority, authority } = this.fileTypesDatas
+            // fileType存放点击文件id，如有孩子，则还有孩子id
             const { fileType, sorts } = this.sqlWhere
             this.listData = []
             let wheres1 = '' // 共用
@@ -338,7 +506,7 @@ export default {
                     wheres3 = wheres3 + ` and wj.${i} like '%${likeWhere}%'`
                 }
             }
-
+            // fileType存放文件的id和有孩子的id
             if (fileType) {
                 if (this.pageKey === 'nbwj') {
                     if (comAuthority.length !== 0) {
@@ -363,6 +531,7 @@ export default {
                     wheres1 = wheres1 + ` and FIND_IN_SET (wj.fen_lei_id_,'${fileType}')`
                 }
             }
+            // 没走
             if (sorts) {
                 if (JSON.stringify(sorts) !== '{}') {
                     wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
@@ -395,6 +564,7 @@ export default {
         WHERE wj.shi_fou_guo_shen_ ='有效' and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
         and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
             const sqlArr = [comSql, buMenSql, authoritySql]
+            // console.log('sqlArr', sqlArr)
             let oldRecordSql = ''
             const buMenWhere = []
             if (this.pageKey !== 'nbwj') {
@@ -420,10 +590,13 @@ export default {
                     needSelType.push(`(${sqlArr[i]})`)
                 }
             }
+            // console.log('this.fileTypesDatas', this.fileTypesDatas)
             //   console.log('needSelType',needSelType)
             const fileSearchSql = needSelType.join('union all')
+            // console.log('fileSearchSql', fileSearchSql)
             const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq ORDER BY sq.wen_jian_bian_hao DESC,sq.wen_jian_ming_che DESC` : oldRecordSql
             // console.log('sql------------：', sql)
+            // console.log('sql121', sql)
             curdPost('sql', sql).then(res => {
                 const tableDatas = res.variables.data
                 this.selectListData = JSON.parse(JSON.stringify(tableDatas))
@@ -451,8 +624,22 @@ export default {
             this.getSearcFormData()
             this.getDatas()
         },
+        hasColumnByProp (columns, prop) {
+            return columns.some(column => column.prop === prop)
+        },
+        removeColumnByProp (columns, prop) {
+            return columns.filter(column => column.prop !== prop)
+        },
         handleNodeClick (nodeId, nodeData, treeDatas) {
-            this.tableTitle = nodeData.name
+            if ((nodeData.id === '1174299180374425600' || nodeData.parentId === '1174299180374425600') && this.$store.getters.isSuper) {
+                this.showCaoZuoColumn = true
+                if (!this.hasColumnByProp(this.listConfig.columns, 'cao_zuo')) {
+                    this.listConfig.columns.push({ prop: 'cao_zuo', label: '操作', slotName: 'caozuo', width: 100 })
+                }
+            } else {
+                this.showCaoZuoColumn = false
+                this.listConfig.columns = this.removeColumnByProp(this.listConfig.columns, 'cao_zuo')
+            }
             this.show = 'detail'
             this.addDataCont = { fenLei: nodeData.name, fenLeiId: nodeId }
             const fileTypes = []
@@ -480,9 +667,11 @@ export default {
                 shiJiSql: [],
                 sheBeiSql: []
             }
+            // 判断是否有下级菜单
             if (nodeData.children === undefined) {
                 const authorityName = JSON.parse(nodeData.authorityName)
                 fileTypes.push(nodeId)
+                // console.log('fileTypes', fileTypes)
                 if (authorityName.chaYue === '公用查阅') {
                     this.fileTypesDatas.comAuthority.push(nodeId)
                 }
@@ -647,15 +836,49 @@ export default {
             this.refreshData()
         },
         handleClickTag (val) {
+            console.log('val', val)
+            // const sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
+            // this.$common.request('sql', sql).then(res => {
+            //     console.log('res', res)
+            //     this.fileInfos = {}// 本人添加
+            //     const { data = [] } = res.variables || {}
+            //     if (!data.length) {
+            //         this.$message.warning('没有可查阅的文件，请查明原因！')
+            //         return
+            //     }
+            //     this.fileInfos = { id: val.id, FILE_NAME_: val.wen_jian_ming_che, fileInfos: data[0], func: this.handleUpdate, ban_ben_: val.ban_ben_ }
+            //     this.dialogVisible = true
+            // 本人修改
+            this.fileArray = []
+            this.handleFileInfo(val)
+            const sql1 = `select t_wjxxb.*, t_wjxzxdjlb.xiu_ding_ban_ben_, t_wjxzxdjlb.xiu_ding_nei_rong,t_wjxzxdjlb.yuan_yin_
+            from  t_wjxxb
+            INNER JOIN t_wjxzxdjlb ON  t_wjxxb.shu_ju_lai_yuan_ = t_wjxzxdjlb.id_ WHERE  tou_ban_wen_jian_='${val.id}' AND t_wjxxb.shi_fou_guo_shen_='有效'`
+            // const sql1 = `select * from t_wjxxb WHERE tou_ban_wen_jian_='${val.id}'`
+            this.$common.request('sql', sql1).then(res => {
+                console.log('res测试', res)
+                const list = res.variables.data
+                list.forEach(el => {
+                    const obj = { id: el.id_, wen_jian_ming_che: el.wen_jian_ming_che, fu_jian_: el.wen_jian_fu_jian_, xiu_ding_nei_rong: el.xiu_ding_nei_rong, yuan_yin_: el.yuan_yin_, xiu_ding_ban_ben_: el.xiu_ding_ban_ben_, ban_ben_: el.ban_ben_, wen_jian_bian_hao: el.wen_jian_bian_hao, fa_fang_shi_jian_: el.fa_fang_shi_jian_
+                    }
+                    this.handleFileInfo(obj)
+                })
+                this.dialogVisible = true
+            })
+        },
+        handleFileInfo (val) {
+            console.log('val121212', val)
             const sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
             this.$common.request('sql', sql).then(res => {
+                console.log('res', res)
+                this.fileInfos = {}// 本人添加
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     this.$message.warning('没有可查阅的文件，请查明原因！')
                     return
                 }
-                this.fileInfos = { id: val.id, FILE_NAME_: val.wen_jian_ming_che, fileInfos: data[0], func: this.handleUpdate }
-                this.dialogVisible = true
+                this.fileInfos = { id: val.id, FILE_NAME_: val.wen_jian_ming_che, fileInfos: data[0], func: this.handleUpdate, ban_ben_: val.ban_ben_, xiu_ding_nei_rong: val.xiu_ding_nei_rong ? val.xiu_ding_nei_rong : '', yuan_yin_: val.yuan_yin_ ? val.yuan_yin_ : '', xiu_ding_ban_ben_: val.xiu_ding_ban_ben_ ? val.xiu_ding_ban_ben_ : '', wen_jian_bian_hao: val.wen_jian_bian_hao, fa_fang_shi_jian_: val.fa_fang_shi_jian_ }
+                this.fileArray.push(this.fileInfos)
             })
         },
         handleUpdate (fileId, time) {
@@ -691,5 +914,15 @@ export default {
 /deep/ .el-tree-node__content {
   display: block;
 }
+
+/deep/ .el-form-item__label{
+    text-align: left;
+}
+
+/deep/ .el-dialog__footer{
+    display: flex;
+    justify-content: center;
+}
+
 </style>
 

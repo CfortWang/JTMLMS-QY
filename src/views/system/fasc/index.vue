@@ -6,9 +6,8 @@
             :class="isComplete(card.children)?'completed' : 'incomplete'"
             class="fasc-card"
         >
-            <div slot="header" class="clearfix fasc-card-hearder">
+            <div slot="header" class="clearfix fasc-card-hearder" @click="goToDetailPage(card)">
                 <span>{{ card.facs_type.split('-')[1] }}</span>
-                <el-button size="medium" @click="goToDetailPage(card)">管理</el-button>
             </div>
 
             <el-collapse v-model="card.activeName" accordion>

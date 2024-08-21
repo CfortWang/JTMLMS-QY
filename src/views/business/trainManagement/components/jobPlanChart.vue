@@ -1,14 +1,14 @@
 <template>
   <div class="statisticsPage" :style="{width:width,height:height}">
     <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
-    <div style="height:92%;display:flex">
+    <div v-show="show" style="height:92%;display:flex">
       <div style="width:30%;display: flex;margin-top: 5%;">
         <div class="leftSty">
           <div style="width: 100%;height:20%;font-size: 20px;">自动创建培训计划</div>
           <div style="display:flex;height: 90%;display: flex;align-items: center;width:100%">
             <div style="width: 46%;display:flex;flex-flow: column;height: 100%;font-size: 20px;">
-              <div style="line-height: 250%;">{{data.num}}</div>
-              <div>占比{{data.proportion}}%</div>
+              <div style="line-height: 250%;color: rgb(250, 200, 88);">{{data.autoNum}}</div>
+              <div style="color: rgb(250, 200, 88);">占比{{data.rate}}%</div>
             </div>
             <div :id="'jobPie'+id" :style="{height:'100%',width:'64%'}"/>
           </div>
@@ -16,6 +16,7 @@
       </div>
       <div :id="'job'+id" :style="{height:'100%',width:'70%'}"/>
     </div>
+    <div v-show="!show" class="nullShow">暂无数据</div>
   </div>
 </template>
 
@@ -57,27 +58,36 @@
     },
     data () {
       return {
+        show: false
       }
     },
     watch: {
         value: {
-            handler () {
-                this.drawLine()
+            handler (val, old) {
+              if(val.length>0){
+                this.show = true
+                setTimeout(() => {
+                  this.drawLine()
+                  this.drawLinePie()
+                }, 100)
+              }else{
+                this.show = false
+              }
             },
             deep: true
         },
-        data: {
-            handler () {
-                this.drawLinePie()
-            },
-            deep: true
-        }
+        // data: {
+        //     handler () {
+        //         this.drawLinePie()
+        //     },
+        //     deep: true
+        // }
     },
     mounted(){
-      setTimeout(() => {
-        this.drawLine()
-        this.drawLinePie()
-      }, 100);
+      // setTimeout(() => {
+      //   this.drawLine()
+      //   this.drawLinePie()
+      // }, 100);
       
     },
     methods: {
@@ -85,7 +95,7 @@
         let xData = []
         let yData = []
         this.value.forEach(e => {
-          xData.push(getFormatDate('string', 5, 10, e.date)+'\n'+e.week)
+          xData.push(getFormatDate('string', 5, 10, e.date)+'\n'+e.dayName)
           yData.push(e.value)
         })
         const that = this
@@ -181,8 +191,8 @@
                 show: false
               },
               data: [
-                { value: this.data.proportion, name: 'Search Engine' },
-                { value: 100-this.data.proportion, name: 'Direct' }
+                { value: this.data.rate, name: 'Search Engine' },
+                { value: 100-this.data.rate, name: 'Direct' }
               ]
             }
           ]
@@ -212,5 +222,12 @@
     display: flex;
     align-items: center;
     flex-flow: column;
+  }
+  .nullShow{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    height: 92%;
   }
 </style>

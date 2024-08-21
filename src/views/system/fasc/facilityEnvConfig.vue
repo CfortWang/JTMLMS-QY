@@ -103,7 +103,7 @@
                         </el-row>
                         <el-row v-if="form.zhou_qi_!==''">
                             <el-col :span="12">
-                                <el-form-item :label="labelShow">
+                                <el-form-item :label="labelShow" label-width="150">
                                     <el-checkbox-group v-if="form.zhou_qi_==='每日'" v-model="dayCheck">
                                         <el-checkbox :label="1">周一</el-checkbox>
                                         <el-checkbox :label="2">周二</el-checkbox>
@@ -158,7 +158,7 @@
 
                             </el-col>
                             <el-col v-if="nextDate" :span="12">
-                                <el-form-item label="下次监测日期为：">
+                                <el-form-item label="下次监测日期为：" label-width="150">
                                     <el-tag>{{ nextDate }}</el-tag>
                                 </el-form-item>
                             </el-col>
@@ -721,7 +721,7 @@ export default {
                 const nextM = midList[qu % 2][val - 1]
 
                 const endMonth = month >= nowM ? nextM : nowM
-                const yearPJ = today.getFullYear()
+                const yearPJ = month >= nowM ? today.getFullYear() + 1 : today.getFullYear()
                 const monthPJ = endMonth > 9 ? endMonth : '0' + endMonth
 
                 this.nextDate = yearPJ + '-' + monthPJ + '-01'

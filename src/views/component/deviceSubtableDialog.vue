@@ -285,7 +285,7 @@ export default {
                 const month = today.getMonth() + 1
                 const qu = this.getQuarter(today)
                 const nowM = this.quarterList[qu - 1][turnVal - 1]
-                const nextM = this.quarterList[qu][turnVal - 1]
+                const nextM = this.quarterList[qu % 4][turnVal - 1]
 
                 const endMonth = month >= nowM ? nextM : nowM
                 const yearPJ = today.getFullYear()
@@ -302,10 +302,10 @@ export default {
                 const month = today.getMonth() + 1
                 const qu = month > 6 ? 2 : 1
                 const nowM = this.midList[qu - 1][turnVal - 1]
-                const nextM = this.midList[qu][turnVal - 1]
+                const nextM = this.midList[qu % 2][turnVal - 1]
 
                 const endMonth = month >= nowM ? nextM : nowM
-                const yearPJ = today.getFullYear()
+                const yearPJ = month >= nowM ? today.getFullYear() + 1 : today.getFullYear()
                 const monthPJ = endMonth > 9 ? endMonth : '0' + endMonth
 
                 this.periodMidYearDate = yearPJ + '-' + monthPJ + '-01'

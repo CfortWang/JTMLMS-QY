@@ -12,13 +12,13 @@
                         <el-button type="text" size="mini">部门</el-button>
                     </el-row>
                     <dv-border-box-8>
-                        <el-select v-model="deptVal" clearable placeholder="请选择部门">
+                        <el-select v-model="deptVal" @change="updateAll" :clearable="false" placeholder="请选择部门">
                             <el-option
                             v-for="item in chooseDept"
                             :key="item.positionId"
                             :label="item.positionName"
                             :value="item.positionId"
-                            @change="updateAll">
+                            >
                             </el-option>
                         </el-select>
                     </dv-border-box-8>
@@ -52,6 +52,7 @@
                             value-format="yyyy-MM"
                             placeholder="选择月"
                             @change="updateAll"
+                            :clearable="false"
                         />
                         <el-date-picker
                             v-show="hoverClassAdd === 'y'"
@@ -61,6 +62,7 @@
                             value-format="yyyy"
                             placeholder="选择年"
                             @change="updateAll"
+                            :clearable="false"
                         />
                     </dv-border-box-8>  
                 </div>
@@ -99,27 +101,24 @@
                 </div> -->
                 <div class="vessel">
                     <dv-border-box-12 class="areaTop" :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)">
-                    <!-- <dv-border-box-12 class="areaTop" :color="['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.9)']" backgroundColor="rgba(6, 30, 93, 0)"> -->
                         <div class="area">
                             <job-plan-chart class="merge" :title="mergeData[1].title" v-model="nowWeekData" :data="mergeData[1].numData" :width="'63%'" :height="'85%'" :id="1" />
                             <dv-decoration-2  :color="['rgba(255, 255, 255, 0.5)']" :key="`line1`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
-                            <pie-chart class="tabular" :title="mergeData[0].title" v-model="mergeData[0].numData" :width="'32%'" :height="'85%'" :id="1"/>
+                            <pie-chart class="tabular" :title="mergeData[0].title" v-model="mergeData[0].numData" :total="mergeData[0].total" :width="'32%'" :height="'85%'" :id="1"/>
                         </div>
-                        <dv-decoration-2  :color="['rgba(255, 255, 255, 0.5)']" :key="`line4`" :dur="6" style="width:99%;height:4%;margin: auto;" />
-                        <!-- <dv-decoration-10 style="width:99%;height:4%;margin: auto;" /> -->
+                        <dv-decoration-2 :color="['rgba(255, 255, 255, 0.5)']" :key="`line4`" :dur="6" style="width:98%;height:4%;margin: auto;" />
                         <div class="area">
                             <training-staff-chart class="merge"  :title="mergeData[2].title" v-model="mergeData[2].numData" :data="mergeData[2].perList" :width="'63%'" :height="'85%'" :id="1" />
                             <dv-decoration-2  :color="['rgba(255, 255, 255, 0.5)']" :key="`line2`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
-                            <pie-chart class="tabular" :title="mergeData[3].title" v-model="mergeData[3].numData" :width="'32%'" :height="'85%'" :id="2"/>
+                            <pie-chart class="tabular" :title="mergeData[3].title" v-model="mergeData[3].numData" :total="mergeData[3].total" :width="'32%'" :height="'85%'" :id="2"/>
                         </div>
                     </dv-border-box-12>
                     <div style="width:100%;height:2.64%" />
                     <dv-border-box-12 class="areaBottom" :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)">
-                    <!-- <dv-border-box-12 class="areaBottom" :color="['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.9)']" backgroundColor="rgba(6, 30, 93, 0)"> -->
                         <div class="area" style="height:100%">
                             <pre-work-chart class="merge" :title="mergeData[5].title" v-model="mergeData[5].numData" :width="'63%'" :height="'87%'" :id="1" />
                             <dv-decoration-2 :color="['rgba(255, 255, 255, 0.5)']" :key="`line3`" :reverse="true" :dur="6" style="width:1%;height:87%;margin: auto;" />
-                            <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :width="'32%'" :height="'87%'" :id="3"/>
+                            <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :total="mergeData[4].total" :width="'32%'" :height="'87%'" :id="3"/>
                         </div>
                     </dv-border-box-12>
                 </div>
@@ -131,8 +130,7 @@
 import screenfull from 'screenfull'
 import data from './constants/simulated.js'
 import { getFormatDate } from './utils/config.js'
-
-// import { labsDashBoard } from '@/api/platform/spectaculars/lab'
+import { trainingDashBoard } from '@/api/platform/spectaculars/lab'
 export default {
     components: {
         JobPlanChart: () => import('./components/jobPlanChart.vue'),
@@ -171,7 +169,8 @@ export default {
             mergeData:[
                 {
                     title: '在岗培训类别占比',
-                    numData: data.dataObj
+                    numData: [],
+                    total: 0
                 },
                 {
                     title: '在岗培训计划',
@@ -184,11 +183,13 @@ export default {
                 },
                 {
                     title: '在岗培训对象占比',
-                    numData: data.dataObj
+                    numData: data.dataObj,
+                    total: 0
                 },
                 {
                     title: '本年度培训类别占比',
-                    numData: data.dataObj
+                    numData: data.dataObj,
+                    total: 0
                 },
                 {
                     title: '本年度岗前培训',
@@ -224,7 +225,7 @@ export default {
         initializeData () {
             const w = window.innerWidth
             const { first = '', second = '' } = this.$store.getters.level || {}
-            this.nowWeekData = this.getNowWeek()
+            this.nowWeekData = []
             this.initData = {}
             this.itemIndex = 0
             this.chartIndex = 0
@@ -232,12 +233,67 @@ export default {
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
             this.tabularArr1=[]
             this.tabularArr2=[]
+            this.mergeData=[
+                {
+                    title: '在岗培训类别占比',
+                    numData: [],
+                    total: 0
+                },
+                {
+                    title: '在岗培训计划',
+                    numData: {}
+                },
+                {
+                    title: '在岗培训人员统计情况',
+                    numData: [],
+                    perList: []
+                },
+                {
+                    title: '在岗培训对象占比',
+                    numData: [],
+                    total: 0
+                },
+                {
+                    title: '本年度培训类别占比',
+                    numData: [],
+                    total: 0
+                },
+                {
+                    title: '本年度岗前培训',
+                    numData: []
+                }
+            ]
         },
         updateAll (val) {
+            const loading = this.$loading({
+                lock: true,
+                // text: 'Loading',
+                // spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+            })
             this.initializeData()
-            data.jobPlanObj.forEach(e => {
-                let mid = this.nowWeekData.find(i => i.date === e.date)
-                mid['value'] = e.value
+            trainingDashBoard(
+                {
+                    dept: this.deptVal,
+                    date: this.hoverClassAdd === 'm' ? this.dateValM :this.dateValY
+                }
+            ).then(res=>{
+                let data = res.data[0] || {}
+                this.nowWeekData = data.weekDtoList
+                this.mergeData[1].numData = data.planDto
+                this.mergeData[0].numData = data.typeDto.typeDtoList
+                this.mergeData[0].title = data.typeDto.remark
+                this.mergeData[0].total = data.typeDto.typeTotal
+                this.mergeData[3].numData = data.objectDto.objectDtoList
+                this.mergeData[3].title = data.objectDto.remark
+                this.mergeData[3].total = data.objectDto.objectTotal
+                this.mergeData[4].numData = data.yearPreWorkDto.yearProWorkDtoList
+                this.mergeData[4].title = data.yearPreWorkDto.remark
+                this.mergeData[4].total = data.yearPreWorkDto.yearPreWorkTotal
+                this.mergeData[2].numData = data.pxrytjqkDtoList
+                this.mergeData[2].perList = data.userRankList
+                this.mergeData[5].numData = data.ndgqpxList
+                loading.close();
             })
         },
         async fetchData () {

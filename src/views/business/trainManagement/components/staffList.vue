@@ -4,6 +4,7 @@
         <div class="box mt10"  style="height:100%">
             <div style="height:100%">
                 <dv-scroll-board
+                    :key="scrollBoardKey" 
                     :config="provinceConfirmedCountBoardConfig"
                     style="width: 100%; height: 100%"
                 />
@@ -27,18 +28,27 @@ const initProvinceConfirmedCountBoardConfig = (resultList = []) => {
   };
 };
 export default {
-    props: {
+  props: {
         value: {
             type: Array,
         },
-    },
-    data () {
+  },
+  data () {
         return {
-        provinceConfirmedCountBoardConfig:
+          scrollBoardKey: 0,
+          provinceConfirmedCountBoardConfig:
             initProvinceConfirmedCountBoardConfig(),
         }
-    },
-
+  },
+  watch: {
+        value: {
+            handler (val,old) {
+              this.scrollBoardKey++
+              this.queryProvinceDataList(val)
+            },
+            deep: true
+        }
+  },
   created () {
     this.getBizBoardFn()
   },
@@ -54,11 +64,11 @@ export default {
     setProvinceComfirmedCountBoardData (areaList) {
       if (areaList && areaList.length > 0) {
         let resultList = areaList.map((item,i) => {
-            let mid = i > 2 ? `<span class="circleOption" >${i+1}</span>` : `<span class="circleOption indexStyle">${i+1}</span>`
+            let mid = item.rank > 2 ? `<span class="circleOption" >${item.rank}</span>` : `<span class="circleOption indexStyle">${item.rank}</span>`
             return [
                 mid,
-                item.name,
-                `<div style="width:100%;text-align: right;">${item.num}</div>`,
+                item.userName,
+                `<div style="width:100%;text-align: right;">${item.count}</div>`,
             ]
         })
         this.provinceConfirmedCountBoardConfig =
@@ -79,8 +89,9 @@ export default {
   border-radius: 10px;
 }
 .fontS{
-    font-size: 20px;
-    font-weight: 600;
+  padding-left: 25px;
+  font-size: 20px;
+  font-weight: 600;
 }
 //修改的是下拉框选项内容上方的尖角
 ::v-deep .el-popper .popper__arrow,

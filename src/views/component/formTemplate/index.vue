@@ -101,12 +101,15 @@
                                 <el-table-column prop="fang_shi_" label="方式" width="120">
                                     <template slot-scope="{row}">
                                         <el-select v-model="row.fang_shi_" placeholder="请选择" size="mini">
-                                            <el-option
-                                                v-for="item in [{label:'提前预设', value:'presets'},{label:'临时指定', value:'temp'}]"
+                                            <el-tooltip
+                                                v-for="item in typeOption"
                                                 :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value"
-                                            />
+                                                effect="dark"
+                                                :content="item.tips"
+                                                placement="right"
+                                            >
+                                                <el-option :label="item.label" :value="item.value" />
+                                            </el-tooltip>
                                         </el-select>
                                     </template>
 
@@ -214,6 +217,10 @@ export default {
                 gui_dang_lu_jing_: '',
                 shen_pi_liu_cheng: '需要审批'
             },
+            typeOption: [
+                { label: '提前预设', value: 'presets', tips: '流程流转时，将直接推送到指定人员或角色的待办' },
+                { label: '临时指定', value: 'temp', tips: '流程流转时，由上一节点的操作人在指定人员或角色范围内自行选择流程下一节点的处理人' }
+            ],
             rules: {
                 biao_dan_ming_che: [
                     { required: true, message: '表单名称不能为空', trigger: 'blur' }

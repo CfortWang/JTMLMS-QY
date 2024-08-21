@@ -77,7 +77,7 @@
             itemHeight: 18, // 图例标记的图形高度，默认为18
             icon: 'circle',
             right: '0',
-            top: '45',
+            top: '60',
             formatter: function (name) {
                 let mid = that.value.find(i => i.name === name)
                 let rate = ((mid.value/totality)*100).toFixed(2)
@@ -90,7 +90,7 @@
               // align: 'right',
               rich: {
                 a: {
-                  width:120,
+                  width:80,
                   align: 'left',
                   fontSize: 16
                 },

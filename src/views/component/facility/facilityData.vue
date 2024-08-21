@@ -28,7 +28,7 @@
                     <el-table-column label="参数单位" prop="unit">
                         <template slot-scope="{row}">
                             <el-autocomplete
-                                v-if="!readonly"
+                                v-if="!readonly && !isCul"
                                 v-model="row.unit"
                                 class="inline-input"
                                 :fetch-suggestions="querySearch"
