@@ -74,9 +74,11 @@
                             <el-form-item label="排班人员" prop="scheduleStaff" :show-message="false">
                                 <!-- collapse-tags -->
                                 <el-cascader
+                                    ref="myCascader"
                                     v-model="formData.scheduleStaff"
                                     :options="getCascaderOptions()"
                                     :show-all-levels="false"
+                                    clearable
                                     :props="{
                                         value: 'value',
                                         label: 'label',
@@ -84,6 +86,7 @@
                                         checkStrictly: false,
                                         emitPath: false
                                     }"
+                                    @change="handleStaffChange"
                                 />
                             </el-form-item>
                         </el-col>
@@ -169,9 +172,12 @@
                                 </div>
                             </template>
                             <div v-else-if="item.key === 'positions'">
-                                <div v-for="(p, pi) in scope.row.positions" :key="pi">
-                                    <el-tag type="primary">{{ p }}</el-tag>
-                                </div>
+                                <el-tag
+                                    v-for="(p, pi) in scope.row.positions"
+                                    :key="pi"
+                                    type="primary"
+                                    style="margin-left: 5px;"
+                                >{{ p }}</el-tag>
                             </div>
                             <div v-else-if="item.key === 'isEnabled'">{{ scope.row.isEnabled === 'Y' ? '是' : '否' }}</div>
                             <div v-else-if="item.key === 'color'">
@@ -468,6 +474,45 @@ export default {
                 }
             })
             return res
+        },
+        handleStaffChange (value) {
+            this.formData.scheduleStaff = Array.from(new Set(value))
+            let checkedNodeList = this.$refs.myCascader.getCheckedNodes()
+            checkedNodeList = checkedNodeList.filter((item, index, self) => !item.hasChildren && index === self.findIndex(t => t.value === item.value))
+            this.$nextTick(() => {
+                const tagListBox = this.$refs.myCascader.$el.children[1]
+                if (!checkedNodeList.length) {
+                    tagListBox.innerHTML = ''
+                    return
+                }
+                const dom = ''
+                const selectedArr = []
+                tagListBox.innerHTML = ''
+                checkedNodeList.forEach((item, index) => {
+                    // 重复的根节点元素只呈现一次就行
+                    const spanA = document.createElement('span')
+                    spanA.className = 'el-tag el-tag--info el-tag--mini el-tag--light'
+                    const spanB = document.createElement('span')
+                    spanB.innerText = item.label
+                    selectedArr.push(item.label)
+                    const iC = document.createElement('i')
+                    iC.className = 'el-tag__close el-icon-close'
+                    iC.onclick = (e) => this.delCascaderTag(e, item, tagListBox)
+                    spanA.appendChild(spanB)
+                    spanA.appendChild(iC)
+                    tagListBox.appendChild(spanA)
+                })
+            })
+        },
+        // 删除系统配置的标签显示
+        delCascaderTag (el, info, box) {
+            // 删除tag元素
+            const child = el.target.parentNode
+            box.removeChild(child)
+            // 删除指定值
+            let arr = JSON.parse(JSON.stringify(this.formData.scheduleStaff))
+            arr = arr.filter(item => item !== info.value)
+            this.formData.scheduleStaff = arr
         },
         transformData (dataset, data, from, to) {
             const list = data.split(',')

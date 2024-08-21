@@ -59,19 +59,25 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item label="颜色" prop="color">
-                <el-color-picker
-                    v-model="formData.color"
-                    :predefine="predefine"
-                    size="mini"
-                    @change="handleColorChange"
-                />
-            </el-form-item>
-            <el-form-item label="是否可用" prop="isEnabled" :show-message="false">
-                <el-switch v-model="formData.isEnabled" active-value="Y" inactive-value="N" />
-            </el-form-item>
+            <el-row :gutter="20" class="form-row">
+                <el-col :span="12">
+                    <el-form-item label="颜色" prop="color">
+                        <el-color-picker
+                            v-model="formData.color"
+                            :predefine="predefine"
+                            size="mini"
+                            @change="handleColorChange"
+                        />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="是否可用" prop="isEnabled" :show-message="false">
+                        <el-switch v-model="formData.isEnabled" active-value="Y" inactive-value="N" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
             <el-form-item
-                v-for="(item, index) in dateRangeList"
+                v-for="(item, index) in formData.dateRange"
                 :key="`${index}`"
                 class="date-range"
             >
@@ -80,7 +86,7 @@
                 </template>
                 <el-radio-group v-model="item.type" class="date-type">
                     <el-radio-button label="range">时间段</el-radio-button>
-                    <el-radio-button label="allday" :disabled="dateRangeList.length !== 1">全天</el-radio-button>
+                    <el-radio-button label="allday" :disabled="formData.dateRange.length !== 1">全天</el-radio-button>
                 </el-radio-group>
                 <div v-if="item.type === 'range'" class="range-item">
                     <div class="start">
@@ -112,7 +118,7 @@
                 </div>
                 <div v-if="!readonly" class="operate-btn">
                     <el-button
-                        v-if="index === 0 && dateRangeList.length < 5 && item.type === 'range'"
+                        v-if="index === 0 && formData.dateRange.length < 5 && item.type === 'range'"
                         type="primary"
                         :tabindex="-1"
                         icon="el-icon-plus"
@@ -120,7 +126,7 @@
                         @click="addOption"
                     />
                     <el-button
-                        v-else-if="index === dateRangeList.length - 1 && dateRangeList.length > 1"
+                        v-else-if="index === formData.dateRange.length - 1 && formData.dateRange.length > 1"
                         type="danger"
                         :tabindex="-1"
                         icon="el-icon-delete"
@@ -173,33 +179,33 @@ export default {
     },
     data () {
         const isCreate = this.$utils.isEmpty(this.pageData)
+        const dateRangeList = [{
+            type: 'range',
+            startTime: '',
+            endTime: '',
+            isSecondDay: 'N',
+            pickerOptions: {
+                start: '06:30',
+                step: '00:30',
+                end: '23:30'
+                // disabledDate (time) {
+                //     // 禁用当前日期之前的日期
+                //     return time.getTime() < Date.now() - 8.64e7
+                // }
+            }
+        }]
         return {
-            isCreate,
+            dateRangeList,
             reagentType: [],
             dialogVisible: this.visible,
-            title: isCreate ? '新增班次' : '编辑班次',
             formLabelWidth: '100px',
-            formData: !isCreate ? JSON.parse(JSON.stringify(this.pageData.row)) : {},
+            title: isCreate ? '新增班次' : '编辑班次',
+            formData: !isCreate ? JSON.parse(JSON.stringify(this.pageData.row)) : { isEnabled: 'Y', dateRange: { ...dateRangeList }},
             rules: {},
-            dateRangeList: [{
-                type: 'range',
-                startTime: '',
-                endTime: '',
-                isSecondDay: 'N',
-                pickerOptions: {
-                    start: '06:30',
-                    step: '00:30',
-                    end: '23:30'
-                    // disabledDate (time) {
-                    //     // 禁用当前日期之前的日期
-                    //     return time.getTime() < Date.now() - 8.64e7
-                    // }
-                }
-            }],
             predefine: setting.color.predefine,
             toolbars: [
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', hidden: () => { return this.readonly } },
-                { key: 'continue', icon: 'ibps-icon-send', label: '保存并继续', type: 'success', hidden: () => { return this.readonly || !this.isCreate } },
+                { key: 'continue', icon: 'ibps-icon-send', label: '保存并继续', type: 'success', hidden: () => { return this.readonly || !isCreate } },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ]
         }
@@ -210,17 +216,29 @@ export default {
                 this.dialogVisible = val
             },
             immediate: true
+        },
+        pageData: {
+            handler (val, oldVal) {
+                this.isCreate = this.$utils.isEmpty(val)
+                this.title = this.isCreate ? '新增班次' : '编辑班次'
+                this.toolbars[1] = {
+                    ...this.toolbars[1],
+                    hidden: () => { return this.readonly || !this.isCreate }
+                }
+                this.formData = !this.isCreate ? JSON.parse(JSON.stringify(val.row)) : {
+                    isEnabled: 'Y',
+                    dateRange: JSON.parse(JSON.stringify(this.dateRangeList))
+                }
+            },
+            immediate: true
         }
-    },
-    mounted () {
-
     },
     methods: {
         handleColorChange (v) {
             console.log(v)
         },
         addOption () {
-            this.dateRangeList.push({
+            this.formData.dateRange.push({
                 type: 'range',
                 startTime: '',
                 endTime: '',
@@ -233,7 +251,7 @@ export default {
             })
         },
         subOption () {
-            this.dateRangeList.pop()
+            this.formData.dateRange.pop()
         },
         handleActionEvent ({ key }) {
             switch (key) {
@@ -260,8 +278,7 @@ export default {
         },
         submitForm (data, key) {
             const submitData = {
-                ...data,
-                dateRange: JSON.stringify(this.dateRangeList)
+                ...data
             }
             console.log(submitData)
             this.$emit('callback', { data: submitData, index: this.pageData.index })
@@ -269,7 +286,10 @@ export default {
                 return this.closeDialog()
             }
             this.$refs.form.resetFields()
-            this.formData = {}
+            this.formData = {
+                isEnabled: 'Y',
+                dateRange: JSON.parse(JSON.stringify(this.dateRangeList))
+            }
         },
         closeDialog () {
             this.$emit('close', false)

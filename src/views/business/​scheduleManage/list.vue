@@ -109,7 +109,7 @@ export default {
             })
             queryScheduleConfig(ActionUtils.formatParams({}, {}, {})).then(res => {
                 const { dataResult } = res.data
-                this.params.configId = dataResult[0].id
+                this.params.configId = dataResult.length ? dataResult[0].id : ''
             })
         },
         /**
