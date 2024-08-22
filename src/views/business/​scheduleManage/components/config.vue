@@ -32,7 +32,7 @@
         <el-form
             ref="configForm"
             :label-width="formLabelWidth"
-            lavel-position="left"
+            label-position="left"
             :model.sync="formData"
             :rules="rules"
             class="config-form"
@@ -46,6 +46,21 @@
                 <div class="form-container">
                     <el-row :gutter="20" class="form-row">
                         <el-col :span="12">
+                            <el-form-item label="配置名称" prop="name" required :show-message="false">
+                                <el-input
+                                    v-model="formData.name"
+                                    type="text"
+                                    clearable
+                                    show-word-limit
+                                    :maxlength="16"
+                                    :disabled="readonly"
+                                    placeholder="请输入"
+                                />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20" class="form-row">
+                        <el-col :span="12">
                             <el-form-item label="排班类型" prop="scheduleType" required :show-message="false">
                                 <el-select
                                     v-model="formData.scheduleType"
@@ -56,9 +71,9 @@
                                 >
                                     <el-option
                                         v-for="item in scheduleType"
-                                        :key="item.key"
-                                        :label="item.value"
-                                        :value="item.key"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
                                     />
                                 </el-select>
                             </el-form-item>
@@ -286,6 +301,10 @@ export default {
         params: {
             type: Object,
             default: () => {}
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -309,7 +328,6 @@ export default {
             },
             rules: configFormRules,
             loading: false,
-            readonly: !isSuper,
             showSchedule: false,
             selectionIndex: {
                 scheduleShift: [],
@@ -344,16 +362,15 @@ export default {
     methods: {
         // 获取数据
         async loadData () {
-            if (!this.params.configId) {
+            if (this.$utils.isEmpty(this.params)) {
                 return
             }
-            this.loading = true
-            getScheduleConfig({ id: this.params.configId }).then(res => {
-                const { id, name, approver, isApproval, isEffective, scheduleRule, scheduleShift, scheduleStaff, scheduleType } = res.data || {}
+            // 初始化表单数据的方法
+            const initializeFormData = (data) => {
+                const { name, approver, isApproval, isEffective, scheduleRule, scheduleShift, scheduleStaff, scheduleType } = data || {}
                 this.formData = {
-                    id,
                     name,
-                    approver: approver.split(','),
+                    approver: approver ? approver.split(',') : [],
                     scheduleType,
                     isApproval,
                     isEffective,
@@ -361,11 +378,19 @@ export default {
                     scheduleShift: scheduleShift ? JSON.parse(scheduleShift) : [],
                     scheduleStaff: scheduleStaff ? JSON.parse(scheduleStaff) : []
                 }
-                console.log(this.formData)
+                this.handleStaffChange(this.formData.scheduleStaff)
+            }
+            this.loading = true
+            try {
+                const res = await getScheduleConfig({ id: this.params.configId })
+                if (res.data) {
+                    initializeFormData(res.data)
+                }
+            } catch (error) {
+                console.error('加载排班配置失败', error)
+            } finally {
                 this.loading = false
-            }).catch(() => {
-                this.loading = false
-            })
+            }
         },
         getPositionLis () {
             const { first, second } = this.$store.getters.level || {}
@@ -407,6 +432,7 @@ export default {
                 const { scheduleStaff, scheduleRule, scheduleShift, approver, ...rest } = this.formData || {}
                 const submitData = {
                     ...rest,
+                    id: this.params.action === 'copy' ? null : this.params.configId,
                     diDian: second || first,
                     approver: approver.join(','),
                     scheduleStaff: JSON.stringify(scheduleStaff),
@@ -414,6 +440,14 @@ export default {
                     scheduleShift: JSON.stringify(scheduleShift)
                 }
                 this.submitForm(submitData)
+            })
+        },
+        // 提交数据
+        submitForm (data) {
+            saveScheduleConfig(data).then(res => {
+                this.$message.success(`${this.params.action === 'edit' ? '保存' : '添加'}成功`)
+                this.closeDialog()
+                this.$emit('refresh')
             })
         },
         handleAddParam (type, data = {}) {
@@ -477,9 +511,9 @@ export default {
         },
         handleStaffChange (value) {
             this.formData.scheduleStaff = Array.from(new Set(value))
-            let checkedNodeList = this.$refs.myCascader.getCheckedNodes()
-            checkedNodeList = checkedNodeList.filter((item, index, self) => !item.hasChildren && index === self.findIndex(t => t.value === item.value))
             this.$nextTick(() => {
+                let checkedNodeList = this.$refs.myCascader.getCheckedNodes()
+                checkedNodeList = checkedNodeList.filter((item, index, self) => !item.hasChildren && index === self.findIndex(t => t.value === item.value))
                 const tagListBox = this.$refs.myCascader.$el.children[1]
                 if (!checkedNodeList.length) {
                     tagListBox.innerHTML = ''
@@ -523,19 +557,14 @@ export default {
             return names.filter(i => i).join(',')
         },
         handleRowData (row) {
+            const temp = JSON.parse(JSON.stringify(this.formData.scheduleShift))
             if (this.$utils.isNotEmpty(row.index)) {
-                this.formData.scheduleShift[row.index] = row.data
+                temp[row.index] = row.data
             } else {
-                this.formData.scheduleShift.push(row.data)
+                temp.push(row.data)
             }
-        },
-        // 提交数据
-        submitForm (data) {
-            saveScheduleConfig(data).then(res => {
-                this.$message.success('保存成功')
-                this.closeDialog()
-                this.$emit('callback')
-            })
+            this.formData.scheduleShift = temp
+            // Vue.set(this.formData, 'scheduleShift', temp)
         },
         handleCancel () {
             this.closeDialog()
@@ -587,14 +616,6 @@ export default {
                     text-align: right;
                     margin-bottom: 5px;
                 }
-                .inline-operate {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-around;
-                    a:hover {
-                        color: #409eff;
-                    }
-                }
                 ::v-deep {
                     .el-form-item {
                         margin-bottom: 10 !important;
@@ -622,44 +643,6 @@ export default {
                         font-size: 16px;
                         color: #409EFF;
                     }
-                    .el-tabs__nav-wrap.is-scrollable {
-                        width: calc(100% - 100px);
-                    }
-                                        .outer-tabs {
-                        .el-tabs__content {
-                            height: calc(100vh - 290px);
-                            overflow: auto;
-                        }
-                        .inner-tabs {
-                            .el-tabs__header.is-left {
-                                width: 90px;
-                            }
-                            .el-tabs__item {
-                                padding: 0 12px 0 0;
-                            }
-                            .el-tabs__content {
-                                height: calc(100vh - 410px);
-                                overflow: auto;
-                            }
-                            .el-input-number--small {
-                                width: 100%;
-                            }
-                            .editor {
-                                .edui-editor {
-                                    width: auto !important;
-                                }
-                            }
-                            .hidden-column {
-                                display: none;
-                            }
-                        }
-                    }
-                }
-                .add-btn {
-                    position: absolute;
-                    top: 36px;
-                    right: 18px;
-                    z-index: 99;
                 }
             }
         }

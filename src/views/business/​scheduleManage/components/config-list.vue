@@ -1,15 +1,29 @@
 <template>
-    <div class="main-container">
+    <el-dialog
+        :visible.sync="dialogVisible"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="true"
+        append-to-body
+        class="dialog schedule-config-list"
+        top="5vh"
+        width="60%"
+        @open="loadData"
+        @close="closeDialog"
+    >
         <ibps-crud
             ref="crud"
             :display-field="title"
-            :height="height"
+            :height="maxHeight"
             :data="listData"
             :toolbars="listConfig.toolbars"
             :search-form="listConfig.searchForm"
             :pk-key="pkKey"
+            :index-row="false"
             :columns="listConfig.columns"
             :row-handle="listConfig.rowHandle"
+            :header-cell-style="{ 'text-align': 'center' }"
+            :cell-style="{ 'text-align': 'center' }"
             :pagination="pagination"
             :loading="loading"
             @action-event="handleAction"
@@ -17,86 +31,90 @@
             @pagination-change="handlePaginationChange"
             @row-dblclick="handleRowDblclick"
         >
-            1
+            <template slot="isEffective" slot-scope="scope">
+                <el-switch
+                    v-model="scope.row.isEffective"
+                    active-value="Y"
+                    inactive-value="N"
+                    @change="handleEffective(scope.row)"
+                />
+            </template>
         </ibps-crud>
-        <schedule-edit
-            v-if="showScheduleEdit"
-            :visible.sync="showScheduleEdit"
+        <schedule-config-detail
+            v-if="showConfigDetail"
+            :visible.sync="showConfigDetail"
             :params="params"
             :readonly="readonly"
             @refresh="loadData"
-            @close="() => showScheduleEdit = false"
+            @close="() => showConfigDetail = false"
         />
-        <schedule-config-list
-            v-if="showConfigList"
-            :visible.sync="showConfigList"
-            @refresh="loadData"
-            @close="() => showConfigList = false"
-        />
-    </div>
+    </el-dialog>
 </template>
 
 <script>
-import { queryStaffSchedule, removeStaffSchedule, queryScheduleConfig } from '@/api/business/schedule'
+import { queryScheduleConfig, removeScheduleConfig, saveScheduleConfig } from '@/api/business/schedule'
+import { scheduleType } from '@/views/constants/schedule'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 
 export default {
     components: {
-        ScheduleEdit: () => import('./edit'),
-        ScheduleConfigList: () => import('./components/config-list')
+        ScheduleConfigDetail: () => import('./config')
     },
     mixins: [FixHeight],
+    props: {
+        visible: {
+            type: Boolean,
+            default: false
+        }
+    },
     data () {
         const { userList = [] } = this.$store.getters || {}
         const userOption = userList.map(item => ({ label: item.userName, value: item.userId }))
         return {
             userOption,
-            title: '排班记录',
+            scheduleType,
+            title: '排班配置项',
+            dialogVisible: this.visible,
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: true,
-            height: document.clientHeight,
+            maxHeight: 600,
             listData: [],
             pagination: {},
             sorts: {},
-            showScheduleEdit: false,
-            showConfigList: false,
+            showConfigDetail: false,
             readonly: false,
             params: {},
             listConfig: {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary', hidden: false },
-                    { key: 'create', icon: 'ibps-icon-plus', label: '创建', type: 'success', hidden: false },
-                    { key: 'remove', icon: 'ibps-icon-close', label: '删除', type: 'danger', hidden: false },
-                    { key: 'config', icon: 'ibps-icon-cogs', label: '配置', type: 'info', hidden: false }
+                    { key: 'create', icon: 'ibps-icon-plus', label: '添加', type: 'success', hidden: false },
+                    { key: 'remove', icon: 'ibps-icon-close', label: '删除', type: 'danger', hidden: false }
                 ],
                 searchForm: {
                     labelWidth: 80,
                     itemWidth: 150,
                     forms: [
-                        { prop: 'Q^title_^SL', label: '排班名称' },
-                        { prop: 'Q^scope_^SL', label: '使用范围' },
-                        { prop: 'Q^cycle_^SL', label: '排班周期' },
-                        { prop: 'Q^status_^SL', label: '状态' },
+                        { prop: 'Q^title_^SL', label: '配置项名称' },
+                        { prop: 'Q^schedule_type_^SL', label: '排班类型', fieldType: 'select', options: scheduleType },
                         { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '创建时间', fieldType: 'daterange', itemWidth: 200 }
                     ]
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'title', label: '排班名称', tags: [], minWidth: 150 },
-                    { prop: 'scope', label: '使用范围', tags: [], width: 120 },
-                    { prop: 'cycle', label: '排班周期', width: 120 },
-                    { prop: 'dateRange', label: '时间范围', slotName: 'time', width: 140 },
-                    { prop: 'status', label: '状态', width: 80 },
+                    { prop: 'name', label: '配置名称', width: 150 },
+                    { prop: 'scheduleType', label: '排班类型', tags: scheduleType, width: 100, sortable: 'custom' },
+                    { prop: 'isEffective', label: '是否生效', slotName: 'isEffective', width: 100 },
+                    { prop: 'approver', label: '调班审批人', tags: userOption, dataType: 'stringArray', minWidth: 140 },
                     { prop: 'createBy', label: '创建人', tags: userOption, width: 90 },
-                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 130 }
+                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 }
                 ],
                 rowHandle: {
                     effect: 'display',
                     actions: [
-                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' },
-                        { key: 'preview', label: '查看', type: 'primary', icon: 'ibps-icon-eye' }
-                        // { key: 'report', label: '实验报告', type: 'success', icon: 'ibps-icon-file-text-o' }
+                        { key: 'copy', label: '复制', type: 'primary', icon: 'ibps-icon-copy' },
+                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' }
+                        // { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt' }
                     ]
                 }
             }
@@ -109,7 +127,7 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
-            queryStaffSchedule(this.getSearchFormData()).then(res => {
+            queryScheduleConfig(this.getSearchFormData()).then(res => {
                 ActionUtils.handleListData(this, res.data)
                 this.loading = false
             }).catch(() => {
@@ -120,6 +138,7 @@ export default {
          * 获取格式化参数
          */
         getSearchFormData () {
+            console.log(this.pagination)
             return ActionUtils.formatParams(
                 this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
                 this.pagination,
@@ -158,14 +177,14 @@ export default {
                 case 'create':
                     this.handleEdit({}, command)
                     break
-                case 'config':
-                    this.showConfigList = true
+                case 'copy':
+                    this.handleEdit(data, command)
                     break
                 case 'edit':
                     this.handleEdit(data, command)
                     break
-                case 'preview':
-                    this.handlePreview(data)
+                case 'detail':
+                    this.handleEdit(data, command)
                     break
                 case 'remove':
                     ActionUtils.removeRecord(selection).then((ids) => {
@@ -179,33 +198,58 @@ export default {
         /**
          * 处理编辑
          */
-        async handleEdit ({ id }, key) {
-            // this.params = {
-            //     configId: ''
-            // }
-            // this.readonly = key === 'detail'
-            this.showScheduleEdit = true
+        async handleEdit (data, key) {
+            this.params = {
+                configId: data.id,
+                action: key
+            }
+            this.readonly = key === 'detail'
+            this.showConfigDetail = true
         },
         /**
          * 处理删除
          */
         handleRemove (ids) {
             // return this.$message.warning('避免误删测试数据，联系开发删除')
-            removeStaffSchedule({ ids }).then(() => {
+            removeScheduleConfig({ ids }).then(() => {
                 ActionUtils.removeSuccessMessage()
                 this.search()
             }).catch(() => {})
         },
         handleRowDblclick (row) {
             this.handleEdit(row, 'detail')
+        },
+        handleEffective (row) {
+            const { id, isEffective, name } = row
+            console.log(isEffective)
+            this.$confirm(`确定要${isEffective ? '启用' : '禁用'}配置项【${name}】吗？`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                showClose: false,
+                closeOnClickModal: false,
+                type: 'warning'
+            }).then(() => {
+                saveScheduleConfig({
+                    ...row,
+                    id,
+                    pk: id,
+                    isEffective
+                }).then(() => {
+                    ActionUtils.success('操作成功')
+                    this.search()
+                }).catch(() => {})
+            }).catch(() => {
+                this.search()
+            })
+        },
+        closeDialog () {
+            this.$emit('close', false)
         }
     }
 }
 </script>
 <style lang="scss">
-    .attachment-uploader-dialog {
-        .el-dialog__body {
-            height: calc(57vh - 100px) !important;
-        }
+    .schedule-config-list {
+
     }
 </style>

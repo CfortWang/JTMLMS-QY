@@ -123,23 +123,41 @@ export const dateType = [
 
 export const scheduleType = [
     {
-        key: 'whole',
-        value: '科室排班'
+        label: '科室排班',
+        value: 'whole'
     },
     {
-        key: 'group',
-        value: '专业组排班'
+        label: '专业组排班',
+        value: 'group'
     },
     {
-        key: 'train',
-        value: '规培生排班'
+        label: '规培生排班',
+        value: 'train'
     },
     {
-        key: 'students',
-        value: '进修生排班'
+        label: '进修生排班',
+        value: 'students'
     },
     {
-        key: 'practice',
-        value: '实习生排班'
+        label: '实习生排班',
+        value: 'practice'
+    }
+]
+
+export const cycleOptions = [
+    {
+        label: '日',
+        value: 'day',
+        limit: 45
+    },
+    {
+        label: '周',
+        value: 'week',
+        limit: 6
+    },
+    {
+        label: '月',
+        value: 'month',
+        limit: 1
     }
 ]
