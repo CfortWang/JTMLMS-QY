@@ -217,28 +217,32 @@
                             {{ item.label }}
                         </div>
                     </div>
-                    <div class="item-list">
-                        <div v-for="(row, rIndex) in ordinateList" :key="row.value" class="item-row">
-                            <div v-for="(column, cIndex) in dateList" :key="cIndex" class="item">
+                    <div class="shift-content">
+                        <div v-for="(row, rIndex) in ordinateList" :key="row.value" class="shift-row">
+                            <!-- <div v-for="(column, cIndex) in dateList" :key="cIndex" class="shift-column"> -->
+                            <div
+                                v-for="(column, cIndex) in dateList"
+                                :key="cIndex"
+                                ref="shiftItem"
+                                class="shift-item"
+                                @mouseenter="hoveredIndex = `${row.value}-${cIndex}`"
+                                @mouseleave="hoveredIndex = null"
+                                @contextmenu.prevent="handleRightClick($event, {row, rIndex, column, cIndex})"
+                            >
                                 <div
-                                    ref="scheduleItem"
-                                    class="item-content"
-                                    @mouseenter="hoveredIndex = `${row.value}-${cIndex}`"
-                                    @mouseleave="hoveredIndex = null"
-                                    @contextmenu.prevent="handleRightClick($event, {row, rIndex, column, cIndex})"
+                                    v-for="(shift, sIndex) in scheduleData[row.value][cIndex]"
+                                    :key="sIndex"
+                                    class="shift"
+                                    :style="{ color: `${shift.color}` }"
                                 >
-                                    <div
-                                        v-for="(shift, sIndex) in scheduleData[row.value][cIndex]"
-                                        :key="sIndex"
-                                        class="icon-box"
-                                    >
-                                        <div :style="{ color: `${shift.color}` }">{{ shift.alias }}</div>
-                                    </div>
-                                    <div v-if="hoveredIndex === `${row.value}-${cIndex}` && !readonly" class="overlay">
-                                        <i class="el-icon-edit" />
-                                    </div>
+                                    {{ shift.alias }}
+                                    <!-- <div :style="{ color: `${shift.color}` }">{{ shift.alias }}</div> -->
+                                </div>
+                                <div v-if="hoveredIndex === `${row.value}-${cIndex}` && !readonly" class="overlay">
+                                    <i class="el-icon-edit" />
                                 </div>
                             </div>
+                            <!-- </div> -->
                         </div>
                     </div>
                 </div>
@@ -444,18 +448,6 @@ export default {
                     return false
                 }
             }
-            // if (dates.length === 1) {
-            //     const startDate = dates[0]
-            //     const maxEndDate = new Date(startDate)
-            //     maxEndDate.setDate(maxEndDate.getDate() + 45)
-
-            //     // 更新 pickerOptions，限制结束日期选择
-            //     this.pickerOptions = {
-            //         disabledDate: (time) => {
-            //             return time.getTime() < startDate.getTime() || time.getTime() > maxEndDate.getTime()
-            //         }
-            //     }
-            // }
         },
         getDateList (dateRange) {
             const [startDate, endDate] = dateRange.map(date => new Date(date))
@@ -479,7 +471,7 @@ export default {
         handleRightClick (event, { row, colunm, rIndex, cIndex }) {
             this.selectItem = []
             this.showContextMenu = true
-            const item = this.$refs.scheduleItem[rIndex * this.dateList.length + cIndex + 1]
+            const item = this.$refs.shiftItem[rIndex * this.dateList.length + cIndex + 1]
             const rect = item.getBoundingClientRect()
             console.log(rect.top + window.scrollY, rect.left + window.scrollX)
             this.itemPosition = {
@@ -682,21 +674,49 @@ export default {
                         flex-shrink: 0;
                     }
                 }
-                .item-list {
+                .shift-content {
                     flex: 1;
                     margin-right: 20px;
-                    .item-row {
+                    .shift-row {
                         display: flex;
-                        .item {
+                        .shift-item {
                             position: relative;
                             width: 59px;
                             height: 59px;
-                            line-height: 30px;
-                            text-align: center;
+                            font-size: 14px;
                             border: 1px solid #ccc;
                             border-bottom: none;
                             border-right: none;
                             cursor: context-menu;
+
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            .shift {
+                                text-align: center;
+                            }
+
+                            &:has(.shift:nth-child(2)) {
+                                flex-direction: column;
+                            }
+
+                            // 当有三个或四个子元素时使用网格布局
+                            &:has(.shift:nth-child(3)) {
+                                flex-direction: column;
+                                display: grid;
+                                grid-template-columns: repeat(2, 1fr);
+                                gap: 1px;
+                            }
+                            &:has(.shift:nth-child(odd)) {
+                                .shift:last-of-type {
+                                    grid-column: span 2;
+                                    justify-self: center;
+                                }
+                            }
+                            .shift:only-child {
+                                margin-left: 0;
+                            }
                             &:last-child {
                                 border-right: 1px solid #ccc;
                             }
@@ -712,20 +732,20 @@ export default {
                                 align-items: center;
                                 color: white;
                             }
-                            .item-content {
-                                width: 100%;
-                                height: 100%;
-                                font-size: 14px;
-                                .icon-box:last-child {
-                                    margin-left: 5px;
-                                }
-                                .icon-box:only-child {
-                                    margin-left: 0;
-                                }
-                            }
+                            // .shift-item {
+                            //     width: 100%;
+                            //     height: 100%;
+                            //     font-size: 14px;
+                            //     .shift:last-child {
+                            //         margin-left: 5px;
+                            //     }
+                            //     .shift:only-child {
+                            //         margin-left: 0;
+                            //     }
+                            // }
                         }
                         &:last-of-type {
-                            .item {
+                            .shift-item {
                                 border-bottom: 1px solid #ccc;
                             }
                         }
