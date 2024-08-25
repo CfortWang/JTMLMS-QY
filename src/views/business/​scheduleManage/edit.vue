@@ -29,9 +29,10 @@
                 </template>
             </div>
         </div>
-        <el-steps :active="activeStep" finish-status="success" simple style="margin-top: 20px">
+        <el-steps :active="activeStep" finish-status="success" simple style="margin: 20px 0;">
             <el-step title="基础信息配置" />
             <el-step title="人员排班" />
+            <el-step title="排班总览" />
         </el-steps>
         <el-form
             v-if="activeStep === 1"
@@ -45,7 +46,7 @@
         >
             <el-form-item label="排班名称" prop="title" required :show-message="false">
                 <el-input
-                    v-model="formData.name"
+                    v-model="formData.title"
                     type="text"
                     clearable
                     show-word-limit
@@ -55,7 +56,7 @@
                 />
             </el-form-item>
             <el-row :gutter="20" class="form-row">
-                <el-col :span="12">
+                <!-- <el-col :span="12">
                     <el-form-item label="排班周期" prop="cycle" required :show-message="false">
                         <el-select
                             v-model="formData.cycle"
@@ -70,22 +71,28 @@
                             />
                         </el-select>
                     </el-form-item>
-                </el-col>
+                </el-col> -->
                 <el-col :span="12">
-                    <el-form-item label="排班时间" prop="time" required :show-message="false">
+                    <el-form-item prop="dateRange" required :show-message="false">
+                        <template slot="label">
+                            排班时间
+                            <el-tooltip effect="dark" content="最多可支持45天内的排班" placement="top">
+                                <i class="el-icon-question question-icon" />
+                            </el-tooltip>
+                        </template>
                         <el-date-picker
-                            v-if="formData.cycle === 'day'"
-                            v-model="formData.time"
+                            v-model="formData.dateRange"
                             type="daterange"
                             range-separator="至"
                             start-placeholder="开始日期"
                             end-placeholder="结束日期"
                             value-format="yyyy-MM-dd"
+                            unlink-panels
+                            :picker-options="pickerOptions"
+                            @change="handleDateChange"
                         />
                     </el-form-item>
                 </el-col>
-            </el-row>
-            <el-row :gutter="20" class="form-row">
                 <el-col :span="12">
                     <el-form-item label="排班配置" prop="config" required :show-message="false">
                         <el-select
@@ -112,7 +119,7 @@
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-form-item label="排班人员" prop="scheduleStaff" required>
+            <el-form-item label="排班人员" prop="scheduleStaff" required :show-message="false">
                 <el-select
                     v-model="formData.scheduleStaff"
                     :disabled="readonly"
@@ -129,18 +136,8 @@
                 </el-select>
             </el-form-item>
             <el-row :gutter="20" class="form-row">
-                <el-col :span="12">
-                    <el-form-item label="是否审批" prop="isApproval" required>
-                        <el-switch
-                            v-model="formData.isApproval"
-                            active-value="Y"
-                            inactive-value="N"
-                            :disabled="readonly"
-                        />
-                    </el-form-item>
-                </el-col>
-                <el-col v-if="formData.isApproval === 'Y'" :span="12">
-                    <el-form-item label="调班审批人" prop="approver" required :show-message="false">
+                <el-col :span="24">
+                    <el-form-item label="调班审批人" prop="approver" :show-message="false">
                         <el-select
                             v-model="formData.approver"
                             :disabled="readonly"
@@ -216,28 +213,28 @@
                 </div>
                 <div class="schedule-content">
                     <div class="ordinate">
-                        <div v-for="item in ordinateList" :key="item.id" class="ordinate-item">
-                            {{ item.name }}
+                        <div v-for="item in ordinateList" :key="item.value" class="ordinate-item">
+                            {{ item.label }}
                         </div>
                     </div>
                     <div class="item-list">
-                        <div v-for="(row, rIndex) in ordinateList" :key="row.id" class="item-row">
+                        <div v-for="(row, rIndex) in ordinateList" :key="row.value" class="item-row">
                             <div v-for="(column, cIndex) in dateList" :key="cIndex" class="item">
                                 <div
                                     ref="scheduleItem"
                                     class="item-content"
-                                    @mouseenter="hoveredIndex = `${row.id}-${cIndex}`"
+                                    @mouseenter="hoveredIndex = `${row.value}-${cIndex}`"
                                     @mouseleave="hoveredIndex = null"
                                     @contextmenu.prevent="handleRightClick($event, {row, rIndex, column, cIndex})"
                                 >
-                                    <span
-                                        v-for="(icon, iconIndex) in scheduleData[row.id][cIndex]"
-                                        :key="iconIndex"
+                                    <div
+                                        v-for="(shift, sIndex) in scheduleData[row.value][cIndex]"
+                                        :key="sIndex"
                                         class="icon-box"
                                     >
-                                        <i :class="icon.icon" :style="{ color: `${icon.color}` }" />
-                                    </span>
-                                    <div v-if="hoveredIndex === `${row.id}-${cIndex}` && !readonly" class="overlay">
+                                        <div :style="{ color: `${shift.color}` }">{{ shift.alias }}</div>
+                                    </div>
+                                    <div v-if="hoveredIndex === `${row.value}-${cIndex}` && !readonly" class="overlay">
                                         <i class="el-icon-edit" />
                                     </div>
                                 </div>
@@ -250,6 +247,7 @@
         <context-menu
             :visible.sync="showContextMenu"
             :params="params"
+            :shift-list="shiftList"
             :position="itemPosition"
             :item-data="selectItem"
             :readonly="readonly"
@@ -286,10 +284,8 @@ export default {
     },
     data () {
         const { userList = [], deptList = [] } = this.$store.getters || {}
-        const users = userList.map(item => ({ id: item.userId, name: item.userName }))
         const readonly = false
         return {
-            users,
             userList,
             deptList,
             cycleOptions,
@@ -299,10 +295,14 @@ export default {
             loading: false,
             activeStep: 1,
             formData: {
+                title: '',
+                dateRange: [],
+                config: '',
+                scheduleStaff: [],
+                isApproval: 'Y',
+                approver: [],
                 scheduleShift: [],
-                scheduleRule: [],
-                isEffective: 'Y',
-                isApproval: 'Y'
+                scheduleRule: []
             },
             rules: {},
             scheduleColumn,
@@ -323,29 +323,52 @@ export default {
                 { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', hidden: readonly },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ],
-            dateRange: ['2024-07-29', '2024-09-01'],
             viewType: 'users',
             dateObj: {},
             dateList: [],
             showContextMenu: false,
             hoveredIndex: null,
             params: {},
+            shiftList: [],
             selectItem: [],
-            itemPosition: {}
+            itemPosition: {},
+            pickerOptions: {
+                disabledDate: (time) => {
+                    const { dateRange } = this.formData
+                    if (!dateRange.length) {
+                        return false
+                    }
+                    const startDate = dateRange[0]
+                    const endDate = dateRange[1] || time
+                    // 日期差超过45天则禁用
+                    const diffDays = (endDate - startDate) / (1000 * 60 * 60 * 24)
+                    return diffDays > 45 || diffDays < -45
+                },
+                onPick: ({ minDate, maxDate }) => {
+                    if (minDate && !maxDate) {
+                        this.pickerOptions.disabledDate = (time) => {
+                            const dayDifference = (time - minDate) / (1000 * 60 * 60 * 24)
+                            return dayDifference > 45 || dayDifference < -45
+                        }
+                    }
+                }
+            }
         }
     },
     computed: {
         ordinateList () {
-            return this[this.viewType]
+            const { scheduleStaff } = this.formData
+            return this.userList.filter(u => scheduleStaff.includes(u.userId)).map(u => ({
+                label: u.userName,
+                value: u.userId
+            }))
         },
         scheduleData () {
-            return mapValues(keyBy(this.ordinateList, 'id'), () => [])
+            return mapValues(keyBy(this.ordinateList, 'value'), () => [])
         }
     },
     created () {
         this.loadData()
-        this.dateObj = this.getDateList(this.dateRange)
-        this.dateList = Object.values(this.dateObj).flat()
     },
     methods: {
         loadData () {
@@ -397,7 +420,7 @@ export default {
         },
         handleConfigChange (val) {
             const temp = this.configList.find(i => i.id === val)
-            console.log(temp)
+            // console.log(temp)
             this.formData = {
                 ...this.formData,
                 approver: temp.approver ? temp.approver.split(',') : [],
@@ -407,11 +430,38 @@ export default {
                 scheduleShift: temp.scheduleShift ? JSON.parse(temp.scheduleShift) : [],
                 scheduleStaff: temp.scheduleStaff ? JSON.parse(temp.scheduleStaff) : []
             }
+            this.shiftList = this.formData.scheduleShift.filter(s => s.isEnabled === 'Y').map(s => ({
+                ...s,
+                positions: s.positions.join('，'),
+                dateRange: s.dateRange.map(d => {
+                    return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
+                })
+            }))
+        },
+        handleDateChange (dates) {
+            if (this.$utils.isEmpty(dates)) {
+                this.pickerOptions.disabledDate = (time) => {
+                    return false
+                }
+            }
+            // if (dates.length === 1) {
+            //     const startDate = dates[0]
+            //     const maxEndDate = new Date(startDate)
+            //     maxEndDate.setDate(maxEndDate.getDate() + 45)
+
+            //     // 更新 pickerOptions，限制结束日期选择
+            //     this.pickerOptions = {
+            //         disabledDate: (time) => {
+            //             return time.getTime() < startDate.getTime() || time.getTime() > maxEndDate.getTime()
+            //         }
+            //     }
+            // }
         },
         getDateList (dateRange) {
             const [startDate, endDate] = dateRange.map(date => new Date(date))
             const dates = {}
             const currentDate = startDate
+            // eslint-disable-next-line no-unmodified-loop-condition
             while (currentDate <= endDate) {
                 const yearMonth = currentDate.toISOString().slice(0, 7) // 获取 'YYYY-MM' 格式
                 const date = currentDate.toISOString().split('T')[0] // 获取 'YYYY-MM-DD' 格式
@@ -424,13 +474,14 @@ export default {
             return dates
         },
         changeView () {
-            this.viewType = this.viewType === 'users' ? 'position' : 'users'
+            console.log('changeView')
         },
         handleRightClick (event, { row, colunm, rIndex, cIndex }) {
             this.selectItem = []
             this.showContextMenu = true
             const item = this.$refs.scheduleItem[rIndex * this.dateList.length + cIndex + 1]
             const rect = item.getBoundingClientRect()
+            console.log(rect.top + window.scrollY, rect.left + window.scrollX)
             this.itemPosition = {
                 top: rect.top + window.scrollY,
                 left: rect.left + window.scrollX
@@ -441,17 +492,24 @@ export default {
                 colunm,
                 cIndex
             }
-            this.selectItem = this.scheduleData[row.id][cIndex]
+            console.log(this.itemPosition)
+            this.selectItem = this.scheduleData[row.value][cIndex]
             console.log(this.selectItem)
         },
         handleSelect ({ selected, params }) {
-            this.scheduleData[params.row.id][params.cIndex] = selected
+            this.scheduleData[params.row.value][params.cIndex] = selected
         },
         handleClose () {
             this.showContextMenu = false
         },
         handleAction (action) {
             switch (action) {
+                case 'prev':
+                    this.handleStepChange(-1)
+                    break
+                case 'next':
+                    this.handleStepChange(1)
+                    break
                 case 'save':
                     this.$emit('save')
                     break
@@ -473,6 +531,23 @@ export default {
                 default:
                     break
             }
+        },
+        handleStepChange (val) {
+            if (this.activeStep === 1 && val) {
+                const valid = this.validateForm()
+                if (!valid) {
+                    this.$message.warning('请完善必填信息后再操作！')
+                    return
+                }
+                this.dateObj = this.getDateList(this.formData.dateRange)
+                this.dateList = Object.values(this.dateObj).flat()
+            }
+            this.activeStep += val
+        },
+        validateForm () {
+            const { scheduleRule, approver, ...rest } = this.formData
+            const result = Object.keys(rest).some(k => this.$utils.isEmpty(rest[k]))
+            return !result
         },
         closeDialog () {
             this.$emit('close', false)
@@ -510,7 +585,7 @@ export default {
             .el-form-item {
                 margin-bottom: 16px !important;
             }
-            .el-input, .el-select, .el-input-number {
+            .el-input, .el-select, .el-input-number, .el-range-editor {
                 width: 100%;
             }
         }
@@ -581,7 +656,7 @@ export default {
                 }
             }
             .schedule-content {
-                height: calc(100vh - 220px);
+                height: calc(100vh - 245px);
                 margin: 10px 0 20px 10px;
                 position: relative;
                 display: flex;
@@ -603,7 +678,7 @@ export default {
                         align-items: center;
                         justify-content: center;
                         text-align: center;
-                        height: 30px;
+                        height: 60px;
                         flex-shrink: 0;
                     }
                 }
@@ -615,7 +690,7 @@ export default {
                         .item {
                             position: relative;
                             width: 59px;
-                            height: 29px;
+                            height: 59px;
                             line-height: 30px;
                             text-align: center;
                             border: 1px solid #ccc;
@@ -640,7 +715,7 @@ export default {
                             .item-content {
                                 width: 100%;
                                 height: 100%;
-                                font-size: 16px;
+                                font-size: 14px;
                                 .icon-box:last-child {
                                     margin-left: 5px;
                                 }
