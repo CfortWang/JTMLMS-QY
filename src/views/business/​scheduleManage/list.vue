@@ -17,7 +17,9 @@
             @pagination-change="handlePaginationChange"
             @row-dblclick="handleRowDblclick"
         >
-            1
+            <template slot="dateRange" slot-scope="scope">
+                <span>{{ `${scope.row.startDate} 至 ${scope.row.endDate}` }}</span>
+            </template>
         </ibps-crud>
         <schedule-edit
             v-if="showScheduleEdit"
@@ -38,6 +40,7 @@
 
 <script>
 import { queryStaffSchedule, removeStaffSchedule, queryScheduleConfig } from '@/api/business/schedule'
+import { scheduleType } from '@/views/constants/schedule'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 
@@ -52,6 +55,7 @@ export default {
         const userOption = userList.map(item => ({ label: item.userName, value: item.userId }))
         return {
             userOption,
+            scheduleType,
             title: '排班记录',
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: true,
@@ -72,24 +76,20 @@ export default {
                 ],
                 searchForm: {
                     labelWidth: 80,
-                    itemWidth: 150,
+                    itemWidth: 180,
                     forms: [
                         { prop: 'Q^title_^SL', label: '排班名称' },
-                        { prop: 'Q^scope_^SL', label: '使用范围' },
-                        { prop: 'Q^cycle_^SL', label: '排班周期' },
-                        { prop: 'Q^status_^SL', label: '状态' },
+                        { prop: 'Q^type_^S', label: '排班类型', fieldType: 'select', options: scheduleType, multiple: 'N' },
                         { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '创建时间', fieldType: 'daterange', itemWidth: 200 }
                     ]
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'title', label: '排班名称', tags: [], minWidth: 150 },
-                    { prop: 'scope', label: '使用范围', tags: [], width: 120 },
-                    { prop: 'cycle', label: '排班周期', width: 120 },
-                    { prop: 'dateRange', label: '时间范围', slotName: 'time', width: 140 },
-                    { prop: 'status', label: '状态', width: 80 },
-                    { prop: 'createBy', label: '创建人', tags: userOption, width: 90 },
-                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 130 }
+                    { prop: 'title', label: '排班名称', minWidth: 150 },
+                    { prop: 'type', label: '排班类型', tags: scheduleType, width: 120 },
+                    { prop: 'dateRange', label: '排班时间范围', slotName: 'dateRange', width: 180 },
+                    { prop: 'createBy', label: '创建人', tags: userOption, width: 100 },
+                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 }
                 ],
                 rowHandle: {
                     effect: 'display',

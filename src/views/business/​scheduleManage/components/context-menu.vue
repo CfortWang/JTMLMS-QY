@@ -8,20 +8,35 @@
         >
             <ul>
                 <li
-                    v-for="(menu, index) in menus"
+                    v-for="(shift, index) in shiftList"
                     :key="index"
-                    :disabled="isMenuDisable(menu.key)"
-                    :class="selectedMenu.includes(menu.key) ? 'menu-actived' : ''"
-                    @click="handleClick(menu.key)"
+                    :disabled="isMenuDisable(shift.alias)"
+                    :class="selectedShift.includes(shift.alias) ? 'shift-actived' : ''"
+                    @click="handleClick(shift.alias)"
                 >
-                    <el-tooltip
+                    <!-- <el-tooltip
                         effect="dark"
-                        :content="menu.name"
+                        :content="shift.name"
                     >
-                        <i :class="menu.icon" :style="{ color: `${menu.color}` }" />
-                    </el-tooltip>
+                        <div :style="`color: ${shift.color};`" class="shift-item">{{ shift.name }}</div>
+                    </el-tooltip> -->
+                    <el-popover
+                        :title="shift.name"
+                        width="300"
+                        placement="right"
+                        trigger="hover"
+                    >
+                        <div>
+                            {{ shift.desc }}
+                        </div>
+                        <div
+                            slot="reference"
+                            :style="`color: ${shift.color};`"
+                            class="shift-item"
+                        >{{ shift.alias }}</div>
+                    </el-popover>
                 </li>
-                <el-button type="success" icon="el-icon-check" @click="handleSubmit" />
+                <el-button class="confirm-btn" type="success" icon="el-icon-check" @click="handleSubmit" />
             </ul>
         </div>
     </transition>
@@ -30,6 +45,14 @@
 <script>
 export default {
     props: {
+        visible: {
+            type: Boolean,
+            default: false
+        },
+        shiftList: {
+            type: Array,
+            default: () => []
+        },
         params: {
             type: Object,
             default: () => {}
@@ -41,14 +64,9 @@ export default {
         itemData: {
             type: Array,
             default: () => []
-        },
-        visible: {
-            type: Boolean,
-            default: false
         }
     },
     data () {
-        console.log(this.itemData)
         return {
             menus: [
                 {
@@ -82,59 +100,44 @@ export default {
                     color: '#8B4513'
                 }
             ],
-            selectedMenu: []
+            selectedShift: []
         }
     },
     watch: {
         visible: {
             handler (val) {
                 console.log(this.itemData)
-                this.selectedMenu = this.itemData.map(i => i.key) || []
+                this.selectedShift = this.itemData.map(i => i.alias) || []
             },
             immediate: true
         }
     },
     methods: {
-        // handleClick (item) {
-        //     this.selectedMenu.push(item.key)
-        // },
         handleClick (key) {
             // 执行trigger
-            if (this.selectedMenu.includes(key)) {
-                this.selectedMenu = this.selectedMenu.filter(i => i !== key)
+            if (this.selectedShift.includes(key)) {
+                this.selectedShift = this.selectedShift.filter(i => i !== key)
                 return
             }
-            // 校验是否可选
-            if (this.isMenuDisable(key)) {
-                this.$message.warning('班次冲突，如需修改请先取消选中当前班次！')
-                return
-            }
-            let temp = this.selectedMenu
-            temp.push(key)
-            if (temp.includes('morning') && temp.includes('afternoon')) {
-                temp = temp.filter(i => !['morning', 'afternoon'].includes(i))
-                temp.push('day')
-            }
-            this.selectedMenu = temp
-            console.log(this.selectedMenu)
+            this.selectedShift.push(key)
         },
         isMenuDisable (key) {
             // 已设置休息班次，则不可再设置其他班次
-            if (this.selectedMenu.includes('rest')) {
+            if (this.selectedShift.includes('rest')) {
                 return key !== 'rest'
             }
-            if (this.selectedMenu.includes('day')) {
+            if (this.selectedShift.includes('day')) {
                 return !['day', 'night'].includes(key)
             }
-            if (this.selectedMenu.includes('morning') || this.selectedMenu.includes('afternoon')) {
+            if (this.selectedShift.includes('morning') || this.selectedShift.includes('afternoon')) {
                 return !['morning', 'afternoon', 'night'].includes(key)
             }
-            if (this.selectedMenu.includes('night')) {
+            if (this.selectedShift.includes('night')) {
                 return key === 'rest'
             }
         },
         handleSubmit () {
-            const selected = this.menus.filter(i => this.selectedMenu.includes(i.key))
+            const selected = this.shiftList.filter(i => this.selectedShift.includes(i.alias))
             this.$emit('select', { selected, params: this.params })
             this.$emit('close')
         }
@@ -160,7 +163,7 @@ export default {
                 //     background-color: #f0f0f0;
                 // }
             }
-            .menu-actived {
+            .shift-actived {
                 // background-color: rgba(1, 245, 131, 0.5);
                 background-color: #007BFF;
                 color: #ffffff;
@@ -180,6 +183,9 @@ export default {
                 cursor: not-allowed;
                 opacity: 0.6;
                 filter: grayscale(100%);
+            }
+            .confirm-btn {
+                width: 100%;
             }
         }
     }
