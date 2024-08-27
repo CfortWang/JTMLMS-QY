@@ -17,7 +17,7 @@
             <div class="operate">
                 <template v-for="btn in toolbars">
                     <el-button
-                        v-if="!btn.hidden"
+                        v-if="!btn.steps || btn.steps.includes(activeStep)"
                         :key="btn.key"
                         :type="btn.type"
                         :icon="btn.icon"
@@ -56,22 +56,6 @@
                 />
             </el-form-item>
             <el-row :gutter="20" class="form-row">
-                <!-- <el-col :span="12">
-                    <el-form-item label="排班周期" prop="cycle" required :show-message="false">
-                        <el-select
-                            v-model="formData.cycle"
-                            :disabled="readonly"
-                            placeholder="请选择排班周期"
-                        >
-                            <el-option
-                                v-for="item in cycleOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                            />
-                        </el-select>
-                    </el-form-item>
-                </el-col> -->
                 <el-col :span="12">
                     <el-form-item prop="dateRange" required :show-message="false">
                         <template slot="label">
@@ -248,9 +232,17 @@
                 </div>
             </div>
         </div>
+        <div v-if="activeStep === 3" class="stat">
+            <statistic
+                :schedule-data="scheduleData"
+                :date-list="dateList"
+                :user-list="ordinateList"
+                @close="handleClose"
+            />
+        </div>
         <context-menu
             :visible.sync="showContextMenu"
-            :params="params"
+            :params="shiftParams"
             :shift-list="shiftList"
             :position="itemPosition"
             :item-data="selectItem"
@@ -263,21 +255,22 @@
 
 <script>
 import { cycleOptions, scheduleType, scheduleColumn } from '../../constants/schedule'
-import { queryScheduleConfig } from '@/api/business/schedule'
+import { queryScheduleConfig, getStaffSchedule, saveStaffSchedule } from '@/api/business/schedule'
 import { mapValues, keyBy } from 'lodash'
 import ActionUtils from '@/utils/action'
 
 export default {
     name: 'schedule',
     components: {
-        ContextMenu: () => import('./components/context-menu')
+        ContextMenu: () => import('./components/context-menu'),
+        Statistic: () => import('./components/statistic')
     },
     props: {
         visible: {
             type: Boolean,
             default: false
         },
-        pageData: {
+        pageParams: {
             type: Object,
             default: () => {}
         },
@@ -315,24 +308,25 @@ export default {
             configOptions: [],
             maxHeight: '250px',
             toolbars: [
-                { key: 'prev', icon: 'el-icon-d-arrow-left', label: '上一步', type: 'primary' },
-                { key: 'next', icon: 'el-icon-d-arrow-right', label: '下一步', type: 'primary' },
-                { key: 'changeView', icon: 'el-icon-set-up', label: '切换视图', type: 'primary' },
-                { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info' },
-                { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning' },
-                { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', hidden: readonly },
-                { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', hidden: readonly },
-                { key: 'edit', icon: 'el-icon-edit', label: '编辑', type: 'primary', hidden: readonly },
-                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', hidden: readonly },
-                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', hidden: readonly },
+                { key: 'prev', icon: 'el-icon-d-arrow-left', label: '上一步', type: 'primary', steps: '2,3' },
+                { key: 'next', icon: 'el-icon-d-arrow-right', label: '下一步', type: 'primary', steps: '1,2' },
+                { key: 'changeView', icon: 'el-icon-set-up', label: '切换视图', type: 'primary', steps: '2' },
+                { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info', steps: '2,3' },
+                { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning', steps: '2,3' },
+                { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', steps: '2,3' },
+                { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', steps: '2' },
+                // { key: 'edit', icon: 'el-icon-edit', label: '编辑', type: 'primary', steps: '2,3' },
+                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary' },
+                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', steps: '3' },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ],
             viewType: 'users',
+            scheduleData: {},
             dateObj: {},
             dateList: [],
             showContextMenu: false,
             hoveredIndex: null,
-            params: {},
+            shiftParams: {},
             shiftList: [],
             selectItem: [],
             itemPosition: {},
@@ -366,17 +360,18 @@ export default {
                 label: u.userName,
                 value: u.userId
             }))
-        },
-        scheduleData () {
-            return mapValues(keyBy(this.ordinateList, 'value'), () => [])
         }
+        // scheduleData () {
+        //     return mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
+        // }
     },
     created () {
         this.loadData()
     },
     methods: {
-        loadData () {
+        async loadData () {
             this.loading = true
+            // 获取配置数据
             queryScheduleConfig({
                 parameters: [],
                 requestPage: {
@@ -384,17 +379,47 @@ export default {
                     limit: 1000
                 },
                 sorts: []
-            }).then(res => {
+            }).then(async res => {
                 const { dataResult } = res.data || {}
                 this.configList = dataResult
-                this.configOptions = this.transformData(dataResult)
-                console.log(this.configOptions)
+                this.configOptions = this.transformConfigData(dataResult)
+                // console.log(this.configOptions)
+                if (this.$utils.isEmpty(this.pageParams.id)) {
+                    this.loading = false
+                    return
+                }
+
+                const response = await getStaffSchedule({ id: this.pageParams.id })
+                const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config } = response.data
+                const temp = config ? JSON.parse(config) : {}
+                console.log('responseData:', response.data)
+                console.log('configData:', temp)
+                this.formData = {
+                    title,
+                    config: temp.id,
+                    dateRange: [startDate, endDate],
+                    approver: temp.approver || [],
+                    scheduleType: type,
+                    scheduleRule: temp.scheduleRule || [],
+                    scheduleShift: temp.scheduleShift || [],
+                    scheduleStaff: temp.scheduleStaff || []
+                }
+                this.shiftList = this.formData.scheduleShift.filter(s => s.isEnabled === 'Y').map(s => ({
+                    ...s,
+                    positions: s.positions.join('，'),
+                    dateRange: s.dateRange.map(d => {
+                        return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
+                    })
+                }))
+                console.log('formData', this.formData)
+                this.scheduleData = this.transformScheduleData(records, overview, temp)
+                console.log('scheduleData', this.scheduleData)
                 this.loading = false
             }).catch(() => {
                 this.loading = false
             })
         },
-        transformData (data) {
+        transformConfigData (data) {
             return data.reduce((acc, item) => {
                 const { scheduleType } = item
                 // 查找是否已存在对应的 scheduleType
@@ -405,7 +430,7 @@ export default {
                     existingGroup.options.push({
                         ...item,
                         value: item.id,
-                        label: item.name || `占位信息${item.isEffective === 'N' ? '（未启用）' : ''}`
+                        label: `${item.name}${item.isEffective === 'N' ? '（未启用）' : ''}`
                     })
                 } else {
                     // 如果不存在，创建新的分组
@@ -415,20 +440,35 @@ export default {
                         options: [{
                             ...item,
                             value: item.id,
-                            label: item.name || `占位信息${item.isEffective === 'N' ? '（未启用）' : ''}`
+                            label: `${item.name}${item.isEffective === 'N' ? '（未启用）' : ''}`
                         }]
                     })
                 }
                 return acc
             }, [])
         },
+        transformScheduleData (records, overview, { scheduleShift }) {
+            const result = {}
+            const temp = overview ? JSON.parse(overview) : {}
+            records.forEach(({ id, userId, ...days }) => {
+                result[userId] = []
+                for (let day = 1; day <= temp.dateCount; day++) {
+                    const shifts = days[`d${day}`] ? days[`d${day}`].split(',') : []
+                    const formattedShifts = shifts.map(shift => {
+                        const temp = scheduleShift.find(s => s.alias === shift)
+                        return temp || {}
+                    })
+                    result[userId].push(formattedShifts)
+                }
+            })
+            return result
+        },
         handleConfigChange (val) {
             const temp = this.configList.find(i => i.id === val)
-            // console.log(temp)
             this.formData = {
                 ...this.formData,
                 approver: temp.approver ? temp.approver.split(',') : [],
-                scheduleType,
+                scheduleType: temp.scheduleType,
                 isApproval: temp.isApproval,
                 scheduleRule: temp.scheduleRule ? JSON.parse(temp.scheduleRule) : [],
                 scheduleShift: temp.scheduleShift ? JSON.parse(temp.scheduleShift) : [],
@@ -468,28 +508,27 @@ export default {
         changeView () {
             console.log('changeView')
         },
-        handleRightClick (event, { row, colunm, rIndex, cIndex }) {
+        handleRightClick (event, { row, rIndex, column, cIndex }) {
             this.selectItem = []
-            this.showContextMenu = true
-            const item = this.$refs.shiftItem[rIndex * this.dateList.length + cIndex + 1]
+            const item = this.$refs.shiftItem[rIndex * this.dateList.length + cIndex]
             const rect = item.getBoundingClientRect()
-            console.log(rect.top + window.scrollY, rect.left + window.scrollX)
             this.itemPosition = {
                 top: rect.top + window.scrollY,
-                left: rect.left + window.scrollX
+                left: rect.left + window.scrollX + rect.width
             }
-            this.params = {
+            this.shiftParams = {
                 row,
                 rIndex,
-                colunm,
+                column,
                 cIndex
             }
-            console.log(this.itemPosition)
+            console.log(row, column, rIndex, cIndex, this.scheduleData)
             this.selectItem = this.scheduleData[row.value][cIndex]
-            console.log(this.selectItem)
+            this.showContextMenu = true
         },
         handleSelect ({ selected, params }) {
             this.scheduleData[params.row.value][params.cIndex] = selected
+            console.log(this.scheduleData)
         },
         handleClose () {
             this.showContextMenu = false
@@ -503,7 +542,7 @@ export default {
                     this.handleStepChange(1)
                     break
                 case 'save':
-                    this.$emit('save')
+                    this.handleSave()
                     break
                 case 'submit':
                     this.$emit('submit')
@@ -533,6 +572,10 @@ export default {
                 }
                 this.dateObj = this.getDateList(this.formData.dateRange)
                 this.dateList = Object.values(this.dateObj).flat()
+                console.log(this.ordinateList)
+                if (!this.pageParams.id) {
+                    this.scheduleData = mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
+                }
             }
             this.activeStep += val
         },
@@ -540,6 +583,96 @@ export default {
             const { scheduleRule, approver, ...rest } = this.formData
             const result = Object.keys(rest).some(k => this.$utils.isEmpty(rest[k]))
             return !result
+        },
+        // dealData (data) {
+        //     const result = Object.entries(data).map(([userId, days]) => {
+        //         const userObj = { userId }
+        //         days.forEach((day, index) => {
+        //             // userObj[`d${index + 1}`] = day.map(({ dateRange, name, alias }) => ({ dateRange, name, alias })) || []
+        //             userObj[`d${index + 1}`] = day.map(({ alias }) => alias).join(',') || ''
+        //         })
+        //         return userObj
+        //     })
+        //     return result
+        // },
+        dealData (data) {
+            var dateCount = 0
+            const result = Object.entries(data).map(([userId, days]) => {
+                const userObj = { userId, statistics: {}}
+                dateCount = days.length
+                days.forEach((day, index) => {
+                    const shifts = day.map(({ alias }) => alias).join(',') || ''
+                    userObj[`d${index + 1}`] = shifts
+
+                    // 统计每个alias出现的次数
+                    day.forEach(({ alias }) => {
+                        if (userObj.statistics[alias]) {
+                            userObj.statistics[alias]++
+                        } else {
+                            userObj.statistics[alias] = 1
+                        }
+                    })
+                })
+
+                return {
+                    ...userObj,
+                    statistics: JSON.stringify(userObj.statistics)
+                }
+            })
+
+            // 统计所有userId中各个alias的平均出现次数
+            const total = {}
+            const userCount = result.length
+
+            result.forEach(user => {
+                Object.entries(JSON.parse(user.statistics)).forEach(([alias, count]) => {
+                    if (total[alias]) {
+                        total[alias] += count
+                    } else {
+                        total[alias] = count
+                    }
+                })
+            })
+            const avg = {}
+            Object.entries(total).forEach(([alias, totalCount]) => {
+                avg[alias] = totalCount / userCount
+            })
+            const overview = {
+                avg,
+                total,
+                userCount,
+                dateCount
+            }
+            return { staffScheduleDetailPoList: result, overview }
+        },
+        handleSave () {
+            const { staffScheduleDetailPoList, overview } = this.dealData(this.scheduleData) || {}
+            console.log(staffScheduleDetailPoList, overview)
+            const { dateRange, title, config, approver, scheduleType, scheduleShift, scheduleStaff, scheduleRule } = this.formData
+            const configData = {
+                id: config,
+                approver,
+                scheduleShift,
+                scheduleStaff,
+                scheduleRule
+            }
+            const submitData = {
+                id: this.pageParams.id,
+                pk: this.pageParams.id,
+                title,
+                startDate: dateRange[0],
+                endDate: dateRange[1],
+                type: scheduleType,
+                config: JSON.stringify(configData),
+                overview: JSON.stringify(overview),
+                staffScheduleDetailPoList
+            }
+            console.log(submitData)
+            saveStaffSchedule(submitData).then(res => {
+                this.$message.success('保存成功')
+                this.closeDialog()
+                this.$emit('callback')
+            })
         },
         closeDialog () {
             this.$emit('close', false)
@@ -701,21 +834,18 @@ export default {
                                 flex-direction: column;
                             }
 
-                            // 当有三个或四个子元素时使用网格布局
                             &:has(.shift:nth-child(3)) {
                                 flex-direction: column;
                                 display: grid;
                                 grid-template-columns: repeat(2, 1fr);
                                 gap: 1px;
                             }
-                            &:has(.shift:nth-child(odd)) {
+                            &:has(.shift:nth-of-type(odd):nth-last-of-type(odd)):not(:has(.overlay)) {
+                                // background: #303133;
                                 .shift:last-of-type {
                                     grid-column: span 2;
                                     justify-self: center;
                                 }
-                            }
-                            .shift:only-child {
-                                margin-left: 0;
                             }
                             &:last-child {
                                 border-right: 1px solid #ccc;

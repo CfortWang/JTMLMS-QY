@@ -24,7 +24,7 @@
         <schedule-edit
             v-if="showScheduleEdit"
             :visible.sync="showScheduleEdit"
-            :params="params"
+            :page-params="params"
             :readonly="readonly"
             @refresh="loadData"
             @close="() => showScheduleEdit = false"
@@ -180,10 +180,10 @@ export default {
          * 处理编辑
          */
         async handleEdit ({ id }, key) {
-            // this.params = {
-            //     configId: ''
-            // }
-            // this.readonly = key === 'detail'
+            this.params = {
+                id
+            }
+            this.readonly = key === 'detail'
             this.showScheduleEdit = true
         },
         /**
