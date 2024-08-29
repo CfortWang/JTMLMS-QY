@@ -113,7 +113,7 @@
                             <el-form-item label="是否启用：">
                                 <template slot="label">
                                     <span>是否启用</span>
-                                    <el-tooltip effect="dark" content="是否启用，停用后将过滤掉与此相关的业务。" placement="top">
+                                    <el-tooltip effect="dark" content="若该值为停用时，将不会按监测周期产生对应记录。" placement="top">
                                         <i class="el-icon-question question-icon">：</i>
                                     </el-tooltip>
                                 </template>

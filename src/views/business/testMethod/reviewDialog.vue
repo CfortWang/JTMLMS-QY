@@ -405,7 +405,6 @@ export default {
         breakData (newValeu) {
             const sql = `select * from neng_li_fan_wei_ where id_='${newValeu}'`
             this.$common.request('sql', sql).then(res => {
-                // console.log('re121s', res)
                 this.ruleForm.xiangMuMingCheng = res.variables.data[0].jian_yan_xiang_mu
                 this.ruleForm.sheBeiMingCheng = res.variables.data[0].she_bei_
                 this.ruleForm.sheBeiBianHao = res.variables.data[0].she_bei_bian_hao_
@@ -438,6 +437,7 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+.paper-detail-dialog{
 .dialog-footer{
     text-align: center;
 }
@@ -452,10 +452,14 @@ export default {
 .review-form{
  padding: 10px;
 }
-::v-deep .el-dialog {
-width: 60% !important;
-margin-top: 2vh !important;
-height: 90% !important;
+::v-deep{
+    .el-dialog{
+        width: 60% !important;
+        margin-top: 2vh !important;
+        height: 90% !important;
+    }
 }
+}
+
 </style>
 

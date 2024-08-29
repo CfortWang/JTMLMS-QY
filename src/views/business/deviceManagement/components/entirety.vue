@@ -13,13 +13,16 @@
               </div>
             </div>
             <div>
-              <div>{{captionArr[n]}}</div>
-              <div style="font-size:28px;">{{item}}</div>
+              <div style="font-size:17px;font-weight:600;">{{captionArr[n]}}</div>
+              <div style="font-weight:600;font-size:28px;color: rgb(255,255,0);margin-top: 1vh;text-align: center;">{{item}}</div>
             </div>
           </div>
           <div class="mySty" v-else>
             <div>{{captionArr[i]}}</div>
-            <div v-for="(t, e) in item" :key="'item'+e">{{captionArr[e]}}{{t}}</div>
+            <div v-for="(t, e) in item" :key="'item'+e">
+              <div>{{captionArr[e]}}</div>
+              <div style="color: rgb(255,255,0);font-weight:600;">{{t}}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -139,7 +142,7 @@
           .mySty{
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
           }
         }
       }

@@ -96,44 +96,127 @@
                         slot="expandSlot"
                         slot-scope="{row}"
                     >
-                        <el-form label-position="left" inline class="demo-table-expand">
-                            <el-form-item label="是否维护：">
-                                <span>{{ row.shiFouWeiHu }}</span>
-                            </el-form-item>
-                            <el-form-item label="是否校准：">
-                                <span>{{ row.shiFouXiaoZhun }}</span>
-                            </el-form-item>
-                            <el-form-item label="检定/校准周期：">
-                                <span>{{ row.xiaoZhunZQ?`${row.xiaoZhunZQ}月` : '/' }}</span>
-                            </el-form-item>
-                            <el-form-item label="供应商：">
-                                <span>{{ row.gongYingShang || '/' }}</span>
-                            </el-form-item>
-                            <el-form-item label="核查人：">
-                                <ibps-user-selector
-                                    v-model="row.biXuDeHuanJin"
-                                    type="user"
-                                    readonly-text="text"
-                                    :multiple="true"
-                                    :disabled="true"
-                                    style="width:200px"
-                                />
-                            </el-form-item>
-                            <el-form-item label="建档时间：">
-                                <span>{{ row.bianZhiShiJian }}</span>
-                            </el-form-item>
-                            <el-form-item label="建档人：">
-                                <ibps-user-selector
-                                    v-model="row.bianZhiRen"
-                                    type="user"
-                                    readonly-text="text"
-                                    :multiple="true"
-                                    :disabled="true"
-                                    style="width:200px"
-                                />
-                            </el-form-item>
-                        </el-form>
-
+                        <el-row :gutter="20" style="height:145px;padding:0 20px 0 0" type="flex" align="middle">
+                            <el-col :span="5" :push="2">
+                                <el-row>
+                                    <el-col :span="3">
+                                        <el-image
+                                            class="icon-image"
+                                            :src="images[0]"
+                                            fit="contain"
+                                        />
+                                    </el-col>
+                                    <el-col :span="21">
+                                        <div class="title">验收信息</div>
+                                        <div class="ctx">
+                                            <div class="item">接收日期：{{ row.jieShouRiQi || '/' }}</div>
+                                            <div class="item">验收日期：{{ row.yanShouRiQi || '/' }}</div>
+                                            <div class="item">核查日期：{{ row.biXuSheShi || '/' }}</div>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                            </el-col>
+                            <el-col :span="5" :push="2">
+                                <el-row>
+                                    <el-col :span="3">
+                                        <el-image
+                                            class="icon-image"
+                                            :src="images[1]"
+                                            fit="contain"
+                                        />
+                                    </el-col>
+                                    <el-col :span="21">
+                                        <div class="title">建档信息</div>
+                                        <div class="ctx">
+                                            <div class="item">
+                                                <div class="cusitem">
+                                                    <span class="span">建档人：</span>
+                                                    <ibps-user-selector
+                                                        :value="row.bianZhiRen"
+                                                        type="user"
+                                                        readonly-text="text"
+                                                        :multiple="true"
+                                                        :disabled="true"
+                                                        size="mini"
+                                                        style="width:100px"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="item">
+                                                <div class="cusitem">
+                                                    <span class="span">建档部门：</span>
+                                                    <ibps-user-selector
+                                                        :value="row.bianZhiBuMen"
+                                                        type="position"
+                                                        readonly-text="text"
+                                                        :disabled="true"
+                                                        :multiple="false"
+                                                        size="mini"
+                                                        style="width:100px"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="item">建档时间：{{ row.bianZhiShiJian || '/' }}</div>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                            </el-col>
+                            <el-col :span="5" :push="2">
+                                <el-row>
+                                    <el-col :span="3">
+                                        <el-image
+                                            class="icon-image"
+                                            :src="images[2]"
+                                            fit="contain"
+                                        />
+                                    </el-col>
+                                    <el-col :span="21">
+                                        <div class="title">维护信息</div>
+                                        <div class="ctx">
+                                            <div class="item">是否维护：{{ row.shiFouWeiHu || '/' }}</div>
+                                            <div class="item">是否24H开机：{{ row.jianKongYiJu || '/' }}</div>
+                                            <div class="item">是否限用：{{ row.xiaoZhunWuCha || '/' }}</div>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                            </el-col>
+                            <el-col :span="5" :push="2">
+                                <el-row>
+                                    <el-col :span="3">
+                                        <el-image
+                                            class="icon-image"
+                                            :src="images[3]"
+                                            fit="contain"
+                                        />
+                                    </el-col>
+                                    <el-col :span="21">
+                                        <div class="title">校准信息</div>
+                                        <div class="ctx">
+                                            <div class="item">是否校准：{{ row.shiFouXiaoZhun || '/' }}</div>
+                                            <div class="item">校准周期：{{ row.xiaoZhunZQ?`${row.xiaoZhunZQ}月` : '/' }}</div>
+                                            <div class="item">最近校准时间：{{ row.yiXiaoRiQi || '/' }}</div>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                            </el-col>
+                            <el-col :span="4" :push="1">
+                                <el-row>
+                                    <el-col :span="24">
+                                        <el-image
+                                            class="device-image"
+                                            :src="ImageUrl(row)"
+                                            fit="fill"
+                                            :preview-src-list="ImageAllUrl(row)"
+                                            :title="`[${row.sheBeiMingCheng}]设备首图，点击查看更多`"
+                                        >
+                                            <div slot="error" class="image-slot">
+                                                <el-empty class="device-image" description="暂无图片" :image-size="70" />
+                                            </div>
+                                        </el-image>
+                                    </el-col>
+                                </el-row>
+                            </el-col>
+                        </el-row>
                     </template>
                     <!-- 搜索条件 -->
                     <template slot="pos">
@@ -249,6 +332,12 @@
 </template>
 
 <script>
+import image01 from '@/assets/images/device/01.png'
+import image02 from '@/assets/images/device/02.png'
+import image03 from '@/assets/images/device/03.png'
+import image04 from '@/assets/images/device/04.png'
+import { getImage } from '@/api/platform/file/attachment'
+
 import xlsx from 'xlsx'
 import fs from 'file-saver'
 import DataTemplateFormrenderDialog from '@/business/platform/data/templaterender/form/dialog.vue'
@@ -273,6 +362,7 @@ export default {
     data () {
         const { userId, level = {}, position } = this.$store.getters || {}
         return {
+            images: [image01, image02, image03, image04],
             ImportDeviceType: '',
             iframeVisible: false,
             srcUrl: '',
@@ -514,6 +604,20 @@ export default {
         this.getDatas()
     },
     methods: {
+        ImageAllUrl (row) {
+            if (row && row.buMen) {
+                const imgId = row.buMen.split(',')
+                return imgId.map(item => getImage(item))
+            }
+            return []
+        },
+        ImageUrl (row) {
+            if (row && row.buMen) {
+                const imgId = row.buMen.split(',')[0]
+                return getImage(imgId)
+            }
+            return ''
+        },
         async getDatas () {
             this.loading = true
             const parameters = {
@@ -764,7 +868,7 @@ export default {
             console.log('导入维护项目')
         },
         getTimeStamp () {
-            return new Date().getTime()
+            return dayjs().format('YYYYMMDDHHmmss')
         },
         xlsx (json, fields, filename = '.xlsx') { // 导出xlsx
             json.forEach(item => {
@@ -1404,22 +1508,42 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.demo-table-expand {
-    margin-left: 100px;
-    font-size: 0;
-  }
-  .demo-table-expand label {
-    width: 90px;
-    color: #99a9bf;
-  }
-  .demo-table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-    width: 32%;
-  }
+    .icon-image{
+        width: 36px;
+    }
+    .device-image{
+        width: 152px;
+        height: 110px;
+    }
+    .title{
+        font-size: 12px;
+        font-weight: 900;
+        color: #333;
+        margin: 0 0 14px 20px;
+
+    }
+    .ctx{
+        margin: 0 0 0 20px;
+        .item{
+            .cusitem{
+                margin: -8px 0;
+                display: flex;
+                align-items: center;
+            }
+            .span{
+                min-width:60px
+            }
+            margin: 6px 0;
+            color: #999;
+        }
+
+    }
   ::v-deep {
         .el-form-item__label{
             text-align: left;
+            font-size: 12px !important;
+        }
+        .el-form-item__ctx{
             font-size: 12px !important;
         }
     }

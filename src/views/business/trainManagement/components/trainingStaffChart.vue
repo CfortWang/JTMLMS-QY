@@ -165,7 +165,7 @@
               show:true,
               lineStyle:{
                   type: [15,8],
-                  color: ['#fff'],
+                  color: ['rgba(255,255,255,0.5)'],
               }
             }
           },

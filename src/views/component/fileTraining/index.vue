@@ -57,11 +57,17 @@
                             v-for="(activity, index) in leftData"
                             :key="index"
                             :timestamp="activity.fa_fang_shi_jian_"
+                            :type="index === activeIndex ? type : ''"
                             @click.stop.native="toggleActive(activity, index)"
                         >
+                            <!-- <div>
+                                <el-tooltip class="item" effect="dark" placement="right-end" :content="showContent(activity,index)">
+                                    <div>版本号:{{ activity.ban_ben_ }}/修订人：{{ activity.fileInfos.CREATOR_NAME_ }}==={{ activity.bian_zhi_ren_ }}</div>
+                                </el-tooltip>
+                            </div> -->
                             <div>
                                 <el-tooltip class="item" effect="dark" placement="right-end" :content="showContent(activity,index)">
-                                    <div>版本号:{{ activity.ban_ben_ }}/修订人：{{ activity.fileInfos.CREATOR_NAME_ }}</div>
+                                    <div>版本号:{{ activity.ban_ben_ }}/修订人：{{ getUserName(activity.bian_zhi_ren_) }}</div>
                                 </el-tooltip>
                             </div>
                         </el-timeline-item>
@@ -133,6 +139,7 @@ export default {
         const { userList, userId, role, isSuper } = this.$store.getters
         // const userId = this.$store.getters.userInfo.employee.id// 本人修改
         return {
+            type: 'success',
             curFileName: '',
             dialogVisible: false,
             operation_status: 'fileTraining',
@@ -153,7 +160,7 @@ export default {
             fileInfo: '',
             fileJie: '',
             leftData: [],
-            activeIndex: null,
+            activeIndex: 0,
             userList: userList,
             userId: userId,
             innerVisible: false,
@@ -189,56 +196,17 @@ export default {
                 this.digData = this.leftData[0]
             }
         },
-        // fileInfos: {
-        //     handler: function (val, oldVal) {
-        //         this.dialogVisible = this.visible
-        //         this.title = `文件：《${val.FILE_NAME_}》`
-        //         this.tmpId = val.id
-        //         this.upFunc = val.func
-        //         const data = {
-        //             ext: val.fileInfos.EXT_,
-        //             fileName: val.fileInfos.FILE_NAME_,
-        //             id: val.fileInfos.ID_,
-        //             index: 0,
-        //             totalBytes: val.fileInfos.TOTAL_BYTES_
-        //         }
-        //         // 1、获取文件数据 及下载流接口
-        //         this.optionFile.url = BASE_API() + SYSTEM_URL() + '/file/download?attachmentId=' + data.id
-        //         this.optionFile.editUrl = BASE_API() + SYSTEM_URL() + '/file/editCallback?fileName=' + data.fileName + '&fileType=' + data.ext + '&type="fileTraining"&id=' + data.id
-        //         this.optionFile.title = data.fileName // 文件名称
-        //         this.optionFile.fileType = data.ext // 类型
-        //         this.optionFile.data = data // 记录编制的位置，需要替换。
-        //         this.optionFile.data.index = data.index
-        //         // 使用 v-if 实现组件刷新功能
-        //         this.refresh = false
-        //         this.$nextTick(() => {
-        //             this.refresh = true
-        //         })
-        //         // 本人修改2
-        //         // const sql = `select * from t_wjxxb WHERE tou_ban_wen_jian_='${val.id}'`
-        //         // this.$common.request('sql', sql).then((res) => {
-        //         //     this.fileInfo = res.variables.data[0]
-        //         //     this.fileJie = res.variables.data[0].jie_gai_jie_xi_
-        //         // })
-
-        //         // 本人修改,获取更新数据
-        //         const sql1 = `select * from t_wjxxgxb where yuan_wen_jian_id_= '${val.id}'`
-        //         const sql2 = `select * from t_wjxxb where id_= '${val.id}'`
-        //         Promise.all([this.$common.request('sql', sql2), this.$common.request('sql', sql1)]).then(([res1, res2]) => {
-        //             this.leftData = res1.variables.data
-        //             const arr = res2.variables.data
-        //             arr.forEach(el => {
-        //                 el['ban_ben_'] = res1.variables.data[0].ban_ben_
-        //                 this.leftData.push(el)
-        //             })
-        //         })
-        //     },
-        //     deep: true// 深度监听，确保对象属性变化也能触发(本人修改)
-        // },
         // 本人修改
         fileInfos: {
             handler (newVal) {
                 this.leftData = newVal
+                const temp = JSON.parse(JSON.stringify(newVal))
+                temp.sort((a, b) => {
+                    return new Date(b.fa_fang_shi_jian_).getTime() - new Date(a.fa_fang_shi_jian_).getTime()
+                })
+                if (newVal !== temp) {
+                    this.leftData = temp
+                }
                 newVal.forEach(val => {
                     this.fileShow(val)
                 })
@@ -284,10 +252,18 @@ export default {
         this.checkDialogBody()
     },
     methods: {
+
+        getUserName (data) {
+            const user = this.userList.find(item => item.userId === data)
+            return user ? user.userName : '未知用户'
+        },
         showContent (activity, index) {
-            if (index <= 0) {
-                return '第一版'
+            if (activity.cao_zuo_lei_xing_ === '新增') {
+                return '第一版本'
             }
+            // if (index <= 0) {
+            //     return '第一版'
+            // }
             return activity.xiu_ding_nei_rong ? activity.xiu_ding_nei_rong : '无修订原因'
         },
 
@@ -298,6 +274,7 @@ export default {
                 this.startTimer()
             }
         },
+
         closeDialog () {
             const fvView = this.$refs.fvView
             // 销毁子组件方法
@@ -347,25 +324,40 @@ export default {
             }
         },
         // 本人修改
+        // id转换
+        async idChange (id) {
+            const sql = `select id_ FROM t_wjxxb WHERE shu_ju_lai_yuan_ = '${id}'`
+            return new Promise((resolve, reject) => {
+                this.$common.request('sql', sql).then((res) => {
+                    const { data = [] } = res.variables || {}
+                    const firstId = data[0]?.id_
+                    resolve(firstId) // 解析 Promise 时返回 firstId
+                }).catch(error => {
+                    reject(error) // 捕获错误并拒绝 Promise
+                })
+            })
+        },
+
         toggleActive (activity, index) {
+            this.activeIndex = index
             this.digData = activity
             clearInterval(this.clearTimeSet)
             this.browseTime = 0
-            // console.log('activity', activity)
             this.curFileName = activity.FILE_NAME_
             this.fileShow(activity)// 展示内容改变
             this.checkNum(activity)// 阅读量
-
             // this.$forceUpdate()// 触发监听器
         },
         // 阅读量函数
         checkNum (activity) {
-            const sql1 = `select * from t_wjcyjl where parent_id_= '${activity.id}' order by create_time_ desc`
-            this.$common.request('sql', sql1).then((res) => {
+            const sql = `select t_wjcyjl.* from t_wjcyjl
+                INNER JOIN t_wjxxb ON t_wjcyjl.parent_id_ = t_wjxxb.id_
+                WHERE t_wjxxb.shu_ju_lai_yuan_ = '${activity.id}' order by create_time_ desc`
+            // const sql1 = `select * from t_wjcyjl where parent_id_= '${activity.id}' order by create_time_ desc`
+            this.$common.request('sql', sql).then((res) => {
                 const { data = [] } = res.variables || {}
                 this.lookNum = data.length
                 this.showList = data
-                // console.log('showList', this.showList)
             })
         },
         handleUpdate (fileId, time) {
@@ -391,8 +383,6 @@ export default {
         lookFile () {
             // console.log(document.querySelector('iframe').contentWindow.document)
             // console.log(document.querySelector('iframe').contentWindow.document.body.innerHTML);
-            // console.log('查看文件', this.digData)
-            // console.log('leftData', this.leftData)
             if (this.digData) {
                 this.checkNum(this.digData)
             } else {
@@ -407,10 +397,9 @@ export default {
             const curRole = this.role.map(i => i.alias)
             const isPower = curRole.some(item => roleKey.includes(item))
             if (this.isSuper || isPower) {
-                console.log('this.leftData[0]', this.leftData[0])
                 const deleteParams = {
                     tableName: 't_wjxxb',
-                    paramWhere: { id_: this.leftData[0].id }
+                    paramWhere: { id_: this.leftData[0].zId }
                 }
                 curdPost('delete', deleteParams).then(() => {
                     this.$message({
@@ -439,9 +428,12 @@ export default {
             a.remove()
         },
         fileShow (val) {
+            // console.log('qwqwqw', this.idChange('1166703356459089920'))
             this.dialogVisible = this.visible
             this.title = `文件：《${val.FILE_NAME_}》`
-            this.tmpId = val.id
+            this.idChange(val.id).then(res => {
+                this.tmpId = res
+            })
             this.upFunc = val.func
             const data = {
                 ext: val.fileInfos.EXT_,
@@ -461,6 +453,14 @@ export default {
             this.refresh = false
             this.$nextTick(() => {
                 this.refresh = true
+            })
+        },
+        // 排序函数
+        sortByFabushijianDesc (data) {
+            return data.sort((a, b) => {
+                const dateA = new Date(a.fa_fang_shi_jian_)
+                const dateB = new Date(b.fa_fang_shi_jian_)
+                return dateB - dateA // 降序排序
             })
         },
         formattedTimestamp (timestamp) {

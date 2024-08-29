@@ -20,17 +20,23 @@
         <div class="container">
             <div class="left" :style="{width:initWidth}">
                 <div class="form">
-                    <el-form ref="form" label-width="100px" :model="form" :rules="rules" :hide-required-asterisk="false">
+                    <el-form ref="form" label-width="100px" :model="form" :rules="rules" :hide-required-asterisk="true">
                         <el-row type="flex" justify="center" :gutter="20">
                             <el-col :span="16">
                                 <el-row :gutter="20">
                                     <el-col v-if="isEdit" :span="8">
                                         <el-form-item label="设备名称：" prop="sheBeiMingCheng">
+                                            <template slot="label">
+                                                <span class="required">设备名称：</span>
+                                            </template>
                                             <el-input v-model="form.sheBeiMingCheng" size="mini" />
                                         </el-form-item>
                                     </el-col>
                                     <el-col v-if="!isEdit" :span="8">
                                         <el-form-item label="设备名称：" prop="sheBeiMingChen">
+                                            <template slot="label">
+                                                <span class="required">设备名称：</span>
+                                            </template>
                                             <ibps-custom-dialog
                                                 v-model="form.sheBeiMingChen"
                                                 size="mini"
@@ -47,6 +53,9 @@
                                 <el-row :gutter="20">
                                     <el-col :span="8">
                                         <el-form-item label="建档部门：" prop="bianZhiBuMen">
+                                            <template slot="label">
+                                                <span class="required">建档部门：</span>
+                                            </template>
                                             <ibps-user-selector
                                                 v-model="form.bianZhiBuMen"
                                                 type="position"
@@ -71,6 +80,9 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="建档时间：" prop="bianZhiShiJian">
+                                            <template slot="label">
+                                                <span class="required">建档时间：</span>
+                                            </template>
                                             <el-date-picker
                                                 v-model="form.bianZhiShiJian"
                                                 style="width:100%"
@@ -98,6 +110,9 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="原设备编号：" prop="yuanSheBeiBian">
+                                            <template slot="label">
+                                                <span class="required">原设备编号：</span>
+                                            </template>
                                             <el-input v-model="form.yuanSheBeiBian" size="mini" />
                                         </el-form-item>
                                     </el-col>
@@ -122,6 +137,9 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="规格型号：" prop="guiGeXingHao">
+                                            <template slot="label">
+                                                <span class="required">规格型号：</span>
+                                            </template>
                                             <el-input v-model="form.guiGeXingHao" size="mini" />
                                         </el-form-item>
                                     </el-col>
@@ -141,6 +159,9 @@
                                 <el-row :gutter="20">
                                     <el-col :span="8">
                                         <el-form-item label="保管人：" prop="guanLiRen">
+                                            <template slot="label">
+                                                <span class="required">保管人：</span>
+                                            </template>
                                             <ibps-user-selector
                                                 v-model="form.guanLiRen"
                                                 type="user"
@@ -153,6 +174,9 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="放置地点：" prop="cunFangWeiZhi">
+                                            <template slot="label">
+                                                <span class="required">放置地点：</span>
+                                            </template>
                                             <ibps-custom-dialog
                                                 v-model="form.cunFangWeiZhi"
                                                 size="mini"
@@ -166,15 +190,64 @@
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
-                                        <el-form-item label="是否校准：" prop="shiFouXiaoZhun">
-                                            <el-select v-model="form.shiFouXiaoZhun" placeholder="请选择" size="mini" style="width:100%">
-                                                <el-option
-                                                    v-for="item in ['是','否']"
-                                                    :key="item"
-                                                    :label="item"
-                                                    :value="item"
-                                                />
-                                            </el-select>
+                                        <el-form-item label="固定资产号：">
+                                            <el-input v-model="form.ziChanBianHao" size="mini" />
+                                        </el-form-item>
+
+                                    </el-col>
+                                </el-row>
+                                <el-row :gutter="20">
+                                    <el-col :span="8">
+                                        <el-form-item label="厂家/品牌：">
+                                            <el-input v-model="form.changShang" size="mini" />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="出厂日期：" prop="chuChangRiQi">
+                                            <template slot="label">
+                                                <span class="required">出厂日期</span>
+                                            </template>
+                                            <el-date-picker
+                                                v-model="form.chuChangRiQi"
+                                                style="width:100%"
+                                                type="date"
+                                                placeholder="选择日期"
+                                                :readonly="readonly"
+                                                value-format="yyyy-MM-dd"
+                                                size="mini"
+                                            />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="出厂编号：">
+                                            <el-input v-model="form.jiShenXuHao" size="mini" />
+                                        </el-form-item>
+
+                                    </el-col>
+                                </el-row>
+                                <el-row :gutter="20">
+                                    <el-col :span="8">
+                                        <el-form-item label="供应商：">
+                                            <ibps-custom-dialog
+                                                v-model="form.shiFouQiJianH"
+                                                size="mini"
+                                                template-key="gysxxdhk"
+                                                :disabled="false"
+                                                type="dialog"
+                                                class="custom-dialog"
+                                                placeholder="请选择"
+                                                icon="el-icon-search"
+                                            />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="供应商电话：">
+                                            <el-input v-model="form.lianXiFangShi" size="mini" />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="注册证号：">
+                                            <el-input v-model="form.zhuCeZhengHao" size="mini" />
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -207,281 +280,311 @@
                 <div class="tabs">
                     <el-row>
                         <el-col>
-                            <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+                            <el-tabs v-model="activeName" @tab-click="handleClick">
                                 <el-tab-pane label="基本信息" name="one">
                                     <el-form label-width="100px" :model="form" :hide-required-asterisk="true">
-                                        <el-row>
-                                            <el-row :gutter="20">
-                                                <el-col :span="8">
-                                                    <el-form-item label="固定资产号：">
-                                                        <el-input v-model="form.ziChanBianHao" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="厂家/品牌：">
-                                                        <el-input v-model="form.changShang" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="出厂编号：">
-                                                        <el-input v-model="form.jiShenXuHao" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
-                                            <el-row :gutter="20">
-                                                <el-col :span="8">
-                                                    <el-form-item label="注册证号：">
-                                                        <el-input v-model="form.zhuCeZhengHao" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="出厂日期：">
-                                                        <template slot="label">
-                                                            <span class="required">出厂日期</span>
-                                                        </template>
-                                                        <el-date-picker
-                                                            v-model="form.chuChangRiQi"
-                                                            style="width:100%"
-                                                            type="date"
-                                                            placeholder="选择日期"
-                                                            :readonly="readonly"
-                                                            value-format="yyyy-MM-dd"
-                                                            size="mini"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="接收日期：">
-                                                        <el-date-picker
-                                                            v-model="form.jieShouRiQi"
-                                                            style="width:100%"
-                                                            type="date"
-                                                            placeholder="选择日期"
-                                                            :readonly="readonly"
-                                                            value-format="yyyy-MM-dd"
-                                                            size="mini"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
-                                            <el-row :gutter="20">
-                                                <el-col :span="8">
-                                                    <el-form-item label="投入日期：">
-                                                        <el-date-picker
-                                                            v-model="form.qiYongRiQi"
-                                                            style="width:100%"
-                                                            type="date"
-                                                            placeholder="选择日期"
-                                                            :readonly="readonly"
-                                                            value-format="yyyy-MM-dd"
-                                                            size="mini"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="验收日期：">
-                                                        <el-date-picker
-                                                            v-model="form.yanShouRiQi"
-                                                            style="width:100%"
-                                                            type="date"
-                                                            placeholder="选择日期"
-                                                            :readonly="readonly"
-                                                            value-format="yyyy-MM-dd"
-                                                            size="mini"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="供应商：">
-                                                        <ibps-custom-dialog
-                                                            v-model="form.shiFouQiJianH"
-                                                            size="mini"
-                                                            template-key="gysxxdhk"
-                                                            :disabled="false"
-                                                            type="dialog"
-                                                            class="custom-dialog"
-                                                            placeholder="请选择"
-                                                            icon="el-icon-search"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
-                                            <el-row :gutter="20">
-                                                <el-col :span="8">
-                                                    <el-form-item label="供应商电话：">
-                                                        <el-input v-model="form.lianXiFangShi" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col v-if="form.shiFouXiaoZhun==='是'" :span="8">
-                                                    <el-form-item label="校准证书编号：">
-                                                        <el-input v-model="form.zhengShuBianHa" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col v-if="form.shiFouXiaoZhun==='是'" :span="8">
-                                                    <el-form-item label="检定/校准周期(月)：" label-width="140">
-                                                        <el-input v-model="form.xiaoZhunZQ" size="mini" type="number" style="width:74%" />
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
-                                            <el-row :gutter="20">
-                                                <el-col v-if="form.shiFouXiaoZhun==='是'" :span="8">
-                                                    <el-form-item label="最近校准时间：">
-                                                        <el-date-picker
-                                                            v-model="form.yiXiaoRiQi"
-                                                            style="width:100%"
-                                                            type="date"
-                                                            placeholder="选择日期"
-                                                            :readonly="readonly"
-                                                            value-format="yyyy-MM-dd"
-                                                            size="mini"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col v-if="form.shiFouXiaoZhun==='是'" :span="8">
-                                                    <el-form-item label="校准有效期至">
-                                                        <el-date-picker
-                                                            v-model="form.xiaoZhunYouXia"
-                                                            style="width:100%"
-                                                            type="date"
-                                                            placeholder="选择日期"
-                                                            :readonly="readonly"
-                                                            value-format="yyyy-MM-dd"
-                                                            size="mini"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="环境要求：">
-                                                        <el-input v-model="form.huanJingYaoQiu" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
-                                            <el-row :gutter="20">
-                                                <el-col :span="8">
-                                                    <el-form-item label="电源要求：">
-                                                        <el-input v-model="form.dianYuanYaoQiu" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="是否限用：">
-                                                        <el-select v-model="form.xiaoZhunWuCha" placeholder="请选择" size="mini" style="width:100%">
-                                                            <el-option
-                                                                v-for="item in ['是','否']"
-                                                                :key="item"
-                                                                :label="item"
-                                                                :value="item"
+                                        <el-row :gutter="20">
+                                            <!-- 第一列 -->
+                                            <el-col :span="8">
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="接收日期：">
+                                                            <el-date-picker
+                                                                v-model="form.jieShouRiQi"
+                                                                style="width:100%"
+                                                                type="date"
+                                                                placeholder="选择日期"
+                                                                :readonly="readonly"
+                                                                value-format="yyyy-MM-dd"
+                                                                size="mini"
                                                             />
-                                                        </el-select>
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col v-if="form.xiaoZhunWuCha==='是'" :span="8">
-                                                    <el-form-item label="限用范围：">
-                                                        <el-input v-model="form.caiGouHeTong" size="mini" />
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
-                                            <el-row :gutter="20">
-                                                <el-col :span="8">
-                                                    <el-form-item label="核查人：">
-                                                        <ibps-user-selector
-                                                            v-model="form.biXuDeHuanJin"
-                                                            type="user"
-                                                            readonly-text="text"
-                                                            :disabled="false"
-                                                            :multiple="false"
-                                                            size="mini"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="核查日期：">
-                                                        <el-date-picker
-                                                            v-model="form.biXuSheShi"
-                                                            style="width:100%"
-                                                            type="date"
-                                                            placeholder="选择日期"
-                                                            :readonly="readonly"
-                                                            value-format="yyyy-MM-dd"
-                                                            size="mini"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="是否维护：">
-                                                        <el-select v-model="form.shiFouWeiHu" placeholder="请选择" size="mini" style="width:100%">
-                                                            <el-option
-                                                                v-for="item in ['是','否']"
-                                                                :key="item"
-                                                                :label="item"
-                                                                :value="item"
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="验收日期：">
+                                                            <el-date-picker
+                                                                v-model="form.yanShouRiQi"
+                                                                style="width:100%"
+                                                                type="date"
+                                                                placeholder="选择日期"
+                                                                :readonly="readonly"
+                                                                value-format="yyyy-MM-dd"
+                                                                size="mini"
                                                             />
-                                                        </el-select>
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
-                                            <el-row :gutter="20">
-                                                <el-col :span="8">
-                                                    <el-form-item label="设备分组：">
-                                                        <ibps-custom-dialog
-                                                            v-model="form.weiHuFangShi"
-                                                            size="mini"
-                                                            template-key="sbbqdhk"
-                                                            multiple
-                                                            :disabled="false"
-                                                            type="dialog"
-                                                            class="custom-dialog"
-                                                            placeholder="请选择"
-                                                            icon="el-icon-search"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="资产原值(元)：">
-                                                        <el-input v-model="form.ziChanYuanZhi" size="mini" type="number" />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <el-form-item label="使用年限(年)：">
-                                                        <el-input v-model="form.heChaXiaoZhun" size="mini" type="number" />
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
-                                            <el-row :gutter="20">
-                                                <el-col :span="8">
-                                                    <el-form-item label="是否24H开机：">
-                                                        <el-select v-model="form.jianKongYiJu" placeholder="请选择" size="mini" style="width:100%">
-                                                            <el-option
-                                                                v-for="item in ['是','否']"
-                                                                :key="item"
-                                                                :label="item"
-                                                                :value="item"
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="投入日期：">
+                                                            <el-date-picker
+                                                                v-model="form.qiYongRiQi"
+                                                                style="width:100%"
+                                                                type="date"
+                                                                placeholder="选择日期"
+                                                                :readonly="readonly"
+                                                                value-format="yyyy-MM-dd"
+                                                                size="mini"
                                                             />
-                                                        </el-select>
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col v-if="form.jianKongYiJu==='是'" :span="8">
-                                                    <el-form-item label="开机时间：">
-                                                        <el-time-picker
-                                                            v-model="form.kaiShiShiYong"
-                                                            placeholder="任意时间点"
-                                                            size="mini"
-                                                            style="width:100%"
-                                                            value-format="HH:mm:ss"
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="核查日期：">
+                                                            <el-date-picker
+                                                                v-model="form.biXuSheShi"
+                                                                style="width:100%"
+                                                                type="date"
+                                                                placeholder="选择日期"
+                                                                :readonly="readonly"
+                                                                value-format="yyyy-MM-dd"
+                                                                size="mini"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="核查人：">
+                                                            <ibps-user-selector
+                                                                v-model="form.biXuDeHuanJin"
+                                                                type="user"
+                                                                readonly-text="text"
+                                                                :disabled="false"
+                                                                :multiple="false"
+                                                                size="mini"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="电源要求：">
+                                                            <el-input v-model="form.dianYuanYaoQiu" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="环境要求：">
+                                                            <el-input v-model="form.huanJingYaoQiu" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="使用年限(年)：">
+                                                            <el-input v-model="form.heChaXiaoZhun" size="mini" type="number" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="资产原值(元)：">
+                                                            <el-input v-model="form.ziChanYuanZhi" size="mini" type="number" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                            </el-col>
+                                            <!-- 第二列 -->
+                                            <el-col :span="8">
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="是否维护：">
+                                                            <el-select v-model="form.shiFouWeiHu" placeholder="请选择" size="mini" style="width:100%">
+                                                                <el-option
+                                                                    v-for="item in ['是','否']"
+                                                                    :key="item"
+                                                                    :label="item"
+                                                                    :value="item"
+                                                                />
+                                                            </el-select>
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="设备分组：">
+                                                            <ibps-custom-dialog
+                                                                v-model="form.weiHuFangShi"
+                                                                size="mini"
+                                                                template-key="sbbqdhk"
+                                                                multiple
+                                                                :disabled="false"
+                                                                type="dialog"
+                                                                class="custom-dialog"
+                                                                placeholder="请选择"
+                                                                icon="el-icon-search"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="是否24H开机：">
+                                                            <el-select v-model="form.jianKongYiJu" placeholder="请选择" size="mini" style="width:100%">
+                                                                <el-option
+                                                                    v-for="item in ['是','否']"
+                                                                    :key="item"
+                                                                    :label="item"
+                                                                    :value="item"
+                                                                />
+                                                            </el-select>
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.jianKongYiJu==='是'">
+                                                    <el-col>
+                                                        <el-form-item label="开机时间：">
+                                                            <el-time-picker
+                                                                v-model="form.kaiShiShiYong"
+                                                                placeholder="任意时间点"
+                                                                size="mini"
+                                                                style="width:100%"
+                                                                value-format="HH:mm:ss"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.jianKongYiJu==='是'">
+                                                    <el-col>
+                                                        <el-form-item label="关机时间：">
+                                                            <el-time-picker
+                                                                v-model="form.shiJiShiYongF"
+                                                                placeholder="任意时间点"
+                                                                size="mini"
+                                                                style="width:100%"
+                                                                value-format="HH:mm:ss"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="是否限用：">
+                                                            <el-select v-model="form.xiaoZhunWuCha" placeholder="请选择" size="mini" style="width:100%">
+                                                                <el-option
+                                                                    v-for="item in ['是','否']"
+                                                                    :key="item"
+                                                                    :label="item"
+                                                                    :value="item"
+                                                                />
+                                                            </el-select>
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.xiaoZhunWuCha==='是'">
+                                                    <el-col>
+                                                        <el-form-item label="限用范围：">
+                                                            <el-input v-model="form.caiGouHeTong" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <!-- todo -->
+                                                    <el-col>
+                                                        <el-alert
+                                                            title="开关机时间配置说明"
+                                                            type="success"
+                                                            description="日保养、按需保养、这些周期，如果配置了开关机时间，在设备使用与维护时会自动带出"
+                                                            :closable="false"
                                                         />
-                                                    </el-form-item>
-                                                </el-col>
-                                                <el-col v-if="form.jianKongYiJu==='是'" :span="8">
-                                                    <el-form-item label="关机时间：">
-                                                        <el-time-picker
-                                                            v-model="form.shiJiShiYongF"
-                                                            placeholder="任意时间点"
-                                                            size="mini"
-                                                            style="width:100%"
-                                                            value-format="HH:mm:ss"
-                                                        />
-                                                    </el-form-item>
-                                                </el-col>
-                                            </el-row>
+                                                    </el-col>
+                                                </el-row>
+                                            </el-col>
+                                            <!-- 第三列 -->
+                                            <el-col :span="8">
+                                                <el-row>
+                                                    <el-col>
+                                                        <el-form-item label="是否校准：" prop="shiFouXiaoZhun">
+                                                            <el-select v-model="form.shiFouXiaoZhun" placeholder="请选择" size="mini" style="width:100%">
+                                                                <el-option
+                                                                    v-for="item in ['是','否']"
+                                                                    :key="item"
+                                                                    :label="item"
+                                                                    :value="item"
+                                                                />
+                                                            </el-select>
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是'">
+                                                    <el-col>
+                                                        <el-form-item label="检定/校准周期(月)：" label-width="140">
+                                                            <el-input v-model="form.xiaoZhunZQ" size="mini" type="number" style="width:50%" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是'">
+                                                    <el-col>
+                                                        <el-form-item label="最近校准时间：">
+                                                            <el-date-picker
+                                                                v-model="form.yiXiaoRiQi"
+                                                                style="width:100%"
+                                                                type="date"
+                                                                placeholder="选择日期"
+                                                                :readonly="readonly"
+                                                                value-format="yyyy-MM-dd"
+                                                                size="mini"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是'">
+                                                    <el-col>
+                                                        <el-form-item label="校准有效期至">
+                                                            <el-date-picker
+                                                                v-model="form.xiaoZhunYouXia"
+                                                                style="width:100%"
+                                                                type="date"
+                                                                placeholder="选择日期"
+                                                                :readonly="readonly"
+                                                                value-format="yyyy-MM-dd"
+                                                                size="mini"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是'">
+                                                    <el-col>
+                                                        <el-form-item label="校准证书编号：">
+                                                            <el-input v-model="form.zhengShuBianHa" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
+                                                    <el-col>
+                                                        <el-form-item label="检定/校准参数：">
+                                                            <el-input v-model="form.jianDingXiao" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
+                                                    <el-col>
+                                                        <el-form-item label="测量范围：">
+                                                            <el-input v-model="form.ceLiangGongZuo" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
+                                                    <el-col>
+                                                        <el-form-item label="U/精确度/最大允差：" label-width="130">
+                                                            <el-input v-model="form.zuiDaYunCha" size="mini" style="width:50%" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
+                                                    <el-col>
+                                                        <el-form-item label="修正值：">
+                                                            <el-input v-model="form.xiuZhengZhiXiu" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+
+                                            </el-col>
                                         </el-row>
                                         <el-row :gutter="20">
                                             <el-col :span="24">
@@ -540,11 +643,10 @@
                                                 </el-form-item>
                                             </el-col>
                                             <el-col :span="24">
-                                                <el-form-item label="附件细类：">
+                                                <el-form-item label="文件路径：">
                                                     <span>{{ form.wenJianXiLei }}</span>
                                                 </el-form-item>
                                             </el-col>
-
                                         </el-row>
                                     </el-form>
 
@@ -612,13 +714,18 @@ export default {
         }
     },
     data () {
-        const { userId, position, level } = this.$store.getters
+        const { userId, position, level, deptList } = this.$store.getters
         return {
+            isFirstyiXiaoRiQi: true,
+            isFirstbianZhiBuMen: true,
+            isFirstshiFouQiJianH: true,
+            isSheKou: false,
             readonly: false,
             activeName: 'one',
             dialogVisible: true,
             userId: userId,
             position: position,
+            deptList: deptList,
             level: level.second || level.first,
             loading: false,
             title: '设备档案卡',
@@ -684,9 +791,12 @@ export default {
                 wenJianXiLei: '', // 附件细类
                 xiLeiId: '',
                 quanXianLeiXing: '',
-                diDian: ''
-                // ceLiangGongZuo: '', // 测量/工作范围
-                // jianDingXiao: '', // 检定/校准参数
+                diDian: '',
+                buMen: '', // 图片id
+                ceLiangGongZuo: '', // 测量/工作范围
+                jianDingXiao: '', // 检定/校准参数
+                xiuZhengZhiXiu: '', // 修正值
+                zuiDaYunCha: '' // U/精确度/最大允差
 
             },
             rules: {
@@ -731,6 +841,9 @@ export default {
                 ],
                 sheBeiMingChen: [
                     { required: true, message: '请选择设备', trigger: 'blur' }
+                ],
+                chuChangRiQi: [
+                    { required: true, message: '出厂日期不能为空', trigger: 'blur' }
                 ]
 
             }
@@ -749,6 +862,11 @@ export default {
         }
     },
     watch: {
+        photos: {
+            handler (val) {
+                this.form.buMen = val.map(item => item.id).join(',')
+            }
+        },
         'form.xiaoZhunWuCha': {
             handler (val, old) {
                 if (!old) return
@@ -762,6 +880,7 @@ export default {
         },
         'form.cunFangWeiZhi': {
             async handler (val) {
+                if (!val) return
                 const sql = `select fang_jian_ming_ from t_jjqfjb where id_='${val}'`
                 const { variables: { data }} = await this.$common.request('sql', sql)
                 this.form.cunFangDiDian = data[0].fang_jian_ming_
@@ -784,6 +903,11 @@ export default {
         // 根据供应商自动带出供应商名称和电话
         'form.shiFouQiJianH': {
             async handler (val) {
+                if (!val) return
+                if (this.isFirstshiFouQiJianH) {
+                    this.isFirstshiFouQiJianH = false
+                    return
+                }
                 const sql = `select * from t_gysxxb where id_='${val}'`
                 const { variables: { data }} = await this.$common.request('sql', sql)
                 if (data.length > 0) {
@@ -796,6 +920,10 @@ export default {
         'form.bianZhiBuMen': {
             handler (value) {
                 if (value) {
+                    if (this.isFirstbianZhiBuMen) {
+                        this.isFirstbianZhiBuMen = false
+                        return
+                    }
                     this.handleData(value)
                 }
             }
@@ -804,6 +932,10 @@ export default {
         'form.yiXiaoRiQi': {
             handler (value) {
                 if (value) {
+                    if (this.isFirstyiXiaoRiQi) {
+                        this.isFirstyiXiaoRiQi = false
+                        return
+                    }
                     const zhouQi = this.form.xiaoZhunZQ || 0
                     const result = this.$common.getFormatDate('string', 10, this.$common.getDate('month', Number(zhouQi), value))
                     this.form.xiaoZhunYouXia = result
@@ -880,9 +1012,6 @@ export default {
             if (this.form.xiaoZhunWuCha === '是' && !this.form.caiGouHeTong) {
                 throw new Error('请填写限用范围！')
             }
-            if (!this.form.chuChangRiQi) {
-                throw new Error('请填写出厂日期！')
-            }
             if (this.form.accessoriesDevicePoList.length > 0) {
                 for (let i = 0; i < this.form.accessoriesDevicePoList.length; i++) {
                     const item = this.form.accessoriesDevicePoList[i]
@@ -936,15 +1065,6 @@ export default {
             try {
                 this.loading = true
                 await saveEquipmentCard(this.form)
-                // const paramsRecord = await this.formatForm()
-                // console.log(paramsRecord)
-                // const { variables: { cont }} = await this.$common.request('add', paramsRecord)
-                // if (cont.length > 0) {
-                //     this.$message.success('添加成功')
-                //     this.closeDialog(true)
-                // } else {
-                //     this.$message.warning('添加失败')
-                // }
                 this.$message.success('添加成功')
                 this.closeDialog(true)
                 this.loading = false
@@ -953,78 +1073,6 @@ export default {
                 this.$message.warning('添加失败')
                 this.loading = false
             }
-        },
-        async formatForm () {
-            const resultForm = {
-                chang_shang_: this.form.changShang,
-                gui_ge_xing_hao_: this.form.guiGeXingHao,
-                jie_shou_ri_qi_: this.form.jieShouRiQi,
-                qi_yong_ri_qi_: this.form.qiYongRiQi,
-                cun_fang_di_dian_: this.form.cunFangDiDian, // 中文
-                cun_fang_wei_zhi_: this.form.cunFangWeiZhi, // id
-                jie_shou_zhuang_tai: this.form.jieShouZhuangTai,
-                guan_li_ren_: this.form.guanLiRen,
-                wei_hu_fang_shi_: this.form.weiHuFangShi,
-                bian_zhi_ren_: this.form.bianZhiRen,
-                bian_zhi_bu_men_: this.form.bianZhiBuMen,
-                bian_zhi_shi_jian: this.form.bianZhiShiJian,
-                shi_fou_guo_shen_: '已完成',
-                she_bei_lei_xing_: this.form.sheBeiLeiXing,
-                she_bei_zhuang_ta: this.form.sheBeiZhuangTa,
-                she_bei_shi_bie_h: this.form.sheBeiShiBieH,
-                shi_fou_xiao_zhun: this.form.shiFouXiaoZhun,
-                gong_ying_shang_: this.form.gongYingShang, // 中文
-                shi_fou_qi_jian_h: this.form.shiFouQiJianH, // id
-                lian_xi_fang_shi_: this.form.lianXiFangShi,
-                xiao_zhun_you_xia: this.form.xiaoZhunYouXia,
-                chu_chang_ri_qi_: this.form.chuChangRiQi,
-                she_bei_ming_cheng_: this.form.sheBeiMingCheng, // 中文
-                she_bei_ming_chen: this.form.sheBeiMingChen, // id
-                yi_xiao_ri_qi_: this.form.yiXiaoRiQi,
-                he_cha_xiao_zhun_: this.form.heChaXiaoZhun,
-                shi_ji_shi_yong_f: this.form.shiJiShiYongF,
-                kai_shi_shi_yong_: this.form.kaiShiShiYong,
-                zheng_shu_bian_ha: this.form.zhengShuBianHa,
-                xiao_zhun_wu_cha_: this.form.xiaoZhunWuCha,
-                xiao_zhun_z_q_: this.form.xiaoZhunZQ,
-                yuan_she_bei_bian: this.form.yuanSheBeiBian,
-                jian_kong_yi_ju_: this.form.jianKongYiJu,
-                bi_xu_de_huan_jin: this.form.biXuDeHuanJin,
-                bi_xu_she_shi_: this.form.biXuSheShi,
-                zi_chan_yuan_zhi_: this.form.ziChanYuanZhi,
-                zi_chan_bian_hao_: this.form.ziChanBianHao,
-                shi_fou_wei_hu_: this.form.shiFouWeiHu,
-                ji_shen_xu_hao_: this.form.jiShenXuHao,
-                yan_shou_ri_qi_: this.form.yanShouRiQi,
-                huan_jing_yao_qiu: this.form.huanJingYaoQiu,
-                dian_yuan_yao_qiu: this.form.dianYuanYaoQiu,
-                zhu_ce_zheng_hao_: this.form.zhuCeZhengHao,
-                yqzp: this.form.yqzp,
-                fa_piao_: this.form.faPiao,
-                fu_jian_shang: this.form.fuJianShang,
-                bei_zhu_: this.form.beiZhu,
-                cai_gou_he_tong_: this.form.caiGouHeTong,
-
-                zhuan_ye_bu_men_: this.form.zhuanYeBuMen,
-                wen_jian_xi_lei_: this.form.wenJianXiLei,
-                xi_lei_id_: this.form.xiLeiId,
-                quan_xian_lei_xin: this.form.quanXianLeiXing
-            }
-            const paramsRecord = { tableName: 't_sbdj' }
-            if (this.isEdit) {
-                paramsRecord.updList = [{
-                    where: {
-                        id_: this.params.id
-                    },
-                    param: resultForm
-                }]
-            } else {
-                paramsRecord.paramWhere = [{
-                    ...resultForm,
-                    di_dian_: this.level
-                }]
-            }
-            return paramsRecord
         },
         async subForm (id, table, parentData) {
             const sql1 = `select id_ from ${table} where parent_id_='${id}'`
@@ -1050,41 +1098,9 @@ export default {
             try {
                 this.loading = true
                 await saveEquipmentCard(this.form)
-                // const paramsRecord = await this.formatForm()
-                // console.log(paramsRecord)
-                // const list1 = await this.subForm(this.params.id, 't_whzqjxm', this.$refs.MaintenanceRef.listDataCopy)
-                // const list2 = await this.subForm(this.params.id, 't_fssbjpjb', this.$refs.MoreDevicesRef.listDataCopy)
-                // console.log('维护项目', list1)
-                // console.log('附属设备', list2)
-                // 1.更新主表
-
-                // await this.$common.request('update', paramsRecord)
                 this.$message.success('修改成功')
                 this.closeDialog(true)
                 this.loading = false
-                // 2.更改维护项目表
-                // if (list1.add_list.length > 0) {
-                //     const addParams = {
-                //         tableName: 't_whzqjxm',
-                //         paramWhere: list1.add_list.map(item => {
-                //             return {
-                //                 parent_id_: this.params.id,
-                //                 wei_hu_xiang_mu_c: item.weiHuXiangMuC,
-                //                 wei_hu_ri_qi_: item.weiHuRiQi,
-                //                 wei_hu_lei_xing_: item.weiHuLeiXing,
-                //                 ri_qi_shu_zi_: item.riQiShuZi
-                //             }
-                //         })
-                //     }
-                //     await this.$common.request('add', addParams)
-                //     console.log('维护项目新增成功')
-                // }
-                // if (list1.update_list.length > 0) {
-                //     const updateParamsRecord = {
-                //         tableName: 't_whzqjxm',
-                //
-                //     }
-                // }
             } catch (error) {
                 this.$message.warning(error.message)
                 this.loading = false
@@ -1136,10 +1152,14 @@ export default {
         async init () {
             this.loading = true
             this.isEdit = !!(this.params && this.params.id)
+            this.isSheKou = this.deptList[0].positionId === '1166372468122714112' // 判断是否是蛇口医院
             if (this.isEdit) {
                 const { data } = await getequipmentCard({ id: this.params.id })
                 this.form = data
             } else {
+                this.isFirstshiFouQiJianH = false
+                this.isFirstbianZhiBuMen = false
+                this.isFirstyiXiaoRiQi = false
                 // 随机生成一个不重复的设备编号
                 this.form.sheBeiShiBieH = this.generateRandomString()
                 for (; await this.checkIsRepeat(this.form.sheBeiShiBieH);) {
@@ -1206,7 +1226,7 @@ export default {
             }
         }
         .left{
-            height: calc(100vh - 70px);
+            height: calc(100vh - 100px);
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding:20px;
             overflow-y: auto;
@@ -1234,8 +1254,14 @@ export default {
             text-align: left;
             font-size: 12px !important;
         }
-        .el-tabs__item{
-            background-color: #f5f7fa;
+        .el-form-item__content{
+            font-size: 12px !important;
+        }
+        .el-table th {
+            background-color:#f5f7fa !important;
+        }
+        .el-tabs__header {
+            margin: 0 0 30px !important;
         }
     }
 

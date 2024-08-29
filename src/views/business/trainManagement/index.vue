@@ -100,24 +100,24 @@
                     <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :width="'32%'" :height="'29%'" :id="3"/>
                 </div> -->
                 <div class="vessel">
-                    <dv-border-box-12 class="areaTop" :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)">
+                    <dv-border-box-12 class="areaTop" :color="dvColor" :backgroundColor="dvBackColor">
                         <div class="area">
                             <job-plan-chart class="merge" :title="mergeData[1].title" v-model="nowWeekData" :data="mergeData[1].numData" :width="'63%'" :height="'85%'" :id="1" />
-                            <dv-decoration-2  :color="['rgba(255, 255, 255, 0.5)']" :key="`line1`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
+                            <dv-decoration-2  :color="dvLineColor" :key="`line1`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
                             <pie-chart class="tabular" :title="mergeData[0].title" v-model="mergeData[0].numData" :total="mergeData[0].total" :width="'32%'" :height="'85%'" :id="1"/>
                         </div>
-                        <dv-decoration-2 :color="['rgba(255, 255, 255, 0.5)']" :key="`line4`" :dur="6" style="width:98%;height:4%;margin: auto;" />
+                        <dv-decoration-2 :color="dvLineColor" :key="`line4`" :dur="6" style="width:98%;height:4%;margin: auto;" />
                         <div class="area">
                             <training-staff-chart class="merge"  :title="mergeData[2].title" v-model="mergeData[2].numData" :data="mergeData[2].perList" :width="'63%'" :height="'85%'" :id="1" />
-                            <dv-decoration-2  :color="['rgba(255, 255, 255, 0.5)']" :key="`line2`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
+                            <dv-decoration-2  :color="dvLineColor" :key="`line2`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
                             <pie-chart class="tabular" :title="mergeData[3].title" v-model="mergeData[3].numData" :total="mergeData[3].total" :width="'32%'" :height="'85%'" :id="2"/>
                         </div>
                     </dv-border-box-12>
                     <div style="width:100%;height:2.64%" />
-                    <dv-border-box-12 class="areaBottom" :color="['rgb(22,47,98)', 'rgba(116, 142, 194, 1)']" backgroundColor="rgba(6, 30, 93, 0)">
+                    <dv-border-box-12 class="areaBottom" :color="dvColor" :backgroundColor="dvBackColor">
                         <div class="area" style="height:100%">
                             <pre-work-chart class="merge" :title="mergeData[5].title" v-model="mergeData[5].numData" :width="'63%'" :height="'87%'" :id="1" />
-                            <dv-decoration-2 :color="['rgba(255, 255, 255, 0.5)']" :key="`line3`" :reverse="true" :dur="6" style="width:1%;height:87%;margin: auto;" />
+                            <dv-decoration-2 :color="dvLineColor" :key="`line3`" :reverse="true" :dur="6" style="width:1%;height:87%;margin: auto;" />
                             <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :total="mergeData[4].total" :width="'32%'" :height="'87%'" :id="3"/>
                         </div>
                     </dv-border-box-12>
@@ -162,6 +162,9 @@ export default {
             dateValM:'',
             dateValY:'',
             nowWeekData: [],
+            dvColor: ['rgb(22,47,98)', 'rgba(116, 142, 194, 1)'],
+            dvLineColor: ['rgba(255, 255, 255, 0.5)'],
+            dvBackColor: 'rgba(6, 30, 93, 0)',
             dateVal: ["week","nowWeek"],
             show: true,
             options: data.options,
@@ -187,12 +190,12 @@ export default {
                     total: 0
                 },
                 {
-                    title: '本年度培训类别占比',
+                    title: '岗前培训类别占比',
                     numData: data.dataObj,
                     total: 0
                 },
                 {
-                    title: '本年度岗前培训',
+                    title: '岗前培训',
                     numData: data.preData
                 }
             ]
@@ -225,6 +228,7 @@ export default {
         initializeData () {
             const w = window.innerWidth
             const { first = '', second = '' } = this.$store.getters.level || {}
+            let annual = this.hoverClassAdd === 'm' ? this.dateValM.substring(0,4) :this.dateValY 
             this.nowWeekData = []
             this.initData = {}
             this.itemIndex = 0
@@ -254,12 +258,12 @@ export default {
                     total: 0
                 },
                 {
-                    title: '本年度培训类别占比',
+                    title: annual+ '年度岗前培训类别占比',
                     numData: [],
                     total: 0
                 },
                 {
-                    title: '本年度岗前培训',
+                    title: annual + '年度岗前培训',
                     numData: []
                 }
             ]
@@ -288,7 +292,7 @@ export default {
                 this.mergeData[3].title = data.objectDto.remark
                 this.mergeData[3].total = data.objectDto.objectTotal
                 this.mergeData[4].numData = data.yearPreWorkDto.yearProWorkDtoList
-                this.mergeData[4].title = data.yearPreWorkDto.remark
+                // this.mergeData[4].title = data.yearPreWorkDto.remark
                 this.mergeData[4].total = data.yearPreWorkDto.yearPreWorkTotal
                 this.mergeData[2].numData = data.pxrytjqkDtoList
                 this.mergeData[2].perList = data.userRankList

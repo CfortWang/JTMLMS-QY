@@ -18,6 +18,7 @@
             :readonly="readonly"
             :type="type"
             @callback="handleCallback"
+            @judgeIndex="acquire"
         />
         <div
             slot="footer"
@@ -109,6 +110,9 @@ export default {
                 case 'confirm':
                     this.confirmMsg()
                     break
+                case 'viewDetails':
+                    this.$refs.innerMessage.handleDifferentTab()
+                    break
                 default:
                     break
             }
@@ -196,8 +200,21 @@ export default {
         },
         handleCallback (res) {
             this.$emit('callback', res)
+        },
+        acquire(res){
+            let mid = { key: 'viewDetails', label: '查看详情', type: 'danger', icon: 'ibps-icon-search' }
+            if(res){
+                let indexNum = this.toolbars.findIndex(i=>i.key == mid.key)
+                if(indexNum == -1){
+                    this.toolbars.unshift(mid)
+                }
+            }else{
+                let indexNum = this.toolbars.findIndex(i=>i.key == mid.key)
+                if(indexNum != -1){
+                    this.toolbars.splice(indexNum,1)
+                }
+            }
         }
-
     }
 }
 </script>

@@ -44,7 +44,7 @@
             :visible.sync="showEditDialog"
             :is-disabled="examInfo.state !== '未发布'"
             @callback="search"
-            @close="visible => showEditDialog = visible"
+            @close="dialogClose"
         />
         <exam-detail
             v-if="showDetailDialog"
@@ -213,6 +213,13 @@ export default {
         this.loadData()
     },
     methods: {
+        // 组件关闭事件
+        dialogClose (visible, refresh) {
+            this.showEditDialog = visible
+            if (refresh) {
+                this.loadData()
+            }
+        },
         // 加载数据
         loadData () {
             this.loading = true
@@ -627,7 +634,7 @@ export default {
                         id_: examId
                     },
                     param: {
-                        examState: '已取消'
+                        zhuang_tai_: '已取消'
                     }
                 }]
             }

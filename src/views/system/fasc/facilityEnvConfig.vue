@@ -24,7 +24,7 @@
                             <el-col :span="12">
                                 <el-form-item label="类型：" prop="lei_xing_">
                                     <template slot="label">
-                                        <span class="required">类型</span>
+                                        <span class="required">类型：</span>
                                     </template>
                                     <el-select v-model="form.lei_xing_" placeholder="请选择" size="mini" style="width:80%">
                                         <el-option
@@ -183,28 +183,28 @@
                     <div class="hearder">
                         <div class="search">
                             <div class="search-item">
-                                <span>部门：</span>
+                                <span class="label">部门：</span>
                                 <ibps-user-selector
                                     v-model="search.buMen"
                                     type="position"
                                     readonly-text="text"
                                     :disabled="false"
                                     :multiple="false"
-                                    style="width:100%"
+
                                     size="mini"
                                 />
                             </div>
                             <div class="search-item">
-                                <span>区域：</span>
-                                <el-input v-model="search.quYu" size="mini" style="width:100%" placeholder="请输入" />
+                                <span class="label">区域：</span>
+                                <el-input v-model="search.quYu" size="mini" placeholder="请输入" @keyup.enter.native="goSearch" />
                             </div>
                             <div class="search-item">
-                                <span>房间：</span>
-                                <el-input v-model="search.fangJian" size="mini" style="width:100%" placeholder="请输入" />
+                                <span class="label">房间：</span>
+                                <el-input v-model="search.fangJian" size="mini" placeholder="请输入" @keyup.enter.native="goSearch" />
                             </div>
                             <div class="search-item">
-                                <span>监测周期：</span>
-                                <el-select v-model="search.zhouQi" placeholder="请选择" size="mini" style="width:66%" :clearable="true">
+                                <span class="label">监测周期：</span>
+                                <el-select v-model="search.zhouQi" placeholder="请选择" size="mini" :clearable="true">
                                     <el-option
                                         v-for="item in ['每日','每周','每月','每季度','每半年','每年']"
                                         :key="item"
@@ -214,8 +214,8 @@
                                 </el-select>
                             </div>
                             <div class="search-item">
-                                <span>监测岗位：</span>
-                                <el-select v-model="search.gangWei" placeholder="请选择" size="mini" style="width:66%" :clearable="true">
+                                <span class="label">监测岗位：</span>
+                                <el-select v-model="search.gangWei" placeholder="请选择" size="mini" :clearable="true">
                                     <el-option
                                         v-for="item in jianCeGangWeiList"
                                         :key="item.id_"
@@ -224,13 +224,13 @@
                                     />
                                 </el-select>
                             </div>
-                            <div class="search-item" style="width:60px">
+                            <div class="search-item" style="width:70px">
                                 <el-button size="mini" type="primary" icon="el-icon-search" @click="goSearch">查询</el-button>
                             </div>
-                            <div class="search-item" style="width:60px">
+                            <div class="search-item" style="width:68px">
                                 <el-button type="success" size="mini" icon="ibps-icon-plus" @click="openDialog">添加</el-button>
                             </div>
-                            <div class="search-item" style="width:60px">
+                            <div class="search-item" style="width:70px">
                                 <el-upload
                                     ref="uploadRef"
                                     class="upload-demo"
@@ -243,13 +243,13 @@
                                     <el-button type="primary" size="mini" icon="el-icon-upload2">导入</el-button>
                                 </el-upload>
                             </div>
-                            <div class="search-item" style="width:60px">
+                            <div class="search-item" style="width:70px">
                                 <el-button type="primary" size="mini" icon="el-icon-download" @click="exportExcel">导出</el-button>
                             </div>
-                            <div v-if="trueList.length>0" class="search-item" style="width:110px">
+                            <div v-if="trueList.length>0" class="search-item" style="width:120px">
                                 <el-button type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
                             </div>
-                            <div class="search-item" style="width:60px">
+                            <div class="search-item" style="width:70px">
                                 <el-button type="danger" size="mini" icon="ibps-icon-close" @click="removeItem">删除</el-button>
                             </div>
                         </div>
@@ -775,7 +775,7 @@ export default {
             })
         },
         loadData () {
-            const sql = `select * from t_sshjpzb where id_=${this.parentData.mainId}`
+            const sql = `select * from t_sshjpzb where id_='${this.parentData.mainId}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 // console.log('主表', data)
@@ -821,7 +821,7 @@ export default {
             })
         },
         loadSubData () {
-            const sql = `select * from t_sshjpzxq where parent_id_=${this.parentData.mainId}`
+            const sql = `select * from t_sshjpzxq where parent_id_='${this.parentData.mainId}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 // console.log('子表', data)
@@ -1484,7 +1484,7 @@ export default {
         }
         .main{
             width: 80%;
-            height: calc(100vh - 70px);
+            height: calc(100vh - 100px);
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding:20px;
             overflow-y: auto;
@@ -1501,15 +1501,14 @@ export default {
                 flex-wrap: wrap;
                 align-items: center;
                 .search-item{
-                    span{
+                    .label{
                         font-size: 12px;
-                        width: 70px;
-                        margin-right: 5px;
+                        min-width: 74px;
                     }
                     display: flex;
                     align-items: center;
-                    width: 220px;
-                    margin: 0 10px 10px 10px;
+                    width: 240px;
+                    margin: 0 10px 8px 0;
                 }
             }
         }

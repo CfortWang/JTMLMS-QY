@@ -90,7 +90,7 @@ export default {
 }
 .fontS{
   padding-left: 25px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
 }
 //修改的是下拉框选项内容上方的尖角

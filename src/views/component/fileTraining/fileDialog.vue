@@ -26,24 +26,26 @@
         <el-row class="row">
             <el-col :span="12">
                 <el-row>
-                    <el-col :span="5" class="nameClass">修订人：</el-col>
+                    <el-col v-if="digData.cao_zuo_lei_xing_=='新增'" :span="5" class="nameClass">创建人：</el-col>
+                    <el-col v-else :span="5" class="nameClass">修订人：</el-col>
                     <el-col :span="19" class="contentClass">{{ digData?(digData.fileInfos.CREATOR_NAME_?digData.fileInfos.CREATOR_NAME_:'/'):'/' }}</el-col>
                 </el-row>
             </el-col>
             <el-col :span="12">
                 <el-row>
-                    <el-col :span="5" class="nameClass">修订日期：</el-col>
+                    <el-col v-if="digData.cao_zuo_lei_xing_=='新增'" :span="5" class="nameClass">创建日期：</el-col>
+                    <el-col v-else :span="5" class="nameClass">修订日期：</el-col>
                     <el-col :span="19" class="contentClass">{{ digData?(digData.fileInfos.CREATE_TIME_?formattedTimestamp(digData.fileInfos.CREATE_TIME_):'/'):'/' }}</el-col>
                 </el-row>
             </el-col>
         </el-row>
-        <el-row v-if="fileIndex>0" class="row">
-            <el-col :span="12" class="nameClass">修订内容：</el-col>
-            <el-col :span="12" class="contentClass">{{ digData.xiu_ding_nei_rong?digData.xiu_ding_nei_rong:'/' }}</el-col>
+        <el-row v-if="digData.cao_zuo_lei_xing_=='修订'" class="row">
+            <el-col :span="3" class="nameClass">修订内容：</el-col>
+            <el-col :span="21" class="contentClass">{{ digData.xiu_ding_nei_rong?digData.xiu_ding_nei_rong:'/' }}</el-col>
         </el-row>
-        <el-row v-if="fileIndex>0" class="row">
-            <el-col :span="12" class="nameClass">修订原因：</el-col>
-            <el-col :span="12" class="contentClass">{{ digData.yuan_yin_?digData.yuan_yin_:'/' }}</el-col>
+        <el-row v-if="digData.cao_zuo_lei_xing_=='修订'" class="row">
+            <el-col :span="3" class="nameClass">修订原因：</el-col>
+            <el-col :span="21" class="contentClass">{{ digData.yuan_yin_?digData.yuan_yin_:'/' }}</el-col>
         </el-row>
         <el-table
             :data="listData"
@@ -54,7 +56,7 @@
             style="width: 100%;padding:10px;"
         >
             <el-table-column
-                label="姓名"
+                label="用户"
                 width="300"
             >
                 <template slot-scope="scope">
@@ -62,7 +64,7 @@
                 </template>
             </el-table-column>
             <el-table-column
-                label="阅读时间"
+                label="最近阅读时间"
                 width="300"
             >
                 <template slot-scope="scope">
@@ -70,7 +72,7 @@
                 </template>
             </el-table-column>
             <el-table-column
-                label="阅读时长"
+                label="累计阅读时长"
             >
                 <template slot-scope="scope">
                     <span style="margin-left: 10px">{{ formatDuration(scope.row.shi_chang_) }}</span>
@@ -114,7 +116,8 @@ export default {
             listData: [],
             currentPage: 1,
             pageSize: 10,
-            timer: null
+            timer: null,
+            controlShow: false
         }
     },
     watch: {
@@ -148,7 +151,7 @@ export default {
         setInterfaceTime () {
             this.timer = setTimeout(() => {
                 this.$emit('pause')
-            }, 5000)
+            }, 180000)
         },
         formattedTimestamp (timestamp) {
             const date = new Date(timestamp)
@@ -163,6 +166,7 @@ export default {
             // 格式化日期
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
         },
+
         // id转name
         changUserName (id) {
             const user = this.userList.find(item => item.userId === id)

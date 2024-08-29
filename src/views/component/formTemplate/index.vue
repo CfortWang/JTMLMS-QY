@@ -20,7 +20,21 @@
         <div class="container">
             <div class="left" :style="{width:initWidth}">
                 <div class="form">
-                    <el-form ref="form" label-width="100px" :model="form" :rules="rules">
+                    <el-form ref="form" label-width="90px" :model="form" :rules="rules">
+                        <el-row>
+                            <el-col :span="24">
+                                <el-form-item label="部门：" prop="bian_zhi_bu_men_">
+                                    <ibps-user-selector
+                                        v-model="form.bian_zhi_bu_men_"
+                                        type="position"
+                                        readonly-text="text"
+                                        :disabled="false"
+                                        :multiple="false"
+                                        size="mini"
+                                    />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
                         <el-row>
                             <el-col :span="24">
                                 <el-form-item label="表单名称：" prop="biao_dan_ming_che">
@@ -215,7 +229,8 @@ export default {
                 biao_dan_ming_che: '',
                 biao_dan_mo_ban_: '',
                 gui_dang_lu_jing_: '',
-                shen_pi_liu_cheng: '需要审批'
+                shen_pi_liu_cheng: '',
+                bian_zhi_bu_men_: ''
             },
             typeOption: [
                 { label: '提前预设', value: 'presets', tips: '流程流转时，将直接推送到指定人员或角色的待办' },
@@ -233,6 +248,9 @@ export default {
                 ],
                 shen_pi_liu_cheng: [
                     { required: true, message: '审批流程不能为空', trigger: 'blur' }
+                ],
+                bian_zhi_bu_men_: [
+                    { required: true, message: '部门不能为空', trigger: 'blur' }
                 ]
             },
             subForm: [],
@@ -328,13 +346,13 @@ export default {
                 ...this.form,
                 liu_cheng_shu_ju_: JSON.stringify({
                     hasProcess: this.form.shen_pi_liu_cheng === '需要审批' ? 'Y' : 'N',
-                    nodeList: this.subForm.map((item, index) => ({
+                    nodeList: this.form.shen_pi_liu_cheng === '需要审批' ? this.subForm.map((item, index) => ({
                         sn: index + 1,
                         nodeName: item.jie_dian_ming_cheng_,
                         conditionType: item.fang_shi_,
                         executeType: item.yong_hu_lei_xing_,
                         executor: item.chu_li_ren_
-                    }))
+                    })) : []
                 })
 
             }
@@ -407,8 +425,10 @@ export default {
             } else {
                 this.form.di_dian_ = this.level
                 this.form.bian_zhi_ren_ = this.userId
-                this.form.bian_zhi_bu_men_ = this.position
+                const positons = this.position.split(',')
+                this.form.bian_zhi_bu_men_ = positons[positons.length - 1]
                 this.form.bian_zhi_shi_jian = dayjs().format('YYYY-MM-DD HH:mm:ss')
+                this.form.shen_pi_liu_cheng = '需要审批'
             }
         }
     }
@@ -444,7 +464,7 @@ export default {
         justify-content: center;
 
         .left{
-            height: calc(100vh - 70px);
+            height: calc(100vh - 100px);
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             padding:20px;
             overflow-y: auto;
@@ -466,7 +486,11 @@ export default {
 }
     ::v-deep {
         .el-form-item__label{
-        text-align: left
+            text-align: left;
+            font-size: 12px !important;
+        }
+        .el-form-item__content{
+            font-size: 12px !important;
         }
     }
 

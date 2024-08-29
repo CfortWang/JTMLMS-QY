@@ -298,7 +298,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.hand-btn{
+.main{
+    .hand-btn{
     width: 100%;
     text-align: right;
 }
@@ -331,19 +332,7 @@ export default {
     padding:10px;
     border-radius: 8px;
 }
-// .custom-input{
-//     display: inline-block;
-//     border: none; /* 移除所有边框 */
-//     outline: none; /* 移除点击时的轮廓 */
-//     border-bottom: 1px solid #ccc; /* 添加下边框 */
-// }
-/* 选中时的效果，可以根据需要调整 */
-// .custom-input:focus {
-//   border-bottom-color: #409EFF; /* 更改下边框颜色 */
-// }
-// ::v-deep .el-dialog {
-// width: 60% !important;
-// margin-top: 2vh !important;
-// height: 90% !important;
-// }
+
+}
+
 </style>

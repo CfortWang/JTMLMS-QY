@@ -14,8 +14,8 @@
             <div class="ibps-panel-search-item__info-fullTitle" flex-box="0">
                 <span>{{ item.fullTitle }}</span>
             </div>
-            <div v-if="isSuper" class="ibps-panel-search-item__info-path" flex-box="0">
-                <span>{{ item.path }}</span>
+            <div class="ibps-panel-search-item__info-path" flex-box="0">
+                <span v-if="isSuper">{{ item.path }}</span>
             </div>
         </div>
     </div>

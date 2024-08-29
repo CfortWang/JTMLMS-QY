@@ -611,12 +611,12 @@ export default {
             const params = type === 'add' ? addParams : updateParams
             this.$common.request(type, params).then(() => {
                 this.$message.success(this.id ? '修改考试成功' : '新建考试成功')
-                this.closeDialog()
+                this.closeDialog(true)
             })
         },
         // 关闭当前窗口
-        closeDialog () {
-            this.$emit('close', false)
+        closeDialog (refresh) {
+            this.$emit('close', false, refresh)
         }
     }
 }

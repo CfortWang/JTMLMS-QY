@@ -2,19 +2,23 @@
   <div class="statisticsPage" :style="{width:width,height:height}">
     <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
     <div v-show="show" style="height:92%;display:flex">
-      <div style="width:30%;display: flex;margin-top: 5%;">
+      <div style="width:28%;margin: 4% 5% 0 0;">
         <div class="leftSty">
-          <div style="width: 100%;height:20%;font-size: 20px;">自动创建培训计划</div>
-          <div style="display:flex;height: 90%;display: flex;align-items: center;width:100%">
-            <div style="width: 46%;display:flex;flex-flow: column;height: 100%;font-size: 20px;">
+          <div class="numSize">手动<div class="numColor"> {{ data.autoNum + ' ' }} ({{calculatedPercentage(data.autoNum, data.total)}}%) </div></div>
+          <div style="flex: 1;"></div>
+          <div class="numSize">自动<div class="numColor" >{{ data.manual + ' ' }} ({{calculatedPercentage(data.manual, data.total)}}%) </div></div>
+          <div style="flex: 6;"><div :id="'jobPie'+id" :style="{height:'8vh',width:'100%'}"/></div>
+          <!-- <div style="width: 100%;font-size: 2vh;">自动创建培训计划</div>
+          <div style="display:flex;display: flex;align-items: center;width:100%">
+            <div style="width: 46%;display:flex;flex-flow: column;height: 100%;font-size: 2vh;">
               <div style="line-height: 250%;color: rgb(250, 200, 88);">{{data.autoNum}}</div>
               <div style="color: rgb(250, 200, 88);">占比{{data.rate}}%</div>
             </div>
-            <div :id="'jobPie'+id" :style="{height:'100%',width:'64%'}"/>
-          </div>
+            <div :id="'jobPie'+id" :style="{height:'8vh',width:'64%'}"/>
+          </div> -->
         </div>
       </div>
-      <div :id="'job'+id" :style="{height:'100%',width:'70%'}"/>
+      <div :id="'job'+id" :style="{height:'100%',width:'72%'}"/>
     </div>
     <div v-show="!show" class="nullShow">暂无数据</div>
   </div>
@@ -106,13 +110,14 @@
           title: {
             text: '近一周计划发布',
             left: 'left',
-            textStyle:{ fontSize:20,color: this.colorw }
+            textStyle:{ fontSize:18,color: this.colorw },
+            itemGap: 20
           },
           grid: {
             left: '5%',
             right: '3%',
             bottom: '15%',
-            top: '15%'
+            top: '20%'
           },
           tooltip: {
             trigger: 'axis',
@@ -137,7 +142,7 @@
               show:true,
               lineStyle:{
                   type: [15,8],
-                  color: ['#fff'],
+                  color: ['rgba(255,255,255,0.5)'],
               }
             }
           },
@@ -198,6 +203,9 @@
           ]
        }
        option && jobPie.setOption(option)
+      },
+      calculatedPercentage(up, down){
+        return (up/down).toFixed(2)*100
       }
     }
   }
@@ -213,15 +221,15 @@
     /* background-color: rgba(6, 30, 93, 0.5); */
   }
   .leftSty{
-    width: 100%;
+    width: 90%;
     display:flex;
     background-color: rgba(84, 112, 198, 0.3);
     border-radius: 10px;
-    padding: 5%;
-    height: 50%;
+    padding: 10%;
+    /* height: 50%; */
     display: flex;
     align-items: center;
-    flex-flow: column;
+    /* flex-flow: column; */
   }
   .nullShow{
     display: flex;
@@ -229,5 +237,15 @@
     justify-content: center;
     font-size: 18px;
     height: 92%;
+  }
+  .numColor{
+    color: rgb(250, 200, 88);
+    margin: 2vh 0;
+    letter-spacing: normal;
+  }
+  .numSize{
+    font-size: 2vh;
+    flex: 5;
+    letter-spacing: 3px;
   }
 </style>
