@@ -61,12 +61,16 @@
             </el-form-item>
             <el-row :gutter="20" class="form-row">
                 <el-col :span="12">
-                    <el-form-item label="颜色" prop="color">
+                    <el-form-item
+                        label="颜色"
+                        prop="color"
+                        required
+                        :show-message="false"
+                    >
                         <el-color-picker
                             v-model="formData.color"
                             :predefine="predefine"
                             size="mini"
-                            @change="handleColorChange"
                         />
                     </el-form-item>
                 </el-col>
@@ -80,6 +84,8 @@
                 v-for="(item, index) in formData.dateRange"
                 :key="`${index}`"
                 class="date-range"
+                required
+                :show-message="false"
             >
                 <template slot="label">
                     <div class="custom-label">{{ `班次时间${index + 1}` }}</div>
@@ -158,6 +164,7 @@
 
 <script>
 import setting from '@/setting.js'
+import { validateId } from 'bpmn-js-properties-panel/lib/Utils'
 export default {
     props: {
         visible: {
@@ -200,8 +207,17 @@ export default {
             dialogVisible: this.visible,
             formLabelWidth: '100px',
             title: isCreate ? '新增班次' : '编辑班次',
-            formData: !isCreate ? JSON.parse(JSON.stringify(this.pageData.row)) : { isEnabled: 'Y', dateRange: { ...dateRangeList }},
-            rules: {},
+            formData: !isCreate ? JSON.parse(JSON.stringify(this.pageData.row)) : {
+                isEnabled: 'Y',
+                positions: '',
+                color: '',
+                desc: '',
+                dateRange: { ...dateRangeList }
+            },
+            rules: {
+                name: [{ required: true, message: '请输入班次名称', trigger: 'change' }],
+                alias: [{ required: true, message: '请输入班次别名', trigger: 'change' }]
+            },
             predefine: setting.color.predefine,
             toolbars: [
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', hidden: () => { return this.readonly } },
@@ -234,9 +250,6 @@ export default {
         }
     },
     methods: {
-        handleColorChange (v) {
-            console.log(v)
-        },
         addOption () {
             this.formData.dateRange.push({
                 type: 'range',
@@ -271,15 +284,17 @@ export default {
         handleSave (key) {
             this.$refs.form.validate((valid) => {
                 if (!valid) {
-                    return
+                    return this.$message.warning('请填写所有必填项！')
+                }
+                const { color, dateRange } = this.formData
+                if (!color || dateRange.some(i => i.type === 'range' && !(i.startTime && i.endTime))) {
+                    return this.$message.warning('请填写所有必填项！')
                 }
                 this.submitForm(this.formData, key)
             })
         },
         submitForm (data, key) {
-            const submitData = {
-                ...data
-            }
+            const submitData = { ...data }
             console.log(submitData)
             this.$emit('callback', { data: submitData, index: this.pageData.index })
             if (key === 'save') {
@@ -303,11 +318,18 @@ export default {
             padding: 20px;
             ::v-deep {
                 .el-form-item {
+                    &__label {
+                        position: relative;
+                        &:before {
+                            position: absolute;
+                            left: -8px;
+                        }
+                    }
                     margin-bottom: 16px !important;
                     &:last-child {
                         margin-bottom: 0 !important;
                     }
-                    .el-form-item__error {
+                    &__error {
                         padding-top: 8px !important;
                     }
                     .el-input {
