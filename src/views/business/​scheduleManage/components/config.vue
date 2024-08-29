@@ -362,7 +362,7 @@ export default {
     methods: {
         // 获取数据
         async loadData () {
-            if (this.$utils.isEmpty(this.params)) {
+            if (this.$utils.isEmpty(this.params.configId)) {
                 return
             }
             // 初始化表单数据的方法
