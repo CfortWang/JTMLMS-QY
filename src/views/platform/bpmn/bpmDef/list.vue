@@ -203,11 +203,36 @@ export default {
                 rowHandle: {
                     actions: [
                         {
-                            key: 'start',
-                            label: '启动',
-                            icon: 'ibps-icon-send',
-                            hidden: (rowData, index) => {
+                            key: 'remove',
+                            hidden: function (rowData, index) {
+                                return !(rowData.authorizeRight && rowData.authorizeRight.managementDel === 'Y')
+                            }
+                        },
+                        {
+                            key: 'clear',
+                            label: '清除数据',
+                            type: 'warning',
+                            icon: 'ibps-icon-trash',
+                            hidden: function (rowData, index) {
+                                return !(rowData.authorizeRight && rowData.authorizeRight.managementClean === 'Y')
+                            }
+                        },
+                        {
+                            key: 'suspend',
+                            label: '挂起',
+                            type: 'info',
+                            icon: 'ibps-icon-square',
+                            hidden: function (rowData, index) {
                                 return !(rowData.authorizeRight && rowData.authorizeRight.managementStart === 'Y' && rowData.status === 'deploy')
+                            }
+                        },
+                        {
+                            key: 'recover',
+                            label: '恢复',
+                            type: 'info',
+                            icon: 'ibps-icon-reply',
+                            hidden: function (rowData, index) {
+                                return !(rowData.authorizeRight && rowData.authorizeRight.managementStart === 'Y' && rowData.status === 'suspend')
                             }
                         },
                         {
@@ -224,41 +249,11 @@ export default {
                             }
                         },
                         {
-                            key: 'suspend',
-                            label: '挂起',
-                            icon: 'ibps-icon-square',
-                            hidden: function (rowData, index) {
-                                return !(rowData.authorizeRight && rowData.authorizeRight.managementStart === 'Y' && rowData.status === 'deploy')
-                            }
-                        },
-                        {
-                            key: 'recover',
-                            label: '恢复',
-                            icon: 'ibps-icon-reply',
-                            hidden: function (rowData, index) {
-                                return !(rowData.authorizeRight && rowData.authorizeRight.managementStart === 'Y' && rowData.status === 'suspend')
-                            }
-                        },
-                        {
                             key: 'setting',
                             label: '设置',
                             icon: 'ibps-icon-cogs',
                             hidden: function (rowData, index) {
                                 return !(rowData.authorizeRight && rowData.authorizeRight.managementSet === 'Y' && rowData.status !== 'draft')
-                            }
-                        },
-                        {
-                            key: 'design',
-                            label: '设计',
-                            icon: 'ibps-icon-share-alt',
-                            hidden: function (rowData, index) {
-                                return !(rowData.authorizeRight && rowData.authorizeRight.managementEdit === 'Y')
-                            }
-                        },
-                        {
-                            key: 'remove',
-                            hidden: function (rowData, index) {
-                                return !(rowData.authorizeRight && rowData.authorizeRight.managementDel === 'Y')
                             }
                         },
                         {
@@ -281,11 +276,20 @@ export default {
                             }
                         },
                         {
-                            key: 'clear',
-                            label: '清除数据',
-                            icon: 'ibps-icon-trash',
+                            key: 'design',
+                            label: '设计',
+                            icon: 'ibps-icon-share-alt',
                             hidden: function (rowData, index) {
-                                return !(rowData.authorizeRight && rowData.authorizeRight.managementClean === 'Y')
+                                return !(rowData.authorizeRight && rowData.authorizeRight.managementEdit === 'Y')
+                            }
+                        },
+                        {
+                            key: 'start',
+                            label: '启动',
+                            type: 'success',
+                            icon: 'ibps-icon-send',
+                            hidden: (rowData, index) => {
+                                return !(rowData.authorizeRight && rowData.authorizeRight.managementStart === 'Y' && rowData.status === 'deploy')
                             }
                         }
                     ]

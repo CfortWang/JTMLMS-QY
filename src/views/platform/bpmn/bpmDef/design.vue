@@ -17,7 +17,7 @@
             </template>
             <template v-else>
                 <el-button type="primary" icon="ibps-icon-save" class="ibps-ml-5" @click="handleSave(true,false)">保存</el-button>
-                <el-button type="primary" icon="ibps-icon-clipboard" class="ibps-ml-5" @click="handleSave(true,true)">发布新版本</el-button>
+                <!-- <el-button type="primary" icon="ibps-icon-clipboard" class="ibps-ml-5" @click="handleSave(true,true)">发布新版本</el-button> -->
             </template>
             <el-upload
                 ref="upload"

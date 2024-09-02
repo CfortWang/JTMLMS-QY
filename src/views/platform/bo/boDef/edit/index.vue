@@ -15,7 +15,7 @@
         <div slot="title" style="padding-left: 20px;" class="el-dialog--left">
             <el-button icon="el-icon-circle-close" @click="closeDialog()">关闭</el-button>
             <el-button v-if="!readonly" type="primary" icon="ibps-icon-save" @click="handleSave('save')">保存</el-button>
-            <el-button v-if="formId&&!readonly&&entrance!=='moreVersions'" icon="ibps-icon-release" type="primary" @click="handleSave('deploy')">发布新版本</el-button>
+            <!-- <el-button v-if="formId&&!readonly&&entrance!=='moreVersions'" icon="ibps-icon-release" type="primary" @click="handleSave('deploy')">发布新版本</el-button> -->
         </div>
         <ibps-layout ref="layout">
             <div slot="west">

@@ -180,6 +180,7 @@ export default {
                 // 管理列
                 rowHandle: {
                     actions: [
+                        { key: 'remove' },
                         {
                             key: 'genBoTable',
                             label: '生成表',
@@ -191,6 +192,7 @@ export default {
                         {
                             key: 'synBoTable',
                             label: '同步表结构',
+                            type: 'warning',
                             icon: 'ibps-icon-exchange',
                             hidden: (row, index) => {
                                 return row.boType !== 'out'
@@ -205,8 +207,7 @@ export default {
                             }
                         },
                         { key: 'edit' },
-                        { key: 'remove' },
-                        { key: 'detail' }
+                        { key: 'detail', type: 'info' }
                     ]
                 }
             },
