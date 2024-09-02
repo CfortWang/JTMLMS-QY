@@ -575,9 +575,47 @@ export default {
                 console.log(this.ordinateList)
                 if (!this.pageParams.id) {
                     this.scheduleData = mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
+                } else {
+                    this.updateScheduleData()
                 }
             }
             this.activeStep += val
+        },
+        /**
+         * 更新排班数据
+         * 1. 获取当前的 ordinateList 的 value 列表
+         * 2. 删除 this.scheduleData 中不在 newOrdinateValues 里的项
+         * 3. 确保 this.scheduleData 包含所有 newOrdinateValues 的项
+         * 4. 更新数组长度
+         */
+        updateScheduleData () {
+            const newOrdinateValues = this.ordinateList.map(ordinate => ordinate.value)
+
+            Object.keys(this.scheduleData).forEach(key => {
+                if (!newOrdinateValues.includes(key)) {
+                    delete this.scheduleData[key]
+                }
+            })
+
+            newOrdinateValues.forEach(key => {
+                if (!this.scheduleData[key]) {
+                    this.scheduleData[key] = Array.from({ length: this.dateList.length }, () => [])
+                }
+            })
+
+            Object.keys(this.scheduleData).forEach(key => {
+                const scheduleArray = this.scheduleData[key]
+                const newLength = this.dateList.length
+                if (scheduleArray.length < newLength) {
+                    // 如果当前长度小于新的长度，添加新的空数组
+                    for (let i = scheduleArray.length; i < newLength; i++) {
+                        scheduleArray.push([])
+                    }
+                } else if (scheduleArray.length > newLength) {
+                    // 如果当前长度大于新的长度，裁剪数组
+                    scheduleArray.length = newLength
+                }
+            })
         },
         validateForm () {
             const { scheduleRule, approver, ...rest } = this.formData

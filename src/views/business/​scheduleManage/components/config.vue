@@ -620,8 +620,13 @@ export default {
                     .el-form-item {
                         margin-bottom: 10 !important;
                         &__label {
+                            position: relative;
                             font-size: 14px !important;
                             color: #606266;
+                            &:before {
+                                position: absolute;
+                                left: -8px;
+                            }
                         }
                         &__content {
                             .el-input, .el-select, .el-input-number {

@@ -161,3 +161,31 @@ export const cycleOptions = [
         limit: 1
     }
 ]
+
+export const stateType = [
+    {
+        label: '待审核',
+        value: '待审核',
+        type: 'info'
+    },
+    {
+        label: '待审批',
+        value: '待审批',
+        type: 'primary'
+    },
+    {
+        label: '已取消',
+        value: '已取消',
+        type: 'warning'
+    },
+    {
+        label: '已作废',
+        value: '已作废',
+        type: 'danger'
+    },
+    {
+        label: '已通过',
+        value: '已通过',
+        type: 'success'
+    }
+]
