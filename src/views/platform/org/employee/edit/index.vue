@@ -27,7 +27,7 @@
                     @input="data => employee = data"
                 />
             </el-tab-pane>
-            <el-tab-pane v-if="isSuper" label="扩展属性" name="ext-attr">
+            <el-tab-pane label="扩展属性" name="ext-attr">
                 <ext-attr
                     ref="attrInfo"
                     :readonly="readonly"

@@ -13,7 +13,7 @@
             <el-tab-pane label="部门人员" name="positionEmployee">
                 <position-employee :id="id" seeting-search-party-type="position" :height="height" :depth="depth" :visible="activeName==='positionEmployee'" />
             </el-tab-pane>
-            <el-tab-pane v-if="isSuper" label="扩展属性" name="extraAttr">
+            <el-tab-pane label="扩展属性" name="extraAttr">
                 <ext-attr :id="id" ref="attrForm" :height="height" :visible="activeName==='extraAttr'" party-type="position" />
             </el-tab-pane>
             <!-- <el-tab-pane label="已分配角色" name="positionRole">
