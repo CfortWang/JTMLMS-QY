@@ -250,6 +250,15 @@
             @select="handleSelect"
             @close="handleClose"
         />
+        <history
+            :visible.sync="showHistory"
+            @close="v => showHistory = v"
+        />
+        <record
+            :visible.sync="showRecord"
+            :schedule-id="pageParams.id"
+            @close="v => showRecord = v"
+        />
     </el-dialog>
 </template>
 
@@ -263,7 +272,9 @@ export default {
     name: 'schedule',
     components: {
         ContextMenu: () => import('./components/context-menu'),
-        Statistic: () => import('./components/statistic')
+        Statistic: () => import('./components/statistic'),
+        History: () => import('./components/history'),
+        Record: () => import('./components/record')
     },
     props: {
         visible: {
@@ -311,7 +322,7 @@ export default {
                 { key: 'prev', icon: 'el-icon-d-arrow-left', label: '上一步', type: 'primary', steps: '2,3' },
                 { key: 'next', icon: 'el-icon-d-arrow-right', label: '下一步', type: 'primary', steps: '1,2' },
                 { key: 'changeView', icon: 'el-icon-set-up', label: '切换视图', type: 'primary', steps: '2' },
-                { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info', steps: '2,3' },
+                // { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info', steps: '2,3' },
                 { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning', steps: '2,3' },
                 { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', steps: '2,3' },
                 { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', steps: '2' },
@@ -325,6 +336,8 @@ export default {
             dateObj: {},
             dateList: [],
             showContextMenu: false,
+            showHistory: false,
+            showRecord: false,
             hoveredIndex: null,
             shiftParams: {},
             shiftList: [],
@@ -551,10 +564,10 @@ export default {
                     this.changeView()
                     break
                 case 'history':
-                    this.$emit('history')
+                    this.showHistory = true
                     break
                 case 'record':
-                    this.$emit('record')
+                    this.showRecord = true
                     break
                 case 'cancel':
                     this.closeDialog()
