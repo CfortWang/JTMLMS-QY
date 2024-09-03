@@ -65,10 +65,7 @@
             <div class="ibps-home__sub-title">初次加载资源可能需要较多时间 请耐心等待</div>
             </div>
             <div class="ibps-home__footer">
-                <span
-                target="_blank">
-                2020©深圳市金源信通科技有限公司©版权所有
-                </span>
+                <span id="copyright" target="_blank"></span>
             </div>
         </div>
     </div>
@@ -78,5 +75,9 @@
       <script src="<%= htmlWebpackPlugin.options.cdn.js[i] %>"></script>
       <% } %>
      <!-- built files will be auto injected -->
+    <script>
+        const currentYear = new Date().getFullYear();
+        document.getElementById('copyright').textContent = '2020-' + currentYear + '©深圳市金源信通科技有限公司©版权所有'
+    </script>
   </body>
 </html>

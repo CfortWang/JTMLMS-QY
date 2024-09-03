@@ -105,10 +105,10 @@ module.exports = {
     ],
     // 默认设置: https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-service/lib/config/base.js
     chainWebpack: config => {
-    /**
-     * 添加 CDN 参数到 htmlWebpackPlugin 配置中
-     * 已适配多页
-     */
+        /**
+         * 添加 CDN 参数到 htmlWebpackPlugin 配置中
+         * 已适配多页
+         */
         const htmlPluginNames = chain(pages).keys().map(page => 'html-' + page).value()
         const targetHtmlPluginNames = htmlPluginNames.length ? htmlPluginNames : ['html']
         each(targetHtmlPluginNames, name => {
@@ -120,33 +120,27 @@ module.exports = {
         // 在html文件注入配置文件
         config.plugin('HtmlInjectConfigPlugin').use(HtmlInjectConfigPlugin, [publicPath])
         /**
-     * 删除懒加载模块的 prefetch preload，降低带宽压力
-     * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#prefetch
-     * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#preload
-     * 而且预渲染时生成的 prefetch 标签是 modern 版本的，低版本浏览器是不需要的
-     */
-        config.plugins
-            .delete('prefetch')
-            .delete('preload')
+         * 删除懒加载模块的 prefetch preload，降低带宽压力
+         * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#prefetch
+         * https://cli.vuejs.org/zh/guide/html-and-static-assets.html#preload
+         * 而且预渲染时生成的 prefetch 标签是 modern 版本的，低版本浏览器是不需要的
+         */
+        config.plugins.delete('prefetch').delete('preload')
         // 解决 cli3 热更新失效 https://github.com/vuejs/vue-cli/issues/1559
-        config.resolve
-            .symlinks(true)
-        config
-            .plugin('theme-color-replacer')
-            .use(ThemeColorReplacer, [{
-                fileName: 'css/theme-colors.[contenthash:8].css',
-                matchColors: [
-                    ...forElementUI.getElementUISeries(elementColor) // Element-ui主色系列
-                ],
-                externalCssFiles: ['./node_modules/element-ui/lib/theme-chalk/index.css'], // optional, String or string array. Set external css files (such as cdn css) to extract colors.
-                changeSelector: forElementUI.changeSelector
-            }])
+        config.resolve.symlinks(true)
+        config.plugin('theme-color-replacer').use(ThemeColorReplacer, [{
+            fileName: 'css/theme-colors.[contenthash:8].css',
+            matchColors: [
+                ...forElementUI.getElementUISeries(elementColor) // Element-ui主色系列
+            ],
+            externalCssFiles: ['./node_modules/element-ui/lib/theme-chalk/index.css'], // optional, String or string array. Set external css files (such as cdn css) to extract colors.
+            changeSelector: forElementUI.changeSelector
+        }])
 
-        config
         // 开发环境 sourcemap 不包含列信息
-            .when(process.env.NODE_ENV === 'development',
-                config => config.devtool('cheap-source-map')
-            )
+        config.when(process.env.NODE_ENV === 'development',
+            config => config.devtool('cheap-source-map')
+        )
 
         config.when(process.env.NODE_ENV !== 'development' && !enableCDN,
             (config) => {
@@ -210,9 +204,7 @@ module.exports = {
             .set('vue$', 'vue/dist/vue.esm.js')
         // 分析工具
         if (process.env.npm_config_report) {
-            config
-                .plugin('webpack-bundle-analyzer')
-                .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
+            config.plugin('webpack-bundle-analyzer').use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
         }
     },
     // 不输出 map 文件
