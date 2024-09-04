@@ -135,8 +135,8 @@
 
 <script>
 // import Watermark from '@/layout/header-aside/components/header-message/watermark/watermark-cont'
-import { shuffle } from 'lodash'
-import { round } from 'lodash'
+import { shuffle, round } from 'lodash'
+
 export default {
     components: {
         IbpsImage: () => import('@/business/platform/file/image')
@@ -323,28 +323,42 @@ export default {
         },
         // 随机题目
         getRandQuestionData (data) {
-            data = shuffle(data)
-            const temp = []
+            let temp = []
             const type = ['单选题', '多选题', '判断题', '填空题', '简答题']
             this.examData.randNumber = this.examData.randNumber.split(',')
             for (let i = 0; i < this.examData.randNumber.length; i++) {
                 let t = +this.examData.randNumber[i]
                 // console.log(t)
                 if (t !== 0) {
-                    for (let j = 0; j < data.length && t; j++) {
-                        const item = data[j]
-                        if (item.questionType === type[i]) {
-                            temp.push(item)
-                            t--
+                    // 题型分类
+                    if (this.examData.randWay === '1') {
+                        for (let j = 0; j < data.length && t; j++) {
+                            const item = data[j]
+                            if (item.questionType === type[i]) {
+                                temp.push(item)
+                                t--
+                            }
+                        } // 难度分类
+                    } else if (this.examData.randWay === '2') {
+                        for (let j = 0; j < data.length && t; j++) {
+                            const item = data[j]
+                            if (item.questionLevel === i + '') {
+                                temp.push(item)
+                                t--
+                            }
                         }
                     }
                 }
             }
+            temp = shuffle(temp)
+            temp.sort((a, b) => {
+                return type.indexOf(a.questionType) - type.indexOf(b.questionType)
+            })
             return temp
         },
         getQuestionData () {
             this.loading = true
-            const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey from t_questions where parent_id_ = '${this.bankId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey,nan_du_ as questionLevel from t_questions where parent_id_ = '${this.bankId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     let { data = [] } = res.variables || {}
@@ -533,7 +547,8 @@ export default {
                     shi_fou_yi_yue_: autoType ? '是' : '否',
                     ping_yue_shi_jian: autoType ? time : '',
                     de_fen_: autoType ? this.getScore(item) : '',
-                    jie_xi_: ''
+                    jie_xi_: '',
+                    nan_du_: item.questionLevel || 0
                 })
             })
             return submitData

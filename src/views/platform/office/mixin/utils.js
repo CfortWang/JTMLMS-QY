@@ -99,6 +99,7 @@ export default {
             if (!arr[2]) {
                 return ''
             }
+            arr[2] = arr[2].replace('：', ':')
             const result = JSON.parse(`{${arr[2]}}`)
             if (!result.dept) {
                 return ''

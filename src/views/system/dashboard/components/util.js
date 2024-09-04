@@ -266,6 +266,8 @@ export function buildComponent (name, column, preview, vm) {
                     if (!arr[2]) {
                         return ''
                     }
+                    // 中文冒号转英文冒号  防止流程定义时输入的冒号格式错误导致转换报错
+                    arr[2] = arr[2].replace('：', ':')
                     const result = JSON.parse(`{${arr[2]}}`)
                     if (!result.dept) {
                         return ''

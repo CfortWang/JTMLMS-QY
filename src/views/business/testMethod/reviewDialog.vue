@@ -19,6 +19,7 @@
                     :multiple="false"
                     :disabled="!selectEditchanges"
                     type="dialog"
+                    icon="el-icon-zoom-in"
                     class="custom-dialog"
                     placeholder="请选择检验方法"
                 />
@@ -32,9 +33,10 @@
                     :disabled="!selectEditchanges"
                     type="dialog"
                     class="custom-dialog"
+                    icon="el-icon-zoom-in"
                     placeholder="请选择检验方法"
-                    :dynamic-params="dynamicParams"
                 />
+                <!-- :dynamic-params="dynamicParams" -->
                 <!--  :dynamic-params="field.dynamicParams"接收的参数，相当于过滤 -->
                 <!-- <el-input v-model="ruleForm.xiangMuFangFa" placeholder="请输入项目名称" />
                      -->
@@ -54,14 +56,15 @@
             </el-form-item>
             <el-form-item label="上次性能验证" prop="deng_ji_bu_men_">
                 <div class="setMargin" :inert="isInert">
-                    <div>{{ firstItemText }}</div>
-                    <el-radio-group v-model="ruleForm.xing_neng_yan_zheng">
+                    <div style="height: 32px" />
+                    <!-- <div>{{ firstItemText }}</div> -->
+                    <el-checkbox-group v-model="ruleForm.xing_neng_yan_zheng">
                         <el-row :gutter="20">
-                            <el-col v-for="(item, index) in yangzheng.slice(1)" :key="index" :span="8">
-                                <el-radio :label="item" :disabled="!selectEditchanges">{{ item }}</el-radio>
+                            <el-col v-for="(item, index) in yangzheng" :key="index" :span="8">
+                                <el-checkbox :label="item" :disabled="!selectEditchanges">{{ item }}</el-checkbox>
                             </el-col>
                         </el-row>
-                    </el-radio-group>
+                    </el-checkbox-group>
                 </div>
             </el-form-item>
             <el-form-item label="评审内容" prop="deng_ji_bu_men_">
@@ -80,6 +83,7 @@
                         <el-table-column
                             prop="shi_fou"
                             label="判断"
+                            width="150px"
                         >
                             <template v-slot="{ row }">
                                 <el-radio-group v-model="row.shi_fou">
@@ -100,19 +104,44 @@
                                 />
                             </template>
                         </el-table-column>
+                        <!-- 添加两个字段 -->
+                        <el-table-column
+                            width="150px"
+                            prop="shi_fou_shi_yong"
+                            label="该次评审是否适用"
+                        >
+                            <template v-slot="{ row }">
+                                <el-radio-group v-model="row.shi_fou_shi_yong">
+                                    <el-radio label="是" :disabled="!selectEditchanges" />
+                                    <el-radio label="否" :disabled="!selectEditchanges" />
+                                </el-radio-group>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                            prop="cuo_shi_"
+                            label="预防或纠正措施"
+                        >
+                            <template v-slot="{ row }">
+                                <el-input
+                                    v-model="row.cuo_shi_"
+                                    :disabled="!selectEditchanges"
+                                    placeholder="请输入备注"
+                                />
+                            </template>
+                        </el-table-column>
                     </el-table>
                 </div>
             </el-form-item>
             <el-form-item label="评审结论" prop="deng_ji_bu_men_">
                 <div :inert="isInert" class="setMargin">
-                    <div>{{ pinNeirong }}</div>
-                    <el-radio-group v-model="ruleForm.ping_shen_jie_lun">
+                    <div style="height: 32px" />
+                    <el-checkbox-group v-model="ruleForm.ping_shen_jie_lun">
                         <el-row :gutter="20">
-                            <el-col v-for="(item, index) in jieLun.slice(1)" :key="index" :span="8">
-                                <el-radio :label="item" :disabled="!selectEditchanges">{{ item }}</el-radio>
+                            <el-col v-for="(item, index) in jieLun" :key="index" :span="8">
+                                <el-checkbox :label="item" :disabled="!selectEditchanges">{{ item }}</el-checkbox>
                             </el-col>
                         </el-row>
-                    </el-radio-group>
+                    </el-checkbox-group>
                 </div>
             </el-form-item>
             <el-form-item label="发现的问题" prop="deng_ji_bu_men_">
@@ -152,6 +181,11 @@ export default {
         selectEditchange: {
             type: Boolean,
             default: false
+        },
+        configList: {
+            type: Array,
+            default: () => {
+            }
         }
     },
     data () {
@@ -159,10 +193,9 @@ export default {
             dialogFormVisibles: this.visidial,
             selectEditchanges: this.selectEditchange,
             selectEditDatas: this.selectEditData,
+            pinShen1: this.configList,
             isInert: false,
             dynamicParams: {},
-            // pinShenTitle: '上次验证性能，请选择以下内容中的一个选项:',
-            // jieLunTitle: '评审结论，请选择以下内容中的一项:',
             id: '',
             toolbars: [
                 {
@@ -180,151 +213,17 @@ export default {
                 sheBeiBianHao: '',
                 shiJi: '',
                 jiaozhuiPin: '',
-                xing_neng_yan_zheng: '',
-                ping_shen_jie_lun: '',
+                xing_neng_yan_zheng: [],
+                ping_shen_jie_lun: [],
                 faXianWenTi: ''
             },
-            //   jianYanXiangMu: '',
-            //   xiaoZhunPinJiPiHa: '',
-            //   a: ''
             rules: {
                 jianYanFangFa: [{ required: true, message: '请填写数据' }],
                 xiangMuFangFa: [{ required: true, message: '请填写数据' }]
             },
             maxHeight: '600px',
-            yangzheng: [`上次验证性能，请选择以下内容中的一个选项:`, '(1)正确性', '(2)精密度', '(3)检出限', '(4)可报告范围', '(5)线性', '(6)符合率', '(7)抗干扰能力', '(8)特异性', '(9)携带污染率'],
-            jieLun: ['评审结论，请选择以下内容中的一项:', '(1)适用于检验申请', '(2)需方法验证', '(3)需方法确认', '(4)需室间比对', '(5)需设备间对比', '(6)需留样再测', '(7)需项目校准', '(8)复测室间质评物', '(9)其他'],
-            // pinShen: ['a 上次检验方法评审的执行情况;', 'b 病人和临床医护部门对某检测项目的意见或建议;', 'c 与检测项目有关的学术进展，是否有更好的替代实验;', 'd 检测项目的应用范围是否合适;', 'e 检测项目是否出现新的局限性;', 'f 检验申请（包括条码内容）是否需要变动;', 'g 检测项目所需标本的采集方式（标本类型、采集容器、保存剂）及量是否合适;', 'h 标本运送中是否存在的问题（包括安全、运送条件、运送时限）;', 'i 标本保存中是否存在的问题;', 'j 标本处理（接收、拒收）中是否存在的问题;', 'k 检测项目所需设备和试剂是否合适，是否需要变更；仪器或试剂供应商提供的意见和建议;', 'l 设备与试剂的校准情况，检测结果的溯源情况;', 'm 检测项目的室间质量评价;', 'n 检测项目的室内质量控制情况;', 'o 检测结果的报告方式是否合适，计算方法是否正确;', 'p  检测项目执行过程中是否出现不符合项;', 'q 检测结果的生物参考区间是否合适;', 'r 测定方法的性能参数（包括线性、敏感性、特异性、精密度、准确度、检出限等）是否满足要求;', 's 检测方法的干扰因素影响;', 't 执行检测项目的安全性;', 'u 检验周期是否合适;', 'v 检验报告格式是否需要变更；检验报告的审核是否全面、规范，检验报告的更改;', 'w 检验报告发布方式是否合适；有无延迟或口头报告发送 ，检验后样品的处置; ', 'x 检测结果危急值的设定;'],
-            pinShen1: [
-                {
-                    name: 'a 上次检验方法评审的执行情况;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'b 病人和临床医护部门对某检测项目的意见或建议;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'c 与检测项目有关的学术进展，是否有更好的替代实验;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'd 检测项目的应用范围是否合适;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                }, {
-                    name: 'e 检测项目是否出现新的局限性;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'f 检验申请（包括条码内容）是否需要变动;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'g 检测项目所需标本的采集方式（标本类型、采集容器、保存剂）及量是否合适;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'h 标本运送中是否存在的问题（包括安全、运送条件、运送时限）;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'i 标本保存中是否存在的问题;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'j 标本处理（接收、拒收）中是否存在的问题;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'k 检测项目所需设备和试剂是否合适，是否需要变更；仪器或试剂供应商提供的意见和建议;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'l 设备与试剂的校准情况，检测结果的溯源情况;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'm 检测项目的室间质量评价;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'n 检测项目的室内质量控制情况;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'o 检测结果的报告方式是否合适，计算方法是否正确;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'p  检测项目执行过程中是否出现不符合项;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'q 检测结果的生物参考区间是否合适;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'r 测定方法的性能参数（包括线性、敏感性、特异性、精密度、准确度、检出限等）是否满足要求;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 's 检测方法的干扰因素影响;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 't 执行检测项目的安全性;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'u 检验周期是否合适;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'v 检验报告格式是否需要变更；检验报告的审核是否全面、规范，检验报告的更改;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'w 检验报告发布方式是否合适；有无延迟或口头报告发送 ，检验后样品的处置;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                },
-                {
-                    name: 'x 检测结果危急值的设定;',
-                    shi_fou: '是',
-                    bei_zhu: ''
-                }
-
-            ]
-        }
-    },
-    computed: {
-        firstItemText () {
-            return `上次验证性能，请选择以下内容中的一个选项:${this.ruleForm.xing_neng_yan_zheng}`
-        },
-        pinNeirong () {
-            return `评审结论，请选择以下内容中的一项:${this.ruleForm.ping_shen_jie_lun}`
+            yangzheng: ['(1)正确性', '(2)精密度', '(3)检出限', '(4)可报告范围', '(5)线性', '(6)符合率', '(7)抗干扰能力', '(8)特异性', '(9)携带污染率'],
+            jieLun: ['(1)适用于检验申请', '(2)需方法验证', '(3)需方法确认', '(4)需室间比对', '(5)需设备间对比', '(6)需留样再测', '(7)需项目校准', '(8)复测室间质评物', '(9)其他']
         }
     },
     watch: {
@@ -339,11 +238,6 @@ export default {
     created () {
         if (this.selectEditDatas) {
             this.slectUpdate(this.selectEditDatas)
-            // if (!this.selectEditchange) {
-            //     this.selectEditchanges = false
-            // } else {
-            //     this.selectEditchanges = true
-            // }
         }
     },
     methods: {
@@ -366,21 +260,6 @@ export default {
         submitForm (formName) {
               this.$refs[formName]?.validate((valid) => {
                   if (valid) {
-                      if (!this.selectEditData) {
-                          const a = this.yangzheng[0] + this.ruleForm.xing_neng_yan_zheng
-                          const b = this.jieLun[0] + this.ruleForm.ping_shen_jie_lun
-                          this.yangzheng[0] = a
-                          this.jieLun[0] = b
-                      } else {
-                          const a = this.yangzheng[0].split(':')
-                          const b = this.jieLun[0].split(':')
-                          if (a[1] !== this.ruleForm.xing_neng_yan_zheng) {
-                              this.yangzheng[0] = a[0] + ':' + this.ruleForm.xing_neng_yan_zheng
-                          }
-                          if (b[1] !== this.ruleForm.ping_shen_jie_lun) {
-                              this.jieLun[0] = b[0] + ':' + this.ruleForm.ping_shen_jie_lun
-                          }
-                      }
                       const obj = {
                           jianYanFangFa: this.ruleForm.jianYanFangFa,
                           xiangMuFangFa: this.ruleForm.xiangMuFangFa,
@@ -389,8 +268,10 @@ export default {
                           sheBeiBianHao: this.ruleForm.sheBeiBianHao,
                           shiJi: this.ruleForm.shiJi,
                           jiaozhuiPin: this.ruleForm.jiaozhuiPin,
-                          yangzheng: JSON.stringify(this.yangzheng),
-                          jieLun: JSON.stringify(this.jieLun),
+                          //   yangzheng: JSON.stringify(this.yangzheng),
+                          yangzheng: this.ruleForm.xing_neng_yan_zheng,
+                          //   jieLun: JSON.stringify(this.jieLun),
+                          jieLun: this.ruleForm.ping_shen_jie_lun,
                           pinShen1: JSON.stringify(this.pinShen1),
                           faXianWenTi: this.ruleForm.faXianWenTi
                       }
@@ -417,10 +298,7 @@ export default {
 
         // 查阅，修改带出数据
         slectUpdate (selectEditDatas) {
-            const a = JSON.parse(selectEditDatas.yangzheng)[0].split(':')
-            const b = JSON.parse(selectEditDatas.jieLun)[0].split(':')
-            this.ruleForm.xing_neng_yan_zheng = a[1]
-            this.ruleForm.ping_shen_jie_lun = b[1]
+            this.ruleForm.xing_neng_yan_zheng = selectEditDatas.yangzheng
             this.ruleForm.jianYanFangFa = selectEditDatas.jianYanFangFa
             this.ruleForm.xiangMuFangFa = selectEditDatas.xiangMuFangFa
             this.ruleForm.xiangMuMingCheng = selectEditDatas.xiangMuMingCheng
@@ -429,9 +307,10 @@ export default {
             this.ruleForm.shiJi = selectEditDatas.shiJi
             this.ruleForm.jiaozhuiPin = selectEditDatas.jiaozhuiPin
             this.ruleForm.faXianWenTi = selectEditDatas.faXianWenTi
-            this.yangzheng = JSON.parse(selectEditDatas.yangzheng)
+            // this.yangzheng = JSON.parse(selectEditDatas.yangzheng)
             this.pinShen1 = JSON.parse(selectEditDatas.pinShen1)
-            this.jieLun = JSON.parse(selectEditDatas.jieLun)
+            // this.jieLun = JSON.parse(selectEditDatas.jieLun)
+            this.ruleForm.ping_shen_jie_lun = selectEditDatas.jieLun
         }
     }
 }
@@ -446,15 +325,15 @@ export default {
     padding:10px;
     border-radius: 4px;
 }
-.setMargin{
-    margin:0 0 15px 0;
-}
+// .setMargin{
+//     margin:0 0 15px 0;
+// }
 .review-form{
  padding: 10px;
 }
 ::v-deep{
     .el-dialog{
-        width: 60% !important;
+        width: 80% !important;
         margin-top: 2vh !important;
         height: 90% !important;
     }

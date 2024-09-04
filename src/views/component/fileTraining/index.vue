@@ -60,13 +60,8 @@
                             :type="index === activeIndex ? type : ''"
                             @click.stop.native="toggleActive(activity, index)"
                         >
-                            <!-- <div>
-                                <el-tooltip class="item" effect="dark" placement="right-end" :content="showContent(activity,index)">
-                                    <div>版本号:{{ activity.ban_ben_ }}/修订人：{{ activity.fileInfos.CREATOR_NAME_ }}==={{ activity.bian_zhi_ren_ }}</div>
-                                </el-tooltip>
-                            </div> -->
                             <div>
-                                <el-tooltip class="item" effect="dark" placement="right-end" :content="showContent(activity,index)">
+                                <el-tooltip class="itemStyle" effect="dark" placement="right-end" :content="showContent(activity,index)">
                                     <div>版本号:{{ activity.ban_ben_ }}/修订人：{{ getUserName(activity.bian_zhi_ren_) }}</div>
                                 </el-tooltip>
                             </div>
@@ -207,6 +202,8 @@ export default {
                 if (newVal !== temp) {
                     this.leftData = temp
                 }
+                // this.fileShow(this.leftData[0])
+
                 newVal.forEach(val => {
                     this.fileShow(val)
                 })
@@ -252,7 +249,6 @@ export default {
         this.checkDialogBody()
     },
     methods: {
-
         getUserName (data) {
             const user = this.userList.find(item => item.userId === data)
             return user ? user.userName : '未知用户'
@@ -261,9 +257,6 @@ export default {
             if (activity.cao_zuo_lei_xing_ === '新增') {
                 return '第一版本'
             }
-            // if (index <= 0) {
-            //     return '第一版'
-            // }
             return activity.xiu_ding_nei_rong ? activity.xiu_ding_nei_rong : '无修订原因'
         },
 
@@ -276,6 +269,7 @@ export default {
         },
 
         closeDialog () {
+            this.$emit('colseVisible', false)
             const fvView = this.$refs.fvView
             // 销毁子组件方法
             fvView.destoryZiComponent()
@@ -288,13 +282,14 @@ export default {
                 clearInterval(this.clearTimeSet)
                 this.clearTimeSet = null
             }
+            this.leftShow = true
             this.out = false
             this.browseTime = 0
-            this.curFileName = ''// 本人添加
-            this.lookNum = null
-            this.showList = []
-            this.leftData = []
-            this.digData = null
+            // this.curFileName = ''// 本人添加
+            // this.lookNum = null
+            // this.showList = []
+            // this.leftData = []
+            // this.digData = null
         },
         hadLoadedFile (v) {
             this.setBrowseTime()
@@ -339,12 +334,17 @@ export default {
         },
 
         toggleActive (activity, index) {
+            if (this.activeIndex === index) { return }
             this.activeIndex = index
             this.digData = activity
+            this.fileShow(activity)
+            if (this.browseTime >= 30) {
+                this.upFunc(this.tmpId, this.browseTime)
+            }
+
             clearInterval(this.clearTimeSet)
             this.browseTime = 0
             this.curFileName = activity.FILE_NAME_
-            this.fileShow(activity)// 展示内容改变
             this.checkNum(activity)// 阅读量
             // this.$forceUpdate()// 触发监听器
         },
@@ -415,11 +415,10 @@ export default {
                 type: 'warning'
             })
         },
-        closeDialog1 (val) {
-            this.innerVisible = val
-        },
+        // closeDialog1 (val) {
+        //     this.innerVisible = val
+        // },
         updateFile () {
-            // console.log('下载文件', this.optionFile)
             const a = document.createElement('a')
             a.href = this.optionFile.url
             a.download = this.optionFile.data.fileName
@@ -428,31 +427,38 @@ export default {
             a.remove()
         },
         fileShow (val) {
-            // console.log('qwqwqw', this.idChange('1166703356459089920'))
-            this.dialogVisible = this.visible
-            this.title = `文件：《${val.FILE_NAME_}》`
-            this.idChange(val.id).then(res => {
-                this.tmpId = res
-            })
-            this.upFunc = val.func
-            const data = {
-                ext: val.fileInfos.EXT_,
-                fileName: val.fileInfos.FILE_NAME_,
-                id: val.fileInfos.ID_,
-                index: 0,
-                totalBytes: val.fileInfos.TOTAL_BYTES_
-            }
-            // 1、获取文件数据 及下载流接口
-            this.optionFile.url = BASE_API() + SYSTEM_URL() + '/file/download?attachmentId=' + data.id
-            this.optionFile.editUrl = BASE_API() + SYSTEM_URL() + '/file/editCallback?fileName=' + data.fileName + '&fileType=' + data.ext + '&type="fileTraining"&id=' + data.id
-            this.optionFile.title = data.fileName // 文件名称
-            this.optionFile.fileType = data.ext // 类型
-            this.optionFile.data = data // 记录编制的位置，需要替换。
-            this.optionFile.data.index = data.index
-            // 使用 v-if 实现组件刷新功能
-            this.refresh = false
-            this.$nextTick(() => {
-                this.refresh = true
+            return new Promise((resolve, reject) => {
+                try {
+                    this.dialogVisible = true
+                    this.title = `文件：《${val.FILE_NAME_}》`
+                    this.idChange(val.id).then(res => {
+                        this.tmpId = res
+                        if (val.func) { this.upFunc = val.func }
+                        const data = {
+                            ext: val.fileInfos.EXT_,
+                            fileName: val.fileInfos.FILE_NAME_,
+                            id: val.fileInfos.ID_,
+                            index: 0,
+                            totalBytes: val.fileInfos.TOTAL_BYTES_
+                        }
+
+                        this.optionFile.url = `${BASE_API()}${SYSTEM_URL()}/file/download?attachmentId=${data.id}`
+                        this.optionFile.editUrl = `${BASE_API()}${SYSTEM_URL()}/file/editCallback?fileName=${data.fileName}&fileType=${data.ext}&type=fileTraining&id=${data.id}`
+                        this.optionFile.title = data.fileName // 文件名称
+                        this.optionFile.fileType = data.ext // 类型
+                        this.optionFile.data = data // 记录编制的位置，需要替换。
+                        this.optionFile.data.index = data.index
+
+                        // 使用 v-if 实现组件刷新功能
+                        this.refresh = false
+                        this.$nextTick(() => {
+                            this.refresh = true
+                            resolve() // 异步操作完成后 resolve
+                        })
+                    })
+                } catch (error) {
+                    reject(error)
+                }
             })
         },
         // 排序函数
@@ -517,6 +523,9 @@ export default {
         }
         .file-type-txt {
             height: calc(88vh) !important;
+        }
+        .itemStyle:hover{
+            cursor: pointer;
         }
     }
     .left-content{

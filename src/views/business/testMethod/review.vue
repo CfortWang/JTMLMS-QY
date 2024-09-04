@@ -36,17 +36,17 @@
                     <span style="margin-left: 10px">{{ getJianYanFangFaName(row.jianYanFangFa) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column
+            <!-- <el-table-column
                 label="项目与方法"
                 width="140"
             >
                 <template v-slot="{ row }">
                     <span style="margin-left: 10px">{{ getProjectAndMethod(row.xiangMuFangFa) }}</span>
                 </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column
                 prop="xiangMuMingCheng"
-                label="项目名称"
+                label="检测项目"
                 width="140"
             />
             <el-table-column
@@ -90,6 +90,7 @@
             :visidial="dialogFormVisibles"
             :select-edit-data="selectEditData"
             :select-editchange="selectEditchange"
+            :config-list="configList"
             @getData="getData"
             @getcolse="getcolse"
         />
@@ -139,11 +140,10 @@ export default {
             projectAndMethodNameCache: {},
             tableKey: 0,
             multipleSelection: [],
-            selectEditData: ''
+            selectEditData: '',
+            configList: []
         }
     },
-    // Activity_0ruri1g编制节点
-    // Activity_0ccsmb9审核节点
     computed: {
         getJianYanFangFaName () {
             return (jianYanFangFa) => {
@@ -188,7 +188,25 @@ export default {
         },
         statData: {
             handler (val) {
+                const t = val.map(item => ({
+                    'id': '',
+                    'parentId': '',
+                    'jianYanXiangMu': item.jianYanXiangMu,
+                    'fangFaMingCheng': '',
+                    'jianYanFangFa': item.jianYanFangFa,
+                    'xiangMuYuFangFa': item.xiangMuFangFa,
+                    'xiangMuMingCheng': item.xiangMuMingCheng,
+                    'sheBeiMingCheng': item.sheBeiMingCheng,
+                    'sheBeiBianHao': item.sheBeiBianHao,
+                    'shiJiJiPiHao': item.shiJi,
+                    'xiaoZhunPinJiPiHa': '不适用',
+                    'shangCiYanZhengXi': item.yangzheng,
+                    'pingShenNeiRong': item.pinShen1,
+                    'pingShenJieLun': item.jieLun,
+                    'faXianDeWenTi': item.faXianWenTi
+                }))
                 this.$emit('change-data', 'lieBiaoShuJu', JSON.stringify(val))
+                this.$emit('change-data', 'jyffxnpsjlzb', t)
             },
             deep: true
         }
@@ -227,6 +245,8 @@ export default {
         addData () {
             this.selectEditchange = true
             this.dialogFormVisibles = true
+            this.configList = []
+            this.configData()
         },
         // 点击取消按钮
         getcolse () {
@@ -292,6 +312,24 @@ export default {
             this.dialogFormVisibles = true
             this.selectEditData = row
             this.selectEditchange = false
+        },
+        // 配置完成之后评审内容数据自动带出
+        configData () {
+            const sql = `select * from  t_jyffxnpspzb`
+            this.$common.request('sql', sql).then(res => {
+                const data = res.variables.data
+
+                data.forEach(item => {
+                    const obj = {
+                        name: item.ping_shen_nei_ron,
+                        shi_fou: '是',
+                        bei_zhu: '',
+                        shi_fou_shi_yong: '是',
+                        cuo_shi_: ''
+                    }
+                    this.configList.push(obj)
+                })
+            })
         }
     }
 }

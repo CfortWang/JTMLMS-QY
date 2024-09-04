@@ -156,10 +156,11 @@ export const basicColumn = [
 
 export const infoColumn = [
     { prop: 'questionCount', label: '题数', width: 65 },
-    { prop: 'duration', label: '考试时长', width: 100 },
+    { prop: 'duration', label: '考试时长', width: 85 },
     { prop: 'limitCount', label: '限考次数', width: 85 },
     { prop: 'limitDate', label: '限考时间', width: 120 },
-    { prop: 'isRand', label: '是否随机', slotName: 'isRand', width: 65 }
+    { prop: 'isRand', label: '是否随机', slotName: 'isRand', width: 65 },
+    { prop: 'randWay', label: '随机方式', slotName: 'randWay', width: 90 }
 ]
 
 export const resultColumn = [

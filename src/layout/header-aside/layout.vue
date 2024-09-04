@@ -83,8 +83,8 @@
                     <!-- 如果你只想在开发环境显示这个按钮请添加 v-if="$nodeEnv === 'development'" -->
                     <!-- 全局搜索放大镜、日志、环境切换、全屏 -->
                     <!-- <ibps-header-search @click="handleSearchClick" /> -->
-                    <ibps-header-error-log v-if="$nodeEnv === 'development'" />
-                    <ibps-header-base-url v-if="$nodeEnv === 'development'" />
+                    <!-- <ibps-header-error-log v-if="$nodeEnv === 'development'" />
+                    <ibps-header-base-url v-if="$nodeEnv === 'development'" /> -->
 
                     <!-- <ibps-header-download />
                     <ibps-header-locking />
@@ -94,9 +94,9 @@
                     <ibps-header-fullscreen />
                     <ibps-header-tenant /> -->
 
-                    <ibps-header-clean-cache v-if="isSuper" type="platform" />
-                    <ibps-header-clean-cache v-if="isSuper" type="form" />
-                    <ibps-header-tools v-if="isSuper" />
+                    <!-- <ibps-header-clean-cache v-if="isSuper" type="platform" />
+                    <ibps-header-clean-cache v-if="isSuper" type="form" /> -->
+                    <ibps-header-tools :isSuper="isSuper" />
                     <!-- <ibps-header-clean-cache v-if="isSuper" type="oauth" />
                     <ibps-header-clean-cache v-if="isSuper" type="office" /> -->
 

@@ -19,7 +19,7 @@
                                     <div class="one">
                                         <div class="container">
                                             <div
-                                                :class="item.deviceStatus === '合格' ? 'triangle' : item.deviceStatus === '停用' ? 'triangleRed' : 'triangleYellow'"
+                                                :class="item.deviceStatus === '合格' ? 'triangle' : item.deviceStatus === '停用' ? 'triangleRed' : item.deviceStatus === '限用' ? 'triangleYellow': 'triangleGray'"
                                             >
                                                 <div class="label" style="border: 0;">{{ item.prove }}</div>
                                             </div>
@@ -221,6 +221,8 @@ export default {
                     return '停用证'
                 case '限用':
                     return '限用证'
+                case '报废':
+                    return '报废证'
                 default:
                     return '测试证'
             }
@@ -233,6 +235,8 @@ export default {
                     return 'STOP'
                 case '限用':
                     return 'RESTRICT'
+                case '报废':
+                    return 'SCRAP'
                 default:
                     return 'TEST'
             }
@@ -303,7 +307,8 @@ export default {
 
 .triangle,
 .triangleYellow,
-.triangleRed {
+.triangleRed,
+.triangleGray {
     width: 0;
     height: 0;
     position: relative;
@@ -324,10 +329,13 @@ export default {
 .triangleRed {
     border-top: 50px solid #ff0000;
 }
-
+.triangleGray {
+    border-top: 50px solid #909399;
+}
 .triangle>.label,
 .triangleYellow>.label,
-.triangleRed>.label {
+.triangleRed>.label,
+.triangleGray>.label {
     width: 100px;
     position: relative;
     top: -45px;

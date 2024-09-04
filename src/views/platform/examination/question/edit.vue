@@ -143,6 +143,14 @@
                     size=""
                 />
             </el-form-item>
+            <el-form-item label="难度：" prop="nan_du_">
+                <el-rate
+                    v-model="form.nan_du_"
+                    show-text
+                    :texts="texts"
+                    :colors="colors"
+                />
+            </el-form-item>
             <el-form-item label="分值：" prop="fen_zhi_" :maxlength="8">
                 <el-input-number
                     v-model="form.fen_zhi_"
@@ -331,6 +339,8 @@ export default {
         const { userList = [], deptList = [], userId } = this.$store.getters || {}
         const defaultType = questionType.length ? questionType[0].value : ''
         return {
+            colors: { 1: '#00FF00', 2: '#7FFF00', 3: '#FFFF00', 4: '#FFA500', 5: '#FF0000' },
+            texts: ['易', '偏易', '适中', '偏难', '难'],
             userId,
             userList,
             questionType,
@@ -358,7 +368,8 @@ export default {
                 ping_fen_ren_: [userId],
                 fen_zhi_: '',
                 bei_zhu_: '',
-                zhuang_tai_: '启用'
+                zhuang_tai_: '启用',
+                nan_du_: 0
             },
             questionTags: [],
             toolbars: [
@@ -493,7 +504,7 @@ export default {
             if (this.$utils.isEmpty(this.id)) {
                 return
             }
-            const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, biao_qian_, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_ from t_questions where id_ = '${this.id}'`
+            const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, biao_qian_, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_,nan_du_ from t_questions where id_ = '${this.id}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
@@ -533,6 +544,7 @@ export default {
                         })
                     })
                 }
+                item.nan_du_ = +item.nan_du_ || 0
                 item.fen_zhi_ = parseInt(item.fen_zhi_)
                 item.fu_tu_ = item.fu_tu_ ? JSON.parse(item.fu_tu_) : ''
                 item.ping_fen_ren_ = item.ping_fen_ren_ ? item.ping_fen_ren_.split(',') : []
@@ -726,6 +738,9 @@ export default {
 <style lang="scss" scoped>
     .question-dialog {
         ::v-deep {
+            .el-rate{
+                padding: 6px 0 0 0;
+            }
             .el-dialog {
                 min-width: 1080px;
             }
