@@ -454,9 +454,9 @@ export default {
                     const afterAdjust = i.afterAdjust.map(item => `【${item}】`).join('')
                     let desc = ''
                     if (i.party) {
-                        desc = `${i.beforeDate}班次${beforeAdjust}申请与${partyName}${i.afterDate}班次${afterAdjust}调换`
+                        desc = `${i.beforeDate}班次${beforeAdjust}与${partyName}${i.afterDate}班次${afterAdjust}调换`
                     } else {
-                        desc = `${i.beforeDate}班次${beforeAdjust}申请调换到${i.afterDate}`
+                        desc = `${i.beforeDate}班次${beforeAdjust}调换到${i.afterDate}`
                     }
                     result.push(desc)
                 })

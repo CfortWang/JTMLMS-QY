@@ -69,6 +69,7 @@ export default {
                     itemWidth: 180,
                     forms: [
                         { prop: 'Q^reason_^SL', label: '调班原因' },
+                        { prop: 'Q^status_^SL', label: '状态', fieldType: 'select', options: stateType },
                         { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '申请时间', fieldType: 'daterange', itemWidth: 200 }
                     ]
                 },
@@ -79,7 +80,7 @@ export default {
                     { prop: 'executor', label: '审批人', tags: userOption, width: 100 },
                     { prop: 'executeDate', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
                     { prop: 'reason', label: '调班原因', width: 150 },
-                    { prop: 'status', label: '状态', tags: stateType, width: 120 },
+                    { prop: 'status', label: '状态', tags: stateType, width: 100 },
                     { prop: 'overview', label: '概览', minWidth: 200 }
                 ],
                 rowHandle: {
