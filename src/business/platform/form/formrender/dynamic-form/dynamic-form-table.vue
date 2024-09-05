@@ -723,7 +723,7 @@ export default {
             const selection = this.getSelection(position, index)
             ActionUtils.selectedMultiRecord(selection).then((ids) => {
                 selection.forEach(i => {
-                    const obj = this.dataModel[i]
+                    const obj = JSON.parse(JSON.stringify(this.dataModel[i]))
                     delete obj.$index
                     delete obj.id
                     this.dataModel.push(obj)
