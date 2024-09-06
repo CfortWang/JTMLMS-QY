@@ -1,12 +1,10 @@
 <template>
     <div style="width: 98%;height: 98%;overflow: hidden;padding: 1%;">
         <div class="title" style="vertical-align: top; height: 10%;font-size: 24px;color: white;font-weight:600;">{{ title }}</div>
-        <div v-show="showChart" style="width:100%;height: 88%;display: flex;justify-content: center;">
-            <dv-scroll-board :config="configData" style="width:100%;height:100%" />
+        <div v-show="showChart" style="width:100%;height: 87%;display: flex;justify-content: center;">
+            <dv-scroll-board :key="scrollBoardKey" :config="configData" style="width:100%;height:100%" />
         </div>
-        <div v-if="!showChart" style="width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;">
-            <div style="color: #c7c7c7">目前无数据</div>
-        </div>
+        <div v-show="!showChart" :class="$style.nullShow">暂无数据</div>
     </div>
 </template>
 
@@ -23,17 +21,24 @@ export default {
     },
     data () {
         return {
+            scrollBoardKey: 0,
             configData: {},
-            showChart: true
+            showChart: false
         }
     },
     watch: {
         value: {
             handler (newVal, oldVal) {
-                this.configData = { ...newVal }
+                if(newVal.data.length>0){
+                    this.configData = { ...newVal }
+                    this.scrollBoardKey++
+                    this.showChart = true
+                }else{
+                    this.shoshowChartw = false
+                }
             },
             deep: true,
-            immediate: true
+            // immediate: true
         }
     },
     mounted () {
@@ -47,4 +52,11 @@ export default {
 }
 </script>
 <style lang="scss" module>
+    .nullShow{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        height: 85%;
+    }
 </style>

@@ -1,18 +1,11 @@
 <template>
     <div class="statisticsPage" :style="{width:width,height:height}">
-        <div :id="'mid'+id" :style="{height:'100%'}"/>
+        <div v-show="show" :id="'mid'+id" :style="{height:'100%'}"/>
+        <div v-show="!show"  :style="{height:'100%'}">
+            <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
+            <div class="nullShow">暂无数据</div>
+        </div>
     </div>
-    <!-- <div class="pieView">
-        <div style="  height:14%;line-height:30px;text-align: left;padding-left: 10px;color: white;">
-            {{ title || "" }}
-        </div>
-        <div v-show="showChart" style="width: 100%; height: 86%; display: inline-block; overflow: hidden">
-            <div :id="'mid'+id" style="width: 100%; height: 95%; overflow: hidden" />
-        </div>
-        <div v-if="!showChart" style="background: #061237;width: 100%;height: 70%;display: flex;justify-content: center;align-items: center;">
-            <div style="color: #c7c7c7">目前无数据</div>
-        </div>
-    </div> -->
 </template>
 
 <script>
@@ -21,7 +14,7 @@ export default {
     props: {
         value: {
             type: Array,
-            default: {}
+            default: []
         },
         width:{
             type:String,
@@ -45,22 +38,31 @@ export default {
     },
     data () {
         return {
-            showChart: true
+            show: false
         }
     },
     watch: {
         value: {
             handler (newVal, oldVal) {
-                this.getMiddleLeft()
+                if(newVal.length>0){
+                    this.show = true
+                    setTimeout(() => {
+                        this.getMiddleLeft()
+                    }, 100)
+                }else{
+                    this.show = false
+                }
+                
             },
-            deep: true
+            deep: true,
+            // immediate: true
         }
     },
     mounted () {
         const this_ = this
-        setTimeout(() => {
-            this_.getMiddleLeft()
-        }, 100);
+        // setTimeout(() => {
+        //     this_.getMiddleLeft()
+        // }, 100);
     },
     methods: {
         getMiddleLeft () {
@@ -131,6 +133,13 @@ export default {
 .statisticsPage{
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     padding: 1%;
-    // background-color: rgba(6, 30, 93, 0.5);
+    .nullShow{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        height: 92%;
+    }
 }
+
 </style>

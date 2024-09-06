@@ -1,10 +1,10 @@
 <template>
-  <div class="statisticsPage" :style="{width:width,height:height}">
+  <div class="statisticsPageEntirety" :style="{width:width,height:height}">
     <div class="titleSty">{{title}}</div>
-    <div class="bodySty">
+    <div v-show="show" class="bodySty">
       <div class="valueSty" v-for="(m,n) in value" :key="'value'+n">
-        <div class="itemSty" v-for="(item, i) in m" :key="'m'+i">
-          <div class="sumSty" v-if="i=='sum'">
+        <div class="itemSty" v-if="i==='sum' || n==='upKeep'" v-for="(item, i) in m" :key="'m'+i">
+          <div class="sumSty" v-if="i==='sum'">
             <div>
               <div class="circleSty">
                 <svg t="1723771326890" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="1227" width="50" height="50"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#1990FF" opacity=".2" p-id="1228"></path><path d="M512 512m-409.6 0a409.6 409.6 0 1 0 819.2 0 409.6 409.6 0 1 0-819.2 0Z" fill="#1990FF" p-id="1229"></path><path d="M47.786667 75.093333m-47.786667 0a47.786667 47.786667 0 1 0 95.573333 0 47.786667 47.786667 0 1 0-95.573333 0Z" fill="#1990FF" p-id="1230"></path><path d="M1003.52 921.6m-20.48 0a20.48 20.48 0 1 0 40.96 0 20.48 20.48 0 1 0-40.96 0Z" fill="#1990FF" p-id="1231"></path><path d="M161.792 326.0416v425.506133a76.3904 76.3904 0 0 0 76.458667 76.458667h547.498666a76.3904 76.3904 0 0 0 76.458667-76.458667V326.0416z" fill="#FFFFFF" p-id="1232"></path><path d="M862.208 272.452267a76.3904 76.3904 0 0 0-76.458667-76.458667H238.250667a76.3904 76.3904 0 0 0-76.458667 76.458667v53.589333h700.416zM587.9808 711.68c-30.993067 0-60.6208-14.7456-88.337067-43.895467-32.3584-34.133333-68.949333-51.6096-108.7488-52.497066h-3.140266c-75.093333 0-138.0352 59.528533-138.6496 60.142933a8.942933 8.942933 0 1 1-12.356267-12.9024c2.730667-2.6624 68.266667-65.1264 150.9376-65.1264h3.4816c44.782933 0.955733 85.6064 20.48 121.378133 58.026667 26.760533 28.125867 54.613333 40.96 83.7632 37.888 60.962133-6.3488 106.973867-79.530667 107.451734-80.2816a8.942933 8.942933 0 1 1 15.223466 9.352533c-2.116267 3.345067-51.2 81.5104-120.832 88.746667-3.413333 0.341333-6.826667 0.546133-10.171733 0.546133z" fill="#70CAFF" p-id="1233"></path><path d="M630.715733 396.151467m27.306667 0l129.706667 0q27.306667 0 27.306666 27.306666l0 307.2q0 27.306667-27.306666 27.306667l-129.706667 0q-27.306667 0-27.306667-27.306667l0-307.2q0-27.306667 27.306667-27.306666Z" fill="#70CAFF" opacity=".2" p-id="1234"></path><path d="M699.460267 380.654933H411.306667a27.306667 27.306667 0 0 0-27.306667 27.306667v126.020267a27.306667 27.306667 0 0 0 27.306667 27.306666h102.4L546.542933 593.92a12.4928 12.4928 0 0 0 17.6128 0l33.041067-32.836267h102.4a27.306667 27.306667 0 0 0 27.306667-27.306666V407.825067a27.306667 27.306667 0 0 0-27.4432-27.170134z" fill="#5BC1F4" p-id="1235"></path><path d="M719.4624 261.051733m-13.653333 0a13.653333 13.653333 0 1 0 27.306666 0 13.653333 13.653333 0 1 0-27.306666 0Z" fill="#FFFFFF" p-id="1236"></path><path d="M760.4224 261.051733m-13.653333 0a13.653333 13.653333 0 1 0 27.306666 0 13.653333 13.653333 0 1 0-27.306666 0Z" fill="#FFFFFF" p-id="1237"></path><path d="M801.3824 261.051733m-13.653333 0a13.653333 13.653333 0 1 0 27.306666 0 13.653333 13.653333 0 1 0-27.306666 0Z" fill="#FFFFFF" p-id="1238"></path><path d="M418.816 419.4304m14.472533 0l244.1216 0q14.472533 0 14.472534 14.472533l0 12.014934q0 14.472533-14.472534 14.472533l-244.1216 0q-14.472533 0-14.472533-14.472533l0-12.014934q0-14.472533 14.472533-14.472533Z" fill="#FF9600" p-id="1239"></path><path d="M418.816 475.7504m11.6736 0l154.146133 0q11.6736 0 11.6736 11.6736l0 17.6128q0 11.6736-11.6736 11.6736l-154.146133 0q-11.6736 0-11.6736-11.6736l0-17.6128q0-11.6736 11.6736-11.6736Z" fill="#FF9600" p-id="1240"></path></svg>
@@ -17,17 +17,52 @@
               <div style="font-weight:600;font-size:28px;color: rgb(255,255,0);margin-top: 1vh;text-align: center;">{{item}}</div>
             </div>
           </div>
-          <div class="mySty" v-else>
-            <div>{{captionArr[i]}}</div>
-            <div v-for="(t, e) in item" :key="'item'+e">
-              <div>{{captionArr[e]}}</div>
-              <div style="color: rgb(255,255,0);font-weight:600;">{{t}}</div>
+          <div class="mySty" v-else-if="i!=='sum'&&n==='upKeep'">
+            <div class="textAlign">{{captionArr[i]}}</div>
+            <div class="styFlex">
+              <div v-for="(t, e) in item" :key="'item'+e">
+                <div>{{captionArr[e]}}</div>
+                <div style="color: rgb(255,255,0);font-weight:600;">{{t}}</div>
+              </div>
             </div>
+          </div>
+        </div>
+        <div class="totaSty" v-if="n==='totality'">
+          <div class="itemSty" v-if="i!=='sum'" v-for="(item, i) in m" :key="'m2'+i">
+            <div class="mySty styWidth">
+              <div class="textAlign">{{captionArr[i]}}</div>
+              <div style="color: rgb(255,255,0);font-weight:600;">{{m[i]}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="caliSty" v-else-if="n==='calibrate'">
+          <div style="text-align: center">{{captionArr['month']}}</div>
+          <div class="totaSty flexCaliSty">
+              <div class="styWidth">
+                <div class="textAlign">{{captionArr['monthAldyNum']}}</div>
+                <div style="color: rgb(255,255,0);font-weight:600;">{{m['monthAldyNum']}}</div>
+              </div>
+              <div class="styWidth">
+                <div class="textAlign">{{captionArr['monthPlanNum']}}</div>
+                <div style="color: rgb(255,255,0);font-weight:600;">{{m['monthPlanNum']}}</div>
+              </div>
+          </div>
+          <div>
+              <div class="mySty totaSty flexCaliSty">
+                <div class="textAlign">{{captionArr['nextMonthPlanNum']}}</div>
+                <div style="color: rgb(255,255,0);font-weight:600;">{{m['nextMonthPlanNum']}}</div>
+              </div>
+          </div>
+          <div>
+              <div class="mySty totaSty flexCaliSty">
+                <div class="textAlign">{{captionArr['yearPlanNum']}}</div>
+                <div style="color: rgb(255,255,0);font-weight:600;">{{m['yearPlanNum']}}</div>
+              </div>
           </div>
         </div>
       </div>
     </div>
-    
+    <div v-show="!show" :style="{height:'80%'}"><div class="nullShow">暂无数据</div></div>
   </div>
 </template>
 
@@ -73,15 +108,23 @@
           outService: '停用',
           scrap: '报废',
           calibrateNum: '已校准',
+          upKeep: '已保养',
           upkeep: '已保养',
-          unUpkeep: '未保养'
-        }
+          unUpkeep: '未保养',
+          monthAldyNum: '已校准',
+          monthPlanNum: '计划校准',
+          nextMonthPlanNum: '下月计划校准数',
+          yearPlanNum: '本年计划校准数',
+          stop: '停用设备数',
+          use: '使用设备数'
+        },
+        show: false
       }
     },
     watch: {
         value: {
-            handler () {
-                // this.drawLine()
+            handler (newVal) {
+              this.show = true
             },
             deep: true
         }
@@ -91,7 +134,7 @@
   }
 </script>
 <style lang="scss" scoped>
-  .statisticsPage{
+  .statisticsPageEntirety{
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       padding: 1%;
       .titleSty{
@@ -139,14 +182,38 @@
               // background-color: rgb(16, 142, 255);
             }
           }
-          .mySty{
-            width: 100%;
+          .totaSty{
             display: flex;
             justify-content: space-around;
+          }
+          .caliSty{}
+          .mySty{
+            width: 100%;
+            .textAlign{
+              text-align: center;
+            }
+            .styFlex{
+              display: flex;
+              justify-content: space-around;
+            }
+          }
+          .styWidth{
+            display: inline-block;
+            // width: 50%;
+          }
+          .flexCaliSty{
+            margin-top: 4%;
           }
         }
       }
       padding: 1%;
       /* background-color: rgba(6, 30, 93, 0.5); */
+      .nullShow{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        height: 92%;
+      }
   }
 </style>

@@ -63,6 +63,7 @@
                                                 :disabled="false"
                                                 :multiple="false"
                                                 size="mini"
+                                                :filter="filter"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -75,6 +76,8 @@
                                                 :disabled="true"
                                                 :multiple="false"
                                                 size="mini"
+                                                style="width:100%"
+                                                :filter="filter"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -169,6 +172,7 @@
                                                 :disabled="false"
                                                 :multiple="false"
                                                 size="mini"
+                                                :filter="filter"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -356,6 +360,8 @@
                                                                 :disabled="false"
                                                                 :multiple="false"
                                                                 size="mini"
+                                                                style="width:100%"
+                                                                :filter="filter"
                                                             />
                                                         </el-form-item>
                                                     </el-col>
@@ -418,6 +424,7 @@
                                                                 class="custom-dialog"
                                                                 placeholder="请选择"
                                                                 icon="el-icon-search"
+                                                                style="width:100%"
                                                             />
                                                         </el-form-item>
                                                     </el-col>
@@ -436,7 +443,7 @@
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
-                                                <el-row v-if="form.jianKongYiJu==='是'">
+                                                <el-row v-if="form.jianKongYiJu==='否'">
                                                     <el-col>
                                                         <el-form-item label="开机时间：">
                                                             <el-time-picker
@@ -449,7 +456,7 @@
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
-                                                <el-row v-if="form.jianKongYiJu==='是'">
+                                                <el-row v-if="form.jianKongYiJu==='否'">
                                                     <el-col>
                                                         <el-form-item label="关机时间：">
                                                             <el-time-picker
@@ -514,7 +521,7 @@
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
                                                         <el-form-item label="检定/校准周期(月)：" label-width="140">
-                                                            <el-input v-model="form.xiaoZhunZQ" size="mini" type="number" style="width:50%" />
+                                                            <el-input v-model="form.xiaoZhunZQ" size="mini" type="number" style="width:100%" />
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -572,7 +579,7 @@
                                                 <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
                                                     <el-col>
                                                         <el-form-item label="U/精确度/最大允差：" label-width="130">
-                                                            <el-input v-model="form.zuiDaYunCha" size="mini" style="width:50%" />
+                                                            <el-input v-model="form.zuiDaYunCha" size="mini" style="width:100%" />
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -612,6 +619,7 @@
                                                         multiple
                                                         accept="*"
                                                         :readonly="false"
+                                                        style="width:100%"
                                                     />
                                                 </el-form-item>
                                             </el-col>
@@ -623,6 +631,7 @@
                                                         multiple
                                                         accept="*"
                                                         :readonly="false"
+                                                        style="width:100%"
                                                     />
                                                 </el-form-item>
                                             </el-col>
@@ -634,6 +643,7 @@
                                                         multiple
                                                         accept="*"
                                                         :readonly="false"
+                                                        style="width:100%"
                                                     />
                                                 </el-form-item>
                                             </el-col>
@@ -716,6 +726,16 @@ export default {
     data () {
         const { userId, position, level, deptList } = this.$store.getters
         return {
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             isFirstyiXiaoRiQi: true,
             isFirstbianZhiBuMen: true,
             isFirstshiFouQiJianH: true,
@@ -1256,6 +1276,7 @@ export default {
         }
         .el-form-item__content{
             font-size: 12px !important;
+            display: flex;
         }
         .el-table th {
             background-color:#f5f7fa !important;

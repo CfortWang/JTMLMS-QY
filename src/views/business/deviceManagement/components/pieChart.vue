@@ -1,6 +1,10 @@
 <template>
   <div class="statisticsPage" :style="{width:width,height:height}">
-    <div :id="'pie'+id" :style="{height:'100%'}"/>
+    <div v-show="show" :id="'pie'+id" :style="{height:'100%'}"/>
+    <div v-show="!show"  :style="{height:'100%'}">
+      <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
+      <div class="nullShow">暂无数据</div>
+    </div>
   </div>
 </template>
 
@@ -38,20 +42,28 @@
     },
     data () {
       return {
+        show: false
       }
     },
     watch: {
         value: {
-            handler () {
-                this.drawLine()
+            handler (newVal) {
+              if(newVal.length>0){
+                this.show = true
+                setTimeout(() => {
+                  this.drawLine()
+                }, 100)
+              }else{
+                this.show = false
+              }              
             },
             deep: true
         }
     },
     mounted(){
-      setTimeout(() => {
-        this.drawLine()
-      }, 100);
+      // setTimeout(() => {
+      //   this.drawLine()
+      // }, 100);
       
     },
     methods: {
@@ -79,9 +91,26 @@
             right: '0',
             top: '60',
             formatter: function (name) {
+                let strn = ""
                 let mid = that.value.find(i => i.name === name)
                 let rate = ((mid.value/totality)*100).toFixed(2)
-                let str = `{a|${name}} | {b|${rate}%}{c|${mid.value}}`
+                let leng = 4
+                let rowNumber = Math.ceil(name.length / leng)
+                if(name.length > leng){
+                  for (let i = 0; i < rowNumber; i++) {
+                    let temp = ""
+                    let start = i * leng
+                    let end = start + leng
+                    if (i == rowNumber - 1) {
+                      temp = name.substring(start, name.length)
+                    } else {
+                      temp = name.substring(start, end) + "\n"
+                    }
+                    strn += temp
+                  }
+                }
+
+                let str = `{a|${strn===""?name:strn}} | {b|${rate}%}{c|${mid.value}}`
                 return str
             },
             textStyle: {
@@ -92,7 +121,8 @@
                 a: {
                   width:80,
                   align: 'left',
-                  fontSize: 16
+                  fontSize: 16,
+                  lineHeight: 20
                 },
                 b: {
                   width:60,
@@ -111,7 +141,7 @@
           series: [
             {
               type: 'pie',
-              radius: ['45%', '70%'],
+              radius: ['35%', '55%'],
               center: ['20%', '55%'],
               label: {
                 show: false,
@@ -137,17 +167,6 @@
                     show: false,
                 },
               },
-              // emphasis: {
-              //   label: {
-              //     show: true,
-              //     fontSize: '12px'
-              //   },
-              //   itemStyle: {
-              //     shadowBlur: 10,
-              //     shadowOffsetX: 0,
-              //     shadowColor: 'rgba(0, 0, 0, 0.5)'
-              //   }
-              // }
             }
           ]
        }
@@ -156,14 +175,17 @@
     }
   }
 </script>
-<style scoped>
-  /* #zlmbPie:hover{
-    transition: all 0.5s;
-    transform:scale(1.03);
-  } */
+<style lang="scss" scoped>
   .statisticsPage{
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       padding: 1%;
       /* background-color: rgba(6, 30, 93, 0.5); */
+      .nullShow{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        height: 92%;
+      }
   }
 </style>

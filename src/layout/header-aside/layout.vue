@@ -80,6 +80,7 @@
 
                 <!-- 顶栏右侧 -->
                 <div class="ibps-header-right" flex-box="0">
+                    <IbpHeaderSearchFeature></IbpHeaderSearchFeature>
                     <!-- 如果你只想在开发环境显示这个按钮请添加 v-if="$nodeEnv === 'development'" -->
                     <!-- 全局搜索放大镜、日志、环境切换、全屏 -->
                     <!-- <ibps-header-search @click="handleSearchClick" /> -->
@@ -96,7 +97,7 @@
 
                     <!-- <ibps-header-clean-cache v-if="isSuper" type="platform" />
                     <ibps-header-clean-cache v-if="isSuper" type="form" /> -->
-                    <ibps-header-tools :isSuper="isSuper" />
+                    <ibps-header-tools :is-super="isSuper" />
                     <!-- <ibps-header-clean-cache v-if="isSuper" type="oauth" />
                     <ibps-header-clean-cache v-if="isSuper" type="office" /> -->
 
@@ -200,12 +201,12 @@ import IbpsHeaderErrorLog from './components/header-error-log'
 import IbpsHeaderBaseUrl from './components/header-base-url'
 import IbpsHeaderCleanCache from './components/header-clean-cache'
 import IbpsHeaderTools from './components/header-tools'
+import IbpHeaderSearchFeature from './components/header-search-feature'
 // import IbpsHeaderDownload from './components/header-download'
 import IbpsNotifyMonitor from '@/business/platform/socket/notify-monitor'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import mixinSearch from './mixins/search'
 import mixinLock from './mixins/lock'
-
 import setting from '@/setting.js'
 import { f } from 'vue-grid-layout'
 export default {
@@ -233,7 +234,8 @@ export default {
         IbpsHeaderCleanCache,
         IbpsHeaderTools,
         // IbpsHeaderDownload,
-        IbpsNotifyMonitor
+        IbpsNotifyMonitor,
+        IbpHeaderSearchFeature
     },
     mixins: [mixinSearch, mixinLock],
     data () {
@@ -302,7 +304,7 @@ export default {
             this.$router.push({ path: '/' })
         },
         pageChange () {
-            
+
         },
         /**
          * 接收点击切换侧边栏的按钮

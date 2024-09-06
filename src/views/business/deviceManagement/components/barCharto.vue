@@ -1,6 +1,10 @@
 <template>
-  <div class="statisticsPage" :style="{width:width,height:height}">
-      <div :id="'staff'+id" :style="{height:'100%'}"/>
+  <div :class="$style.statisticsPage" :style="{width:width,height:height}">
+      <div v-show="show" :id="'staff'+id" :style="{height:'100%'}"/>
+      <div v-show="!show" :style="{height:'100%'}">
+        <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
+        <div :class="$style.nullShow">暂无数据</div>
+      </div>
   </div>
 </template>
 
@@ -38,6 +42,14 @@
       },
       data: {
         type: Array,
+      },
+      lineTF: {
+        type: Boolean,
+        default: false
+      },
+      colorIndex: {
+        type: Number,
+        default: 0
       }
     },
     data () {
@@ -47,53 +59,72 @@
           numOT: '1-3年',
           numTF: '3-5年',
           numF: '5年以上',
-          numAll: '设备总数',
+          // numAll: '设备总数',
           numR: '良好数',
           numS: '停用数',
           numP: '待处理',
           numC: '已完成',
           numJ: '计划数',
-          numW: '完成数',
+          numW: '完成数'
+        },
+        correspondenceUn:{
+          rate: '完成率'
         },
         // color: ['rgb(78,203,115)', 'rgb(251,211,55)', 'rgb(16,142,233)']
-        color: ['#5470c6', '#339933', '#FF0033', 'rgb(251,211,55)']
+        color: ['#5470c6', '#339933', '#FF0033', 'rgb(251,211,55)'],
+        show: false
       }
     },
     watch: {
         value: {
-            handler () {
-                this.drawLine()
+            handler (newVal) {
+                if(newVal.length>0){
+                  this.show = true
+                  setTimeout(() => {
+                    this.drawLine()
+                  }, 100)
+                }else{
+                  this.show = false
+                }  
             },
             deep: true
         }
     },
     mounted(){
-      setTimeout(() => {
-        this.drawLine()
-      }, 100);
+      // setTimeout(() => {
+      //   this.drawLine()
+      // }, 100);
     },
     methods: {
       drawLine(){
         const that = this
         let xData = []
         for (const key in this.value[0]) {
-          // if (this.value[0].hasOwnProperty.call(object, key)) {
+          if (this.correspondence.hasOwnProperty(key) || key === 'org') {
             xData.push(key)
-          // }
+          }
         }
-        
         let serArr = []
         for (let i = 1; i < xData.length; i++) {
           let ser = {
             name: '',
             type: 'bar',
-            barWidth: 10,
+            barWidth: xData.length>3?10:20,
             color: ''
           }
           ser.name = xData[i]
-          ser.color = this.color[i-1]
+          ser.color = this.color[i-1+this.colorIndex]
           serArr.push(ser)
         }
+        if(this.lineTF){
+          serArr.push({
+            name: 'rate',
+            type: 'line',
+            // barWidth: xData.length>3?10:20,
+            color: 'rgb(251,211,55)'
+          })
+        }
+        
         let staff = echarts.init(document.getElementById('staff'+this.id))
         let option
 
@@ -110,7 +141,7 @@
               color: '#fff'
             },
             formatter: function (name) {
-              return that.correspondence[name]
+              return that.correspondence[name] || that.correspondenceUn[name]
             }
           },
           grid: { // 让图表占满容器
@@ -130,8 +161,9 @@
             formatter: function (params) {
               let str = `${that.value[params[0].dataIndex].org}`
               params.forEach(item =>{
+                console.log(item,'iiiiiiiiiiiiii')
                 let nameNum = ''
-                nameNum = that.correspondence[item.seriesName]
+                nameNum = that.correspondence[item.seriesName] || that.correspondenceUn[item.seriesName]
                 str += `<br /> ${item.marker} ${nameNum}  ${item.data[item.seriesName]}`
               })
               return str
@@ -146,7 +178,29 @@
             axisLabel: {
               color: '#fff',
               interval: 0,
-              rotate: 20
+              // rotate: 20,
+              formatter: function (params) {
+                let str = ""
+                let paramsLen = params.length
+                let len = 5
+                let rowNumber = Math.ceil(paramsLen / len)
+                if (paramsLen > len) {
+                  for (let i = 0; i < rowNumber; i++) {
+                    let temp = ""
+                    let start = i * len
+                    let end = start + len
+                    if (i == rowNumber - 1) {
+                      temp = params.substring(start, paramsLen)
+                    } else {
+                      temp = params.substring(start, end) + "\n"
+                    }
+                    str += temp
+                  }
+                } else {
+                  str = params
+                }
+                return str
+              }
             }
           },
           yAxis: {
@@ -162,7 +216,7 @@
     }
   }
 </script>
-<style scoped>
+<style lang="scss" module>
   /* #zlmbPie:hover{
     transition: all 0.5s;
     transform:scale(1.03);
@@ -171,5 +225,12 @@
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       padding: 1%;
       /* background-color: rgba(6, 30, 93, 0.5); */
+      .nullShow{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        height: 92%;
+      }
   }
 </style>

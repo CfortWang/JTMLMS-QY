@@ -34,19 +34,19 @@
                         </dv-border-box-7>
                         <dv-decoration-2 :key="`line5`" :dur="6" style="width:100%;height:2.5%;" />
                         <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:56.18%;">
-                            <bar-chart v-if="mergeData[3].numData.length>0" :title="mergeData[3].title" v-model="mergeData[3].numData" :width="'98%'" :height="'98%'" :id="2" />
+                            <bar-chart v-if="mergeData[3].numData.length>0" :title="mergeData[3].title" v-model="mergeData[3].numData" :colorIndex="1" :width="'98%'" :height="'98%'" :id="2" />
                         </dv-border-box-7>
                     </div>
                     <dv-decoration-2 :key="`line4`" :reverse="true" :dur="6" style="width:1%;height:100%;" />
                     <div class="area">
                         <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
-                            <bar-chart v-if="mergeData[4].numData.length>0" :title="mergeData[4].title" v-model="mergeData[4].numData" :width="'98%'" :height="'98%'" :id="3" />
+                            <bar-chart v-if="mergeData[4].numData.length>0" :title="mergeData[4].title" v-model="mergeData[4].numData" :lineTF="true" :width="'98%'" :height="'98%'" :id="3" />
                         </dv-border-box-7>
-                        <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2.5%;" />
+                        <dv-decoration-2 :key="`6`" :dur="6" style="width:100%;height:2.5%;" />
                         <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
                             <bar-chart v-if="mergeData[5].numData.length>0" :title="mergeData[5].title" v-model="mergeData[5].numData" :width="'98%'" :height="'98%'" :id="4" />
                         </dv-border-box-7>
-                        <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2.5%;" />
+                        <dv-decoration-2 :key="`line7`" :dur="6" style="width:100%;height:2.5%;" />
                         <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
                             <CarouselTabl v-if="mergeData[6].numData.data.length>0" :title="mergeData[6].title" v-model="mergeData[6].numData"/> 
                         </dv-border-box-7>
@@ -59,6 +59,7 @@
 <script>
 import screenfull from 'screenfull'
 import dataobj from './constants/simulated.js'
+import { equipDashBoard } from '@/api/platform/spectaculars/lab'
 export default {
     components: {
         barChart: () => import('./components/barCharto.vue'),
@@ -78,7 +79,7 @@ export default {
             level: '',
             title: '设备管理看板',
             fontSize: 18,
-            show: true,
+            // show: true,
             hoverClassAdd:'w',
             dvColor: ['rgb(22,47,98)', 'rgba(116, 142, 194, 1)'],
             dvBackColor: 'rgba(6, 30, 93, 0)',
@@ -137,7 +138,6 @@ export default {
         if (screenfull.isFullscreen) {
             screenfull.toggle()
         }
-        // this.clenUp()
     },
     methods: {
         initializeData () {
@@ -147,12 +147,28 @@ export default {
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
         },
         updateAll () {
+            const loading = this.$loading({
+                lock: true,
+                background: 'rgba(0, 0, 0, 0.7)'
+            })
             this.initializeData()
-        },
-        updatePart () {
-
-        },
-        async fetchData () {
+            equipDashBoard().then(res => {
+                let data = res.data[0] || {}
+                this.mergeData[0].numData = data.distributionDataObj || []
+                this.mergeData[1].numData = data.numDistributionDataObj || []
+                this.mergeData[2].numData = data.lifeTimeData || []
+                this.mergeData[3].numData = data.intactData || []
+                this.mergeData[4].numData = []
+                if(data.completeData !== null && data.completeData.length>0){
+                    data.completeData.forEach(element => {
+                        this.mergeData[4].numData.push({...element,rate: element.numP!==0?(element.numC/element.numP).toFixed(2) * 100:0})
+                    })
+                }
+                this.mergeData[5].numData = data.verificationData || []
+                this.mergeData[6].numData.data = data.scrapData || []
+                this.mergeData[7].numData = data.entiretyData || []
+                loading.close()
+            })
         },
         goBack () {
             this.$router.back(-1)

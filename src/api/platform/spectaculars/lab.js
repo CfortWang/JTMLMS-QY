@@ -23,3 +23,14 @@ export function labsDashBoard(params) {
     params: params
   })
 }
+/**
+ *设备看板
+ * @param {*} params
+ */
+ export function equipDashBoard(params) {
+  return request({
+    url: DATA_URL() + '/report/statistic/equipDashBoard',
+    method: 'get',
+    // params: params
+  })
+}

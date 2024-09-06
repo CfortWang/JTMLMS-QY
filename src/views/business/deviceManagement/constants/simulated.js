@@ -75,25 +75,25 @@ export const lifeTimeData = [
 export const intactData = [
     {
         org: '生化组',
-        numAll: 60,
+        // numAll: 60,
         numR: 40,
         numS: 20
     },
     {
         org: '免疫组',
-        numAll: 60,
+        // numAll: 60,
         numR: 40,
         numS: 20
     },
     {
         org: '临检组',
-        numAll: 60,
+        // numAll: 60,
         numR: 40,
         numS: 20
     },
     {
         org: '微生物组',
-        numAll: 60,
+        // numAll: 60,
         numR: 40,
         numS: 20
     }
@@ -252,11 +252,11 @@ export const entiretyData = {
             outService: 10,
             scrap: 10
         },
-        year: {
-            add: 10,
-            outService: 10,
-            scrap: 10
-        }
+        // year: {
+        //     add: 10,
+        //     outService: 10,
+        //     scrap: 10
+        // }
     },
     calibrate:{
         sum: 50,

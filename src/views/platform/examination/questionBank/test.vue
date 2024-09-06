@@ -324,6 +324,7 @@ export default {
         // 随机题目
         getRandQuestionData (data) {
             let temp = []
+            data = shuffle(data)
             const type = ['单选题', '多选题', '判断题', '填空题', '简答题']
             this.examData.randNumber = this.examData.randNumber.split(',')
             for (let i = 0; i < this.examData.randNumber.length; i++) {
