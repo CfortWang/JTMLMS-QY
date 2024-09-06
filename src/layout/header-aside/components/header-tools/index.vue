@@ -1,6 +1,6 @@
 
 <template>
-    <div>
+    <div v-if="isSuper">
         <el-dropdown trigger="click">
             <el-tooltip effect="dark" content="工具箱" placement="bottom">
                 <el-button type="text" class="ibps-mr btn-text can-hover">

@@ -80,7 +80,7 @@
 
                 <!-- 顶栏右侧 -->
                 <div class="ibps-header-right" flex-box="0">
-                    <IbpHeaderSearchFeature></IbpHeaderSearchFeature>
+                    <!-- <IbpHeaderSearchFeature></IbpHeaderSearchFeature> -->
                     <!-- 如果你只想在开发环境显示这个按钮请添加 v-if="$nodeEnv === 'development'" -->
                     <!-- 全局搜索放大镜、日志、环境切换、全屏 -->
                     <!-- <ibps-header-search @click="handleSearchClick" /> -->
