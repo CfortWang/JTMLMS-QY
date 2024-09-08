@@ -126,6 +126,11 @@
             :calendar-alert-data="calendarAlertData"
             @onCalendarAlert="onCalendarAlert"
         />
+        <my-schedule
+            ref="schedule"
+            :schedule-config="scheduleConfig"
+            @close="handleClose"
+        />
     </ibps-container>
 </template>
 
@@ -149,6 +154,7 @@ import ScheduleAdd from '@/views/system/dashboard/templates/scheduleAdd'
 import { markReadCalendar } from '@/api/detection/newHomeApi'
 // 日程提醒弹窗组件
 import CalendarAlert from '@/views/system/dashboard/components/calendar-alert.vue'
+import mySchedule from './components/mySchedule.vue'
 
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
 export default {
@@ -161,7 +167,8 @@ export default {
         'ibps-grid-layout': GridLayout,
         'ibps-grid-item': GridItem,
         ScheduleAdd,
-        CalendarAlert
+        CalendarAlert,
+        mySchedule
     },
     data () {
         return {
@@ -215,7 +222,8 @@ export default {
             calendarDialogForm: {},
             addComponentDatas: {},
             calendarAlertData: {}, // 日程
-            calendarIds: [] // 日程 id 数组
+            calendarIds: [], // 日程 id 数组
+            scheduleConfig: {}
         }
     },
     computed: {
@@ -359,6 +367,9 @@ export default {
                     break
                 case 'calendarAlert':
                     this.handleCalendarAlert(params)
+                    break
+                case 'mySchedule':
+                    this.handleMySchedule(params)
                     break
                 default:
                     break
@@ -665,6 +676,11 @@ export default {
             if (param.state === 'calendar') {
                 this.$refs.myCalendar[0].hanldeCalendardel(param)
             }
+        },
+        handleMySchedule (data) {
+            console.log('wwwwwwwwwwwwwwwwwww',data)
+            this.scheduleConfig = data
+            this.$refs.schedule.openDialog()
         }
     }
 }

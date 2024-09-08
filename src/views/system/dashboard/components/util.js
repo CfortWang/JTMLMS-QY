@@ -147,7 +147,9 @@ export function buildComponent (name, column, preview, vm) {
                         axis: 'y'
                     },
                     calendarToolbar: this.fullScreen ? [{ key: 'refresh' }] : [{ key: 'refresh' }, { key: 'fullscreen' }, { key: 'collapse' }],
-                    isFirstAlert: true // 是否首次日程提醒
+                    isFirstAlert: true, // 是否首次日程提醒
+                    scheduleData: [],
+                    todaySchedule: []
                 }
             },
             computed: {
@@ -158,6 +160,7 @@ export function buildComponent (name, column, preview, vm) {
             mounted () {
                 this.defaultForm = JSON.parse(JSON.stringify(this.quickNavform))
                 this.$nextTick(() => {
+                    this.scheduleData = this.getScheduleData()
                     this.fetchData()
                 })
             },
@@ -574,6 +577,79 @@ export function buildComponent (name, column, preview, vm) {
                         return val.slice(0, length - 2) + '...'
                     }
                     return val
+                },
+                getDays (start, end) {
+                    if (!start || !end) {
+                        return 0
+                    }
+                    return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24))
+                },
+                getScheduleData () {
+                    const sql = `select a.*, b.title_, b.start_date_, b.end_date_, b.config_, b.overview_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and a.user_id_ = '${this.userId}'`
+                    return new Promise((resolve, reject) => {
+                        this.$common.request('sql', sql).then(res => {
+                            const { data = [] } = res.variables || {}
+                            const eventList = []
+                            data.forEach(item => {
+                                const days = this.getDays(item.start_date_, item.end_date_)
+                                const config = item.config_ ? JSON.parse(item.config_) : {}
+                                const { scheduleShift } = config
+                                for (let i = 1; i <= days; i++) {
+                                    const shift = item[`d${i}_`]
+                                    if (shift) {
+                                        const date = this.$common.getFormatDate('string', 10, this.$common.getDate('day', i - 1, item.start_date_))
+                                        const shiftList = shift.split(',')
+                                        shiftList.forEach(s => {
+                                            const t = scheduleShift.find(i => i.alias === s)
+                                            eventList.push({
+                                                color: t ? t.color : '',
+                                                content: s,
+                                                title: s,
+                                                start: date,
+                                                end: date,
+                                                jieShuShiJian: date,
+                                                zhuangTai: '',
+                                                id: i
+                                            })
+                                        })
+                                    }
+                                }
+                            })
+                            const today = this.$common.getDateNow()
+                            this.todaySchedule = eventList.filter(i => i.start === today).map(i => i.title)
+                            console.log(this.todaySchedule)
+                            resolve(eventList)
+                        }).catch(error => {
+                            reject(error)
+                        })
+                    })
+                },
+                showMySchedule () {
+                    const scheduleConfig = {
+                        height: '100%',
+                        locale: 'zh-cn',
+                        selectable: true,
+                        buttonText: {
+                            today: '今天',
+                            dayGridMonth: '月',
+                            listMonth: '',
+                            month: '月',
+                            week: '周视图',
+                            day: '日视图',
+                            list: '表'
+                            // prev: '<i class="icon-chevron-left">后退</i>',
+                            // next: '<i class="icon-chevron-right">前进</i>'
+                        },
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            // start: '',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                            // end: 'prev,next,today,month,agendaWeek,agendaDay,listWeek'
+                        },
+                        events: this.scheduleData
+                    }
+                    this.$emit('action-event', 'mySchedule', scheduleConfig)
                 }
             },
             template: column.templateHtml !== '' ? `${column.templateHtml}` : `<div></div>`

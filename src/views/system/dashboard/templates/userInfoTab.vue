@@ -1,5 +1,5 @@
 <template>
-    <el-card class="home-card changeShadow verticalCenterFlex">
+    <el-card id="user-info" class="home-card changeShadow verticalCenterFlex">
         <div ref="body" :style="{width: '100%'}">
             <ibps-list-item-meta style="align-items: center; overflow: hidden;">
                 <el-avatar
@@ -10,12 +10,12 @@
                     :size="85"
                     style="font-size: 85px; color: #c0c4cc; background: #fff;"
                 >
-                    <img :src="getPhoto(data.photo)" class="photo-img" @error="errorAvatarHandler(data)">
+                    <img :src="getPhoto(data.photo)" class="photo-img" style="height: 100%; width: 100%;" @error="errorAvatarHandler(data)">
                 </el-avatar>
                 <div slot="title" class="ibps-item-content">
                     <div class="ibps-item-content-title" style="font-size: 16px;">
-                        <span>您好！</span>
-                        <span v-if="data && data.orgName">{{ data.orgName }}的</span>
+                        <label>您好！</label>
+                        <!-- <span v-if="data && data.orgName">{{ data.orgName }}的</span> -->
                         <label v-if="data && data.fullname">{{ data.fullname }}</label>
                         <label v-if="data && data.gender">{{ data.gender | filterStatus('gender') }}</label>
                     </div>
@@ -34,7 +34,25 @@
                                 size="mini"
                             >{{ item.name }}</el-tag>
                         </div>
-                        <!-- <span v-if="data&&data.address!==''">地址：{{ data.address }}</span> -->
+                        <div>
+                            <template v-if="todaySchedule.length">
+                                <span>今日班次：</span>
+                                <el-tag
+                                    v-for="(item, index) in todaySchedule"
+                                    :key="index"
+                                    class="dept-tag"
+                                    type="info"
+                                    size="mini"
+                                >{{ item }}</el-tag>
+                            </template>
+                            <span v-else>今日无排班，祝您休息愉快！</span>
+                            <a style="color: #409eff;" @click="showMySchedule">我的排班</a>
+                            <!-- <el-button
+                                type="primary"
+                                size="mini"
+                                @click="showMySchedule"
+                            >我的排班</el-button> -->
+                        </div>
                     </div>
                 </div>
             </ibps-list-item-meta>

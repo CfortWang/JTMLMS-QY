@@ -60,6 +60,7 @@
     "highlight.js": "^10.1.2",
     "hls.js": "^0.14.11",
     "hotkeys-js": "^3.8.1",
+    "html2canvas": "^1.4.1",
     "jquery": "^3.6.0",
     "js-base64": "^3.7.2",
     "js-cookie": "^2.2.1",

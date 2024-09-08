@@ -185,7 +185,7 @@
                 </el-table-column>
             </el-table>
         </el-form>
-        <div v-if="activeStep === 2" class="schedule-container">
+        <div v-if="activeStep === 2" ref="schedule" class="schedule-container">
             <div class="schedule-box">
                 <div class="abscissa">
                     <div v-for="(month, mIndex) in Object.keys(dateObj)" :key="mIndex" class="abs-type">
@@ -266,6 +266,7 @@
 import { cycleOptions, scheduleType, scheduleColumn } from '../../constants/schedule'
 import { queryScheduleConfig, getStaffSchedule, saveStaffSchedule } from '@/api/business/schedule'
 import { mapValues, keyBy } from 'lodash'
+import html2canvas from 'html2canvas'
 import ActionUtils from '@/utils/action'
 
 export default {
@@ -566,6 +567,9 @@ export default {
                 case 'history':
                     this.showHistory = true
                     break
+                case 'export':
+                    this.handleExport()
+                    break
                 case 'record':
                     this.showRecord = true
                     break
@@ -723,6 +727,18 @@ export default {
                 this.$message.success('保存成功')
                 this.closeDialog()
                 this.$emit('callback')
+            })
+        },
+        handleExport () {
+            const element = this.$refs.schedule
+            // 使用 html2canvas 渲染 DOM 元素
+            html2canvas(element).then(canvas => {
+                const link = document.createElement('a')
+                link.href = canvas.toDataURL('image/png')
+                link.download = `${this.formData.title || '排班'}.png`
+                link.click()
+            }).catch(err => {
+                console.error('导出失败', err)
             })
         },
         closeDialog () {
