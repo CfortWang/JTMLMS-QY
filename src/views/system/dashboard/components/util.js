@@ -159,9 +159,9 @@ export function buildComponent (name, column, preview, vm) {
             },
             mounted () {
                 this.defaultForm = JSON.parse(JSON.stringify(this.quickNavform))
-                this.$nextTick(() => {
-                    this.scheduleData = this.getScheduleData()
+                this.$nextTick(async () => {
                     this.fetchData()
+                    this.scheduleData = await this.getScheduleData()
                 })
             },
             methods: {
@@ -603,7 +603,9 @@ export function buildComponent (name, column, preview, vm) {
                                             const t = scheduleShift.find(i => i.alias === s)
                                             eventList.push({
                                                 color: t ? t.color : '',
-                                                content: s,
+                                                content: t.dateRange.map(d => {
+                                                    return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
+                                                }).join('\n'),
                                                 title: s,
                                                 start: date,
                                                 end: date,

@@ -281,6 +281,27 @@ $transition: all .5s;
             }
         }
     }
+
+    [alias="userInfo"] {
+        .el-card__body {
+            padding: 10px 20px;
+            .ibps-item-content {
+                .ibps-item-content-title {
+                    line-height: 20px;
+                    margin-bottom: 6px;
+                }
+                .ibps-item-content-label {
+                    > div {
+                        margin-bottom: 2px;
+                        &:last-child {
+                            margin-bottom: 0;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
     
     .pending-business {
         .ibps-list-col-main {

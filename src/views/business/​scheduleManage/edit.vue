@@ -191,10 +191,91 @@
                     <div v-for="(month, mIndex) in Object.keys(dateObj)" :key="mIndex" class="abs-type">
                         <div class="month">{{ month }}</div>
                         <div class="abscissa-item">
-                            <div v-for="(date, dIndex) in dateObj[month]" :key="dIndex">{{ date.split('-')[2] }}</div>
+                            <div
+                                v-for="(date, dIndex) in dateObj[month]"
+                                :ref="`day${dIndex}`"
+                                :key="dIndex"
+                                class="date"
+                                @click="showShiftSetting($event, date)"
+                            >{{ date.split('-')[2] }}</div>
                         </div>
                     </div>
                 </div>
+                <el-popover
+                    ref="popover"
+                    trigger="manual"
+                    placement="top"
+                    width="255"
+                    title=""
+                    :reference="popoverReference"
+                >
+                    <el-form
+                        ref="popover-form"
+                        label-width="80px"
+                        label-position="right"
+                        :model="shiftForm"
+                        size="mini"
+                        class="popover-form"
+                        @submit.native.prevent
+                    >
+                        <el-form-item label="选择操作">
+                            <el-radio-group v-model="shiftForm.operateType">
+                                <el-tooltip effect="dark" content="将该列排班数据复制到指定的一个或多个日期" placement="left">
+                                    <el-radio-button label="copy">复制</el-radio-button>
+                                </el-tooltip>
+                                <el-tooltip effect="dark" content="将该列排班数据按指定间隔向后覆盖" placement="right">
+                                    <el-radio-button label="cycle">循环</el-radio-button>
+                                </el-tooltip>
+                            </el-radio-group>
+                        </el-form-item>
+                        <!-- <el-form-item label="覆盖方式">
+                            <el-radio-group v-model="shiftForm.pasteType">
+                                <el-tooltip effect="dark" content="无视已有数据，完全覆盖" placement="top">
+                                    <el-radio-button label="all">全覆盖</el-radio-button>
+                                </el-tooltip>
+                                <el-tooltip effect="dark" content="仅覆盖目标列的空值" placement="top">
+                                    <el-radio-button label="empty">空值覆盖</el-radio-button>
+                                </el-tooltip>
+                            </el-radio-group>
+                        </el-form-item> -->
+                        <el-form-item v-if="shiftForm.operateType === 'copy'" label="覆盖日期">
+                            <el-select
+                                v-model="shiftForm.dates"
+                                filterable
+                                width="100%"
+                                clearable
+                                multiple
+                                collapse-tags
+                                :multiple-limit="10"
+                                placeholder="请选择需覆盖的日期"
+                            >
+                                <el-option
+                                    v-for="(item, index) in dateList"
+                                    :key="index"
+                                    :label="item"
+                                    :value="item"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item v-else label="覆盖间隔">
+                            <el-input-number
+                                v-model="shiftForm.cycle"
+                                type="number"
+                                :min="0"
+                                :max="10"
+                            />
+                        </el-form-item>
+                        <div style="text-align: right; margin: 0">
+                            <el-tooltip effect="dark" content="仅覆盖目标列的空值" placement="bottom">
+                                <el-button type="primary" size="mini" plain @click="handleShiftSetting('empty')">覆盖空值</el-button>
+                            </el-tooltip>
+                            <el-tooltip effect="dark" content="无视目标列已有数据，完全覆盖" placement="bottom">
+                                <el-button type="warning" size="mini" plain @click="handleShiftSetting('all')">覆盖全部</el-button>
+                            </el-tooltip>
+                            <el-button size="mini" plain @click="resetShiftSetting">取消</el-button>
+                        </div>
+                    </el-form>
+                </el-popover>
                 <div class="schedule-content">
                     <div class="ordinate">
                         <div v-for="item in ordinateList" :key="item.value" class="ordinate-item">
@@ -204,6 +285,7 @@
                     <div class="shift-content">
                         <div v-for="(row, rIndex) in ordinateList" :key="row.value" class="shift-row">
                             <!-- <div v-for="(column, cIndex) in dateList" :key="cIndex" class="shift-column"> -->
+                            <!-- @contextmenu.prevent="handleRightClick($event, {row, rIndex, column, cIndex})" -->
                             <div
                                 v-for="(column, cIndex) in dateList"
                                 :key="cIndex"
@@ -211,7 +293,7 @@
                                 class="shift-item"
                                 @mouseenter="hoveredIndex = `${row.value}-${cIndex}`"
                                 @mouseleave="hoveredIndex = null"
-                                @contextmenu.prevent="handleRightClick($event, {row, rIndex, column, cIndex})"
+                                @click.prevent="handleShiftClick($event, {row, rIndex, column, cIndex})"
                             >
                                 <div
                                     v-for="(shift, sIndex) in scheduleData[row.value][cIndex]"
@@ -241,7 +323,7 @@
             />
         </div>
         <context-menu
-            :visible.sync="showContextMenu"
+            :visible.sync="contextMenuVisible"
             :params="shiftParams"
             :shift-list="shiftList"
             :position="itemPosition"
@@ -251,13 +333,13 @@
             @close="handleClose"
         />
         <history
-            :visible.sync="showHistory"
-            @close="v => showHistory = v"
+            :visible.sync="historyVisible"
+            @close="v => historyVisible = v"
         />
         <record
-            :visible.sync="showRecord"
+            :visible.sync="recordVisible"
             :schedule-id="pageParams.id"
-            @close="v => showRecord = v"
+            @close="v => recordVisible = v"
         />
     </el-dialog>
 </template>
@@ -336,14 +418,19 @@ export default {
             scheduleData: {},
             dateObj: {},
             dateList: [],
-            showContextMenu: false,
-            showHistory: false,
-            showRecord: false,
+            contextMenuVisible: false,
+            historyVisible: false,
+            recordVisible: false,
+            popoverReference: null,
             hoveredIndex: null,
             shiftParams: {},
             shiftList: [],
             selectItem: [],
             itemPosition: {},
+            shiftForm: {
+                operateType: 'copy',
+                pasteType: 'all'
+            },
             pickerOptions: {
                 disabledDate: (time) => {
                     const { dateRange } = this.formData
@@ -522,7 +609,7 @@ export default {
         changeView () {
             console.log('changeView')
         },
-        handleRightClick (event, { row, rIndex, column, cIndex }) {
+        handleShiftClick (event, { row, rIndex, column, cIndex }) {
             this.selectItem = []
             const item = this.$refs.shiftItem[rIndex * this.dateList.length + cIndex]
             const rect = item.getBoundingClientRect()
@@ -536,16 +623,14 @@ export default {
                 column,
                 cIndex
             }
-            console.log(row, column, rIndex, cIndex, this.scheduleData)
             this.selectItem = this.scheduleData[row.value][cIndex]
-            this.showContextMenu = true
+            this.contextMenuVisible = true
         },
         handleSelect ({ selected, params }) {
             this.scheduleData[params.row.value][params.cIndex] = selected
-            console.log(this.scheduleData)
         },
         handleClose () {
-            this.showContextMenu = false
+            this.contextMenuVisible = false
         },
         handleAction (action) {
             switch (action) {
@@ -565,13 +650,16 @@ export default {
                     this.changeView()
                     break
                 case 'history':
-                    this.showHistory = true
+                    this.historyVisible = true
                     break
                 case 'export':
                     this.handleExport()
                     break
                 case 'record':
-                    this.showRecord = true
+                    this.recordVisible = true
+                    break
+                case 'reset':
+                    this.handleReset()
                     break
                 case 'cancel':
                     this.closeDialog()
@@ -589,7 +677,6 @@ export default {
                 }
                 this.dateObj = this.getDateList(this.formData.dateRange)
                 this.dateList = Object.values(this.dateObj).flat()
-                console.log(this.ordinateList)
                 if (!this.pageParams.id) {
                     this.scheduleData = mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
                 } else {
@@ -702,7 +789,6 @@ export default {
         },
         handleSave () {
             const { staffScheduleDetailPoList, overview } = this.dealData(this.scheduleData) || {}
-            console.log(staffScheduleDetailPoList, overview)
             const { dateRange, title, config, approver, scheduleType, scheduleShift, scheduleStaff, scheduleRule } = this.formData
             const configData = {
                 id: config,
@@ -740,6 +826,87 @@ export default {
             }).catch(err => {
                 console.error('导出失败', err)
             })
+        },
+        handleReset () {
+            this.$confirm('<p style="font-size: 18px;">重置后当前排班的信息将会清空，您确定要执行该操作吗？</p>', '提示', {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type: 'warning',
+                showClose: false,
+                closeOnClickModal: false,
+                dangerouslyUseHTMLString: true
+            }).then(() => {
+                this.scheduleData = mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
+            }).catch(() => {
+                // nothing
+            })
+        },
+        showShiftSetting (e, date) {
+            this.resetShiftSetting()
+            this.shiftForm.current = date
+            this.popoverReference = e.target
+            this.$refs.popover.showPopper = true
+            // 手动更改弹窗位置
+            setTimeout(() => {
+                const popoverElement = document.querySelector('.el-popover')
+                if (popoverElement) {
+                    const rect = popoverElement.getBoundingClientRect()
+                    popoverElement.style.left = `${e.target.offsetLeft + (e.target.offsetWidth / 2) - (rect.width / 2)}px`
+                    popoverElement.style.top = `${e.target.offset}px`
+                }
+            }, 10)
+        },
+        resetShiftSetting () {
+            this.popoverReference = null
+            this.shiftForm = {
+                operateType: 'copy',
+                pasteType: 'all'
+            }
+            this.$refs.popover.showPopper = false
+        },
+        getDays (start, end) {
+            if (!start || !end) {
+                return 0
+            }
+            return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24))
+        },
+        handleShiftSetting (type) {
+            const { cycle, dates, operateType, current } = this.shiftForm || {}
+            if ((operateType === 'copy' && this.$utils.isEmpty(dates)) || (operateType === 'cycle' && this.$utils.isEmpty(cycle))) {
+                return this.$message.warning('请补充必填信息！')
+            }
+            const target = this.getDays(this.formData.dateRange[0], current)
+            const total = this.getDays(this.formData.dateRange[0], this.formData.dateRange[1])
+            if (operateType === 'copy') {
+                dates.forEach(d => {
+                    const index = this.getDays(this.formData.dateRange[0], d)
+                    Object.keys(this.scheduleData).forEach(key => {
+                        if (type === 'all' || this.$utils.isEmpty(this.scheduleData[key][index])) {
+                            this.scheduleData[key][index] = [...this.scheduleData[key][target]]
+                        }
+                    })
+                })
+            } else {
+                // 获取需覆盖的下标数组
+                const getIndexList = (start, end, step) => {
+                    const result = []
+                    let cur = start + step + 1
+                    while (cur <= end) {
+                        result.push(cur)
+                        cur += step + 1
+                    }
+                    return result
+                }
+                const indexList = getIndexList(target, total, cycle)
+                indexList.forEach(i => {
+                    Object.keys(this.scheduleData).forEach(key => {
+                        if (type === 'all' || this.$utils.isEmpty(this.scheduleData[key][i])) {
+                            this.scheduleData[key][i] = [...this.scheduleData[key][target]]
+                        }
+                    })
+                })
+            }
+            this.resetShiftSetting()
         },
         closeDialog () {
             this.$emit('close', false)
@@ -826,13 +993,18 @@ export default {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        > div {
+                        .date {
                             width: 59px;
                             height: 28px;
                             line-height: 30px;
                             text-align: center;
                             border: 1px solid #ccc;
                             border-right: none;
+                            cursor: pointer;
+                            color: #409eff;
+                            &:hover {
+                                background: #ecf5ff;
+                            }
                         }
                     }
                     &:last-child {
