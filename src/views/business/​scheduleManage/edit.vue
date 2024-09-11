@@ -9,6 +9,7 @@
         fullscreen
         class="dialog schedule-edit-dialog"
         top="0"
+        @scroll="handleScroll"
         @open="loadData"
         @close="closeDialog"
     >
@@ -185,9 +186,9 @@
                 </el-table-column>
             </el-table>
         </el-form>
-        <div v-if="activeStep === 2" ref="schedule" class="schedule-container">
-            <div class="schedule-box">
-                <div class="abscissa">
+        <div v-if="activeStep === 2" ref="scheduleContainer" class="schedule-container">
+            <div ref="schedule" class="schedule-box">
+                <div ref="scrollTarget" class="abscissa">
                     <div v-for="(month, mIndex) in Object.keys(dateObj)" :key="mIndex" class="abs-type">
                         <div class="month">{{ month }}</div>
                         <div class="abscissa-item">
@@ -277,7 +278,7 @@
                     </el-form>
                 </el-popover>
                 <div class="schedule-content">
-                    <div class="ordinate">
+                    <div ref="sidebar" class="ordinate">
                         <div v-for="item in ordinateList" :key="item.value" class="ordinate-item">
                             {{ item.label }}
                         </div>
@@ -347,6 +348,9 @@
 <script>
 import { cycleOptions, scheduleType, scheduleColumn } from '../../constants/schedule'
 import { queryScheduleConfig, getStaffSchedule, saveStaffSchedule } from '@/api/business/schedule'
+import request from '@/utils/request'
+import { SYSTEM_URL } from '@/api/baseUrl'
+import { previewFile } from '@/api/platform/file/attachment'
 import { mapValues, keyBy } from 'lodash'
 import html2canvas from 'html2canvas'
 import ActionUtils from '@/utils/action'
@@ -416,6 +420,7 @@ export default {
             ],
             viewType: 'users',
             scheduleData: {},
+            scheduleRecord: [],
             dateObj: {},
             dateList: [],
             contextMenuVisible: false,
@@ -469,7 +474,38 @@ export default {
     created () {
         this.loadData()
     },
+    mounted () {
+        this.handleListener('addEventListener')
+    },
+    beforeDestroy () {
+        this.handleListener('removeEventListener')
+    },
     methods: {
+        handleListener (event) {
+            const scrollContainer = this.$refs.scheduleContainer
+            if (scrollContainer) {
+                scrollContainer[event]('scroll', this.handleScroll)
+            }
+        },
+        handleScroll () {
+            console.log(111)
+            const scrollTarget = this.$refs.scrollTarget
+            const sidebar = this.$refs.sidebar
+            const scrollContainer = this.$refs.scheduleContainer
+
+            console.log(123)
+            if (scrollContainer.scrollTop > scrollTarget.offsetTop) {
+                scrollTarget.classList.add('sticky')
+            } else {
+                scrollTarget.classList.remove('sticky')
+            }
+            // 处理左侧元素的固定
+            if (scrollContainer.scrollLeft > sidebar.offsetLeft) {
+                sidebar.classList.add('sticky')
+            } else {
+                sidebar.classList.remove('sticky')
+            }
+        },
         async loadData () {
             this.loading = true
             // 获取配置数据
@@ -491,12 +527,13 @@ export default {
                 }
 
                 const response = await getStaffSchedule({ id: this.pageParams.id })
-                const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config } = response.data
+                const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config, status } = response.data
                 const temp = config ? JSON.parse(config) : {}
                 console.log('responseData:', response.data)
                 console.log('configData:', temp)
                 this.formData = {
                     title,
+                    status,
                     config: temp.id,
                     dateRange: [startDate, endDate],
                     approver: temp.approver || [],
@@ -561,6 +598,7 @@ export default {
                     })
                     result[userId].push(formattedShifts)
                 }
+                this.scheduleRecord.push({ userId, id })
             })
             return result
         },
@@ -644,7 +682,7 @@ export default {
                     this.handleSave()
                     break
                 case 'submit':
-                    this.$emit('submit')
+                    this.handleSave('submit')
                     break
                 case 'changeView':
                     this.changeView()
@@ -722,7 +760,7 @@ export default {
             })
         },
         validateForm () {
-            const { scheduleRule, approver, ...rest } = this.formData
+            const { scheduleRule, approver, status, ...rest } = this.formData
             const result = Object.keys(rest).some(k => this.$utils.isEmpty(rest[k]))
             return !result
         },
@@ -741,6 +779,8 @@ export default {
             var dateCount = 0
             const result = Object.entries(data).map(([userId, days]) => {
                 const userObj = { userId, statistics: {}}
+                const temp = this.scheduleRecord.find(i => i.userId === userId)
+                const recordId = temp ? temp.id : ''
                 dateCount = days.length
                 days.forEach((day, index) => {
                     const shifts = day.map(({ alias }) => alias).join(',') || ''
@@ -758,9 +798,12 @@ export default {
 
                 return {
                     ...userObj,
+                    id: recordId,
+                    pk: recordId,
                     statistics: JSON.stringify(userObj.statistics)
                 }
             })
+            console.log(result)
 
             // 统计所有userId中各个alias的平均出现次数
             const total = {}
@@ -787,9 +830,9 @@ export default {
             }
             return { staffScheduleDetailPoList: result, overview }
         },
-        handleSave () {
+        handleSave (type) {
             const { staffScheduleDetailPoList, overview } = this.dealData(this.scheduleData) || {}
-            const { dateRange, title, config, approver, scheduleType, scheduleShift, scheduleStaff, scheduleRule } = this.formData
+            const { dateRange, title, config, approver, scheduleType, status, scheduleShift, scheduleStaff, scheduleRule } = this.formData
             const configData = {
                 id: config,
                 approver,
@@ -801,6 +844,7 @@ export default {
                 id: this.pageParams.id,
                 pk: this.pageParams.id,
                 title,
+                status: type ? '已发布' : (status || '未发布'),
                 startDate: dateRange[0],
                 endDate: dateRange[1],
                 type: scheduleType,
@@ -809,16 +853,100 @@ export default {
                 staffScheduleDetailPoList
             }
             console.log(submitData)
-            saveStaffSchedule(submitData).then(res => {
+            this.loading = true
+            saveStaffSchedule(submitData).then(() => {
                 this.$message.success('保存成功')
-                this.closeDialog()
-                this.$emit('callback')
+                if (type) {
+                    this.handleSaveNews()
+                } else {
+                    this.loading = false
+                    this.closeDialog()
+                    this.$emit('callback')
+                }
+            }).catch(() => {
+                this.loading = false
             })
         },
-        handleExport () {
+        handleSaveNews () {
+            this.activeStep = 2
+            this.$nextTick(async () => {
+                const element = this.$refs.schedule
+                console.log(element)
+                const fileId = await this.captureAndUpload(element)
+                const fileUrl = await previewFile(fileId)
+                const { userId, name } = this.$store.getters
+                const { first, second } = this.$store.getters.level
+                const { title, dateRange } = this.formData
+                const news = {
+                    author: name,
+                    content: `<img src="${fileUrl}" title="${title}.png" alt="image.png"/>`,
+                    depId: '',
+                    depName: '',
+                    fileAttach: '',
+                    includeChild: 'N',
+                    // 发布时间
+                    publicDate: this.$common.getDateNow(19),
+                    // 失效时间
+                    loseDate: dateRange[1] + ' 23:59:59',
+                    public0: 'Y',
+                    publicItem: 'notices',
+                    status: 'publish',
+                    title: title,
+                    type: second || first,
+                    userId: userId,
+                    userName: name
+                }
+                this.$common.saveNews(news).then(() => {
+                    this.loading = false
+                    this.closeDialog()
+                    this.$emit('callback')
+                })
+            })
+        },
+        captureAndUpload (element) {
+            const uploadImage = (blob) => {
+                return new Promise((resolve, reject) => {
+                    const data = new FormData() // 创建form对象
+                    data.append('file', blob, `${this.formData.title}.png`)
+                    request({
+                        url: SYSTEM_URL() + '/file/upload',
+                        method: 'post',
+                        isLoading: true,
+                        gateway: true,
+                        data
+                    }).then(res => {
+                        resolve(res.data.id || '')
+                    }).catch(error => {
+                        reject(error)
+                    })
+                })
+            }
+            const canvasToBlob = (canvas) => {
+                return new Promise(resolve => {
+                    canvas.toBlob(blob => {
+                        resolve(blob)
+                    }, 'image/png', 1.0)
+                })
+            }
+            return new Promise((resolve, reject) => {
+                html2canvas(element).then(canvas => {
+                    canvasToBlob(canvas).then(blob => {
+                        uploadImage(blob).then(fileId => {
+                            resolve(fileId)
+                        })
+                    })
+                })
+            })
+        },
+        async handleExport () {
             const element = this.$refs.schedule
             // 使用 html2canvas 渲染 DOM 元素
-            html2canvas(element).then(canvas => {
+            html2canvas(element, {
+                scrollX: 0,
+                scrollY: -10,
+                width: element.scrollWidth,
+                height: element.scrollHeight
+            }).then(canvas => {
                 const link = document.createElement('a')
                 link.href = canvas.toDataURL('image/png')
                 link.download = `${this.formData.title || '排班'}.png`
@@ -951,6 +1079,8 @@ export default {
     }
     .schedule-container {
         width: 100%;
+        max-height: calc(100vh - 146px);
+        overflow: auto;
         ::v-deep {
             .el-button > span {
                 margin-left: 5px;
@@ -970,7 +1100,7 @@ export default {
             }
         }
         .schedule-box {
-            width: auto;
+            width: fit-content;
             overflow-x: auto;
             font-size: 14px;
             position: relative;
@@ -978,6 +1108,7 @@ export default {
                 // width: 100%;
                 margin: 0 20px 0 110px;
                 display: flex;
+                width: fit-content;
                 .abs-type {
                     .month {
                         display: flex;
@@ -1020,7 +1151,8 @@ export default {
                 }
             }
             .schedule-content {
-                height: calc(100vh - 245px);
+                // max-height: calc(100vh - 245px);
+                height: fit-content;
                 margin: 10px 0 20px 10px;
                 position: relative;
                 display: flex;
@@ -1120,6 +1252,13 @@ export default {
                         }
                     }
                 }
+            }
+            .sticky {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
             }
         }
     }
