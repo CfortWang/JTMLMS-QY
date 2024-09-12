@@ -93,9 +93,9 @@ export default {
 <style lang="scss" scoped>
     .context-menu {
         position: absolute;
-        background-color: rgba(204, 204, 204, 0.4);
+        background-color: rgba(204, 204, 204, 0.9);
         border: 1px solid #cccccc;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         text-align: center;
         z-index: 1000;
         padding-bottom: 10px;
