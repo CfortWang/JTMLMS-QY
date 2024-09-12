@@ -515,12 +515,16 @@ export default {
             }
             // 处理最后一题无法自动提交的bug
             if (this.questionList[this.questionList.length - 1] !== '判断题' && this.questionList[this.questionList.length - 1] !== '单选题') {
+                const temp = this.showIndex
                 if (this.showIndex !== this.questionList.length) {
                     this.showIndex = this.questionList.length
                 } else {
                     this.showIndex = 1
                 }
-                this.$nextTick(nextHandle)
+                this.$nextTick(() => {
+                    this.showIndex = temp
+                    nextHandle()
+                })
             } else {
                 nextHandle()
             }

@@ -87,21 +87,17 @@
                     @node-click="handleNodeClick"
                     @node-contextmenu="handleNodeContextmenu"
                 >
-                    <span slot-scope="scope" class="ibps-custom-tree-node">
-                        <el-tooltip class="item" effect="light" :content="scope.node.label" placement="right-end">
-                            <span>
-                                <ibps-icon
-                                    v-if="showIcon"
-                                    :name="getIcon(scope.data)"
-                                />
-                                <img
-                                    v-if="categoryKey === 'FILE_TYPE' || categoryKey ==='FLOW_TYPE'"
-                                    :src="filePng"
-                                    style="vertical-align: middle; height: 20px;"
-                                >
-                                <span>{{ scope.node.label }}</span>
-                            </span>
-                        </el-tooltip>
+                    <span slot-scope="scope" class="ibps-custom-tree-node" :title="scope.node.label">
+                        <ibps-icon
+                            v-if="showIcon"
+                            :name="getIcon(scope.data)"
+                        />
+                        <img
+                            v-if="categoryKey === 'FILE_TYPE' || categoryKey ==='FLOW_TYPE'"
+                            :src="filePng"
+                            style="vertical-align: middle; height: 20px;"
+                        >
+                        <span>{{ scope.node.label }}</span>
                     </span>
                 </el-tree>
             </el-scrollbar>

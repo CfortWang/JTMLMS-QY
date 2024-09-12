@@ -181,6 +181,8 @@
                                 :disabled="readonly"
                                 :multiple="true"
                                 size="mini"
+                                :filter="filter"
+                                filterable
                             />
                         </div>
 
@@ -209,6 +211,8 @@
                                 :disabled="readonly"
                                 :multiple="true"
                                 size="mini"
+                                :filter="filter"
+                                filterable
                             />
                         </div>
 
@@ -270,6 +274,16 @@ export default {
     data () {
         const { userId, position, level } = this.$store.getters
         return {
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             isFirst: true,
             userId: userId,
             position: position,

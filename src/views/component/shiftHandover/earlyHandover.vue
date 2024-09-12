@@ -36,6 +36,8 @@
                                     :multiple="false"
                                     size="mini"
                                     style="width:200px"
+                                    :filter="filter"
+                                    filterable
                                 />
                             </el-form-item>
                         </el-col>
@@ -250,6 +252,8 @@
                                     :multiple="true"
                                     size="mini"
                                     style="width:1000px"
+                                    :filter="filter"
+                                    filterable
                                 />
                             </el-form-item>
                         </el-col>
@@ -311,6 +315,16 @@ export default {
     data () {
         const { userId, position, level } = this.$store.getters
         return {
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             codeId: '', // 扫码签到
             RegisterInfoShow: false,
             QrcodeedDialogShow: false,
@@ -363,7 +377,7 @@ export default {
                 { key: 'gunRegister', label: '扫码枪签到', hidden: () => { return !this.isEdit || this.isFinished } },
                 { key: 'registerInfo', label: '签到信息', hidden: () => { return !this.isEdit } },
                 { key: 'submit', label: '提交', icon: 'el-icon-finished', hidden: () => { return !this.isEdit || this.isFinished } },
-                { key: 'cancel', label: '退出', type: 'danger',icon:'ibps-icon-close' }
+                { key: 'cancel', label: '退出', type: 'danger', icon: 'ibps-icon-close' }
             ],
             initWidth: '1280px',
             isEdit: false,

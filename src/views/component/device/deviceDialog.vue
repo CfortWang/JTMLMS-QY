@@ -46,6 +46,7 @@
                                                 class="custom-dialog"
                                                 placeholder="请选择"
                                                 icon="el-icon-search"
+                                                style="width:100%"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -64,6 +65,8 @@
                                                 :multiple="false"
                                                 size="mini"
                                                 :filter="filter"
+                                                filterable
+                                                style="width:100%"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -78,6 +81,7 @@
                                                 size="mini"
                                                 style="width:100%"
                                                 :filter="filter"
+                                                filterable
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -173,6 +177,8 @@
                                                 :multiple="false"
                                                 size="mini"
                                                 :filter="filter"
+                                                filterable
+                                                style="width:100%"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -190,6 +196,7 @@
                                                 class="custom-dialog"
                                                 placeholder="请选择"
                                                 icon="el-icon-search"
+                                                style="width:100%"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -241,6 +248,7 @@
                                                 class="custom-dialog"
                                                 placeholder="请选择"
                                                 icon="el-icon-search"
+                                                style="width:100%"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -362,6 +370,7 @@
                                                                 size="mini"
                                                                 style="width:100%"
                                                                 :filter="filter"
+                                                                filterable
                                                             />
                                                         </el-form-item>
                                                     </el-col>

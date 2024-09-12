@@ -43,6 +43,8 @@
                             readonly-text="text"
                             :disabled="false"
                             :multiple="false"
+                            :filter="filter"
+                            filterable
                         />
                     </div>
                     <div class="item">
@@ -78,7 +80,7 @@
                     </div>
                 </div>
 
-                <div class="table">
+                <div v-if="fliterData.length>0" class="table">
                     <div class="column">
                         <div class="item">设备名称/日期</div>
                         <div v-for="(item,index) in fliterData" :key="index" class="item" style="cursor:pointer" @click="goLookStatic(item)">
@@ -94,7 +96,7 @@
                                         <div>
                                             <span v-if="i.todo">待处理：{{ i.todo }}；</span>
                                             <span v-if="i.done">已完成：{{ i.done }}；</span>
-                                            <div v-for="ii in i.data" :key="ii.mainId" class="detail">
+                                            <div v-for="(ii,indd) in i.data" :key="indd" class="detail">
                                                 <el-divider />
                                                 <div class="detail-item">
                                                     <div class="item" style="margin:2px 0">处理人：{{ switchIdToUserName(ii.bian_zhi_ren_)|| '/' }}</div>
@@ -113,6 +115,7 @@
                         </div>
                     </div>
                 </div>
+                <el-empty v-else description="暂无数据" />
             </div>
             <MaintenanceStatic v-if="MaintenanceStaticVisible" :dialog-visible.sync="MaintenanceStaticVisible" :params="dialogParams" />
 
@@ -187,7 +190,17 @@ export default {
 
             },
             dataList: [],
-            type: ['日保养', '周保养', '月保养', '季度保养', '半年保养', '年保养', '按需保养']
+            type: ['日保养', '周保养', '月保养', '季度保养', '半年保养', '年保养', '按需保养'],
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }]
         }
     },
     computed: {
@@ -252,7 +265,7 @@ export default {
                     })
                 }
             })
-            console.log('fliterData', result)
+            // console.log('fliterData', result)
             return result
         },
         formatData () {
@@ -278,7 +291,7 @@ export default {
                 })
                 answer[i] = arr
             }
-            console.log('data', answer)
+            // console.log('data', answer)
             return answer
         }
     },
@@ -301,6 +314,7 @@ export default {
         // 查看设备统计
         goLookStatic (row) {
             this.dialogParams = row
+            this.dialogParams.searchMonth = this.month
             this.MaintenanceStaticVisible = true
         },
         // 人员id 转人员名称
@@ -323,7 +337,7 @@ export default {
             const ws = xlsx.utils.json_to_sheet(json, { header: Object.values(fields) }) // 将JS对象数组转换为工作表。
             wb.SheetNames.push(sheetName)
             wb.Sheets[sheetName] = ws
-            console.log('json', ws)
+            // console.log('json', ws)
             const defaultCellStyle = { font: { name: 'Verdana', sz: 13, color: 'FF00FF88' }, fill: { fgColor: { rgb: 'FFFFAA00' }}}// 设置表格的样式
             const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary', cellStyles: true, defaultCellStyle: defaultCellStyle, showGridLines: false } // 写入的样式
             const wbout = xlsx.write(wb, wopts)
@@ -363,8 +377,14 @@ export default {
             this.$message.success('导出设备成功！')
         },
         async handleMonthChange (val) {
+            const year = +val.split('-')[0]
             const month = +val.split('-')[1]
             this.monthDays = this.monthList[month - 1]
+            if ((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)) {
+                this.monthList[1] = 29
+            } else {
+                this.monthList[1] = 28
+            }
             await this.init()
         },
         // 获取人员部门
@@ -389,7 +409,7 @@ export default {
             this.title = `月度设备维护统计`
             const y = +this.month.split('-')[0]
             const m = +this.month.split('-')[1]
-            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,a.bian_zhi_bu_men_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,b.id_ AS subId,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,c.id_ AS addtionId,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m}`
+            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,a.bian_zhi_bu_men_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,b.id_ AS subId,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,c.id_ AS addtionId,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m} and a.di_dian_='${this.level}'`
             const { variables: { data }} = await this.$common.request('sql', sql)
             this.dataList = data
             this.dataList.forEach(item => {
@@ -438,7 +458,7 @@ export default {
             &::before{
                 content: '*';
                 margin: 0 4px 0 -7.5px;
-                color: #F56C6C;
+                color: red;
             }
         }
         .left{
@@ -461,19 +481,19 @@ export default {
                     .green-circle {
                         width: 12px;
                         height: 12px;
-                        background-color: green;
+                        background-color: #67C23A;
                         border-radius: 50%;
                     }
                     .red-circle {
                         width: 12px;
                         height: 12px;
-                        background-color: red;
+                        background-color: #F56C6C;
                         border-radius: 50%;
                     }
                     .orange-circle {
                         width: 12px;
                         height: 12px;
-                        background-color: orange;
+                        background-color: #E6A23C;
                         border-radius: 50%;
                     }
                 }
@@ -499,6 +519,7 @@ export default {
             .table{
                 display: flex;
                 .column{
+                    flex: 1;
                     &:nth-child(2){
                         display: flex;
                     }
@@ -529,6 +550,11 @@ export default {
                         height: 30px;
                         line-height: 30px;
                         text-align: center;
+                    }
+                    >.item:not(:first-child) {
+                        :hover{
+                            color: #409EFF;
+                        }
                     }
                     .content-item{
                         >.item{
@@ -570,7 +596,7 @@ export default {
                             transform: translate(-50%, -50%);
                             width: 10px;
                             height: 10px;
-                            background-color: green;
+                            background-color: #67C23A;
                             border-radius: 50%;
                         }
                         .red-circle {
@@ -581,7 +607,7 @@ export default {
                             transform: translate(-50%, -50%);
                             width: 10px;
                             height: 10px;
-                            background-color: red;
+                            background-color: #F56C6C;
                             border-radius: 50%;
                         }
                         .orange-circle {
@@ -592,7 +618,7 @@ export default {
                             transform: translate(-50%, -50%);
                             width: 10px;
                             height: 10px;
-                            background-color: orange;
+                            background-color: #E6A23C;
                             border-radius: 50%;
                         }
                     }

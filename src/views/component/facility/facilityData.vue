@@ -25,29 +25,44 @@
                             <span v-else>{{ row.label|| '/' }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="参数单位" prop="unit">
+                    <el-table-column label="参数单位" prop="unit" width="120">
                         <template slot-scope="{row}">
                             <el-autocomplete
                                 v-if="!readonly && !isCul"
                                 v-model="row.unit"
                                 class="inline-input"
                                 :fetch-suggestions="querySearch"
-                                placeholder="请输入内容"
+                                placeholder="请输入"
                                 size="mini"
                             />
                             <span v-else>{{ row.unit || '/' }}</span>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="参数范围限值" prop="range">
+                    <el-table-column label="参数范围限值" prop="range" width="300">
                         <template slot-scope="{row}">
                             <NumberRange v-model="row.range" :precision="2" :disabled="readonly || isCul" /></template>
                     </el-table-column>
 
-                    <el-table-column label="参数修正值" prop="fixValue">
+                    <el-table-column label="参数修正值" prop="fixValue" width="120">
                         <template slot-scope="{row}">
                             <el-input v-if="!readonly && !isCul" v-model="row.fixValue" size="mini" placeholder="请输入" type="number" />
                             <span v-else>{{ row.fixValue|| '/' }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column label="填写频率" prop="rate">
+                        <template slot="header" slot-scope="">
+                            <el-tooltip class="item" effect="dark" content="配置参数填写周期，适用于参数填写频率与检测周期不一致的情况。若为空则表示该参数每次推送都需填写。" placement="top-start">
+                                <span>
+                                    填写频率
+                                    <i class="el-icon-question" />
+                                </span>
+                            </el-tooltip>
+                        </template>
+                        <template slot-scope="{row,$index}">
+                            <span>{{ row.rate || '/' }}</span>
+                            <el-button v-if="!readonly && !isCul" size="mini" icon="ibps-icon-edit" type="text" style="margin-left:10px" @click="openDialog(row,$index)">编辑</el-button>
                         </template>
                     </el-table-column>
 
@@ -72,13 +87,15 @@
                 </el-table>
             </el-col>
         </el-row>
+        <FacilityDataDialog v-if="dialogShow" :dialog-visible.sync="dialogShow" :params="dialogParams" @submit="dialogSubmit" />
     </div>
 </template>
 <script>
 import NumberRange from '@/views/component/xcomponent/numberRange.vue'
+import FacilityDataDialog from './facilityDataDialog.vue'
 export default {
     components: {
-        NumberRange
+        NumberRange, FacilityDataDialog
     },
     props: {
         formData: {
@@ -96,6 +113,8 @@ export default {
     },
     data () {
         return {
+            dialogParams: {},
+            dialogShow: false,
             isFirst: true,
             forms: [],
             multipleSelection: []
@@ -109,10 +128,10 @@ export default {
                 // console.log('formData', val)
                 if (val.lieBiaoShuJu) {
                     if (!this.isCul) {
-                        this.forms = JSON.parse(val.lieBiaoShuJu)
+                        this.forms = this.initData(val.lieBiaoShuJu)
                     } else {
                         if (this.isFirst) {
-                            this.forms = JSON.parse(val.lieBiaoShuJu)
+                            this.forms = this.initData(val.lieBiaoShuJu)
                             this.isFirst = false
                         }
                     }
@@ -135,9 +154,114 @@ export default {
         // console.log('mounted', this.formData)
     },
     methods: {
+        // 弹窗的提交事件
+        dialogSubmit (data, index) {
+            this.$set(this.forms, index, data)
+            // console.log('form', this.forms)
+        },
+        openDialog (row, $index) {
+            this.dialogParams = {
+                ...row,
+                $index
+            }
+            this.dialogShow = true
+        },
+        // 计算时间差
+        getDayDifference (date1, date2) {
+            // 将两个日期转换为Date对象
+            const d1 = new Date(date1)
+            const d2 = new Date(date2)
+            // 计算两个日期之间的毫秒差
+            const timeDiff = d2.getTime() - d1.getTime()
+            // 将毫秒差转换为天数并返回
+            const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
+            // console.log(dayDiff)
+            return dayDiff
+        },
+        // 初始化数据
+        initData (data) {
+            const ans = JSON.parse(data)
+            const result = []
+            if (this.isFirst) {
+                console.log(ans)
+            }
+            ans.forEach(item => {
+                if (!Object.hasOwn(item, 'label')) {
+                    item.label = ''
+                }
+                if (!Object.hasOwn(item, 'unit')) {
+                    item.unit = '℃'
+                }
+                if (!Object.hasOwn(item, 'range')) {
+                    item.range = [null, null]
+                }
+                if (!Object.hasOwn(item, 'fixValue')) {
+                    item.fixValue = ''
+                }
+                if (!Object.hasOwn(item, 'value')) {
+                    item.value = ''
+                }
+                if (!Object.hasOwn(item, 'result')) {
+                    item.result = ''
+                }
+                if (!Object.hasOwn(item, 'rate')) {
+                    item.rate = ''
+                }
+                if (!Object.hasOwn(item, 'status')) {
+                    item.status = ''
+                }
+                if (!Object.hasOwn(item, 'period')) {
+                    item.period = ''
+                }
+                if (!Object.hasOwn(item, 'date')) {
+                    item.date = ''
+                }
+                if (!Object.hasOwn(item, 'startTime')) {
+                    item.startTime = ''
+                }
+
+                // this.formData.jianCeShiJian = '2024-09-05'
+                if (item.rate && this.formData.jianCeShiJian) {
+                    const jianCeShiJian = this.formData.jianCeShiJian.slice(0, 10)
+                    const thatDate = new Date(jianCeShiJian)
+                    const day = thatDate.getDay() // 周几
+                    const dayofMonth = thatDate.getDate() // 多少号
+                    let dayDiff = ''
+                    console.log(`监测时间：${jianCeShiJian},周${day}`)
+                    switch (item.period) {
+                        case 'day':
+                            if (item.date.indexOf(day) > -1) {
+                                result.push(item)
+                            }
+                            break
+                        case 'week':
+                            if (item.date === day) {
+                                result.push(item)
+                            }
+                            break
+                        case 'month':
+                            if (item.date === dayofMonth) {
+                                result.push(item)
+                            }
+                            break
+                        case 'repeat':
+                            dayDiff = this.getDayDifference(item.startTime, jianCeShiJian)
+                            if (dayDiff >= 0 && dayDiff % (item.date + 1) === 0) {
+                                result.push(item)
+                            }
+                            break
+                        default:
+                            break
+                    }
+                } else {
+                    result.push(item)
+                }
+            })
+            return result
+        },
         // 默认单位
         querySearch (queryString, cb) {
-            const units = [{ value: '℃' }, { value: '%' }, { value: 'Pa' }]
+            const units = [{ value: '℃' }, { value: '%' }, { value: 'Pa' }, { value: 'MΩ·CM' }, { value: 'uS/cm' }, { value: 'cfu/ml' }]
             // 调用 callback 返回建议列表的数据
             cb(units)
         },
@@ -190,7 +314,9 @@ export default {
                 value: '',
                 result: '',
                 status: '',
-                unit: ''
+                unit: '',
+                period: '',
+                date: ''
             })
         },
         goRemove () {

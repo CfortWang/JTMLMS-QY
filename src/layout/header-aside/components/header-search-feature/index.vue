@@ -10,6 +10,7 @@
             :trigger-on-focus="false"
             :popper-append-to-body="false"
             clearable
+            size="mini"
             @clear="handleClear"
             @select="handleSelect"
         >
@@ -102,8 +103,11 @@ export default {
 
 <style lang="scss" scoped>
 .header-search-feature {
-    .custom-autocomplete  ::v-deep .el-autocomplete-suggestion{
+    .custom-autocomplete {
+        width: 150px;
+        ::v-deep .el-autocomplete-suggestion{
         width: auto !important;
+    }
     }
 }
 

@@ -16,7 +16,9 @@
             <div class="paper-info">
                 <div class="info-item">
                     <span class="label">考试名称：</span>
-                    <span class="value">{{ paperData.examName }}</span>
+                    <el-tooltip class="item" effect="dark" :content="paperData.examName" placement="top-start">
+                        <span class="value">{{ paperData.examName }}</span>
+                    </el-tooltip>
                 </div>
                 <div class="info-item">
                     <span class="label">创建人：</span>
@@ -44,7 +46,9 @@
                 </div>
                 <div class="info-item">
                     <span class="label">题库名称：</span>
-                    <span class="value">{{ paperData.bankName }}</span>
+                    <el-tooltip class="item" effect="dark" :content="paperData.bankName" placement="top-start">
+                        <span class="value">{{ paperData.bankName }}</span>
+                    </el-tooltip>
                 </div>
                 <div class="info-item">
                     <span class="label">题目数量：</span>

@@ -25,6 +25,8 @@
                                     :disabled="false"
                                     :multiple="false"
                                     style="width:80%"
+                                    :filter="filter"
+                                    filterable
                                 />
                             </el-form-item>
                         </el-col>
@@ -85,12 +87,12 @@
                     <el-row v-if="isShowDevice">
                         <el-col :span="12">
                             <el-form-item label="被控设备/设施编号：" label-width="140">
-                                <el-input v-model="form.deviceno1_" size="mini" style="width:62%" />
+                                <el-input v-model="form.deviceno1_" size="mini" style="width:80%" />
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
                             <el-form-item label="被控设备/设施名称：" label-width="140">
-                                <el-input v-model="form.devicename1_" size="mini" style="width:62%" />
+                                <el-input v-model="form.devicename1_" size="mini" style="width:80%" />
                             </el-form-item>
                         </el-col>
 
@@ -126,22 +128,12 @@
                         <el-col :span="12">
                             <el-form-item :label="labelShow">
                                 <el-checkbox-group v-if="form.jian_ce_zhou_qi_==='每日'" v-model="dayCheck" size="mini">
-                                    <el-checkbox :label="1" size="mini">周一</el-checkbox>
-                                    <el-checkbox :label="2" size="mini">周二</el-checkbox>
-                                    <el-checkbox :label="3" size="mini">周三</el-checkbox>
-                                    <el-checkbox :label="4" size="mini">周四</el-checkbox>
-                                    <el-checkbox :label="5" size="mini">周五</el-checkbox>
-                                    <el-checkbox :label="6" size="mini">周六</el-checkbox>
-                                    <el-checkbox :label="7" size="mini">周日</el-checkbox>
+                                    <el-checkbox v-for="item in weekDays" :key="item.value" :label="item.value" size="mini">{{ item.label }}</el-checkbox>
                                 </el-checkbox-group>
                                 <template v-if="form.jian_ce_zhou_qi_==='每周'">
-                                    <el-radio v-model="weekCheck" :label="1" size="mini">周一</el-radio>
-                                    <el-radio v-model="weekCheck" :label="2" size="mini">周二</el-radio>
-                                    <el-radio v-model="weekCheck" :label="3" size="mini">周三</el-radio>
-                                    <el-radio v-model="weekCheck" :label="4" size="mini">周四</el-radio>
-                                    <el-radio v-model="weekCheck" :label="5" size="mini">周五</el-radio>
-                                    <el-radio v-model="weekCheck" :label="6" size="mini">周六</el-radio>
-                                    <el-radio v-model="weekCheck" :label="7" size="mini">周日</el-radio>
+                                    <div class="radio" style="width:100%">
+                                        <el-radio v-for="item in weekDays" :key="item.value" v-model="weekCheck" :label="item.value" size="mini">{{ item.label }}</el-radio>
+                                    </div>
                                 </template>
                                 <el-select v-if="form.jian_ce_zhou_qi_==='每月'" v-model="monthCheck" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
@@ -175,12 +167,34 @@
                                         :value="item"
                                     />
                                 </el-select>
+                                <el-select v-if="form.jian_ce_zhou_qi_==='间隔'" v-model="sepCheck" placeholder="请选择" size="mini" style="width:80%">
+                                    <el-option
+                                        v-for="item in 30"
+                                        :key="item"
+                                        :label="`每隔${item}天`"
+                                        :value="item"
+                                    />
+                                </el-select>
                             </el-form-item>
 
                         </el-col>
                         <el-col v-if="nextDate" :span="12">
                             <el-form-item label="下次监测日期为：">
                                 <el-tag size="mini">{{ nextDate }}</el-tag>
+                            </el-form-item>
+                        </el-col>
+                        <el-col v-if="form.jian_ce_zhou_qi_==='间隔'" :span="12">
+                            <el-form-item label="开始监测时间：" prop="">
+                                <el-date-picker
+                                    v-model="form.kai_shi_shi_jian_"
+                                    :clearable="false"
+                                    type="date"
+                                    placeholder="选择监测开始时间"
+                                    :picker-options="pickerOptions"
+                                    value-format="yyyy-MM-dd"
+                                    size="mini"
+                                    style="width:80%"
+                                />
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -200,8 +214,8 @@
             </div>
         </div>
         <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="submit">确 定</el-button>
-            <el-button @click="close">取 消</el-button>
+            <el-button type="primary" icon="ibps-icon-save" size="mini" @click="submit">确 定</el-button>
+            <el-button icon="ibps-icon-close" type="danger" size="mini" @click="close">取 消</el-button>
         </span>
     </el-dialog>
 </template>
@@ -219,6 +233,22 @@ export default {
     },
     data () {
         return {
+            pickerOptions: {
+                disabledDate (time) {
+                    return time.getTime() < (Date.now() - (24 * 60 * 1000 * 60))
+                }
+            },
+            weekDays: [{ label: '周一', value: 1 }, { label: '周二', value: 2 }, { label: '周三', value: 3 }, { label: '周四', value: 4 }, { label: '周五', value: 5 }, { label: '周六', value: 6 }, { label: '周日', value: 7 }],
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             dialogVisible: true,
             title: '配置详情',
             jianCeGangWeiList: [],
@@ -237,7 +267,8 @@ export default {
                 jian_ce_ri_qi_: '',
                 ri_qi_lie_biao_: '',
                 zi_wai_deng_wai_j: '', // 紫外灯外键
-                lie_biao_shu_ju_: ''
+                lie_biao_shu_ju_: '',
+                kai_shi_shi_jian_: ''
             },
             isEdit: false,
             quYuList: [],
@@ -249,13 +280,15 @@ export default {
             quarterCheck: '',
             halfYearCheck: '',
             yearCheck: '',
+            sepCheck: '',
             period: [
                 { label: '日监测', value: '每日' },
                 { label: '周监测', value: '每周' },
                 { label: '月监测', value: '每月' },
                 { label: '季度监测', value: '每季度' },
                 { label: '半年监测', value: '每半年' },
-                { label: '年监测', value: '每年' }
+                { label: '年监测', value: '每年' },
+                { label: '按时间间隔监测', value: '间隔' }
             ]
         }
     },
@@ -265,20 +298,26 @@ export default {
         },
         labelShow () {
             if (this.form.jian_ce_zhou_qi_) {
-                return this.form.jian_ce_zhou_qi_.split('每')[1] + '监测日期：'
+                if (this.form.jian_ce_zhou_qi_ !== '间隔') {
+                    return this.form.jian_ce_zhou_qi_.split('每')[1] + '监测日期：'
+                }
+                return '间隔时间：'
             }
             return ''
         }
     },
     watch: {
-        'form.jian_ce_zhou_qi_' (val) {
+        'form.jian_ce_zhou_qi_' (val, old) {
+            if (!old) return
             this.dayCheck = []
             this.weekCheck = ''
             this.monthCheck = ''
             this.quarterCheck = ''
             this.halfYearCheck = ''
             this.yearCheck = ''
+            this.sepCheck = ''
             this.nextDate = ''
+            this.form.kai_shi_shi_jian_ = ''
         },
         dayCheck: {
             handler: function (val, oldVal) {
@@ -483,6 +522,15 @@ export default {
                         this.form.ri_qi_lie_biao_ = ''
                     }
                     break
+                case '间隔':
+                    if (this.sepCheck && this.form.kai_shi_shi_jian_) {
+                        this.form.jian_ce_ri_qi_ = this.form.kai_shi_shi_jian_ + '起每隔' + this.sepCheck + '天'
+                        this.form.ri_qi_lie_biao_ = this.sepCheck + ''
+                    } else {
+                        this.form.jian_ce_ri_qi_ = ''
+                        this.form.ri_qi_lie_biao_ = ''
+                    }
+                    break
                 default:
                     break
             }
@@ -546,6 +594,9 @@ export default {
                         case '每年':
                             this.yearCheck = +this.form.jian_ce_ri_qi_.split('每年第')[1].split('个月')[0]
                             break
+                        case '间隔':
+                            this.sepCheck = +this.form.ri_qi_lie_biao_
+                            break
                         default:
                             break
                     }
@@ -559,7 +610,9 @@ export default {
             this.isEdit = !!(row && row.zi_wai_deng_wai_j)
             // 编辑
             if (this.isEdit) {
-                this.form = JSON.parse(JSON.stringify(row))
+                // this.form = JSON.parse(JSON.stringify(row))
+                const temp = JSON.parse(JSON.stringify(row))
+                Object.assign(this.form, temp)
             } else {
                 this.form.zi_wai_deng_wai_j = this.$utils.guid()
                 this.form.bu_men_ = parentForm.bian_zhi_bu_men_
@@ -569,6 +622,7 @@ export default {
                 this.form.jian_ce_zhou_qi_ = parentForm.zhou_qi_
                 this.form.ri_qi_lie_biao_ = parentForm.ri_qi_lie_biao_
                 this.form.lie_biao_shu_ju_ = parentForm.lie_biao_shu_ju_
+                this.form.kai_shi_shi_jian_ = parentForm.kai_shi_shi_jian_
             }
             this.formatData()
         },

@@ -67,7 +67,7 @@
                                         <div>
                                             <span v-if="i.todo">待处理：{{ i.todo }}；</span>
                                             <span v-if="i.done">已完成：{{ i.done }}；</span>
-                                            <div v-for="ii in i.data" :key="ii.mainId" class="detail">
+                                            <div v-for="(ii,indd) in i.data" :key="indd" class="detail">
                                                 <el-divider />
                                                 <div class="detail-item">
                                                     <div class="item" style="margin:2px 0">处理人：{{ switchIdToUserName(ii.bian_zhi_ren_)|| '/' }}</div>
@@ -208,7 +208,7 @@ export default {
                     })
                 }
             })
-            console.log('fliterData', result)
+            // console.log('fliterData', result)
             const answer = new Array(this.monthDays)
             for (let i = 0; i < this.monthDays; i++) {
                 const arr = []
@@ -238,7 +238,12 @@ export default {
         }
     },
     mounted () {
-        this.init()
+        if (this.params.searchMonth) {
+            this.month = this.params.searchMonth
+            this.handleMonthChange(this.month)
+        } else {
+            this.init()
+        }
     },
     methods: {
         handleActionEvent ({ key }) {
@@ -273,7 +278,7 @@ export default {
             const ws = xlsx.utils.json_to_sheet(json, { header: Object.values(fields) }) // 将JS对象数组转换为工作表。
             wb.SheetNames.push(sheetName)
             wb.Sheets[sheetName] = ws
-            console.log('json', ws)
+            // console.log('json', ws)
             const defaultCellStyle = { font: { name: 'Verdana', sz: 13, color: 'FF00FF88' }, fill: { fgColor: { rgb: 'FFFFAA00' }}}// 设置表格的样式
             const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary', cellStyles: true, defaultCellStyle: defaultCellStyle, showGridLines: false } // 写入的样式
             const wbout = xlsx.write(wb, wopts)
@@ -313,8 +318,14 @@ export default {
             this.$message.success('导出设备成功！')
         },
         async handleMonthChange (val) {
+            const year = +val.split('-')[0]
             const month = +val.split('-')[1]
             this.monthDays = this.monthList[month - 1]
+            if ((year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)) {
+                this.monthList[1] = 29
+            } else {
+                this.monthList[1] = 28
+            }
             await this.init()
         },
         // 获取人员部门
@@ -411,19 +422,19 @@ export default {
                     .green-circle {
                         width: 12px;
                         height: 12px;
-                        background-color: green;
+                        background-color: #67C23A;
                         border-radius: 50%;
                     }
                     .red-circle {
                         width: 12px;
                         height: 12px;
-                        background-color: red;
+                        background-color: #F56C6C;
                         border-radius: 50%;
                     }
                     .orange-circle {
                         width: 12px;
                         height: 12px;
-                        background-color: orange;
+                        background-color: #E6A23C;
                         border-radius: 50%;
                     }
                 }
@@ -446,29 +457,28 @@ export default {
             .table{
                 display: flex;
                 .column{
+                    flex: 1;
                     &:nth-child(2){
                         display: flex;
                     }
                     >.item{
                         height: 50px;
-                        width: 160px;
                         text-align: center;
                         line-height: 50px;
                         border-bottom: 1px solid #333;
                         border-right: 1px solid #333;
                         border-left: 1px solid #333;
+                        min-width: 100px;
                     }
                     @media screen and (max-width: 1800px) {
                          >.item{
                             height: 44px;
-                            width: 120px;
                             line-height: 44px;
                         }
                     }
                     @media screen and (max-width: 1550px) {
                          >.item{
                             height: 40px;
-                            width: 100px;
                             line-height: 40px;
                         }
                     }
@@ -518,7 +528,7 @@ export default {
                             transform: translate(-50%, -50%);
                             width: 10px;
                             height: 10px;
-                            background-color: green;
+                            background-color: #67C23A;
                             border-radius: 50%;
                         }
                         .red-circle {
@@ -529,7 +539,7 @@ export default {
                             transform: translate(-50%, -50%);
                             width: 10px;
                             height: 10px;
-                            background-color: red;
+                            background-color: #F56C6C;
                             border-radius: 50%;
                         }
                         .orange-circle {
@@ -540,7 +550,7 @@ export default {
                             transform: translate(-50%, -50%);
                             width: 10px;
                             height: 10px;
-                            background-color: orange;
+                            background-color: #E6A23C;
                             border-radius: 50%;
                         }
                     }

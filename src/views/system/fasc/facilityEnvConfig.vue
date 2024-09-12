@@ -26,7 +26,7 @@
                                     <template slot="label">
                                         <span class="required">类型：</span>
                                     </template>
-                                    <el-select v-model="form.lei_xing_" placeholder="请选择" size="mini" style="width:80%">
+                                    <el-select v-model="form.lei_xing_" placeholder="请选择" size="mini" style="width:80%" :disabled="isEdit">
                                         <el-option
                                             v-for="(value,key) in config"
                                             :key="key"
@@ -55,131 +55,11 @@
                                 </el-form-item>
                             </el-col>
                         </el-row>
-                        <el-alert
-                            title="默认数据，配置详情中的同名字段为空则使用以下默认数据"
-                            type="success"
-                            :closable="false"
-                        />
-                        <el-row>
-                            <el-col :span="12">
-                                <el-form-item label="部门：">
-                                    <ibps-user-selector
-                                        v-model="form.bian_zhi_bu_men_"
-                                        size="mini"
-                                        type="position"
-                                        readonly-text="text"
-                                        :disabled="false"
-                                        :multiple="false"
-                                        style="width:80%"
-                                    />
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="12">
-                                <el-form-item label="监测岗位：">
-                                    <el-select v-model="form.gang_wei_" placeholder="请选择" size="mini" style="width:80%">
-                                        <el-option
-                                            v-for="item in jianCeGangWeiList"
-                                            :key="item.id_"
-                                            :label="item.wei_hu_gang_wei_"
-                                            :value="item.wei_hu_gang_wei_"
-                                        />
-                                    </el-select>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                        <el-row>
-                            <el-col :span="12">
-                                <el-form-item label="监测周期：">
-                                    <el-select v-model="form.zhou_qi_" placeholder="请选择" size="mini" style="width:80%">
-                                        <el-option
-                                            v-for="item in period"
-                                            :key="item.value"
-                                            :label="item.label"
-                                            :value="item.value"
-                                        />
-                                    </el-select>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                        <el-row v-if="form.zhou_qi_!==''">
-                            <el-col :span="12">
-                                <el-form-item :label="labelShow" label-width="150">
-                                    <el-checkbox-group v-if="form.zhou_qi_==='每日'" v-model="dayCheck">
-                                        <el-checkbox :label="1">周一</el-checkbox>
-                                        <el-checkbox :label="2">周二</el-checkbox>
-                                        <el-checkbox :label="3">周三</el-checkbox>
-                                        <el-checkbox :label="4">周四</el-checkbox>
-                                        <el-checkbox :label="5">周五</el-checkbox>
-                                        <el-checkbox :label="6">周六</el-checkbox>
-                                        <el-checkbox :label="7">周日</el-checkbox>
-                                    </el-checkbox-group>
-                                    <template v-if="form.zhou_qi_==='每周'">
-                                        <el-radio v-model="weekCheck" :label="1">周一</el-radio>
-                                        <el-radio v-model="weekCheck" :label="2">周二</el-radio>
-                                        <el-radio v-model="weekCheck" :label="3">周三</el-radio>
-                                        <el-radio v-model="weekCheck" :label="4">周四</el-radio>
-                                        <el-radio v-model="weekCheck" :label="5">周五</el-radio>
-                                        <el-radio v-model="weekCheck" :label="6">周六</el-radio>
-                                        <el-radio v-model="weekCheck" :label="7">周日</el-radio>
-                                    </template>
-                                    <el-select v-if="form.zhou_qi_==='每月'" v-model="monthCheck" placeholder="请选择">
-                                        <el-option
-                                            v-for="item in 28"
-                                            :key="item"
-                                            :label="`第${item}天`"
-                                            :value="item"
-                                        />
-                                    </el-select>
-                                    <el-select v-if="form.zhou_qi_==='每季度'" v-model="quarterCheck" placeholder="请选择">
-                                        <el-option
-                                            v-for="item in 3"
-                                            :key="item"
-                                            :label="`第${item}个月`"
-                                            :value="item"
-                                        />
-                                    </el-select>
-                                    <el-select v-if="form.zhou_qi_==='每半年'" v-model="halfYearCheck" placeholder="请选择">
-                                        <el-option
-                                            v-for="item in 6"
-                                            :key="item"
-                                            :label="`第${item}个月`"
-                                            :value="item"
-                                        />
-                                    </el-select>
-                                    <el-select v-if="form.zhou_qi_==='每年'" v-model="yearCheck" placeholder="请选择">
-                                        <el-option
-                                            v-for="item in 12"
-                                            :key="item"
-                                            :label="`第${item}个月`"
-                                            :value="item"
-                                        />
-                                    </el-select>
-                                </el-form-item>
-
-                            </el-col>
-                            <el-col v-if="nextDate" :span="12">
-                                <el-form-item label="下次监测日期为：" label-width="150">
-                                    <el-tag>{{ nextDate }}</el-tag>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                        <el-row>
-                            <el-col :span="12">
-                                <el-form-item label="控制条件：">
-                                    <el-input v-model="form.tiao_jian_" type="textarea" :rows="2" size="mini" style="width:80%" />
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                        <el-row>
-                            <el-col :span="24">
-                                <FacilityData v-if="form.lie_biao_shu_ju_" :form-data="{lieBiaoShuJu:form.lie_biao_shu_ju_}" :is-cul="false" @change-data="onFacilityData" />
-                            </el-col>
-
-                        </el-row>
                     </el-form>
                 </div>
                 <!-- <el-divider /> -->
                 <div class="table">
+                    <el-alert type="success" title="配置详情" :closable="false" />
                     <div class="hearder">
                         <div class="search">
                             <div class="search-item">
@@ -190,7 +70,8 @@
                                     readonly-text="text"
                                     :disabled="false"
                                     :multiple="false"
-
+                                    :filter="filter"
+                                    filterable
                                     size="mini"
                                 />
                             </div>
@@ -230,7 +111,7 @@
                             <div class="search-item" style="width:68px">
                                 <el-button type="success" size="mini" icon="ibps-icon-plus" @click="openDialog">添加</el-button>
                             </div>
-                            <div class="search-item" style="width:70px">
+                            <!-- <div class="search-item" style="width:70px">
                                 <el-upload
                                     ref="uploadRef"
                                     class="upload-demo"
@@ -245,10 +126,13 @@
                             </div>
                             <div class="search-item" style="width:70px">
                                 <el-button type="primary" size="mini" icon="el-icon-download" @click="exportExcel">导出</el-button>
+                            </div> -->
+                            <div class="search-item" style="width:100px">
+                                <el-button type="info" size="mini" icon="el-icon-setting" @click="settingData">批量配置</el-button>
                             </div>
-                            <div v-if="trueList.length>0" class="search-item" style="width:120px">
+                            <!-- <div v-if="trueList.length>0" class="search-item" style="width:120px">
                                 <el-button type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
-                            </div>
+                            </div> -->
                             <div class="search-item" style="width:70px">
                                 <el-button type="danger" size="mini" icon="ibps-icon-close" @click="removeItem">删除</el-button>
                             </div>
@@ -354,6 +238,20 @@
                 </div>
             </div>
             <FecDialog v-if="subDialogVisible" ref="FecDialogRef" @onSubmit="sonSubmit" @onClose="sonClose" />
+            <DefaultSettingDialog
+                ref="DefaultSettingDialogRef"
+                :dialog-visible.sync="defultdialogVisible"
+                :jian-ce-gang-wei-list="jianCeGangWeiList"
+                :params="form"
+                :day="dayCheck"
+                :week="weekCheck"
+                :month="monthCheck"
+                :quarter="quarterCheck"
+                :half-year="halfYearCheck"
+                :year="yearCheck"
+                :sep="sepCheck"
+                @emitParent="handleSetting"
+            />
         </div>
     </el-dialog>
 </template>
@@ -364,8 +262,10 @@ import xlsx from 'xlsx'
 import fs from 'file-saver'
 import FecDialog from './fecDialog.vue'
 import FacilityData from '@/views/component/facility/facilityData.vue'
+import DefaultSettingDialog from './defaultSettingDialog.vue'
 export default {
     components: {
+        DefaultSettingDialog,
         FacilityData,
         ibpsUserSelector,
         FecDialog,
@@ -384,6 +284,17 @@ export default {
     data () {
         const { userId, level = {}, position } = this.$store.getters || {}
         return {
+            defultdialogVisible: false,
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             search: {
                 buMen: '',
                 quYu: '',
@@ -415,6 +326,7 @@ export default {
             quarterCheck: '',
             halfYearCheck: '',
             yearCheck: '',
+            sepCheck: '',
             form: {
                 di_dian_: level.second || level.first,
                 bian_zhi_ren_: userId,
@@ -427,7 +339,8 @@ export default {
                 jian_ce_ri_qi_: '',
                 ri_qi_lie_biao_: '',
                 mo_kuai_lu_jing_: '',
-                lie_biao_shu_ju_: ''
+                lie_biao_shu_ju_: '',
+                kai_shi_shi_jian_: ''
             },
             subForm: [
 
@@ -544,10 +457,7 @@ export default {
             return this.form.lei_xing_ !== '' && this.form.lei_xing_ !== '01-室内温湿度监控' && this.form.lei_xing_ !== '06-每日安全检查' && this.form.lei_xing_ !== '08-含氯有效性监测'
         },
         isEdit () {
-            return this.parentData instanceof Object && this.parentData.mainId
-        },
-        labelShow () {
-            return this.form.zhou_qi_.split('每')[1] + '监测日期：'
+            return !!(this.parentData instanceof Object && this.parentData.mainId)
         }
     },
     watch: {
@@ -575,7 +485,8 @@ export default {
                                 jian_ce_ri_qi_: this.form.jian_ce_ri_qi_,
                                 ri_qi_lie_biao_: this.form.ri_qi_lie_biao_,
                                 zi_wai_deng_wai_j: this.$utils.guid(),
-                                lie_biao_shu_ju_: this.form.lie_biao_shu_ju_
+                                lie_biao_shu_ju_: this.form.lie_biao_shu_ju_,
+                                kai_shi_shi_jian_: ''
                             })
                         }
                     })
@@ -610,140 +521,18 @@ export default {
                             { label: '温度', range: [], fixValue: '', value: '', result: '', status: '', unit: '℃' }
                         ])
                         break
+                    case '05-纯水机水质监测':
+                        this.form.lie_biao_shu_ju_ = JSON.stringify([
+                            { label: '电阻率', range: [10, null], fixValue: '', value: '', result: '', status: '', unit: 'MΩ·CM' },
+                            { label: '电导率', range: [0, 1], fixValue: '', value: '', result: '', status: '', unit: 'uS/cm' },
+                            { label: '微生物含量', range: [0, 10], fixValue: '', value: '', result: '', status: '', unit: 'cfu/ml' }
+                        ])
+                        break
                     default:
                         delete this.form.lie_biao_shu_ju_
                         break
                 }
             }
-        },
-        'form.zhou_qi_' (val) {
-            this.dayCheck = []
-            this.weekCheck = ''
-            this.monthCheck = ''
-            this.quarterCheck = ''
-            this.halfYearCheck = ''
-            this.yearCheck = ''
-            this.nextDate = ''
-        },
-        dayCheck: {
-            handler: function (val, oldVal) {
-                this.formatRiQi()
-                if (val.length === 0) {
-                    this.nextDate = ''
-                    return
-                }
-                const temp_val = JSON.parse(JSON.stringify(val))
-                const today = new Date()
-                temp_val.sort(function (a, b) {
-                    return a - b
-                })
-                const num = temp_val.findIndex(e => e > today.getDay())
-                if (temp_val.length > 0 && num !== -1) {
-                    this.nextDate = this.getDayDate(temp_val[num], 0)
-                } else if (temp_val.length > 0 && num === -1) {
-                    this.nextDate = this.getDayDate(temp_val[0], 1)
-                } else {
-                    this.nextDate = ''
-                }
-            },
-            immediate: true
-        },
-        weekCheck: {
-            handler: function (val, oldVal) {
-                this.formatRiQi()
-                if (val === '') {
-                    this.nextDate = ''
-                    return
-                }
-                const today = new Date()
-                const weekNum = []
-                weekNum.push(val)
-                const num = weekNum.findIndex(e => e > today.getDay())
-                if (val !== '' && num !== -1) {
-                    this.nextDate = this.getDayDate(weekNum[0], 0)
-                } else if (val !== '' && num === -1) {
-                    this.nextDate = this.getDayDate(weekNum[0], 1)
-                } else {
-                    this.nextDate = ''
-                }
-            },
-            immediate: true
-        },
-        monthCheck: {
-            handler: function (val, oldVal) {
-                this.formatRiQi()
-                if (val === '') {
-                    this.nextDate = ''
-                    return
-                }
-                const today = new Date()
-                const day = today.getDate()
-                const nextMonth = this.getNextMonthDate(today, val, 1)
-                const currentMonth = this.getNextMonthDate(today, val, 0)
-                this.nextDate = val > day ? currentMonth : nextMonth
-            }
-            // immediate: true
-        },
-        quarterCheck: {
-            handler: function (val, oldVal) {
-                this.formatRiQi()
-                if (val === '') {
-                    this.nextDate = ''
-                    return
-                }
-                const quarterList = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]
-                const today = new Date()
-                const month = today.getMonth() + 1
-                const qu = this.getQuarter(today)
-                const nowM = quarterList[qu - 1][val - 1]
-                const nextM = quarterList[qu % 4][val - 1]
-
-                const endMonth = month >= nowM ? nextM : nowM
-                const yearPJ = today.getFullYear()
-                const monthPJ = endMonth > 9 ? endMonth : '0' + endMonth
-
-                this.nextDate = yearPJ + '-' + monthPJ + '-01'
-            }
-            // immediate: true
-        },
-        halfYearCheck: {
-            handler: function (val, oldVal) {
-                this.formatRiQi()
-                if (val === '') {
-                    this.nextDate = ''
-                    return
-                }
-                const midList = [[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12]]
-                const today = new Date()
-                const month = today.getMonth() + 1
-                const qu = month > 6 ? 2 : 1
-                const nowM = midList[qu - 1][val - 1]
-                const nextM = midList[qu % 2][val - 1]
-
-                const endMonth = month >= nowM ? nextM : nowM
-                const yearPJ = month >= nowM ? today.getFullYear() + 1 : today.getFullYear()
-                const monthPJ = endMonth > 9 ? endMonth : '0' + endMonth
-
-                this.nextDate = yearPJ + '-' + monthPJ + '-01'
-            }
-            // immediate: true
-        },
-        yearCheck: {
-            handler: function (val, oldVal) {
-                this.formatRiQi()
-                if (val === '') {
-                    this.nextDate = ''
-                    return
-                }
-                const today = new Date()
-                const month = today.getMonth() + 1
-                const year = today.getFullYear()
-                const qu = month >= val ? year + 1 : year
-                const monthPJ = val > 9 ? val : '0' + val
-
-                this.nextDate = qu + '-' + monthPJ + '-01'
-            }
-            // immediate: true
         }
     },
     mounted () {
@@ -757,12 +546,6 @@ export default {
         }
     },
     methods: {
-        // 接收自定义组件数据
-        onFacilityData (...arg) {
-            if (arg.length > 1) {
-                this.form.lie_biao_shu_ju_ = arg[1]
-            }
-        },
         init () {
             this.loadSelectorData()
         },
@@ -782,8 +565,10 @@ export default {
                 if (!data.length) {
                     return this.$message.warning(``)
                 }
-                this.form = data[0]
+                Object.assign(this.form, data[0])
+                // this.form = data[0]
                 const jian_ce_ri_qi_ = data[0].jian_ce_ri_qi_
+                const ri_qi_lie_biao_ = data[0].ri_qi_lie_biao_
                 if (this.form.jian_ce_ri_qi_) {
                     this.$nextTick(() => {
                         switch (this.form.zhou_qi_) {
@@ -809,6 +594,9 @@ export default {
                             case '每年':
                                 this.yearCheck = +jian_ce_ri_qi_.split('每年第')[1].split('个月')[0]
                                 break
+                            case '间隔':
+                                this.sepCheck = +ri_qi_lie_biao_
+                                break
                             default:
                                 break
                         }
@@ -832,132 +620,87 @@ export default {
                 this.subIdList = data.map(item => item.zi_wai_deng_wai_j)
             })
         },
-        formatRiQi () {
-            switch (this.form.zhou_qi_) {
-                case '每日':
-                    if (!this.dayCheck || this.dayCheck.length === 0) {
-                        this.form.jian_ce_ri_qi_ = ''
-                        this.form.ri_qi_lie_biao_ = ''
-                    } else if (this.dayCheck.length === 7) {
-                        this.form.jian_ce_ri_qi_ = '每天'
-                        this.form.ri_qi_lie_biao_ = '1,2,3,4,5,6,7'
-                    } else {
-                        const temp_dayCheck = JSON.parse(JSON.stringify(this.dayCheck))
-                        temp_dayCheck.sort(function (a, b) {
-                            return a - b
-                        })
-                        this.form.ri_qi_lie_biao_ = temp_dayCheck.join(',')
-                        this.form.jian_ce_ri_qi_ = '每周' + temp_dayCheck.join(',')
-                    }
-                    break
-                case '每周':
-                    if (this.weekCheck) {
-                        this.form.jian_ce_ri_qi_ = '每周' + this.weekCheck
-                        this.form.ri_qi_lie_biao_ = this.weekCheck + ''
-                    } else {
-                        this.form.jian_ce_ri_qi_ = ''
-                        this.form.ri_qi_lie_biao_ = ''
-                    }
-
-                    break
-                case '每月':
-                    if (this.monthCheck) {
-                        this.form.jian_ce_ri_qi_ = '每个月第' + this.monthCheck + '天'
-                        this.form.ri_qi_lie_biao_ = this.monthCheck + ''
-                    } else {
-                        this.form.jian_ce_ri_qi_ = ''
-                        this.form.ri_qi_lie_biao_ = ''
-                    }
-
-                    break
-                case '每季度':
-                    if (this.quarterCheck) {
-                        this.form.jian_ce_ri_qi_ = '每季度第' + this.quarterCheck + '个月'
-                        this.form.ri_qi_lie_biao_ = this.quarterCheck + ''
-                    } else {
-                        this.form.jian_ce_ri_qi_ = ''
-                        this.form.ri_qi_lie_biao_ = ''
-                    }
-
-                    break
-                case '每半年':
-                    if (this.halfYearCheck) {
-                        this.form.jian_ce_ri_qi_ = '每半年第' + this.halfYearCheck + '个月'
-                        this.form.ri_qi_lie_biao_ = this.halfYearCheck + ''
-                    } else {
-                        this.form.jian_ce_ri_qi_ = ''
-                        this.form.ri_qi_lie_biao_ = ''
-                    }
-
-                    break
-                case '每年':
-                    if (this.yearCheck) {
-                        this.form.jian_ce_ri_qi_ = '每年第' + this.yearCheck + '个月'
-                        this.form.ri_qi_lie_biao_ = this.yearCheck + ''
-                    } else {
-                        this.form.jian_ce_ri_qi_ = ''
-                        this.form.ri_qi_lie_biao_ = ''
-                    }
-
-                    break
-                default:
-                    this.form.jian_ce_ri_qi_ = ''
-                    this.form.ri_qi_lie_biao_ = ''
-                    break
-            }
+        handleSetting (type) {
+            this.form = this.$refs.DefaultSettingDialogRef.form
+            if (type === 'settingEmpty') this.settingEmpty()
+            else if (type === 'settingAll') this.settingAll()
+            this.defultdialogVisible = false
         },
         // 使用默认数据
         settingData () {
-            this.$confirm('使用默认数据后子表中为空的字段将会被以上数据代替，是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
+            if (this.form.lei_xing_ === '') {
+                return this.$message.warning('请先选择类型！')
+            }
+            this.defultdialogVisible = true
+        },
+        settingAll () {
+            this.subForm.forEach(item => {
+                item.bu_men_ = this.form.bian_zhi_bu_men_
+                item.jian_ce_gang_wei_ = this.form.gang_wei_
+                item.kong_zhi_tiao_jia = this.form.tiao_jian_
+                item.jian_ce_ri_qi_ = this.form.jian_ce_ri_qi_
+                item.ri_qi_lie_biao_ = this.form.ri_qi_lie_biao_
+                item.jian_ce_zhou_qi_ = this.form.zhou_qi_
+                item.lie_biao_shu_ju_ = this.form.lie_biao_shu_ju_
+                item.kai_shi_shi_jian_ = this.form.kai_shi_shi_jian_
             })
-                .then(() => {
-                    this.subForm.forEach(item => {
-                        if (item.bu_men_ === '') {
-                            item.bu_men_ = this.form.bian_zhi_bu_men_
+            this.$message.success('完全批量替换成功！')
+            this.defultdialogVisible = false
+        },
+        // 使用默认数据
+        settingEmpty () {
+            this.subForm.forEach(item => {
+                if (item.bu_men_ === '') {
+                    item.bu_men_ = this.form.bian_zhi_bu_men_
+                }
+                if (item.jian_ce_gang_wei_ === '') {
+                    item.jian_ce_gang_wei_ = this.form.gang_wei_
+                }
+                if (item.kong_zhi_tiao_jia === '') {
+                    item.kong_zhi_tiao_jia = this.form.tiao_jian_
+                }
+                if (item.jian_ce_ri_qi_ === '') {
+                    item.jian_ce_ri_qi_ = this.form.jian_ce_ri_qi_
+                }
+                if (item.ri_qi_lie_biao_ === '') {
+                    item.ri_qi_lie_biao_ = this.form.ri_qi_lie_biao_
+                }
+                if (item.jian_ce_zhou_qi_ === '') {
+                    item.jian_ce_zhou_qi_ = this.form.zhou_qi_
+                }
+                if (item.kai_shi_shi_jian_ === '') {
+                    item.kai_shi_shi_jian_ = this.form.kai_shi_shi_jian_
+                }
+                if (this.form.lie_biao_shu_ju_) {
+                    if (item.lie_biao_shu_ju_) {
+                        const main = JSON.parse(this.form.lie_biao_shu_ju_)
+                        const sub = JSON.parse(item.lie_biao_shu_ju_)
+                        if (sub.length === 0) {
+                            item.lie_biao_shu_ju_ = JSON.stringify(sub)
                         }
-                        if (item.jian_ce_gang_wei_ === '') {
-                            item.jian_ce_gang_wei_ = this.form.gang_wei_
+                        if (sub.length > 0) {
+                            sub.forEach((i, index) => {
+                                if (i.label === main[index].label && (i.range.length === 0 || i.range.join(',') === [null, null].join(',') || i.range.join(',') === ['', ''].join(','))) {
+                                    i.range = main[index].range
+                                }
+                                if (i.label === main[index].label && i.fixValue === '') {
+                                    i.fixValue = main[index].fixValue
+                                }
+                                if (i.label === main[index].label && i.unit === '') {
+                                    i.unit = main[index].unit
+                                }
+                            })
+                            item.lie_biao_shu_ju_ = JSON.stringify(sub)
+                        } else {
+                            item.lie_biao_shu_ju_ = this.form.lie_biao_shu_ju_
                         }
-                        if (item.kong_zhi_tiao_jia === '') {
-                            item.kong_zhi_tiao_jia = this.form.tiao_jian_
-                        }
-                        if (item.jian_ce_ri_qi_ === '') {
-                            item.jian_ce_ri_qi_ = this.form.jian_ce_ri_qi_
-                        }
-                        if (item.ri_qi_lie_biao_ === '') {
-                            item.ri_qi_lie_biao_ = this.form.ri_qi_lie_biao_
-                        }
-                        if (item.jian_ce_zhou_qi_ === '') {
-                            item.jian_ce_zhou_qi_ = this.form.zhou_qi_
-                        }
-                        if (item.lie_biao_shu_ju_ && this.form.lie_biao_shu_ju_) {
-                            const main = JSON.parse(this.form.lie_biao_shu_ju_)
-                            const sub = JSON.parse(item.lie_biao_shu_ju_)
-                            if (sub.length === 0) {
-                                item.lie_biao_shu_ju_ = JSON.stringify(sub)
-                            }
-                            if (sub.length > 0) {
-                                sub.forEach((i, index) => {
-                                    if (i.label === main[index].label && (i.range.length === 0 || i.range.join(',') === [null, null].join(',') || i.range.join(',') === ['', ''].join(','))) {
-                                        i.range = main[index].range
-                                    }
-                                    if (i.label === main[index].label && i.fixValue === '') {
-                                        i.fixValue = main[index].fixValue
-                                    }
-                                    if (i.label === main[index].label && i.unit === '') {
-                                        i.unit = main[index].unit
-                                    }
-                                })
-                                item.lie_biao_shu_ju_ = JSON.stringify(sub)
-                            } else {
-                                item.lie_biao_shu_ju_ = this.form.lie_biao_shu_ju_
-                            }
-                        }
-                    })
-                })
+                    } else {
+                        item.lie_biao_shu_ju_ = this.form.lie_biao_shu_ju_
+                    }
+                }
+            })
+            this.$message.success('空值批量替换成功！')
+            this.defultdialogVisible = false
         },
         // 当前页码改变
         handleCurrentChange (val) {
@@ -1098,7 +841,8 @@ export default {
                                 jian_ce_ri_qi_: this.form.jian_ce_ri_qi_,
                                 ri_qi_lie_biao_: this.form.ri_qi_lie_biao_,
                                 mo_kuai_lu_jing_: this.form.mo_kuai_lu_jing_,
-                                lie_biao_shu_ju_: this.form.lie_biao_shu_ju_
+                                lie_biao_shu_ju_: this.form.lie_biao_shu_ju_,
+                                kai_shi_shi_jian_: this.form.kai_shi_shi_jian_
                             }
 
                         }
@@ -1125,7 +869,8 @@ export default {
                                     qu_yu_: item.qu_yu_,
                                     ri_qi_lie_biao_: item.ri_qi_lie_biao_,
                                     shi_fou_qi_yong_: item.shi_fou_qi_yong_,
-                                    zi_wai_deng_wai_j: item.zi_wai_deng_wai_j
+                                    zi_wai_deng_wai_j: item.zi_wai_deng_wai_j,
+                                    kai_shi_shi_jian_: item.kai_shi_shi_jian_
                                 }
                             })
                         }
@@ -1151,7 +896,8 @@ export default {
                                     kong_zhi_tiao_jia: item.kong_zhi_tiao_jia,
                                     jian_ce_ri_qi_: item.jian_ce_ri_qi_,
                                     ri_qi_lie_biao_: item.ri_qi_lie_biao_,
-                                    lie_biao_shu_ju_: item.lie_biao_shu_ju_
+                                    lie_biao_shu_ju_: item.lie_biao_shu_ju_,
+                                    kai_shi_shi_jian_: item.kai_shi_shi_jian_
                                 }
                             }))
                         }
@@ -1198,7 +944,8 @@ export default {
                                     qu_yu_: item.qu_yu_,
                                     ri_qi_lie_biao_: item.ri_qi_lie_biao_,
                                     shi_fou_qi_yong_: item.shi_fou_qi_yong_,
-                                    zi_wai_deng_wai_j: item.zi_wai_deng_wai_j
+                                    zi_wai_deng_wai_j: item.zi_wai_deng_wai_j,
+                                    kai_shi_shi_jian_: item.kai_shi_shi_jian_
                                 }
                             })
                         }
@@ -1391,39 +1138,6 @@ export default {
                 return buf
             }
         },
-        getDayDate (type, dates) {
-            const now = new Date()
-            const nowTime = now.getTime()
-            const day = now.getDay()
-            const longTime = 24 * 60 * 60 * 1000
-            const n = longTime * 7 * (dates || 0)
-            let dd = nowTime - (day - type) * longTime + n
-            dd = new Date(dd)
-            const y = dd.getFullYear()
-            let m = dd.getMonth() + 1
-            let d = dd.getDate()
-            m = m < 10 ? '0' + m : m
-            d = d < 10 ? '0' + d : d
-            const daynow = y + '-' + m + '-' + d
-            return daynow
-        },
-        // 获取往后几个月相应的日期
-        // currentDate：当前日期
-        // dayOfMonth：获取几号
-        // val：往后几个月
-        getNextMonthDate (currentDate, dayOfMonth, val) {
-            const currentYear = currentDate.getFullYear()
-            const currentMonth = currentDate.getMonth()
-            const nextMonth = currentMonth + val
-
-            const nextMonthDate = new Date(currentYear, nextMonth, dayOfMonth)
-            const formattedDate = nextMonthDate.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-')
-            return formattedDate
-        },
-        // 获取当前季度
-        getQuarter (date) {
-            return Math.floor(date.getMonth() / 3) + 1
-        },
         // 查询
         goSearch () {
             console.log(this.search)
@@ -1446,6 +1160,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.sub-dialog{
+    .contain{
+        padding: 20px;
+    }
+}
 .paper-detail-dialog {
     ::v-deep {
         .el-dialog__header {
@@ -1495,7 +1214,10 @@ export default {
             }
         }
         .table{
-            margin-top: 40px;
+            margin-top: 20px;
+           .el-alert{
+             margin-bottom: 20px;
+           }
             .search{
                 display: flex;
                 flex-wrap: wrap;
@@ -1517,7 +1239,11 @@ export default {
 }
     ::v-deep {
         .el-form-item__label{
-        text-align: left
+            text-align: left
         }
+        .el-form-item__content{
+            font-size: 12px !important;
+            display: flex;
+         }
     }
 </style>

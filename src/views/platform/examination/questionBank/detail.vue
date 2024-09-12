@@ -16,7 +16,9 @@
             <div class="paper-info">
                 <div class="info-item">
                     <span class="label">题库名称：</span>
-                    <span class="value">{{ paperData.paperName }}</span>
+                    <el-tooltip class="item" effect="dark" :content="paperData.paperName" placement="top-start">
+                        <span class="value">{{ paperData.paperName }}</span>
+                    </el-tooltip>
                 </div>
                 <div class="info-item">
                     <span class="label">题目数量：</span>

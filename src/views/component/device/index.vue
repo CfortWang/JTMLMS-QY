@@ -226,6 +226,8 @@
                             readonly-text="text"
                             :multiple="true"
                             size="mini"
+                            :filter="filter"
+                            filterable
                         />
                     </template>
                     <template slot="time">
@@ -280,6 +282,8 @@
                             readonly-text="text"
                             :multiple="true"
                             size="mini"
+                            :filter="filter"
+                            filterable
                         />
                     </template>
                     <template slot="deviceClass">
@@ -362,6 +366,16 @@ export default {
     data () {
         const { userId, level = {}, position } = this.$store.getters || {}
         return {
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             images: [image01, image02, image03, image04],
             ImportDeviceType: '',
             iframeVisible: false,
@@ -501,7 +515,7 @@ export default {
                 chuChangRiQi: '出厂日期',
                 jiShenXuHao: '机身序号',
                 zhuCeZhengHao: '注册证号',
-                // ceLiangGongZuo:'测量/工作范围',
+                ceLiangGongZuo: '测量/工作范围',
                 huanJingYaoQiu: '环境要求',
                 dianYuanYaoQiu: '电源要求',
                 yanShouRiQi: '验收日期',
@@ -512,10 +526,10 @@ export default {
                 yiXiaoRiQi: '已校日期',
                 xiaoZhunZQ: '检定/校准周期（以月为单位）',
                 xiaoZhunYouXia: '校准有效期至',
-                // jianDingXiao:'检定/校准参数',
-                // zuiDaYunCha:'U/精确度/最大允差',
+                jianDingXiao: '检定/校准参数',
+                zuiDaYunCha: 'U/精确度/最大允差',
                 zhengShuBianHa: '证书编号',
-                // xiuZhengZhiXiu:'修正值/修正因子',
+                xiuZhengZhiXiu: '修正值/修正因子',
                 // wenDuYingYong:'温度应用修正值',
                 // shiDuYingYong:'湿度应用修正值',
                 shiFouWeiHu: '是否维护（是/否）',
@@ -624,6 +638,11 @@ export default {
                 relation: 'AND',
                 parameters: []
             }
+            // 增加地点过滤
+            const obj = { relation: 'AND', parameters: [] }
+            obj.parameters.push({ key: 'Q^di_dian_^S', value: this.level, param: this.$utils.guid() })
+            parameters.parameters.push(obj)
+
             // 部门搜索(可多选)
             if (this.search.pos) {
                 const obj = { relation: 'OR', parameters: [] }
@@ -973,10 +992,17 @@ export default {
         // 转换对象的key
         switchDeviceObj (data, originalObj) {
             const result = []
+            // data.forEach(item => {
+            //     const obj = {}
+            //     for (const key in item) {
+            //         obj[this.switchV2K(key, originalObj)] = item[key]
+            //     }
+            //     result.push(obj)
+            // })
             data.forEach(item => {
                 const obj = {}
-                for (const key in item) {
-                    obj[this.switchV2K(key, originalObj)] = item[key]
+                for (const key in originalObj) {
+                    obj[key] = String(item[originalObj[key]] || '')
                 }
                 result.push(obj)
             })
@@ -1427,6 +1453,12 @@ export default {
             const workSheet = workBook.Sheets[workBook.SheetNames[0]]
             const data = xlsx.utils.sheet_to_json(workSheet)
             const importData = this.switchDeviceObj(data, this.projectColums)
+            console.log(importData)
+            importData.forEach(item => {
+                if (item.weiHuLeiXing === '按需保养') {
+                    item.weiHuRiQi = '/'
+                }
+            })
             const currentPosition = this.level
             const { userList = [], deptList = [] } = this.$store.getters || {}
             const positionSql = `select id_,fang_jian_ming_ from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息

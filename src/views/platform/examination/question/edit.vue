@@ -539,7 +539,7 @@ export default {
                         this.optionList.push({
                             value: key,
                             radio: null,
-                            checkbox: rightKey,
+                            checkbox: rightKey.indexOf(key) > -1 ? [key] : [],
                             content: options[key]
                         })
                     })

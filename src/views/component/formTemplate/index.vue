@@ -31,6 +31,8 @@
                                         :disabled="false"
                                         :multiple="false"
                                         size="mini"
+                                        :filter="filter"
+                                        filterable
                                     />
                                 </el-form-item>
                             </el-col>
@@ -152,6 +154,8 @@
                                             :disabled="false"
                                             placeholder="请选择人员"
                                             :multiple="true"
+                                            :filter="filter"
+                                            filterable
                                         />
                                         <ibps-role-selector
                                             v-if="row.yong_hu_lei_xing_==='role'"
@@ -209,6 +213,16 @@ export default {
     data () {
         const { userId, position, level } = this.$store.getters
         return {
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: '',
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             dialogVisible: true,
             userId: userId,
             position: position,

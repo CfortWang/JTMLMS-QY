@@ -95,7 +95,8 @@
                             placeholder="请选择考试题目"
                             style="width:90%"
                         />
-                        <div class="number">题数：{{ allQuestionsNumber.handQuestionsNumber }}</div>
+                        <div class="number">题数：{{ allQuestions.handQuestions?allQuestions.handQuestions.split(',').length:0 }}</div>
+                        <div class="number" style="margin-left:-20px">去重后：{{ allQuestionsNumber.handQuestionsNumber }}</div>
                     </div>
                 </div>
             </el-form-item>
@@ -542,7 +543,13 @@ export default {
                     allRequests.push(this.$common.request('sql', sql))
                 }
                 if (handQuestions) {
-                    const sql = `select * from t_questions where id_ in (${handQuestions.split(',').map(i => `'${i}'`)}) and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+                    let sql = ''
+                    if (tiKu) {
+                        sql = `select * from t_questions where id_ in (${handQuestions.split(',').map(i => `'${i}'`)}) and parent_id_ not in (${tiKu.split(',').map(i => `'${i}'`)}) and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+                    } else {
+                        sql = `select * from t_questions where id_ in (${handQuestions.split(',').map(i => `'${i}'`)}) and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+                    }
+
                     allRequests.push(this.$common.request('sql', sql))
                 }
                 if (allRequests.length) {
@@ -607,7 +614,17 @@ export default {
                         level.questionNumber = level.list.length
                     })
                 } else {
+                    // 根据当前的抽题方式给另外一种抽题方式填充默认值
                     this.isFirst = false
+                    if (this.form.chou_ti_fang_shi_ === '1') {
+                        this.levelList.forEach(level => {
+                            level.questionNumber = level.list.length
+                        })
+                    } else if (this.form.chou_ti_fang_shi_ === '2') {
+                        this.handList.forEach(hand => {
+                            hand.questionNumber = hand.list.length
+                        })
+                    }
                 }
             }
 
