@@ -24,7 +24,7 @@
             :selection-all="selectionAll"
             :default-sort-type="dataTemplate && dataTemplate.datasetType === 'view' ? 'none' : 'underline'"
             @display-field-change="handleDisplayField"
-            @header-dragend="handleHeaderDragend"
+            @header-dragend="handleRefreshTable"
             @selection-change="handleSelectionChange"
             @action-event="handleAction"
             @sort-change="handleSortChange"
@@ -553,7 +553,23 @@ export default {
             JTemplate.cleanEvents()
         }
     },
+    created () {
+        window.onresize = () => {
+            this.handleRefreshTable()
+        }
+    },
+    updated () {
+        this.handleRefreshTable()
+    },
     methods: {
+        handleRefreshTable () {
+            this.$nextTick(() => {
+                const table = this.$refs.crud
+                if (table && table.doLayout) {
+                    table.doLayout()
+                }
+            })
+        },
         getDatabaseType () {
             getDatabaseType().then((response) => {
                 this.databaseType = response.data
@@ -764,6 +780,7 @@ export default {
                         }
                     }, 100)()
                 }
+                this.handleRefreshTable()
             }).catch(() => {
                 this.loading = false
             })

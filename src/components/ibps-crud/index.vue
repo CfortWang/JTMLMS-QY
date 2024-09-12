@@ -115,6 +115,7 @@
                 @row-contextmenu="handleRowContextmenu"
                 @row-dblclick="handleRowDblclick"
                 @header-click="handleHeaderClick"
+                @header-dragend="handleHeaderDragend"
                 @header-contextmenu="handleHeaderContextmenu"
             >
                 <template slot="empty">

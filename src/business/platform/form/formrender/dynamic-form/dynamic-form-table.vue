@@ -500,14 +500,25 @@ export default {
         // 注销当前表格保存在window[this.mainCode+'TableRefs']的this
         this.destoryTable()
     },
+    created () {
+        window.onresize = () => {
+            this.handleRefreshTable()
+        }
+    },
+    updated () {
+        this.handleRefreshTable()
+    },
     mounted () {
-        this.$nextTick(() => {
-            if (this.$refs.elTable) {
-                this.$refs.elTable.doLayout()
-            }
-        })
+        this.handleRefreshTable()
     },
     methods: {
+        handleRefreshTable () {
+            this.$nextTick(() => {
+                if (this.$refs.elTable) {
+                    this.$refs.elTable.doLayout()
+                }
+            })
+        },
         getShowData,
         indexMethod (index) {
             return (this.currentPage - 1) * this.pageSize + index + 1
