@@ -19,13 +19,18 @@
             @submit.native.prevent
         >
             <template v-for="(field, index) in fields">
-                <el-form-item :key="index" :label="field.label" :prop="field.key">
+                <el-form-item
+                    :key="index"
+                    :label="field.label"
+                    :prop="field.key"
+                    :required="$utils.isEmpty(field.required) ? true : field.required"
+                    :show-message="false"
+                >
                     <el-select
                         v-if="field.type === 'select'"
                         v-model="paramForm[field.key]"
                         filterable
                         clearable
-                        :required="field.required"
                         placeholder="请选择"
                     >
                         <el-option
@@ -145,9 +150,8 @@ export default {
             }
         },
         handleSave () {
-            const paramValues = Object.values(this.paramForm)
-            if (paramValues.length !== this.fields.length || paramValues.some(i => !i)) {
-                return this.$message.warning('请完整填写查询参数！')
+            if (this.fields.some(i => i.required !== false && this.$utils.isEmpty(this.paramForm[i.key]))) {
+                return this.$message.warning('请填写所有必填项！')
             }
             this.$emit('confirm', this.paramForm)
         },
