@@ -210,6 +210,8 @@
                                     :disabled="readonly"
                                     :multiple="false"
                                     size="mini"
+                                    :filter="filter"
+                                    filterable
                                 />
                             </template>
                         </el-table-column>
@@ -257,6 +259,16 @@ export default {
     data () {
         const { userId, position, level } = this.$store.getters
         return {
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: this.$store.getters.userInfo.employee.positions,
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             form: {
                 xuan_ze_feng_xian: ''
             },

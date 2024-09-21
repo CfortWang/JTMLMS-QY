@@ -393,7 +393,8 @@ export default {
         },
         deleteFile () {
             this.deleteVisible = false
-            const roleKey = ['xtgljs', 'syszr', 'wjgly', 'wjglzzc']
+            // const roleKey = ['xtgljs', 'syszr', 'wjgly', 'wjglzzc']
+            const roleKey = ['xtgljs']
             const curRole = this.role.map(i => i.alias)
             const isPower = curRole.some(item => roleKey.includes(item))
             if (this.isSuper || isPower) {
@@ -419,12 +420,22 @@ export default {
         //     this.innerVisible = val
         // },
         updateFile () {
-            const a = document.createElement('a')
-            a.href = this.optionFile.url
-            a.download = this.optionFile.data.fileName
-            document.body.appendChild(a)
-            a.click()
-            a.remove()
+            const roleKey = ['xtgljs', 'wjglzzc', 'wjgly']
+            const curRole = this.role.map(i => i.alias)
+            const isPower = curRole.some(i => roleKey.includes(i))
+            if (this.isSuper || isPower) {
+                const a = document.createElement('a')
+                a.href = this.optionFile.url
+                a.download = this.optionFile.data.fileName
+                document.body.appendChild(a)
+                a.click()
+                a.remove()
+                return
+            }
+            this.$message({
+                message: '您还没有权限，请联系管理员',
+                type: 'warning'
+            })
         },
         fileShow (val) {
             return new Promise((resolve, reject) => {

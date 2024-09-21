@@ -1,10 +1,13 @@
 (function (global) {
     const BASE_URL = 'http://dev1.local/'
+    const PUBLIC_URL = 'http://dev1.local/'
     global.__IBPS_CONFIG__ = {
         // 是否启用配置
         ENABLE_CONFIG: true,
         // 基础路径
         BASE_URL,
+        //公网路径
+        PUBLIC_URL,
         //  api
         BASE_API: `${ BASE_URL }ibps`,
         // GATEWAY API

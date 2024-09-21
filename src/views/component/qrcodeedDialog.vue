@@ -25,7 +25,7 @@
 
 <script>
 import QRCode from 'qrcodejs2' // 引入qrcode
-import { BASE_URL } from '@/constant'
+import { PUBLIC_URL } from '@/constant'
 export default {
     name: 'qrcode',
     props: {
@@ -79,7 +79,7 @@ export default {
                 width: 200,
                 height: 200,
                 // text: `${this.url}h5/#/pages/signin/signin?codeId=${this.codeId}`,
-                text: `${BASE_URL}h5/#/pages/signin/signin?codeId=${this.codeId}`,
+                text: `${PUBLIC_URL}#/bpmn/siginin/index?codeId=${this.codeId}`,
                 colorDark: '#000000', // 前景色
                 colorLight: '#FFFFFF', // 背景色
                 correctLevel: QRCode.CorrectLevel.L

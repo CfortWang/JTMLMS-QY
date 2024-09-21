@@ -739,7 +739,7 @@ export default {
                 descVal: '2',
                 includeSub: true,
                 old: 'position',
-                partyId: '',
+                partyId: this.$store.getters.userInfo.employee.positions,
                 partyName: '',
                 scriptContent: '',
                 type: 'user',
@@ -1292,6 +1292,16 @@ export default {
         }
         .el-tabs__header {
             margin: 0 0 30px !important;
+        }
+        .ibps-image{
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .list-group{
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
     }
 

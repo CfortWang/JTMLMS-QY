@@ -148,7 +148,7 @@
               top: '80px',
               left: '40px',
               right: '20px',
-              bottom: '30px'
+              bottom: '40px'
           },
           tooltip: {
             trigger: 'axis',
@@ -161,7 +161,6 @@
             formatter: function (params) {
               let str = `${that.value[params[0].dataIndex].org}`
               params.forEach(item =>{
-                console.log(item,'iiiiiiiiiiiiii')
                 let nameNum = ''
                 nameNum = that.correspondence[item.seriesName] || that.correspondenceUn[item.seriesName]
                 str += `<br /> ${item.marker} ${nameNum}  ${item.data[item.seriesName]}`
@@ -178,7 +177,8 @@
             axisLabel: {
               color: '#fff',
               interval: 0,
-              // rotate: 20,
+              rotate: 20,
+              margin: 15,
               formatter: function (params) {
                 let str = ""
                 let paramsLen = params.length

@@ -2,7 +2,7 @@
   <div class="statisticsPage" :style="{width:width,height:height}">
     <div v-show="show" :id="'pie'+id" :style="{height:'100%'}"/>
     <div v-show="!show"  :style="{height:'100%'}">
-      <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
+      <div :style="{height:'8%','font-size':this.titleFontSize+'px','font-weight': '600'}"> {{ title }} </div>
       <div class="nullShow">暂无数据</div>
     </div>
   </div>
@@ -42,7 +42,8 @@
     },
     data () {
       return {
-        show: false
+        show: false,
+        titleFontSize: 24
       }
     },
     watch: {
@@ -64,19 +65,21 @@
       // setTimeout(() => {
       //   this.drawLine()
       // }, 100);
-      
+      let clientWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      // this.titleFontSize = clientWidth * 0.0052083 * 24
     },
     methods: {
       drawLine(){
         const totality = GetTotality(this.value)
         const that = this
+        
         let pie = echarts.init(document.getElementById('pie'+this.id))
         let option;
         option = {
           title: {
             text: this.title,
             left: 'left',
-            textStyle:{ fontSize:24,color: this.colorw }
+            textStyle:{ fontSize:this.titleFontSize,color: this.colorw }
           },
           tooltip: {
             trigger: 'item'
@@ -121,19 +124,19 @@
                 a: {
                   width:80,
                   align: 'left',
-                  fontSize: 16,
-                  lineHeight: 20
+                  fontSize: 12,
+                  lineHeight: 18
                 },
                 b: {
                   width:60,
                   align: 'right',
-                  fontSize: 16,
+                  fontSize: 12,
                   fontWeight: 300
                 },
                 c: {
                   width:50,
                   align: 'right',
-                  fontSize: 16
+                  fontSize: 12
                 }
               }
             }

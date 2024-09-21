@@ -225,7 +225,7 @@ export default {
                 descVal: '2',
                 includeSub: true,
                 old: 'position',
-                partyId: '',
+                partyId: this.$store.getters.userInfo.employee.positions,
                 partyName: '',
                 scriptContent: '',
                 type: 'user',
@@ -555,7 +555,10 @@ export default {
             }
         },
         emitParent (type) {
-            this.$confirm('正在进行批量替换操作，请确保数据的正确性，是否继续?', '提示', {
+            let msg = ''
+            if (type === 'settingEmpty') msg = '该操作会将未设置过的配置子表数据设置为默认值，是否继续？'
+            if (type === 'settingAll') msg = '该操作会将所有配置子表数据替换为默认值，是否继续？'
+            this.$confirm(msg, '提示', {
                 confirmButtonText: '继续',
                 cancelButtonText: '取消',
                 type: 'warning'

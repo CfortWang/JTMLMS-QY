@@ -217,7 +217,7 @@ export default {
                 descVal: '2',
                 includeSub: true,
                 old: 'position',
-                partyId: '',
+                partyId: this.$store.getters.userInfo.employee.positions,
                 partyName: '',
                 scriptContent: '',
                 type: 'user',

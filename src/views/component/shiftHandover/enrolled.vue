@@ -25,7 +25,7 @@
                 </el-form-item></el-col>
                 <el-col :span="8">  <el-form-item label="岗位" prop="gang_wei_">
                     <!-- <el-input v-model="ruleForm.gang_wei_" type="text" :disabled="!editPermissions" /> -->
-                    <el-select v-model="ruleForm.gang_wei_" placeholder="请选择" size="mini" style="width:100%"  :disabled="!editPermissions">
+                    <el-select v-model="ruleForm.gang_wei_" placeholder="请选择" size="mini" style="width:100%" :disabled="!editPermissions">
                         <el-option
                             v-for="item in filterData"
                             :key="item.id_"
@@ -95,6 +95,8 @@
                                 :disabled="false"
                                 :multiple="true"
                                 :temp-search="true"
+                                :filter="filter"
+                                filterable
                             />
                         </el-form-item>
                     </div>
@@ -114,6 +116,8 @@
                                 readonly-text="text"
                                 :disabled="!hasRole"
                                 :multiple="false"
+                                :filter="filter"
+                                filterable
                             />
                         </el-form-item>
                     </div>
@@ -154,6 +158,16 @@ export default {
     data () {
         const { userId } = this.$store.getters
         return {
+            filter: [{
+                descVal: '2',
+                includeSub: true,
+                old: 'position',
+                partyId: this.$store.getters.userInfo.employee.positions,
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             userId: userId,
             editPermissions: false,
             isDisabled: false,

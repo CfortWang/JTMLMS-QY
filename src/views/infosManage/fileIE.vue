@@ -414,11 +414,12 @@ export default {
                     wheres1 = wheres1 + ` and FIND_IN_SET (wj.fen_lei_id_,'${fileType}')`
                 }
             }
-            // 没走
+            let ascDesc = 'desc'
             if (sorts) {
                 if (JSON.stringify(sorts) !== '{}') {
                     wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
                     wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
+                    ascDesc = sorts.order === 'ascending' ? 'asc' : 'desc'
                 }
             }
 
@@ -473,7 +474,8 @@ export default {
                 }
             }
             const fileSearchSql = needSelType.join('union all')
-            const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq ORDER BY sq.wen_jian_bian_hao DESC,sq.wen_jian_ming_che DESC` : oldRecordSql
+            // ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
+            const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq ORDER BY sq.wen_jian_bian_hao ${ascDesc},sq.wen_jian_ming_che DESC` : oldRecordSql
             // console.log('sql------------：', sql)
             curdPost('sql', sql).then(res => {
                 const tableDatas = res.variables.data
@@ -512,19 +514,19 @@ export default {
         handleNodeClick (nodeId, nodeData, treeDatas) {
             if (nodeData.name !== '文件分类') {
                 const pathId = nodeData.path.split('.')
-                const sql = `select ID_ from ibps_cat_type where type_key_= 'skwbwj'`
-                this.$common.request('sql', sql).then(res => {
-                    const { data = [] } = res.variables || {}
-                    if (pathId.includes(data[0].ID_) && this.$store.getters.isSuper) {
-                        this.showCaoZuoColumn = true
-                        if (!this.hasColumnByProp(this.listConfig.columns, 'cao_zuo')) {
-                            this.listConfig.columns.push({ prop: 'cao_zuo', label: '操作', slotName: 'caozuo', width: 100 })
-                        }
-                    } else {
-                        this.showCaoZuoColumn = false
-                        this.listConfig.columns = this.removeColumnByProp(this.listConfig.columns, 'cao_zuo')
-                    }
+                const pathNameList = pathId.map(id => {
+                    const node = treeDatas.find(item => item.id === id)
+                    return node ? node.name : ''
                 })
+                if (pathNameList.includes('外部文件') && this.$store.getters.isSuper) {
+                    this.showCaoZuoColumn = true
+                    if (!this.hasColumnByProp(this.listConfig.columns, 'cao_zuo')) {
+                        this.listConfig.columns.push({ prop: 'cao_zuo', label: '操作', slotName: 'caozuo', width: 100 })
+                    }
+                } else {
+                    this.showCaoZuoColumn = false
+                    this.listConfig.columns = this.removeColumnByProp(this.listConfig.columns, 'cao_zuo')
+                }
             }
             this.show = 'detail'
             this.addDataCont = { fenLei: nodeData.name, fenLeiId: nodeId }

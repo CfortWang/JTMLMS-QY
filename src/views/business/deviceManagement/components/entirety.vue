@@ -22,7 +22,7 @@
             <div class="styFlex">
               <div v-for="(t, e) in item" :key="'item'+e">
                 <div>{{captionArr[e]}}</div>
-                <div style="color: rgb(255,255,0);font-weight:600;">{{t}}</div>
+                <div style="color: rgb(255,255,0);font-weight:600;margin-top: 1vh;text-align: center;">{{t}}</div>
               </div>
             </div>
           </div>
@@ -31,7 +31,7 @@
           <div class="itemSty" v-if="i!=='sum'" v-for="(item, i) in m" :key="'m2'+i">
             <div class="mySty styWidth">
               <div class="textAlign">{{captionArr[i]}}</div>
-              <div style="color: rgb(255,255,0);font-weight:600;">{{m[i]}}</div>
+              <div style="color: rgb(255,255,0);font-weight:600;margin-top: 1vh;text-align: center;">{{m[i]}}</div>
             </div>
           </div>
         </div>
@@ -40,11 +40,11 @@
           <div class="totaSty flexCaliSty">
               <div class="styWidth">
                 <div class="textAlign">{{captionArr['monthAldyNum']}}</div>
-                <div style="color: rgb(255,255,0);font-weight:600;">{{m['monthAldyNum']}}</div>
+                <div style="color: rgb(255,255,0);font-weight:600;margin-top: 1vh;text-align: center;">{{m['monthAldyNum']}}</div>
               </div>
               <div class="styWidth">
                 <div class="textAlign">{{captionArr['monthPlanNum']}}</div>
-                <div style="color: rgb(255,255,0);font-weight:600;">{{m['monthPlanNum']}}</div>
+                <div style="color: rgb(255,255,0);font-weight:600;margin-top: 1vh;text-align: center;">{{m['monthPlanNum']}}</div>
               </div>
           </div>
           <div>
@@ -184,11 +184,15 @@
           }
           .totaSty{
             display: flex;
+            font-size: small;
             justify-content: space-around;
           }
-          .caliSty{}
+          .caliSty{
+            font-size: small;
+          }
           .mySty{
             width: 100%;
+            font-size: small;
             .textAlign{
               text-align: center;
             }
@@ -202,7 +206,7 @@
             // width: 50%;
           }
           .flexCaliSty{
-            margin-top: 4%;
+            margin-top: 5%;
           }
         }
       }

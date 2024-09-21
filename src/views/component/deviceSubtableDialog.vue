@@ -1,5 +1,5 @@
 <template>
-    <el-dialog ref="dialog" :visible.sync="dialogVisible" :close-on-click-modal="false" class="form-renderer-dialog" :width="width" :top="top" :title="this.dynamicParams.editFromType" :custom-class="customClass" append-to-body @close="closeDialog">
+    <el-dialog ref="dialog" :visible.sync="dialogVisible" :close-on-click-modal="false" class="form-renderer-dialog" :width="width" :top="top" :title="dynamicParams.editFromType" :custom-class="customClass" append-to-body @close="closeDialog">
         <div class="maintenanceCycle">
             <div class="maintenanceFont">维护周期：</div>
             <el-select v-model="cycleValue" clearable placeholder="请选择">
@@ -11,7 +11,30 @@
                 />
             </el-select>
         </div>
-        <div v-if="judgeShow>0" class="maintenanceCycle" style="align-items: baseline;">
+        <div v-if="judgeShow===7" class="maintenanceCycle" style="align-items: baseline;">
+            <div class="maintenanceFont">间隔时间：</div>
+            <el-select v-if="judgeShow==7" v-model="sepValue" clearable placeholder="请选择">
+                <el-option
+                    v-for="item in 30"
+                    :key="item"
+                    :label="`每隔${item}天`"
+                    :value="item"
+                />
+            </el-select>
+        </div>
+        <div v-if="judgeShow===7" class="maintenanceCycle" style="align-items: baseline;">
+            <div class="maintenanceFont">开始保养时间：</div>
+            <el-date-picker
+                v-model="startTime"
+                :clearable="false"
+                type="date"
+                placeholder="选择保养开始时间"
+                :picker-options="pickerOptions"
+                value-format="yyyy-MM-dd"
+            />
+        </div>
+
+        <div v-if="judgeShow>0 && judgeShow<7" class="maintenanceCycle" style="align-items: baseline;">
             <div class="maintenanceFont">{{ cycleOptions[judgeShow].label }}日期：</div>
             <div>
                 <div v-if="judgeShow==1" class="maintenanceCycle marginNone">
@@ -144,6 +167,11 @@ export default {
             return `${year}-${month}-${day}`
         }
         return {
+            pickerOptions: {
+                disabledDate (time) {
+                    return time.getTime() < (Date.now() - (24 * 60 * 1000 * 60))
+                }
+            },
             qrCode: '',
             dialogVisible: this.visible,
             cycleOptions: [{
@@ -167,6 +195,9 @@ export default {
             }, {
                 value: '年保养',
                 label: '年保养'
+            }, {
+                value: '间隔保养',
+                label: '按时间间隔保养'
             }],
             cycleValue: '',
             qmonthDateOptions: monthLunarGeneration(4),
@@ -188,6 +219,8 @@ export default {
             quarterDateValue: '',
             midyearDateValue: '',
             yearDateValue: '',
+            sepValue: '',
+            startTime: '',
             periodDayDate: '',
             periodWeekDate: '',
             periodMonthDate: '',
@@ -208,18 +241,20 @@ export default {
         },
         cycleValue: {
             handler: function (val, oldVal) {
-                if (val == '日保养') {
+                if (val === '日保养') {
                     this.judgeShow = 1
-                } else if (val == '月保养') {
+                } else if (val === '月保养') {
                     this.judgeShow = 2
-                } else if (val == '周保养') {
+                } else if (val === '周保养') {
                     this.judgeShow = 3
-                } else if (val == '季度保养') {
+                } else if (val === '季度保养') {
                     this.judgeShow = 4
-                } else if (val == '半年保养') {
+                } else if (val === '半年保养') {
                     this.judgeShow = 5
-                } else if (val == '年保养') {
+                } else if (val === '年保养') {
                     this.judgeShow = 6
+                } else if (val === '间隔保养') {
+                    this.judgeShow = 7
                 } else {
                     this.judgeShow = 0
                 }
@@ -351,8 +386,17 @@ export default {
             const val = this.corresponding(this.cycleValue)
             const valNum = this.correspondingNum(this.cycleValue)
             if (this.cycleValue !== '按需保养' && this.cycleValue !== '' && val !== '' && valNum !== '' && this.maintenanceTextarea !== '') {
-                this.$emit('submit', { weiHuLeiXing: this.cycleValue, weiHuRiQi: val, riQiShuZi: valNum, weiHuXiangMuC: this.maintenanceTextarea, index: this.dynamicParams?.index })
-                this.closeDialog()
+                if (this.cycleValue === '间隔保养') {
+                    if (!this.startTime) {
+                        return this.$message.warning('请选择开始保养时间')
+                    } else {
+                        this.$emit('submit', { weiHuLeiXing: this.cycleValue, weiHuRiQi: val, riQiShuZi: valNum, weiHuXiangMuC: this.maintenanceTextarea, kaiShiShiJian: this.startTime, index: this.dynamicParams?.index })
+                        this.closeDialog()
+                    }
+                } else {
+                    this.$emit('submit', { weiHuLeiXing: this.cycleValue, weiHuRiQi: val, riQiShuZi: valNum, weiHuXiangMuC: this.maintenanceTextarea, index: this.dynamicParams?.index })
+                    this.closeDialog()
+                }
             } else if (this.cycleValue === '按需保养' && this.cycleValue !== '' && this.maintenanceTextarea !== '') {
                 this.$emit('submit', { weiHuLeiXing: this.cycleValue, weiHuXiangMuC: this.maintenanceTextarea, index: this.dynamicParams?.index })
                 this.closeDialog()
@@ -392,7 +436,7 @@ export default {
         },
         corresponding (content) {
             const that = this
-            if (content == '日保养') {
+            if (content === '日保养') {
                 let str = '每周'
                 const numArr = []
                 that.dayCheckList.forEach((element, i) => {
@@ -403,31 +447,33 @@ export default {
                     return a - b
                 })
                 numArr.forEach((element, i) => {
-                    if (i == that.dayCheckList.length - 1) {
+                    if (i === that.dayCheckList.length - 1) {
                         str = str + element
                     } else {
                         str = str + element + ','
                     }
                 })
-                return str == '每周1,2,3,4,5,6,7' ? '每天' : str
-            } else if (content == '月保养') {
+                return str === '每周1,2,3,4,5,6,7' ? '每天' : str
+            } else if (content === '月保养') {
                 return '每月' + that.monthDateValue
-            } else if (content == '周保养') {
-                const ind = that.weekList.findIndex(item => item === that.weekDateValue) != -1 ? that.weekList.findIndex(item => item === that.weekDateValue) + 1 : ''
+            } else if (content === '周保养') {
+                const ind = that.weekList.findIndex(item => item === that.weekDateValue) !== -1 ? that.weekList.findIndex(item => item === that.weekDateValue) + 1 : ''
                 return '每周' + ind
-            } else if (content == '季度保养') {
+            } else if (content === '季度保养') {
                 return '每季度' + that.quarterDateValue
-            } else if (content == '半年保养') {
+            } else if (content === '半年保养') {
                 return '每半年' + that.midyearDateValue
-            } else if (content == '年保养') {
+            } else if (content === '年保养') {
                 return '每年' + that.yearDateValue
+            } else if (content === '间隔保养') {
+                return `${this.startTime}起每隔${this.sepValue}天`
             } else {
                 return ''
             }
         },
         correspondingNum (content) {
             const that = this
-            if (content == '日保养') {
+            if (content === '日保养') {
                 let str = ''
                 const numArr = []
                 that.dayCheckList.forEach((element, i) => {
@@ -438,27 +484,30 @@ export default {
                     return a - b
                 })
                 numArr.forEach((element, i) => {
-                    if (i == that.dayCheckList.length - 1) {
+                    if (i === that.dayCheckList.length - 1) {
                         str = str + element
                     } else {
                         str = str + element + ','
                     }
                 })
                 return str
-            } else if (content == '月保养') {
+            } else if (content === '月保养') {
                 const turnVal = that.monthDateValue.replace(/[^0-9]/ig, '')
                 return turnVal
-            } else if (content == '周保养') {
-                const ind = that.weekList.findIndex(item => item === that.weekDateValue) != -1 ? that.weekList.findIndex(item => item === that.weekDateValue) + 1 : ''
+            } else if (content === '周保养') {
+                const ind = that.weekList.findIndex(item => item === that.weekDateValue) !== -1 ? that.weekList.findIndex(item => item === that.weekDateValue) + 1 : ''
                 return ind
-            } else if (content == '季度保养') {
+            } else if (content === '季度保养') {
                 const turnVal = that.quarterDateValue.replace(/[^0-9]/ig, '')
                 return turnVal
-            } else if (content == '半年保养') {
+            } else if (content === '半年保养') {
                 const turnVal = that.midyearDateValue.replace(/[^0-9]/ig, '')
                 return turnVal
-            } else if (content == '年保养') {
+            } else if (content === '年保养') {
                 const turnVal = that.yearDateValue.replace(/[^0-9]/ig, '')
+                return turnVal
+            } else if (content === '间隔保养') {
+                const turnVal = that.sepValue
                 return turnVal
             } else {
                 return ''
@@ -466,9 +515,9 @@ export default {
         },
         assignment (content) {
             const that = this
-            if (content.weiHuLeiXing == '日保养') {
+            if (content.weiHuLeiXing === '日保养') {
                 const strArr = []
-                const str = content.weiHuRiQi == '每天' ? '1,2,3,4,5,6,7' : content.weiHuRiQi.slice(2)
+                const str = content.weiHuRiQi === '每天' ? '1,2,3,4,5,6,7' : content.weiHuRiQi.slice(2)
                 const partArr = str.split(',')
                 // console.log(partArr)
                 partArr.forEach((e, i) => {
@@ -476,19 +525,22 @@ export default {
                     strArr.push(this.weekList[num])
                 })
                 this.dayCheckList = strArr
-            } else if (content.weiHuLeiXing == '月保养') {
+            } else if (content.weiHuLeiXing === '月保养') {
                 that.monthDateValue = content.weiHuRiQi.slice(2)
-            } else if (content.weiHuLeiXing == '周保养') {
+            } else if (content.weiHuLeiXing === '周保养') {
                 const str = content.weiHuRiQi.slice(2)
                 const partArr = str.split(',')
                 // console.log(partArr*1-1)
                 that.weekDateValue = this.weekList[partArr * 1 - 1]
-            } else if (content.weiHuLeiXing == '季度保养') {
+            } else if (content.weiHuLeiXing === '季度保养') {
                 that.quarterDateValue = content.weiHuRiQi.slice(3)
-            } else if (content.weiHuLeiXing == '半年保养') {
+            } else if (content.weiHuLeiXing === '半年保养') {
                 that.midyearDateValue = content.weiHuRiQi.slice(3)
-            } else if (content.weiHuLeiXing == '年保养') {
+            } else if (content.weiHuLeiXing === '年保养') {
                 that.yearDateValue = content.weiHuRiQi.slice(2)
+            } else if (content.weiHuLeiXing === '间隔保养') {
+                that.sepValue = +content.riQiShuZi || ''
+                that.startTime = content.kaiShiShiJian || ''
             } else {
 
             }

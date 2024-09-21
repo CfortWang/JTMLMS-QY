@@ -15,7 +15,7 @@
             </el-row>
             <el-row type="flex">
                 <el-col>
-                    <el-table ref="reagent" :data="reagentData" :span-method="spanMethod">
+                    <el-table ref="reagent" :data="reagentDataFilter" :span-method="spanMethod">
                         <el-table-column
                             label="检验项目"
                             prop="jyxm"
@@ -48,6 +48,15 @@
                         <el-table-column label="符合率" prop="fhl" />
                         <el-table-column label="结论" prop="jl" />
                     </el-table>
+                    <el-pagination
+                        layout="total,sizes,prev, pager, next,jumper"
+                        :current-page="requestPage.pageNo"
+                        :page-size="requestPage.limit"
+                        :page-sizes="[10,15,20,30,50,100]"
+                        :total="reagentData.length"
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                    />
                 </el-col>
             </el-row>
         </div>
@@ -108,10 +117,17 @@ export default {
             ypFlag: false,
             nodeId: '',
             spanLength: 0,
-            show: true
+            show: true,
+            requestPage: {
+                limit: 20,
+                pageNo: 1
+            }
         }
     },
     computed: {
+        reagentDataFilter () {
+            return this.reagentData.slice((this.requestPage.pageNo - 1) * (this.requestPage.limit), (this.requestPage.pageNo - 1) * (this.requestPage.limit) + this.requestPage.limit)
+        }
     },
     watch: {
         disabled: {
@@ -183,6 +199,15 @@ export default {
         this.showAndHide(this.formData.fangAn)
     },
     methods: {
+        // 当前页码改变
+        handleCurrentChange (val) {
+            this.requestPage.pageNo = val
+        },
+        // 页码选择器改变
+        handleSizeChange (val) {
+            this.requestPage.limit = val
+            this.requestPage.pageNo = 1
+        },
         showAndHide (data) {
             if (data.includes('平行试验') || data.includes('留样再测') || data.includes('对比方案')) {
                 this.show = true
@@ -222,7 +247,7 @@ export default {
                     this.initData()
                 }
             } else {
-                this.$message.error('请先配置样品数据')
+                this.$message.warning('请先配置样品数据')
             }
         },
         // 计算结果
@@ -237,7 +262,7 @@ export default {
             if (!computedFlag && this.reagentData.length > 0) {
                 this.reagentData.forEach(item => {
                     item.pq = this.deleteAccuracy(Math.abs(item.xsjcdjg - item.jsjcdjg) / item.jsjcdjg)
-                    item.sfxf = Number(item.pq.replace('%', '')) < Number(item.xdfw.replace('%', '')) ? '是' : '否'
+                    item.sfxf = Number(item.pq.replace('%', '')) <= Number(item.xdfw.replace('%', '')) ? '是' : '否'
                 })
                 this.ypData.forEach(c => {
                     const count = this.reagentData.filter(item => item.jyxm === c.jianCeXiangMu && item.sfxf === '是').length
@@ -250,7 +275,7 @@ export default {
                 })
                 this.disabled = true
             } else {
-                this.$message.error('试剂测得结果必须大于0且不能为空！')
+                this.$message.warning('试剂测得结果必须大于0且不能为空！')
             }
         },
         initData () {
@@ -284,7 +309,7 @@ export default {
         },
         deleteRow (index) {
             if (this.dialogData.length === 1) {
-                this.$message.error('删除失败，样品不能为空!')
+                this.$message.warning('删除失败，样品不能为空!')
             } else {
                 this.dialogData.splice(index, 1)
             }

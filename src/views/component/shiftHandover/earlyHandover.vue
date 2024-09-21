@@ -319,7 +319,7 @@ export default {
                 descVal: '2',
                 includeSub: true,
                 old: 'position',
-                partyId: '',
+                partyId: this.$store.getters.userInfo.employee.positions,
                 partyName: '',
                 scriptContent: '',
                 type: 'user',
@@ -545,7 +545,8 @@ export default {
                                 paramWhere: [{
                                     guan_lian_id_: variable,
                                     ren_yuan_id_: cont[0].ryid,
-                                    qian_dao_shi_jian: this.$common.getDateNow(19)
+                                    qian_dao_shi_jian: this.$common.getDateNow(19),
+                                    ye_wu_biao_ming_: 't_jykzjbdjb'
                                 }]
                             }
                             this.$common.request('add', addParams).then(res => {
@@ -754,7 +755,8 @@ export default {
                             guan_lian_id_: this.params.id_,
                             ren_yuan_id_: id,
                             qian_dao_shi_jian: this.$common.getDateNow(19),
-                            qian_dao_lei_xing: '手动'
+                            qian_dao_lei_xing: '手动',
+                            ye_wu_biao_ming_: 't_jykzjbdjb'
                         }))
                     }
                     await this.$common.request('add', params).then(res => {

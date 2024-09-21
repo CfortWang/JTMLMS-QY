@@ -1,12 +1,12 @@
 <template>
     <div :class="hoverMode ? 'can-hover' : ''" class="ibps-panel-search-item" flex>
-        <div class="ibps-panel-search-item__icon" flex-box="0">
+        <!-- <div class="ibps-panel-search-item__icon" flex-box="0">
             <div class="ibps-panel-search-item__icon-box" flex="main:center cross:center">
                 <ibps-icon v-if="item.icon" :name="item.icon" />
                 <ibps-icon-svg v-else-if="item.iconSvg" :name="item.iconSvg" />
                 <ibps-icon v-else name="file-o" />
             </div>
-        </div>
+        </div> -->
         <div class="ibps-panel-search-item__info" flex-box="1" flex="dir:top">
             <div class="ibps-panel-search-item__info-title" flex-box="1" flex="cross:center">
                 <span>{{ item.title }}</span>
@@ -89,7 +89,7 @@ export default {
     }
   }
   .ibps-panel-search-item__info {
-    margin-left: 10px;
+    margin: 0 15px;
     .ibps-panel-search-item__info-title {
       font-size: 16px;
       line-height: 16px;

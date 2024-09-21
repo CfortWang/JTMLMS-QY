@@ -61,15 +61,19 @@ export default {
         /**
      * @description 接收用户在下拉菜单中选中事件
      */
-        async handleSelect ({ path }) {
+        async handleSelect (item) {
             // 如果用户选择的就是当前页面 就直接关闭搜索面板
-            if (path === this.$route.path) {
+            if (item.path === this.$route.path) {
                 this.handleEsc()
                 return
             }
+            const sql1 = `select * FROM ibps_auth_res WHERE id_='${item.id}'`
+            const response = await this.$common.request('sql', sql1)
+            const id = response?.variables?.data[0]?.PATH_?.split('.')[0]
+            await this.$store.dispatch('ibps/menu/activeHeaderSet', { activeHeader: id, vm: this })
             // 用户选择的是其它页面
             await this.$nextTick()
-            this.handleMenuSelect(path)
+            this.handleMenuSelect(item.path)
         },
         /**
      * @description 过滤选项 这个方法在每次输入框的值发生变化时会触发

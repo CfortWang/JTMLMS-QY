@@ -370,7 +370,7 @@ export default {
                 descVal: '2',
                 includeSub: true,
                 old: 'position',
-                partyId: '',
+                partyId: this.$store.getters.userInfo.employee.positions,
                 partyName: '',
                 scriptContent: '',
                 type: 'user',
@@ -1002,7 +1002,12 @@ export default {
             data.forEach(item => {
                 const obj = {}
                 for (const key in originalObj) {
-                    obj[key] = String(item[originalObj[key]] || '')
+                    // 对日期格式的数据做兼容处理
+                    if (item[originalObj[key]] instanceof Date) {
+                        obj[key] = dayjs(item[originalObj[key]]).add(8, 'hour').format('YYYY-MM-DD') || ''
+                    } else {
+                        obj[key] = String(item[originalObj[key]] || '')
+                    }
                 }
                 result.push(obj)
             })

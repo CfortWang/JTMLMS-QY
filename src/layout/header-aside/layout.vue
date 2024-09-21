@@ -101,7 +101,7 @@
                     <!-- <ibps-header-clean-cache v-if="isSuper" type="oauth" />
                     <ibps-header-clean-cache v-if="isSuper" type="office" /> -->
 
-                    <span style="font-size: 12px; cursor: pointer;" @click="goToMain()">首页</span>
+                    <span :class="{'mgl5':!isSuper}" style="font-size: 12px; cursor: pointer;" @click="goToMain()">首页</span>
                     <span style="margin: 0 10px;">|</span>
                     <ibps-header-message />
                     <!-- 消息中心 -->
@@ -355,5 +355,8 @@ export default {
             font-size: 18px;
             font-weight: bold;
         }
+    }
+    .mgl5 {
+        margin-left: 5px;
     }
 </style>

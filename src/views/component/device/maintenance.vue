@@ -94,7 +94,8 @@ export default {
                 weiHuLeiXing: val.weiHuLeiXing,
                 weiHuRiQi: val.weiHuRiQi,
                 weiHuXiangMuC: val.weiHuXiangMuC,
-                riQiShuZi: val.riQiShuZi
+                riQiShuZi: val.riQiShuZi,
+                kaiShiShiJian: val.kaiShiShiJian
             })
         },
         handleSelectionChange (val) {

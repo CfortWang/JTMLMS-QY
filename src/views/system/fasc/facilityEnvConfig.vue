@@ -289,7 +289,7 @@ export default {
                 descVal: '2',
                 includeSub: true,
                 old: 'position',
-                partyId: '',
+                partyId: this.$store.getters.userInfo.employee.positions,
                 partyName: '',
                 scriptContent: '',
                 type: 'user',
@@ -622,6 +622,7 @@ export default {
         },
         handleSetting (type) {
             this.form = this.$refs.DefaultSettingDialogRef.form
+            if (this.subForm.length === 0) return this.$message.warning('配置详情列表中无数据，请先添加数据！')
             if (type === 'settingEmpty') this.settingEmpty()
             else if (type === 'settingAll') this.settingAll()
             this.defultdialogVisible = false

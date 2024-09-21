@@ -38,7 +38,12 @@
                     highlight-current
                     check-on-click-node
                     @check-change="handleCheckChange"
-                />
+                >
+                    <span slot-scope="{ node, data }" class="custom-tree-node">
+                        <span>{{ node.label }}</span>
+                        <el-button v-show="data.children && data.children.length>0" style="margin-left:8px" type="text" size="mini" @click.stop="allChecked(node, data)">全选</el-button>
+                    </span>
+                </el-tree>
                 <!-- 单选-->
                 <el-tree
                     v-else
@@ -376,6 +381,19 @@ export default {
         expandCompressTree (expanded) {
             for (let i = 0; i < this.$refs.elTree.store._getAllNodes().length; i++) {
                 this.$refs.elTree.store._getAllNodes()[i].expanded = expanded
+            }
+        },
+        allChecked (node, data) {
+            this.$refs.elTree.setChecked(data, !node.checked)
+            this.checkChildNodes(data, node.checked)
+        },
+        // 递归设置子节点的勾选状态
+        checkChildNodes (nodes, checked) {
+            if (nodes.children && nodes.children.length > 0) {
+                nodes.children.forEach(childNode => {
+                    this.$refs.elTree.setChecked(childNode, checked)
+                    this.checkChildNodes(childNode, checked)
+                })
             }
         },
         handleCheckChange (data, checked) {
