@@ -17,6 +17,7 @@ import I18n from '@/utils/i18n'
 import Utils from '@/utils/util'
 import Ids from 'ids'
 import setting from '@/setting.js'
+import { encryptByAes } from '@/utils/encrypt'
 
 // 验权
 import { getToken, updateToken, removeRefreshToken } from '@/utils/auth'
@@ -26,7 +27,7 @@ import { showFullScreenLoading, tryHideFullScreenLoading } from './loading'
 
 import requestState from '@/constants/state'
 import { BASE_API, BASE_GATEWAY_API } from '@/api/baseUrl'
-import { HEADER_TOKEN_KEY, HEADER_SYSTEM_ID, HEADER_TENANT_ID, MULTIPLE_DOMAIN, API_DOMAIN_NAMES } from '@/constant'
+import { HEADER_TOKEN_KEY, HEADER_SYSTEM_ID, HEADER_TENANT_ID, MULTIPLE_DOMAIN, API_DOMAIN_NAMES, ENCRYPT_GET_PARAMS } from '@/constant'
 
 // 请求超时（timeout）时间
 const TIMEOUT = setting.requestTimeout
@@ -92,11 +93,18 @@ service.interceptors.request.use(async config => {
     if (Utils.isNotEmpty(config.overtime)) {
         config.timeout = config.overtime
     }
-    // 防止缓存
+    // 防止缓存，参数加密
     if (config.method.toUpperCase() === 'GET') {
-        config.params = {
-            ...config.params,
-            _t: new Ids([32, 36, 1]).next()
+        if (ENCRYPT_GET_PARAMS) {
+            config.params = {
+                _p: Utils.isNotEmpty(config.params) ? encryptByAes(JSON.stringify(config.params)) : undefined,
+                _t: new Ids([32, 36, 1]).next()
+            }
+        } else {
+            config.params = {
+                ...config.params,
+                _t: new Ids([32, 36, 1]).next()
+            }
         }
     }
 

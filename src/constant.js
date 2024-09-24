@@ -62,3 +62,5 @@ export const SYSTEM_NAME = __IBPS_CONFIG__.SYSTEM_NAME || '金通医学实验室
 export const REPORT_PATH = __IBPS_CONFIG__.REPORT_PATH || '金通医学实验室管理系统'
 // 是否显示明文SQL，开发环境默认显示
 export const SHOW_PLAINTEXT = __IBPS_CONFIG__.SHOW_PLAINTEXT || env.NODE_ENV === 'development'
+// 是否加密 GET 请求参数
+export const ENCRYPT_GET_PARAMS = __IBPS_CONFIG__.ENCRYPT_GET_PARAMS || false

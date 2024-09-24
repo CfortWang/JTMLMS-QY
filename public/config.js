@@ -72,7 +72,9 @@
         // 润乾报表根目录
         REPORT_PATH: '金通医学实验室管理系统',
         // 是否显示开启明文SQL
-        SHOW_PLAINTEXT: false
+        SHOW_PLAINTEXT: false,
+        // 是否加密 GET 请求参数
+        ENCRYPT_GET_PARAMS: false
     }
 
 })(window)
