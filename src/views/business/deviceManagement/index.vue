@@ -154,18 +154,39 @@ export default {
             this.initializeData()
             equipDashBoard().then(res => {
                 let data = res.data[0] || {}
+                
+                const numDistributionDataObj = data.numDistributionDataObj.filter((item,i)=>{
+                    return item.name.indexOf('综合')===-1
+                })
+                const lifeTimeData = data.lifeTimeData.filter((item,i)=>{
+                    return item.org.indexOf('综合')===-1
+                })
+                
+                const intactData = data.intactData.filter((item,i)=>{
+                    return item.org.indexOf('综合')===-1
+                })
+                console.log(data.verificationData)
+                const verificationData = data.intactData.filter((item,i)=>{
+                    return item.org.indexOf('综合')===-1
+                })
+                const scrapData = data.scrapData.filter((item,i)=>{
+                    return item[0].indexOf('综合')===-1
+                })
+
                 this.mergeData[0].numData = data.distributionDataObj || []
-                this.mergeData[1].numData = data.numDistributionDataObj || []
-                this.mergeData[2].numData = data.lifeTimeData || []
-                this.mergeData[3].numData = data.intactData || []
+                this.mergeData[1].numData = numDistributionDataObj
+                this.mergeData[2].numData = lifeTimeData
+                this.mergeData[3].numData = intactData
                 this.mergeData[4].numData = []
                 if(data.completeData !== null && data.completeData.length>0){
                     data.completeData.forEach(element => {
-                        this.mergeData[4].numData.push({...element,rate: element.numP!==0?(element.numC/element.numP).toFixed(2) * 100:0})
+                        if(element.org.indexOf('综合')===-1){
+                            this.mergeData[4].numData.push({...element,rate: element.numP!==0?(element.numC/element.numP).toFixed(2) * 100:0})
+                        }
                     })
                 }
-                this.mergeData[5].numData = data.verificationData || []
-                this.mergeData[6].numData.data = data.scrapData || []
+                this.mergeData[5].numData = verificationData
+                this.mergeData[6].numData.data = scrapData
                 this.mergeData[7].numData = data.entiretyData || []
                 loading.close()
             })

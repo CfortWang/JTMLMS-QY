@@ -127,7 +127,7 @@
                     v-if="(selectionRow || selectionRow === '') && selectionType === 'checkbox'"
                     v-bind="typeof selectionRow === 'Object'?selectionRow:null"
                     :label="handleAttribute(selectionRow.label, '')"
-                    :reserve-selection="selectionRow.reserveSelectione||false"
+                    :reserve-selection="selectionRow.reserveSelectione||true"
                     type="selection"
                     show-overflow-tooltip
                 />

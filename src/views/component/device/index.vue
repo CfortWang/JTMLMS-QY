@@ -195,6 +195,7 @@
                                             <div class="item">是否校准：{{ row.shiFouXiaoZhun || '/' }}</div>
                                             <div class="item">校准周期：{{ row.xiaoZhunZQ?`${row.xiaoZhunZQ}月` : '/' }}</div>
                                             <div class="item">最近校准时间：{{ row.yiXiaoRiQi || '/' }}</div>
+                                            <div class="item">校准机构：{{ row.shiWuShuoMing || '/' }}</div>
                                         </div>
                                     </el-col>
                                 </el-row>
@@ -478,24 +479,24 @@ export default {
                 // 表格字段配置
                 columns: [
                     { type: 'expand', slotName: 'expandSlot' },
-                    { prop: 'bianZhiBuMen', label: '部门', slotName: 'posSlot' },
-                    { prop: 'shiFouGuoShen', label: '状态' },
-                    { prop: 'sheBeiShiBieH', label: '设备编号' },
-                    { prop: 'yuanSheBeiBian', label: '原设备编号' },
-                    { prop: 'sheBeiMingCheng', label: '设备名称' },
-                    { prop: 'sheBeiLeiXing', label: '设备类型' },
-                    { prop: 'guiGeXingHao', label: '规格型号' },
-                    { prop: 'sheBeiZhuangTa', label: '设备状态' },
-                    { prop: 'guanLiRen', label: '保管人', slotName: 'userSlot' },
-                    { prop: 'weiHuFangShi', label: '设备分组', slotName: 'deviceSlot' },
-                    { prop: 'cunFangWeiZhi', label: '放置地点', slotName: 'placeSlot' },
+                    { prop: 'bianZhiBuMen', label: '部门', slotName: 'posSlot', sortable: true },
+                    { prop: 'bianZhiShiJian', label: '建档时间', sortable: true },
+                    { prop: 'sheBeiShiBieH', label: '设备编号', sortable: true },
+                    { prop: 'yuanSheBeiBian', label: '原设备编号', sortable: true },
+                    { prop: 'sheBeiMingCheng', label: '设备名称', sortable: true },
+                    { prop: 'sheBeiLeiXing', label: '设备类型', sortable: true },
+                    { prop: 'guiGeXingHao', label: '规格型号', sortable: true },
+                    { prop: 'sheBeiZhuangTa', label: '设备状态', sortable: true },
+                    { prop: 'guanLiRen', label: '保管人', slotName: 'userSlot', sortable: true },
+                    { prop: 'weiHuFangShi', label: '设备分组', slotName: 'deviceSlot', sortable: true },
+                    { prop: 'cunFangWeiZhi', label: '放置地点', slotName: 'placeSlot', sortable: true },
                     { prop: '', label: '操作', width: 130, slotName: 'customButton' }
                 ]
             },
             pagination: {
                 limit: 20, page: 1
             },
-            sorts: {},
+            sorts: [{ field: 'BIAN_ZHI_SHI_JIAN', order: 'desc' }],
             sqlWhere: {},
             searchWhere: {},
             deviceColumns: {
@@ -515,7 +516,7 @@ export default {
                 chuChangRiQi: '出厂日期',
                 jiShenXuHao: '机身序号',
                 zhuCeZhengHao: '注册证号',
-                ceLiangGongZuo: '测量/工作范围',
+                ceLiangGongZuo: '测量范围',
                 huanJingYaoQiu: '环境要求',
                 dianYuanYaoQiu: '电源要求',
                 yanShouRiQi: '验收日期',
@@ -715,9 +716,8 @@ export default {
                     pageNo: this.pagination.page,
                     limit: this.pagination.limit
                 },
-                sorts: [
-                    { field: 'bian_zhi_shi_jian', order: 'desc' }
-                ] }
+                sorts: this.sorts
+            }
             if (parameters.parameters.length > 0) {
                 params.parameters = [parameters]
             }
@@ -789,6 +789,28 @@ export default {
         },
         // 处理排序
         handleSortChange (sort) {
+            function removeUnderscores (str) {
+                return str.replace(/^_+|_+$/g, '')
+            }
+            const { order, sortBy } = sort
+            let s = ''
+            switch (sortBy) {
+                case 'BIAN_ZHI_SHI_JIAN_':
+                case 'SHE_BEI_SHI_BIE_H_':
+                case 'YUAN_SHE_BEI_BIAN_':
+                case 'SHE_BEI_ZHUANG_TA_':
+                    s = removeUnderscores(sortBy)
+                    break
+                default:
+                    s = sortBy
+            }
+            let o = null
+            if (order === 'descending') {
+                o = 'desc'
+            } else if (order === 'ascending') {
+                o = 'asc'
+            }
+            this.sorts = [{ field: s, order: o }]
             this.getDatas()
         },
         handleCustomAdd () {

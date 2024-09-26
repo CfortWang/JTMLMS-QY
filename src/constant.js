@@ -18,7 +18,7 @@ const enableConfig = __IBPS_CONFIG__.ENABLE_CONFIG || false
  * @type {*|string}
  */
 export const BASE_URL = enableConfig ? (__IBPS_CONFIG__.BASE_URL || env.VUE_APP_BASE_URL) : env.VUE_APP_BASE_URL
-export const PUBLIC_URL = enableConfig ? (__IBPS_CONFIG__.PUBLIC_URL || env.PUBLIC_URL) : env.PUBLIC_URL
+export const PUBLIC_URL = enableConfig ? (__IBPS_CONFIG__.PUBLIC_URL || env.VUE_APP_BASE_URL) : env.VUE_APP_BASE_URL
 export const BASE_API = enableConfig ? (__IBPS_CONFIG__.BASE_API || env.VUE_APP_BASE_API) : env.VUE_APP_BASE_API
 export const BASE_GATEWAY_API = enableConfig ? (__IBPS_CONFIG__.BASE_GATEWAY_API || env.VUE_APP_BASE_GATEWAY_API) : env.VUE_APP_BASE_GATEWAY_API
 export const BASE_WEBSOCKET = enableConfig ? (__IBPS_CONFIG__.BASE_WEBSOCKET_API || env.VUE_APP_BASE_WEBSOCKET) : env.VUE_APP_BASE_WEBSOCKET

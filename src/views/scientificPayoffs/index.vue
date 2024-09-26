@@ -435,7 +435,7 @@ export default {
 
         getPositionList () {
             const first = this.$store.getters.level.first
-            const sql2 = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${first}%' and DEPTH_ > 2`
+            const sql2 = `select * from ibps_party_entity where id_!='1166373874003083264' and name_ not like '%综合%' and party_type_ = 'position' and PATH_ like '%${first}%' and DEPTH_ > 2`
             curdPost('sql', sql2).then((res2) => {
                 if (res2.state === 200) {
                     const datas = res2.variables.data

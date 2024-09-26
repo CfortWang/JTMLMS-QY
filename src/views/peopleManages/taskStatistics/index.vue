@@ -55,7 +55,7 @@
                         "
                     >
                         <!-- 部门选择 -->
-                        <SelectPositions @handleFunc="handleFunc" />
+                        <SelectPositions :filterGroup="true" @handleFunc="handleFunc" />
                         <div
                             style="
                                 width: 30%;
@@ -988,7 +988,7 @@ export default {
             sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT
             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji
             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_ 
-            )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where ${positionsWhere} GROUP BY enName) jh`
+            )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where ${positionsWhere} and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY enName) jh`
             curdPost('sql', sql).then((res) => {
                 const data = res.variables.data
                 // 组装数据集，以学历职称为列，以部门为行:{" 大专":['1','2','3']}
@@ -1014,6 +1014,7 @@ export default {
                         'zhongJi',
                         'gaoJi'
                     ]
+                    console.log(data)
                     for (let t = 0; t < data.length; t++) {
                         this.PositionsDegreeOption.xAxis[0].data.push(
                             data[t].enName
@@ -1153,7 +1154,8 @@ export default {
             if (this.positionsIdArr.length) {
                 const users = this.getPositionPeopleIds(this.positionsIdArr[0])
                 const userIds = users.map(user => user.userId)
-                const sql = `select * from t_examination where  kao_shi_ren_ in (${userIds.map(i => `'${i}'`).join(',')}) and zhuang_tai_ = '已完成'`
+                const renyuan =userIds.map(i => `'${i}'`).join(',')!=='' ? `and kao_shi_ren_ in (${userIds.map(i => `'${i}'`).join(',')})`:''
+                const sql = `select * from t_examination where zhuang_tai_ = '已完成' ${renyuan} `
                 let { variables: { data }} = await this.$common.request('sql', sql)
                 if (this.startDate && this.endDate) {
                     data = data.filter(item => {

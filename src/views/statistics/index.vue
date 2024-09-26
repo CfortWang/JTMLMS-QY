@@ -855,16 +855,20 @@
         end[2]=end[1]
         end[1]=this.getNextMonth(end[1])
         Promise.all([repostCurd('sql', getConfig()),repostCurd('sql', getyangPinCaiJiObj(end,info1)),repostCurd('sql', getzhiliangzhibiaotitleObj(end,info1)),
-                     repostCurd('sql', getzongZLMBObj(end,info1)),repostCurd('sql', getfenzuZLZBObj(end,info1)),repostCurd('sql', getzaigangrenyuanObj(end,info)),
-                     repostCurd('sql', getgangqianpeixunObj(end,info)),repostCurd('sql', getJiaoYanObj(end,info)),repostCurd('sql', getJiaoYanObjFB(end,info)),
-                     repostCurd('sql', gethechaObj(end,info)),repostCurd('sql', gethechaObjFB(end,info)),repostCurd('sql', getwaibuObj(end,info)),
-                     repostCurd('sql', getneibuObj(end,info)),repostCurd('sql', getyingjiObj(end,info)),repostCurd('sql', getfengxianObj(end,info)),
-                     repostCurd('sql', getneishenObj(end,info)),repostCurd('sql', getguanshenObj(end,info)),repostCurd('sql', getbufuheObj(end,info)),
-                     repostCurd('sql', getgaijinxiangObj(end,info)),
-                     repostCurd('sql', getzaigangrenyuanFBObj(end,info)),repostCurd('sql', getgangqianpeixunFBObj(end,info)),
-                     repostCurd('sql', getneibuObjFB(end,info)),repostCurd('sql', getwaibuObjFB(end,info)),
-                     repostCurd('sql', getyingjiObjFB(end,info)),repostCurd('sql', getfengxianObjFB(end,info)),
-                     repostCurd('sql', getneishenObjFB(end,info)),repostCurd('sql', getguanshenObjFB(end,info)),
+                     repostCurd('sql', getzongZLMBObj(end,info1)),repostCurd('sql', getfenzuZLZBObj(end,info1)),
+                     //
+                     repostCurd('sql', getzaigangrenyuanObj(end,info1)),
+                     repostCurd('sql', getgangqianpeixunObj(end,info1)),repostCurd('sql', getJiaoYanObj(end,info1)),repostCurd('sql', getJiaoYanObjFB(end,info1)),
+                     repostCurd('sql', gethechaObj(end,info1)),repostCurd('sql', gethechaObjFB(end,info1)),repostCurd('sql', getwaibuObj(end,info1)),
+                     repostCurd('sql', getneibuObj(end,info1)),repostCurd('sql', getyingjiObj(end,info1)),repostCurd('sql', getfengxianObj(end,info1)),
+                     repostCurd('sql', getneishenObj(end,info1)),repostCurd('sql', getguanshenObj(end,info1)),repostCurd('sql', getbufuheObj(end,info1)),
+                     repostCurd('sql', getgaijinxiangObj(end,info1)),
+                     repostCurd('sql', getzaigangrenyuanFBObj(end,info1)),repostCurd('sql', getgangqianpeixunFBObj(end,info1)),
+                     repostCurd('sql', getneibuObjFB(end,info1)),repostCurd('sql', getwaibuObjFB(end,info1)),
+                     repostCurd('sql', getyingjiObjFB(end,info1)),repostCurd('sql', getfengxianObjFB(end,info1)),
+                     repostCurd('sql', getneishenObjFB(end,info1)),repostCurd('sql', getguanshenObjFB(end,info1)),
+
+                     //
                      repostCurd('sql', getzhiliangmubiaotitleObj(end,info1))]).then(([response,response1, response2,response3,response4,response5,response6,response7,response8,response9,response10,response11,response12,response13,response14,response15,response16,response17,response18,
                                                                                                              fb,fb1,fb2,fb3,fb4,fb5,fb6,fb7,fb8]) => {
 

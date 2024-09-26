@@ -53,6 +53,7 @@
                                         :multiple="false"
                                         accept=".docx"
                                         :readonly="false"
+                                        operation_status="saveAdd"
                                         size="mini"
                                     />
                                 </el-form-item>

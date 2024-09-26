@@ -118,8 +118,20 @@ export default {
             this.initializeData()
             // this.fetchData().then(() => {})
             labsDashBoard({year: this.year}).then(res=>{
-                
+
+                // this.mergeData = 
+                res.data.forEach(item=>{
+                    let mid = []
+                    item.groups.forEach(i=>{
+                        if(i.name.indexOf('综合')===-1){
+                            mid.push(i)
+                        }
+                    })
+                    item.groups = mid
+                })
                 this.mergeData = res.data
+                console.log(res.data)
+
                 this.mergeData.forEach((item,i)=>{
                     const child = [
                         {
@@ -141,8 +153,6 @@ export default {
                     }else{
                         this.tabularArr2.push(mid)
                     }
-                    console.log(this.tabularArr1,this.tabularArr2,'resresresres')
-
                 })
             })
             

@@ -15,6 +15,12 @@ import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import TreeUtils from '@/utils/tree'
 
 export default {
+    props:{
+        filterGroup: {
+            type: Boolean,
+            default: false
+        }
+    },
     data () {
         const { level, userId, userInfo } = this.$store.getters
         return {
@@ -118,13 +124,17 @@ export default {
                 )`
             curdPost('sql', positonsSql).then((res) => {
                 if (res.state === 200) {
-                    const datas = res.variables.data
+                    let datas = res.variables.data
                     this.sqlDatas = datas
                     const positionsValue = []
                     if (datas.length > 0) {
-                        // datas = datas.filter(fil => {
-                        //   return fil.DEPTH_ == 3 && fil.NAME_ !== '检验科'
-                        // })
+                        if(this.filterGroup){
+                            datas = datas.filter(fil => {
+                                console.log(datas)
+                                return fil.ID_!=="1166373874003083264" && fil.NAME_.indexOf('综合')==-1
+                            })
+                        }
+                        
                         this.options = this.toTree(datas)
                         // for (var i of this.options) {
                         //   //   if (i.children !== undefined) {
@@ -145,11 +155,18 @@ export default {
                         //   }
                         // }
                         for (var i of datas) {
+                            console.log(i,datas)
+                            
                             const itemArr = i.PATH_.split('.')
                             // 先删除前面部门的数据，比如："xxx医院/院本部/检验科....."，只保留"检验科....."
                             itemArr.splice(0, 2)
                             itemArr.splice(itemArr.length - 1, 1)
-                            positionsValue.push(itemArr)
+                            if(this.filterGroup&&(i.ID_==="1166373874003083264"||i.NAME_.indexOf('综合')!=-1)){
+                                
+                            }else{
+                                positionsValue.push(itemArr)
+                            }
+                            
                         }
                         // this.selectDatas = positionsValue;
                         this.selectDatas = positionsValue.slice(0, 2).map(item => item[item.length - 1])

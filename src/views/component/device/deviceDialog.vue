@@ -152,6 +152,9 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="接收时状态：" prop="jieShouZhuangTai">
+                                            <template slot="label">
+                                                <span class="required">接收时状态：</span>
+                                            </template>
                                             <el-select v-model="form.jieShouZhuangTai" placeholder="请选择" size="mini" style="width:100%">
                                                 <el-option
                                                     v-for="item in ['新设备','二手或翻新设备']"
@@ -536,6 +539,13 @@
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
+                                                        <el-form-item label="检定/校准单位">
+                                                            <el-input v-model="form.shiYongKeShi" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是'">
+                                                    <el-col>
                                                         <el-form-item label="最近校准时间：">
                                                             <el-date-picker
                                                                 v-model="form.yiXiaoRiQi"
@@ -568,6 +578,13 @@
                                                     <el-col>
                                                         <el-form-item label="校准证书编号：">
                                                             <el-input v-model="form.zhengShuBianHa" size="mini" />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row v-if="form.shiFouXiaoZhun==='是'">
+                                                    <el-col>
+                                                        <el-form-item label="校准机构：">
+                                                            <el-input v-model="form.shiWuShuoMing" size="mini" />
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -799,6 +816,7 @@ export default {
                 zhengShuBianHa: '', // 校准证书编号
                 xiaoZhunWuCha: '', // 是否限用
                 xiaoZhunZQ: '', // 检定/校准周期
+                shiYongKeShi: '', // 检定/校准单位
                 yuanSheBeiBian: '', // 原设备编号
                 jianKongYiJu: '', // 是否24H开机
                 biXuDeHuanJin: '', // 核查人
@@ -822,10 +840,11 @@ export default {
                 quanXianLeiXing: '',
                 diDian: '',
                 buMen: '', // 图片id
-                ceLiangGongZuo: '', // 测量/工作范围
+                ceLiangGongZuo: '', // 测量范围
                 jianDingXiao: '', // 检定/校准参数
                 xiuZhengZhiXiu: '', // 修正值
-                zuiDaYunCha: '' // U/精确度/最大允差
+                zuiDaYunCha: '', // U/精确度/最大允差
+                shiWuShuoMing: '' // 校准机构
 
             },
             rules: {
@@ -1294,14 +1313,16 @@ export default {
             margin: 0 0 30px !important;
         }
         .ibps-image{
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .list-group{
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            width: 100%;
+            .ibps-p-0{
+                width: 100%;
+                .list-group{
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                    flex-wrap: wrap;
+                }
+            }
         }
     }
 

@@ -12,6 +12,11 @@
         @close="closeDialog"
     >
         <div class="toolbar">
+            <div class="user-type">
+                <span>用户类型：</span>
+                <el-radio v-for="item in userTypes" :key="item.value" v-model="userType" :label="item.value">{{ item.label }}</el-radio>
+            </div>
+
             <el-button type="primary" size="mini" icon="el-icon-plus" @click="addConfig()">添加</el-button>
         </div>
         <el-table
@@ -58,10 +63,18 @@ export default {
     },
     data () {
         return {
+            userTypes: [
+                { label: '门诊患者', value: '门诊患者' },
+                { label: '住院患者', value: '住院患者' },
+                { label: '医务人员', value: '医务人员' },
+                { label: '员工', value: '员工' }
+            ],
+            userType: '门诊患者',
             dialogVisible: this.visible,
             maxHeight: '400px',
             configId: '',
             configData: [],
+            jsonData: [],
             title: '满意度调查项配置',
             toolbars: [
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', hidden: () => { return this.readonly } },
@@ -75,6 +88,18 @@ export default {
                 this.dialogVisible = val
             },
             immediate: true
+        },
+        userType: {
+            handler (val, oldVal) {
+                // 保存旧的
+                const old = this.jsonData.find(item => item.type === oldVal)
+                old.data = this.configData.map(item => item.name)
+                // 找出新的
+                const news = this.jsonData.find(item => item.type === val)
+                this.configData = news.data.map(item => {
+                    return { name: item }
+                })
+            }
         }
     },
     mounted () {
@@ -83,17 +108,38 @@ export default {
     methods: {
         initData () {
             const { first, second } = this.$store.getters.level || {}
-            const sql = `select id_ as configId, pei_zhi_xiang_ as configData from t_mydpz where di_dian_ = '${second || first}' order by create_time_ desc`
+            const sql = `select id_ as configId, pei_zhi_xiang_ as configData,lie_biao_shu_ju_ as jsonData from t_mydpz where di_dian_ = '${second || first}' order by create_time_ desc`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
+                    this.jsonData = this.userTypes.map(item => {
+                        return {
+                            type: item.value,
+                            data: []
+                        }
+                    })
                     return
                 }
-                const { configId, configData } = data[0]
+                const { configId, configData, jsonData } = data[0]
                 this.configId = configId
-                this.configData = configData.split('@#@').map(item => {
-                    return { name: item }
-                })
+                if (jsonData) {
+                    this.jsonData = JSON.parse(jsonData)
+                    const temp = this.jsonData.find(item => item.type === this.userType)
+                    this.configData = temp.data.map(item => {
+                        return { name: item }
+                    })
+                } else {
+                    // 老版本
+                    this.configData = configData.split('@#@').map(item => {
+                        return { name: item }
+                    })
+                    this.jsonData = this.userTypes.map(item => {
+                        return {
+                            type: item.value,
+                            data: item.value === this.userType ? this.configData.map(item => item.name) : []
+                        }
+                    })
+                }
             })
         },
         handleActionEvent ({ key }) {
@@ -115,6 +161,11 @@ export default {
                 this.configData.splice(index + 1, 0, { name: '' })
             }
         },
+        formatData () {
+            const temp = this.jsonData.find(item => item.type === this.userType)
+            temp.data = this.configData.map(item => item.name)
+            return JSON.stringify(this.jsonData)
+        },
         handleSave () {
             const isError = this.configData.some(item => !item.name)
             if (isError) {
@@ -127,7 +178,7 @@ export default {
                     tableName: 't_mydpz',
                     paramWhere: [{
                         di_dian_: second || first,
-                        pei_zhi_xiang_: configData
+                        lie_biao_shu_ju_: this.formatData()
                     }]
                 }
                 this.$common.request('add', params).then(() => {
@@ -140,7 +191,7 @@ export default {
                         id_: this.configId
                     }],
                     paramCond: {
-                        pei_zhi_xiang_: configData
+                        lie_biao_shu_ju_: this.formatData()
                     }
                 }
                 this.$common.request('updates', params).then(() => {
@@ -160,7 +211,10 @@ export default {
 <style lang="scss" scoped>
     .satisfaction-config-dialog {
         .toolbar {
-            text-align: right;
+            margin: 10px 0 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-content: center;
         }
     }
 </style>

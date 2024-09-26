@@ -421,9 +421,9 @@ export default {
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
             this.moreBarData.data.dimensions = ['product', '设备总数', '良好数', '停用数']
-            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where b.name_ not like '%检验科%' and  a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
-            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='合格'  GROUP BY a.bian_zhi_bu_men_`
-            const sql3 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='停用'  GROUP BY a.bian_zhi_bu_men_`
+            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='合格'  GROUP BY a.bian_zhi_bu_men_`
+            const sql3 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='停用'  GROUP BY a.bian_zhi_bu_men_`
             let data1, data2, data3
             await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2), curdPost('sql', sql3)]).then(([res1, res2, res3]) => {
                 if (res1.state === 200) {
@@ -482,9 +482,9 @@ export default {
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
             // 计划数，查询设备维护计划表完成数
-            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE '%${this_.today}%' AND a.shi_fou_guo_shen_ != '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE '%${this_.today}%' and b.name_ not like '%综合%' and b.name_ not like '%综合%' AND a.shi_fou_guo_shen_ != '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
             //   维护记录数
-            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE '%${this_.today}%' AND a.shi_fou_guo_shen_ = '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE '%${this_.today}%' and b.name_ not like '%综合%' and b.name_ not like '%综合%' AND a.shi_fou_guo_shen_ = '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
             this.weihuBarData.data.dimensions = ['product', '待处理', '已完成']
             let data1, data2
             await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2)]).then(([res1, res2]) => {
@@ -560,7 +560,7 @@ export default {
             let didian = ''
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
-            const sql1 = `select a.bian_zhi_bu_men_,name_,a.zi_chan_yuan_zhi_ FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ ASC`
+            const sql1 = `select a.bian_zhi_bu_men_,name_,a.zi_chan_yuan_zhi_ FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%'  and b.name_ not like '%综合%' and a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ ASC`
             const source = []
             let data1
             await Promise.all([curdPost('sql', sql1)]).then(([res1, res2]) => {
@@ -624,8 +624,8 @@ export default {
             let didian = ''
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
-            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND (shi_fou_guo_shen_ = '已审批' or shi_fou_guo_shen_ = '已完成')) AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
-            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND shi_fou_guo_shen_ = '已完成') AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND (shi_fou_guo_shen_ = '已审批' or shi_fou_guo_shen_ = '已完成')) AND a.di_dian_ = '${didian}'  and b.name_ not like '%综合%' GROUP BY a.bian_zhi_bu_men_`
+            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND shi_fou_guo_shen_ = '已完成') AND a.di_dian_ = '${didian}' and b.name_ not like '%综合%' GROUP BY a.bian_zhi_bu_men_`
             this.jiaozhunBarData.data.dimensions = ['product', '计划数', '完成数']
             let data1, data2
             await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2)]).then(([res1, res2]) => {
@@ -700,7 +700,7 @@ export default {
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
             // const sql =`select * from t_sbdj where (she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') and  di_dian_ = '${didian}'`;
-            const sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
+            const sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' and b.name_ not like '%综合%' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
             let data1 = []
             await curdPost('sql', sql)
                 .then((res) => {

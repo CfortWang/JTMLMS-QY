@@ -53,7 +53,7 @@
 
                     <el-table-column label="填写频率" prop="rate">
                         <template slot="header" slot-scope="">
-                            <el-tooltip class="item" effect="dark" content="配置参数填写周期，适用于参数填写频率与检测周期不一致的情况。若为空则表示该参数每次推送都需填写。" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="配置参数填写周期，适用于参数填写频率与监测周期不一致的情况。若为空则表示该参数每次推送都需填写。" placement="top-start">
                                 <span>
                                     填写频率
                                     <i class="el-icon-question" />

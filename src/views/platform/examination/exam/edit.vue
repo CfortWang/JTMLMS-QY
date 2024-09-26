@@ -214,7 +214,7 @@
                 <ibps-custom-dialog
                     v-model="form.can_kao_ren_yuan_"
                     size="small"
-                    template-key="gjxcxryk"
+                    template-key="gjxcxryk_copy"
                     multiple
                     :disabled="isDisabled"
                     type="dialog"
