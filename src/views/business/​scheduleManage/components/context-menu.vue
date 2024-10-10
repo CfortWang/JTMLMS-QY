@@ -11,7 +11,7 @@
                     v-for="(shift, index) in shiftList"
                     :key="index"
                     :label="shift.alias"
-                    class="shift-item"
+                    class="shift-item ibps-ellipsis"
                 >
                     <!-- <el-popover
                         :title="shift.name"
@@ -103,11 +103,14 @@ export default {
             display: flex;
             align-items: center;
             flex-direction: column;
+            height: 200px;
+            overflow-y: auto;
             .shift-item {
                 padding: 8px 12px;
                 cursor: pointer;
                 margin: 0;
-                width: calc(100% - 24px);
+                // width: calc(100% - 24px);
+                width: 100px;
                 text-align: left;
             }
             .shift-actived {

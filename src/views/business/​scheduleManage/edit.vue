@@ -188,7 +188,7 @@
         </el-form>
         <div v-if="activeStep === 2" ref="scheduleContainer" class="schedule-container">
             <div ref="schedule" class="schedule-box">
-                <div ref="scrollTarget" class="abscissa">
+                <div ref="scrollTarget" class="abscissa" :style="{ left: leftOffset + 'px' }">
                     <div v-for="(month, mIndex) in Object.keys(dateObj)" :key="mIndex" class="abs-type">
                         <div class="month">{{ month }}</div>
                         <div class="abscissa-item">
@@ -205,7 +205,7 @@
                 <el-popover
                     ref="popover"
                     trigger="manual"
-                    placement="top"
+                    placement="bottom"
                     width="255"
                     title=""
                     :reference="popoverReference"
@@ -277,8 +277,8 @@
                         </div>
                     </el-form>
                 </el-popover>
-                <div class="schedule-content">
-                    <div ref="sidebar" class="ordinate">
+                <div ref="scheduleContent" class="schedule-content">
+                    <div ref="sidebar" class="ordinate" :style="{ top: topOffset + 'px' }">
                         <div v-for="item in ordinateList" :key="item.value" class="ordinate-item">
                             {{ item.label }}
                         </div>
@@ -421,6 +421,10 @@ export default {
             viewType: 'users',
             scheduleData: {},
             scheduleRecord: [],
+            leftOffset: '',
+            topOffset: '',
+            topFixed: false,
+            leftFixed: false,
             dateObj: {},
             dateList: [],
             contextMenuVisible: false,
@@ -482,29 +486,46 @@ export default {
     },
     methods: {
         handleListener (event) {
-            const scrollContainer = this.$refs.scheduleContainer
-            if (scrollContainer) {
-                scrollContainer[event]('scroll', this.handleScroll)
-            }
+            setTimeout(() => {
+                const scrollContainer = this.$refs.scheduleContainer
+                if (scrollContainer) {
+                    scrollContainer[event]('scroll', this.handleScroll)
+                    console.log(scrollContainer)
+                }
+            }, 10)
         },
         handleScroll () {
-            console.log(111)
             const scrollTarget = this.$refs.scrollTarget
             const sidebar = this.$refs.sidebar
             const scrollContainer = this.$refs.scheduleContainer
+            const scheduleContent = this.$refs.scheduleContent
+            let defaultTopOffset = 0
 
-            console.log(123)
-            if (scrollContainer.scrollTop > scrollTarget.offsetTop) {
-                scrollTarget.classList.add('sticky')
+            if (scrollContainer.scrollTop > 80) {
+                this.topFixed = true
+                scrollTarget.classList.add('stickyTop')
+                scheduleContent.style.paddingTop = '100px'
+                defaultTopOffset = 130
+                this.leftOffset = -scrollContainer.scrollLeft
+                // this.leftOffset = -scrollContainer.scrollLeft + (this.leftFixed ? 100 : 0)
             } else {
-                scrollTarget.classList.remove('sticky')
+                this.topFixed = false
+                scrollTarget.classList.remove('stickyTop')
+                this.leftOffset = 0
+                defaultTopOffset = 206
+                scheduleContent.style.paddingTop = '0px'
             }
-            // 处理左侧元素的固定
-            if (scrollContainer.scrollLeft > sidebar.offsetLeft) {
-                sidebar.classList.add('sticky')
-            } else {
-                sidebar.classList.remove('sticky')
-            }
+            // // 处理左侧元素的固定
+            // if (scrollContainer.scrollLeft > 40) {
+            //     this.leftFixed = true
+            //     sidebar.classList.add('stickyLeft')
+            //     this.topOffset = defaultTopOffset - scrollContainer.scrollTop
+            //     scheduleContent.style.paddingLeft = '100px'
+            // } else {
+            //     this.leftFixed = false
+            //     sidebar.classList.remove('stickyLeft')
+            //     scheduleContent.style.paddingLeft = '0px'
+            // }
         },
         async loadData () {
             this.loading = true
@@ -651,10 +672,26 @@ export default {
             this.selectItem = []
             const item = this.$refs.shiftItem[rIndex * this.dateList.length + cIndex]
             const rect = item.getBoundingClientRect()
-            this.itemPosition = {
-                top: rect.top + window.scrollY,
-                left: rect.left + window.scrollX + rect.width
+            // 计算弹出菜单的位置
+            let top = rect.top + window.scrollY
+            let left = rect.left + window.scrollX + rect.width
+
+            // 获取窗口的宽度和高度
+            const windowWidth = window.innerWidth
+            const windowHeight = window.innerHeight
+            const menuWidth = 126
+            const menuHeight = 240
+
+            // 检查右侧边界，如果超出右边界，调整到左侧
+            if (left + menuWidth > windowWidth) {
+                left = rect.left + window.scrollX - menuWidth
             }
+
+            // 检查底部边界，如果超出底部边界，调整到顶部
+            if (top + menuHeight > windowHeight) {
+                top = rect.top + window.scrollY - menuHeight
+            }
+            this.itemPosition = { top, left }
             this.shiftParams = {
                 row,
                 rIndex,
@@ -721,6 +758,7 @@ export default {
                     this.updateScheduleData()
                 }
             }
+            this.handleListener('addEventListener')
             this.activeStep += val
         },
         /**
@@ -974,13 +1012,34 @@ export default {
             this.shiftForm.current = date
             this.popoverReference = e.target
             this.$refs.popover.showPopper = true
+
             // 手动更改弹窗位置
             setTimeout(() => {
                 const popoverElement = document.querySelector('.el-popover')
                 if (popoverElement) {
                     const rect = popoverElement.getBoundingClientRect()
-                    popoverElement.style.left = `${e.target.offsetLeft + (e.target.offsetWidth / 2) - (rect.width / 2)}px`
-                    popoverElement.style.top = `${e.target.offset}px`
+                    const targetRect = e.target.getBoundingClientRect()
+
+                    // 计算新的位置
+                    let left = targetRect.left + (targetRect.width / 2) - (rect.width / 2)
+                    // 使用目标元素的底部作为弹窗顶部
+                    const top = targetRect.bottom
+                    const windowWidth = window.innerWidth
+
+                    // 左右边界检查
+                    if (left < 0) {
+                        left = 0
+                    } else if (left + rect.width > windowWidth) {
+                        left = windowWidth - rect.width
+                    }
+                    // 设置弹窗位置
+                    popoverElement.style.left = `${left}px`
+                    popoverElement.style.top = `${top}px`
+                    const triangle = popoverElement.querySelector('.popper__arrow')
+                    // 设置小三角位置
+                    if (triangle) {
+                        triangle.style.left = `${(targetRect.left + (targetRect.width / 2)) - left}px`
+                    }
                 }
             }, 10)
         },
@@ -1163,8 +1222,6 @@ export default {
                     width: 80px;
                     padding: 0 10px;
                     height: 100%;
-                    position: sticky;
-                    left: 0;
                     // background-color: #f0f0f0;
                     display: flex;
                     flex-shrink: 0;
@@ -1253,12 +1310,22 @@ export default {
                     }
                 }
             }
-            .sticky {
+            .stickyTop {
                 position: fixed;
-                top: 0;
+                top: 80px;
+                left: 0;
+                right: 0;
+                z-index: 1001;
+                background: #fff;
+            }
+            .stickyLeft {
+                position: fixed;
+                top: 206px;
                 left: 0;
                 right: 0;
                 z-index: 1000;
+                background: #fff;
+                box-shadow: 0 2px 20px rgba(228, 231, 237, 1);
             }
         }
     }
