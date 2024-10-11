@@ -303,6 +303,21 @@
                                             <el-col :span="8">
                                                 <el-row>
                                                     <el-col>
+                                                        <el-form-item label="购进日期：">
+                                                            <el-date-picker
+                                                                v-model="form.gouJinRiQi"
+                                                                style="width:100%"
+                                                                type="date"
+                                                                placeholder="选择日期"
+                                                                :readonly="readonly"
+                                                                value-format="yyyy-MM-dd"
+                                                                size="mini"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <el-row>
+                                                    <el-col>
                                                         <el-form-item label="接收日期：">
                                                             <el-date-picker
                                                                 v-model="form.jieShouRiQi"
@@ -539,8 +554,18 @@
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
-                                                        <el-form-item label="检定/校准单位">
-                                                            <el-input v-model="form.shiYongKeShi" size="mini" />
+                                                        <el-form-item label="检定/校准单位：">
+                                                            <ibps-custom-dialog
+                                                                v-model="form.shiYongKeShi"
+                                                                size="mini"
+                                                                template-key="gysxxdhk"
+                                                                :disabled="false"
+                                                                type="dialog"
+                                                                class="custom-dialog"
+                                                                placeholder="请选择"
+                                                                icon="el-icon-search"
+                                                                style="width:100%"
+                                                            />
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -561,7 +586,7 @@
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
-                                                        <el-form-item label="校准有效期至">
+                                                        <el-form-item label="校准有效期至：">
                                                             <el-date-picker
                                                                 v-model="form.xiaoZhunYouXia"
                                                                 style="width:100%"
@@ -785,6 +810,7 @@ export default {
             preParams: {},
             Ids: [],
             form: {
+                gouJinRiQi: '', // 购进日期
                 changShang: '', // 厂家/品牌
                 guiGeXingHao: '', // 规格型号
                 jieShouRiQi: '', // 接收日期

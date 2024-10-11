@@ -303,8 +303,8 @@ export default {
         .item {
             position: relative;
             margin: 12px;
-            padding: 12px;
-            height: 90px;
+            padding: 15px;
+            // height: 110px;
             border-radius: 4px;
             box-sizing: border-box;
             overflow: hidden;
@@ -332,6 +332,12 @@ export default {
                 font-size: 32px;
                 line-height: 60px;
             }
+        }
+        .item-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
         }
         // .item-footer {
         //     line-height: 16px;

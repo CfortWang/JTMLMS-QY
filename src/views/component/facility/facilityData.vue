@@ -268,9 +268,8 @@ export default {
         // 计算状态
         getStatus (range, result) {
             let [min, max] = range
-            if (min === null || min === '' || typeof min === 'undefined') min = Number.MIN_VALUE
-            if (max === null || max === '' || typeof max === 'undefined') max = Number.MAX_VALUE
-            // console.log(min, max, result)
+            if (min === null || min === '' || typeof min === 'undefined') min = Number.NEGATIVE_INFINITY
+            if (max === null || max === '' || typeof max === 'undefined') max = Number.POSITIVE_INFINITY
             if (+min === 0 && +max === 0) {
                 return '正常'
             }

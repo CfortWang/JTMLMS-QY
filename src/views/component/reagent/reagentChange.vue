@@ -7,7 +7,7 @@
                     <div v-if="nodeId === 'Activity_0xkc1ji' || readonly" />
                     <div v-else>
                         <el-button type="primary" size="mini" icon="ibps-icon-edit" @click="openDialog">配置样品</el-button>
-                        <el-button type="success" size="mini" icon="ibps-icon-plus" @click="generateData">生成数据</el-button>
+                        <el-button type="success" size="mini" icon="ibps-icon-refresh" @click="generateData">重置</el-button>
                         <el-button v-if="!disabled" type="danger" size="mini" icon="ibps-icon-calculator" @click="computedResult">计算结果</el-button>
                         <el-button v-else type="danger" size="mini" icon="ibps-icon-edit" @click="disabled=false">编辑</el-button>
                     </div>
@@ -70,10 +70,13 @@
         >
             <div v-for="(item, index) in dialogData" :key="index" class="ragent-dialog-content">
                 <span>样品编号{{ index+1 }}</span>
-                <el-input v-model="item.number" :min="0" type="number" style="width: 30%;" />
+                <div style="display: flex;align-items: center;">
+                    <span style="color: red;margin-right: 3px;">*</span>
+                    <el-input v-model="item.number" required :min="0" type="number" style="flex:1;" />
+                </div>
                 <div>
-                    <el-button type="text" @click="addRow">添加</el-button>
-                    <el-button type="text" style="color:red;" @click="deleteRow(index)">删除</el-button>
+                    <el-button type="text" :style="{visibility: index === dialogData.length-1?'visible':'hidden'}" @click="addRow">添加</el-button>
+                    <el-button type="text" :style="{visibility: index === dialogData.length-1?'visible':'hidden'}" style="color:red;" @click="deleteRow(index)">删除</el-button>
                 </div>
             </div>
             <span slot="footer" class="dialog-footer">
@@ -137,6 +140,7 @@ export default {
             immediate: true
         },
         'formData.sjghyzjlbxmcszb': {
+            // 在表单中的任何操作都会触发子表的监听
             handler (val) {
                 this.ypData = []
                 this.ypFlag = false
@@ -148,17 +152,17 @@ export default {
                     this.ypData.push({ ...item })
                 })
                 // 处理表单”平行实验/留样再测“
-                // if (val.length && !this.ypFlag) {
+                // if (val.length && !this.ypFlag && this.copyDialogData.length && (this.params.nodeId === 'Activity_1bwqyf1' || this.params.nodeId === 'StartEvent_1fk5is7')) {
                 //     // 点完计算结果后再去编辑”平行实验/留样再测“表单，则给表格置空重新填写
-                //     if (this.disabled && this.reagentData.length) {
-                //         this.copyDialogData = []
-                //         this.reagentData = []
-                //         this.disabled = false
-                //         return this.$message.error('请重新配置样品')
-                //     }
-                //     if (!this.disabled && this.reagentData.length) {
-                //         this.initData()
-                //     }
+                //     // if (this.disabled && this.reagentData.length) {
+                //     //     this.copyDialogData = []
+                //     //     this.reagentData = []
+                //     //     this.disabled = false
+                //     //     return this.$message.error('请重新配置样品')
+                //     // }
+                //     // if (!this.disabled && this.reagentData.length) {
+                //     //     this.initData()
+                //     // }
                 // }
             },
             deep: true,
@@ -327,6 +331,12 @@ export default {
             } else {
                 this.centerDialogVisible = false
                 this.copyDialogData = JSON.parse(JSON.stringify(this.dialogData))
+                // 样品配置完自定生成表格数据,先判断样品配置表数据是否全填
+                if (this.ypData.length > 0 && !this.ypFlag) {
+                    this.initData()
+                } else {
+                    this.$message.warning('请完成样品参数配置')
+                }
             }
         },
         // 去除小数*100精度方法

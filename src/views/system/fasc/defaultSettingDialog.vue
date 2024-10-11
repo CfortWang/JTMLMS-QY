@@ -113,7 +113,7 @@
                         </el-col>
                         <el-col v-if="nextDate" :span="12">
                             <el-form-item label="下次监测日期为：" label-width="150">
-                                <el-tag>{{ nextDate }}</el-tag>
+                                <el-tag size="mini" class="eltag">{{ nextDate }}</el-tag>
                             </el-form-item>
                         </el-col>
                         <el-col v-if="form.zhou_qi_==='间隔'" :span="12">
@@ -591,6 +591,9 @@ export default {
     }
     .el-row{
             margin: 0 !important;
+    }
+    .eltag{
+        margin-top: 6px;
     }
 }
 .dialog-footer{

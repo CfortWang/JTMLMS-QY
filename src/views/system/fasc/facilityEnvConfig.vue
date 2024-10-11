@@ -37,24 +37,6 @@
                                 </el-form-item>
                             </el-col>
                         </el-row>
-                        <el-row v-if="isShowDevice">
-                            <el-col :span="24">
-                                <el-form-item label="设备编号：">
-                                    <ibps-custom-dialog
-                                        v-model="form.she_bei_bian_hao_"
-                                        size="mini"
-                                        template-key="sbxzmcgl"
-                                        :multiple="true"
-                                        :disabled="false"
-                                        type="dialog"
-                                        class="custom-dialog"
-                                        placeholder="请选择设备"
-                                        icon="el-icon-search"
-                                        style="width:90%"
-                                    />
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
                     </el-form>
                 </div>
                 <!-- <el-divider /> -->
@@ -111,28 +93,9 @@
                             <div class="search-item" style="width:68px">
                                 <el-button type="success" size="mini" icon="ibps-icon-plus" @click="openDialog">添加</el-button>
                             </div>
-                            <!-- <div class="search-item" style="width:70px">
-                                <el-upload
-                                    ref="uploadRef"
-                                    class="upload-demo"
-                                    action=""
-                                    accept=".xlsx,.xls"
-                                    :auto-upload="false"
-                                    :show-file-list="false"
-                                    :on-change="handleUploadChange"
-                                >
-                                    <el-button type="primary" size="mini" icon="el-icon-upload2">导入</el-button>
-                                </el-upload>
-                            </div>
-                            <div class="search-item" style="width:70px">
-                                <el-button type="primary" size="mini" icon="el-icon-download" @click="exportExcel">导出</el-button>
-                            </div> -->
                             <div class="search-item" style="width:100px">
                                 <el-button type="info" size="mini" icon="el-icon-setting" @click="settingData">批量配置</el-button>
                             </div>
-                            <!-- <div v-if="trueList.length>0" class="search-item" style="width:120px">
-                                <el-button type="info" size="mini" icon="el-icon-setting" @click="settingData">使用默认数据</el-button>
-                            </div> -->
                             <div class="search-item" style="width:70px">
                                 <el-button type="danger" size="mini" icon="ibps-icon-close" @click="removeItem">删除</el-button>
                             </div>
@@ -425,20 +388,7 @@ export default {
                     path: '/sshjgl/aqgl/rcfhxd'
                 }
             },
-            listHander: {
-                bu_men_: '部门',
-                qu_yu_: '区域',
-                fang_jian_: '房间',
-                deviceno1_: '被控设备编号',
-                devicename1_: '被控设备名称',
-                deviceno2_: '监控设备编号',
-                jian_ce_zhou_qi_: '监测周期',
-                jian_ce_ri_qi_: '监测日期',
-                jian_ce_gang_wei_: '监测岗位',
-                kong_zhi_tiao_jia: '控制条件'
-            },
             subIdList: [],
-            isFirstDevice: true,
             isFirstLieBiao: true
         }
     },
@@ -461,38 +411,6 @@ export default {
         }
     },
     watch: {
-        'form.she_bei_bian_hao_' (val) {
-            if (!this.isFirstDevice) {
-                const sql = `select yuan_she_bei_bian,she_bei_ming_cheng_ from t_sbdj where find_in_set(id_, '${val}')`
-                this.$common.request('sql', sql).then(res => {
-                    const { data = [] } = res.variables || {}
-                    data.forEach(item => {
-                        const bianHao = item.yuan_she_bei_bian
-                        const mingChneg = item.she_bei_ming_cheng_
-                        const t = this.subForm.find(sub => sub.deviceno1_ === bianHao)
-                        if (!t) {
-                            this.subForm.push({
-                                deviceno1_: bianHao,
-                                devicename1_: mingChneg,
-                                shi_fou_qi_yong_: '1',
-                                bu_men_: this.form.bian_zhi_bu_men_,
-                                jian_ce_gang_wei_: this.form.gang_wei_,
-                                jian_ce_zhou_qi_: this.form.zhou_qi_,
-                                kong_zhi_tiao_jia: this.form.tiao_jian_,
-                                fang_jian_: '',
-                                qu_yu_: '',
-                                deviceno2_: '',
-                                jian_ce_ri_qi_: this.form.jian_ce_ri_qi_,
-                                ri_qi_lie_biao_: this.form.ri_qi_lie_biao_,
-                                zi_wai_deng_wai_j: this.$utils.guid(),
-                                lie_biao_shu_ju_: this.form.lie_biao_shu_ju_,
-                                kai_shi_shi_jian_: ''
-                            })
-                        }
-                    })
-                })
-            }
-        },
         'form.lei_xing_' (val) {
             this.form.mo_kuai_lu_jing_ = this.config[val].path
             if (!this.isFirstLieBiao) {
@@ -541,7 +459,6 @@ export default {
             this.loadData()
             this.loadSubData()
         } else {
-            this.isFirstDevice = false
             this.isFirstLieBiao = false
         }
     },
@@ -603,7 +520,6 @@ export default {
                     })
                 }
                 this.$nextTick(() => {
-                    this.isFirstDevice = false
                     this.isFirstLieBiao = false
                 })
             })
@@ -805,6 +721,12 @@ export default {
                 if (item.jian_ce_gang_wei_ === '') {
                     return this.$message.warning(`子表第${i + 1}行监测岗位信息缺失！`)
                 }
+                if (this.isShowDevice && item.deviceno1_ === '') {
+                    return this.$message.warning(`子表第${i + 1}行设备信息缺失！`)
+                }
+                if (this.form.lei_xing_ === '01-室内温湿度监控' && item.fang_jian_ === '') {
+                    return this.$message.warning(`子表第${i + 1}行房间信息缺失！`)
+                }
                 if (item.lie_biao_shu_ju_) {
                     const lie_biao_shu_ju_ = JSON.parse(item.lie_biao_shu_ju_)
                     for (let i = 0; i < lie_biao_shu_ju_.length; i++) {
@@ -860,8 +782,11 @@ export default {
                                     bu_men_: item.bu_men_,
                                     devicename1_: item.devicename1_,
                                     deviceno1_: item.deviceno1_,
+                                    deviceid1_: item.deviceid1_,
                                     deviceno2_: item.deviceno2_,
+                                    deviceid2_: item.deviceid2_,
                                     fang_jian_: item.fang_jian_,
+                                    fang_jian_id_: item.fang_jian_id_,
                                     jian_ce_gang_wei_: item.jian_ce_gang_wei_,
                                     jian_ce_ri_qi_: item.jian_ce_ri_qi_,
                                     jian_ce_zhou_qi_: item.jian_ce_zhou_qi_,
@@ -887,10 +812,13 @@ export default {
                                 param: {
                                     qu_yu_: item.qu_yu_,
                                     fang_jian_: item.fang_jian_,
+                                    fang_jian_id_: item.fang_jian_id_,
                                     bu_men_: item.bu_men_,
                                     deviceno1_: item.deviceno1_,
+                                    deviceid1_: item.deviceid1_,
                                     devicename1_: item.devicename1_,
                                     deviceno2_: item.deviceno2_, // 监控设备
+                                    deviceid2_: item.deviceid2_,
                                     jian_ce_zhou_qi_: item.jian_ce_zhou_qi_,
                                     jian_ce_gang_wei_: item.jian_ce_gang_wei_,
                                     shi_fou_qi_yong_: item.shi_fou_qi_yong_,
@@ -935,8 +863,11 @@ export default {
                                     bu_men_: item.bu_men_,
                                     devicename1_: item.devicename1_,
                                     deviceno1_: item.deviceno1_,
+                                    deviceid1_: item.deviceid1_,
                                     deviceno2_: item.deviceno2_,
+                                    deviceid2_: item.deviceid2_,
                                     fang_jian_: item.fang_jian_,
+                                    fang_jian_id_: item.fang_jian_id_,
                                     jian_ce_gang_wei_: item.jian_ce_gang_wei_,
                                     jian_ce_ri_qi_: item.jian_ce_ri_qi_,
                                     jian_ce_zhou_qi_: item.jian_ce_zhou_qi_,
@@ -971,7 +902,8 @@ export default {
                         bian_zhi_ren_: this.userId,
                         zi_wai_deng_ming_: item.devicename1_,
                         she_shi_id_: item.zi_wai_deng_wai_j,
-                        gang_wei_: item.jian_ce_gang_wei_
+                        gang_wei_: item.jian_ce_gang_wei_,
+                        shi_fou_ting_yong: item.shi_fou_qi_yong_
                     }))
                 } : null
 
@@ -985,7 +917,8 @@ export default {
                         param: {
                             bian_zhi_bu_men_: item.bu_men_,
                             zi_wai_deng_ming_: item.devicename1_,
-                            gang_wei_: item.jian_ce_gang_wei_
+                            gang_wei_: item.jian_ce_gang_wei_,
+                            shi_fou_ting_yong: item.shi_fou_qi_yong_
                         }
                     }))
                 } : null
@@ -1026,118 +959,6 @@ export default {
                     return false
                 }
             })
-        },
-        /* 读取文件 */
-        readFile (file) {
-            return new Promise(resolve => {
-                const reader = new FileReader()
-                reader.readAsBinaryString(file)
-                reader.onload = ev => {
-                    resolve(ev.target.result)
-                }
-            })
-        },
-        // 获取 excel 的 json 数据
-        async handleUploadChange (file) {
-            const dataBinary = await this.readFile(file.raw)
-            const workBook = xlsx.read(dataBinary, { type: 'binary', cellDates: true })
-            const workSheet = workBook.Sheets[workBook.SheetNames[0]]
-            const data = xlsx.utils.sheet_to_json(workSheet)
-            if (!this.form.lei_xing_) {
-                return this.$message.warning('请先选择类型！')
-            }
-            if (data.length === 0) {
-                return this.$message.warning('文件内容为空！')
-            }
-            data.forEach(item => {
-                this.subForm.push({
-                    deviceno1_: item['被控设备编号'] || '',
-                    devicename1_: item['被控设备名称'] || '',
-                    shi_fou_qi_yong_: '1',
-                    bu_men_: this.switchDeptid(item['部门']),
-                    jian_ce_gang_wei_: item['监测岗位'] || '',
-                    jian_ce_zhou_qi_: item['监测周期'] || '',
-                    kong_zhi_tiao_jia: item['控制条件'] || '',
-                    fang_jian_: item['房间'] || '',
-                    qu_yu_: item['区域'] || '',
-                    deviceno2_: item['监控设备编号'] || '',
-                    jian_ce_ri_qi_: '',
-                    ri_qi_lie_biao_: '',
-                    zi_wai_deng_wai_j: this.$utils.guid(),
-                    lie_biao_shu_ju_: this.form.lie_biao_shu_ju_
-                })
-            })
-            this.$message.success('导入成功！')
-        },
-        // 部门id转部门
-        switchDept (dep) {
-            const userList = this.$store.getters.userList
-            for (let i = 0; i < userList.length; i++) {
-                const user = userList[i]
-                const positionId = user.positionId.split(',')
-                const positions = user.positions.split(',')
-                const pos = positionId.findIndex(p => p === dep)
-                if (pos >= 0) {
-                    return positions[pos]
-                }
-            }
-        },
-        // id 转部门
-        switchDeptid (id) {
-            const userList = this.$store.getters.userList
-            for (let i = 0; i < userList.length; i++) {
-                const user = userList[i]
-                const positionId = user.positionId.split(',')
-                const positions = user.positions.split(',')
-                const pos = positions.findIndex(p => p === id)
-                if (pos >= 0) {
-                    return positionId[pos]
-                }
-            }
-            return ''
-        },
-        // 导出
-        exportExcel () {
-            const temp_subForm = JSON.parse(JSON.stringify(this.subForm))
-            temp_subForm.forEach(item => {
-                item.bu_men_ = this.switchDept(item.bu_men_)
-            })
-            this.xlsx(temp_subForm, this.listHander, '设施环境配置表')
-            this.$message.success('导出成功！')
-        },
-        xlsx (json, fields, filename = '.xlsx') { // 导出xlsx
-            json.forEach(item => {
-                for (const i in item) {
-                    if (fields.hasOwnProperty(i)) {
-                        item[fields[i]] = item[i]
-                    }
-                    delete item[i] // 删除原先的对象属性
-                }
-            })
-            const sheetName = filename // excel的文件名称
-            const wb = xlsx.utils.book_new() // 工作簿对象包含一SheetNames数组，以及一个表对象映射表名称到表对象。XLSX.utils.book_new实用函数创建一个新的工作簿对象。
-            const ws = xlsx.utils.json_to_sheet(json, { header: Object.values(fields) }) // 将JS对象数组转换为工作表。
-            wb.SheetNames.push(sheetName)
-            wb.Sheets[sheetName] = ws
-            const defaultCellStyle = { font: { name: 'Verdana', sz: 13, color: 'FF00FF88' }, fill: { fgColor: { rgb: 'FFFFAA00' }}}// 设置表格的样式
-            const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary', cellStyles: true, defaultCellStyle: defaultCellStyle, showGridLines: false } // 写入的样式
-            const wbout = xlsx.write(wb, wopts)
-            const blob = new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' })
-            fs.saveAs(blob, filename + '.xlsx')
-        },
-
-        s2ab (s) {
-            let buf
-            if (typeof ArrayBuffer !== 'undefined') {
-                buf = new ArrayBuffer(s.length)
-                const view = new Uint8Array(buf)
-                for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
-                return buf
-            } else {
-                buf = new Array(s.length)
-                for (let i = 0; i !== s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF
-                return buf
-            }
         },
         // 查询
         goSearch () {

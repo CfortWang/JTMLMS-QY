@@ -122,6 +122,8 @@ export default {
         .sin{
             margin: 5px;
             cursor: pointer;
+            font-weight: 500;
+            font-family: inherit;
         }
     }
     /deep/ .el-popover{

@@ -25,27 +25,30 @@
         fullscreen
         append-to-body
         custom-class="ibps-file-preview-dialog"
+        :show-close="false"
     >
         <template #title>
             <el-row>
-                <el-col :span="12">{{ title }}</el-col>
-                <el-col :span="4">阅读量:{{ lookNum }}</el-col>
-                <el-col :span="8" style="text-align: center;">
-                    <el-button type="primary" @click="lookFile">查看文件信息</el-button>
-                    <el-button type="primary" @click="hideLeft">左侧内容</el-button>
-                    <el-button type="primary" @click="updateFile">下载文件</el-button>
+                <el-col :span="11" class="titleHander">{{ title }}</el-col>
+                <el-col :span="3" class="read" style="text-align: right;">阅读量:{{ lookNum }}</el-col>
+                <el-col :span="10" style="text-align: right;">
                     <el-popover
                         v-model="deleteVisible"
                         placement="top"
                         width="160"
                     >
+
                         <p>文件删除之后将不能查看，确定要删除该文件吗？</p>
                         <div style="text-align: right; margin: 0">
                             <el-button size="mini" type="text" @click="deleteVisible = false">取消</el-button>
                             <el-button type="primary" size="mini" @click="deleteFile">确定</el-button>
                         </div>
-                        <el-button slot="reference" type="danger" style="margin-left:10px;">删除</el-button>
+                        <el-button v-if="deleteShow" slot="reference" type="danger" icon="el-icon-delete" class="deleteBtn" @click="deleteVisible=true">删除</el-button>
                     </el-popover>
+                    <el-button type="primary" icon="el-icon-view" @click="lookFile">查看文件信息</el-button>
+                    <el-button type="primary" icon="el-icon-s-fold" @click="hideLeft">左侧内容</el-button>
+                    <el-button type="primary" icon="el-icon-download" @click="updateFile">下载文件</el-button>
+                    <el-button type="danger" icon="el-icon-close" @click="closeDialog">关闭</el-button>
                 </el-col>
             </el-row>
         </template>
@@ -133,6 +136,7 @@ export default {
     data () {
         const { userList, userId, role, isSuper } = this.$store.getters
         // const userId = this.$store.getters.userInfo.employee.id// 本人修改
+
         return {
             type: 'success',
             curFileName: '',
@@ -167,7 +171,8 @@ export default {
             paused: false,
             role: role,
             isSuper: isSuper,
-            deleteVisible: false
+            deleteVisible: false,
+            deleteShow: false
 
         }
     },
@@ -245,8 +250,11 @@ export default {
         this.height = this.getDialogHeightHeight()
         // 页面切换时改变计时状态
         document.addEventListener('visibilitychange', this.handlePageChange)
-        // 本人修改
         this.checkDialogBody()
+        const roleKey = ['xtgljs']
+        const curRole = this.role.map(i => i.alias)
+        const isPower = curRole.some(item => roleKey.includes(item))
+        this.deleteShow = !!((isPower || this.isPower))
     },
     methods: {
         getUserName (data) {
@@ -537,6 +545,12 @@ export default {
         }
         .itemStyle:hover{
             cursor: pointer;
+        }
+        .titleHander, .read{
+            line-height: 32px;
+        }
+        .deleteBtn{
+            margin: 0 10px 0 0;
         }
     }
     .left-content{

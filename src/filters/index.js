@@ -6,21 +6,21 @@ import Utils from '@/utils/util'
  * 时间格式化
  *
  */
-export function dateFormat(dateObj, dateFormat = 'yyyy-MM-dd HH:mm:ss', origFormat) {
-  if (Utils.isEmpty(dateObj)) { return '' }
-  try {
-    if (typeof dateObj === 'number') {
-      dateObj = new Date(dateObj)
+export function dateFormat (dateObj, dateFormat = 'yyyy-MM-dd HH:mm:ss', origFormat) {
+    if (Utils.isEmpty(dateObj)) { return '' }
+    try {
+        if (typeof dateObj === 'number') {
+            dateObj = new Date(dateObj)
+        }
+        if (Object.prototype.toString.call(dateObj) !== '[object Date]' || isNaN(dateObj.getTime())) {
+            // 需要把字符串转换日期格式
+            dateObj = dateDealFmt.dealFmt(dateObj, origFormat || dateFormat)
+        }
+        return format(dateObj, dateFormat)
+    } catch (error) {
+        console.error('转换日期格式错误：', error)
+        return dateObj
     }
-    if (Object.prototype.toString.call(dateObj) !== '[object Date]' || isNaN(dateObj.getTime())) {
-      // 需要把字符串转换日期格式
-      dateObj = dateDealFmt.dealFmt(dateObj, origFormat || dateFormat)
-    }
-    return format(dateObj, dateFormat)
-  } catch (error) {
-    console.error('转换日期格式错误：', error)
-    return dateObj
-  }
 }
 
 /**
@@ -30,8 +30,8 @@ export function dateFormat(dateObj, dateFormat = 'yyyy-MM-dd HH:mm:ss', origForm
  * @param {String} locale 国际化语言
  * @returns {String} 相对时间字符串
  */
-export function formatRelativeTime(time, format, locale) {
-  return getRelativeTime(time, format, locale)
+export function formatRelativeTime (time, format, locale) {
+    return getRelativeTime(time, format, locale)
 }
 
 /**
@@ -40,25 +40,25 @@ export function formatRelativeTime(time, format, locale) {
  * @param {string} label
  * @return {string}
  */
-function pluralize(time, label) {
-  return time + label
+function pluralize (time, label) {
+    return time + label
 }
 
 /**
  * duration
  * @param {*} time
  */
-export function duration(time) {
-  const between = Number(time)
-  if (between < 1000) {
-    return pluralize(~~(between / 1000), '秒')
-  } else if (between < 3600 * 1000) {
-    return pluralize(~~(between / (60 * 1000)), '分钟')
-  } else if (between < 86400 * 1000) {
-    return pluralize(~~(between / (60 * 60 * 1000)), '小时')
-  } else {
-    return pluralize(~~(between / (60 * 60 * 24 * 1000)), '天')
-  }
+export function duration (time) {
+    const between = Number(time)
+    if (between < 1000) {
+        return pluralize(~~(between / 1000), '秒')
+    } else if (between < 3600 * 1000) {
+        return pluralize(~~(between / (60 * 1000)), '分钟')
+    } else if (between < 86400 * 1000) {
+        return pluralize(~~(between / (60 * 60 * 1000)), '小时')
+    } else {
+        return pluralize(~~(between / (60 * 60 * 24 * 1000)), '天')
+    }
 }
 
 /**
@@ -66,56 +66,77 @@ export function duration(time) {
  * @param {*} num
  * @param {*} digits
  */
-export function numberFormatter(num, digits = 2) {
-  const si = [
-    { value: 1E18, symbol: 'E' },
-    { value: 1E15, symbol: 'P' },
-    { value: 1E12, symbol: 'T' },
-    { value: 1E9, symbol: 'G' },
-    { value: 1E6, symbol: 'M' },
-    { value: 1E3, symbol: 'k' }
-  ]
-  for (let i = 0; i < si.length; i++) {
-    if (num >= si[i].value) {
-      return (num / si[i].value + 0.1).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1') + si[i].symbol
+export function numberFormatter (num, digits = 2) {
+    const si = [
+        { value: 1E18, symbol: 'E' },
+        { value: 1E15, symbol: 'P' },
+        { value: 1E12, symbol: 'T' },
+        { value: 1E9, symbol: 'G' },
+        { value: 1E6, symbol: 'M' },
+        { value: 1E3, symbol: 'k' }
+    ]
+    for (let i = 0; i < si.length; i++) {
+        if (num >= si[i].value) {
+            return (num / si[i].value + 0.1).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1') + si[i].symbol
+        }
     }
-  }
-  return num.toString()
+    return num.toString()
 }
 
 /**
  * html 格式转文本
  * @param {*} val
 */
-export function html2Text(val) {
-  const div = document.createElement('div')
-  div.innerHTML = val
-  return div.textContent || div.innerText
+export function html2Text (val) {
+    const div = document.createElement('div')
+    div.innerHTML = val
+    return div.textContent || div.innerText
 }
 
 /**
  * 正则去掉所有的html标记
  * @param {*} val
  */
-export function removeHtmlTag(val) {
-  if (Utils.isEmpty(val)) { return val }
-  return val.replace(/<[^>]+>/g, '')
+export function removeHtmlTag (val) {
+    if (Utils.isEmpty(val)) { return val }
+    return val.replace(/<[^>]+>/g, '')
 }
 
 /**
  * 去第一个字符
  * @param {*} val
  */
-export function firstStr(val) {
-  return val.substr(0, 1)
+export function firstStr (val) {
+    return val.substr(0, 1)
 }
 
+export function fiveStr (val) {
+    return val.substr(0, 5)
+}
+
+export function filterDataMethod (val1, val2) {
+    if (!val1) {
+        return 0
+    }
+    const arrData = val1.split(',')
+    if (val2 === 'join') {
+        return arrData[1]
+    } else if (val2 === 'joinRate') {
+        return arrData[0] == 0 ? '0%' : ((arrData[1] / arrData[0]) * 100).toFixed(1) + '%'
+    } else if (val2 === 'unjoin') {
+        return arrData[2]
+    } else if (val2 === 'unjoinRate') {
+        return arrData[0] == 0 ? '0%' : ((arrData[2] / arrData[0]) * 100).toFixed(1) + '%'
+    } else {
+        return 0
+    }
+}
 /**
  * 千分位过滤
  * @param {*} num
  */
-export function toThousandslsFilter(num) {
-  return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+export function toThousandslsFilter (num) {
+    return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
 }
 
 /**
@@ -125,12 +146,12 @@ export function toThousandslsFilter(num) {
  * @param {*} labelKey  选项的展示值key
  * @param {*} valueKey  选项的值key
  */
-export function optionsFilter(val, options = [], labelKey = 'label', valueKey = 'value', defaultValue = '') {
-  let opt
-  if (Array.isArray(options)) {
-    opt = options.find(x => x[valueKey] === val)
-  }
-  return opt ? opt[labelKey] : val || defaultValue
+export function optionsFilter (val, options = [], labelKey = 'label', valueKey = 'value', defaultValue = '') {
+    let opt
+    if (Array.isArray(options)) {
+        opt = options.find(x => x[valueKey] === val)
+    }
+    return opt ? opt[labelKey] : val || defaultValue
 }
 
 /**
@@ -140,21 +161,21 @@ export function optionsFilter(val, options = [], labelKey = 'label', valueKey = 
  * @param {*} labelKey  选项的展示值key
  * @param {*} valueKey  选项的值key
  */
-export function optionsCheckboxFilter(val, options = [], labelKey = 'label', valueKey = 'value', defaultValue = '') {
-  if (Utils.isEmpty(val)) {
-    return []
-  }
-  const valAry = val.split(',')
-  const optMap = []
-  options.forEach(x => {
-    optMap[valueKey] = x[labelKey]
-  })
-
-  const optVal = []
-  valAry.forEach(v => {
-    if (optMap[v]) {
-      optVal.push(optMap[v])
+export function optionsCheckboxFilter (val, options = [], labelKey = 'label', valueKey = 'value', defaultValue = '') {
+    if (Utils.isEmpty(val)) {
+        return []
     }
-  })
-  return optVal
+    const valAry = val.split(',')
+    const optMap = []
+    options.forEach(x => {
+        optMap[valueKey] = x[labelKey]
+    })
+
+    const optVal = []
+    valAry.forEach(v => {
+        if (optMap[v]) {
+            optVal.push(optMap[v])
+        }
+    })
+    return optVal
 }

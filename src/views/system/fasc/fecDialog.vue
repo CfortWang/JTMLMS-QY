@@ -17,6 +17,9 @@
                     <el-row>
                         <el-col :span="12">
                             <el-form-item label="部门：">
+                                <template slot="label">
+                                    <span class="required">部门：</span>
+                                </template>
                                 <ibps-user-selector
                                     v-model="form.bu_men_"
                                     size="mini"
@@ -32,6 +35,9 @@
                         </el-col>
                         <el-col :span="12">
                             <el-form-item label="监测岗位：">
+                                <template slot="label">
+                                    <span class="required">监测岗位：</span>
+                                </template>
                                 <el-select v-model="form.jian_ce_gang_wei_" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
                                         v-for="item in jianCeGangWeiList"
@@ -45,27 +51,45 @@
                     </el-row>
                     <el-row>
                         <el-col :span="12">
-                            <el-form-item label="区域：">
-                                <el-select v-model="form.qu_yu_" placeholder="请选择" size="mini" style="width:80%">
-                                    <el-option
-                                        v-for="item in quYuList"
-                                        :key="item.id_"
-                                        :label="item.qu_yu_ming_cheng_"
-                                        :value="item.qu_yu_ming_cheng_"
-                                    />
-                                </el-select>
+                            <el-form-item v-if="lei_xing_!=='01-室内温湿度监控'" label="房间：">
+                                <ibps-link-data
+                                    v-model="form.fang_jian_"
+                                    style="width:80%"
+                                    size="mini"
+                                    template-key="fjzly"
+                                    :multiple="false"
+                                    :temp-search="true"
+                                    label-value="fang_jian_ming_ha"
+                                    value-key="fang_jian_ming_ha"
+                                    @change-link-data="fangJianChange"
+                                />
+                            </el-form-item>
+                            <el-form-item v-else label="房间：">
+                                <template slot="label">
+                                    <span class="required">房间：</span>
+                                </template>
+                                <ibps-link-data
+                                    v-model="form.fang_jian_"
+                                    style="width:80%"
+                                    size="mini"
+                                    template-key="fjzly"
+                                    :multiple="false"
+                                    :temp-search="true"
+                                    label-value="fang_jian_ming_ha"
+                                    value-key="fang_jian_ming_ha"
+                                    @change-link-data="fangJianChange"
+                                />
                             </el-form-item>
                         </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="房间：">
-                                <el-select v-model="form.fang_jian_" placeholder="请选择" size="mini" style="width:80%">
-                                    <el-option
-                                        v-for="item in fangJianList"
-                                        :key="item.id_"
-                                        :label="item.fang_jian_ming_ha"
-                                        :value="item.fang_jian_ming_ha"
-                                    />
-                                </el-select>
+                        <el-col v-show="form.qu_yu_" :span="12">
+                            <el-form-item label="区域：">
+                                <template slot="label">
+                                    <span>区域</span>
+                                    <el-tooltip effect="dark" content="区域由房间自动带出" placement="top">
+                                        <i class="el-icon-question question-icon">：</i>
+                                    </el-tooltip>
+                                </template>
+                                <span>{{ form.qu_yu_ }}</span>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -79,6 +103,9 @@
                                     template-key="jksbxz"
                                     :multiple="false"
                                     :temp-search="true"
+                                    label-value="deviceInfo"
+                                    value-key="deviceInfo"
+                                    @change-link-data="deviceno2Change"
                                 />
                             </el-form-item>
                         </el-col>
@@ -87,12 +114,33 @@
                     <el-row v-if="isShowDevice">
                         <el-col :span="12">
                             <el-form-item label="被控设备/设施编号：" label-width="140">
-                                <el-input v-model="form.deviceno1_" size="mini" style="width:80%" />
+                                <template slot="label">
+                                    <span class="required">被控设备/设施编号：</span>
+                                </template>
+                                <ibps-custom-dialog
+                                    v-model="form.deviceno1_"
+                                    size="mini"
+                                    template-key="sbxzmcgl"
+                                    :multiple="false"
+                                    :disabled="false"
+                                    type="dialog"
+                                    class="custom-dialog"
+                                    placeholder="请选择设备"
+                                    icon="el-icon-search"
+                                    style="width:80%"
+                                    @change-link-data="deviceno1Change"
+                                />
                             </el-form-item>
                         </el-col>
-                        <el-col :span="12">
+                        <el-col v-show="form.devicename1_" :span="12">
                             <el-form-item label="被控设备/设施名称：" label-width="140">
-                                <el-input v-model="form.devicename1_" size="mini" style="width:80%" />
+                                <template slot="label">
+                                    <span>被控设备/设施名称</span>
+                                    <el-tooltip effect="dark" content="选择设备后自动带出名称" placement="top">
+                                        <i class="el-icon-question question-icon">：</i>
+                                    </el-tooltip>
+                                </template>
+                                <div>{{ form.devicename1_ }}</div>
                             </el-form-item>
                         </el-col>
 
@@ -101,6 +149,9 @@
                     <el-row>
                         <el-col :span="12">
                             <el-form-item label="监测周期：">
+                                <template slot="label">
+                                    <span class="required">监测周期：</span>
+                                </template>
                                 <el-select v-model="form.jian_ce_zhou_qi_" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
                                         v-for="item in period"
@@ -119,14 +170,20 @@
                                         <i class="el-icon-question question-icon">：</i>
                                     </el-tooltip>
                                 </template>
-                                <el-radio v-model="form.shi_fou_qi_yong_" label="1">启用</el-radio>
-                                <el-radio v-model="form.shi_fou_qi_yong_" label="0">停用</el-radio>
+                                <div class="qiyong">
+                                    <el-radio v-model="form.shi_fou_qi_yong_" label="1">启用</el-radio>
+                                    <el-radio v-model="form.shi_fou_qi_yong_" label="0">停用</el-radio>
+                                </div>
+
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row v-if="form.jian_ce_zhou_qi_!==''">
                         <el-col :span="12">
                             <el-form-item :label="labelShow">
+                                <template slot="label">
+                                    <span class="required">{{ labelShow }}</span>
+                                </template>
                                 <el-checkbox-group v-if="form.jian_ce_zhou_qi_==='每日'" v-model="dayCheck" size="mini">
                                     <el-checkbox v-for="item in weekDays" :key="item.value" :label="item.value" size="mini">{{ item.label }}</el-checkbox>
                                 </el-checkbox-group>
@@ -180,7 +237,7 @@
                         </el-col>
                         <el-col v-if="nextDate" :span="12">
                             <el-form-item label="下次监测日期为：">
-                                <el-tag size="mini">{{ nextDate }}</el-tag>
+                                <el-tag size="mini" class="eltag">{{ nextDate }}</el-tag>
                             </el-form-item>
                         </el-col>
                         <el-col v-if="form.jian_ce_zhou_qi_==='间隔'" :span="12">
@@ -229,7 +286,9 @@ export default {
     components: {
         FacilityData,
         ibpsUserSelector,
-        IbpsLinkData
+        IbpsLinkData,
+        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
+
     },
     data () {
         return {
@@ -256,10 +315,13 @@ export default {
             form: {
                 qu_yu_: '',
                 fang_jian_: '',
+                fang_jian_id_: '',
                 bu_men_: '',
                 deviceno1_: '',
+                deviceid1_: '', // 设备id
                 devicename1_: '',
                 deviceno2_: '', // 监控设备
+                deviceid2_: '', // 监控设备id
                 jian_ce_zhou_qi_: '',
                 jian_ce_gang_wei_: '',
                 shi_fou_qi_yong_: '1',
@@ -271,8 +333,6 @@ export default {
                 kai_shi_shi_jian_: ''
             },
             isEdit: false,
-            quYuList: [],
-            fangJianList: [],
             nextDate: '',
             dayCheck: [],
             weekCheck: '',
@@ -434,28 +494,23 @@ export default {
             // immediate: true
         }
     },
-    mounted () {
-        this.init()
-    },
     methods: {
+        deviceno1Change (key, data) {
+            this.form.deviceid1_ = data.id_
+            this.form.devicename1_ = data.she_bei_ming_cheng_
+        },
+        deviceno2Change (key, data) {
+            this.form.deviceid2_ = data.deviceId
+        },
+        fangJianChange (key, data) {
+            this.form.fang_jian_id_ = data.id_
+            this.form.qu_yu_ = data.qu_yu_
+        },
         // 接收自定义组件数据
         onFacilityData (...arg) {
             if (arg.length > 1) {
                 this.form.lie_biao_shu_ju_ = arg[1]
             }
-        },
-        init () {
-            const pos = this.$store.getters.level.second ? this.$store.getters.level.second : this.$store.getters.level.first
-            const sql1 = `select * from t_qypzb where di_dian_='${pos}'`
-            this.$common.request('sql', sql1).then(res => {
-                const { data = [] } = res.variables || {}
-                this.quYuList = data
-            })
-            const sql2 = `select * from t_jjqfjb where di_dian_='${pos}'`
-            this.$common.request('sql', sql2).then(res => {
-                const { data = [] } = res.variables || {}
-                this.fangJianList = data.filter(item => item.fang_jian_ming_ha)
-            })
         },
         // 格式化数据
         formatForm () {
@@ -544,6 +599,12 @@ export default {
             }
             if (this.form.jian_ce_gang_wei_ === '') {
                 throw new Error('监测岗位信息缺失！')
+            }
+            if (this.isShowDevice && this.form.deviceno1_ === '') {
+                throw new Error('请先选择设备！')
+            }
+            if (this.lei_xing_ === '01-室内温湿度监控' && this.form.fang_jian_ === '') {
+                throw new Error('室内温湿度类型必须填写房间！')
             }
             if (this.form.lie_biao_shu_ju_) {
                 const lie_biao_shu_ju_ = JSON.parse(this.form.lie_biao_shu_ju_)
@@ -668,8 +729,22 @@ export default {
     .main{
         padding: 20px;
         height: 60vh;
+        .qiyong{
+            margin-top: 0px;
+        }
         .el-row{
             margin: 10px 0;
+        }
+        .required{
+            color: #606266 !important;
+            &::before{
+                content: '*';
+                margin: 0 4px 0 -7.5px;
+                color: #F56C6C;
+            }
+        }
+        .eltag{
+            margin-top: 6px;
         }
     }
     .el-row{

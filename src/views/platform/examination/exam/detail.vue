@@ -439,7 +439,8 @@ export default {
                         item.examCount = item.scoreList.length
                         item.finishCount = finishScore.length
                         item.count = `${item.examCount}/${item.finishCount}`
-                        item.examStatus = item.examCount === item.finishCount ? '已完成' : '未完成'
+                        // 修改考试结束的判断逻辑：只要有一次交卷记录即为已完成
+                        item.examStatus = item.finishCount > 0 ? '已完成' : '未完成'
                         item.resultScore = item[scorrType[item.scoringType]]
                         item.isQualified = item.examStatus === '已完成' ? item.resultScore >= (parseFloat(item.qualifiedRadio) / 100 * parseFloat(item.totalScore)) ? '达标' : '未达标' : '考试未结束'
                     })

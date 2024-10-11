@@ -7,7 +7,6 @@
 import { handleDocType } from './editor/editor.js'
 import { showView } from '@/api/platform/file/attachment'
 import { getToken } from '@/utils/auth'
-import { ref } from 'vue'
 
 export default {
     name: 'editor',
