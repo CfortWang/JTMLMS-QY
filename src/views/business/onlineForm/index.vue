@@ -133,6 +133,7 @@ export default {
             defKey: '',
             data: {},
             typeId: '',
+            templateId: '', // 模板id
             status: '',
             // 数据字典列表
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
@@ -152,6 +153,7 @@ export default {
                         label: '更多',
                         mode: 'dropdown',
                         type: 'info',
+                        visible: false,
                         menus: [
                             { key: 'setTemplate', label: '模板配置', icon: 'ibps-icon-cogs', type: 'info' },
                             { key: 'revoke', label: '废除模板', icon: 'ibps-icon-trash', type: 'danger' }
@@ -244,7 +246,7 @@ export default {
                 sortParams = 'bian_zhi_shi_jian desc, bian_zhi_bu_men_ asc'
             }
             const params = this.getParams(parameters)
-            const sql = `select id_ as recordId, create_by_ as createBy, bian_zhi_ren_ as submitBy, create_time_ as createTime, bian_zhi_shi_jian as submitTime, bian_zhi_bu_men_ as dept, shi_fou_guo_shen_ as state, biao_dan_ming_che as formName, biao_dan_mo_ban_ as formTemplete, gui_dang_lu_jing_ as parentId, fu_jian_ as attachment, shuo_ming_ as detail, pei_zhi_ as config, mo_ban_id_ as templeteId from t_bdmbtxjl where di_dian_ = '${this.level}'${params} order by ${sortParams}`
+            const sql = `select id_ as recordId, create_by_ as createBy, bian_zhi_ren_ as submitBy, create_time_ as createTime, bian_zhi_shi_jian as submitTime, bian_zhi_bu_men_ as dept, shi_fou_guo_shen_ as state, biao_dan_ming_che as formName, biao_dan_mo_ban_ as formTemplate, gui_dang_lu_jing_ as parentId, fu_jian_ as attachment, shuo_ming_ as detail, pei_zhi_ as config, mo_ban_id_ as templateId from t_bdmbtxjl where di_dian_ = '${this.level}'${params} order by ${sortParams}`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -376,8 +378,15 @@ export default {
                     break
             }
         },
-        handleNodeClick (typeId) {
+        handleNodeClick (typeId, data) {
             this.typeId = typeId
+            this.templateId = data.templateId
+            const moreBtn = this.listConfig.toolbars.find(i => i.key === 'more')
+            const moreBtnIndex = this.listConfig.toolbars.findIndex(i => i.key === 'more')
+            if (moreBtnIndex !== -1) {
+                moreBtn.visible = !!this.templateId
+                this.listConfig.toolbars.splice(moreBtnIndex, 1, moreBtn)
+            }
             this.loadData()
         },
         handleExpandCollapse (isExpand) {

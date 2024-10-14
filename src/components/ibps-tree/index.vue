@@ -95,7 +95,7 @@
                         > -->
                         <template v-if="['FILE_TYPE', 'FLOW_TYPE'].includes(categoryKey)">
                             <ibps-icon
-                                v-if="scope.data.templeteId"
+                                v-if="scope.data.templateId"
                                 style="font-size: 12px;"
                                 name="file-text-o"
                             />
