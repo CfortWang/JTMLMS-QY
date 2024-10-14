@@ -1,99 +1,102 @@
 <template>
     <span class="ibps-actions">
         <template v-for="(button,index) in actions">
-            <!--只显示图标-->
-            <template v-if="type === 'icon'">
-                <el-tooltip
-                    v-if="handleActionHidden(button.hidden)"
-                    :key="button.key+index"
-                    v-permission="button.permission"
-                    :content="getLabel(button)"
-                    :disabled="handleActionDisabled(button.disabled)"
-                    placement="bottom-start"
-                >
-                    <el-button
+            <!-- 增加visible属性用于控制按钮是否显示 -->
+            <template v-if="button.visible !== false">
+                <!--只显示图标-->
+                <template v-if="type === 'icon'">
+                    <el-tooltip
+                        v-if="handleActionHidden(button.hidden)"
                         :key="button.key+index"
-                        :name="button.key"
-                        :size="button.size|| $ELEMENT.size "
-                        :type="getType(button)"
-                        :icon="getIcon(button)"
+                        v-permission="button.permission"
+                        :content="getLabel(button)"
                         :disabled="handleActionDisabled(button.disabled)"
-                        class="action-icon"
-                        @click="emitEventHandler('action-event',button,position,data,index)"
-                    />
-                </el-tooltip>
-            </template>
-            <template v-else-if="type==='link'">
-                <el-link
-                    v-if="handleActionHidden(button.hidden)"
-                    :key="button.key+index"
-                    :type="getType(button)"
-                    :icon="getIcon(button)"
-                    :underline="false"
-                    :disabled="handleActionDisabled(button.disabled)"
-                    @click="emitEventHandler('action-event',button,position,data,index)"
-                >
-                    {{ `&nbsp;${button.label}` }}
-                </el-link>
-                <el-divider
-                    v-if="(actions.length == 2 && index == 0) || (actions.length == 3 && index != 2)"
-                    :key="index"
-                    direction="vertical"
-                />
-            </template>
-            <template v-else-if="type==='linkHide'">
-                <div :key="button.key+index" class="more-btn">
+                        placement="bottom-start"
+                    >
+                        <el-button
+                            :key="button.key+index"
+                            :name="button.key"
+                            :size="button.size|| $ELEMENT.size "
+                            :type="getType(button)"
+                            :icon="getIcon(button)"
+                            :disabled="handleActionDisabled(button.disabled)"
+                            class="action-icon"
+                            @click="emitEventHandler('action-event',button,position,data,index)"
+                        />
+                    </el-tooltip>
+                </template>
+                <template v-else-if="type==='link'">
                     <el-link
                         v-if="handleActionHidden(button.hidden)"
                         :key="button.key+index"
                         :type="getType(button)"
-                        :underline="false"
                         :icon="getIcon(button)"
+                        :underline="false"
                         :disabled="handleActionDisabled(button.disabled)"
                         @click="emitEventHandler('action-event',button,position,data,index)"
                     >
                         {{ `&nbsp;${button.label}` }}
                     </el-link>
-                </div>
-            </template>
-            <template v-else>
-                <!--下拉-->
-                <template v-if="button.mode === 'dropdown'">
-                    <el-dropdown
-                        :key="button.key"
-                        :hide-on-click="false"
-                        @command="(action)=> { emitEventHandler('action-event',action,position,data,index) }"
-                    >
-                        <span v-if="button.buttonType==='link'" class="el-dropdown-link">
-                            {{ `&nbsp;${button.label}` }}<i v-if="hasRighticon(button.rightIcon)" class="el-icon-arrow-down el-icon--right" />
-                        </span>
-                        <el-button v-else :type="getType(button)" size="mini" :icon="getIcon(button)">
-                            {{ `&nbsp;${button.label}` }}<i v-if="hasRighticon(button.rightIcon)" class="el-icon-arrow-down el-icon--right" />
-                        </el-button>
-                        <el-dropdown-menu v-if="button.menus && button.menus.length >0" slot="dropdown">
-                            <el-dropdown-item
-                                v-for="menu in button.menus"
-                                :key="menu.key"
-                                :command="menu"
-                                :icon="getIcon(menu)"
-                            >{{ `&nbsp;${getLabel(menu)}` }}</el-dropdown-item>
-                        </el-dropdown-menu>
-                    </el-dropdown>
+                    <el-divider
+                        v-if="(actions.length == 2 && index == 0) || (actions.length == 3 && index != 2)"
+                        :key="index"
+                        direction="vertical"
+                    />
                 </template>
-                <!--默认-->
+                <template v-else-if="type==='linkHide'">
+                    <div :key="button.key+index" class="more-btn">
+                        <el-link
+                            v-if="handleActionHidden(button.hidden)"
+                            :key="button.key+index"
+                            :type="getType(button)"
+                            :underline="false"
+                            :icon="getIcon(button)"
+                            :disabled="handleActionDisabled(button.disabled)"
+                            @click="emitEventHandler('action-event',button,position,data,index)"
+                        >
+                            {{ `&nbsp;${button.label}` }}
+                        </el-link>
+                    </div>
+                </template>
                 <template v-else>
-                    <el-button
-                        v-if="handleActionHidden(button.hidden)"
-                        :key="button.key+index"
-                        v-permission="button.permission"
-                        :name="button.key"
-                        :size="button.size|| 'mini' "
-                        :type="getType(button)"
-                        :icon="getIcon(button)"
-                        :disabled="handleActionDisabled(button.disabled)"
-                        :autofocus="false"
-                        @click="emitEventHandler('action-event',button,position,data,index)"
-                    >{{ `&nbsp;${getLabel(button)}` }}</el-button>
+                    <!--下拉-->
+                    <template v-if="button.mode === 'dropdown'">
+                        <el-dropdown
+                            :key="button.key"
+                            :hide-on-click="false"
+                            @command="(action)=> { emitEventHandler('action-event',action,position,data,index) }"
+                        >
+                            <span v-if="button.buttonType==='link'" class="el-dropdown-link">
+                                {{ `&nbsp;${button.label}` }}<i v-if="hasRighticon(button.rightIcon)" class="el-icon-arrow-down el-icon--right" />
+                            </span>
+                            <el-button v-else :type="getType(button)" size="mini" :icon="getIcon(button)">
+                                {{ `&nbsp;${button.label}` }}<i v-if="hasRighticon(button.rightIcon)" class="el-icon-arrow-down el-icon--right" />
+                            </el-button>
+                            <el-dropdown-menu v-if="button.menus && button.menus.length >0" slot="dropdown">
+                                <el-dropdown-item
+                                    v-for="menu in button.menus"
+                                    :key="menu.key"
+                                    :command="menu"
+                                    :icon="getIcon(menu)"
+                                >{{ `&nbsp;${getLabel(menu)}` }}</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    </template>
+                    <!--默认-->
+                    <template v-else>
+                        <el-button
+                            v-if="handleActionHidden(button.hidden)"
+                            :key="button.key+index"
+                            v-permission="button.permission"
+                            :name="button.key"
+                            :size="button.size|| 'mini' "
+                            :type="getType(button)"
+                            :icon="getIcon(button)"
+                            :disabled="handleActionDisabled(button.disabled)"
+                            :autofocus="false"
+                            @click="emitEventHandler('action-event',button,position,data,index)"
+                        >{{ `&nbsp;${getLabel(button)}` }}</el-button>
+                    </template>
                 </template>
             </template>
         </template>
