@@ -87,7 +87,7 @@ const sortField = {
 
 export default {
     components: {
-        IbpsTypeTree: () => import('@/business/platform/cat/type/tree'),
+        IbpsTypeTree: () => import('./tree'),
         SettingType: () => import('@/business/platform/cat/type/setting-type'),
         BpmnFormrender: () => import('@/business/platform/bpmn/form/dialog'),
         IbpsUserSelector: () => import('@/business/platform/org/selector'),
@@ -123,7 +123,7 @@ export default {
             filterOption,
             level: second || first,
 
-            width: 200,
+            width: 250,
             height: document.clientHeight,
             settingTypeFormVisible: false, // 设置分类弹窗
             startFormVisible: false, // 启动流程表单弹窗
@@ -244,7 +244,7 @@ export default {
                 sortParams = 'bian_zhi_shi_jian desc, bian_zhi_bu_men_ asc'
             }
             const params = this.getParams(parameters)
-            const sql = `select id_ as recordId, create_by_ as createBy, bian_zhi_ren_ as submitBy, create_time_ as createTime, bian_zhi_shi_jian as submitTime, bian_zhi_bu_men_ as dept, shi_fou_guo_shen_ as state, biao_dan_ming_che as formName, biao_dan_mo_ban_ as formTemplete, gui_dang_lu_jing_ as path, fu_jian_ as attachment, shuo_ming_ as detail, pei_zhi_ as config, mo_ban_id_ as templeteId from t_bdmbtxjl where di_dian_ = '${this.level}'${params} order by ${sortParams}`
+            const sql = `select id_ as recordId, create_by_ as createBy, bian_zhi_ren_ as submitBy, create_time_ as createTime, bian_zhi_shi_jian as submitTime, bian_zhi_bu_men_ as dept, shi_fou_guo_shen_ as state, biao_dan_ming_che as formName, biao_dan_mo_ban_ as formTemplete, gui_dang_lu_jing_ as parentId, fu_jian_ as attachment, shuo_ming_ as detail, pei_zhi_ as config, mo_ban_id_ as templeteId from t_bdmbtxjl where di_dian_ = '${this.level}'${params} order by ${sortParams}`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -304,6 +304,9 @@ export default {
                 }
             }
             addDateCondition('submitTime', 'bian_zhi_shi_jian')
+            if (this.typeId) {
+                params += ` and mo_ban_id_ = '${this.typeId}'`
+            }
             return params
         },
         /**
@@ -348,15 +351,6 @@ export default {
             this.$refs['crud'].handleReset()
         },
         /**
-         * 前置事件
-         *
-        * @before-action-event="beforeActionEvent"
-        */
-        beforeActionEvent (key, position, data, callback) {
-            const flag = true
-            callback(flag)
-        },
-        /**
          * 处理按钮事件
          */
         handleAction (command, position, selection, data) {
@@ -364,12 +358,6 @@ export default {
                 case 'search':// 查询
                     ActionUtils.setFirstPagination(this.pagination)
                     this.search()
-                    break
-                case 'design':// 设计
-                    if (this.$utils.isNotEmpty(data)) {
-                        this.status = data.status
-                    }
-                    this.handleDesign(position === 'toolbar' ? '' : selection)
                     break
                 case 'remove':// 删除
                     ActionUtils.removeRecord(selection).then((ids) => {
@@ -381,71 +369,19 @@ export default {
                         this.handleSetCat(ids)
                     }).catch(() => { })
                     break
-                case 'export':// 导出
-                    ActionUtils.selectedMultiRecord(selection).then((ids) => {
-                        this.handleExport(ids)
-                    }).catch(() => { })
-                    break
-                case 'import': // 导入
-                    this.handImport()
-                    break
-                case 'batchSuspend':// 挂起
-                case 'suspend':// 挂起
-                    ActionUtils.selectedMultiRecord(selection).then((ids) => {
-                        this.handleBatchSuspend(ids)
-                    }).catch(() => { })
-                    break
-                case 'batchRecover':// 恢复
-                case 'recover':// 恢复
-                    ActionUtils.selectedMultiRecord(selection).then((ids) => {
-                        this.handleBatchRecover(ids)
-                    }).catch(() => { })
-                    break
-                case 'start':// 启动
-                    this.handleStart(selection)
-                    break
-                case 'copy':// 复制
-                    this.title = '复制流程'
-                    this.data = data
-                    this.handleCopy(selection)
-                    break
-                case 'deploy':// 发布
-                    this.handleDeploy(selection)
-                    break
                 case 'setting':// 设置
                     this.handleSetting(selection, data.defKey)
-                    break
-                case 'getGuide':// 查看指南
-                    this.handleEditGuide(selection, 'look')
-                    break
-                case 'editGuide':// 编辑指南
-                    this.handleEditGuide(selection, 'edit')
-                    break
-                case 'clear':// 清除数据
-                    this.handleClear(selection)
                     break
                 default:
                     break
             }
-        },
-        handleCopy (id) {
-            this.copyFormVisible = true
-            this.editId = id
         },
         handleNodeClick (typeId) {
             this.typeId = typeId
             this.loadData()
         },
         handleExpandCollapse (isExpand) {
-            this.width = isExpand ? 200 : 30
-        },
-        getSelectedData (id) {
-            const data = this.listData
-            for (let index = 0; index < data.length; index++) {
-                if (data[index].id === id) {
-                    return data[index]
-                }
-            }
+            this.width = isExpand ? 250 : 30
         },
         saveSettingType (typeId) {
             setCategory({

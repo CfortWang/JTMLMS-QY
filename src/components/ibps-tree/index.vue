@@ -88,15 +88,23 @@
                     @node-contextmenu="handleNodeContextmenu"
                 >
                     <span slot-scope="scope" class="ibps-custom-tree-node" :title="scope.node.label">
-                        <ibps-icon
-                            v-if="showIcon"
-                            :name="getIcon(scope.data)"
-                        />
-                        <img
-                            v-if="categoryKey === 'FILE_TYPE' || categoryKey ==='FLOW_TYPE'"
+                        <!-- <img
+                            v-if="['FILE_TYPE', 'FLOW_TYPE'].includes(categoryKey) && scope.data.categoryKey"
                             :src="filePng"
                             style="vertical-align: middle; height: 20px;"
-                        >
+                        > -->
+                        <template v-if="['FILE_TYPE', 'FLOW_TYPE'].includes(categoryKey)">
+                            <ibps-icon
+                                v-if="scope.data.templeteId"
+                                style="font-size: 12px;"
+                                name="file-text-o"
+                            />
+                            <ibps-icon v-else :name="getFolderIcon(scope)" />
+                        </template>
+                        <ibps-icon
+                            v-else-if="showIcon"
+                            :name="getIcon(scope.data)"
+                        />
                         <span>{{ scope.node.label }}</span>
                     </span>
                 </el-tree>
@@ -218,6 +226,7 @@ export default {
             contextmenuList: [],
             zIndex: 2003,
             treeExpandData: [],
+            activedId: '',
             filePng
         }
     },
@@ -268,13 +277,9 @@ export default {
         },
         expandCollapseIcon () {
             if (this.position === 'west') {
-                return this.isExpand
-                    ? 'angle-double-left'
-                    : 'angle-double-right'
+                return this.isExpand ? 'angle-double-left' : 'angle-double-right'
             } else {
-                return this.isExpand
-                    ? 'angle-double-right'
-                    : 'angle-double-left'
+                return this.isExpand ? 'angle-double-right' : 'angle-double-left'
             }
         }
     },
@@ -317,13 +322,7 @@ export default {
          * 判斷tree是否展开
          */
         judgeTitle () {
-            if (this.title === '业务对象管理' ||
-                this.title === undefined ||
-                (
-                    this.treeData[0] && this.treeData[0].children && this.treeData[0].children.length === 1 &&
-                    this.title === '部门管理'
-                )
-            ) {
+            if (this.title === '业务对象管理' || this.title === undefined || (this.treeData[0] && this.treeData[0].children && this.treeData[0].children.length === 1 && this.title === '部门管理')) {
                 return true
             }
             return this.lazy
@@ -335,9 +334,7 @@ export default {
             this.zIndex = PopupManager.getZIndex()
         },
         getIcon (data) {
-            let icon = data
-                ? data[this.treeOptions['iconKey'] || 'icon']
-                : 'list-alt'
+            let icon = data ? data[this.treeOptions['iconKey'] || 'icon'] : 'list-alt'
             if (icon) {
                 return icon
             }
@@ -346,6 +343,11 @@ export default {
             } else {
                 icon = this.treeOptions['nodeIcon'] || 'list-alt'
             }
+        },
+        getFolderIcon ({ data, node }) {
+            const { expanded, childNodes = [] } = node
+            const { id } = data
+            return (expanded && childNodes.length) || id === this.activedId ? 'folder-open-o' : 'folder-o'
         },
         handleTreeHeight () {
             this.treeHeight = this.height
@@ -378,6 +380,7 @@ export default {
             }
         },
         handleNodeClick (data) {
+            this.activedId = data.id
             this.$emit('node-click', data)
         },
         refreshNode (id) {
@@ -392,23 +395,9 @@ export default {
             if (!this.contextmenus || this.contextmenus.length === 0) return
             let target = event.target
             let flag = false
-            if (
-                (target &&
-                    target.className.indexOf('el-tree-node__content') > -1) ||
-                (target &&
-                    target.className.indexOf('ibps-custom-tree-node') > -1)
-            ) {
+            if ((target && target.className.indexOf('el-tree-node__content') > -1) || (target && target.className.indexOf('ibps-custom-tree-node') > -1)) {
                 flag = true
-            } else if (
-                (target &&
-                    target.parentNode.className.indexOf(
-                        'el-tree-node__content'
-                    ) > -1) ||
-                (target &&
-                    target.parentNode.className.indexOf(
-                        'ibps-custom-tree-node'
-                    ) > -1)
-            ) {
+            } else if ((target && target.parentNode.className.indexOf('el-tree-node__content') > -1) || (target && target.parentNode.className.indexOf('ibps-custom-tree-node') > -1)) {
                 target = target.parentNode
                 flag = true
             }
@@ -489,7 +478,7 @@ export default {
 }
 </script>
 
-<style lang="scss" >
+<style lang="scss" scoped>
 $border-color: #e5e6e7;
 .ibps-tree {
     .layout-header {
@@ -562,13 +551,18 @@ $border-color: #e5e6e7;
     }
     .ibps-tree-wrapper {
         background: #ffffff;
-        .el-tree > .el-tree-node {
-            display: block;
+        ::v-deep {
+            .el-tree > .el-tree-node {
+                display: block;
+            }
         }
     }
     .ibps-custom-tree-node {
         font-size: 13px;
         padding-right: 8px;
+        .ibps-icon {
+            margin-right: 2px;
+        }
     }
 }
 </style>
