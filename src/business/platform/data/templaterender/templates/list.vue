@@ -865,6 +865,8 @@ export default {
         // 查询数据
         search (type) {
             this.hadDoSearch = true
+            // 2024.10.16修复，回车时直接触发查询方法，未重置页码，会导致查询结果显示为空
+            ActionUtils.setFirstPagination(this.pagination)
             this.loadData('', type)
             this.addDataCont = {}
         },
