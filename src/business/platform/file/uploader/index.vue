@@ -24,6 +24,7 @@
                     :height="height"
                     :init="dialogVisible"
                     :limit="limit"
+                    :upload-method="uploadMethod"
                     @callback="uploadCallback"
                 />
             </el-tab-pane>
@@ -95,6 +96,11 @@ export default {
         fileExt: {
             type: Array,
             default: () => []
+        },
+        // 上传类型：normal:普通上传，onlyoffice:onlyoffice文件上传
+        uploadMethod: {
+            type: String,
+            default: 'normal'
         }
     },
     data () {

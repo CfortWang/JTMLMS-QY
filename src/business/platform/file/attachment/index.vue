@@ -127,6 +127,7 @@
 
 import { fileTypes, allFileTypes, accept as acceptTypes } from '@/business/platform/file/constants/fileTypes'
 import { uploadFile } from '@/api/platform/file/attachment'
+import { uploadOnlyOfficeFile } from '@/api/platform/file/onlyoffice'
 import VueDraggable from 'vuedraggable'
 
 export default {
@@ -261,7 +262,11 @@ export default {
         },
         // 默认上传模块
         httpRequest (options) {
-            return uploadFile(options.file, {})
+            const uploadMap = {
+                normal: uploadFile,
+                onlyoffice: uploadOnlyOfficeFile
+            }
+            return uploadMap[this.uploadMethod || 'normal'](options.file, {})
         },
         handleSuccess (response, file, fileList) {
             this.fileList = fileList

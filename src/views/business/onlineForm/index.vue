@@ -7,6 +7,7 @@
                 title="表单分类"
                 category-key="FLOW_TYPE"
                 :has-contextmenu="true"
+                @refresh="refresh"
                 @node-click="handleNodeClick"
                 @expand-collapse="handleExpandCollapse"
             />
@@ -54,20 +55,22 @@
                 </template>
             </ibps-crud>
         </ibps-container>
-        <!-- 设置分类 -->
-        <setting-type
-            :visible="settingTypeFormVisible"
-            title="设置任务分类"
-            category-key="FLOW_TYPE"
-            @save="saveSettingType"
-            @close="visible => settingTypeFormVisible = visible"
-        />
         <!-- 流程启动 -->
         <bpmn-formrender
             :visible="startFormVisible"
             :def-id="editId"
             :title="title"
             @close="visible => startFormVisible = visible"
+        />
+        <data-template-formrender-dialog
+            :visible="dialogFormVisible"
+            :form-key="formKey"
+            :default-data="defaultFormData"
+            :pk-value="pkValue"
+            :toolbars="editToolbars"
+            :readonly="readonly"
+            @callback="search"
+            @close="visible => dialogFormVisible = visible"
         />
     </ibps-layout>
 </template>
@@ -91,7 +94,8 @@ export default {
         SettingType: () => import('@/business/platform/cat/type/setting-type'),
         BpmnFormrender: () => import('@/business/platform/bpmn/form/dialog'),
         IbpsUserSelector: () => import('@/business/platform/org/selector'),
-        IbpsEmployeeSelector: () => import('@/business/platform/org/employee/selector')
+        IbpsEmployeeSelector: () => import('@/business/platform/org/employee/selector'),
+        DataTemplateFormrenderDialog: () => import('@/business/platform/data/templaterender/form/dialog')
     },
     mixins: [
         // Handle,
@@ -128,13 +132,20 @@ export default {
             settingTypeFormVisible: false, // 设置分类弹窗
             startFormVisible: false, // 启动流程表单弹窗
 
+            // 表单参数
+            dialogFormVisible: false,
+            formKey: '',
+            defaultFormData: {},
+            pkValue: '',
+            editToolbars: [],
+            readonly: false,
+
             title: '启动',
             editId: '', // 编辑dialog需要使用
             defKey: '',
             data: {},
             typeId: '',
             templateId: '', // 模板id
-            status: '',
             // 数据字典列表
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: false,
@@ -366,14 +377,6 @@ export default {
                         this.handleRemove(ids)
                     }).catch(() => { })
                     break
-                case 'setCategory':// 设置分类
-                    ActionUtils.selectedMultiRecord(selection).then((ids) => {
-                        this.handleSetCat(ids)
-                    }).catch(() => { })
-                    break
-                case 'setting':// 设置
-                    this.handleSetting(selection, data.defKey)
-                    break
                 default:
                     break
             }
@@ -391,6 +394,10 @@ export default {
         },
         handleExpandCollapse (isExpand) {
             this.width = isExpand ? 250 : 30
+        },
+        refresh () {
+            this.typeId = ''
+            this.loadData()
         },
         saveSettingType (typeId) {
             setCategory({

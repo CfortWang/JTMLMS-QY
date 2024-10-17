@@ -29,6 +29,7 @@
             :accept="acceptType"
             :file-ext="fileExt"
             :limit="limit"
+            :upload-method="uploadMethod"
             @close="visible => selectorVisible = visible"
             @action-event="handleSelectorActionEvent"
         />
@@ -48,6 +49,7 @@
 </template>
 <script>
 import { get, transfer, uploadFile } from '@/api/platform/file/attachment'
+import { uploadOnlyOfficeFile } from '@/api/platform/file/onlyoffice'
 import { downloadFile } from '@/business/platform/file/utils'
 import { remoteRequest, remoteTransRequest } from '@/utils/remote'
 import IbpsFileAttachmentSelector from './index'
@@ -157,6 +159,11 @@ export default {
         showExtName: {
             type: Boolean,
             default: true
+        },
+        // 上传方法：normal:普通上传，onlyoffice:onlyoffice文件上传
+        uploadMethod: {
+            type: String,
+            default: 'normal'
         }
     },
     data () {
@@ -588,7 +595,11 @@ export default {
          * 文件上传
          */
         httpRequest (options) {
-            return uploadFile(options.file, {})
+            const uploadMap = {
+                normal: uploadFile,
+                onlyoffice: uploadOnlyOfficeFile
+            }
+            return uploadMap[this.uploadMethod || 'normal'](options.file, {})
         },
         handleDelete (file, selectorValue) {
             this.selectorValue = selectorValue
