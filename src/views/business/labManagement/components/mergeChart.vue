@@ -157,6 +157,7 @@
                                 color: '#fff'
                             },
                             min: 0,
+                            minInterval: 1,
                             axisLabel: {
                                 show: true,
                                 textStyle: {

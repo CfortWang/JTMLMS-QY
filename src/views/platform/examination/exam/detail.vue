@@ -293,6 +293,10 @@ export default {
                 {
                     value: 'noFinish',
                     label: '考试未结束'
+                },
+                {
+                    value: 'wait',
+                    label: '试卷待评阅'
                 }
             ],
             selectValue: 'all',
@@ -443,6 +447,13 @@ export default {
                         item.examStatus = item.finishCount > 0 ? '已完成' : '未完成'
                         item.resultScore = item[scorrType[item.scoringType]]
                         item.isQualified = item.examStatus === '已完成' ? item.resultScore >= (parseFloat(item.qualifiedRadio) / 100 * parseFloat(item.totalScore)) ? '达标' : '未达标' : '考试未结束'
+                        if (item.isQualified === '考试未结束') {
+                            // 细化考试未结束的情况
+                            if (item.statusList.includes('已交卷')) {
+                                // 有已交卷记录 试卷等待评阅
+                                item.isQualified = '试卷待评阅'
+                            }
+                        }
                     })
                     const finishList = result.filter(i => i.examStatus === '已完成')
                     this.maxScore = finishList.length ? maxBy(finishList, 'max').max : nodatadesc

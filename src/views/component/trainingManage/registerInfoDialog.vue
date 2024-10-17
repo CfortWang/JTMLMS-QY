@@ -29,9 +29,9 @@
                         <div>
                             <el-popover
                                 placement="top-start"
-                                width="200"
+                                width="300"
                                 trigger="hover"
-                                :content="`应到：${calRate.total}人，实到：${calRate.signIn}人`"
+                                :content="`应到：${calRate.mustPeople}人，应到人员中实际签到：${calRate.mustSignIn}人（总计签到人数：${calRate.signIn}人，其他签到人数：${calRate.signIn-calRate.mustSignIn}人）`"
                             >
                                 <div slot="reference" style="cursor: pointer;">出勤率：{{ calRate.signInRate }}%</div>
                             </el-popover>
@@ -39,9 +39,9 @@
                         <div>
                             <el-popover
                                 placement="top-start"
-                                width="200"
+                                width="300"
                                 trigger="hover"
-                                :content="`应到：${calRate.total}人，未到：${calRate.noSignIn}人`"
+                                :content="`应到：${calRate.mustPeople}人，未到：${calRate.noSignIn}人`"
                             >
                                 <div slot="reference" style="cursor: pointer;">缺勤率：{{ calRate.noSignInRate }}%</div>
                             </el-popover>
@@ -49,9 +49,9 @@
                         <div>
                             <el-popover
                                 placement="top-start"
-                                width="200"
+                                width="300"
                                 trigger="hover"
-                                :content="`应到：${calRate.total}人，补签：${calRate.laterSignIn}人`"
+                                :content="`应到：${calRate.mustPeople}人，补签：${calRate.laterSignIn}人`"
                             >
                                 <div slot="reference" style="cursor: pointer;">补签率：{{ calRate.laterSignInRate }}%</div>
                             </el-popover>
@@ -153,19 +153,29 @@ export default {
         // 计算各种统计率
         calRate () {
             const total = this.tableList.length
+            let mustPeople = this.tableList.filter(i => i.flag).length
             let noSignIn = 0
             let signIn = 0
+            let mustSignIn = 0 // 应参人数中签到的人数
             let laterSignIn = 0
             this.tableList.forEach(item => {
-                if (item.status === '已签到') signIn++
+                if (item.status === '已签到') {
+                    signIn++
+                    if (item.flag) mustSignIn++
+                }
                 if (item.status === '未签到') noSignIn++
                 if (item.status === '已补签') laterSignIn++
             })
-
-            const signInRate = total === 0 ? 0 : signIn / total * 100
-            const noSignInRate = total === 0 ? 0 : noSignIn / total * 100
-            const laterSignInRate = total === 0 ? 0 : laterSignIn / total * 100
+            if (mustPeople === 0) { // 没有确定参会人员的情况
+                mustPeople = total
+                mustSignIn = signIn
+            }
+            const signInRate = mustPeople === 0 ? 0 : mustSignIn / mustPeople * 100
+            const noSignInRate = mustPeople === 0 ? 0 : noSignIn / mustPeople * 100
+            const laterSignInRate = mustPeople === 0 ? 0 : laterSignIn / mustPeople * 100
             return {
+                mustSignIn,
+                mustPeople,
                 total,
                 signIn,
                 noSignIn,
@@ -259,7 +269,8 @@ export default {
                     this.tableList.push({
                         ren_yuan_id_: person,
                         status: '未签到',
-                        qian_dao_shi_jian: ''
+                        qian_dao_shi_jian: '',
+                        flag: true // 原本应参人员的标记
                     })
                 }
             })

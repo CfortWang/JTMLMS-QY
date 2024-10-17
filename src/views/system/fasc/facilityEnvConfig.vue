@@ -404,7 +404,10 @@ export default {
             return this.isSearch ? this.searchData : this.subForm
         },
         isShowDevice () {
-            return this.form.lei_xing_ !== '' && this.form.lei_xing_ !== '01-室内温湿度监控' && this.form.lei_xing_ !== '06-每日安全检查' && this.form.lei_xing_ !== '08-含氯有效性监测'
+            return this.form.lei_xing_ !== '' && this.form.lei_xing_ !== '01-室内温湿度监控' && this.form.lei_xing_ !== '06-每日安全检查' && this.form.lei_xing_ !== '08-含氯有效性监测' && this.form.lei_xing_ !== '15-日常防护消毒'
+        },
+        deviceIsRequired () {
+            return this.form.lei_xing_ === '02-冰箱温度监控' || this.form.lei_xing_ === '05-纯水机水质监测' || this.form.lei_xing_ === '03-温浴箱温度监控' || this.form.lei_xing_ === '04-阴凉柜温度监控'
         },
         isEdit () {
             return !!(this.parentData instanceof Object && this.parentData.mainId)
@@ -412,8 +415,10 @@ export default {
     },
     watch: {
         'form.lei_xing_' (val) {
+            if (this.isEdit) return
             this.form.mo_kuai_lu_jing_ = this.config[val].path
             if (!this.isFirstLieBiao) {
+                this.subForm = []
                 switch (val) {
                     case '01-室内温湿度监控':
                         this.form.lie_biao_shu_ju_ = JSON.stringify([
@@ -447,7 +452,7 @@ export default {
                         ])
                         break
                     default:
-                        delete this.form.lie_biao_shu_ju_
+                        this.form.lie_biao_shu_ju_ = ''
                         break
                 }
             }
@@ -721,7 +726,7 @@ export default {
                 if (item.jian_ce_gang_wei_ === '') {
                     return this.$message.warning(`子表第${i + 1}行监测岗位信息缺失！`)
                 }
-                if (this.isShowDevice && item.deviceno1_ === '') {
+                if (this.deviceIsRequired && item.deviceno1_ === '') {
                     return this.$message.warning(`子表第${i + 1}行设备信息缺失！`)
                 }
                 if (this.form.lei_xing_ === '01-室内温湿度监控' && item.fang_jian_ === '') {

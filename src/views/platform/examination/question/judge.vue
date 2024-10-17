@@ -257,7 +257,7 @@ export default {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
                     if (!data.length) {
-                        this.$message.error('获取题目信息失败！')
+                        this.$message.warning('没有试卷需要评阅！')
                         return this.closeDialog()
                     }
                     data.map(item => {
@@ -495,6 +495,8 @@ export default {
                         }
                     }
                     .result {
+                        position: absolute;
+                        bottom: 170px;
                         margin-top: 20px;
                         .title {
                             display: inline-block;
@@ -515,6 +517,7 @@ export default {
                 position: absolute;
                 width: calc(100% - 40px);
                 bottom: 20px;
+                height: 140px;
 
                 .question{
                     display: flex;

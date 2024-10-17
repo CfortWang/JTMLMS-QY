@@ -10,7 +10,7 @@ export const paperTypeOptions = [
     {
         label: 'ISO15189相关考试',
         value: 'ISO15189相关考试'
-    },
+    }
     // {
     //     label: '数学题库',
     //     value: '数学题库'
@@ -150,6 +150,7 @@ export const basicColumn = [
     { prop: 'examName', label: '考试名称', minWidth: 200 },
     { prop: 'examType', label: '考试类型', width: 90 },
     { prop: 'bankName', label: '考试题库', width: 160 },
+    { prop: 'trainId', label: '关联培训', width: 160 },
     { prop: 'examState', label: '状态', width: 80, tags: statusOption },
     { prop: 'totalScore', label: '总分', width: 65 }
 ]

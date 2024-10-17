@@ -113,7 +113,7 @@
                     </el-row>
                     <el-row v-if="isShowDevice">
                         <el-col :span="12">
-                            <el-form-item label="被控设备/设施编号：" label-width="140">
+                            <el-form-item v-if="deviceIsRequired" label="被控设备/设施编号：" label-width="140">
                                 <template slot="label">
                                     <span class="required">被控设备/设施编号：</span>
                                 </template>
@@ -131,9 +131,22 @@
                                     @change-link-data="deviceno1Change"
                                 />
                             </el-form-item>
+                            <el-form-item v-else label="被控设备/设施编号：" label-width="140">
+                                <ibps-link-data
+                                    v-model="form.deviceno1_"
+                                    style="width:80%"
+                                    size="mini"
+                                    template-key="sbxzsshj"
+                                    :multiple="false"
+                                    :temp-search="true"
+                                    label-value="yuan_she_bei_bian"
+                                    value-key="yuan_she_bei_bian"
+                                    @change-link-data="deviceno1Change"
+                                />
+                            </el-form-item>
                         </el-col>
-                        <el-col v-show="form.devicename1_" :span="12">
-                            <el-form-item label="被控设备/设施名称：" label-width="140">
+                        <el-col v-show="form.deviceno1_" :span="12">
+                            <el-form-item v-if="deviceIsRequired" label="被控设备/设施名称：" label-width="140">
                                 <template slot="label">
                                     <span>被控设备/设施名称</span>
                                     <el-tooltip effect="dark" content="选择设备后自动带出名称" placement="top">
@@ -141,6 +154,9 @@
                                     </el-tooltip>
                                 </template>
                                 <div>{{ form.devicename1_ }}</div>
+                            </el-form-item>
+                            <el-form-item v-else label="被控设备/设施名称：" label-width="140">
+                                <el-input v-model="form.devicename1_" size="mini" style="width:80%" />
                             </el-form-item>
                         </el-col>
 
@@ -255,7 +271,7 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                    <el-row>
+                    <el-row v-show="lei_xing_!=='12-紫外灯消毒'">
                         <el-col :span="22">
                             <el-form-item label="控制条件：">
                                 <el-input v-model="form.kong_zhi_tiao_jia" type="textarea" :rows="2" size="mini" />
@@ -354,7 +370,10 @@ export default {
     },
     computed: {
         isShowDevice () {
-            return this.lei_xing_ !== '01-室内温湿度监控' && this.lei_xing_ !== '06-每日安全检查' && this.lei_xing_ !== '08-含氯有效性监测'
+            return this.lei_xing_ !== '01-室内温湿度监控' && this.lei_xing_ !== '06-每日安全检查' && this.lei_xing_ !== '08-含氯有效性监测' && this.lei_xing_ !== '15-日常防护消毒'
+        },
+        deviceIsRequired () {
+            return this.lei_xing_ === '02-冰箱温度监控' || this.lei_xing_ === '05-纯水机水质监测' || this.lei_xing_ === '03-温浴箱温度监控' || this.lei_xing_ === '04-阴凉柜温度监控'
         },
         labelShow () {
             if (this.form.jian_ce_zhou_qi_) {
@@ -600,7 +619,7 @@ export default {
             if (this.form.jian_ce_gang_wei_ === '') {
                 throw new Error('监测岗位信息缺失！')
             }
-            if (this.isShowDevice && this.form.deviceno1_ === '') {
+            if (this.deviceIsRequired && this.form.deviceno1_ === '') {
                 throw new Error('请先选择设备！')
             }
             if (this.lei_xing_ === '01-室内温湿度监控' && this.form.fang_jian_ === '') {
