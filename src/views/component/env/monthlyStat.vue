@@ -129,6 +129,14 @@ export default {
             immediate: true
         }
     },
+    mounted () {
+        // 增加默认值属性
+        this.fields.forEach(item => {
+            if (item.default) {
+                this.$set(this.paramForm, item.key, item.default)
+            }
+        })
+    },
     methods: {
         handleActionEvent ({ key }) {
             switch (key) {

@@ -4,9 +4,9 @@
     <div v-show="show" style="height:92%;display:flex">
       <div style="width:28%;margin: 4% 5% 0 0;">
         <div class="leftSty">
-          <div class="numSize">手动<div class="numColor"> {{ data.autoNum + ' ' }} ({{calculatedPercentage(data.autoNum, data.total)}}%) </div></div>
+          <div class="numSize">非计划<div class="numColor"> {{ data.autoNum + ' ' }} ({{calculatedPercentage(data.autoNum, data.total)}}%) </div></div>
           <div style="flex: 1;"></div>
-          <div class="numSize">自动<div class="numColor" >{{ data.manual + ' ' }} ({{calculatedPercentage(data.manual, data.total)}}%) </div></div>
+          <div class="numSize">计划内<div class="numColor" >{{ data.manual + ' ' }} ({{calculatedPercentage(data.manual, data.total)}}%) </div></div>
           <div style="flex: 6;"><div :id="'jobPie'+id" :style="{height:'8vh',width:'100%'}"/></div>
           <!-- <div style="width: 100%;font-size: 2vh;">自动创建培训计划</div>
           <div style="display:flex;display: flex;align-items: center;width:100%">
@@ -135,8 +135,14 @@
           },
           yAxis: {
             type: 'value',
+            // minInterval: 1,
+            min:0,
             axisLabel: {
-                color: '#fff'
+                color: '#fff',
+                formatter: function(value) {
+                  console.log(value)
+                  return (value+'').indexOf('.')===-1?value: ''
+                }
             },
             splitLine:{
               show:true,
@@ -205,7 +211,23 @@
        option && jobPie.setOption(option)
       },
       calculatedPercentage(up, down){
-        return (up/down).toFixed(2)*100
+        console.log(typeof (up*100/down),'(up/down).toFixed(2)')
+        if(down !== 0){
+          let a = (up*100/down).toFixed(2)
+
+          if(this.isInfinit(a)){
+            return '0.00'
+          }else{
+            return a
+          }
+          
+        }else{
+          return '0.00'
+        }
+        
+      },
+      isInfinit(num) {
+        return isNaN(num) || Math.abs(num) === Infinity;
       }
     }
   }

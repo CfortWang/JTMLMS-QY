@@ -120,7 +120,7 @@
                 }else if(item.seriesName === 'numReal'){
                   nameNum = '实际参训人数'
                 }else if(item.seriesName === 'numAll'){
-                  nameNum = '培训总人数'
+                  nameNum = '应培训人数'
                 }
                 str += `<br /> ${item.marker} ${nameNum}  ${item.data}`
               })
@@ -140,7 +140,7 @@
               }else if(name === 'numReal'){
                 return '实际参训人数';
               }else if(name === 'numAll'){
-                return '培训总人数';
+                return '应培训人数';
               }
             }
           },
@@ -157,8 +157,13 @@
           },
           yAxis: {
             type: 'value',
+            min:0,
             axisLabel: {
-                color: '#fff'
+                color: '#fff',
+                formatter: function(value) {
+                  console.log(value)
+                  return (value+'').indexOf('.')===-1?value: ''
+                }
             },
             // boundaryGap:true,
             splitLine:{

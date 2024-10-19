@@ -118,8 +118,13 @@
           },
           yAxis: {
             type: 'value',
+            min:0,
             axisLabel: {
-                color: '#fff'
+                color: '#fff',
+                formatter: function(value) {
+                  console.log(value)
+                  return (value+'').indexOf('.')===-1?value: ''
+                }
             },
             splitLine:{
               show:true,

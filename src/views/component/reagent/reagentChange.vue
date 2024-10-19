@@ -10,6 +10,8 @@
                         <el-button type="success" size="mini" icon="ibps-icon-refresh" @click="generateData">重置</el-button>
                         <el-button v-if="!disabled" type="danger" size="mini" icon="ibps-icon-calculator" @click="computedResult">计算结果</el-button>
                         <el-button v-else type="danger" size="mini" icon="ibps-icon-edit" @click="disabled=false">编辑</el-button>
+                        <el-button type="primary" size="mini" icon="ibps-icon-download" @click="handleDownload">模版下载</el-button>
+                        <el-button type="primary" size="mini" icon="ibps-icon-import" @click="handleImport">导入</el-button>
                     </div>
                 </el-col>
             </el-row>
@@ -20,6 +22,12 @@
                             label="检验项目"
                             prop="jyxm"
                         />
+                        <el-table-column label="浓度" prop="nd">
+                            <template slot-scope="{row}">
+                                <el-input v-if="!disabled" v-model="row.nd" size="mini" placeholder="请输入" />
+                                <span v-else>{{ row.nd|| '/' }}</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column label="样品编号" prop="ypbh" />
                         <el-table-column label="旧试剂测得结果" prop="jsjcdjg">
                             <template slot-scope="{row}">
@@ -33,8 +41,8 @@
                                 <span v-else>{{ row.xsjcdjg|| '/' }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column label="偏倚" prop="pq" />
-                        <el-table-column label="限定范围" prop="xdfw" />
+                        <el-table-column label="实际差值" prop="xdfw" />
+                        <el-table-column label="实际偏倚" prop="pq" />
                         <el-table-column label="是否相符" prop="sfxf">
                             <template slot-scope="{row}">
                                 <el-radio-group v-model="row.sfxf" disabled>
@@ -84,10 +92,22 @@
                 <el-button type="primary" @click="dialogDataConfirm">确 定</el-button>
             </span>
         </el-dialog>
+        <import-table
+            :visible="importTableDialogVisible"
+            title="导入"
+            @close="(visible) => (importTableDialogVisible = visible)"
+            @action-event="handleImportTableActionEvent"
+        />
     </div>
 </template>
 <script>
+import importTable from '@/business/platform/form/formrender/dynamic-form/components/import-table'
+import IbpsImport from '@/plugins/import'
+import { SYSTEM_URL, BASE_API } from '@/api/baseUrl'
 export default {
+    components: {
+        importTable
+    },
     props: {
         formData: {
             type: Object,
@@ -124,7 +144,8 @@ export default {
             requestPage: {
                 limit: 20,
                 pageNo: 1
-            }
+            },
+            importTableDialogVisible: false
         }
     },
     computed: {
@@ -133,12 +154,12 @@ export default {
         }
     },
     watch: {
-        disabled: {
-            handler (val) {
-                this.$emit('change-data', 'zuJianShuJu', JSON.stringify([this.reagentData, this.copyDialogData.length, val]))
-            },
-            immediate: true
-        },
+        // disabled: {
+        //     handler (val) {
+        //         this.$emit('change-data', 'zuJianShuJu', JSON.stringify([this.reagentData, this.copyDialogData.length, val]))
+        //     },
+        //     immediate: true
+        // },
         'formData.sjghyzjlbxmcszb': {
             // 在表单中的任何操作都会触发子表的监听
             handler (val) {
@@ -172,11 +193,11 @@ export default {
             handler (val) {
                 if (this.formData.zuJianShuJu) {
                     const data = JSON.parse(this.formData.zuJianShuJu)
-                    this.spanLength = data[1]
+                    this.spanLength = data[1] || 0
                     if (val.length && this.reagentData.length <= 0) {
                         const arry = []
                         val.forEach(item => {
-                            arry.push({ jyxm: item.jianCeXiangMu, ypbh: item.biaoBenHao, jsjcdjg: item.jiuJieGuo, xsjcdjg: item.xinJieGuo, pq: item.jieGuo, fhl: item.biaoZhun, sfxf: item.xiangFu, jl: item.jieLun, xdfw: item.zuiXiaoFanWei })
+                            arry.push({ jyxm: item.jianCeXiangMu, nd: item.nongDu, ypbh: item.biaoBenHao, jsjcdjg: item.jiuJieGuo, xsjcdjg: item.xinJieGuo, pq: item.jieGuo, fhl: item.biaoZhun, sfxf: item.xiangFu, jl: item.jieLun, xdfw: item.zuiXiaoFanWei })
                         })
                         setTimeout(() => {
                             this.reagentData = arry
@@ -198,11 +219,117 @@ export default {
     },
     mounted () {
         this.nodeId = this.params ? this.params.nodeId : ''
-        this.spanLength = this.params ? this.params.spanLength : ''
+        this.spanLength = this.params ? this.params.spanLength : 0
         this.disabled = this.readonly || this.nodeId === 'Activity_0xkc1ji'
         this.showAndHide(this.formData.fangAn)
     },
     methods: {
+        handleImport () {
+            this.importTableDialogVisible = true
+        },
+        handleDownload () {
+            const a = document.createElement('a')
+            a.href = BASE_API() + SYSTEM_URL() + `/file/download?attachmentId=download_sjgh`
+            a.download = '试剂更换验证定量模板.xlsx'
+            a.style.display = 'none'
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+        },
+        getColumns () {
+            return [{
+                field_name: 'xsjcdjg',
+                label: '新试剂测得结果',
+                name: 'xsjcdjg'
+            }, {
+                field_name: 'jsjcdjg',
+                label: '旧试剂测得结果',
+                name: 'jsjcdjg'
+            }, {
+                field_name: 'nd',
+                label: '浓度',
+                name: 'nd'
+            }, {
+                field_name: 'sfxf',
+                label: '是否相符',
+                name: 'sfxf'
+            }, {
+                field_name: 'ypbh',
+                label: '样品编号',
+                name: 'ypbh'
+            }, {
+                field_name: 'jyxm',
+                label: '检验项目',
+                name: 'jyxm'
+            }, {
+                field_name: 'nd',
+                label: '浓度',
+                name: 'nd'
+            }, {
+                field_name: 'fhl',
+                label: '符合率',
+                name: 'fhl'
+            }, {
+                field_name: 'jl',
+                label: '结论',
+                name: 'jl'
+            }, {
+                field_name: 'xdfw',
+                label: '限定范围',
+                name: 'xdfw'
+            },
+            {
+                field_name: 'xiangMuFuHeLv',
+                label: '项目符合率',
+                name: 'xiangMuFuHeLv'
+            },
+            {
+                field_name: 'pq',
+                label: '偏倚',
+                name: 'pq'
+            }]
+        },
+        getKeys (data) {
+            return Array.isArray(data) ? data.reduce((acc, item) => ({ ...acc, [item.label]: item.name }), {}) : {}
+        },
+        handleImportTableActionEvent (file, options) {
+            IbpsImport.xlsx(file, options).then(({ header, results }) => {
+                const list = []
+                const keys = this.getKeys(this.getColumns())
+                results.forEach(item => {
+                    const obj = {}
+                    Object.keys(item).forEach(key => {
+                        if (keys[key]) {
+                            obj[keys[key]] = item[key]
+                        }
+                    })
+                    list.push(obj)
+                })
+                const filteredArray = list.map(item => {
+                    if (item.jyxm && item.fhl && item.jl) {
+                        return item
+                    }
+                    return null
+                }).filter(item => item !== null)
+                filteredArray.forEach(item => {
+                    list.forEach(el => {
+                        if (el.jyxm === item.jyxm) {
+                            el.fhl = item.fhl
+                            el.jl = item.jl
+                        }
+                    })
+                })
+                this.reagentData = list
+                this.disabled = true
+                setTimeout(() => {
+                    this.$nextTick(() => {
+                        this.$refs.reagent && this.$refs.reagent.$forceUpdate()
+                    })
+                })
+                this.importTableDialogVisible = false
+                this.$emit('change-data', 'zuJianShuJu', JSON.stringify([this.reagentData, this.copyDialogData.length, this.disabled]))
+            })
+        },
         // 当前页码改变
         handleCurrentChange (val) {
             this.requestPage.pageNo = val
@@ -278,6 +405,7 @@ export default {
                     })
                 })
                 this.disabled = true
+                this.$emit('change-data', 'zuJianShuJu', JSON.stringify([this.reagentData, this.copyDialogData.length, this.disabled]))
             } else {
                 this.$message.warning('试剂测得结果必须大于0且不能为空！')
             }
@@ -287,25 +415,47 @@ export default {
             this.reagentData = []
             this.ypData.forEach(item => {
                 this.copyDialogData.forEach(el => {
-                    this.reagentData.push({ jyxm: item.jianCeXiangMu, ypbh: el.number, jsjcdjg: '', xsjcdjg: '', pq: '', xdfw: item.xianDingFanWei + '%', sfxf: '', fhl: '', jl: '' })
+                    this.reagentData.push({ jyxm: item.jianCeXiangMu, nd: '', ypbh: el.number, jsjcdjg: '', xsjcdjg: '', pq: '', xdfw: item.xianDingFanWei + '%', sfxf: '', fhl: '', jl: '' })
                 })
             })
             this.$refs.reagent.doLayout()
         },
         spanMethod ({ row, column, rowIndex, columnIndex }) {
-            const rowspan = this.copyDialogData.length || this.spanLength
-            if (columnIndex === 0 || columnIndex === 5 || columnIndex === 7 || columnIndex === 8) {
-                if (rowIndex % rowspan === 0) {
-                    return {
-                        rowspan,
-                        colspan: 1
-                    }
+            // const rowspan = this.copyDialogData.length || this.spanLength
+            if (columnIndex === 0 || columnIndex === 8 || columnIndex === 9) {
+                const currentValue = row[column.property]
+                const preRow = this.reagentData[rowIndex - 1]
+                // 上一行这一列的数据
+                const preValue = preRow ? preRow[column.property] : null
+                // 如果当前值和上一行的值相同，则将当前单元格隐藏
+                // 给第0，8,9列对数值相同且是同一个'jyxm'进行表格合并
+                if (currentValue === preValue && row['jyxm'] === preRow['jyxm']) {
+                    return { rowspan: 0, colspan: 0 }
                 } else {
-                    return {
-                        rowspan: 0,
-                        colspan: 0
+                    let rowspan = 1
+                    // 计算应该合并的行数
+                    for (let i = rowIndex + 1; i < this.reagentData.length; i++) {
+                        const nextRow = this.reagentData[i]
+                        const nextValue = nextRow[column.property]
+                        if (nextValue === currentValue && nextRow['jyxm'] === row['jyxm']) {
+                            rowspan++
+                        } else {
+                            break
+                        }
                     }
+                    return { rowspan, colspan: 1 }
                 }
+                // if (rowIndex % rowspan === 0) {
+                //     return {
+                //         rowspan,
+                //         colspan: 1
+                //     }
+                // } else {
+                //     return {
+                //         rowspan: 0,
+                //         colspan: 0
+                //     }
+                // }
             }
         },
         addRow () {

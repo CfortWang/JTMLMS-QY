@@ -141,7 +141,7 @@ export default {
     data () {
         const d = new Date()
         const { deptList = [] } = this.$store.getters || {}
-        let chooseDept = deptList.filter(e => e.depth == 4)
+        let chooseDept = deptList.filter(e => e.depth == 4&&e.positionName.indexOf('质量')==-1)
         chooseDept.unshift({positionId: " ",positionName: "全科室"})
         return {
             deptList,

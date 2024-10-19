@@ -473,7 +473,7 @@ export default {
                                         di_dian_: this.level,
                                         shi_fou_guo_shen_: '已编制',
                                         bian_zhi_ren_: item.zhi_ding_ren_,
-                                        bian_zhi_bu_men_: this.getPersonPosition(item.zhi_ding_ren_),
+                                        bian_zhi_bu_men_: this.getPersonPosition(item.zhi_ding_ren_.split(',')[0]),
                                         bian_zhi_shi_jian: dayjs().format('YYYY-MM-DD HH:mm:ss'),
                                         gai_jin_bian_hao_: ('FXGJ-' + dayjs().format('YYYYMMDDHHmmss')) + count,
                                         yao_su_tiao_kuan_: item.yao_su_tiao_kuan_,
@@ -530,9 +530,7 @@ export default {
                         this.$message.success('提交成功')
                         // 提醒用户推送信息
                         if (addParams.paramWhere.length) {
-                            // 对措施制定人去重处理
-                            const ids = [...new Set(addParams.paramWhere.map(item => this.switchIdtoUserName(item.bian_zhi_ren_)))]
-                            this.$alert(`已向 ${ids.join(',')} ${ids.length}位措施制定人推送风险改进流程，同时向组长 ${this.infoFxssbData.zu_chang_} 推送风险报告流程！`, '提交成功', {
+                            this.$alert(`需要改进项${addParams.paramWhere.length}条，已向其中的每位措施制定人推送风险改进流程，同时向组长 ${this.infoFxssbData.zu_chang_} 推送风险报告流程！`, '提交成功', {
                                 confirmButtonText: '确定',
                                 callback: action => {
                                     this.closeDialog(true)
@@ -643,7 +641,7 @@ export default {
             const userList = this.$store.getters.userList
             const bianzhiUserid = userList.find(i => i.userId === id)
             if (bianzhiUserid) {
-                return bianzhiUserid.positionId
+                return bianzhiUserid.positionId.split(',')[0]
             }
         },
         checkRequired () {

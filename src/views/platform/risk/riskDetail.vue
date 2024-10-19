@@ -208,7 +208,7 @@
                                     type="user"
                                     readonly-text="text"
                                     :disabled="readonly"
-                                    :multiple="false"
+                                    :multiple="true"
                                     size="mini"
                                     :filter="filter"
                                     filterable

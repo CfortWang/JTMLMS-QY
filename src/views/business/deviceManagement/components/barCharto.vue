@@ -205,7 +205,12 @@
           },
           yAxis: {
             axisLabel: {
-              color: '#fff'
+              color: '#fff',
+              min:0,
+              formatter: function(value) {
+                  console.log(value)
+                  return (value+'').indexOf('.')===-1?value: ''
+              }
             },
             // interval: interval
           },
