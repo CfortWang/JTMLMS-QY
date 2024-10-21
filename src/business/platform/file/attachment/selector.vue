@@ -49,7 +49,7 @@
 </template>
 <script>
 import { get, transfer, uploadFile } from '@/api/platform/file/attachment'
-import { uploadOnlyOfficeFile } from '@/api/platform/file/onlyoffice'
+import { uploadTemplateFile } from '@/api/platform/file/onlyoffice'
 import { downloadFile } from '@/business/platform/file/utils'
 import { remoteRequest, remoteTransRequest } from '@/utils/remote'
 import IbpsFileAttachmentSelector from './index'
@@ -597,7 +597,7 @@ export default {
         httpRequest (options) {
             const uploadMap = {
                 normal: uploadFile,
-                onlyoffice: uploadOnlyOfficeFile
+                onlyoffice: uploadTemplateFile
             }
             return uploadMap[this.uploadMethod || 'normal'](options.file, {})
         },

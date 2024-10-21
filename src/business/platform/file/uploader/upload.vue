@@ -60,7 +60,7 @@
 </template>
 <script>
 import { uploadFile, remove, deleteFile } from '@/api/platform/file/attachment'
-import { uploadOnlyOfficeFile } from '@/api/platform/file/onlyoffice'
+import { uploadTemplateFile } from '@/api/platform/file/onlyoffice'
 import { fileTypes, allFileTypes, accept as acceptTypes } from '@/business/platform/file/constants/fileTypes'
 export default {
     props: {
@@ -105,7 +105,7 @@ export default {
         httpRequest (options) {
             const uploadMap = {
                 normal: uploadFile,
-                onlyoffice: uploadOnlyOfficeFile
+                onlyoffice: uploadTemplateFile
             }
             return uploadMap[this.uploadMethod || 'normal'](options.file, {})
         },

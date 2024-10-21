@@ -127,7 +127,7 @@
 
 import { fileTypes, allFileTypes, accept as acceptTypes } from '@/business/platform/file/constants/fileTypes'
 import { uploadFile } from '@/api/platform/file/attachment'
-import { uploadOnlyOfficeFile } from '@/api/platform/file/onlyoffice'
+import { uploadTemplateFile } from '@/api/platform/file/onlyoffice'
 import VueDraggable from 'vuedraggable'
 
 export default {
@@ -264,7 +264,7 @@ export default {
         httpRequest (options) {
             const uploadMap = {
                 normal: uploadFile,
-                onlyoffice: uploadOnlyOfficeFile
+                onlyoffice: uploadTemplateFile
             }
             return uploadMap[this.uploadMethod || 'normal'](options.file, {})
         },
