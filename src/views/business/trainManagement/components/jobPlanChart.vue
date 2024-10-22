@@ -4,9 +4,9 @@
     <div v-show="show" style="height:92%;display:flex">
       <div style="width:28%;margin: 4% 5% 0 0;">
         <div class="leftSty">
-          <div class="numSize">非计划<div class="numColor"> {{ data.autoNum + ' ' }} ({{calculatedPercentage(data.autoNum, data.total)}}%) </div></div>
+          <div class="numSize">非计划<div class="numColor"> {{ data.manual + ' ' }} ({{calculatedPercentage(data.manual, data.total)}}%) </div></div>
           <div style="flex: 1;"></div>
-          <div class="numSize">计划内<div class="numColor" >{{ data.manual + ' ' }} ({{calculatedPercentage(data.manual, data.total)}}%) </div></div>
+          <div class="numSize">计划内<div class="numColor" >{{ data.autoNum + ' ' }} ({{calculatedPercentage(data.autoNum, data.total)}}%) </div></div>
           <div style="flex: 6;"><div :id="'jobPie'+id" :style="{height:'8vh',width:'100%'}"/></div>
           <!-- <div style="width: 100%;font-size: 2vh;">自动创建培训计划</div>
           <div style="display:flex;display: flex;align-items: center;width:100%">

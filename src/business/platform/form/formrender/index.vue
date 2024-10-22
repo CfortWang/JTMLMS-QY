@@ -73,6 +73,7 @@
     import DynamicForm from './dynamic-form/dynamic-form'
     import IbpsWatermark from '@/components/ibps-watermark'
     import panle from '@/components/jbd-panel'
+    import { startFlowFromListLoading } from "@/api/platform/bpmn/bpmInst";
 
     const JFormId = 'JForm'
 
@@ -357,6 +358,13 @@
                     }
                 }
                 return step
+            },
+            handleStartFlowFromListLoading(idArr) {
+                return startFlowFromListLoading(idArr)
+                    .then((r) => {})
+                    .catch(() => {
+                        // loading.close()
+                    });
             },
             handleStepButtonEvent(button) {
                 const key = button.key

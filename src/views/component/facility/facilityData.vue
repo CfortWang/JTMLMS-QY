@@ -220,11 +220,14 @@ export default {
                     item.startTime = ''
                 }
 
-                // this.formData.jianCeShiJian = '2024-09-05'
+                // this.formData.jianCeShiJian = '2024-10-20' // 测试用
                 if (item.rate && this.formData.jianCeShiJian) {
                     const jianCeShiJian = this.formData.jianCeShiJian.slice(0, 10)
                     const thatDate = new Date(jianCeShiJian)
-                    const day = thatDate.getDay() // 周几
+                    let day = thatDate.getDay() // 周几
+                    if (day === 0) { // 周日得到结果为0 需要特判
+                        day = 7
+                    }
                     const dayofMonth = thatDate.getDate() // 多少号
                     let dayDiff = ''
                     console.log(`监测时间：${jianCeShiJian},周${day}`)
