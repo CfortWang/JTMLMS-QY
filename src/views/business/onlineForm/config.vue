@@ -248,7 +248,7 @@ export default {
             level: level.second || level.first,
             dialogVisible: this.visible,
             loading: false,
-            title: this.params.id_ ? '配置电子表单模板' : '添加电子表单模板',
+            title: '添加电子表单模板',
             formLabelWidth: '110px',
             categoryKey: 'FLOW_TYPE',
             processData: [],
@@ -429,6 +429,7 @@ export default {
         },
         init () {
             const isEdit = this.params && this.params.id_
+            this.title = isEdit ? '配置电子表单模板' : '添加电子表单模板'
             this.form = JSON.parse(JSON.stringify(this.params))
             this.processData = []
             if (isEdit) {

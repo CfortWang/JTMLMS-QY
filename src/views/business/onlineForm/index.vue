@@ -75,7 +75,8 @@
     </ibps-layout>
 </template>
 <script>
-import { setCategory } from '@/api/platform/bpmn/bpmDefinition'
+
+import { createTemplateFile, deleteTemplateFile } from '@/api/platform/file/onlyoffice'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 // import Handle from './mixin/handle'
@@ -145,7 +146,7 @@ export default {
             defKey: '',
             data: {},
             typeId: '',
-            templateId: '', // 模板id
+            templateData: '', // 模板数据
             // 数据字典列表
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: false,
@@ -157,19 +158,19 @@ export default {
             listConfig: { // 工具栏
                 toolbars: [
                     { key: 'search' },
-                    { key: 'online', label: '在线填写', icon: 'ibps-icon-add', type: 'success' },
-                    { key: 'upload', label: '扫描上传', icon: 'ibps-icon-upload', type: 'primary' },
-                    { key: 'remove' },
-                    { key: 'more',
-                        label: '更多',
-                        mode: 'dropdown',
-                        type: 'info',
-                        visible: false,
-                        menus: [
-                            { key: 'setTemplate', label: '模板配置', icon: 'ibps-icon-cogs', type: 'info' },
-                            { key: 'revoke', label: '废除模板', icon: 'ibps-icon-trash', type: 'danger' }
-                        ]
-                    }
+                    { key: 'online', label: '在线填写', icon: 'ibps-icon-add', type: 'success', visible: false },
+                    { key: 'upload', label: '扫描上传', icon: 'ibps-icon-upload', type: 'primary', visible: false },
+                    { key: 'remove', visible: hasRole }
+                    // { key: 'more',
+                    //     label: '更多',
+                    //     mode: 'dropdown',
+                    //     type: 'info',
+                    //     visible: false,
+                    //     menus: [
+                    //         { key: 'setTemplate', label: '模板配置', icon: 'ibps-icon-cogs', type: 'info' },
+                    //         { key: 'revoke', label: '废除模板', icon: 'ibps-icon-trash', type: 'danger' }
+                    //     ]
+                    // }
                 ],
                 searchForm: { // 查询条件
                     labelWidth: 80,
@@ -189,12 +190,12 @@ export default {
                 // 表格字段配置
                 columns: [
                     { prop: 'dept', label: '部门', tags: deptOption, width: 100, sortable: true },
-                    { prop: 'formName', label: '表单名称', minWidth: 150, sortable: true },
+                    { prop: 'formName', label: '表单名称', width: 200, sortable: true },
                     { prop: 'state', label: '状态', slotName: 'state', width: 90 },
                     { prop: 'submitBy', label: '填写人', tags: userOption, width: 100, sortable: true },
                     { prop: 'submitTime', label: '填写时间', width: 140, sortable: true },
-                    { prop: 'attachment', label: '附件', slotName: 'attachment', width: 90 },
-                    { prop: 'version', label: '表单版本', width: 90 }
+                    { prop: 'version', label: '表单版本', width: 90 },
+                    { prop: 'attachment', label: '附件', slotName: 'attachment', minWidth: 110 }
                 ],
                 rowHandle: {
                     effect: 'display',
@@ -257,7 +258,7 @@ export default {
                 sortParams = 'bian_zhi_shi_jian desc, bian_zhi_bu_men_ asc'
             }
             const params = this.getParams(parameters)
-            const sql = `select id_ as recordId, create_by_ as createBy, bian_zhi_ren_ as submitBy, create_time_ as createTime, bian_zhi_shi_jian as submitTime, bian_zhi_bu_men_ as dept, shi_fou_guo_shen_ as state, biao_dan_ming_che as formName, biao_dan_mo_ban_ as formTemplate, gui_dang_lu_jing_ as parentId, fu_jian_ as attachment, shuo_ming_ as detail, pei_zhi_ as config, mo_ban_id_ as templateId from t_bdmbtxjl where di_dian_ = '${this.level}'${params} order by ${sortParams}`
+            const sql = `select id_ as id, create_by_ as createBy, bian_zhi_ren_ as submitBy, create_time_ as createTime, bian_zhi_shi_jian as submitTime, bian_zhi_bu_men_ as dept, shi_fou_guo_shen_ as state, biao_dan_ming_che as formName, biao_dan_mo_ban_ as formTemplate, mo_ban_id_ as templateId, gui_dang_lu_jing_ as parentId, fu_jian_ as attachment, cun_fang_lu_jing_ as filePath, shuo_ming_ as detail, pei_zhi_ as config from t_bdmbtxjl where di_dian_ = '${this.level}'${params} order by ${sortParams}`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -372,10 +373,29 @@ export default {
                     ActionUtils.setFirstPagination(this.pagination)
                     this.search()
                     break
+                case 'online':// 在线填写
+                    this.handleOnlineForm(data)
+                    break
+                case 'upload':// 记录上传
+                    this.handleUploadForm(data)
+                    break
+                case 'edit':// 编辑
+                    this.handleEdit()
+                    break
+                case 'preview':// 查阅
+                    this.handlePreview()
+                    break
                 case 'remove':// 删除
-                    ActionUtils.removeRecord(selection).then((ids) => {
-                        this.handleRemove(ids)
-                    }).catch(() => { })
+                    if (this.$utils.isEmpty(selection)) {
+                        return this.$message.warning('请选择要删除的数据！')
+                    }
+                    this.$confirm('数据删除后不可恢复，您确定要删除吗？', '提示', {
+                        type: 'warning',
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消'
+                    }).then(() => {
+                        this.handleRemove(data)
+                    })
                     break
                 default:
                     break
@@ -383,13 +403,18 @@ export default {
         },
         handleNodeClick (typeId, data) {
             this.typeId = typeId
-            this.templateId = data.templateId
-            const moreBtn = this.listConfig.toolbars.find(i => i.key === 'more')
-            const moreBtnIndex = this.listConfig.toolbars.findIndex(i => i.key === 'more')
-            if (moreBtnIndex !== -1) {
-                moreBtn.visible = !!this.templateId
-                this.listConfig.toolbars.splice(moreBtnIndex, 1, moreBtn)
-            }
+            this.templateData = data
+            const { templateId } = this.templateData || {}
+            this.listConfig.toolbars.forEach(item => {
+                // 在线填写按钮仅在模板下显示
+                if (item.key === 'more' || item.key === 'online') {
+                    item.visible = !!templateId
+                }
+                if (item.key === 'upload') {
+                    item.visible = !templateId && !!typeId
+                }
+            })
+            this.listConfig.toolbars = [...this.listConfig.toolbars]
             this.loadData()
         },
         handleExpandCollapse (isExpand) {
@@ -399,16 +424,40 @@ export default {
             this.typeId = ''
             this.loadData()
         },
-        saveSettingType (typeId) {
-            setCategory({
-                defIds: this.editId,
-                typeId: typeId
-            }).then(response => {
-                ActionUtils.successMessage('保存成功')
-                this.settingTypeFormVisible = false
-                this.search()
-            }).catch((err) => {
-                console.error(err)
+        handleOnlineForm (data) {
+            console.log(data)
+            createTemplateFile({ templateId: '1287803894423879680' }).then(res => {
+                console.log(res)
+            })
+        },
+        handleUploadForm (data) {
+
+        },
+        handleEdit () {
+
+        },
+        handlePreview () {
+        },
+        handleRemove (data) {
+            const idList = data.map(i => i.id)
+            const filePathList = data.map(i => i.filePath).filter(i => i)
+            // 删除记录
+            this.$common.request('delete', {
+                tableName: 't_bdmbtxjl',
+                paramWhere: { id_: idList.join(',') }
+            }).then(() => {
+                // 删除文件
+                if (!filePathList.length) {
+                    this.$message.success('删除成功！')
+                    this.search()
+                    return
+                }
+                deleteTemplateFile({
+                    filePath: filePathList
+                }).then(() => {
+                    this.$message.success('删除成功！')
+                    this.search()
+                })
             })
         }
     }

@@ -57,7 +57,7 @@
 
 <script>
 import { findTreeData, remove } from '@/api/platform/cat/type'
-import { deleteOnlyOfficeFile } from '@/api/platform/file/onlyoffice'
+import { deleteTemplateFile } from '@/api/platform/file/onlyoffice'
 import ActionUtils from '@/utils/action'
 
 import TypeEdit from '@/views/platform/cat/type/edit'
@@ -312,7 +312,7 @@ export default {
                     this.$emit('refresh')
                     this.loadTreeData()
                     // 删除文件模板
-                    // deleteOnlyOfficeFile({ id: data.id }).then(res => {})
+                    // deleteTemplateFile({ id: data.id }).then(res => {})
                 }).catch(error => {
                     this.$message.warning(error.message)
                 })
