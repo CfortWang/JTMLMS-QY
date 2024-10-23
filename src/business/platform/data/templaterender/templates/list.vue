@@ -1468,7 +1468,7 @@ export default {
                 code: rf.code,
                 label: rf.label || defaultButton.label,
                 icon: rf.icon ? 'ibps-icon-' + rf.icon : defaultButton.icon,
-                type: rf.style || defaultButton.type,
+                type: rf.style || (rf.button_type === 'close' ? 'danger' : defaultButton.type),
                 deflow: rf.deflow || null,
                 isEditOnHis: rf.isEditOnHis === 'Y',
                 // eslint-disable-next-line no-eval
