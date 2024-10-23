@@ -273,6 +273,7 @@ export default {
                             const newTab = window.open()
                             const link = newTab.document.createElement('link')
                             const url = BASE_API() + SYSTEM_URL() + '/file/download?attachmentId=' + data.id
+                            const hasRole = localStorage.getItem('hasHighRole') || 0
                             link.rel = 'shortcut icon'
                             link.type = 'image/x-icon'
                             link.href = 'favicon.ico'
@@ -280,7 +281,7 @@ export default {
                             newTab.document.write(`<title>文件预览页-${data.fileName}</title>`)
                             newTab.document.write('<style>body { margin: 0px; }</style>')
                             newTab.document.head.appendChild(link)
-                            newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(url)}" style="width:100%; height:100%;" frameborder="0";>`)
+                            newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(url)}&hasRole=${hasRole}" style="width:100%; height:100%;" frameborder="0";>`)
                         })
                     } else {
                         this.file.url = BASE_API() + SYSTEM_URL() + `/file/download?attachmentId=${data.id}`

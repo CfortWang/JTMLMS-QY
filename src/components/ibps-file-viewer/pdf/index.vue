@@ -8,7 +8,8 @@ export default {
     data () {
         return {
             pdfUrl: null,
-            height: '450px'
+            height: '450px',
+            hasRole: localStorage.getItem('hasHighRole') || 0
         }
     },
     mounted () {
@@ -19,11 +20,11 @@ export default {
         load (url) {
             this.pdfUrl = null
             url = encodeURIComponent(url)
-            this.pdfUrl = `${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${url}&newWindow=true`
+            this.pdfUrl = `${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${url}&&hasRole=${this.hasRole}`
         },
         loadData (data) {
             this.pdfUrl = null
-            this.pdfUrl = `${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${data}`
+            this.pdfUrl = `${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${data}&hasRole=${this.hasRole}`
         },
         handleDialogHeightResize () {
             this.height = this.getDialogHeightHeight()

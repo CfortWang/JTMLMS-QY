@@ -1764,9 +1764,11 @@ function loadAndEnablePDFBug(enabledTabs) {
 function webViewerInitialized() {
   const appConfig = PDFViewerApplication.appConfig;
   let file;
+  let hasRole;
   const queryString = document.location.search.substring(1);
   const params = (0, _ui_utils.parseQueryString)(queryString);
   file = "file" in params ? params.file : _app_options.AppOptions.get("defaultUrl");
+  hasRole = "hasrole" in params ? params.hasrole : _app_options.AppOptions.get("hasRole");
   validateFileURL(file);
   const fileInput = document.createElement("input");
   fileInput.id = appConfig.openFileInputName;
@@ -1774,6 +1776,14 @@ function webViewerInitialized() {
   fileInput.setAttribute("type", "file");
   fileInput.oncontextmenu = _ui_utils.noContextMenuHandler;
   document.body.appendChild(fileInput);
+
+  if (hasRole !== '1') {
+    appConfig.toolbar.openFile.setAttribute("hidden", "true");
+    appConfig.toolbar.print.setAttribute("hidden", "true");
+    appConfig.toolbar.download.setAttribute("hidden", "true");
+    appConfig.toolbar.viewBookmark.setAttribute("hidden", "true");
+    appConfig.secondaryToolbar.downloadButton.setAttribute("hidden", "true");
+  }
 
   if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
     appConfig.toolbar.openFile.setAttribute("hidden", "true");
@@ -3492,6 +3502,10 @@ const defaultOptions = {
   },
   defaultUrl: {
     value: "compressed.tracemonkey-pldi-09.pdf",
+    kind: OptionKind.VIEWER
+  },
+  hasRole: {
+    value: '0',
     kind: OptionKind.VIEWER
   },
   defaultZoomValue: {

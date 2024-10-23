@@ -136,6 +136,7 @@ export default {
                 this.fileType = 'image'
             } else if (flag && pdfType.includes(this.fileExt)) {
                 // this.fileType = 'pdf'
+                const hasRole = localStorage.getItem('hasHighRole') || 0
                 this.$nextTick(() => {
                     // this.$refs.viewer.load(this.url)
                     const newTab = window.open()
@@ -147,7 +148,7 @@ export default {
                     newTab.document.write(`<title>文件预览页-${this.title}</title>`)
                     newTab.document.write('<style>body { margin: 0px; }</style>')
                     newTab.document.head.appendChild(link)
-                    newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(this.url)}" style="width:100%; height:100%;" frameborder="0";>`)
+                    newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(this.url)}&hasRole=${hasRole}" style="width:100%; height:100%;" frameborder="0";>`)
                     this.closeDialog()
                 })
             } else {

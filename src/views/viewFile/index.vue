@@ -18,7 +18,8 @@ export default {
             newId: '',
             timer: '',
             configKey: '',
-            option: {}
+            option: {},
+            hasRole: localStorage.getItem('hasHighRole') === '1'
         }
     },
     watch: {
@@ -50,10 +51,10 @@ export default {
                     permissions: {
                         comment: true,
                         copy: true,
-                        download: false,
+                        download: this.hasRole,
                         modifyContentControl: true,
                         modifyFilter: true,
-                        print: false,
+                        print: this.hasRole,
                         edit: true,
                         fillForms: true,
                         review: true

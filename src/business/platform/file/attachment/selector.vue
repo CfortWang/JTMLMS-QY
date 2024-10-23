@@ -29,7 +29,6 @@
             :accept="acceptType"
             :file-ext="fileExt"
             :limit="limit"
-            :upload-method="uploadMethod"
             @close="visible => selectorVisible = visible"
             @action-event="handleSelectorActionEvent"
         />
@@ -49,7 +48,6 @@
 </template>
 <script>
 import { get, transfer, uploadFile } from '@/api/platform/file/attachment'
-import { uploadTemplateFile } from '@/api/platform/file/onlyoffice'
 import { downloadFile } from '@/business/platform/file/utils'
 import { remoteRequest, remoteTransRequest } from '@/utils/remote'
 import IbpsFileAttachmentSelector from './index'
@@ -159,11 +157,6 @@ export default {
         showExtName: {
             type: Boolean,
             default: true
-        },
-        // 上传方法：normal:普通上传，onlyoffice:onlyoffice文件上传
-        uploadMethod: {
-            type: String,
-            default: 'normal'
         }
     },
     data () {
@@ -520,6 +513,7 @@ export default {
          */
         handlePreview (index) {
             this.attachment = this.multiple ? this.selectorValue[index] : this.selectorValue
+            const hasRole = localStorage.getItem('hasHighRole') || 0
             if (this.attachment.ext === 'pdf') {
                 this.$nextTick(() => {
                     // this.$refs.viewer.load(this.url)
@@ -533,7 +527,7 @@ export default {
                     newTab.document.write(`<title>文件预览页-${this.attachment.fileName}</title>`)
                     newTab.document.write('<style>body { margin: 0px; }</style>')
                     newTab.document.head.appendChild(link)
-                    newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(url)}" style="width:100%; height:100%;" frameborder="0";>`)
+                    newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(url)}&hasRole=${hasRole}" style="width:100%; height:100%;" frameborder="0";>`)
                     // this.closeDialog()
                 })
             } else if (supportFileTypes.includes(this.attachment.ext)) {
@@ -595,11 +589,7 @@ export default {
          * 文件上传
          */
         httpRequest (options) {
-            const uploadMap = {
-                normal: uploadFile,
-                onlyoffice: uploadTemplateFile
-            }
-            return uploadMap[this.uploadMethod || 'normal'](options.file, {})
+            return uploadFile(options.file, {})
         },
         handleDelete (file, selectorValue) {
             this.selectorValue = selectorValue

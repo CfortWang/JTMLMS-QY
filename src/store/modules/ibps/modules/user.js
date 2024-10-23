@@ -73,6 +73,16 @@ export default {
                             reject(response)
                         }
                         const info = response.data
+                        /**
+                         * store 统一存储高权限角色，用于各模块校验附件下载权限
+                         * 初定角色为：系统管理角色、主任、质量负责人、文件管理负责人、文件管理员
+                         */
+                        info.highRoles = ['xtgljs', 'syszr', 'zlfzr', 'wjglzzc', 'wjgly']
+                        const { role = [] } = info || {}
+                        const hasHighRole = role.some(item => info.highRoles.includes(item.alias))
+                        // 用于文件预览页判定是否开启下载权限
+                        localStorage.setItem('hasHighRole', hasHighRole ? 1 : 0)
+
                         // 设置当前
                         await dispatch('ibps/user/set', info, {
                             root: true
