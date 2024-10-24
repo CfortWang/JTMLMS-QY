@@ -168,6 +168,20 @@ export function startFlowFromList (params) {
     return request({
         url: BPMN_URL() + '/bpm/instance/startFlowFromList',
         method: 'post',
+        isLoading: true,
+        params: params
+    })
+}
+/**
+ * 启动自定义流程按钮【列表】
+ * 带loading提示
+ * @param {*} params
+ */
+export function startFlowFromListLoading (params) {
+    return request({
+        url: BPMN_URL() + '/bpm/instance/startFlowFromList',
+        method: 'post',
+        isLoading: true,
         params: params
     })
 }
