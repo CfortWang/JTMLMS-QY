@@ -10,8 +10,8 @@
         PUBLIC_URL,
         //  api
         BASE_API: `${ BASE_URL }ibps`,
-        // 是否启用动态API，启用后，将根据访问IP的host获取API地址
-        ENABLE_DYNAMIC_API: true,
+        // 是否启用动态API，启用后，将根据访问IP的origin获取API地址
+        ENABLE_DYNAMIC_API: false,
         // GATEWAY API
         BASE_GATEWAY_API: `${ BASE_URL }ibps`,
         // WEBSOCKET api
