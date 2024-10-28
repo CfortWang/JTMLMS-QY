@@ -15,6 +15,7 @@
             :def-id="defId"
             :pro-inst-id="proInstId"
             :flow-name="title"
+            :process-name="processName"
             :task-id="taskId"
             :wai-jian="waiJian"
             :instance-id="instanceId"
@@ -66,8 +67,12 @@ export default {
             type: String
         },
         previousDataTemplate: {
-          type: Object
-        }
+            type: Object
+        },
+        processName: { // 流程名称
+            type: String,
+            default: ''
+        }
     },
     data () {
         return {
@@ -101,7 +106,7 @@ export default {
         },
         // 关闭当前窗口
         closeDialog () {
-            this.$emit('close', false , this.previousDataTemplate)
+            this.$emit('close', false, this.previousDataTemplate)
         }
     }
 }

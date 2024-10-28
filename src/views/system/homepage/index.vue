@@ -27,6 +27,7 @@
             :task-id="taskId"
             :instance-id="instanceId"
             :title="flowName"
+            :process-name="processName"
             @close="visible => (bpmnFormrenderDialogVisible = visible)"
             @callback="handleFlowCallback"
         />
@@ -186,6 +187,7 @@ export default {
             useCssTransforms: true,
             taskId: '',
             flowName: '',
+            processName: '',
             ibpsNewsDialogVisible: false,
             newsEditId: '',
             newsTitle: '公告明细',
@@ -426,8 +428,20 @@ export default {
             this.defId = params.defId || null
             this.taskId = params.taskId || null
             this.instanceId = params.instanceId || null
-            this.flowName = params.flowName || null
+            this.flowName = params.name || null
+            this.processName = this.getProcessName(params.procDefKey, params.subject)
             this.bpmnFormrenderDialogVisible = true
+        },
+        getProcessName (key, subject) {
+            // 从store中获取特殊流程数组
+            const { specialProcessList = ['Process_16lkr65'] } = this.$store.getters
+            const isSpecial = specialProcessList.includes(key)
+            const arr = subject.split('#')
+            if (!isSpecial || !arr[2]) {
+                return ''
+            }
+            const temp = JSON.parse(`{${arr[2]}}`)
+            return temp.hasOwnProperty('formName') ? temp.processName : ''
         },
         handleFlowCallback () {
             this.$refs[this.alias] ? this.$refs[this.alias][0].refreshData() : null

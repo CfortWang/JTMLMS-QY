@@ -144,6 +144,7 @@
 <script>
     import { getFormData, getInstFormData } from '@/api/platform/bpmn/bpmInst'
     import { getTaskFormData } from '@/api/platform/bpmn/bpmTask'
+    import { cleanFormCache } from '@/api/platform/system/cache'
 
     import FormUtil from '@/business/platform/form/utils/formUtil'
     import FormFieldUtil from '@/business/platform/form/utils/formFieldUtil'
@@ -224,6 +225,11 @@
             closeable: {
                 type: Boolean,
                 default: true
+            },
+            // 流程名称
+            processName: {
+                type: String,
+                default: ''
             }
         },
         data() {
@@ -331,14 +337,16 @@
                 this.loading = true
                 this.formParams.taskId = this.taskId || null
                 this.formParams.waiJian = this.waiJian || null
-                getTaskFormData({
-                    taskId: this.taskId,
-                    waiJian: this.waiJian
-                }).then(response => {
-                    this.loading = false
-                    this.buildFormData(response.data)
-                }).catch(() => {
-                    this.loading = false
+                cleanFormCache().then(() => {
+                    getTaskFormData({
+                        taskId: this.taskId,
+                        waiJian: this.waiJian
+                    }).then(response => {
+                        this.loading = false
+                        this.buildFormData(response.data)
+                    }).catch(() => {
+                        this.loading = false
+                    })
                 })
             },
             /**
@@ -396,6 +404,7 @@
                     // 表单定义
                     this.formDef = this.$utils.parseData(formModel.formData) || {}
                     this.formDef.flowName = this.flowName
+                    this.formDef.processName = this.processName
 
                     this.formData = {
                         // 表单数据

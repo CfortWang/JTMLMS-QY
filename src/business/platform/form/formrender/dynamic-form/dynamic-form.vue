@@ -5,7 +5,7 @@
             <!--表头-->
             <div v-if="hasHeader" class="form-header">
                 <div v-if="hasHeader" class="title" style="font-size: 22px; font-family: SimHei" :class="titlePosition">
-                    {{ formDef.name }}
+                    {{ formDef.processName ? formDef.processName : formDef.name }}
                     <span v-if="formDef && formDef.flowName">{{ formDef.flowName }}</span>
                     <relevance-table
                         v-if="titleList.length > 0 && (formParams.formAttrs.customClass && formParams.formAttrs.customClass.includes('true'))"
