@@ -72,14 +72,19 @@
                         <el-form-item label="表单模板：" prop="biao_dan_mo_ban_">
                             <ibps-attachment
                                 v-model="form.biao_dan_mo_ban_"
-                                :download="true"
+                                :download="false"
                                 :multiple="false"
                                 accept=".docx"
                                 :disabled="readonly"
-                                operation_status="saveAdd"
+                                operation-status="saveAdd"
                                 upload-method="onlyoffice"
+                                :file-option="fileOption"
                                 size="mini"
+                                label-key="filename"
+                                value-key="filepath"
+                                store="json"
                                 placeholder="请选择docx格式文档"
+                                @callback="handleFileCallback"
                             />
                         </el-form-item>
                     </el-col>
@@ -217,13 +222,14 @@
 
 <script>
 import dayjs from 'dayjs'
+import { editTemplateFile } from '@/api/platform/file/onlyoffice'
 
 export default {
     components: {
         IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog'),
         ibpsUserSelector: () => import('@/business/platform/org/selector'),
         IbpsRoleSelector: () => import('@/business/platform/org/role/selector'),
-        IbpsAttachment: () => import('@/business/platform/file/attachment/selector'),
+        IbpsAttachment: () => import('@/business/platform/file/attachment/template-selector'),
         IbpsTypeSelect: () => import('@/business/platform/cat/type/select')
     },
     props: {
@@ -236,6 +242,10 @@ export default {
             default: false
         },
         params: {
+            type: Object,
+            default: () => {}
+        },
+        fileOption: {
             type: Object,
             default: () => {}
         }
@@ -352,8 +362,10 @@ export default {
             }).catch(() => {})
         },
         formatData () {
+            const templateInfo = this.form.biao_dan_mo_ban_ ? JSON.parse(this.form.biao_dan_mo_ban_) : {}
             const formData = {
                 ...this.form,
+                cun_fang_lu_jing_: templateInfo.filepath,
                 liu_cheng_shu_ju_: JSON.stringify(this.processData.map((item, index) => ({
                     sn: index + 1,
                     nodeName: item.jie_dian_ming_cheng_,
@@ -430,11 +442,11 @@ export default {
         init () {
             const isEdit = this.params && this.params.id_
             this.title = isEdit ? '配置电子表单模板' : '添加电子表单模板'
-            this.form = JSON.parse(JSON.stringify(this.params))
+            this.form = this.params ? JSON.parse(JSON.stringify(this.params)) : {}
             this.processData = []
             if (isEdit) {
                 // JSON 解析
-                const liu_cheng_shu_ju_ = JSON.parse(this.form.liu_cheng_shu_ju_)
+                const liu_cheng_shu_ju_ = this.form.liu_cheng_shu_ju_ ? JSON.parse(this.form.liu_cheng_shu_ju_) : []
                 liu_cheng_shu_ju_.forEach((item, index) => {
                     this.$set(this.processData, index, {
                         jie_dian_ming_cheng_: item.nodeName,
@@ -451,6 +463,15 @@ export default {
                 this.form.bian_zhi_shi_jian = dayjs().format('YYYY-MM-DD HH:mm:ss')
                 this.form.liu_cheng_shu_ju_ = []
             }
+        },
+        handleFileCallback (val) {
+            if (this.$utils.isEmpty(val) || this.$utils.isEmpty(val.filepath)) {
+                return
+            }
+            this.form.cun_fang_lu_jing_ = val.filepath
+            editTemplateFile({ fileName: val.filepath }).then(res => {
+                this.form.wen_jian_xin_xi_ = JSON.stringify(res.data)
+            })
         }
     }
 }
