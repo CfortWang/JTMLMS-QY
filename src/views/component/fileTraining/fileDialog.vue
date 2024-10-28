@@ -120,6 +120,7 @@ export default {
             controlShow: false
         }
     },
+
     watch: {
         innerVisible: {
             immediate: true,

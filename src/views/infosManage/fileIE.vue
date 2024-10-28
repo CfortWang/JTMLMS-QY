@@ -75,7 +75,6 @@
                                     @click="handleClickTag(scope.row)"
                                 >{{ scope.row.file_info_ }}</el-tag>
                             </div>
-
                         </template>
                         <!-- 阅览/收藏具名插槽 -->
                         <template
@@ -327,8 +326,21 @@ export default {
             ]
         }
     },
-    mounted () { },
+    mounted () {
+
+    },
     methods: {
+
+        unitConversions (str) {
+            // 使用正则表达式匹配括号内的数字
+            const match = str.match(/（(\d+)）/)
+            // const match = str.match(/\((\d+)\)/)
+            console.log('match', match)
+            // 如果找到了匹配，则返回匹配到的数字；否则返回空字符串
+            if (!match) { return }
+            if (match[1] < 1024) { return match[0] + match[1] }
+            return match[0] + (match[1] / 1024).toFixed(2) + 'M'
+        },
         colseVisible (val) {
             this.dialogVisible = val
         },
@@ -400,6 +412,7 @@ export default {
                         // eslint-disable-next-line no-redeclare
                         for (const i in positionsDatas) {
                             if (i === '0') {
+                                // if (positionsDatas[i].name = '检验科') return
                                 orSql = `wj.quan_xian_xin_xi_ LIKE '%${positionsDatas[i].id}%'`
                             } else {
                                 orSql = orSql + `or wj.quan_xian_xin_xi_ LIKE '%${positionsDatas[i].id}%'`
@@ -426,8 +439,17 @@ export default {
             // 重复发放的文件，在权限表会存在重复的文件信息
             //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian
             //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
-            const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（大小：',file.total_bytes_,'）') as file_info_,
+            const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（大小：',
+               CASE
+                WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
+                WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
+                ELSE CONCAT(file.total_bytes_, 'B')
+            END
+            ,'）') as file_info_,
             wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,"" AS cha_yue_jie_zhi_s  from`
+
+            // const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（大小：',file.total_bytes_,'）') as file_info_,
+            // wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,"" AS cha_yue_jie_zhi_s  from`
             const leftSql = `left join (select id_,parent_id_ from t_wjcyjl group by parent_id_) cy on cy.parent_id_ = wj.id_
             left join (select id_,parent_id_ from t_wjscjl group by parent_id_) sc on sc.parent_id_ = wj.id_
             left join ibps_file_attachment file on file.id_ = wj.wen_jian_fu_jian_`
@@ -440,7 +462,14 @@ export default {
             const buMenSql = `${selectSql}  t_wjxxb wj ${leftSql}
             where wj.shi_fou_guo_shen_ in ('有效','使用') ${wheres2} `
             // 受限文件:结合查阅授权模块的截止时间
-            const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',file.total_bytes_,'）') as file_info_,
+            // select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',file.total_bytes_,'）') as file_info_,
+            const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',
+                 CASE
+                WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
+                WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
+                ELSE CONCAT(file.total_bytes_, 'B')
+            END
+            ,'）') as file_info_,
             wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s  from
         t_wjxxb wj 
         left join (select *from t_skwjcysqsqzb order by create_time_ desc limit 1) sq on wj.id_=sq.wen_jian_id_ 
@@ -476,7 +505,7 @@ export default {
             const fileSearchSql = needSelType.join('union all')
             // ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
             const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq ORDER BY sq.wen_jian_bian_hao ${ascDesc},sq.wen_jian_ming_che DESC` : oldRecordSql
-            // console.log('sql------------：', sql)
+            // console.log(sql, 'sssssssssssssssssss')
             curdPost('sql', sql).then(res => {
                 const tableDatas = res.variables.data
                 this.selectListData = JSON.parse(JSON.stringify(tableDatas))
@@ -499,7 +528,6 @@ export default {
                 this.listData = []
             })
         },
-
         refreshData () {
             this.listData = []
             this.getSearcFormData()

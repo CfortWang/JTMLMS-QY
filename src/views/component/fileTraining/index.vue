@@ -46,7 +46,7 @@
                         <el-button v-if="deleteShow" slot="reference" type="danger" icon="el-icon-delete" class="deleteBtn" @click="deleteVisible=true">删除</el-button>
                     </el-popover>
                     <el-button type="primary" icon="el-icon-view" @click="lookFile">查看文件信息</el-button>
-                    <el-button type="primary" icon="el-icon-s-fold" @click="hideLeft">左侧内容</el-button>
+                    <el-button type="primary" icon="el-icon-s-fold" @click="hideLeft">{{ leftContent }}</el-button>
                     <el-button type="primary" icon="el-icon-download" @click="updateFile">下载文件</el-button>
                     <el-button type="danger" icon="el-icon-close" @click="closeDialog">关闭</el-button>
                 </el-col>
@@ -55,6 +55,7 @@
         <div>
             <el-row>
                 <el-col v-if="leftShow" :span="4" class="left-content">
+                    <div class="left-title">文件修订历史</div>
                     <el-timeline :reverse="reverse">
                         <el-timeline-item
                             v-for="(activity, index) in leftData"
@@ -63,7 +64,7 @@
                             :type="index === activeIndex ? type : ''"
                             @click.stop.native="toggleActive(activity, index)"
                         >
-                            <div>
+                            <div class="timeline-content">
                                 <el-tooltip class="itemStyle" effect="dark" placement="right-end" :content="showContent(activity,index)">
                                     <div>版本号:{{ activity.ban_ben_ }}/修订人：{{ getUserName(activity.bian_zhi_ren_) }}</div>
                                 </el-tooltip>
@@ -172,7 +173,8 @@ export default {
             role: role,
             isSuper: isSuper,
             deleteVisible: false,
-            deleteShow: false
+            deleteShow: false,
+            leftContent: '隐藏修订历史'
 
         }
     },
@@ -194,6 +196,16 @@ export default {
             immediate: true,
             handler (val) {
                 this.digData = this.leftData[0]
+            }
+        },
+        leftShow: {
+            immediate: true, // 强制执行一次
+            handler (val) {
+                if (val) {
+                    this.leftContent = '隐藏修订历史'
+                    return
+                }
+                this.leftContent = '显示修订历史'
             }
         },
         // 本人修改
@@ -399,6 +411,35 @@ export default {
             }
             this.innerVisible = true
         },
+        a () {
+            fetch(this.optionFile.url)
+                .then(response => {
+                    if (response.ok) {
+                        // 如果响应状态码为 200-299，则创建下载链接
+                        const a = document.createElement('a')
+                        a.href = this.optionFile.url
+                        a.download = this.optionFile.data.fileName
+                        document.body.appendChild(a)
+                        a.click()
+                        a.remove()
+                    } else {
+                        // 如果响应状态码不是 200-299，则显示错误消息
+                        this.$message({
+                            message: '文件未找到，请联系管理员',
+                            type: 'warning'
+                        })
+                        console.error('文件未找到:', response.status, response.statusText)
+                    }
+                })
+                .catch(error => {
+                    // 捕获网络请求错误
+                    this.$message({
+                        message: '网络请求失败，请联系管理员',
+                        type: 'warning'
+                    })
+                    console.error('网络请求失败:', error)
+                })
+        },
         deleteFile () {
             this.deleteVisible = false
             // const roleKey = ['xtgljs', 'syszr', 'wjgly', 'wjglzzc']
@@ -554,10 +595,20 @@ export default {
         }
     }
     .left-content{
-        padding-top: 2%;
+        .left-title{
+            text-align: left;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .el-timeline{
+            padding: 0 15px;
+        }
+
     }
     // .file-read-num{
     //     display: inline-block;
     //     margin-left: 60px;
     // }
 </style>
+
