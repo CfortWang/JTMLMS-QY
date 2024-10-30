@@ -606,7 +606,7 @@
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
-                                                <el-row v-if="form.shiFouXiaoZhun==='是'">
+                                                <el-row v-if="false">
                                                     <el-col>
                                                         <el-form-item label="校准机构：">
                                                             <el-input v-model="form.shiWuShuoMing" size="mini" />

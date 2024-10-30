@@ -21,8 +21,18 @@
             <el-table-column prop="zhunQueDu" label="证书编号" />
             <el-table-column prop="jianDingDanWei" label="检定单位" />
             <el-table-column prop="shiShiRiQi" label="实施日期" />
-            <el-table-column prop="xiuZhengYinZi" label="修正因子" />
-            <el-table-column prop="beiZhu" label="附件" />
+            <el-table-column prop="xiuZhengYinZi" label="修正因子" width="80" />
+            <el-table-column prop="beiZhu" label="附件" width="260">
+                <template slot-scope="{row}">
+                    <ibps-attachment
+                        v-model="row.beiZhu"
+                        :download="true"
+                        multiple
+                        accept="*"
+                        :readonly="true"
+                    />
+                </template>
+            </el-table-column>
         </el-table>
         <el-pagination
             style="margin-top: 5px; padding-bottom: 10px"
@@ -38,11 +48,12 @@
 </template>
 
 <script>
+import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import { queryCalibrationCheckRecord } from '@/api/platform/device/device'
 export default {
     components: {
-        ibpsUserSelector
+        ibpsUserSelector, IbpsAttachment
     },
     props: {
         params: {

@@ -271,7 +271,10 @@ export default {
                             score: item.score,
                             applyTime: item.applyTime,
                             startTime: item.startTime,
-                            endTime: item.endTime
+                            endTime: item.endTime,
+                            qualifiedRadio: item.qualifiedRadio,
+                            totalScore: item.isRand === '1' ? parseFloat(item.randScore) : parseFloat(item.totalScore),
+                            scoringType: item.scoringType
                         }
                         if (examIndex === -1) {
                             archiveData.push({
@@ -313,8 +316,9 @@ export default {
                     archiveData.forEach((item, index) => {
                         const finishScore = item.scoreList.filter(i => i !== -1)
                         const examCount = item.scoreList.length
-                        item.paperList.forEach(paper => {
-                            paper.userName = this.transformUser(item.examineeId)
+                        item.paperList.forEach((paper, index) => {
+                            paper.cj = item.scoreList[index]
+                            paper.userName = this.transformUser(paper.examineeId)
                             paper.max = finishScore.length ? round(max(finishScore), 2) : nodatadesc
                             paper.min = finishScore.length ? round(min(finishScore), 2) : nodatadesc
                             paper.avg = finishScore.length ? round(mean(finishScore), 2) : nodatadesc
@@ -323,17 +327,18 @@ export default {
                             paper.examCount = examCount
                             paper.finishCount = finishScore.length
                             paper.count = `${paper.examCount}/${paper.finishCount}`
-                            paper.examStatus = paper.examCount === paper.finishCount ? '已完成' : '未完成'
+                            // 修改考试结束的判断逻辑：只要有一次交卷记录即为已完成
+                            paper.examStatus = paper.finishCount > 0 ? '已完成' : '未完成'
                             paper.resultScore = paper[scorrType[paper.scoringType]]
                             paper.isQualified = paper.examStatus === '已完成' ? paper.resultScore >= (parseFloat(paper.qualifiedRadio) / 100 * parseFloat(paper.totalScore)) ? '达标' : '未达标' : '考试未结束'
                         })
-                        const finishList = item.paperList.filter(i => i.examStatus === '已完成')
+                        const finishList = item.paperList.filter(i => i.cj !== -1)
                         item.maxScore = finishList.length ? maxBy(finishList, 'max').max : nodatadesc
                         item.minScore = finishList.length ? minBy(finishList, 'min').min : nodatadesc
                         item.avgScore = finishList.length ? meanBy(finishList, 'avg').toFixed(2) : nodatadesc
                         item.passRate = finishList.length ? this.getPassRate(finishList) : nodatadesc
                         item.examineeCount = item.examinee ? item.examinee.split(',').length : 0
-                        item.examFinishCount = item.paperList.filter(i => i.examStatus === '已完成').length
+                        item.examFinishCount = [...new Set(finishList.map(ii => ii.examineeId))].length
                     })
                     const page = {
                         limit,
@@ -734,8 +739,36 @@ export default {
         },
         getPassRate (list) {
             const passScore = parseFloat(list[0].qualifiedRadio) / 100 * parseFloat(list[0].totalScore)
-            const passList = list.filter(i => i.resultScore >= passScore)
-            return (passList.length / list.length * 100).toFixed(2) + '%'
+            const result = []
+            // 按照考试人进行分类
+            const scorrType = {
+                '最高分': 'max',
+                '平均分': 'avg',
+                '最近得分': 'latest'
+            }
+            list.forEach(item => {
+                const { examineeId, userName, scoringType } = item
+                const t = result.find(i => i.examineeId === examineeId)
+                if (t) {
+                    t.data.push(item)
+                } else {
+                    result.push({
+                        examineeId,
+                        userName,
+                        scoringType,
+                        data: [item]
+                    })
+                }
+            })
+            result.forEach(item => {
+                item.max = maxBy(item.data, 'cj').cj
+                item.min = minBy(item.data, 'cj').cj
+                item.avg = meanBy(item.data, 'cj').toFixed(2)
+                item.latest = item.data[item.data.length - 1].cj
+                item.resultScore = item[scorrType[item.scoringType]]
+            })
+            const passList = result.filter(i => +i.resultScore >= passScore)
+            return (passList.length / result.length * 100).toFixed(2) + '%'
         }
     }
 }

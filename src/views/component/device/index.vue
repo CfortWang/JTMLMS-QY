@@ -227,7 +227,7 @@
                             readonly-text="text"
                             :multiple="true"
                             size="mini"
-                            :filter="filter"
+                            :filter="[]"
                             filterable
                         />
                     </template>
