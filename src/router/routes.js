@@ -311,6 +311,14 @@ const frameOut = [
         component: _import('/viewFile')
     },
     {
+        path: '/templateView',
+        name: 'templateView',
+        meta: {
+            title: '模板文件预览页'
+        },
+        component: _import('/viewFile/template')
+    },
+    {
         path: '/register',
         name: 'register',
         meta: {

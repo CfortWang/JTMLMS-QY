@@ -60,6 +60,7 @@
             :visible="startFormVisible"
             :def-id="editId"
             :title="title"
+            :add-data-cont="addDataCont"
             @close="visible => startFormVisible = visible"
         />
         <data-template-formrender-dialog
@@ -76,7 +77,7 @@
 </template>
 <script>
 
-import { createTemplateFile, deleteTemplateFile } from '@/api/platform/file/onlyoffice'
+import { createTemplateFile, editTemplateFile, deleteTemplateFile } from '@/api/platform/file/onlyoffice'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 // import Handle from './mixin/handle'
@@ -88,6 +89,11 @@ const sortField = {
     SUBMIT_TIME_: 'bian_zhi_shi_jian',
     FORM_NAME_: 'biao_dan_ming_che'
 }
+
+const stateOption = [
+    { label: '已暂存', value: '已暂存' },
+    { label: '已完成', value: '已完成' }
+]
 
 export default {
     components: {
@@ -130,9 +136,6 @@ export default {
 
             width: 250,
             height: document.clientHeight,
-            settingTypeFormVisible: false, // 设置分类弹窗
-            startFormVisible: false, // 启动流程表单弹窗
-
             // 表单参数
             dialogFormVisible: false,
             formKey: '',
@@ -140,16 +143,21 @@ export default {
             pkValue: '',
             editToolbars: [],
             readonly: false,
-
-            title: '启动',
-            editId: '', // 编辑dialog需要使用
-            defKey: '',
-            data: {},
+            // 启动流程表单弹窗
+            startFormVisible: false,
+            title: '',
+            // 编辑dialog需要使用
+            editId: '1267498699286642688',
+            defKey: 'Process_16lkr65',
+            addDataCont: {},
             typeId: '',
-            templateData: '', // 模板数据
-            // 数据字典列表
-            pkKey: 'id', // 主键  如果主键不是pk需要传主键
+            // 模板数据
+            templateData: '',
+            // 主键  如果主键不是pk需要传主键
+            pkKey: 'id',
             loading: false,
+            // 模板文件配置参数
+            fileOption: {},
             listData: [],
             searchParams: {
                 dept: '',
@@ -159,7 +167,7 @@ export default {
                 toolbars: [
                     { key: 'search' },
                     { key: 'online', label: '在线填写', icon: 'ibps-icon-add', type: 'success', visible: false },
-                    { key: 'upload', label: '扫描上传', icon: 'ibps-icon-upload', type: 'primary', visible: false },
+                    // { key: 'upload', label: '扫描上传', icon: 'ibps-icon-upload', type: 'primary', visible: false },
                     { key: 'remove', visible: hasRole }
                     // { key: 'more',
                     //     label: '更多',
@@ -178,6 +186,7 @@ export default {
                     forms: [
                         { prop: 'dept', label: '部门', fieldType: 'slot', slotName: 'dept', itemWidth: 120 },
                         { prop: 'formName', label: '表单名称' },
+                        { prop: 'state', label: '状态', fieldType: 'select', options: stateOption },
                         { prop: 'submitBy', label: '填写人', fieldType: 'slot', slotName: 'user' },
                         {
                             prop: ['submitTime0', 'submitTime1'],
@@ -191,7 +200,7 @@ export default {
                 columns: [
                     { prop: 'dept', label: '部门', tags: deptOption, width: 100, sortable: true },
                     { prop: 'formName', label: '表单名称', width: 200, sortable: true },
-                    { prop: 'state', label: '状态', slotName: 'state', width: 90 },
+                    { prop: 'state', label: '状态', width: 90 },
                     { prop: 'submitBy', label: '填写人', tags: userOption, width: 100, sortable: true },
                     { prop: 'submitTime', label: '填写时间', width: 140, sortable: true },
                     { prop: 'version', label: '表单版本', width: 90 },
@@ -213,18 +222,18 @@ export default {
                             key: 'preview',
                             type: 'info',
                             icon: 'ibps-icon-eye',
-                            hidden: function (rowData, index) {
-                                return !(rowData.submitBy === userId || hasRole)
-                            }
+                            // hidden: function (rowData, index) {
+                            //     return !(rowData.submitBy === userId || hasRole)
+                            // }
                         },
-                        {
-                            label: '删除',
-                            key: 'remove',
-                            type: 'danger',
-                            hidden: function (rowData, index) {
-                                return !(rowData.submitBy === userId || hasRole)
-                            }
-                        }
+                        // {
+                        //     label: '删除',
+                        //     key: 'remove',
+                        //     type: 'danger',
+                        //     hidden: function (rowData, index) {
+                        //         return !(rowData.submitBy === userId || hasRole)
+                        //     }
+                        // }
                     ]
                 }
             },
@@ -309,6 +318,7 @@ export default {
             }
             addCondition('biao_dan_ming_che', temp.formName)
             addCondition('bian_zhi_bu_men_', temp.dept?.split(','), true)
+            addCondition('shi_fou_guo_shen_', temp.state)
             addCondition('bian_zhi_ren_', temp.submitBy?.split(','), true)
 
             const addDateCondition = (key, field) => {
@@ -380,10 +390,10 @@ export default {
                     this.handleUploadForm(data)
                     break
                 case 'edit':// 编辑
-                    this.handleEdit()
+                    this.handleEdit('edit')
                     break
                 case 'preview':// 查阅
-                    this.handlePreview()
+                    this.handleEdit('view')
                     break
                 case 'remove':// 删除
                     if (this.$utils.isEmpty(selection)) {
@@ -402,6 +412,7 @@ export default {
             }
         },
         handleNodeClick (typeId, data) {
+            console.log(data)
             this.typeId = typeId
             this.templateData = data
             const { templateId } = this.templateData || {}
@@ -424,19 +435,45 @@ export default {
             this.typeId = ''
             this.loadData()
         },
-        handleOnlineForm (data) {
-            console.log(data)
-            createTemplateFile({ templateId: '1287803894423879680' }).then(res => {
-                console.log(res)
+        handleOnlineForm () {
+            const { templateId, templateFile, parentId, name, filePath, configData } = this.templateData || {}
+            if (this.$utils.isEmpty(templateId)) {
+                return this.$message.warning('获取文件信息失败！')
+            }
+            createTemplateFile({ templateId }).then(res => {
+                this.fileOption = res.data
+                this.addDataCont = {
+                    templateId,
+                    name: name,
+                    file: templateFile,
+                    type: parentId,
+                    path: filePath,
+                    option: res.data ? JSON.stringify(res.data) : '',
+                    config: configData
+                }
+                this.startFormVisible = true
             })
         },
         handleUploadForm (data) {
 
         },
-        handleEdit () {
-
-        },
-        handlePreview () {
+        handleEdit (type) {
+            const { templateId, templateFile, parentId, name, filePath, configData, fileOption } = this.templateData || {}
+            if (this.$utils.isEmpty(fileOption)) {
+                return this.$message.warning('获取文件信息失败！')
+            }
+            this.fileOption = JSON.parse(fileOption)
+            this.fileOption.editorConfig.mode = type
+            this.addDataCont = {
+                templateId,
+                name,
+                file: templateFile,
+                type: parentId,
+                path: filePath,
+                option: fileOption,
+                config: configData
+            }
+            this.startFormVisible = true
         },
         handleRemove (data) {
             const idList = data.map(i => i.id)

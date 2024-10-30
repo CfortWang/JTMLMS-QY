@@ -7,7 +7,7 @@ import { BPMN_URL } from '@/api/baseUrl'
  * @param {*} file
  * @param {*} uploadFileVo
  */
-export function uploadOnlyOfficeFile (file, uploadFileVo) {
+export function uploadTemplateFile (file, uploadFileVo) {
     const data = new FormData() // 创建form对象
     data.append('file', file)
     // data.append('uploadFileVo', null)
@@ -16,7 +16,8 @@ export function uploadOnlyOfficeFile (file, uploadFileVo) {
         method: 'post',
         isLoading: true,
         gateway: true,
-        data: data
+        data: data,
+        retainData: file
     })
 }
 
@@ -24,12 +25,37 @@ export function uploadOnlyOfficeFile (file, uploadFileVo) {
  * 删除文件
  * @param {*} params
  */
-export function deleteOnlyOfficeFile (params) {
+export function deleteTemplateFile (params) {
     return request({
         url: BPMN_URL() + '/onlyOffice/delete',
         method: 'post',
+        isLoading: true,
+        data: params
+    })
+}
+
+/**
+ * 创建文件
+ * @param {*} params
+ */
+export function createTemplateFile (params) {
+    return request({
+        url: BPMN_URL() + '/onlyOffice/create',
+        method: 'get',
         isLoading: true,
         params: params
     })
 }
 
+/**
+ * 创建文件
+ * @param {*} params
+ */
+export function editTemplateFile (params) {
+    return request({
+        url: BPMN_URL() + '/onlyOffice/editor',
+        method: 'get',
+        isLoading: true,
+        params: params
+    })
+}

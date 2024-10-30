@@ -43,7 +43,7 @@
         </div>
 
         <div v-if="showFile" class="divShow">
-            <fView :option="fileOption" @updateFile="updateFile" />
+            <fView :option="templateOption" />
         </div>
     </div>
 </template>
@@ -183,7 +183,8 @@ export default {
             acceptType: '',
             showFile: false,
             file: '',
-            optionFileView: {}
+            optionFileView: {},
+            templateOption: this.fileOption
         }
     },
     computed: {
@@ -480,26 +481,25 @@ export default {
                     this.handleSelectorActionEvent(action, index)
                     break
                 case 'edit': // 编辑
-                    this.handleEdit(index, data, type)
+                    this.handleEdit(data, 'edit', '_blank')
                     break
             }
         },
         // 处理编辑文件
-        async handleEdit (index, data, type) {
-            // const routeData = this.$router.resolve({
-            //     path: '/templateView',
-            //     query: this.fileOption
-            // })
-            let option = {}
-            if (this.$utils.isEmpty(this.fileOption) && data.filepath) {
+        async handleEdit (data, mode, openType) {
+            if (this.$utils.isEmpty(this.templateOption) && data.filepath) {
                 const res = await editTemplateFile({ fileName: data.filepath })
-                option = res.data
+                this.templateOption = res.data
             }
-            if (this.$utils.isNotEmpty(option)) {
-                this.$emit('update', option)
+            this.templateOption.editorConfig.mode = mode
+            // 新标签页打开
+            if (openType === '_blank') {
+                localStorage.setItem('templateOption', JSON.stringify(this.templateOption))
+                window.open('#/templateView', '_blank')
+            } else {
+                // 表单内打开
+                this.showFile = true
             }
-            localStorage.setItem('fileOption', JSON.stringify(option || this.fileOption))
-            window.open('#/templateView', '_blank')
         },
         /**
          * 处理删除

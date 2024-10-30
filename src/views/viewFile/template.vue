@@ -6,8 +6,6 @@
 </template>
 
 <script>
-import { showView } from '@/api/platform/file/attachment'
-import { getToken } from '@/utils/auth'
 
 export default {
     name: 'editor',
@@ -26,7 +24,7 @@ export default {
         }
     },
     mounted () {
-        const temp = localStorage.getItem('fileOption')
+        const temp = localStorage.getItem('templateOption')
         this.option = temp ? JSON.parse(temp) : {}
         if (this.$utils.isNotEmpty(this.option)) {
             this.setEditor(this.option)
