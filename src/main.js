@@ -27,6 +27,14 @@ Vue.use(dataV)
 
 // 核心插件
 Vue.use(ibps)
+Vue.directive('removeAriaHidden', {
+    bind (el, binding) {
+        const ariaEls = el.querySelectorAll('.el-radio__original')
+        ariaEls.forEach((item) => {
+            item.removeAttribute('aria-hidden')
+        })
+    }
+})
 
 new Vue({
     router,
