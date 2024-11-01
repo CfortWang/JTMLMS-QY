@@ -442,13 +442,20 @@ export default {
             }
             createTemplateFile({ templateId }).then(res => {
                 this.fileOption = res.data
+                if (this.$utils.isEmpty(res.data)) {
+                    return this.$message.warning('获取文件信息失败！')
+                }
+                const { referenceData, title } = res.data.document || {}
+                const { fileKey } = referenceData || {}
+                const temp = fileKey ? JSON.parse(fileKey) : {}
+                const fileInfo = JSON.stringify({ filename: title, filepath: temp.fileName })
                 this.addDataCont = {
                     templateId,
                     name: name,
-                    file: templateFile,
+                    file: fileInfo,
                     type: parentId,
-                    path: filePath,
-                    option: res.data ? JSON.stringify(res.data) : '',
+                    path: temp.fileName,
+                    option: res.data,
                     config: configData
                 }
                 this.startFormVisible = true
@@ -470,7 +477,7 @@ export default {
                 file: templateFile,
                 type: parentId,
                 path: filePath,
-                option: fileOption,
+                option: this.fileOption,
                 config: configData
             }
             this.startFormVisible = true

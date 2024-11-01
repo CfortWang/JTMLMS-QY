@@ -104,7 +104,7 @@ export default {
                 approver4: []
             },
             fileData: {
-                tempalteId: '',
+                templateId: '',
                 name: '',
                 type: '',
                 path: '',
@@ -153,17 +153,17 @@ export default {
                 pageData = addDataCont
             } else {
                 pageData = {
-                    tempalteId: formData.moBanId,
+                    templateId: formData.moBanId,
                     name: formData.biaoDanMingCheng,
                     file: formData.biaoDanMoBan,
                     type: formData.guiDangLuJing,
                     path: formData.cunFangLuJing,
                     config: formData.peiZhi,
-                    option: formData.muBanXinXi
+                    option: formData.muBanXinXi ? JSON.parse(formData.muBanXinXi) : {}
                 }
             }
             const { shenPiRen1, shenPiRen2, shenPiRen3, shenPiRen4 } = formData || {}
-            const { name, file, type, path, tempalteId, config, option } = pageData || {}
+            const { name, file, type, path, templateId, config, option } = pageData || {}
             console.log('pageData:', pageData)
             this.approverData = {
                 approver1: shenPiRen1 ? shenPiRen1.split(',') : [],
@@ -175,13 +175,13 @@ export default {
             this.nodeId = nodeId
             // const res = await editTemplateFile({ fileName: path })
             this.fileData = {
-                tempalteId,
+                templateId,
                 name,
                 type,
                 path,
                 file,
                 config,
-                option: option ? JSON.parse(option) : {}
+                option: option || {}
             }
             this.showApprover = this.nodeList.length > 0
             if (!this.isInitialized || this.lastApproval !== config) {
@@ -220,7 +220,7 @@ export default {
             this.$emit('change-data', 'biaoDanMoBan', this.fileData.file)
             this.$emit('change-data', 'guiDangLuJing', this.fileData.type)
             this.$emit('change-data', 'cunFangLuJing', this.fileData.path)
-            this.$emit('change-data', 'moBanId', this.fileData.tempalteId)
+            this.$emit('change-data', 'moBanId', this.fileData.templateId)
         },
         shouldShowApprover (index) {
             return this.nodeList.length > index && (!this.nodeId || !this.nodeIdList.slice(0, index).includes(this.nodeId))
