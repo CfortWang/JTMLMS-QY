@@ -13,14 +13,15 @@ export default __IBPS_CONFIG__
 
 const enableConfig = __IBPS_CONFIG__.ENABLE_CONFIG || false
 
-const HOSTAPI = `${location.origin}/ibps`
+const HOSTAPI = `${location.origin}${location.pathname}ibps`
+const HOSTURL = `${location.origin}${location.pathname}`
 
 /**
  * 接口服务器
  * @type {*|string}
  */
-export const BASE_URL = enableConfig ? (__IBPS_CONFIG__.BASE_URL || env.VUE_APP_BASE_URL) : env.VUE_APP_BASE_URL
-export const PUBLIC_URL = enableConfig ? (__IBPS_CONFIG__.PUBLIC_URL || env.VUE_APP_BASE_URL) : env.VUE_APP_BASE_URL
+export const BASE_URL = enableConfig ? (__IBPS_CONFIG__.ENABLE_DYNAMIC_API ? HOSTURL : (__IBPS_CONFIG__.BASE_URL || env.VUE_APP_BASE_URL)) : env.VUE_APP_BASE_URL
+export const PUBLIC_URL = enableConfig ? (__IBPS_CONFIG__.ENABLE_DYNAMIC_API ? HOSTURL : (__IBPS_CONFIG__.PUBLIC_URL || env.VUE_APP_BASE_URL)) : env.VUE_APP_BASE_URL
 export const BASE_API = enableConfig ? (__IBPS_CONFIG__.ENABLE_DYNAMIC_API ? HOSTAPI : (__IBPS_CONFIG__.BASE_API || env.VUE_APP_BASE_API)) : env.VUE_APP_BASE_API
 export const BASE_GATEWAY_API = enableConfig ? (__IBPS_CONFIG__.BASE_GATEWAY_API || env.VUE_APP_BASE_GATEWAY_API) : env.VUE_APP_BASE_GATEWAY_API
 export const BASE_WEBSOCKET = enableConfig ? (__IBPS_CONFIG__.BASE_WEBSOCKET_API || env.VUE_APP_BASE_WEBSOCKET) : env.VUE_APP_BASE_WEBSOCKET
