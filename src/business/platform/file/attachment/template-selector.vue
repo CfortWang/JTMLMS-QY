@@ -261,6 +261,7 @@ export default {
 
             const data = this.value ? JSON.parse(this.value) : []
             this.selectorValue = this.multiple ? [data] : data
+            this.templateOption = this.fileOption
         },
         setCacheData () {
             if (this.$utils.isEmpty(this.selectorValue)) return
@@ -494,8 +495,10 @@ export default {
             this.templateOption.editorConfig.mode = mode
             // 新标签页打开
             if (openType === '_blank') {
-                localStorage.setItem('templateOption', JSON.stringify(this.templateOption))
-                window.open('#/templateView', '_blank')
+                const path = this.templateOption.document.title
+                // localStorage.setItem('templateOption', JSON.stringify(this.templateOption))
+                sessionStorage.setItem(path, JSON.stringify(this.templateOption))
+                window.open(`#/templateView?path=${encodeURIComponent(path)}`, '_blank')
             } else {
                 // 表单内打开
                 this.showFile = true

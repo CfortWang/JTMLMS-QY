@@ -25,6 +25,7 @@
                 :columns="listConfig.columns"
                 :pagination="pagination"
                 :loading="loading"
+                display-field="记录填写"
                 @action-event="handleAction"
                 @sort-change="handleSortChange"
                 @pagination-change="handlePaginationChange"
@@ -167,7 +168,7 @@ export default {
                 toolbars: [
                     { key: 'search' },
                     { key: 'online', label: '在线填写', icon: 'ibps-icon-add', type: 'success', visible: false },
-                    // { key: 'upload', label: '扫描上传', icon: 'ibps-icon-upload', type: 'primary', visible: false },
+                    { key: 'upload', label: '记录上传', icon: 'ibps-icon-upload', type: 'primary', visible: false },
                     { key: 'remove', visible: hasRole }
                     // { key: 'more',
                     //     label: '更多',

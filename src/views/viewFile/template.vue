@@ -24,7 +24,19 @@ export default {
         }
     },
     mounted () {
-        const temp = localStorage.getItem('templateOption')
+        const url = (location.hash.match(/\?(.*)/) || [])[1] || ''
+        const params = {}
+        if (url) {
+            url.split('&').forEach(param => {
+                if (param.includes('=')) {
+                    const [key, value] = param.split('=')
+                    params[decodeURIComponent(key)] = decodeURIComponent(value)
+                }
+            })
+        }
+        const path = params.path
+        const temp = sessionStorage.getItem(decodeURIComponent(path))
+        // const temp = localStorage.getItem('templateOption')
         this.option = temp ? JSON.parse(temp) : {}
         if (this.$utils.isNotEmpty(this.option)) {
             this.setEditor(this.option)
