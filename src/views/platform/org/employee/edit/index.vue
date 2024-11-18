@@ -181,6 +181,7 @@ export default {
                 jiNengZhiCheng: 'inside'
             },
             employee: {},
+            oldEmployee: {}, // 未更改前全部信息
             qrcodeVisible: false,
             personalInfo: '',
             toolbars: [
@@ -390,8 +391,39 @@ export default {
                     if (this.wxyhId) {
                         this.updateWxyh()
                     }
-                    // 更新部门、岗位数据
-                    this.$common.request('update', updateParams)
+                    // 防止主部门多条起
+                    const obj = this.employee.posItemList.find(t => t.isMainPost === 'Y')
+                    const sql = `select * from ibps_party_rel where biz_ = 'mainPost' and SUB_PID_ = '${this.employee.id}'`
+                    this.$common.request('sql', sql).then((r) => {
+                        const res = r.variables.data
+                        let old = false
+                        const oldArr = []
+                        if (res.length > 0) {
+                            old = true
+                            res.forEach((e, i) => {
+                                if (i + 1 !== res.length) {
+                                    oldArr.push(e.MAIN_PID_)
+                                }
+                            })
+                        }
+                        if (typeof obj === 'undefined') {
+                            const delParams = {
+                                tableName: 'ibps_party_rel',
+                                paramWhere: { SUB_PID_: this.employee.id }
+                            }
+                            this.$common.request('delete', delParams)
+                        } else if (typeof obj !== 'undefined' && old) {
+                            const delParams = {
+                                tableName: 'ibps_party_rel',
+                                paramWhere: { SUB_PID_: this.employee.id, MAIN_PID_: oldArr.join(',') }
+                            }
+                            this.$common.request('delete', delParams)
+                        }
+                        // 更新部门、岗位数据
+                        this.$common.request('update', updateParams)
+                    })
+                    // 防止主部门多条止
+
                     // 启动培训
                     this.createTrain(response.variables.id)
                     this.$emit('dialog-callback', this)
@@ -495,6 +527,8 @@ export default {
                     })
                     this.employee.attrItemList = list
                 }
+                // 保存更改前全部信息
+                this.oldEmployee = structuredClone(this.employee)
 
                 // 添加更新 t_wxyh 用于扫码签到
                 // if()

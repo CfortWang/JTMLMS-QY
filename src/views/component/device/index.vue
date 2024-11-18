@@ -195,7 +195,6 @@
                                             <div class="item">是否校准：{{ row.shiFouXiaoZhun || '/' }}</div>
                                             <div class="item">校准周期：{{ row.xiaoZhunZQ?`${row.xiaoZhunZQ}月` : '/' }}</div>
                                             <div class="item">最近校准时间：{{ row.yiXiaoRiQi || '/' }}</div>
-                                            <div class="item">校准机构：{{ row.shiWuShuoMing || '/' }}</div>
                                         </div>
                                     </el-col>
                                 </el-row>
@@ -1227,8 +1226,9 @@ export default {
      * @param {*} currentUser 当前用户ID
      * @param {*} currentPosition 当前地点ID
      */
-        handleBasicData (list, currentTime, currentApartment, currentUser, currentPosition, deptList) {
-            list.forEach(async element => {
+        async handleBasicData (list, currentTime, currentApartment, currentUser, currentPosition, deptList) {
+            // 使用map生成一个异步操作的数组
+            const promises = list.map(async (element) => {
                 element.bianZhiShiJian = currentTime
                 element.bianZhiRen = currentUser
                 element.diDian = currentPosition
@@ -1236,9 +1236,15 @@ export default {
                 const o = deptList?.find(i => i.positionName === element.bianZhiBuMen.trim())
                 const { positionId = currentApartment } = o || {}
                 element.bianZhiBuMen = positionId
-                if (!element.id) element.sheBeiShiBieH = await this.getNextAlias() // 新增的时候自动生成编号
+                if (!element.id) {
+                    // 获取下一个编号
+                    element.sheBeiShiBieH = await this.getNextAlias()
+                }
             })
+            // 使用Promise.all并发执行所有异步操作
+            await Promise.all(promises)
         },
+
         /**
      *
      * @param {*} list excel数据
@@ -1358,19 +1364,21 @@ export default {
 
             importData = this.formatDateFieldsToReal(importData)
             console.log('%c partOne doCheck is completed! %c the result is %c', 'background:#35495E; padding: 1px; border-radius: 3px 0 0 3px; color: #fff;', 'background:#FF5733; padding: 1px; border-radius: 0 3px 3px 0; color: #fff;', 'background:transparent', importData)
+            this.loading = true
             Promise.all([this.$common.request('sql', positionSql), this.$common.request('sql', supplierSql), this.$common.request('sql', deviceGroupSql)]).then(async ([res1, res2, res3]) => {
                 const { data: positionList = [] } = res1.variables || {}
                 const { data: supplierList = [] } = res2.variables || {}
                 const { data: deviceGroupList = [] } = res3.variables || {}
                 // 根据原设备编号去重，检验原设备编号是否在数据库中存在
                 const originalDeviceNoList = await this.filterOriginalDeviceNo(importData, currentPosition)
-                this.handleBasicData(importData, currentTime, currentApartment, currentUser, currentPosition, deptList)
+                await this.handleBasicData(importData, currentTime, currentApartment, currentUser, currentPosition, deptList)
                 this.handleExcelData(importData, positionList, supplierList, userList, deviceGroupList)
                 // 分离出 已存在的设备，和新设备
                 const newDeviceList = importData.filter(i => !originalDeviceNoList.includes(i.yuanSheBeiBian.trim()))
                 const existDeviceList = importData.filter(i => originalDeviceNoList.includes(i.yuanSheBeiBian.trim()))
                 console.log('%c new device %c', 'background:#FF5733; padding: 1px; border-radius: 0 3px 3px 0; color: #fff;', 'background:transparent', newDeviceList)
                 console.log('%c already exist device %c', 'background:#43f80c; padding: 1px; border-radius: 0 3px 3px 0; color: #fff;', 'background:transparent', existDeviceList)
+                this.loading = false
                 this.$confirm(`<span style="color:#f56c6c; font-size: 18px; font-weight: 600;">
                                         经系统判定</span><br>1.预期新导入设备的数量为 ${newDeviceList.length} 台！<br>
                                         2.预期更新已存在的设备数量为 ${existDeviceList.length} 台！<br>
@@ -1388,22 +1396,28 @@ export default {
                         this.getDatas()
                     }, 1000)
                 }).catch(() => { })
+            }).catch(() => {
+                this.loading = false
             })
         },
         async doImportDevice (existDeviceList, currentPosition) {
             this.loading = true
             const allRequests = []
-            existDeviceList.forEach(async item => {
+            for (let index = 0; index < existDeviceList.length; index++) {
+                const item = existDeviceList[index]
                 let params = {}
                 if (item.id) {
+                    // 获取设备数据
                     const { data: itemData } = await getequipmentCard({ id: item.id })
-                    params = { ...itemData, ...item }
+                    params = { ...itemData, ...item } // 合并数据
                 } else {
-                    params = item
+                    params = item // 直接使用当前 item
                 }
                 console.log(params)
+                // 将每个 saveEquipmentCard 请求加入到 allRequests 数组中
                 allRequests.push(saveEquipmentCard(params))
-            })
+            }
+            // 等待所有异步请求完成
             await Promise.all(allRequests)
             this.loading = false
         },

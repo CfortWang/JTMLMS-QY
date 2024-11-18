@@ -692,7 +692,6 @@ export default {
             }
         },
         handleMySchedule (data) {
-            console.log('wwwwwwwwwwwwwwwwwww',data)
             this.scheduleConfig = data
             this.$refs.schedule.openDialog()
         }

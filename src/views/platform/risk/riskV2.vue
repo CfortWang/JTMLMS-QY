@@ -26,21 +26,27 @@
                             v-model="infoFxssbData.nian_du_"
                             type="year"
                             placeholder="选择年"
-                            :readonly="readonly"
+                            :disabled="readonly"
                             value-format="yyyy"
                             size="mini"
                         />
                     </el-descriptions-item>
 
-                    <el-descriptions-item label="编制部门：">
-                        <ibps-user-selector
-                            type="position"
-                            :value="infoFxssbData.bian_zhi_bu_men_"
-                            readonly-text="text"
-                            :disabled="true"
-                            :multiple="false"
-                            size="mini"
-                        />
+                    <el-descriptions-item label="编制部门">
+                        <div style="display:flex">
+                            <span class="required-star">*</span>
+                            <ibps-user-selector
+                                type="position"
+                                :value="infoFxssbData.bian_zhi_bu_men_"
+                                readonly-text="text"
+                                :disabled="readonly"
+                                :multiple="false"
+                                size="mini"
+                                style="width:100%"
+                                :filter="filter"
+                                filterable
+                            />
+                        </div>
                     </el-descriptions-item>
                     <el-descriptions-item label="编制人">
                         <ibps-user-selector
@@ -53,11 +59,12 @@
                         />
                     </el-descriptions-item>
                     <el-descriptions-item label="编制时间">
+                        <span class="required-star">*</span>
                         <el-date-picker
                             v-model="infoFxssbData.bian_zhi_shi_jian"
                             type="datetime"
                             placeholder="选择日期时间"
-                            :readonly="true"
+                            :disabled="readonly"
                             value-format="yyyy-MM-dd HH:mm:ss"
                             size="mini"
                         />
@@ -73,6 +80,8 @@
                             :disabled="true"
                             :multiple="true"
                             size="mini"
+                            :filter="filter"
+                            filterable
                         />
                     </el-descriptions-item>
                     <el-descriptions-item label="评估开始时间">
@@ -81,7 +90,7 @@
                             v-model="infoFxssbData.kai_shi_ri_qi_"
                             type="date"
                             placeholder="选择日期"
-                            :readonly="readonly"
+                            :disabled="readonly"
                             value-format="yyyy-MM-dd"
                             size="mini"
                         />
@@ -92,7 +101,7 @@
                             v-model="infoFxssbData.jie_shu_ri_qi_"
                             type="date"
                             placeholder="选择日期"
-                            :readonly="readonly"
+                            :disabled="readonly"
                             value-format="yyyy-MM-dd"
                             size="mini"
                         />
@@ -104,20 +113,16 @@
                             v-model="infoFxssbData.bao_gao_shi_jian_"
                             type="date"
                             placeholder="选择日期"
-                            :readonly="readonly"
+                            :disabled="readonly"
                             value-format="yyyy-MM-dd"
                             size="mini"
                         />
                     </el-descriptions-item>
                     <el-descriptions-item label="风险类型">
-                        <el-select v-model="infoFxssbData.feng_xian_lei_xin" :disabled="readonly" placeholder="请选择" size="mini">
-                            <el-option
-                                v-for="item in ['质量','安全']"
-                                :key="item"
-                                :label="item"
-                                :value="item"
-                            />
-                        </el-select>
+                        <div>
+                            <el-radio v-model="infoFxssbData.feng_xian_lei_xin" label="质量" size="mini" :disabled="readonly">质量</el-radio>
+                            <el-radio v-model="infoFxssbData.feng_xian_lei_xin" label="安全" size="mini" :disabled="readonly">安全</el-radio>
+                        </div>
                     </el-descriptions-item>
                     <el-descriptions-item label="时机" :span="1">
                         <el-select v-model="infoFxssbData.shi_ji_" :disabled="readonly" placeholder="请选择" size="mini">
@@ -132,14 +137,14 @@
                     </el-descriptions-item>
 
                     <el-descriptions-item label="范围" :span="2">
-                        <el-input v-model="infoFxssbData.fan_wei_" :readonly="readonly" size="mini" />
+                        <el-input v-model="infoFxssbData.fan_wei_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
                     <el-descriptions-item label="方法" :span="2">
-                        <el-input v-model="infoFxssbData.fang_fa_" :readonly="readonly" size="mini" />
+                        <el-input v-model="infoFxssbData.fang_fa_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
 
                     <el-descriptions-item label="目的" :span="5">
-                        <el-input v-model="infoFxssbData.mu_di_" :readonly="readonly" size="mini" />
+                        <el-input v-model="infoFxssbData.mu_di_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
                     <el-descriptions-item label="依据文件" :span="5">
                         <!-- 模版弹窗 -->
@@ -164,7 +169,7 @@
                             type="datetime"
                             placeholder="选择日期时间"
                             default-time="12:00:00"
-                            :readonly="readonly"
+                            :disabled="readonly"
                             value-format="yyyy-MM-dd HH:mm"
                             size="mini"
                         />
@@ -199,7 +204,7 @@
                     </el-descriptions-item>
 
                     <el-descriptions-item label="事务说明 " :span="5">
-                        <el-input v-model="infoFxssbData.shi_wu_shuo_ming_" :readonly="readonly" size="mini" /></el-descriptions-item>
+                        <el-input v-model="infoFxssbData.shi_wu_shuo_ming_" :disabled="readonly" size="mini" /></el-descriptions-item>
                     <el-descriptions-item label="评估人员 " :span="5">
                         <div style="display:flex">
                             <span class="required-star">*</span>
@@ -665,6 +670,12 @@ export default {
             }
             if (!this.infoFxssbData.ping_gu_ren_yuan_) {
                 throw new Error('请填写评估人员！')
+            }
+            if (!this.infoFxssbData.bian_zhi_shi_jian) {
+                throw new Error('请选择编制时间！')
+            }
+            if (!this.infoFxssbData.bian_zhi_bu_men_) {
+                throw new Error('请选择编制部门！')
             }
         },
         async goAdd () {

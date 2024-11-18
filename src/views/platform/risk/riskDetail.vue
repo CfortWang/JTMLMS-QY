@@ -17,13 +17,15 @@
                     <div class="item">
                         <span>部门：</span>
                         <ibps-user-selector
+                            v-model="position"
                             style="width:60%"
                             type="position"
-                            :value="position"
                             readonly-text="text"
-                            :disabled="true"
+                            :disabled="readonly"
                             :multiple="false"
                             size="mini"
+                            :filter="filter"
+                            filterable
                         />
                     </div>
                     <div class="item">
@@ -44,7 +46,7 @@
                             v-model="time"
                             type="datetime"
                             placeholder="未编制"
-                            :readonly="true"
+                            :disabled="readonly"
                             value-format="yyyy-MM-dd HH:mm:ss"
                             size="mini"
                         />
@@ -54,7 +56,7 @@
                     title="说明"
                     type="success"
                     :closable="false"
-                    description="1、风险指数=严重度X发生频度、风险应对优先对高风险、频次高的风险采取措施。2，风险等级判定：RPN=Severity(严重程度)×Possibility(发生的频度）。"
+                    :description="descriptionContent"
                 />
                 <div class="tab">
                     <el-tabs v-model="activeName">
@@ -107,7 +109,7 @@
                             width="150"
                         >
                             <template slot-scope="{row}">
-                                <el-input v-model="row.gong_zuo_huan_jie" type="textarea" :rows="2" size="mini" :readonly="readonly" />
+                                <el-input v-model="row.gong_zuo_huan_jie" type="textarea" :rows="2" size="mini" :disabled="readonly" />
                             </template>
                         </el-table-column>
                         <!-- <el-table-column
@@ -125,7 +127,7 @@
                             width="150"
                         >
                             <template slot-scope="{row}">
-                                <el-input v-model="row.feng_xian_miao_sh" type="textarea" :rows="2" size="mini" :readonly="readonly" />
+                                <el-input v-model="row.feng_xian_miao_sh" type="textarea" :rows="2" size="mini" :disabled="readonly" />
                             </template>
                         </el-table-column>
                         <el-table-column
@@ -134,7 +136,7 @@
                             width="150"
                         >
                             <template slot-scope="{row}">
-                                <el-input v-model="row.xian_xing_kong_zh" type="textarea" :rows="2" size="mini" :readonly="readonly" />
+                                <el-input v-model="row.xian_xing_kong_zh" type="textarea" :rows="2" size="mini" :disabled="readonly" />
                             </template>
                         </el-table-column>
                         <el-table-column
@@ -162,6 +164,24 @@
                                 <el-select v-model="row.fa_sheng_pin_du_" placeholder="请选择" :disabled="readonly" size="mini" @change="culRate(row)">
                                     <el-option
                                         v-for="item in fa_sheng_pin_du_List"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item"
+                                    />
+                                </el-select>
+                            </template>
+
+                        </el-table-column>
+                        <el-table-column
+                            v-if="muban==='2'"
+                            prop="ke_jian_ce_du_"
+                            label="可检测度"
+                            width="100"
+                        >
+                            <template slot-scope="{row}">
+                                <el-select v-model="row.ke_jian_ce_du_" placeholder="请选择" :disabled="readonly" size="mini" @change="culRate(row)">
+                                    <el-option
+                                        v-for="item in ke_jian_ce_du_List"
                                         :key="item"
                                         :label="item"
                                         :value="item"
@@ -221,7 +241,7 @@
                             width="150"
                         >
                             <template slot-scope="{row}">
-                                <el-input v-model="row.ni_cai_qu_cuo_shi" type="textarea" :rows="2" size="mini" :readonly="readonly" />
+                                <el-input v-model="row.ni_cai_qu_cuo_shi" type="textarea" :rows="2" size="mini" :disabled="readonly" />
                             </template>
                         </el-table-column>
                     </el-table>
@@ -278,18 +298,29 @@ export default {
 2级：一般，对检验科人员、设备、环境、形象造成轻微损害，对检验质量和TAT造成影响，能通过现场及时处置解决或缓解出现的损害和影响；造成一定的财产损失；未造成投诉；无检验科信息泄露。
 3级：较严重，对检验科人员、设备、环境、形象造成损害，对检验质量和TAT造成影响，无法通过现场及时处置解决或缓解出现的损害和影响；被投诉至检验科管理层；造成较大的财产的损失；有检验科信息泄露。
 4级：严重，对检验科人员造成较大伤害；对仪器设备造成损坏；对周边较少的人员或环境产生损害；对检验质量、TAT、临床诊疗造成严重影响；造成重大的的经济损失；被投诉至上级主管部门；造成不良的社会影响。
-5级：非常严重，对检验科人员造成重大伤害甚至死亡；对仪器设备造成损毁；极度影响检验质量和TAT，对临床造成极大误诊致使病人死亡；对周边人员或环境产生重大损害；造成恶劣的社会影响；导致检验科停工停业 ` },
-                { label: '发生概率分级表说明', value: `1级:基本不可能发生，评估范围内未发生过，类似区域/行业也极少发生
-2级:较不可能发生，评估范围内未发生过，类似区域/行业偶有发生
-3级:可能发生，评估范围内发生过，类似区域/行业也偶有发生； 评估范围内未发生过，但类似区域/行业发生频率较高
-4级:很有可能发生，评估范围内发生频率较高
-5级:必定会发生，评估范围内发生频率很高` },
-                { label: '风险等级及应对措施说明', value: `中风险级:5-11，可采取措施降低风险。
-低风险级:1-4，风险较低,当采取措施消除风险引起的成本比风险本身引起的损失较大时，接受风险。
-高风险级:12-25，应采取措施规避或降低风险。` }
+5级：非常严重，对检验科人员造成重大伤害甚至死亡；对仪器设备造成损毁；极度影响检验质量和TAT，对临床造成极大误诊致使病人死亡；对周边人员或环境产生重大损害；造成恶劣的社会影响；导致检验科停工停业。 ` },
+                { label: '发生概率分级表说明', value: `1级:基本不可能发生，评估范围内未发生过，类似区域/行业也极少发生。
+2级:较不可能发生，评估范围内未发生过，类似区域/行业偶有发生。
+3级:可能发生，评估范围内发生过，类似区域/行业也偶有发生； 评估范围内未发生过，但类似区域/行业发生频率较高。
+4级:很有可能发生，评估范围内发生频率较高。
+5级:必定会发生，评估范围内发生频率很高。` },
+                { label: '事件可检测度描述', value: `1级:确定，当某项风险发生时，根据现有的控制手段及检测方法，能准确识别出。
+2级:大，当某项风险发生时，根据现有的控制手段及检测方法，识别出的概率较大。
+3级:中等，当某项风险发生时，根据现有的控制手段及检测方法，识别出的概率中等。
+4级:小，当某项风险发生时，根据现有的控制手段及检测方法，识别出的概率较小。
+5级:不可测，当某项风险发生时，根据现有的控制手段及检测方法，不可识别。` },
+                { label: '风险等级及应对措施说明', value: `低风险:1-4，风险较低,当采取措施消除风险引起的成本比风险本身引起的损失较大时，接受风险。
+中风险:5-11，可采取措施降低风险。
+高风险:12-25，应采取措施规避或降低风险。` }
             ],
+            fengXianDengJi2: { label: '风险等级及应对措施说明', value: `可忽略的:1-8，稍有危险，可以接受。
+可接受的:9-27，一般危险，需要注意。
+中度的:28-63，显著危险，需要整改。
+重大的:64-99，高度危险，需立即整改。
+不可接受的:100-125，极其危险，不能继续作业。` },
             yan_zhong_cheng_d_List: ['1', '2', '3', '4', '5'],
             fa_sheng_pin_du_List: ['1', '2', '3', '4', '5'],
+            ke_jian_ce_du_List: ['1', '2', '3', '4', '5'],
             userId: userId,
             position: position,
             level: level.second || level.first,
@@ -306,10 +337,24 @@ export default {
             dialogVisible: false,
             tableList: [],
             Ids: [],
-            fengXianJiSuan: []
+            fengXianJiSuan: [],
+            muban: '1'
         }
     },
     computed: {
+        descriptionContent () {
+            const msg1 = '1.当前风险系数计算公式为模板一。2.风险系数 RPN = Severity(严重度) × Occurrence(发生度）。'
+            const msg2 = '1.当前风险系数计算公式为模板二。2.风险系数 RPN = Severity(严重度) × Occurrence(发生度）× Likelihood of Detection(检测度)。'
+            switch (this.muban) {
+                case '1':
+                    return msg1
+                case '2':
+                    return msg2
+                default:
+                    break
+            }
+            return msg1
+        },
         showPaperList () {
             const start = (this.pagination.currentPage - 1) * this.pagination.pageSize
             const end = start + this.pagination.pageSize
@@ -413,19 +458,28 @@ export default {
                 this.tableList = []
                 this.Ids = []
             }
-
+            const sqll = `select mo_ban_fen_lei_ FROM t_yzcdfjb WHERE mo_ban_fen_lei_!='' AND  mo_ban_fen_lei_ IS NOT NULL AND di_dian_='${this.level}' LIMIT 1`
+            const { variables: { data: dataa }} = await this.$common.request('sql', sqll)
+            if (dataa.length > 0) {
+                this.muban = dataa[0].mo_ban_fen_lei_
+                this.content[3] = this.fengXianDengJi2
+            }
+            console.log('模板类型：', this.muban)
             // 获取风险等级相关
-            const degreeSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE parent_id_ =(select id_ FROM t_yzcdfjb WHERE fen_lei_ ='严重程度' and di_dian_ = ${this.level} ORDER BY create_time_ DESC LIMIT 1) ORDER BY fen_ji_ ASC`
-            const gailvSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE parent_id_ =(select id_ FROM t_yzcdfjb WHERE fen_lei_ ='发生概率' and di_dian_ = ${this.level} ORDER BY create_time_ DESC LIMIT 1) ORDER BY fen_ji_ ASC`
-            const dengjiSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE parent_id_ =(select id_ FROM t_yzcdfjb WHERE fen_lei_ ='风险等级' and di_dian_ = ${this.level} ORDER BY create_time_ DESC LIMIT 1) ORDER BY fen_ji_ ASC`
+            const degreeSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='严重程度' and di_dian_ = '${this.level}' ORDER BY fen_ji_ ASC`
+            const gailvSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='发生概率' and di_dian_ = '${this.level}' ORDER BY fen_ji_ ASC`
+            const dengjiSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='${this.muban === '2' ? '风险等级2' : '风险等级'}' and di_dian_ = '${this.level}'`
+            const jianCeSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='可检测度' and di_dian_ = '${this.level}' ORDER BY fen_ji_ ASC`
             Promise.all([
                 this.$common.request('sql', degreeSql),
                 this.$common.request('sql', gailvSql),
-                this.$common.request('sql', dengjiSql)
+                this.$common.request('sql', dengjiSql),
+                this.$common.request('sql', jianCeSql)
             ]).then(responses => {
                 let degreeData = []
                 let gailvData = []
                 let dengjiData = []
+                let jianCeData = []
 
                 if (responses[0].variables != null && responses[0].variables.data != null && responses[0].variables.data.length > 0) {
                     degreeData = responses[0].variables.data
@@ -436,9 +490,13 @@ export default {
                 if (responses[2].variables != null && responses[2].variables.data != null && responses[2].variables.data.length > 0) {
                     dengjiData = responses[2].variables.data
                 }
+                if (responses[3].variables != null && responses[3].variables.data != null && responses[3].variables.data.length > 0) {
+                    jianCeData = responses[3].variables.data
+                }
                 let degreeWord = ''
                 let gailvWord = ''
                 let dengjiWord = ''
+                let jianCeWord = ''
                 for (const el of degreeData) {
                     degreeWord += `${el.fen_ji_}级：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
                 }
@@ -446,13 +504,30 @@ export default {
                     gailvWord += `${el.fen_ji_}级：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
                 }
                 for (const el of dengjiData) {
-                    dengjiWord += `${el.fen_ji_}级：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
+                    dengjiWord += `${el.fen_ji_}：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
                 }
-                this.content[0].value = degreeWord
-                this.content[1].value = gailvWord
-                this.content[2].value = dengjiWord
-                this.yan_zhong_cheng_d_List = degreeData.map(item => item.fen_ji_)
-                this.fa_sheng_pin_du_List = gailvData.map(item => item.fen_ji_)
+                for (const el of jianCeData) {
+                    jianCeWord += `${el.fen_ji_}级：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
+                }
+                if (degreeData.length > 0) {
+                    console.log('严重程度使用配置值')
+                    this.content[0].value = degreeWord
+                    this.yan_zhong_cheng_d_List = degreeData.map(item => item.fen_ji_)
+                }
+                if (gailvData.length > 0) {
+                    console.log('发生概率使用配置值')
+                    this.content[1].value = gailvWord
+                    this.fa_sheng_pin_du_List = gailvData.map(item => item.fen_ji_)
+                }
+                if (jianCeData.length > 0) {
+                    console.log('可检测度使用配置值')
+                    this.content[2].value = jianCeWord
+                    this.ke_jian_ce_du_List = jianCeData.map(item => item.fen_ji_)
+                }
+                if (dengjiData.length > 0) {
+                    console.log('风险等级使用配置值')
+                    this.content[3].value = dengjiWord
+                }
                 this.fengXianJiSuan = dengjiData
                 this.loading = false
             }).catch(error => {
@@ -500,38 +575,80 @@ export default {
         },
         // 计算风险指数
         culRate (row) {
-            if (row.yan_zhong_cheng_d && row.fa_sheng_pin_du_) {
-                let degree = ''
-                let rate = ''
-                rate = +row.yan_zhong_cheng_d * +row.fa_sheng_pin_du_
-                if (this.fengXianJiSuan.length === 0) {
-                    if (rate >= 1 && rate <= 4) {
-                        degree = '低风险'
-                    }
-                    if (rate >= 5 && rate <= 11) {
-                        degree = '中风险'
-                    }
-                    if (rate >= 12 && rate <= 25) {
-                        degree = '高风险'
-                    }
-                } else {
-                    for (let i = 0; i < this.fengXianJiSuan.length; i++) {
-                        const item = this.fengXianJiSuan[i]
-                        if (item.yan_zhong_cheng_d) {
-                            const [a, b] = item.yan_zhong_cheng_d.split('-')
-                            if (a && b) {
-                                if (rate >= +a && rate <= +b) {
-                                    degree = item.fen_ji_
-                                    break
+            if (this.muban === '1') {
+                if (row.yan_zhong_cheng_d && row.fa_sheng_pin_du_) {
+                    let degree = ''
+                    let rate = ''
+                    rate = +row.yan_zhong_cheng_d * +row.fa_sheng_pin_du_
+                    if (this.fengXianJiSuan.length === 0) {
+                        if (rate >= 1 && rate <= 4) {
+                            degree = '低风险'
+                        }
+                        if (rate >= 5 && rate <= 11) {
+                            degree = '中风险'
+                        }
+                        if (rate >= 12 && rate <= 25) {
+                            degree = '高风险'
+                        }
+                    } else {
+                        for (let i = 0; i < this.fengXianJiSuan.length; i++) {
+                            const item = this.fengXianJiSuan[i]
+                            if (item.yan_zhong_cheng_d) {
+                                const [a, b] = item.yan_zhong_cheng_d.split('-')
+                                if (a && b) {
+                                    if (rate >= +a.trim() && rate <= +b.trim()) {
+                                        degree = item.fen_ji_
+                                        break
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                this.$set(row, 'feng_xian_ying_du', (!row.feng_xian_ying_du && degree === '低风险') ? '风险接受' : '风险降低')
-                row.feng_xian_zhi_shu = rate + ''
-                row.feng_xian_deng_ji = degree
+                    this.$set(row, 'feng_xian_ying_du', (!row.feng_xian_ying_du && degree === '低风险') ? '风险接受' : '风险降低')
+                    row.feng_xian_zhi_shu = rate + ''
+                    row.feng_xian_deng_ji = degree
+                }
+            } else if (this.muban === '2') {
+                if (row.yan_zhong_cheng_d && row.fa_sheng_pin_du_ && row.ke_jian_ce_du_) {
+                    let degree = ''
+                    let rate = ''
+                    rate = +row.yan_zhong_cheng_d * +row.fa_sheng_pin_du_ * +row.ke_jian_ce_du_
+                    if (this.fengXianJiSuan.length === 0) {
+                        if (rate >= 1 && rate <= 8) {
+                            degree = '可忽略的'
+                        }
+                        if (rate >= 9 && rate <= 27) {
+                            degree = '可接受的'
+                        }
+                        if (rate >= 28 && rate <= 63) {
+                            degree = '中度的'
+                        }
+                        if (rate >= 64 && rate <= 99) {
+                            degree = '重大的'
+                        }
+                        if (rate >= 100 && rate <= 125) {
+                            degree = '不可接受的'
+                        }
+                    } else {
+                        for (let i = 0; i < this.fengXianJiSuan.length; i++) {
+                            const item = this.fengXianJiSuan[i]
+                            if (item.yan_zhong_cheng_d) {
+                                const [a, b] = item.yan_zhong_cheng_d.split('-')
+                                if (a && b) {
+                                    if (rate >= +a.trim() && rate <= +b.trim()) {
+                                        degree = item.fen_ji_
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    this.$set(row, 'feng_xian_ying_du', (!row.feng_xian_ying_du && (degree === '可忽略的' || degree === '可接受的')) ? '风险接受' : '风险降低')
+                    row.feng_xian_zhi_shu = rate + ''
+                    row.feng_xian_deng_ji = degree
+                }
             }
         },
         check () {
@@ -541,7 +658,7 @@ export default {
             for (let i = 0; i < this.tableList.length; i++) {
                 const item = this.tableList[i]
                 if (!item.feng_xian_zhi_shu) {
-                    throw new Error(`第${i + 1}请选择严重程度和发生频度！`)
+                    throw new Error(`第${i + 1}未计算风险指数，请填写相关数据！`)
                 }
                 if (item.feng_xian_ying_du !== '风险接受' && !item.zhi_ding_ren_) {
                     throw new Error(`第${i + 1}行缺少措施制定人！`)

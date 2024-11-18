@@ -48,15 +48,21 @@
                         />
                     </div>
                     <div class="item">
-                        <div class="label">设备编号：</div>
+                        <div class="label">灯管号：</div>
                         <div class="content">
                             <el-input v-model="deviceNo" size="mini" />
                         </div>
                     </div>
                     <div class="item">
-                        <div class="label">设备名称：</div>
+                        <div class="label">紫外灯名：</div>
                         <div class="content">
                             <el-input v-model="deviceName" size="mini" />
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">岗位：</div>
+                        <div class="content">
+                            <el-input v-model="gangWei" size="mini" />
                         </div>
                     </div>
                 </div>
@@ -64,20 +70,20 @@
                     <div class="agend">
                         <div class="item">
                             <div class="green-circle" />
-                            <span>全部完成</span>
+                            <span>已完成</span>
                         </div>
-                        <div class="item">
+                        <!-- <div class="item">
                             <div class="orange-circle" />
                             <span>部分完成</span>
-                        </div>
+                        </div> -->
                         <div class="item">
                             <div class="red-circle" />
-                            <span>全部未完成</span>
+                            <span>待处理</span>
                         </div>
-                        <div class="item">
+                        <!-- <div class="item">
                             <div class="red-bg" />
                             <span>设备状况异常</span>
-                        </div>
+                        </div> -->
                         <div class="item-time">
                             <span>统计时间：{{ curTime }}</span>
                         </div>
@@ -86,56 +92,52 @@
 
                 <div v-if="fliterData.length>0" class="table">
                     <div class="column">
-                        <div class="item">设备名称/日期</div>
+                        <div class="item">紫外灯/日期</div>
                         <div v-for="(item,index) in fliterData" :key="index" class="item" style="cursor:pointer" @click="goLookStatic(item)">
-                            <span style="padding:0 6px">{{ item.ri_qi_ }}/{{ item.she_bei_ming_chen }}</span>
+                            <span style="padding:0 6px">{{ item.deng_guan_hao_ }}/{{ item.zi_wai_deng_ming_ }}</span>
                         </div>
                     </div>
                     <div class="column">
                         <div v-for="(item,index) in formatData" :key="index" class="content-item">
                             <div class="item">{{ index+1 }}</div>
-                            <div v-for="(i,ind) in item" :key="ind" class="item" :class="i.status?'':'unusual'">
+                            <div v-for="(i,ind) in item" :key="ind" class="item">
                                 <el-tooltip v-show="i.count>0" class="item" effect="light" placement="top-start">
                                     <template slot="content">
                                         <div>
-                                            <span v-if="i.todo">待处理：{{ i.todo }}；</span>
-                                            <span v-if="i.done">已完成：{{ i.done }}；</span>
                                             <div v-for="(ii,indd) in i.data" :key="indd" class="detail">
                                                 <el-divider />
                                                 <div class="detail-item">
-                                                    <div class="item" style="margin:2px 0">处理人：{{ switchIdToUserName(ii.bian_zhi_ren_)|| '/' }}</div>
-                                                    <div class="item" style="margin:2px 0">设备状况：{{ ii.wei_hu_zhuang_tai|| '/' }}</div>
-                                                    <div class="item" style="margin:2px 0">维护项目：{{ ii.wei_hu_xiang_mu_c|| '/' }}</div>
-                                                    <div class="item" style="margin:2px 0">备注：{{ ii.bei_zhu_|| '/' }}</div>
+                                                    <div class="item" style="margin:2px 0">处理人：{{ switchIdToUserName(ii.qian_ming_)|| '/' }}</div>
+                                                    <div class="item" style="margin:2px 0">岗位：{{ ii.gang_wei_|| '/' }}</div>
+                                                    <div class="item" style="margin:2px 0">额定时长：{{ ii.e_ding_shi_chang_|| '/' }}</div>
+                                                    <div class="item" style="margin:2px 0">已使用总时长：{{ ii.zsc2|| '/' }}</div>
+                                                    <div class="item" style="margin:2px 0">当次使用时长：{{ ii.shi_yong_shi_chan|| '/' }}</div>
+                                                    <div class="item" style="margin:2px 0">使用时间：{{ ii.sysj1|| '/' }}</div>
+                                                    <div class="item" style="margin:2px 0">擦拭情况：{{ ii.wan_cheng_qing_ku|| '/' }}</div>
                                                 </div>
                                             </div>
                                         </div>
                                     </template>
-                                    <div v-if="i.todo===0" class="green-circle" />
-                                    <div v-else-if="i.done===0" class="red-circle" />
-                                    <div v-else class="orange-circle" />
+                                    <div class="green-circle" />
+                                    <!-- <div v-else class="orange-circle" /> -->
                                 </el-tooltip>
+                                <div v-if=" i.count===0 && i.show" class="red-circle" />
                             </div>
                         </div>
                     </div>
                 </div>
                 <el-empty v-else description="暂无数据" />
             </div>
-            <MaintenanceStatic v-if="MaintenanceStaticVisible" :dialog-visible.sync="MaintenanceStaticVisible" :params="dialogParams" />
-
         </div>
     </el-dialog>
 </template>
 
 <script>
-import MaintenanceStatic from './maintenanceStatic.vue'
-import xlsx from 'xlsx'
-import fs from 'file-saver'
 import dayjs from 'dayjs'
 import ibpsUserSelector from '@/business/platform/org/selector'
 export default {
     components: {
-        ibpsUserSelector, MaintenanceStatic
+        ibpsUserSelector
     },
     props: {
         params: {
@@ -170,6 +172,7 @@ export default {
             curTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             deviceNo: '',
             deviceName: '',
+            gangWei: '',
             monthList: monthList,
             month: monthValue,
             monthDays: monthDays,
@@ -194,7 +197,7 @@ export default {
 
             },
             dataList: [],
-            type: ['日保养', '周保养', '月保养', '季度保养', '半年保养', '年保养', '按需保养'],
+            type: [],
             filter: [{
                 descVal: '2',
                 includeSub: true,
@@ -204,72 +207,57 @@ export default {
                 scriptContent: '',
                 type: 'user',
                 userType: 'position'
-            }]
+            }],
+            totalList: []
         }
     },
     computed: {
-        deviceColumns () {
-            return {
-                'leiXing': '保养类型',
-                'One': this.month + '-01',
-                'Two': this.month + '-02',
-                'Three': this.month + '-03',
-                'Four': this.month + '-04',
-                'Five': this.month + '-05',
-                'Six': this.month + '-06',
-                'Seven': this.month + '-07',
-                'Eight': this.month + '-08',
-                'Nine': this.month + '-09',
-                'Ten': this.month + '-10',
-                'Eleven': this.month + '-11',
-                'Twelve': this.month + '-12',
-                'Thirteen': this.month + '-13',
-                'Fourteen': this.month + '-14',
-                'Fifteen': this.month + '-15',
-                'Sixteen': this.month + '-16',
-                'Seventeen': this.month + '-17',
-                'Eighteen': this.month + '-18',
-                'Nineteen': this.month + '-19',
-                'Twenty': this.month + '-20',
-                'Twenty-One': this.month + '-21',
-                'Twenty-Two': this.month + '-22',
-                'Twenty-Three': this.month + '-23',
-                'Twenty-Four': this.month + '-24',
-                'Twenty-Five': this.month + '-25',
-                'Twenty-Six': this.month + '-26',
-                'Twenty-Seven': this.month + '-27',
-                'Twenty-Eight': this.month + '-28',
-                'Twenty-Nine': this.month + '-29',
-                'Thirty': this.month + '-30',
-                'Thirty-One': this.month + '-31'
-            }
-        },
         fliterData () {
-            let fliterData = this.dataList
-            if (this.position) {
-                fliterData = fliterData.filter(item => item.bian_zhi_bu_men_ === this.position)
-            }
-            if (this.deviceNo) {
-                fliterData = fliterData.filter(item => item.ri_qi_.indexOf(this.deviceNo) > -1)
-            }
-            if (this.deviceName) {
-                fliterData = fliterData.filter(item => item.she_bei_ming_chen.indexOf(this.deviceName) > -1)
-            }
-            const result = []
+            const fliterData = this.dataList
+            let result = []
             fliterData.forEach(item => {
-                const { ri_qi_, she_bei_ming_chen } = item
-                const t = result.find(i => i.ri_qi_ === ri_qi_)
+                const { she_shi_id_, zi_wai_deng_ming_, deng_guan_hao_, bu_men_, gang_wei_ } = item
+                const t = result.find(i => i.she_shi_id_ === she_shi_id_)
                 if (t) {
                     t.children.push(item)
                 } else {
                     result.push({
-                        she_bei_ming_chen: she_bei_ming_chen,
-                        ri_qi_: ri_qi_,
+                        she_shi_id_: she_shi_id_ || '',
+                        zi_wai_deng_ming_: zi_wai_deng_ming_ || '',
+                        deng_guan_hao_: deng_guan_hao_ || '',
+                        bu_men_: bu_men_ || '',
+                        gang_wei_: gang_wei_ || '',
                         children: [item]
                     })
                 }
             })
             // console.log('fliterData', result)
+            this.totalList.forEach(item => {
+                const { she_shi_id_, zi_wai_deng_ming_, deng_guan_hao_, bian_zhi_bu_men_, gang_wei_ } = item
+                const t = result.find(i => i.she_shi_id_ === item.she_shi_id_)
+                if (!t) {
+                    result.push({
+                        she_shi_id_: she_shi_id_ || '',
+                        zi_wai_deng_ming_: zi_wai_deng_ming_ || '',
+                        deng_guan_hao_: deng_guan_hao_ || '',
+                        bu_men_: bian_zhi_bu_men_ || '',
+                        gang_wei_: gang_wei_ || '',
+                        children: []
+                    })
+                }
+            })
+            if (this.position) {
+                result = result.filter(item => item.bu_men_ === this.position)
+            }
+            if (this.deviceNo) {
+                result = result.filter(item => item.deng_guan_hao_.indexOf(this.deviceNo) > -1)
+            }
+            if (this.deviceName) {
+                result = result.filter(item => item.zi_wai_deng_ming_.indexOf(this.deviceName) > -1)
+            }
+            if (this.gangWei) {
+                result = result.filter(item => item.gang_wei_.indexOf(this.gangWei) > -1)
+            }
             return result
         },
         formatData () {
@@ -283,26 +271,28 @@ export default {
                     const obj = {
                         data: [],
                         count: 0,
-                        todo: 0,
-                        done: 0,
-                        status: true
+                        show: true,
+                        fullDay
                     }
-                    const tempList = item.children.filter(k => k.ji_hua_shi_jian_ === fullDay)
+                    const tempList = item.children.filter(k => k.ri_qi_.slice(0, 10) === fullDay)
                     obj.count = tempList.length
-                    obj.todo = tempList.filter(k => k.shi_fou_guo_shen_ === '待处理').length
-                    obj.done = tempList.filter(k => k.shi_fou_guo_shen_ === '已完成').length
-                    obj.data = tempList.filter(k => k.shi_fou_guo_shen_ === '已完成')
-                    obj.status = !obj.data.some(item => item.wei_hu_zhuang_tai === '异常')
+                    obj.data = tempList
+                    if (new Date(fullDay).getTime() > new Date(this.curTime).getTime()) {
+                        obj.show = false
+                    }
                     arr.push(obj)
                 })
                 answer[i] = arr
             }
-            // console.log('data', answer)
+            // console.log('answer', answer)
             return answer
         }
     },
-    mounted () {
+    async mounted () {
         this.init()
+        const sql = `select she_shi_id_,zi_wai_deng_ming_,deng_guan_hao_,bian_zhi_bu_men_,gang_wei_ from t_jykzwdxdjlbsc where di_dian_='${this.level}' and shi_fou_ting_yong='1'`
+        const { variables: { data }} = await this.$common.request('sql', sql)
+        this.totalList = data
     },
     methods: {
         handleActionEvent ({ key }) {
@@ -319,68 +309,15 @@ export default {
         },
         // 查看设备统计
         goLookStatic (row) {
-            this.dialogParams = row
-            this.dialogParams.searchMonth = this.month
-            this.MaintenanceStaticVisible = true
+            // this.dialogParams = row
+            // this.dialogParams.searchMonth = this.month
+            // this.MaintenanceStaticVisible = true
         },
         // 人员id 转人员名称
         switchIdToUserName (id) {
             const { userList } = this.$store.getters
             const temp = userList.find(item => item.userId === id)
             return temp ? temp.userName : ''
-        },
-        xlsx (json, fields, filename = '.xlsx') { // 导出xlsx
-            json.forEach(item => {
-                for (const i in item) {
-                    if (fields.hasOwnProperty(i)) {
-                        item[fields[i]] = item[i]
-                    }
-                    delete item[i] // 删除原先的对象属性
-                }
-            })
-            const sheetName = filename // excel的文件名称
-            const wb = xlsx.utils.book_new() // 工作簿对象包含一SheetNames数组，以及一个表对象映射表名称到表对象。XLSX.utils.book_new实用函数创建一个新的工作簿对象。
-            const ws = xlsx.utils.json_to_sheet(json, { header: Object.values(fields) }) // 将JS对象数组转换为工作表。
-            wb.SheetNames.push(sheetName)
-            wb.Sheets[sheetName] = ws
-            // console.log('json', ws)
-            const defaultCellStyle = { font: { name: 'Verdana', sz: 13, color: 'FF00FF88' }, fill: { fgColor: { rgb: 'FFFFAA00' }}}// 设置表格的样式
-            const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary', cellStyles: true, defaultCellStyle: defaultCellStyle, showGridLines: false } // 写入的样式
-            const wbout = xlsx.write(wb, wopts)
-            const blob = new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' })
-            fs.saveAs(blob, filename + '.xlsx')
-        },
-        s2ab (s) {
-            let buf
-            if (typeof ArrayBuffer !== 'undefined') {
-                buf = new ArrayBuffer(s.length)
-                const view = new Uint8Array(buf)
-                for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
-                return buf
-            } else {
-                buf = new Array(s.length)
-                for (let i = 0; i !== s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF
-                return buf
-            }
-        },
-        getTimeStamp () {
-            return dayjs().format('YYYYMMDDHHmmss')
-        },
-        handleExport () {
-            const exportData = this.type.map((item, index) => {
-                const obj = { 'leiXing': item }
-                for (let i = 1; i < this.monthDays + 1; i++) {
-                    const t = this.formatData[i - 1][index]
-                    const text = `已完成：${t.done};待处理：${t.todo}`
-                    obj[Object.keys(this.deviceColumns)[i]] = text
-                }
-                return obj
-            })
-
-            // const copyData = JSON.parse(JSON.stringify(exportData))
-            // console.log('导出数据', copyData)
-            this.xlsx(exportData, this.deviceColumns, '设备维护统计' + this.getTimeStamp())
-            this.$message.success('导出设备成功！')
         },
         async handleMonthChange (val) {
             const year = +val.split('-')[0]
@@ -412,17 +349,18 @@ export default {
         },
         async init () {
             this.loading = true
-            this.title = `月度设备维护统计`
+            this.title = `紫外灯消毒月度统计`
             const y = +this.month.split('-')[0]
             const m = +this.month.split('-')[1]
-            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,a.bian_zhi_bu_men_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,b.id_ AS subId,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,c.id_ AS addtionId,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m} and a.di_dian_='${this.level}'`
+            const sql = `select a.id_,a.parent_id_,a.she_bei_hao_,a.ri_qi_,a.bu_men_,a.wan_cheng_qing_ku,a.pi_ci_,a.shi_yong_shi_chan,a.zong_shi_chang_ as zsc1,a.qian_ming_,a.fang_jian_di_zhi_,a.e_ding_shi_chang_,a.zi_wai_deng_id_,a.gang_wei_,a.pan_ding_ri_qi_ as pdrq1,b.zi_wai_deng_ming_,b.zong_shi_chang_ as zsc2,b.deng_guan_hao_,b.ri_chang_zhao_she,b.shang_ci_xiao_du_,b.she_shi_id_,b.fang_jian_,b.shi_fou_gen_huan_,b.shi_fou_ting_yong,b.pan_ding_ri_qi_ as pdrq2 FROM t_jykzwdxdjlbzb a LEFT JOIN t_jykzwdxdjlbsc b ON a.zi_wai_deng_id_=b.id_ where b.di_dian_='${this.level}' and b.shi_fou_ting_yong='1' and YEAR(a.ri_qi_) = ${y} and MONTH(a.ri_qi_) = ${m}`
             const { variables: { data }} = await this.$common.request('sql', sql)
+            // console.log('data', data)
             this.dataList = data
-            this.dataList.forEach(item => {
-                if (!Object.hasOwn(item, 'wei_hu_lei_xing_') || !item.wei_hu_lei_xing_) {
-                    item.wei_hu_lei_xing_ = '按需保养'
-                }
-            })
+            // this.dataList.forEach(item => {
+            //     if (!Object.hasOwn(item, 'wei_hu_lei_xing_') || !item.wei_hu_lei_xing_) {
+            //         item.wei_hu_lei_xing_ = '按需保养'
+            //     }
+            // })
             this.loading = false
         }
     }

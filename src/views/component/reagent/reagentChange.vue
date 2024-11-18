@@ -80,7 +80,7 @@
                 <span>样品编号{{ index+1 }}</span>
                 <div style="display: flex;align-items: center;">
                     <span style="color: red;margin-right: 3px;">*</span>
-                    <el-input v-model="item.number" required :min="0" type="number" style="flex:1;" />
+                    <el-input v-model="item.number" required :min="0" style="flex:1;" />
                 </div>
                 <div>
                     <el-button type="text" :style="{visibility: index === dialogData.length-1?'visible':'hidden'}" @click="addRow">添加</el-button>

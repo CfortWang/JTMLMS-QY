@@ -130,6 +130,7 @@ import setting from '@/setting.js'
 import ChangePassword from '@/views/platform/org/employee/change-password'
 import UserInfo from '@/views/platform/org/employee/edit'
 import request from '@/utils/request'
+import { getUserInfo } from '@/api/oauth2/user'
 
 export default {
     components: {
@@ -149,6 +150,7 @@ export default {
             locationName,
             roleName,
             positions: userInfo.positions || [],
+            users: userInfo.user || [],
             mainPosition,
             tenants: this.$store.getters.tenants,
             tenantid: this.$store.getters.tenantid,
@@ -256,30 +258,59 @@ export default {
             this.$router.replace('/tenantSelect')
         },
         handleMainChange (item) {
-            if (this.$utils.isEmpty(this.mainPosition)) {
-                this.setMainPosition(item.id)
-                return
-            }
-            if (this.mainPosition && this.mainPosition.id === item.id) {
-                return
-            }
-            this.updateMainPosition(this.mainPosition.id, item.id)
+            getUserInfo(this.users.account).then(async response => {
+                if (!response) {
+                    reject(response)
+                }
+                const info = response.data
+                info.positions.sort((a, b) => a.id - b.id)
+                this.positions.sort((a, b) => a.id - b.id)
+                if (info.positions.length !== this.positions.length) {
+                    this.$message.warning('部门信息更新，请在刷新后重新选择！')
+                    location.reload()
+                    return
+                } else {
+                    info.positions.forEach((element, i) => {
+                        if (element.id !== this.positions[i].id || element.isMainPost !== this.positions[i].isMainPost) {
+                            this.$message.warning('部门信息更新，请在刷新后重新选择！')
+                            location.reload()
+                            return
+                        }
+                    })
+                }
+                if (this.$utils.isEmpty(this.mainPosition)) {
+                    this.setMainPosition(item.id)
+                    return
+                }
+                if (this.mainPosition && this.mainPosition.id === item.id) {
+                    return
+                }
+                this.updateMainPosition(this.mainPosition.id, item.id)
+            })
         },
         setMainPosition (mid) {
-            request({
-                url: '/platform/v3/rel/save',
-                method: 'post',
-                isLoading: true,
-                data: {
-                    biz: 'mainPost',
-                    mainType: 'position',
-                    subType: 'employee',
-                    mainPid: mid,
-                    subPid: this.userId
+            const sql = `select * from ibps_party_rel where biz_ = 'mainPost' and SUB_PID_ = '${this.userId}'`
+            this.$common.request('sql', sql).then((r) => {
+                if (r.variables.data.length === 0) {
+                    request({
+                        url: '/platform/v3/rel/save',
+                        method: 'post',
+                        isLoading: true,
+                        data: {
+                            biz: 'mainPost',
+                            mainType: 'position',
+                            subType: 'employee',
+                            mainPid: mid,
+                            subPid: this.userId
+                        }
+                    }).then(res => {
+                        this.$message.success('设置主部门成功!')
+                        location.reload()
+                    })
+                } else {
+                    this.$message.warning('部门信息更新，请在刷新后重新选择！')
+                    location.reload()
                 }
-            }).then(res => {
-                this.$message.success('设置主部门成功!')
-                location.reload()
             })
         },
         updateMainPosition (oldId, newId) {

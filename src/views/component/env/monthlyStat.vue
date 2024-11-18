@@ -1,6 +1,6 @@
 <template>
     <el-dialog
-        :title="title"
+        :title="labelTitle"
         :visible.sync="dialogVisible"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
@@ -106,6 +106,10 @@ export default {
         visible: {
             type: Boolean,
             default: false
+        },
+        labelTitle: {
+            type: String,
+            default: '月报表参数选择'
         }
     },
     data () {

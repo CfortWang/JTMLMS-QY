@@ -326,9 +326,6 @@ export default {
             ]
         }
     },
-    mounted () {
-
-    },
     methods: {
 
         unitConversions (str) {
@@ -409,15 +406,9 @@ export default {
                     }
                     if (buMenAuthority.length !== 0) {
                         let orSql = ''
-                        // eslint-disable-next-line no-redeclare
-                        for (const i in positionsDatas) {
-                            if (i === '0') {
-                                // if (positionsDatas[i].name = '检验科') return
-                                orSql = `wj.quan_xian_xin_xi_ LIKE '%${positionsDatas[i].id}%'`
-                            } else {
-                                orSql = orSql + `or wj.quan_xian_xin_xi_ LIKE '%${positionsDatas[i].id}%'`
-                            }
-                        }
+                        positionsDatas.forEach((item, index) => {
+                            orSql += `${index === 0 ? '' : 'OR'} wj.quan_xian_xin_xi_ LIKE '%${item.id}%'`
+                        })
                         wheres2 = wheres2 + ` and (${orSql}) and FIND_IN_SET (wj.xi_lei_id_,'${buMenAuthority}')`
                     }
                     if (authority.length !== 0) {
@@ -428,14 +419,16 @@ export default {
                 }
             }
             let ascDesc = 'desc'
-            if (sorts) {
-                if (JSON.stringify(sorts) !== '{}') {
-                    wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
-                    wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
-                    ascDesc = sorts.order === 'ascending' ? 'asc' : 'desc'
-                }
+            if (sorts && JSON.stringify(sorts) !== '{}') {
+                wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
+                wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
+                ascDesc = sorts.order === 'ascending' ? 'asc' : 'desc'
             }
-
+            const isSuper = this.$store.getters.isSuper
+            const roleLists = this.$store.getters.userInfo.role
+            const roleKey = ['wjgly']
+            const curRole = roleLists.map(i => i.alias)
+            const isPower = curRole.some(i => roleKey.includes(i))
             // 重复发放的文件，在权限表会存在重复的文件信息
             //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian
             //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
@@ -446,7 +439,7 @@ export default {
                 ELSE CONCAT(file.total_bytes_, 'B')
             END
             ,'）') as file_info_,
-            wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,"" AS cha_yue_jie_zhi_s  from`
+            wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,'' AS cha_yue_jie_zhi_s  from`
 
             // const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（大小：',file.total_bytes_,'）') as file_info_,
             // wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,"" AS cha_yue_jie_zhi_s  from`
@@ -463,25 +456,48 @@ export default {
             where wj.shi_fou_guo_shen_ in ('有效','使用') ${wheres2} `
             // 受限文件:结合查阅授权模块的截止时间
             // select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',file.total_bytes_,'）') as file_info_,
+
             const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',
-                 CASE
-                WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
-                WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
-                ELSE CONCAT(file.total_bytes_, 'B')
-            END
-            ,'）') as file_info_,
-            wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s  from
-        t_wjxxb wj 
-        left join (select *from t_skwjcysqsqzb order by create_time_ desc limit 1) sq on wj.id_=sq.wen_jian_id_ 
-        ${leftSql}
-        WHERE wj.shi_fou_guo_shen_ ='有效' and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
-        and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
+                     CASE
+                    WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
+                    WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
+                    ELSE CONCAT(file.total_bytes_, 'B')
+                END
+                ,'）') as file_info_,
+                wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s  from
+            t_wjxxb wj
+            left join (select *from t_skwjcysqsqzb order by create_time_ desc limit 1) sq on wj.id_=sq.wen_jian_id_
+            ${leftSql}
+            WHERE wj.shi_fou_guo_shen_ ='有效'and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
+            and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3}`
+            // and (${isPower} or wj.quan_xian_xin_xi_ like '%${this.userId}%')  ${wheres3}
+            // 深圳三院（受限文件查阅权限）
+            //     const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,
+            //     CONCAT(file.file_name_, '.', file.ext_, '（',
+            //     CASE
+            //        WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
+            //        WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
+            //        ELSE CONCAT(file.total_bytes_, 'B')
+            //     END
+            //  , '）') as file_info_,wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s FROM t_wjxxb wj
+            //  LEFT JOIN (SELECT * FROM t_skwjcysqsqzb ORDER BY create_time_ DESC LIMIT 1) sq ON wj.id_ = sq.wen_jian_id_ ${leftSql}
+            //  WHERE wj.shi_fou_guo_shen_ = '有效' AND (${isSuper} OR ${isPower}
+            // 	OR EXISTS (SELECT 1 FROM t_wjxdzb wjxdzb
+            // 		JOIN t_wjxzxdjlb wjxzxdjlb ON wjxdzb.id_ = wjxzxdjlb.parent_id_
+            // 		JOIN t_wjxxb wjxxb ON wjxxb.shu_ju_lai_yuan_ = wjxzxdjlb.id_
+            // 	WHERE wjxxb.id_ = wj.id_  AND CONCAT_WS(',',
+            //         IF ( wjxdzb.bian_zhi_ren_ != '', wjxdzb.bian_zhi_ren_, NULL ),
+            // 		IF( wjxdzb.zhu_shen_he_ren_ != '', wjxdzb.zhu_shen_he_ren_, NULL ),
+            // 		IF( wjxdzb.zhu_shen_pi_ren_ != '', wjxdzb.zhu_shen_pi_ren_, NULL )
+            // 		) LIKE '%${this.userId}%'
+            // 	)
+            // ) ${wheres3}`
             const sqlArr = [comSql, buMenSql, authoritySql]
             let oldRecordSql = ''
             const buMenWhere = []
             if (this.pageKey !== 'nbwj') {
                 if (this.$store.getters.deptList.length !== 0) {
-                    // eslint-disable-next-line no-redeclare
+                // eslint-disable-next-line no-redeclare
                     for (var i of this.$store.getters.deptList) {
                         buMenWhere.push(`bian_zhi_bu_men_ like '%${i.positionId}%'`)
                     }
@@ -528,6 +544,7 @@ export default {
                 this.listData = []
             })
         },
+        //  and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
         refreshData () {
             this.listData = []
             this.getSearcFormData()

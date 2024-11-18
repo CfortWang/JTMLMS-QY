@@ -122,7 +122,11 @@ export default {
                     }
                     myMap.set(category, myMap.get(category) + 1)
                 })
-                return `低风险：${myMap.get('低风险') || 0}；中风险：${myMap.get('中风险') || 0}；高风险：${myMap.get('高风险') || 0}；`
+                let result = ''
+                myMap.forEach((value, key) => {
+                    result += `${key}：${value || 0}；`
+                })
+                return result
             }
         },
         async getPeopleList () {
