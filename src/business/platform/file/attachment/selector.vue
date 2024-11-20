@@ -543,9 +543,9 @@ export default {
         getPreview (index) {
             // 1、获取文件数据 及下载流接口
             // 下载地址
-            this.optionFileView.url = BASE_API() + SYSTEM_URL() + '/file/download?attachmentId=' + this.attachment.id
+            this.optionFileView.url = this.$onlyofficeApi + '/file/download?attachmentId=' + this.attachment.id
             // 回调接口url
-            this.optionFileView.editUrl = BASE_API() + SYSTEM_URL() + '/file/editCallback?fileName=' + this.attachment.fileName + '&fileType=' + this.attachment.ext
+            this.optionFileView.editUrl = this.$onlyofficeApi + '/file/editCallback?fileName=' + this.attachment.fileName + '&fileType=' + this.attachment.ext
             this.optionFileView.title = this.attachment.fileName // 文件名称
             this.optionFileView.fileType = this.attachment.ext // 类型
             this.optionFileView.data = this.attachment // 记录编制的位置，需要替换。
