@@ -554,11 +554,10 @@ export default {
          */
         getPreview (index) {
             // 1、获取文件数据 及下载流接口
-            const api = BASE_API('', 'intranet') + SYSTEM_URL()
             // 下载地址
-            this.optionFileView.url = api + '/file/download?attachmentId=' + this.attachment.id
+            this.optionFileView.url = this.$onlyofficeApi + '/file/download?attachmentId=' + this.attachment.id
             // 回调接口url
-            this.optionFileView.editUrl = api + '/file/editCallback?fileName=' + this.attachment.fileName + '&fileType=' + this.attachment.ext
+            this.optionFileView.editUrl = this.$onlyofficeApi + '/file/editCallback?fileName=' + this.attachment.fileName + '&fileType=' + this.attachment.ext
             this.optionFileView.title = this.attachment.fileName // 文件名称
             this.optionFileView.fileType = this.attachment.ext // 类型
             this.optionFileView.data = this.attachment // 记录编制的位置，需要替换。

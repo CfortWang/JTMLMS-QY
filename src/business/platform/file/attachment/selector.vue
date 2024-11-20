@@ -474,9 +474,8 @@ export default {
         // 处理编辑文件
         handleEdit (index, data, type) {
             // 1、获取文件数据 及下载流接口
-            const api = BASE_API('', 'intranet') + SYSTEM_URL()
-            this.optionFile.url = api + '/file/download?attachmentId=' + data.id
-            this.optionFile.editUrl = api + '/file/editCallback?fileName=' + data.fileName + '&fileType=' + data.ext + '&type=' + type + '&id=' + data.id
+            this.optionFile.url = this.$onlyofficeApi + '/file/download?attachmentId=' + data.id
+            this.optionFile.editUrl = this.$onlyofficeApi + '/file/editCallback?fileName=' + data.fileName + '&fileType=' + data.ext + '&type=' + type + '&id=' + data.id
             this.optionFile.title = data.fileName // 文件名称
             this.optionFile.fileType = data.ext // 类型
             this.optionFile.data = data // 记录编制的位置，需要替换。

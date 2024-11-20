@@ -1,6 +1,6 @@
 (function (global) {
     // 是否启用动态API，启用后，将根据访问IP的origin获取API地址
-    const ENABLE_DYNAMIC_API = true
+    const ENABLE_DYNAMIC_API = false
     const HOST_URL = `${location.origin}${location.pathname}`
     const BASE_URL = ENABLE_DYNAMIC_API ? HOST_URL : 'http://dev1.local/'
     global.__IBPS_CONFIG__ = {

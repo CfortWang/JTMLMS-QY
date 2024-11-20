@@ -284,9 +284,8 @@ export default {
                             newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(url)}&hasRole=${hasRole}" style="width:100%; height:100%;" frameborder="0";>`)
                         })
                     } else {
-                        const api = BASE_API('', 'intranet') + SYSTEM_URL()
-                        this.file.url = `${api}/file/download?attachmentId=${data.id}`
-                        this.file.editUrl = `${api}/file/editCallback?fileName=${data.fileName}&fileType=${data.ext}&id=${data.id}`
+                        this.file.url = `${this.$onlyofficeApi}/file/download?attachmentId=${data.id}`
+                        this.file.editUrl = `${this.$onlyofficeApi}/file/editCallback?fileName=${data.fileName}&fileType=${data.ext}&id=${data.id}`
                         this.file.title = data.fileName // 文件名称
                         this.file.fileType = data.ext // 类型
                         this.filePreviewVisible = false

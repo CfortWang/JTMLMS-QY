@@ -38,8 +38,9 @@ import pluginLog from '@/plugins/log'
 import pluginOpen from '@/plugins/open'
 // 平台配置文件
 import setting from '@/setting.js'
-import { BASE_URL, BASE_SEAL_API, REPORT_PATH } from '@/constant'
+import { BASE_URL, BASE_SEAL_API, REPORT_PATH, INTRANET_URL } from '@/constant'
 import env from '@/env'
+import { BASE_API, SYSTEM_URL } from '@/api/baseUrl'
 
 export default {
     async install (Vue, options) {
@@ -50,6 +51,8 @@ export default {
         Vue.prototype.$nodeEnv = env.NODE_ENV
         // 当前环境变量
         Vue.prototype.$env = env
+        // onlyofficeUrl，开发环境使用当前环境api，生产环境固定使用INTRANET_URL
+        Vue.prototype.$onlyofficeApi = env.NODE_ENV === 'development' ? BASE_API() : `${INTRANET_URL}ibps` + SYSTEM_URL()
 
         // 当前的 baseUrl   简化代码中 env.VUE_APP_PUBLIC_PATH 取值
         Vue.prototype.$baseUrl = env.VUE_APP_PUBLIC_PATH || '/'

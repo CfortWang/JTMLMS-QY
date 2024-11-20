@@ -162,11 +162,10 @@ export default {
                 this.$message.warning('图片附件请直接在列表预览！')
                 return
             }
-            const api = BASE_API('', 'intranet') + SYSTEM_URL()
             this.fileOption.user.id = this.$store.getters.userId
             this.fileOption.user.name = this.$store.getters.name
-            this.fileOption.url = api + `/file/download?attachmentId=${id}`
-            this.fileOption.editUrl = api + `/file/editCallback?fileName=${fileName}&fileType=${ext}&id=${id}`
+            this.fileOption.url = this.$onlyofficeApi + `/file/download?attachmentId=${id}`
+            this.fileOption.editUrl = this.$onlyofficeApi + `/file/editCallback?fileName=${fileName}&fileType=${ext}&id=${id}`
             this.fileOption.title = fileName
             this.fileOption.fileType = ext
             // console.log(this.fileOption)
