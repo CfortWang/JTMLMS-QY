@@ -1,17 +1,19 @@
 (function (global) {
-    const BASE_URL = 'http://dev1.local/'
-    const PUBLIC_URL = 'http://dev1.local/'
+    // 是否启用动态API，启用后，将根据访问IP的origin获取API地址
+    const ENABLE_DYNAMIC_API = true
+    const HOST_URL = `${location.origin}${location.pathname}`
+    const BASE_URL = ENABLE_DYNAMIC_API ? HOST_URL : 'http://dev1.local/'
     global.__IBPS_CONFIG__ = {
         // 是否启用配置
         ENABLE_CONFIG: true,
         // 基础路径
         BASE_URL,
-        //公网路径
-        PUBLIC_URL,
+        //公网地址（文件预览下载、扫码回调）
+        PUBLIC_URL: 'http://dev1.local/',
+        // 内网地址（onlyoffice相关url默认使用该ip）
+        INTRANET_URL: 'http://dev1.local/',
         //  api
         BASE_API: `${ BASE_URL }ibps`,
-        // 是否启用动态API，启用后，将根据访问IP的origin获取API地址
-        ENABLE_DYNAMIC_API: false,
         // GATEWAY API
         BASE_GATEWAY_API: `${ BASE_URL }ibps`,
         // WEBSOCKET api

@@ -1,6 +1,7 @@
 import store from '@/store'
 import {
     BASE_API as baseApi,
+    INTRANET_URL,
     BASE_GATEWAY_API as gatewayApi,
     BASE_WEBSOCKET as baseWebsocket,
     SINGLE, MULTIPLE_DOMAIN, API_DOMAIN_NAMES
@@ -23,8 +24,9 @@ const getApi = (api, i) => {
 }
 
 // 默认url
-export const BASE_API = function (i) {
-    const api = store && store.getters.baseApi ? store.getters.baseApi : baseApi
+export const BASE_API = function (i, type = '') {
+    const base = type === 'intranet' ? `${INTRANET_URL}ibps` : baseApi
+    const api = store && store.getters.baseApi ? store.getters.baseApi : base
     return MULTIPLE_DOMAIN ? getApi(api, i) : api
 }
 // 网关API 解决上传乱码问题
