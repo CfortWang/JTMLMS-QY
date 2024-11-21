@@ -55,7 +55,8 @@ export default {
 
   },
   mounted() {
-    this.scrollInit()
+    // 这个插件会影响到滚动效果 修复菜单栏无法滚动的bug 先注释掉
+    // this.scrollInit()
   },
   beforeDestroy() {
     this.scrollDestroy()

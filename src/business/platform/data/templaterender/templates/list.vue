@@ -1900,7 +1900,7 @@ export default {
              * type:dialog，表示对话框列表
              * tempSearch为true的时候是列表搜索框点击打开的对话框
              * 数据模板脚本里打开的对话框列表，不需要执行本模块代码，否则会执行到底层列表的onload脚本：洗眼器
-             * 但是在表单页面打开对话框的时候需要执行本模块代码：考试管理对话框
+             * 但是在表单页面打开对话框的时候需要执行本模块代码：考试管理对话框（如模板内需注册组件的场景，若不执行脚本则组件未注册，后续逻辑无法正确执行）
              */
             if (this.dataTemplate.type === 'default' || (this.dataTemplate.type === 'dialog' && !this.tempSearch) || this.tempSearch) {
                 // 判断对话框模板脚本是否存在onload，如果存在就执行，如果不存在就不执行JTemplate._onLoad(this)
