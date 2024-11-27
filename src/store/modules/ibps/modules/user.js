@@ -75,9 +75,9 @@ export default {
                         const info = response.data
                         /**
                          * store 统一存储高权限角色，用于各模块校验附件下载权限
-                         * 初定角色为：系统管理角色、主任、质量负责人、文件管理负责人、文件管理员
+                         * 初定角色为：系统管理角色、主任、质量负责人、文件管理负责人、文件管理员，文件下载角色
                          */
-                        info.highRoles = ['xtgljs', 'syszr', 'zlfzr', 'wjglzzc', 'wjgly']
+                        info.highRoles = ['xtgljs', 'syszr', 'zlfzr', 'wjglzzc', 'wjgly', 'wjxzjs']
                         const { role = [] } = info || {}
                         const hasHighRole = role.some(item => info.highRoles.includes(item.alias))
                         // 用于文件预览页判定是否开启下载权限
