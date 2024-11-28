@@ -365,16 +365,16 @@ export default {
             const sql = `select p.*,r.SUB_PID_ as userId FROM IBPS_PARTY_POSITION p INNER JOIN ibps_party_rel r ON p.id_ = r.MAIN_PID_ WHERE r.BIZ_ = 'mainPost' ORDER BY p.CREATE_TIME_ DESC`
             const { variables: { data }} = await this.$common.request('sql', sql)
             this.paperList.forEach((item) => {
-                const mainUser = data.find(i => i.userId === item.examinee)
+                const mainUser = data.find(i => i.userId === item.examineeId)
                 // 如果有主部门  只统计主部门
                 if (mainUser) {
-                    item.positionId = mainUser?.ID_ || ''
-                    item.positionName = mainUser?.NAME_ || ''
+                    this.$set(item, 'positionId', mainUser?.ID_ || '')
+                    this.$set(item, 'positionName', mainUser?.NAME_ || '')
                 } else {
                     // 没有主部门 则统计全部
-                    const user = this.userList.find((u) => u.userId === item.examinee)
-                    item.positionId = user?.positionId || ''
-                    item.positionName = user?.positions || ''
+                    const user = this.userList.find((u) => u.userId === item.examineeId)
+                    this.$set(item, 'positionId', user?.positionId || '')
+                    this.$set(item, 'positionName', user?.positions || '')
                 }
             })
         },

@@ -438,6 +438,7 @@ export default {
         closeDialog () {
             this.dialogVisible = false
             this.$emit('close')
+            this.$emit('update')
         },
         init () {
             const isEdit = this.params && this.params.id_
