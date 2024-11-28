@@ -345,10 +345,10 @@ export default {
                     keyword: '',
                     path: '/sshjgl/aqgl/mraqjc'
                 },
-                // '07-每月安全检查': {
-                //     keyword: '',
-                //     path: '/sshjgl/aqgl/myaqjc'
-                // },
+                '07-每月安全检查': {
+                    keyword: '',
+                    path: '/sshjgl/aqgl/myaqjc'
+                },
                 '08-含氯有效性监测': {
                     keyword: '',
                     path: '/sshjgl/aqgl/hlyxxjc'
