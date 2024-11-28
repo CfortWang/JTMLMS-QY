@@ -40,7 +40,7 @@
                                 </template>
                                 <el-select v-model="form.jian_ce_gang_wei_" placeholder="请选择" size="mini" style="width:80%">
                                     <el-option
-                                        v-for="item in jianCeGangWeiList"
+                                        v-for="item in monitoringpPosition"
                                         :key="item.id_"
                                         :label="item.wei_hu_gang_wei_"
                                         :value="item.wei_hu_gang_wei_"
@@ -369,6 +369,9 @@ export default {
         }
     },
     computed: {
+        monitoringpPosition () {
+            return this.jianCeGangWeiList.filter(i => i.suo_shu_bu_men_ === this.form.bu_men_)
+        },
         isShowDevice () {
             return this.lei_xing_ !== '01-室内温湿度监控' && this.lei_xing_ !== '06-每日安全检查' && this.lei_xing_ !== '08-含氯有效性监测' && this.lei_xing_ !== '15-日常防护消毒'
         },

@@ -34,7 +34,7 @@
                             <el-form-item label="默认岗位：">
                                 <el-select v-model="form.gang_wei_" placeholder="请选择" size="mini" style="width:100%">
                                     <el-option
-                                        v-for="item in jianCeGangWeiList"
+                                        v-for="item in monitoringpPosition"
                                         :key="item.id_"
                                         :label="item.wei_hu_gang_wei_"
                                         :value="item.wei_hu_gang_wei_"
@@ -243,6 +243,9 @@ export default {
         }
     },
     computed: {
+        monitoringpPosition () {
+            return this.jianCeGangWeiList.filter(i => i.suo_shu_bu_men_ === this.form.bian_zhi_bu_men_)
+        },
         labelShow () {
             if (this.form.zhou_qi_) {
                 if (this.form.zhou_qi_ !== '间隔') {

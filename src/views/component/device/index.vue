@@ -1290,7 +1290,7 @@ export default {
         handlePositionInfo (list, positionList) {
             list.forEach(element => {
                 if (element.cunFangDiDian !== '') {
-                    const postion = positionList.find(i => i.fang_jian_ming_ === element.cunFangDiDian.trim())
+                    const postion = positionList.find(i => (i.fang_jian_ming_ha.trim() || '') === element.cunFangDiDian.trim())
                     if (postion) {
                         const positionId = postion.id_
                         element.cunFangWeiZhi = positionId
@@ -1352,7 +1352,7 @@ export default {
             })
             const currentPosition = this.level
             const { userList = [], deptList = [] } = this.$store.getters || {}
-            const positionSql = `select id_,fang_jian_ming_ from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息
+            const positionSql = `select id_,fang_jian_ming_ha from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息
             const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb where di_dian_ = ${currentPosition}` // 供应商信息
             const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 设备分组信息
             const currentTime = dayjs().format('YYYY-MM-DD HH:mm')
@@ -1502,7 +1502,7 @@ export default {
             })
             const currentPosition = this.level
             const { userList = [], deptList = [] } = this.$store.getters || {}
-            const positionSql = `select id_,fang_jian_ming_ from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息
+            const positionSql = `select id_,fang_jian_ming_ha from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息
             const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb where di_dian_ = ${currentPosition}` // 供应商信息
             const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 设备分组信息
             const currentTime = dayjs().format('YYYY-MM-DD HH:mm')

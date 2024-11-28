@@ -252,6 +252,7 @@
                                                 placeholder="请选择"
                                                 icon="el-icon-search"
                                                 style="width:100%"
+                                                @change-link-data="shiFouQiJianHChange"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -712,31 +713,17 @@
                                     </el-form>
 
                                 </el-tab-pane>
-                                <el-tab-pane label="维护项目" name="two">
-                                    <Maintenance ref="MaintenanceRef" :list-data="form.maintenanceItemPoList" />
-                                </el-tab-pane>
-                                <el-tab-pane label="附属设备及配件" name="three">
-                                    <MoreDevices ref="MoreDevicesRef" :list-data="form.accessoriesDevicePoList" />
-                                </el-tab-pane>
-                                <el-tab-pane label="使用与维护记录" name="four" :disabled="!isEdit">
-                                    <!-- 使用 v-if 配合 keep-alive 实现按需加载 -->
-                                    <keep-alive>
-                                        <MaintenanceRecord v-if="activeName==='four'" :params="form" />
-                                    </keep-alive>
-                                </el-tab-pane>
-                                <el-tab-pane label="校准记录" name="five" :disabled="!isEdit">
-                                    <keep-alive>
-                                        <CalibrationCheckRecord v-if="activeName==='five'" :params="form" />
-                                    </keep-alive>
-                                </el-tab-pane>
-                                <el-tab-pane label="维修记录" name="six" :disabled="!isEdit">
-                                    <keep-alive>
-                                        <RepairRecord v-if="activeName==='six'" :params="form" /></keep-alive>
-                                </el-tab-pane>
-                                <el-tab-pane label="停用、报废记录" name="seven" :disabled="!isEdit">
-                                    <keep-alive>
-                                        <ScrappedRecord v-if="activeName==='seven'" :params="form" />
-                                    </keep-alive>
+
+                                <el-tab-pane v-for="item in tabItems" :key="item.name" :label="item.label" :name="item.name" :disabled="item.isKeepAlive&&!isEdit">
+                                    <template v-if="item.isKeepAlive">
+                                        <!-- 使用 v-if 配合 keep-alive 实现按需加载 -->
+                                        <keep-alive>
+                                            <component :is="item.component" v-if="activeName===item.name" :params="form" />
+                                        </keep-alive>
+                                    </template>
+                                    <template v-else>
+                                        <component :is="item.component" :ref="item.ref" :list-data="form[item.data]" />
+                                    </template>
                                 </el-tab-pane>
                             </el-tabs>
                         </el-col>
@@ -777,6 +764,14 @@ export default {
     data () {
         const { userId, position, level, deptList } = this.$store.getters
         return {
+            tabItems: [
+                { label: '维护项目', name: 'two', ref: 'MaintenanceRef', data: 'maintenanceItemPoList', component: 'Maintenance', isKeepAlive: false },
+                { label: '附属设备及配件', name: 'three', ref: 'MoreDevicesRef', data: 'accessoriesDevicePoList', component: 'MoreDevices', isKeepAlive: false },
+                { label: '使用与维护记录', name: 'four', component: 'MaintenanceRecord', isKeepAlive: true },
+                { label: '校准记录', name: 'five', component: 'CalibrationCheckRecord', isKeepAlive: true },
+                { label: '维修记录', name: 'six', component: 'RepairRecord', isKeepAlive: true },
+                { label: '停用、报废记录', name: 'seven', component: 'ScrappedRecord', isKeepAlive: true }
+            ],
             filter: [{
                 descVal: '2',
                 includeSub: true,
@@ -789,7 +784,6 @@ export default {
             }],
             isFirstyiXiaoRiQi: true,
             isFirstbianZhiBuMen: true,
-            isFirstshiFouQiJianH: true,
             isSheKou: false,
             readonly: false,
             activeName: 'one',
@@ -798,6 +792,7 @@ export default {
             position: position,
             deptList: deptList,
             level: level.second || level.first,
+            org: level.first || '',
             loading: false,
             title: '设备档案卡',
             toolbars: [
@@ -955,9 +950,9 @@ export default {
         'form.cunFangWeiZhi': {
             async handler (val) {
                 if (!val) return
-                const sql = `select fang_jian_ming_ from t_jjqfjb where id_='${val}'`
+                const sql = `select fang_jian_ming_ha from t_jjqfjb where id_='${val}'`
                 const { variables: { data }} = await this.$common.request('sql', sql)
-                this.form.cunFangDiDian = data[0].fang_jian_ming_
+                this.form.cunFangDiDian = data[0].fang_jian_ming_ha
             }
         },
         'form.sheBeiMingChen': {
@@ -971,22 +966,6 @@ export default {
                     this.form.jiShenXuHao = data[0].chu_chang_bian_ha
                     this.form.changShang = data[0].sheng_chan_chang_
                     this.form.yuanSheBeiBian = data[0].she_bei_bian_hao_
-                }
-            }
-        },
-        // 根据供应商自动带出供应商名称和电话
-        'form.shiFouQiJianH': {
-            async handler (val) {
-                if (!val) return
-                if (this.isFirstshiFouQiJianH) {
-                    this.isFirstshiFouQiJianH = false
-                    return
-                }
-                const sql = `select * from t_gysxxb where id_='${val}'`
-                const { variables: { data }} = await this.$common.request('sql', sql)
-                if (data.length > 0) {
-                    this.form.lianXiFangShi = data[0].lian_xi_dian_hua_
-                    this.form.gongYingShang = data[0].gong_ying_shang_m
                 }
             }
         },
@@ -1023,6 +1002,11 @@ export default {
         this.init()
     },
     methods: {
+        // 根据供应商自动带出供应商名称和电话
+        shiFouQiJianHChange (key, data) {
+            this.form.lianXiFangShi = data.lian_xi_dian_hua_
+            this.form.gongYingShang = data.gong_ying_shang_m
+        },
         changeData (...args) {
             this.form[args[0]] = args[1]
         },
@@ -1186,9 +1170,9 @@ export default {
                 if (valid) {
                     try {
                         // 维护项目
-                        this.form.maintenanceItemPoList = this.$refs.MaintenanceRef.listDataCopy
+                        this.form.maintenanceItemPoList = this.$refs.MaintenanceRef?.[0]?.listDataCopy || this.form.maintenanceItemPoList || []
                         // 附属设备及配件
-                        this.form.accessoriesDevicePoList = this.$refs.MoreDevicesRef.listDataCopy
+                        this.form.accessoriesDevicePoList = this.$refs.MoreDevicesRef?.[0]?.listDataCopy || this.form.accessoriesDevicePoList || []
                         await this.checkRequired()
                         if (this.isEdit) {
                             this.goEdit(flag)
@@ -1227,11 +1211,27 @@ export default {
             this.loading = true
             this.isEdit = !!(this.params && this.params.id)
             this.isSheKou = this.deptList[0].positionId === '1166372468122714112' // 判断是否是蛇口医院
+            // 加载tab
+            const sql = `select tabs_option_ from t_ipcc where org_ = '${this.org}' limit 1`
+            const { variables: { data: optionData }} = await this.$common.request('sql', sql)
+            if (optionData.length > 0 && optionData?.[0]?.tabs_option_) {
+                const optionArr = optionData[0].tabs_option_.split(',')
+                const newTab = []
+                for (let i = 0; i < optionArr.length; i++) {
+                    const item = optionArr[i]
+                    const t = this.tabItems.find(j => j.label === item)
+                    if (t) {
+                        newTab.push(t)
+                    }
+                }
+                this.tabItems = newTab
+            }
+            console.log('tab', this.tabItems)
+
             if (this.isEdit) {
                 const { data } = await getequipmentCard({ id: this.params.id })
                 this.form = data
             } else {
-                this.isFirstshiFouQiJianH = false
                 this.isFirstbianZhiBuMen = false
                 this.isFirstyiXiaoRiQi = false
                 // 随机生成一个不重复的设备编号

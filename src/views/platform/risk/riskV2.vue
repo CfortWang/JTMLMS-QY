@@ -136,11 +136,16 @@
 
                     </el-descriptions-item>
 
-                    <el-descriptions-item label="范围" :span="2">
+                    <el-descriptions-item label="范围" :span="1">
                         <el-input v-model="infoFxssbData.fan_wei_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
-                    <el-descriptions-item label="方法" :span="2">
+                    <el-descriptions-item label="方法" :span="1">
                         <el-input v-model="infoFxssbData.fang_fa_" :disabled="readonly" size="mini" />
+                    </el-descriptions-item>
+                    <el-descriptions-item label="风险系数计算方式" :span="2">
+                        <span class="required-star">*</span>
+                        <el-radio v-model="infoFxssbData.ji_suan_fang_shi_" label="1" size="mini" :disabled="isEdit">S * O（严重度*发生率）</el-radio>
+                        <el-radio v-model="infoFxssbData.ji_suan_fang_shi_" label="2" size="mini" :disabled="isEdit">S * O * D（严重度*发生率*可检测度）</el-radio>
                     </el-descriptions-item>
 
                     <el-descriptions-item label="目的" :span="5">
@@ -303,7 +308,7 @@ export default {
                 { key: 'refresh', label: '刷新', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
                 { key: 'save', label: '保存', hidden: () => { return !this.isZuZhang || this.isFinished } },
                 // { key: 'sendMsg', label: '提醒评估人', icon: 'el-icon-bell', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
-                { key: 'peizhifengxian', label: '更新风险库', type: 'info', icon: 'el-icon-setting', hidden: () => { return !this.isZuZhang || !this.isEdit } },
+                // { key: 'peizhifengxian', label: '更新风险库', type: 'info', icon: 'el-icon-setting', hidden: () => { return !this.isZuZhang || !this.isEdit } },
                 { key: 'submit', label: '提交', icon: 'el-icon-finished', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
                 { key: 'cancel', label: '退出', type: 'danger', icon: 'ibps-icon-close' }
             ],
@@ -329,8 +334,8 @@ export default {
                 hui_yi_fu_jian_: '',
                 shi_wu_shuo_ming_: '',
                 ping_gu_ren_yuan_: '',
-                ji_hua_bian_hao_: ''
-
+                ji_hua_bian_hao_: '',
+                ji_suan_fang_shi_: ''
             },
             initWidth: '1280px',
             isEdit: false,
@@ -493,7 +498,9 @@ export default {
                                         feng_xian_lei_xin: this.infoFxssbData.feng_xian_lei_xin,
                                         qian_fu_jian_: this.infoFxssbData.yi_ju_wen_jian_id,
                                         ji_hua_bian_hao_: this.infoFxssbData.ji_hua_bian_hao_,
-                                        ni_cai_qu_kong_zh: item.ni_cai_qu_cuo_shi
+                                        ni_cai_qu_kong_zh: item.ni_cai_qu_cuo_shi,
+                                        qian_zai_yuan_yin: item.qian_zai_yuan_yin,
+                                        ji_suan_fang_shi_: this.infoFxssbData.ji_suan_fang_shi_
                                     }
                                 }
                             }).filter(i => i !== undefined),
@@ -677,6 +684,9 @@ export default {
             if (!this.infoFxssbData.bian_zhi_bu_men_) {
                 throw new Error('请选择编制部门！')
             }
+            if (!this.infoFxssbData.ji_suan_fang_shi_) {
+                throw new Error('请选择风险系数计算方式！')
+            }
         },
         async goAdd () {
             try {
@@ -754,7 +764,14 @@ export default {
                 if (this.isEdit) {
                     await this.goEdit(flag)
                 } else {
-                    await this.goAdd()
+                    this.$confirm('风险系数计算公式保存后不可再修改，是否继续?', '提示', {
+                        confirmButtonText: '继续',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(async () => {
+                        await this.goAdd()
+                    }).catch(() => {
+                    })
                 }
             } catch (error) {
                 this.$message.warning(error.message)

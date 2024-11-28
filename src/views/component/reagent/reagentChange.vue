@@ -103,7 +103,7 @@
 <script>
 import importTable from '@/business/platform/form/formrender/dynamic-form/components/import-table'
 import IbpsImport from '@/plugins/import'
-import { SYSTEM_URL, BASE_API } from '@/api/baseUrl'
+import { downloadFile } from '@/business/platform/file/utils'
 export default {
     components: {
         importTable
@@ -228,13 +228,7 @@ export default {
             this.importTableDialogVisible = true
         },
         handleDownload () {
-            const a = document.createElement('a')
-            a.href = BASE_API() + SYSTEM_URL() + `/file/download?attachmentId=download_sjgh`
-            a.download = '试剂更换验证定量模板.xlsx'
-            a.style.display = 'none'
-            document.body.appendChild(a)
-            a.click()
-            a.remove()
+            downloadFile({ id: 'download_sjgh', fileName: '试剂更换验证定量模板', ext: 'xlsx' })
         },
         getColumns () {
             return [{

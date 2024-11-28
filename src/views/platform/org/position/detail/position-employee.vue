@@ -238,6 +238,9 @@ export default {
                 this.selectorVisible = false
                 ActionUtils.success('加入人员成功!')
                 this.search()
+                setTimeout(() => {
+                    location.reload()
+                }, 1000);
             })
             this.handleUpemployee('add', userIdsStr)
         },
@@ -248,6 +251,9 @@ export default {
             }).then(response => {
                 ActionUtils.removeSuccessMessage()
                 this.search()
+                setTimeout(() => {
+                    location.reload()
+                }, 1000);
             })
             this.handleUpemployee('remove', ids)
         },

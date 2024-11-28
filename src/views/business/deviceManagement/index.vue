@@ -108,16 +108,28 @@ export default {
                     title: '各部门设备检定/校准完成情况',
                     numData: dataobj.verificationData
                 },
+                // {
+                //     title: '检验科设备停用/报废列表',
+                //     numData: {
+                //         header: ['部门', '设备名称', '设备编号', '状态'],
+                //         headerBGC: 'rgba(0,0,0,0)',
+                //         data: dataobj.scrapData,
+                //         columnWidth: ['120', '250', '180', '110'],
+                //         rowNum: 5,
+                //         hoverPause: true
+                //     }
+                // },
                 {
-                    title: '检验科设备停用/报废列表',
+                    title: "检验科设备信息",
                     numData: {
-                        header: ['部门', '设备名称', '设备编号', '状态'],
-                        headerBGC: 'rgba(0,0,0,0)',
+                           // header: ["部门", "设备名称", "设备编号", "状态"],
+                        header: ["部门", "设备名称", "设备编号", "状态","维修次数"],
+                        headerBGC: "rgba(0,0,0,0)",
                         data: dataobj.scrapData,
-                        columnWidth: ['120', '250', '180', '110'],
+                        columnWidth: ["100", "220", "110","110","120"],
                         rowNum: 5,
                         hoverPause: true
-                    }
+                        }
                 },
                 {
                     title: '设备整体情况',
@@ -172,7 +184,15 @@ export default {
                 const scrapData = data.scrapData.filter((item,i)=>{
                     return item[0].indexOf('综合')===-1
                 })
-
+                const scrapDataList=JSON.parse(JSON.stringify(scrapData))
+                for (var i = 0; i < scrapData.length; i++) {
+                scrapDataList[i][0] = scrapData[i][4]
+                scrapDataList[i][1] = scrapData[i][5]
+                scrapDataList[i][2] = scrapData[i][3]
+                scrapDataList[i][3] = scrapData[i][7]
+                scrapDataList[i][4] = scrapData[i][1]
+                scrapDataList[i].splice(5, 3)
+                }
                 this.mergeData[0].numData = data.distributionDataObj || []
                 this.mergeData[1].numData = numDistributionDataObj
                 this.mergeData[2].numData = lifeTimeData
@@ -186,7 +206,7 @@ export default {
                     })
                 }
                 this.mergeData[5].numData = verificationData
-                this.mergeData[6].numData.data = scrapData
+                this.mergeData[6].numData.data = scrapDataList
                 this.mergeData[7].numData = data.entiretyData || []
                 loading.close()
             })

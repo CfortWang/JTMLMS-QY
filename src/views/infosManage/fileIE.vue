@@ -432,7 +432,7 @@ export default {
             // 重复发放的文件，在权限表会存在重复的文件信息
             //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian
             //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
-            const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（大小：',
+            const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,wj.shu_ju_lai_yuan_ AS shu_ju_lai_yuan_,concat(file.file_name_,'.',file.ext_,'（大小：',
                CASE
                 WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
                 WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
@@ -457,7 +457,7 @@ export default {
             // 受限文件:结合查阅授权模块的截止时间
             // select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',file.total_bytes_,'）') as file_info_,
 
-            const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',
+            const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,wj.shu_ju_lai_yuan_ AS shu_ju_lai_yuan_,concat(file.file_name_,'.',file.ext_,'（',
                      CASE
                     WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
                     WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
@@ -469,7 +469,7 @@ export default {
             left join (select *from t_skwjcysqsqzb order by create_time_ desc limit 1) sq on wj.id_=sq.wen_jian_id_
             ${leftSql}
             WHERE wj.shi_fou_guo_shen_ ='有效'and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
-            and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3}`
+            and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
             // and (${isPower} or wj.quan_xian_xin_xi_ like '%${this.userId}%')  ${wheres3}
             // 深圳三院（受限文件查阅权限）
             //     const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,
@@ -520,7 +520,7 @@ export default {
             }
             const fileSearchSql = needSelType.join('union all')
             // ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
-            const sql = this.pageKey === 'nbwj' ? `select sq.* from (${fileSearchSql}) sq ORDER BY sq.wen_jian_bian_hao ${ascDesc},sq.wen_jian_ming_che DESC` : oldRecordSql
+            const sql = this.pageKey === 'nbwj' ? `select sq.id,sq.cy_id_,sq.sc_id_,sq.shu_ju_lai_yuan_,sq.file_info_,sq.wen_jian_xi_lei_,sq.wen_jian_bian_hao,sq.wen_jian_ming_che,sq.ban_ben_,COALESCE(wjxz.gai_zhang_fu_jian,sq.fu_jian_) AS fu_jian_,sq.fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s from (${fileSearchSql}) sq LEFT JOIN t_wjxzxdjlb wjxz ON sq.shu_ju_lai_yuan_ = wjxz.id_ ORDER BY sq.wen_jian_bian_hao ${ascDesc},sq.wen_jian_ming_che DESC` : oldRecordSql
             // console.log(sql, 'sssssssssssssssssss')
             curdPost('sql', sql).then(res => {
                 const tableDatas = res.variables.data
@@ -768,6 +768,7 @@ export default {
             this.refreshData()
         },
         handleClickTag (val) {
+            // console.log('val', val)
             // const sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
             // this.$common.request('sql', sql).then(res => {
             //     console.log('res', res)
@@ -792,13 +793,15 @@ export default {
             WHERE wjxxb.id_ = '${val.id}' ORDER BY wjxzxdjlb.create_time_ DESC`
             this.$common.request('sql', sql).then(res => {
                 const list = res.variables.data
+                // console.log('list', list)
                 list.forEach(el => {
                     const obj = {
                         zId: val.id,
                         id: el.id_,
                         wen_jian_ming_che: el.wen_jian_ming_che,
                         ban_ben_: el.ban_ben_,
-                        fu_jian_: el.wen_jian_fu_jian_,
+                        // fu_jian_: el.wen_jian_fu_jian_,
+                        fu_jian_: el.gai_zhang_fu_jian ? el.gai_zhang_fu_jian : el.wen_jian_fu_jian_,
                         xiu_ding_nei_rong: el.xiu_ding_nei_rong,
                         yuan_yin_: el.yuan_yin_,
                         fa_fang_shi_jian_: el.bian_zhi_shi_jian,
