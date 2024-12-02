@@ -43,8 +43,8 @@
                             readonly-text="text"
                             :disabled="false"
                             :multiple="false"
-                            :filter="[]"
-                            filterable
+                            :filter="filter"
+                            filtrate
                         />
                     </div>
                     <div class="item">
@@ -199,7 +199,7 @@ export default {
             dataList: [],
             type: [],
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,

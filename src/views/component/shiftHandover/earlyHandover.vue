@@ -37,7 +37,7 @@
                                     size="mini"
                                     style="width:200px"
                                     :filter="filter"
-                                    filterable
+                                    filtrate
                                 />
                             </el-form-item>
                         </el-col>
@@ -253,7 +253,7 @@
                                     size="mini"
                                     style="width:1000px"
                                     :filter="filter"
-                                    filterable
+                                    filtrate
                                 />
                             </el-form-item>
                         </el-col>
@@ -316,7 +316,7 @@ export default {
         const { userId, position, level } = this.$store.getters
         return {
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,

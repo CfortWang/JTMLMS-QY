@@ -44,7 +44,7 @@
                                 size="mini"
                                 style="width:100%"
                                 :filter="filter"
-                                filterable
+                                filtrate
                             />
                         </div>
                     </el-descriptions-item>
@@ -81,7 +81,7 @@
                             :multiple="true"
                             size="mini"
                             :filter="filter"
-                            filterable
+                            filtrate
                         />
                     </el-descriptions-item>
                     <el-descriptions-item label="评估开始时间">
@@ -168,7 +168,6 @@
                     </el-descriptions-item>
 
                     <el-descriptions-item label="首次会议时间" :span="1">
-                        <span class="required-star">*</span>
                         <el-date-picker
                             v-model="infoFxssbData.hui_yi_shi_jian_"
                             type="datetime"
@@ -182,7 +181,6 @@
                     </el-descriptions-item>
                     <el-descriptions-item label="参会人员" :span="4">
                         <div style="display:flex">
-                            <span class="required-star">*</span>
                             <ibps-user-selector
                                 v-model="infoFxssbData.can_hui_ren_yuan_"
                                 style="width:100%"
@@ -192,7 +190,7 @@
                                 :multiple="true"
                                 size="mini"
                                 :filter="filter"
-                                filterable
+                                filtrate
                             />
                         </div>
 
@@ -222,7 +220,7 @@
                                 :multiple="true"
                                 size="mini"
                                 :filter="filter"
-                                filterable
+                                filtrate
                             />
                         </div>
 
@@ -249,6 +247,7 @@
             @close="visible => DialogVisible = visible"
         /> -->
         <RiskDetail ref="RiskDetailRef" @close="goRefresh" />
+        <el-image-viewer v-if="showViewer" :on-close="closeViewer" :url-list="[FlowPic]" />
 
     </el-dialog>
 </template>
@@ -262,9 +261,12 @@ import RiskDetail from './riskDetail.vue'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import DataFormrender from '@/business/platform/data/templaterender/form'
 import DataTemplateFormrenderDialog from '@/business/platform/data/templaterender/form/dialog.vue'
+import ElImageViewer from 'element-ui/packages/image/src/image-viewer'
+import FlowPic from '@/assets/images/risk/file-read-18951.png'
 
 export default {
     components: {
+        ElImageViewer,
         RiskDetail,
         RiskPeopleTable,
         ibpsUserSelector,
@@ -284,8 +286,10 @@ export default {
     data () {
         const { userId, position, level } = this.$store.getters
         return {
+            FlowPic: FlowPic,
+            showViewer: false,
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,
@@ -305,6 +309,7 @@ export default {
             dialogVisible: true,
             title: '风险评估与措施',
             toolbars: [
+                { key: 'openFlowPic', label: '流程图', icon: 'ibps-icon-image' },
                 { key: 'refresh', label: '刷新', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
                 { key: 'save', label: '保存', hidden: () => { return !this.isZuZhang || this.isFinished } },
                 // { key: 'sendMsg', label: '提醒评估人', icon: 'el-icon-bell', hidden: () => { return !this.isZuZhang || !this.isEdit || this.isFinished } },
@@ -598,11 +603,17 @@ export default {
                 case 'peizhifengxian':
                     this.goPeizhifengxian()
                     break
+                case 'openFlowPic':
+                    this.showViewer = true
+                    break
                 default:
                     break
             }
         },
-
+        // 关闭大图预览
+        closeViewer () {
+            this.showViewer = false
+        },
         // 推送消息给评估人
         async goSendMsg () {
             const sql2 = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
@@ -669,12 +680,12 @@ export default {
             if (!this.infoFxssbData.bao_gao_shi_jian_) {
                 throw new Error('请填写报告完成时间！')
             }
-            if (!this.infoFxssbData.hui_yi_shi_jian_) {
-                throw new Error('请填写首次会议时间！')
-            }
-            if (!this.infoFxssbData.can_hui_ren_yuan_) {
-                throw new Error('请填写参会人员！')
-            }
+            // if (!this.infoFxssbData.hui_yi_shi_jian_) {
+            //     throw new Error('请填写首次会议时间！')
+            // }
+            // if (!this.infoFxssbData.can_hui_ren_yuan_) {
+            //     throw new Error('请填写参会人员！')
+            // }
             if (!this.infoFxssbData.ping_gu_ren_yuan_) {
                 throw new Error('请填写评估人员！')
             }
@@ -916,5 +927,8 @@ export default {
         font-weight: bold;
         color: #222;
     }
+}
+.el-image-viewer__wrapper{
+    z-index: 9999 !important;
 }
 </style>

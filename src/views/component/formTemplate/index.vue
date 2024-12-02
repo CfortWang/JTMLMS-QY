@@ -32,7 +32,7 @@
                                         :multiple="false"
                                         size="mini"
                                         :filter="filter"
-                                        filterable
+                                        filtrate
                                     />
                                 </el-form-item>
                             </el-col>
@@ -156,7 +156,7 @@
                                             placeholder="请选择人员"
                                             :multiple="true"
                                             :filter="filter"
-                                            filterable
+                                            filtrate
                                         />
                                         <ibps-role-selector
                                             v-if="row.yong_hu_lei_xing_==='role'"
@@ -215,7 +215,7 @@ export default {
         const { userId, position, level } = this.$store.getters
         return {
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,

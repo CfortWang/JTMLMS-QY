@@ -53,7 +53,7 @@
                                     :disabled="false"
                                     :multiple="false"
                                     :filter="filter"
-                                    filterable
+                                    filtrate
                                     size="mini"
                                 />
                             </div>
@@ -249,7 +249,7 @@ export default {
         return {
             defultdialogVisible: false,
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,

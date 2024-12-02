@@ -26,7 +26,7 @@
                                     :multiple="false"
                                     style="width:100%"
                                     :filter="filter"
-                                    filterable
+                                    filtrate
                                 />
                             </el-form-item>
                         </el-col>
@@ -222,7 +222,7 @@ export default {
             nextDate: '',
             form: {},
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,

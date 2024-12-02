@@ -25,7 +25,7 @@
                             :multiple="false"
                             size="mini"
                             :filter="filter"
-                            filterable
+                            filtrate
                         />
                     </div>
                     <div class="item">
@@ -249,7 +249,7 @@
                                     :multiple="true"
                                     size="mini"
                                     :filter="filter"
-                                    filterable
+                                    filtrate
                                 />
                             </template>
                         </el-table-column>
@@ -289,7 +289,7 @@ export default {
         const { userId, position, level } = this.$store.getters
         return {
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,

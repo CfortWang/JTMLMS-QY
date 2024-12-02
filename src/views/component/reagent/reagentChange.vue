@@ -6,10 +6,10 @@
                     <div class="title">平行实验/留样再测</div>
                     <div v-if="nodeId === 'Activity_0xkc1ji' || readonly" />
                     <div v-else>
-                        <el-button type="primary" size="mini" icon="ibps-icon-edit" @click="openDialog">配置样品</el-button>
+                        <!-- <el-button type="primary" size="mini" icon="ibps-icon-edit" @click="openDialog">配置样品</el-button>
                         <el-button type="success" size="mini" icon="ibps-icon-refresh" @click="generateData">重置</el-button>
                         <el-button v-if="!disabled" type="danger" size="mini" icon="ibps-icon-calculator" @click="computedResult">计算结果</el-button>
-                        <el-button v-else type="danger" size="mini" icon="ibps-icon-edit" @click="disabled=false">编辑</el-button>
+                        <el-button v-else type="danger" size="mini" icon="ibps-icon-edit" @click="disabled=false">编辑</el-button> -->
                         <el-button type="primary" size="mini" icon="ibps-icon-download" @click="handleDownload">模版下载</el-button>
                         <el-button type="primary" size="mini" icon="ibps-icon-import" @click="handleImport">导入</el-button>
                     </div>
@@ -41,19 +41,20 @@
                                 <span v-else>{{ row.xsjcdjg|| '/' }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column label="实际差值" prop="xdfw" />
+                        <el-table-column label="实际差值" prop="sjcz" />
                         <el-table-column label="实际偏倚" prop="pq" />
+                        <el-table-column label="限定范围" prop="xdfw" />
+                        <el-table-column label="允许偏倚" prop="yxpq" />
                         <el-table-column label="是否相符" prop="sfxf">
                             <template slot-scope="{row}">
                                 <el-radio-group v-model="row.sfxf" disabled>
                                     <el-radio label="是">是</el-radio>
                                     <el-radio label="否">否</el-radio>
                                 </el-radio-group>
-                                <!-- <el-checkbox v-model="row.sfxf === '是'" disabled>是</el-checkbox>
-                                <el-checkbox v-model="row.sfxf === '否'" disabled>否</el-checkbox> -->
                             </template>
                         </el-table-column>
                         <el-table-column label="符合率" prop="fhl" />
+                        <el-table-column label="符合率可接受标准" prop="xmfhl" />
                         <el-table-column label="结论" prop="jl" />
                     </el-table>
                     <el-pagination
@@ -172,19 +173,6 @@ export default {
                     }
                     this.ypData.push({ ...item })
                 })
-                // 处理表单”平行实验/留样再测“
-                // if (val.length && !this.ypFlag && this.copyDialogData.length && (this.params.nodeId === 'Activity_1bwqyf1' || this.params.nodeId === 'StartEvent_1fk5is7')) {
-                //     // 点完计算结果后再去编辑”平行实验/留样再测“表单，则给表格置空重新填写
-                //     // if (this.disabled && this.reagentData.length) {
-                //     //     this.copyDialogData = []
-                //     //     this.reagentData = []
-                //     //     this.disabled = false
-                //     //     return this.$message.error('请重新配置样品')
-                //     // }
-                //     // if (!this.disabled && this.reagentData.length) {
-                //     //     this.initData()
-                //     // }
-                // }
             },
             deep: true,
             immediate: true
@@ -197,7 +185,7 @@ export default {
                     if (val.length && this.reagentData.length <= 0) {
                         const arry = []
                         val.forEach(item => {
-                            arry.push({ jyxm: item.jianCeXiangMu, nd: item.nongDu, ypbh: item.biaoBenHao, jsjcdjg: item.jiuJieGuo, xsjcdjg: item.xinJieGuo, pq: item.jieGuo, fhl: item.biaoZhun, sfxf: item.xiangFu, jl: item.jieLun, xdfw: item.zuiXiaoFanWei })
+                            arry.push({ jyxm: item.jianCeXiangMu, nd: item.nongDu, ypbh: item.biaoBenHao, jsjcdjg: item.jiuJieGuo, xsjcdjg: item.xinJieGuo, pq: item.jieGuo, fhl: item.biaoZhun, sfxf: item.xiangFu, jl: item.jieLun, xdfw: item.zuiXiaoFanWei, xmfhl: item.xiangMuFuHeLv, sjcz: item.shiJiChaZhi, yxpq: item.yunXuPianYi })
                         })
                         setTimeout(() => {
                             this.reagentData = arry
@@ -228,38 +216,60 @@ export default {
             this.importTableDialogVisible = true
         },
         handleDownload () {
-            downloadFile({ id: 'download_sjgh', fileName: '试剂更换验证定量模板', ext: 'xlsx' })
+            downloadFile({ id: 'download_sjghdl', fileName: '试剂更换验证定量模板', ext: 'xlsx' })
         },
         getColumns () {
             return [{
-                field_name: 'xsjcdjg',
-                label: '新试剂测得结果',
-                name: 'xsjcdjg'
-            }, {
-                field_name: 'jsjcdjg',
-                label: '旧试剂测得结果',
-                name: 'jsjcdjg'
-            }, {
-                field_name: 'nd',
-                label: '浓度',
-                name: 'nd'
-            }, {
                 field_name: 'sfxf',
                 label: '是否相符',
                 name: 'sfxf'
-            }, {
-                field_name: 'ypbh',
-                label: '样品编号',
-                name: 'ypbh'
-            }, {
+            },
+            {
                 field_name: 'jyxm',
                 label: '检验项目',
                 name: 'jyxm'
-            }, {
+            },
+            {
                 field_name: 'nd',
                 label: '浓度',
                 name: 'nd'
-            }, {
+            },
+            {
+                field_name: 'ypbh',
+                label: '样品编号',
+                name: 'ypbh'
+            },
+            {
+                field_name: 'jsjcdjg',
+                label: '旧试剂测得结果',
+                name: 'jsjcdjg'
+            },
+            {
+                field_name: 'xsjcdjg',
+                label: '新试剂测得结果',
+                name: 'xsjcdjg'
+            },
+            {
+                field_name: 'sjcz',
+                label: '实际差值',
+                name: 'sjcz'
+            },
+            {
+                field_name: 'pq',
+                label: '实际偏倚',
+                name: 'pq'
+            },
+            {
+                field_name: 'xdfw',
+                label: '限定范围',
+                name: 'xdfw'
+            },
+            {
+                field_name: 'yxpq',
+                label: '允许偏倚',
+                name: 'yxpq'
+            },
+            {
                 field_name: 'fhl',
                 label: '符合率',
                 name: 'fhl'
@@ -267,20 +277,11 @@ export default {
                 field_name: 'jl',
                 label: '结论',
                 name: 'jl'
-            }, {
-                field_name: 'xdfw',
-                label: '限定范围',
-                name: 'xdfw'
             },
             {
-                field_name: 'xiangMuFuHeLv',
-                label: '项目符合率',
-                name: 'xiangMuFuHeLv'
-            },
-            {
-                field_name: 'pq',
-                label: '偏倚',
-                name: 'pq'
+                field_name: 'xmfhl',
+                label: '符合率可接受标准',
+                name: 'xmfhl'
             }]
         },
         getKeys (data) {
@@ -310,6 +311,7 @@ export default {
                         if (el.jyxm === item.jyxm) {
                             el.fhl = item.fhl
                             el.jl = item.jl
+                            el.xmfhl = item.xmfhl
                         }
                     })
                 })
@@ -409,20 +411,20 @@ export default {
             this.reagentData = []
             this.ypData.forEach(item => {
                 this.copyDialogData.forEach(el => {
-                    this.reagentData.push({ jyxm: item.jianCeXiangMu, nd: '', ypbh: el.number, jsjcdjg: '', xsjcdjg: '', pq: '', xdfw: item.xianDingFanWei + '%', sfxf: '', fhl: '', jl: '' })
+                    this.reagentData.push({ jyxm: item.jianCeXiangMu, nd: '', ypbh: el.number, jsjcdjg: '', xsjcdjg: '', pq: '', xdfw: item.xianDingFanWei + '%', sfxf: '', fhl: '', jl: '', xmfhl: item.xiangMuFuHeLv + '%', sjcz: '', yxpq: '' })
                 })
             })
             this.$refs.reagent.doLayout()
         },
         spanMethod ({ row, column, rowIndex, columnIndex }) {
             // const rowspan = this.copyDialogData.length || this.spanLength
-            if (columnIndex === 0 || columnIndex === 8 || columnIndex === 9) {
+            if (columnIndex === 0 || columnIndex === 10 || columnIndex === 11 || columnIndex === 12) {
                 const currentValue = row[column.property]
                 const preRow = this.reagentData[rowIndex - 1]
                 // 上一行这一列的数据
                 const preValue = preRow ? preRow[column.property] : null
                 // 如果当前值和上一行的值相同，则将当前单元格隐藏
-                // 给第0，8,9列对数值相同且是同一个'jyxm'进行表格合并
+                // 给第0,10,11,12列对数值相同且是同一个'jyxm'进行表格合并
                 if (currentValue === preValue && row['jyxm'] === preRow['jyxm']) {
                     return { rowspan: 0, colspan: 0 }
                 } else {

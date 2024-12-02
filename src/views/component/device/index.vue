@@ -226,8 +226,8 @@
                             readonly-text="text"
                             :multiple="true"
                             size="mini"
-                            :filter="[]"
-                            filterable
+                            :filter="filter"
+                            filtrate
                         />
                     </template>
                     <template slot="time">
@@ -283,7 +283,7 @@
                             :multiple="true"
                             size="mini"
                             :filter="filter"
-                            filterable
+                            filtrate
                         />
                     </template>
                     <template slot="deviceClass">
@@ -367,7 +367,7 @@ export default {
         const { userId, level = {}, position } = this.$store.getters || {}
         return {
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,
