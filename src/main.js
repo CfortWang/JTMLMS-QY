@@ -40,6 +40,7 @@ new Vue({
     router,
     store,
     i18n,
+    devtools: process.env.NODE_ENV === 'development',
     async created () {
         // 加载接口配置
         await this.$store.dispatch('ibps/api/load')
