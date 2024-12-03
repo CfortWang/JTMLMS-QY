@@ -149,6 +149,7 @@ export function buildComponent (name, column, preview, vm) {
                     calendarToolbar: this.fullScreen ? [{ key: 'refresh' }] : [{ key: 'refresh' }, { key: 'fullscreen' }, { key: 'collapse' }],
                     isFirstAlert: true, // 是否首次日程提醒
                     scheduleData: [],
+                    scheduleShift: [],
                     todaySchedule: []
                 }
             },
@@ -594,6 +595,7 @@ export function buildComponent (name, column, preview, vm) {
                                 const days = this.getDays(item.start_date_, item.end_date_)
                                 const config = item.config_ ? JSON.parse(item.config_) : {}
                                 const { scheduleShift } = config
+                                this.scheduleShift = scheduleShift
                                 for (let i = 1; i <= days; i++) {
                                     const shift = item[`d${i}_`]
                                     if (shift) {
@@ -626,12 +628,21 @@ export function buildComponent (name, column, preview, vm) {
                         })
                     })
                 },
+                handleScheduleEventClick (param) {
+                    this.$emit(
+                        'open',
+                        'banci',
+                        [param.event.startStr, param.event._def.extendedProps.jieShuShiJian],
+                        this.scheduleShift,
+                        param.event._def.title
+                    )
+                },
                 showMySchedule () {
                     const scheduleConfig = {
                         height: '100%',
-                        locale: 'zh-cn',
-                        selectable: true,
-                        buttonText: {
+                        locale: 'zh-cn', // 语言
+                        selectable: true, // 是否可以选中日历格
+                        buttonText: { // 日历头部按钮中文转换
                             today: '今天',
                             dayGridMonth: '月',
                             listMonth: '',
@@ -642,17 +653,20 @@ export function buildComponent (name, column, preview, vm) {
                             // prev: '<i class="icon-chevron-left">后退</i>',
                             // next: '<i class="icon-chevron-right">前进</i>'
                         },
-                        headerToolbar: {
+                        headerToolbar: { // 日历头部按钮位置
                             left: 'prev,next today',
                             // start: '',
                             center: 'title',
                             right: 'dayGridMonth,timeGridWeek,timeGridDay'
                             // end: 'prev,next,today,month,agendaWeek,agendaDay,listWeek'
                         },
-                        events: this.scheduleData
+                        events: this.scheduleData, // 日程数组
+                        eventClick: this.handleScheduleEventClick, // 日程点击信息展示
+                        scheduleShift: this.scheduleShift
                     }
                     this.$emit('action-event', 'mySchedule', scheduleConfig)
                 }
+
             },
             template: column.templateHtml !== '' ? `${column.templateHtml}` : `<div></div>`
         }

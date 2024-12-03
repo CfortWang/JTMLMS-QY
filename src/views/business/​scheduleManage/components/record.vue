@@ -16,14 +16,14 @@
             <el-timeline-item
                 v-for="(item, index) in timelineDate"
                 :key="index"
-                :timestamp="item.createTime"
+                :timestamp="item.updateTime"
                 placement="top"
             >
                 <el-card class="card">
                     <div class="applicant">申请人：{{ item.creator }}</div>
                     <div class="reason">原因：{{ item.reason }}</div>
                     <div class="detail">详情：{{ item.overview }}</div>
-                    <div class="approve">通过时间：{{ item.executeDate }}</div>
+                    <div class="approve">通过时间：{{ item.updateTime }}</div>
                 </el-card>
             </el-timeline-item>
         </el-timeline>
@@ -65,7 +65,8 @@ export default {
             if (!this.scheduleId) {
                 return
             }
-            const sql = `select a.id_ as dataId, a.parent_id_ as parentId, a.record_id_ as recordId, a.before_adjust_ as beforeAdjust, a.before_date_ as beforeDate, a.after_adjust_ as afterAdjust, a.after_date_ as afterDate, a.party_ as party, b.create_by_ as createBy, date_format(b.create_time_,'%Y-%m-%d %H:%i') AS createTime, b.di_dian_ as location, b.reason_ as reason, b.executor_ as executor, b.execute_date_ as executeDate, b.overview_ as overview, b.schedule_id_ as scheduleId from t_adjustment_detail a left join t_adjustment b on a.parent_id_ = b.id_ and b.schedule_id_ = '${this.scheduleId}'`
+            // const sql = `select a.id_ as dataId, a.parent_id_ as parentId, a.record_id_ as recordId, a.before_adjust_ as beforeAdjust, a.before_date_ as beforeDate, a.after_adjust_ as afterAdjust, a.after_date_ as afterDate, a.party_ as party, b.create_by_ as createBy, date_format(b.create_time_,'%Y-%m-%d %H:%i') AS createTime, b.di_dian_ as location, b.reason_ as reason, b.executor_ as executor, b.execute_date_ as executeDate, b.overview_ as overview, b.schedule_id_ as scheduleId from t_adjustment_detail a left join t_adjustment b on a.parent_id_ = b.id_ and b.schedule_id_ = '${this.scheduleId}'`
+            const sql = 'select * from t_adjustment where status in ( "已通过") and schedule_id_ = ' + this.scheduleId
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
@@ -76,29 +77,33 @@ export default {
             })
         },
         formatData (data) {
-            const groupedData = {}
+            const groupedData = []
             data.forEach(item => {
-                const parentId = item.parentId
-                if (!groupedData[parentId]) {
-                    groupedData[parentId] = {
-                        parentId,
-                        createTime: item.createTime,
-                        createBy: item.createBy,
-                        creator: this.transformData(this.userList, item.createBy, 'userId', 'userName'),
-                        reason: item.reason,
-                        overview: item.overview,
-                        executor: item.executor,
-                        executeDate: item.executeDate,
-                        items: []
-                    }
+                const tempObj = {
+                    updateTime: this.formatTime(item.update_time_),
+                    createBy: item.create_by_,
+                    creator: this.transformData(this.userList, item.create_by_, 'userId', 'userName'),
+                    reason: item.reason_,
+                    overview: item.overview_,
+                    items: []
                 }
-                groupedData[parentId].items.push(item)
+                groupedData.push(tempObj)
             })
-            return Object.values(groupedData)
+            return groupedData
         },
         handleClose () {
             console.log(123123)
             this.$emit('close', false)
+        },
+        formatTime (timestamp) {
+            const dateObj = new Date(timestamp)
+            const year = dateObj.getFullYear()
+            const month = (dateObj.getMonth() + 1).toString().padStart(2, '0')
+            const day = dateObj.getDate().toString().padStart(2, '0')
+            const hours = dateObj.getHours().toString().padStart(2, '0')
+            const minutes = dateObj.getMinutes().toString().padStart(2, '0')
+            const seconds = dateObj.getSeconds().toString().padStart(2, '0')
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
         },
         transformData (dataset, data, from, to) {
             if (!data) {

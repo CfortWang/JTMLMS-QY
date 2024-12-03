@@ -10,7 +10,7 @@
                 <el-checkbox
                     v-for="(shift, index) in shiftList"
                     :key="index"
-                    :label="shift.alias"
+                    :label="viewType === 'users' ? shift.alias : shift.userName"
                     class="shift-item ibps-ellipsis"
                 >
                     <!-- <el-popover
@@ -28,7 +28,7 @@
                             class="shift-item"
                         >{{ shift.alias }}</div>
                     </el-popover> -->
-                    {{ shift.alias }}
+                    {{ viewType === 'users' ? shift.alias : shift.userName }}
                 </el-checkbox>
             </el-checkbox-group>
             <el-button
@@ -45,6 +45,10 @@
 <script>
 export default {
     props: {
+        viewType: {
+            type: String,
+            default: 'users'
+        },
         visible: {
             type: Boolean,
             default: false
@@ -68,13 +72,13 @@ export default {
     },
     data () {
         return {
-            selectedShift: this.itemData.map(i => i.alias) || []
+            selectedShift: this.viewType === 'users' ? (this.itemData.map(i => i.alias) || []) : (this.itemData.map(i => i.userName) || [])
         }
     },
     watch: {
         itemData: {
             handler (val) {
-                this.selectedShift = val.map(i => i.alias) || []
+                this.selectedShift = this.viewType === 'users' ? (val.map(i => i.alias) || []) : (val.map(i => i.userName) || [])
             },
             deep: true,
             immediate: true
@@ -82,7 +86,7 @@ export default {
     },
     methods: {
         handleSubmit () {
-            const selected = this.shiftList.filter(i => this.selectedShift.includes(i.alias))
+            const selected = this.viewType === 'users' ? this.shiftList.filter(i => this.selectedShift.includes(i.alias)) : this.shiftList.filter(i => this.selectedShift.includes(i.userName))
             this.$emit('select', { selected, params: this.params })
             this.$emit('close')
         }
@@ -104,14 +108,17 @@ export default {
             align-items: center;
             flex-direction: column;
             height: 200px;
-            overflow-y: auto;
+            overflow-y: scroll;
             .shift-item {
                 padding: 8px 12px;
                 cursor: pointer;
                 margin: 0;
+                height: 35px;
                 // width: calc(100% - 24px);
                 width: 100px;
                 text-align: left;
+                //flex-shrink: 0;
+                min-height: 15px;
             }
             .shift-actived {
                 background-color: #007BFF;

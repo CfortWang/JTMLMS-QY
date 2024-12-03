@@ -4,7 +4,7 @@
             <div class="page-header">
                 <div class="toolbar">
                     <el-button
-                        v-for="btn in toolbars"
+                        v-if="btn.show && (!btn.steps || btn.steps.includes(activeStep)) "
                         :key="btn.key"
                         :type="btn.type"
                         size="mini"
@@ -87,15 +87,17 @@ export default {
             readonly,
             title: '排班',
             toolbars: [
-                { key: 'changeView', icon: 'el-icon-set-up', label: '切换视图', type: 'primary' },
-                { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info' },
-                { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning' },
-                { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', hidden: readonly },
-                { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', hidden: readonly },
-                { key: 'edit', icon: 'el-icon-edit', label: '编辑', type: 'primary', hidden: readonly },
-                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', hidden: readonly },
-                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', hidden: readonly },
-                { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
+                { key: 'prev', icon: 'el-icon-d-arrow-left', label: '上一步', type: 'primary', steps: '2,3', show: true },
+                { key: 'next', icon: 'el-icon-d-arrow-right', label: '下一步', type: 'primary', steps: '1,2', show: true },
+                { key: 'changeView', icon: 'el-icon-set-up', label: '切换视图', type: 'primary', steps: '2', show: true },
+                // { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info', steps: '2,3' },
+                { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning', steps: '2,3', show: !readonly },
+                { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', steps: '2,3', show: true },
+                { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', steps: '2', show: !readonly },
+                // { key: 'edit', icon: 'el-icon-edit', label: '编辑', type: 'primary', steps: '2,3' },
+                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', show: !readonly },
+                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', steps: '3', show: !readonly },
+                { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger', show: true }
             ],
             dateRange: ['2024-07-29', '2024-09-01'],
             viewType: 'users',

@@ -18,17 +18,26 @@ $transition: all .5s;
             margin: 12px 0 !important;
             cursor: pointer;
             .item-header > p {
-                font-size: 18px;
+                font-size: 16px;
+                font-weight: 600;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
             .item-body {
-                margin-top: 15px;
+                margin-top: 5px;
+                margin-bottom: 5px;
                 & > span {
-                    font-size: 32px;
+                    font-size: 24px;
                     font-weight: bold;
                 }
+            }
+            .item-bottom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 13px;
+                opacity: .6;
             }
             @media (max-width: 1688px) {
                 .item-header > p {
@@ -36,30 +45,48 @@ $transition: all .5s;
                 }
                 .item-body {
                     & > span {
-                        font-size: 32px;
+                        font-size: 24px;
                         font-weight: bold;
                     }
                 }
             }
+            @media (max-width: 1640px) {
+                .item-bottom {
+                    font-size: 12px;
+                }
+            }
             @media (max-width: 1580px) {
                 .item-header > p {
-                    font-size: 14px;
+                    font-size: 16px;
                 }
                 .item-body {
                     & > span {
-                        font-size: 30px;
+                        font-size: 22px;
                     }
+                }
+                .item-bottom {
+                    font-size: 11px;
                 }
                 
             }
+            @media (max-width: 1455px) {
+                .item-bottom {
+                    font-size: 10px;
+                }
+            }
             @media (max-width: 1450px) {
                 .item-header > p {
-                    font-size: 12px;
+                    font-size: 16px;
                 }
                 .item-body {
                     & > span {
-                        font-size: 28px;
+                        font-size: 20px;
                     }
+                }
+            }
+            @media (max-width: 1355px) {
+                .item-bottom {
+                    font-size: 9px;
                 }
             }
             @media (max-width: 1288px) {
@@ -72,8 +99,11 @@ $transition: all .5s;
                 }
                 .item-body {
                     & > span {
-                        font-size: 26px;
+                        font-size: 18px;
                     }
+                }
+                .item-bottom {
+                    font-size: 8px;
                 }
             }
         }

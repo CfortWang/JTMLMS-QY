@@ -25,6 +25,7 @@
             v-if="showAdjustEdit"
             :visible.sync="showAdjustEdit"
             :params="params"
+            :readonly="readonly"
             @refresh="loadData"
             @close="() => showAdjustEdit = false"
         />
@@ -32,10 +33,11 @@
 </template>
 
 <script>
-import { queryAdjustment, removeAdjustment } from '@/api/business/schedule'
+import { queryAdjustment, removeAdjustment, saveAdjustment } from '@/api/business/schedule'
 import { stateType } from '@/views/constants/schedule'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
+import action from '@/business/platform/bpmn/form/action';
 
 export default {
     components: {
@@ -48,7 +50,7 @@ export default {
         return {
             userOption,
             stateType,
-            title: '调班记录',
+            title: '调班申请记录',
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
             loading: true,
             height: document.clientHeight,
@@ -62,14 +64,14 @@ export default {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary', hidden: false },
                     { key: 'create', icon: 'ibps-icon-plus', label: '申请', type: 'success', hidden: false },
-                    { key: 'remove', icon: 'ibps-icon-close', label: '删除', type: 'danger', hidden: false }
+                    { key: 'remove', icon: 'ibps-icon-close', label: '删除', type: 'danger', hidden: !this.isRoleFilter() }
                 ],
                 searchForm: {
                     labelWidth: 80,
                     itemWidth: 180,
                     forms: [
                         { prop: 'Q^reason_^SL', label: '调班原因' },
-                        { prop: 'Q^status_^SL', label: '状态', fieldType: 'select', options: stateType },
+                        { prop: 'Q^status^S', label: '状态', fieldType: 'select', options: stateType },
                         { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '申请时间', fieldType: 'daterange', itemWidth: 200 }
                     ]
                 },
@@ -84,9 +86,11 @@ export default {
                     { prop: 'overview', label: '概览', minWidth: 200 }
                 ],
                 rowHandle: {
-                    effect: 'display',
+                    effect: 'default',
+                    // effect: 'display',
                     actions: [
-                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' },
+                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit', hidden: function (row) { return row.status !== '已暂存' && row.status !== '已取消' } },
+                        { key: 'cancel', label: '取消', type: 'danger', icon: 'ibps-icon-cancel', hidden: function (row) { return row.status !== '待审核' } },
                         { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt' }
                     ]
                 }
@@ -108,11 +112,35 @@ export default {
             })
         },
         /**
+         * 判断当前用户是否为超级管理员和高权限角色
+         */
+        isRoleFilter () {
+            const highRoles = this.$store.getters.userInfo.highRoles || [] // 高权限角色
+            const userRole = this.$store.getters.userInfo.role || [] // 用户权限角色
+            let isHighRole = false
+            userRole.forEach(el => {
+                const roleAlias = el.alias
+                if (highRoles.includes(roleAlias)) {
+                    isHighRole = true
+                }
+            })
+            return (this.$store.getters.isSuper || isHighRole)
+        },
+        /**
          * 获取格式化参数
          */
         getSearchFormData () {
+            const paramjson = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            if (this.isRoleFilter()) { // 超级管理员和高权限角色不做申请人过滤
+            } else {
+                const { userId } = this.$store.getters || ''
+                if (userId) {
+                    paramjson['Q^create_By_^S'] = userId
+                }
+            }
             return ActionUtils.formatParams(
-                this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
+                // this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
+                paramjson,
                 this.pagination,
                 this.sorts
             )
@@ -152,6 +180,9 @@ export default {
                 case 'edit':
                     this.handleEdit(command, data)
                     break
+                case 'cancel':
+                    this.handleCancel(data)
+                    break
                 case 'detail':
                     this.handleEdit(command, data)
                     break
@@ -170,10 +201,55 @@ export default {
         async handleEdit (key, { id, scheduleId }) {
             this.params = {
                 id,
-                scheduleId
+                scheduleId,
+                action: key === 'detail' ? 'view' : 'edit'
             }
             this.readonly = key === 'detail'
             this.showAdjustEdit = true
+        },
+        /**
+         * 处理取消
+         */
+        async handleCancel (data) {
+            data.status = '已取消'
+            // 改为通用接口
+            const tableName = 't_adjustment'
+            const updateParams = {
+                tableName,
+                updList: [
+                    {
+                        where: {
+                            id_: data.id
+                        },
+                        param: {
+                            status: data.status
+                        }
+                    }]
+            }
+            this.$common.request('update', updateParams).then(async () => {
+                const sonTableName = 't_adjustment_detail'
+                const sonUpdateParams = {
+                    tableName: sonTableName,
+                    updList: [
+                        {
+                            where: {
+                                parent_id_: data.id
+                            },
+                            param: {
+                                status_: data.status
+                            }
+                        }]
+                }
+                await this.$common.request('update', sonUpdateParams) // 更新子表
+                ActionUtils.successMessage()
+                this.search()
+            }).catch((e) => { console.error(e) })
+            /*
+            saveAdjustment(data).then(() => {
+                ActionUtils.successMessage()
+                this.search()
+            }).catch((e) => { console.error(e) })
+            */
         },
         /**
          * 处理删除

@@ -132,6 +132,12 @@
             :schedule-config="scheduleConfig"
             @close="handleClose"
         />
+        <banciDialog
+            :banciInfo="banciInfo"
+            :visible="banciDialogVisible"
+            @closeBanciDialog="handleClose"
+            @open="handleOpen"
+        />
     </ibps-container>
 </template>
 
@@ -147,7 +153,10 @@ import Preview from '@/views/platform/desktop/column/preview'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 
 import IbpsNewsDialog from '@/views/platform/system/news/detail'
+import banciDialog from '@/views/system/homepage/components/banciDialog.vue'
+
 import IbpsMessageDialog from '@/views/platform/message/inner/detail/dialog'
+
 import { getToken } from '@/utils/auth'
 import ScheduleAdd from '@/views/system/dashboard/templates/scheduleAdd'
 
@@ -169,7 +178,8 @@ export default {
         'ibps-grid-item': GridItem,
         ScheduleAdd,
         CalendarAlert,
-        mySchedule
+        mySchedule,
+        banciDialog
     },
     data () {
         return {
@@ -225,7 +235,9 @@ export default {
             addComponentDatas: {},
             calendarAlertData: {}, // 日程
             calendarIds: [], // 日程 id 数组
-            scheduleConfig: {}
+            scheduleConfig: {},
+            banciInfo: {},
+            banciDialogVisible: false
         }
     },
     computed: {
@@ -641,6 +653,9 @@ export default {
                 case 'calendar':
                     this.calendarDialogVisible = false
                     break
+                case 'banci':
+                    this.banciDialogVisible = false
+                    break
                 default:
                     break
             }
@@ -665,6 +680,13 @@ export default {
                     this.calendarDialogForm.clickedDate = dateArr[0]
                     this.calendarDialogForm.clickId = clickId
                     break
+                case 'banci':
+                {
+                    const filterObj = events.filter(item => item.alias === clickId)
+                    this.banciInfo = filterObj[0]
+                    this.banciDialogVisible = true
+                    break
+                }
                 default:
                     break
             }

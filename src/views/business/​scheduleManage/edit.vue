@@ -18,7 +18,7 @@
             <div class="operate">
                 <template v-for="btn in toolbars">
                     <el-button
-                        v-if="!btn.steps || btn.steps.includes(activeStep)"
+                        v-if="btn.show && (!btn.steps || btn.steps.includes(activeStep)) "
                         :key="btn.key"
                         :type="btn.type"
                         :icon="btn.icon"
@@ -67,6 +67,7 @@
                         </template>
                         <el-date-picker
                             v-model="formData.dateRange"
+                            :disabled="readonly"
                             type="daterange"
                             range-separator="至"
                             start-placeholder="开始日期"
@@ -197,7 +198,7 @@
                                 :ref="`day${dIndex}`"
                                 :key="dIndex"
                                 class="date"
-                                @click="showShiftSetting($event, date)"
+                                @click="!readonly && showShiftSetting($event, date)"
                             >{{ date.split('-')[2] }}</div>
                         </div>
                     </div>
@@ -279,7 +280,12 @@
                 </el-popover>
                 <div ref="scheduleContent" class="schedule-content">
                     <div ref="sidebar" class="ordinate" :style="{ top: topOffset + 'px' }">
-                        <div v-for="item in ordinateList" :key="item.value" class="ordinate-item">
+                        <div
+                            v-for="item in ordinateList"
+                            :key="item.value"
+                            class="ordinate-item"
+                            :style="{ color: viewType === 'users' ? '#606266' : `${item.color}`, height:viewType === 'users' ? '60px' : '130px' }"
+                        >
                             {{ item.label }}
                         </div>
                     </div>
@@ -292,17 +298,18 @@
                                 :key="cIndex"
                                 ref="shiftItem"
                                 class="shift-item"
-                                @mouseenter="hoveredIndex = `${row.value}-${cIndex}`"
-                                @mouseleave="hoveredIndex = null"
-                                @click.prevent="handleShiftClick($event, {row, rIndex, column, cIndex})"
+                                :style="{ display: viewType === 'users' ? 'grid' : 'flex', height:viewType === 'users' ? '59px' : '129px'}"
+                                @mouseenter=" hoveredIndex = !readonly && `${row.value}-${cIndex}`"
+                                @mouseleave=" hoveredIndex = !readonly && null"
+                                @click.prevent="!readonly && handleShiftClick($event, {row, rIndex, column, cIndex})"
                             >
                                 <div
                                     v-for="(shift, sIndex) in scheduleData[row.value][cIndex]"
                                     :key="sIndex"
                                     class="shift"
-                                    :style="{ color: `${shift.color}` }"
+                                    :style="{ color: viewType === 'users' ? `${shift.color}` : `${ordinateList[rIndex].color}`}"
                                 >
-                                    {{ shift.alias }}
+                                    {{ viewType === 'users'? shift.alias : shift.userName }}
                                     <!-- <div :style="{ color: `${shift.color}` }">{{ shift.alias }}</div> -->
                                 </div>
                                 <div v-if="hoveredIndex === `${row.value}-${cIndex}` && !readonly" class="overlay">
@@ -324,9 +331,10 @@
             />
         </div>
         <context-menu
+            :viewType="viewType"
             :visible.sync="contextMenuVisible"
             :params="shiftParams"
-            :shift-list="shiftList"
+            :shift-list="viewType === 'users' ? shiftList : userNameList"
             :position="itemPosition"
             :item-data="selectItem"
             :readonly="readonly"
@@ -347,13 +355,17 @@
 
 <script>
 import { cycleOptions, scheduleType, scheduleColumn } from '../../constants/schedule'
-import { queryScheduleConfig, getStaffSchedule, saveStaffSchedule } from '@/api/business/schedule'
+import { queryScheduleConfig, getStaffSchedule, saveStaffSchedule, saveAdjustment } from '@/api/business/schedule'
 import request from '@/utils/request'
 import { SYSTEM_URL } from '@/api/baseUrl'
 import { previewFile } from '@/api/platform/file/attachment'
 import { mapValues, keyBy } from 'lodash'
 import html2canvas from 'html2canvas'
 import ActionUtils from '@/utils/action'
+import Json from '@/business/platform/serv/components/json.vue'
+import color from '@/store/modules/ibps/modules/color'
+import height from '@/mixins/height'
+import { reset } from '@/api/platform/auth/client'
 
 export default {
     name: 'schedule',
@@ -379,7 +391,6 @@ export default {
     },
     data () {
         const { userList = [], deptList = [] } = this.$store.getters || {}
-        const readonly = false
         return {
             userList,
             deptList,
@@ -401,25 +412,27 @@ export default {
             },
             rules: {},
             scheduleColumn,
-            title: readonly ? '创建排班' : '编辑排班',
+            title: this.readonly ? '创建排班' : '编辑排班',
             configList: [],
             configOptions: [],
             maxHeight: '250px',
             toolbars: [
-                { key: 'prev', icon: 'el-icon-d-arrow-left', label: '上一步', type: 'primary', steps: '2,3' },
-                { key: 'next', icon: 'el-icon-d-arrow-right', label: '下一步', type: 'primary', steps: '1,2' },
-                { key: 'changeView', icon: 'el-icon-set-up', label: '切换视图', type: 'primary', steps: '2' },
+                { key: 'prev', icon: 'el-icon-d-arrow-left', label: '上一步', type: 'primary', steps: '2,3', show: true },
+                { key: 'next', icon: 'el-icon-d-arrow-right', label: '下一步', type: 'primary', steps: '1,2', show: true },
+                { key: 'changeView', icon: 'el-icon-set-up', label: '切换视图', type: 'primary', steps: '2', show: true },
                 // { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info', steps: '2,3' },
-                { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning', steps: '2,3' },
-                { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', steps: '2,3' },
-                { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', steps: '2' },
+                { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning', steps: '2,3', show: true },
+                { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', steps: '2,3', show: true },
+                { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', steps: '2', show: (!this.readonly) },
                 // { key: 'edit', icon: 'el-icon-edit', label: '编辑', type: 'primary', steps: '2,3' },
-                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary' },
-                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', steps: '3' },
-                { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
+                { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', show: (!this.readonly) },
+                { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', steps: '3', show: (!this.readonly) },
+                { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger', show: true }
             ],
             viewType: 'users',
             scheduleData: {},
+            responseData: {},
+            userNameList: [],
             scheduleRecord: [],
             leftOffset: '',
             topOffset: '',
@@ -465,11 +478,19 @@ export default {
     },
     computed: {
         ordinateList () {
-            const { scheduleStaff } = this.formData
-            return this.userList.filter(u => scheduleStaff.includes(u.userId)).map(u => ({
-                label: u.userName,
-                value: u.userId
-            }))
+            if (this.viewType === 'users') {
+                const { scheduleStaff } = this.formData
+                return this.userList.filter(u => scheduleStaff.includes(u.userId)).map(u => ({
+                    label: u.userName,
+                    value: u.userId
+                }))
+            } else {
+                return this.formData.scheduleShift.map(s => ({
+                    label: s.name,
+                    value: s.alias,
+                    color: s.color
+                }))
+            }
         }
         // scheduleData () {
         //     return mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
@@ -550,6 +571,7 @@ export default {
                 const response = await getStaffSchedule({ id: this.pageParams.id })
                 const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config, status } = response.data
                 const temp = config ? JSON.parse(config) : {}
+                this.responseData = response.data
                 console.log('responseData:', response.data)
                 console.log('configData:', temp)
                 this.formData = {
@@ -558,6 +580,7 @@ export default {
                     config: temp.id,
                     dateRange: [startDate, endDate],
                     approver: temp.approver || [],
+                    overview: overview,
                     scheduleType: type,
                     scheduleRule: temp.scheduleRule || [],
                     scheduleShift: temp.scheduleShift || [],
@@ -572,8 +595,13 @@ export default {
                 }))
                 console.log('formData', this.formData)
                 this.scheduleData = this.transformScheduleData(records, overview, temp)
+                this.responseData = { ...this.responseData, records, overview, temp }
                 console.log('scheduleData', this.scheduleData)
                 this.loading = false
+                this.userNameList = this.ordinateList.map(item => ({ // 存起user对应id和name
+                    userName: item.label,
+                    userId: item.value
+                }))
             }).catch(() => {
                 this.loading = false
             })
@@ -623,6 +651,58 @@ export default {
             })
             return result
         },
+        /* 切换ScheduleData为人员排班数据格式(人员排班->班次排班)
+         */
+        transformScheduleDataForShiftsView (data, userList, scheduleShift, overview) {
+            const result = []
+            const temp = overview ? JSON.parse(overview) : {}
+            // 先创建以排班班次为键的空二维数组
+            scheduleShift.forEach(shift => {
+                result[shift.alias] = Array.from({ length: temp.dateCount }, () => [])
+            })
+            // 再次遍历用户列表，填充每个排班班次对应的用户信息
+            userList.forEach(({ userId, userName }) => {
+                data[userId].forEach((day, dayIndex) => {
+                    day.forEach(({ alias }) => {
+                        result[alias][dayIndex].push({
+                            userId,
+                            userName
+                        })
+                    })
+                })
+            })
+            return result
+        },
+        /* 复原ScheduleData为人员排班数据格式(班次排班->人员排班)
+        */
+        reverseForScheduleData (data, userList, scheduleShift, overview) {
+            const result = []
+            // 先创建以userId为键的空二维数组
+            const temp = overview ? JSON.parse(overview) : {}
+            userList.forEach(({ userId }) => {
+                result[userId] = Array.from({ length: temp.dateCount }, () => [])
+            })
+            const scheduleShiftMap = scheduleShift.reduce((acc, item) => {
+                acc[item.alias] = item
+                return acc
+            }, {})
+
+            // 遍历转换后的数据格式中的每个排班班次
+            Object.keys(data).forEach(alias => {
+                const days = data[alias]
+                const aliasData = scheduleShiftMap[alias]
+                // 遍历每一天的数据
+                days.forEach((users, dayIndex) => {
+                    // 遍历当天该班次上的每个用户
+                    users.forEach(({ userId }) => {
+                        // 将当天该用户在该班次的信息添加到对应的用户数据中
+                        result[userId][dayIndex].push(aliasData)
+                    })
+                })
+            })
+
+            return result
+        },
         handleConfigChange (val) {
             const temp = this.configList.find(i => i.id === val)
             this.formData = {
@@ -666,7 +746,18 @@ export default {
             return dates
         },
         changeView () {
-            console.log('changeView')
+            // 关闭可能存在的弹出框（如果有的话），确保视图切换时界面整洁
+            this.$refs.popover.showPopper = false
+            this.handleClose()
+            // 判断当前视图类型，如果是'users'则切换为'shifts'，如果是'shifts'则切换为'users'
+            this.viewType = this.viewType === 'users' ? 'shifts' : 'users'
+            // 重新计算scheduleData的结构以适应新视图
+            if (this.viewType === 'users') {
+                this.scheduleData = this.reverseForScheduleData(this.scheduleData, this.userNameList, this.formData.scheduleShift, this.formData.overview)
+            } else {
+                this.scheduleData = this.transformScheduleDataForShiftsView(this.scheduleData, this.userNameList, this.formData.scheduleShift, this.formData.overview)
+            }
+            console.log('changeView', this.scheduleData)
         },
         handleShiftClick (event, { row, rIndex, column, cIndex }) {
             this.selectItem = []
@@ -814,6 +905,9 @@ export default {
         //     return result
         // },
         dealData (data) {
+            if (this.viewType === 'shifts') { // 班次排班需还原数据
+                data = this.reverseForScheduleData(this.scheduleData, this.userNameList, this.formData.scheduleShift, this.formData.overview)
+            }
             var dateCount = 0
             const result = Object.entries(data).map(([userId, days]) => {
                 const userObj = { userId, statistics: {}}
@@ -841,6 +935,7 @@ export default {
                     statistics: JSON.stringify(userObj.statistics)
                 }
             })
+
             console.log(result)
 
             // 统计所有userId中各个alias的平均出现次数
@@ -901,6 +996,8 @@ export default {
                     this.closeDialog()
                     this.$emit('callback')
                 }
+                // 增加一条调班申请记录，用于查看排班管理员修改历史。
+                this.submitAdjust(submitData)
             }).catch(() => {
                 this.loading = false
             })
@@ -1012,6 +1109,8 @@ export default {
             this.shiftForm.current = date
             this.popoverReference = e.target
             this.$refs.popover.showPopper = true
+            // 先把编辑菜单关闭
+            this.handleClose()
 
             // 手动更改弹窗位置
             setTimeout(() => {
@@ -1094,6 +1193,61 @@ export default {
                 })
             }
             this.resetShiftSetting()
+        },
+        /** 获取排班变化描述 */
+        getOverViews (responseData, newData) {
+            const oldData = responseData.staffScheduleDetailPoList
+            const result = []
+            // 遍历newData
+            newData.forEach((newItem, i) => {
+                // 比较每个人班次的数量变化
+                if (newItem.statistics !== oldData[i].statistics) {
+                    const newStatistics = JSON.parse(newItem.statistics) || []
+                    const oldStatistics = JSON.parse(oldData[i].statistics) || []
+                    const changes = []
+                    // 比较每个人班次的数量变化
+                    for (const shift in newStatistics) {
+                        const newCount = newStatistics[shift] || 0
+                        const oldCount = oldStatistics[shift] || 0
+                        const shiftName = this.formData.scheduleShift.find(item => item.alias === shift)?.name
+                        if (newCount > oldCount) {
+                            changes.push(`${shiftName}增加了` + (newCount - oldCount) + '班次')
+                        } else if (newCount < oldCount) {
+                            changes.push(`${shiftName}减少了` + (oldCount - newCount) + '班次')
+                        }
+                    }
+                    // oldStatistics中有的项而newStatistics中没有的项
+                    for (const oldShift in oldStatistics) {
+                        if (!newStatistics.hasOwnProperty(oldShift)) {
+                            const shiftName = this.formData.scheduleShift.find(item => item.alias === oldShift)?.name
+                            const oldCount = oldStatistics[oldShift] || 0
+                            changes.push(`${shiftName}减少了` + oldCount + '班次')
+                        }
+                    }
+                    // 如果有班次变化，将其与userId记录到结果中
+                    if (changes.length > 0) {
+                        const userNameObj = this.userNameList.filter(item => item.userId === newItem.userId)
+                        const perOverView = userNameObj[0]?.userName + changes.join(',')
+                        result.push(perOverView)
+                    }
+                }
+            })
+            return '排班管理员调整如下：' + result.join('。')
+        },
+        // 提交调班申请数据
+        submitAdjust (submitData) {
+            const overView = this.getOverViews(this.responseData, submitData.staffScheduleDetailPoList)
+            const { first, second } = this.$store.getters.level || {}
+            const adjustData = {
+                scheduleId: submitData.id,
+                reason: '排班管理员调整排班',
+                diDian: second || first,
+                overview: overView,
+                status: '已通过',
+                updateTime: Date.now(),
+                adjustmentDetailPoList: []
+            }
+            saveAdjustment(adjustData)
         },
         closeDialog () {
             this.$emit('close', false)
@@ -1249,11 +1403,11 @@ export default {
                             border-bottom: none;
                             border-right: none;
                             cursor: context-menu;
-
+                            /*filter: saturate(0.8);*/
                             display: flex;
                             flex-direction: column;
                             justify-content: center;
-                            align-items: center;
+                            align-items: center ;
                             .shift {
                                 text-align: center;
                             }

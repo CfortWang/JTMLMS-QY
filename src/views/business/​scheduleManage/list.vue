@@ -27,7 +27,7 @@
             :page-params="params"
             :readonly="readonly"
             @refresh="loadData"
-            @close="() => showScheduleEdit = false"
+            @close="() => {showScheduleEdit = false;this.search()}"
         />
         <schedule-config-list
             v-if="showConfigList"
@@ -196,7 +196,7 @@ export default {
             this.params = {
                 id
             }
-            this.readonly = key === 'detail'
+            this.readonly = (key === 'detail' || key === 'preview')
             this.showScheduleEdit = true
         },
         handleAdjust (key, { id }) {
