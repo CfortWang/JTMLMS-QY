@@ -141,7 +141,7 @@
                                     <el-button-group>
                                         <template v-for="(button, b) in toolbarButtons">
                                             <template v-if="!(button.key === 'remove' && dataModel.length === 1)">
-                                                <el-button :key="b" :type="button.type" :icon="button.icon" @click="handleActionEvent(button, b)">
+                                                <el-button :key="b" :type="button.type" :icon="button.icon" @click="handleActionEvent(button, index)">
                                                     {{ button.label }}
                                                 </el-button>
                                             </template>
@@ -375,6 +375,9 @@ export default {
         nameColumns () {
             return FormFieldUtil.getSubDisplayColumns(this.columns)
         },
+        tableColumns () {
+            return FormFieldUtil.getColumns(this.columns)
+        },
         displayColumns () {
             const displayColumns = []
             const traverse = (fields) => {
@@ -576,6 +579,7 @@ export default {
         },
         getColumnsRights (rights = {}) {
             const columnsRights = {}
+            // console.log(this.nameColumns, this.tableColumns)
             if (this.nameColumns && this.nameColumns.length > 0) {
                 this.nameColumns.forEach((column) => {
                     columnsRights[column.name] = this.getRealRights(rights[column.name] || FormUtils.getDefaultRigths(column))
@@ -648,6 +652,7 @@ export default {
         handleActionEvent (button, buttonIndex) {
             // 起始下标
             const index = (this.currentPage - 1) * this.pageSize + buttonIndex
+            console.log(this.currentPage, this.pageSize, index)
             this.actionCode = button.key === 'custom' ? button.code || button.key + index : button.key
             this.actionPosition = button.position || 'toolbar'
             this.actionButton = button
@@ -767,6 +772,7 @@ export default {
         },
         handleRemove (button, index) {
             const position = button.position
+            console.log(position, index)
             const selection = this.getSelection(position, index)
             ActionUtils.removeRecord(selection, '确定删除当前数据？', true).then((ids) => {
                 for (let i = this.dataModel.length - 1; i >= 0; i--) {
@@ -1045,6 +1051,7 @@ export default {
                     fields: this.columnsRights
                 }
             }
+            // console.log('调试', this.dialogFormData)
             const attrs = {
                 hide_name: true
             }
