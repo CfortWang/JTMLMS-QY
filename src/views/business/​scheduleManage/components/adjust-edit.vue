@@ -90,6 +90,7 @@
                 </div>
                 <el-table
                     ref="adjustTable"
+                    :key="reScheduleValue"
                     :data="formData.adjustList"
                     border
                     stripe
@@ -164,6 +165,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
+                        v-if= "reScheduleValue!=='paiban'"
                         prop="party"
                         label="目标人员"
                         width="130"
@@ -188,6 +190,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
+                        v-if= "reScheduleValue!=='paiban'"
                         prop="afterDate"
                         label="目标日期"
                         width="150"
@@ -334,8 +337,9 @@ export default {
             }
         },
         reScheduleValue (newValue, oldValue) {
-        // 当reScheduleValue发生变化时，清空调班数组
-            this.formData.adjustList = []
+            if (oldValue !== '') { // 当reScheduleValue发生变化时，清空调班数组(初始化除外)
+                this.formData.adjustList = []
+            }
         }
     },
     async mounted () {
@@ -357,6 +361,7 @@ export default {
             // 初始化表单数据的方法
             const initializeFormData = (data) => {
                 const { scheduleId, reason, executor, executeDate, adjustmentDetailPoList } = data || {}
+                // this.reScheduleValue = 'paiban'
                 self.formData = {
                     scheduleId,
                     reason,
@@ -365,7 +370,7 @@ export default {
                         beforeAdjust: i.beforeAdjust ? i.beforeAdjust.split(',') : [],
                         afterAdjust: i.afterAdjust ? i.afterAdjust.split(',') : [],
                         beforeShiftList: self.handleDateInit(i.beforeDate, index, 'beforeShiftList', i.createBy, i.beforeAdjust),
-                        afterShiftList: self.handleDateInit(i.afterDate, index, 'afterShiftList', i.party, i.afterAdjust)
+                        afterShiftList: this.reScheduleValue === 'paiban' ? self.getPaiBanBanci(true, index, i.afterAdjust.split(',')) : self.handleDateInit(i.afterDate, index, 'afterShiftList', i.party, i.afterAdjust)
                     }))
                 }
                 console.log('formData', self.formData)
@@ -408,7 +413,8 @@ export default {
                     startDate: data.startDate,
                     scheduleShift: config.scheduleShift,
                     scheduleStaff: self.userList.filter(u => config.scheduleStaff.includes(u.userId) && u.userId !== this.userId),
-                    shiftList: data.staffScheduleDetailPoList
+                    shiftList: data.staffScheduleDetailPoList,
+                    executor: JSON.stringify(config.approver) || ''
                 }
                 self.scheduleOptions = self.scheduleList.map(s => ({
                     label: s.title,
@@ -437,7 +443,8 @@ export default {
                     endDate: schedule.endDate,
                     scheduleShift: config.scheduleShift,
                     scheduleStaff: self.userList.filter(u => config.scheduleStaff.includes(u.userId) && u.userId !== self.userId),
-                    shiftList: schedule.staffScheduleDetailPoList
+                    shiftList: schedule.staffScheduleDetailPoList,
+                    executor: JSON.stringify(config.approver) || ''
                 }
                 self.currentShift = self.scheduleInfo.shiftList.find(s => s.userId === self.userId) // 当前排班中我的排版表
                 if (!self.currentShift) {
@@ -693,9 +700,13 @@ export default {
                 this.handleDateChange(row.afterDate, index, 'afterShiftList')
             }
         },
-        getPaiBanBanci (visible, index) { // 排班变更方式，班次全部可选，目标人员和日期不可选
+        getPaiBanBanci (visible, index, afterAdjust) { // 排班变更方式，班次全部可选，目标人员和日期不可选
             if (this.reScheduleValue === 'paiban' && visible === true) {
                 this.formData.adjustList[index]['afterShiftList'] = this.scheduleInfo.scheduleShift
+                if (afterAdjust) {
+                    this.formData.adjustList[index]['afterAdjust'] = afterAdjust
+                    return this.formData.adjustList[index]['afterShiftList']
+                }
             } else {
                 return
             }
@@ -741,10 +752,10 @@ export default {
                     const beforeAdjust = i.beforeAdjust.map(item => `【${item}】`).join('')
                     const afterAdjust = i.afterAdjust.map(item => `【${item}】`).join('')
                     let desc = ''
-                    if (i.party) {
+                    if (i.party && i.party !== this.$store.getters.userId) {
                         desc = `${i.beforeDate}班次${beforeAdjust}与${partyName}${i.afterDate}班次${afterAdjust}调换`
                     } else {
-                        desc = `${i.beforeDate}班次${beforeAdjust}调换到${i.afterDate}`
+                        desc = `${i.beforeDate}班次${beforeAdjust}调换到${i.afterAdjust}`
                     }
                     result.push(desc)
                 })
@@ -767,8 +778,7 @@ export default {
                     if (this.rowValidate(this.formData.adjustList[this.formData.adjustList.length - 1], this.formData.adjustList.length)) {
                         return
                     }
-
-                    statusVal = adjustList.some(i => this.$utils.isNotEmpty(i.party)) ? '待审核' : '待审批'
+                    statusVal = adjustList.some((i) => { return this.$utils.isNotEmpty(i.party) && this.reScheduleValue !== 'paiban' }) ? '待审核' : '待审批'
                 }
                 // return
                 const submitData = {
@@ -779,6 +789,7 @@ export default {
                     diDian: second || first,
                     overview: getOverview(adjustList),
                     status: statusVal,
+                    executor: this.scheduleInfo.executor.replace(/\[|\]|\"/g, '').replace(/,/g, ',') || '',
                     adjustmentDetailPoList: adjustList.map(i => ({
                         recordId: i.recordId,
                         beforeDate: i.beforeDate,
@@ -798,7 +809,10 @@ export default {
                         sendMessage(submitData, el)
                     })
                 } else if (statusVal === '待审批') {
-                    sendMessage(submitData, submitData.executor || '')
+                    const executorList = submitData.executor.split(',')
+                    executorList.forEach(el => {
+                        sendMessage(submitData, el)
+                    })
                 }
             })
         },

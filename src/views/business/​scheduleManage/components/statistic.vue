@@ -68,8 +68,13 @@ export default {
                 itemStyle: {
                     color: colors[key]
                 },
-                barMaxWidth: '50px',
-                barMinWidth: '20px',
+                barMaxWidth: '90%',
+                barMinWidth: '80%',
+                stack: 'stack1',
+                emphasis: {
+                    focus: 'series'
+                }
+                /*
                 markLine: {
                     silent: true,
                     precision: 2,
@@ -79,7 +84,7 @@ export default {
                             type: 'average'
                         }
                     ]
-                }
+                }*/
                 // label: {
                 //     show: true,
                 //     position: 'top',
@@ -129,8 +134,13 @@ export default {
                 itemStyle: {
                     color: colors[key]
                 },
-                barMaxWidth: '50px',
-                barMinWidth: '20px',
+                barMaxWidth: '90%',
+                barMinWidth: '80%',
+                stack: 'stack1',
+                emphasis: {
+                    focus: 'series'
+                }
+                /*
                 markLine: {
                     silent: true,
                     precision: 2,
@@ -140,7 +150,7 @@ export default {
                             type: 'average'
                         }
                     ]
-                }
+                }*/
             }))
 
             const avg = mapValues(seriesData, values => mean(values).toFixed(2))
@@ -175,24 +185,39 @@ export default {
                     })
                 })
             })
-
             const series = [
                 {
                     name: '人数',
-                    type: 'bar',
-                    data: categories.map(name => seriesData[name]),
+                    type: 'pie',
+                    data: Object.keys(seriesData).map(name => ({
+                        name: name,
+                        value: seriesData[name]
+                    })),
                     itemStyle: {
-                        color: params => colors[categories[params.dataIndex]]
-                    },
-                    barMaxWidth: '50px',
-                    barMinWidth: '20px'
+                        color: params => colors[params.data.name]
+                    }
                 }
             ]
-
-            const shiftOption = JSON.parse(JSON.stringify(chartOption))
-            shiftOption.title.text = '班次人数统计'
-            shiftOption.legend.data = Object.keys(seriesData)
-            shiftOption.xAxis.data = categories
+            const option = {
+                title: chartOption.title,
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b} : {c} ({d}%)'
+                },
+                textStyle: chartOption.textStyle,
+                legend: {
+                    orient: 'vertical',
+                    x: '80%',
+                    y: 'center',
+                    textStyle: {
+                        fontSize: 14
+                    },
+                    itemGap: 20,
+                    data: categories
+                }
+            }
+            option.title.text = '班次人数统计'
+            const shiftOption = option
             shiftOption.series = series
             shiftChart.setOption(shiftOption)
         }

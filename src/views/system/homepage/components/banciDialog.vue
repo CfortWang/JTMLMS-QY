@@ -1,12 +1,12 @@
 <template>
     <div>
-        <el-button type="primary" @click="openDialog">查看班次详情</el-button>
         <el-dialog
             title="班次详情"
             :visible.sync="dialogVisible"
             width="30%"
             :close-on-click-modal="false"
             :close-on-press-escape="false"
+            :show-close="false"
         >
             <div class="containerDiv">
                 <div>

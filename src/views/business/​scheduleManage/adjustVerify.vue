@@ -83,7 +83,7 @@ export default {
                 columns: [
                     { prop: 'createBy', label: '申请人', tags: userOption, width: 100 },
                     { prop: 'createTime', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
-                    { prop: 'executor', label: '审批人', tags: userOption, width: 100 },
+                    { prop: 'executor', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', minWidth: 100 },
                     { prop: 'executeDate', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
                     { prop: 'reason', label: '调班原因', width: 150 },
                     { prop: 'status', label: '状态', tags: stateType, width: 100 },
@@ -177,12 +177,14 @@ export default {
 
             if (this.isRoleFilter()) { // 超级管理员和高权限角色不做审批人过滤
             } else {
-                /* 审批人过滤
+                // 审批人过滤
                 const { userId } = this.$store.getters || ''
                 if (userId) {
-                    paramjson['Q^executor_^S'] = userId
+                    parameters[0].parameters.push({
+                        'key': 'Q^executor_^SL',
+                        'value': userId
+                    })
                 }
-                */
             }
             const param = {
                 parameters: parameters,
@@ -269,8 +271,11 @@ export default {
         sendMsg (data) {
             switch (data.status) {
                 case '待审批':
-                    sendMessage(data, data.executor || '')
-                    break
+                { const executorList = data.executor.split(',')
+                    executorList.forEach(el => {
+                        sendMessage(data, el)
+                    })
+                    break }
                 case '已拒绝':
                 { // 已拒绝时视情况发送给审核人申请人(审核时拒绝消息对象需排除自己)
                     const parties = data.adjustmentDetailPoList.map(obj => obj.party)
@@ -387,6 +392,10 @@ export default {
             let uparr = []
             let sonuparr = []
             data.forEach((el) => {
+                if (el.status === '已通过' || el.status === '已拒绝') {
+                    // this.$message.warning('所选数据中有已通过/已拒绝的申请单，请取消选择！')
+                    return
+                }
                 el.status = key === 'massAgree' ? this.isNextStep(el) : '已拒绝'
                 uparr.push({
                     where: {
@@ -479,7 +488,7 @@ export default {
          *
          */
         handleRowDblclick (row) {
-            this.handleEdit(row, 'detail')
+            // this.handleEdit(row, 'detail')
         }
     }
 }

@@ -33,11 +33,10 @@
 </template>
 
 <script>
-import { queryAdjustment, removeAdjustment, saveAdjustment } from '@/api/business/schedule'
+import { queryAdjustment, removeAdjustment, sendMessage, saveAdjustment } from '@/api/business/schedule'
 import { stateType } from '@/views/constants/schedule'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
-import action from '@/business/platform/bpmn/form/action';
 
 export default {
     components: {
@@ -79,7 +78,7 @@ export default {
                 columns: [
                     { prop: 'createBy', label: '申请人', tags: userOption, width: 100 },
                     { prop: 'createTime', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
-                    { prop: 'executor', label: '审批人', tags: userOption, width: 100 },
+                    { prop: 'executor', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', minWidth: 100 },
                     { prop: 'executeDate', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
                     { prop: 'reason', label: '调班原因', width: 150 },
                     { prop: 'status', label: '状态', tags: stateType, width: 100 },
@@ -243,6 +242,8 @@ export default {
                 await this.$common.request('update', sonUpdateParams) // 更新子表
                 ActionUtils.successMessage()
                 this.search()
+                // 告知审核人该单已取消
+                // sendMessage(data, data.createBy)
             }).catch((e) => { console.error(e) })
             /*
             saveAdjustment(data).then(() => {
@@ -262,7 +263,7 @@ export default {
             }).catch(() => {})
         },
         handleRowDblclick (row) {
-            this.handleEdit(row, 'detail')
+            // this.handleEdit(row, 'detail')
         }
     }
 }

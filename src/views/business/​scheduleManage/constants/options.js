@@ -25,6 +25,7 @@ const rowLimit = (params, max) => {
 const fontColor = '#333'
 
 export const chartOption = {
+    animation: true,
     title: {
         show: true,
         text: '',
@@ -51,6 +52,7 @@ export const chartOption = {
     },
     legend: {
         data: [],
+        itemGap: 30,
         bottom: 0
     },
     xAxis: {
@@ -127,6 +129,9 @@ export const chartOption = {
             }
         }
     }],
+    textStyle: {
+        fontSize: 14
+    },
     tooltip: {
         show: true,
         trigger: 'axis',

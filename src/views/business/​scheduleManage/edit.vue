@@ -548,7 +548,7 @@ export default {
             //     scheduleContent.style.paddingLeft = '0px'
             // }
         },
-        async loadData () {
+        loadData () {
             this.loading = true
             // 获取配置数据
             queryScheduleConfig({
@@ -567,7 +567,6 @@ export default {
                     this.loading = false
                     return
                 }
-
                 const response = await getStaffSchedule({ id: this.pageParams.id })
                 const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config, status } = response.data
                 const temp = config ? JSON.parse(config) : {}
@@ -598,10 +597,6 @@ export default {
                 this.responseData = { ...this.responseData, records, overview, temp }
                 console.log('scheduleData', this.scheduleData)
                 this.loading = false
-                this.userNameList = this.ordinateList.map(item => ({ // 存起user对应id和name
-                    userName: item.label,
-                    userId: item.value
-                }))
             }).catch(() => {
                 this.loading = false
             })
@@ -658,12 +653,15 @@ export default {
             const temp = overview ? JSON.parse(overview) : {}
             // 先创建以排班班次为键的空二维数组
             scheduleShift.forEach(shift => {
-                result[shift.alias] = Array.from({ length: temp.dateCount }, () => [])
+                result[shift.alias] = Array.from({ length: temp.dateCount || this.dateList.length }, () => [])
             })
             // 再次遍历用户列表，填充每个排班班次对应的用户信息
             userList.forEach(({ userId, userName }) => {
                 data[userId].forEach((day, dayIndex) => {
                     day.forEach(({ alias }) => {
+                        if (!result[alias][dayIndex]) {
+                            result[alias][dayIndex] = []
+                        }
                         result[alias][dayIndex].push({
                             userId,
                             userName
@@ -676,11 +674,11 @@ export default {
         /* 复原ScheduleData为人员排班数据格式(班次排班->人员排班)
         */
         reverseForScheduleData (data, userList, scheduleShift, overview) {
-            const result = []
+            const result = {}
             // 先创建以userId为键的空二维数组
             const temp = overview ? JSON.parse(overview) : {}
             userList.forEach(({ userId }) => {
-                result[userId] = Array.from({ length: temp.dateCount }, () => [])
+                result[userId] = Array.from({ length: temp.dateCount || this.dateList.length }, () => [])
             })
             const scheduleShiftMap = scheduleShift.reduce((acc, item) => {
                 acc[item.alias] = item
@@ -696,6 +694,9 @@ export default {
                     // 遍历当天该班次上的每个用户
                     users.forEach(({ userId }) => {
                         // 将当天该用户在该班次的信息添加到对应的用户数据中
+                        if (!result[userId][dayIndex]) {
+                            result[userId][dayIndex] = []
+                        }
                         result[userId][dayIndex].push(aliasData)
                     })
                 })
@@ -746,6 +747,12 @@ export default {
             return dates
         },
         changeView () {
+            if (this.userNameList.length < 1) {
+                this.userNameList = this.ordinateList.map(item => ({ // 存起user对应id和name
+                    userName: item.label,
+                    userId: item.value
+                }))
+            }
             // 关闭可能存在的弹出框（如果有的话），确保视图切换时界面整洁
             this.$refs.popover.showPopper = false
             this.handleClose()
@@ -847,6 +854,11 @@ export default {
                     this.scheduleData = mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
                 } else {
                     this.updateScheduleData()
+                }
+            }
+            if (this.activeStep === 2 && this.viewType === 'shifts') { // 班次排班需还原数据
+                if (val > 0) {
+                    this.changeView() // 切换为人员排班
                 }
             }
             this.handleListener('addEventListener')
@@ -1226,23 +1238,29 @@ export default {
                     }
                     // 如果有班次变化，将其与userId记录到结果中
                     if (changes.length > 0) {
-                        const userNameObj = this.userNameList.filter(item => item.userId === newItem.userId)
+                        const userNameObj = this.userList.filter(item => item.userId === newItem.userId)
                         const perOverView = userNameObj[0]?.userName + changes.join(',')
                         result.push(perOverView)
                     }
                 }
             })
-            return '排班管理员调整如下：' + result.join('。')
+            return result.join('。')
         },
         // 提交调班申请数据
         submitAdjust (submitData) {
-            const overView = this.getOverViews(this.responseData, submitData.staffScheduleDetailPoList)
+            let overView = ''
+            if (submitData.id) {
+                overView = this.getOverViews(this.responseData || null, submitData.staffScheduleDetailPoList)
+            }
+            if (overView === '') {
+                return
+            }
             const { first, second } = this.$store.getters.level || {}
             const adjustData = {
                 scheduleId: submitData.id,
                 reason: '排班管理员调整排班',
                 diDian: second || first,
-                overview: overView,
+                overview: '排班管理员调整：' + overView,
                 status: '已通过',
                 updateTime: Date.now(),
                 adjustmentDetailPoList: []
