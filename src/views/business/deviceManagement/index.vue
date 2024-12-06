@@ -119,7 +119,7 @@ export default {
                 //         hoverPause: true
                 //     }
                 // },
-                {
+                 {
                     title: "检验科设备信息",
                     numData: {
                            // header: ["部门", "设备名称", "设备编号", "状态"],
@@ -184,13 +184,14 @@ export default {
                 const scrapData = data.scrapData.filter((item,i)=>{
                     return item[0].indexOf('综合')===-1
                 })
+
                 const scrapDataList=JSON.parse(JSON.stringify(scrapData))
                 for (var i = 0; i < scrapData.length; i++) {
                 scrapDataList[i][0] = scrapData[i][4]
                 scrapDataList[i][1] = scrapData[i][5]
                 scrapDataList[i][2] = scrapData[i][3]
                 scrapDataList[i][3] = scrapData[i][7]
-                scrapDataList[i][4] = scrapData[i][1]
+                scrapDataList[i][4] = "&nbsp;&nbsp;&nbsp;&nbsp;"+scrapData[i][1]+'次'
                 scrapDataList[i].splice(5, 3)
                 }
                 this.mergeData[0].numData = data.distributionDataObj || []

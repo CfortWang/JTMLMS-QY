@@ -219,11 +219,12 @@ export default {
                 if (newVal !== temp) {
                     this.leftData = temp
                 }
-                // this.fileShow(this.leftData[0])
-
-                newVal.forEach(val => {
-                    this.fileShow(val)
+                temp.forEach(val => {
+                    this.fileShow(temp[0])
                 })
+                // newVal.forEach(val => {
+                //     this.fileShow(val)
+                // })
             },
             deep: true, // 深度监听，确保对象属性变化也能触发(本人修改)
             immediate: true
@@ -469,10 +470,11 @@ export default {
         //     this.innerVisible = val
         // },
         updateFile () {
-            const roleKey = ['xtgljs', 'wjglzzc', 'wjgly']
+            const hasRole = localStorage.getItem('hasHighRole') || 0
+            // const roleKey = ['xtgljs', 'wjglzzc', 'wjgly', 'zhsfzr']
             const curRole = this.role.map(i => i.alias)
-            const isPower = curRole.some(i => roleKey.includes(i))
-            if (this.isSuper || isPower) {
+            // const isPower = curRole.some(i => roleKey.includes(i))
+            if (this.isSuper || hasRole === 1) {
                 const a = document.createElement('a')
                 a.href = this.optionFile.url
                 a.download = this.optionFile.data.fileName

@@ -119,7 +119,7 @@ export default {
             // 新
             moreBarData: {
                 data: { dimensions: [], source: [] },
-                config: { idSelector: 'eqFinish', title: '各部门设备完好情况', colors: ['#3870e0', '#12bc79', '#ff0066'] }
+                config: { idSelector: 'eqFinish', title: '各部门设备完好情况', colors: ['#3870e0', '#12bc79','#C1FFC1','#ff0066','#FFFF00'] }
             },
             zichangBarData: {
                 data: [],
@@ -134,10 +134,15 @@ export default {
                 data: { dimensions: [], source: [] },
                 config: { idSelector: 'eqJiaozhun', title: '各部门设备检定/校准完成情况', colors: ['#3870e0', '#12bc79'] }
             },
+            // allSheBeiData: {
+            //     data: [{ name: '设备总数', value: 0 }, { name: '良好数', value: 0 }, { name: '停用数', value: 0 }],
+            //     config: { title: '检验科设备完好情况', idSelector: 'allShebei' },
+            //     color: ['#339933', '#3870e0', '#FF0033']
+            // },
             allSheBeiData: {
-                data: [{ name: '设备总数', value: 0 }, { name: '良好数', value: 0 }, { name: '停用数', value: 0 }],
+                data: [{ name: '良好数', value: 0 }, { name: '限用数', value: 0 }, { name: '停用数', value: 0 }, { name: '报废数', value: 0 }],
                 config: { title: '检验科设备完好情况', idSelector: 'allShebei' },
-                color: ['#339933', '#3870e0', '#FF0033']
+                color: ['#12bc79', '#C1FFC1', '#FF0033','#FFFF00']
             },
             allWeihuSheBeiData: {
                 data: [{ name: '待处理', value: 0 }, { name: '已完成', value: 0 }],
@@ -420,12 +425,14 @@ export default {
             let didian = ''
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
-            this.moreBarData.data.dimensions = ['product', '设备总数', '良好数', '停用数']
+            this.moreBarData.data.dimensions = ['product', '设备总数', '良好数', '限用数', '停用数', '报废数']
             const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
             const sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='合格'  GROUP BY a.bian_zhi_bu_men_`
-            const sql3 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='停用'  GROUP BY a.bian_zhi_bu_men_`
-            let data1, data2, data3
-            await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2), curdPost('sql', sql3)]).then(([res1, res2, res3]) => {
+            const sql3 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='限用'  GROUP BY a.bian_zhi_bu_men_`
+            const sql4 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='停用'  GROUP BY a.bian_zhi_bu_men_`
+            const sql5 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='报废'  GROUP BY a.bian_zhi_bu_men_`
+            let data1, data2, data3, data4, data5
+            await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2), curdPost('sql', sql3), curdPost('sql', sql4), curdPost('sql', sql5)]).then(([res1, res2, res3, res4, res5]) => {
                 if (res1.state === 200) {
                     data1 = res1.variables.data
                 }
@@ -435,6 +442,12 @@ export default {
                 if (res3.state === 200) {
                     data3 = res3.variables.data
                 }
+                if (res4.state === 200) {
+                    data4 = res4.variables.data
+                }
+                if (res5.state === 200) {
+                    data5 = res5.variables.data
+                }
             })
             const source = []
             data1.forEach((item, index) => {
@@ -442,7 +455,9 @@ export default {
                     product: item.name_,
                     '设备总数': item.total,
                     '良好数': 0,
-                    '停用数': 0
+                    '限用数': 0,
+                    '停用数': 0,
+                    '报废数': 0
                 })
             })
             data2.forEach(item => {
@@ -452,28 +467,54 @@ export default {
                     }
                 })
             })
+
             data3.forEach(item => {
+                source.forEach((el, index) => {
+                    if (item.name_ === el.product) {
+                        source[index]['限用数'] = item.total
+                    }
+                })
+            })
+            data4.forEach(item => {
                 source.forEach((el, index) => {
                     if (item.name_ === el.product) {
                         source[index]['停用数'] = item.total
                     }
                 })
             })
+            data5.forEach(item => {
+                source.forEach((el, index) => {
+                    if (item.name_ === el.product) {
+                        source[index]['报废数'] = item.total
+                    }
+                })
+            })
+            
             if (source.length === 0) {
                 this.moreBarData.data.source = [999]
             } else {
                 this.moreBarData.data.source = source
             }
 
-            let allTotal = 0; let goods = 0; let deactivates = 0
+            // let allTotal = 0; let goods = 0; let deactivates = 0
+            let goods = 0; let restricts = 0; let deactivates = 0; let scraps = 0;
             source.forEach(item => {
-                allTotal += item['设备总数']
+                // allTotal += item['设备总数']
                 goods += item['良好数']
+                restricts += item['限用数']
                 deactivates += item['停用数']
+                scraps += item['报废数']
             })
-            this.allSheBeiData.data[0].value = allTotal
-            this.allSheBeiData.data[1].value = goods
+            // this.allSheBeiData.data[0].value = allTotal
+            // this.allSheBeiData.data[1].value = goods
+            // this.allSheBeiData.data[2].value = deactivates
+
+            // this.allSheBeiData.data[0].value = allTotal
+            this.allSheBeiData.data[0].value = goods
+            this.allSheBeiData.data[1].value = restricts
             this.allSheBeiData.data[2].value = deactivates
+            this.allSheBeiData.data[3].value = scraps
+           
         },
         async getWeihuBarData () {
             const this_ = this
@@ -700,7 +741,8 @@ export default {
             this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
             didian.includes(',') ? didian = didian.split(',')[0] : ''
             // const sql =`select * from t_sbdj where (she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') and  di_dian_ = '${didian}'`;
-            const sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' and b.name_ not like '%综合%' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
+            // const sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' and b.name_ not like '%综合%' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
+            const sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' and b.name_ not like '%综合%' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
             let data1 = []
             await curdPost('sql', sql)
                 .then((res) => {
