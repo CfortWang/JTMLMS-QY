@@ -61,6 +61,7 @@
                         :field="item"
                         :code="code"
                         :params="formParams"
+                        :time-modification="timeModification"
                     />
                 </template>
             </el-form>
@@ -150,6 +151,11 @@ export default {
             default: true
         },
         initialization: {
+            type: Boolean,
+            default: false
+        },
+        // 修改流程时间
+        timeModification: {
             type: Boolean,
             default: false
         },
@@ -442,6 +448,9 @@ export default {
                 // 字段
                 rightsValue = permissions.fields[name] ? permissions.fields[name] : null
             }
+            // if (this.$route.path === '/xxgl/jssllb') {
+            //     return rightsValue
+            // }
             if (this.readonly && !isNonInputField && !isSpecial) {
                 // 只读权限
                 // 修复空权限默认值的bug

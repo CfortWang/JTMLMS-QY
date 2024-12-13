@@ -131,7 +131,8 @@ export default {
             const { data: { dataResult, pageResult }} = await queryScrappedRecord({
                 requestPage: this.requestPage,
                 parameters: [
-                    { key: 'Q^she_bei_id_^S', value: this.params.id }
+                    { key: 'Q^she_bei_id_^S', value: this.params.id },
+                    { key: 'Q^shi_fou_guo_shen_^S', value: '已完成' }
                 ],
                 sorts: [
                     { field: 'bian_zhi_shi_jian', order: 'desc' }

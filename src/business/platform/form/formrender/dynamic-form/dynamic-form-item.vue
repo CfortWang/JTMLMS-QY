@@ -31,6 +31,8 @@
                     :opinion-data="formOpinionData[fieldName]"
                     :un-complate="unComplateOpinion"
                     :params="params"
+                    :time-modification="timeModification"
+                    @childByValue="childByValue"
                     v-on="listeners"
                 />
                 <!--子表-->
@@ -84,7 +86,12 @@ export default {
         code: String, // 表名
         mainCode: String, // 主表名
         row: [String, Number], // 子表行数
-        params: Object // 参数
+        params: Object, // 参数
+        // 修改流程时间
+        timeModification: {
+            type: Boolean,
+            default: false
+        }
     },
     inject: {
         elForm: {
@@ -105,7 +112,8 @@ export default {
 
         return {
             dataModel: this.models[this.field.name] || defaultVal,
-            fieldRights: this.rights[this.field.name] || 'e'
+            fieldRights: this.rights[this.field.name] || 'e',
+            opinionData: []
         }
     },
     computed: {
@@ -333,6 +341,10 @@ export default {
         },
         emitEvent (event) {
             this.$emit(event, ...Array.from(arguments).slice(1))
+        },
+        childByValue (childValue) {
+        // childValue就是子组件传过来的值
+            this.opinionData = childValue
         }
     }
 }

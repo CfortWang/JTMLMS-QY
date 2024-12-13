@@ -92,7 +92,8 @@ export default {
             const { data: { dataResult, pageResult }} = await queryRepairRecord({
                 requestPage: this.requestPage,
                 parameters: [
-                    { key: 'Q^she_bei_bian_hao_^S', value: this.params.sheBeiShiBieH }
+                    { key: 'Q^she_bei_bian_hao_^S', value: this.params.sheBeiShiBieH },
+                    { key: 'Q^shi_fou_guo_shen_^S', value: '已完成' }
                 ],
                 sorts: [
                     { field: 'bian_zhi_shi_jian', order: 'desc' }

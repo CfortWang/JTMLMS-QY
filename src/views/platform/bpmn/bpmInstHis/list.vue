@@ -145,6 +145,9 @@
         <bpmn-formrender
             :visible="dialogFormVisible"
             :instance-id="instanceId"
+            :data-resultitem="dataResultitem"
+            :time-modification="timeModification"
+            :time-modificationbtn="timeModificationbtn"
             @close="visible => dialogFormVisible = visible"
         />
         <el-dialog
@@ -215,6 +218,9 @@ export default {
             dialogFormVisible: false,
             // 编辑dialog需要使用
             instanceId: '',
+            dataResultitem: {},
+            timeModification: false,
+            timeModificationbtn: true,
             // 主键 如果主键不是pk需要传主键
             pkKey: 'id',
             tableTitle: '',
@@ -644,6 +650,8 @@ export default {
                     break
                 case 'detail': // 明细
                     ActionUtils.selectedRecord(selection).then((id) => {
+                        // console.log(this.timeModification)
+                        this.dataResultitem = data[0] || {}
                         this.handleEdit(id)
                         this.title = '信息'
                     }).catch(() => {})

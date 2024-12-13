@@ -43,8 +43,8 @@
                             readonly-text="text"
                             :disabled="false"
                             :multiple="false"
-                            :filter="[]"
-                            filterable
+                            :filter="filter"
+                            filtrate
                         />
                     </div>
                     <div class="item">
@@ -196,7 +196,7 @@ export default {
             dataList: [],
             type: ['日保养', '周保养', '月保养', '季度保养', '半年保养', '年保养', '按需保养'],
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,

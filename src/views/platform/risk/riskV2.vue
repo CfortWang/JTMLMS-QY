@@ -478,19 +478,17 @@ export default {
                         await this.$common.request('update', updateParamsRecord)
                         // console.log(data)
                         // 2.推送给措施制定人下一个流程
-                        let count = 0
                         const addParams = {
                             tableName: 't_fxkzcsb2',
                             paramWhere: data.map(item => {
                                 if (item.feng_xian_ying_du !== '风险接受' && item.zhi_ding_ren_) {
-                                    count++
                                     return {
                                         di_dian_: this.level,
                                         shi_fou_guo_shen_: '已编制',
                                         bian_zhi_ren_: item.zhi_ding_ren_,
                                         bian_zhi_bu_men_: this.getPersonPosition(item.zhi_ding_ren_.split(',')[0]),
                                         bian_zhi_shi_jian: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-                                        gai_jin_bian_hao_: ('FXGJ-' + dayjs().format('YYYYMMDDHHmmss')) + count,
+                                        gai_jin_bian_hao_: '',
                                         yao_su_tiao_kuan_: item.yao_su_tiao_kuan_,
                                         gong_zuo_huan_jie: item.gong_zuo_huan_jie,
                                         // gong_zuo_miao_shu: item.gong_zuo_miao_shu,
@@ -511,6 +509,10 @@ export default {
                             }).filter(i => i !== undefined),
                             formKey: 'fxcscsbV2',
                             defKey: 'Process_1li9h0n'
+                        }
+                        for (let i = 0; i < addParams.paramWhere.length; i++) {
+                            const item = addParams.paramWhere[i]
+                            item.gai_jin_bian_hao_ = await this.getNextAlias('gjjllsh')
                         }
                         console.log(addParams)
                         if (addParams.paramWhere.length) {
@@ -839,6 +841,17 @@ export default {
                 }
             })
         },
+        getNextAlias (alias) {
+            return new Promise((resolve, reject) => {
+                this.$common.getNextIdByAlias({
+                    alias
+                }).then(response => {
+                    resolve(response.data)
+                }).catch((error) => {
+                    reject(error)
+                })
+            })
+        },
         async init () {
             this.isEdit = !!(this.params && this.params.id_)
             if (this.isEdit) {
@@ -857,7 +870,7 @@ export default {
             } else {
                 this.readonly = false
                 this.infoFxssbData.di_dian_ = this.level
-                this.infoFxssbData.ji_hua_bian_hao_ = 'FX-' + dayjs().format('YYYYMMDDHHmmss')
+                this.infoFxssbData.ji_hua_bian_hao_ = await this.getNextAlias('fxjhlsh')
                 this.infoFxssbData.nian_du_ = dayjs().format('YYYY')
                 this.infoFxssbData.bian_zhi_bu_men_ = this.position
                 this.infoFxssbData.bian_zhi_ren_ = this.userId

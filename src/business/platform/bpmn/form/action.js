@@ -1,6 +1,8 @@
 import { doEndProcess, doAddSignTask, lock, unlock, suspendProcess, recoverProcess } from '@/api/platform/bpmn/bpmTask'
 import { agree, oppose, abandon, reject, rejectToStarter, rejectToPrevious, bpmTaskSave } from '@/api/platform/bpmn/bpmTask'
 import { startFlow, saveDraft } from '@/api/platform/bpmn/bpmInst'
+import { saveFormData } from '@/api/platform/data/dataTemplate'
+import { changeCompleteTime, replenishSnapshot } from '@/api/platform/bpmn/bpmInstHis'
 import Print from '@/utils/print'
 
 export default {
@@ -146,6 +148,10 @@ export default {
                 case 'save':// 节点按钮设置-保存
                     // this.setData('已暂存')
                     this.handleSave()
+                    break
+                case 'timeModification':// 节点按钮设置-修改时间
+                    this.handleTimeModification()
+
                     break
                 default:
                     break
@@ -740,6 +746,83 @@ export default {
                 }]
             }
             this.$common.request('update', params)
+        },
+        // 修改流程时间
+
+        async handleTimeModification () {
+            // 表单参数
+            const { code = '', name = '' } = this.getFormEL().formDefData || {}
+            const jsonData = {
+                boCode: code,
+                version: 0,
+                formKey: this.dataResultitem.formKey,
+                pk: this.dataResultitem.bizKey,
+                data: JSON.stringify(this.$common.replaceNullWithEmpty(this.getFormData()))
+            }
+            // 流程参数
+            const defData = this.formParams.formOpinionData.opinionList
+            // 快照参数
+
+            const snapshot = { id: this.instanceId_ }
+
+            // console.log(JSON.stringify(this.$common.replaceNullWithEmpty(this.formDataBF)), JSON.stringify(this.$common.replaceNullWithEmpty(this.getFormData())))
+            // console.log(this.formDataBF)
+            if (this.timeModification_) {
+                if (JSON.stringify(this.$common.replaceNullWithEmpty(this.formDataBF)) === JSON.stringify(this.$common.replaceNullWithEmpty(this.getFormData()))) {
+                    // console.log('aa')
+                    if (JSON.stringify(defData) === JSON.stringify(this.opinionListBF)) {
+                        // console.log('aa')
+                    } else {
+                        await this.timeModify(defData)
+                    }
+                } else {
+                    if (JSON.stringify(defData) === JSON.stringify(this.opinionListBF)) {
+                        await this.saveData(jsonData, false, defData, snapshot)
+                    } else {
+                        await this.saveData(jsonData, true, defData, snapshot)
+                    }
+                }
+                this.timeModification_ = false
+            } else {
+                this.timeModification_ = true
+            }
+        },
+        // 保存流程数据生成快照
+        async timeModify (data) {
+            await changeCompleteTime(data).then(response => {
+                if (response.state === 200) {
+                    this.$message.success('修改成功！')
+                    this.callbackPage()
+                } else {
+                    this.$message.error(response.message)
+                }
+            }).catch(() => {
+            })
+        },
+        // 保存表单数据生成快照
+        async saveData (data, sflc, defData, snapshot) {
+            await saveFormData(data).then(response => {
+                if (sflc) {
+                    this.timeModify(defData)
+                } else {
+                    this.repleceSnapshot(snapshot)
+                }
+            }).catch(() => {
+            })
+        },
+
+        // 生成快照
+        async repleceSnapshot (data) {
+            await replenishSnapshot(data).then(response => {
+                if (response.state === 200) {
+                    this.$message.success('生成快照成功！')
+                    this.callbackPage()
+                } else {
+                    this.$message.error(response.message)
+                }
+            }).catch(() => {
+            })
         }
+
     }
 }

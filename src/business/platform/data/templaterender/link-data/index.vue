@@ -12,7 +12,7 @@
                 :multiple="multiple"
                 :placeholder="placeholder"
                 style="width: 100%"
-                allow-create
+                :allow-create="allowCreate"
                 :collapse-tags="tempSearch"
                 @focus="focusData"
                 @change="changeData"
@@ -84,6 +84,11 @@ export default {
         IbpsTreeSelect
     },
     props: {
+        allowCreate: {
+            // 是否可填写
+            type: Boolean,
+            default: true
+        },
         value: {
             type: [String, Number, Array, Object],
             default: ''

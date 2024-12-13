@@ -19,6 +19,11 @@
             <template slot="dateRange" slot-scope="scope">
                 <span>{{ `${scope.row.startDate} 至 ${scope.row.endDate}` }}</span>
             </template>
+            <template slot="partys" slot-scope="scope">
+                <span v-for="party in scope.row.partys" :key="party.value">
+                    <span :class="getTagClass(party)" class="el-tag el-tag--small el-tag--light" style="margin-left: 5px;">{{ party.label }}</span>
+                </span>
+            </template>
         </ibps-crud>
         <adjust-edit
             v-if = "showAdjustEdit"
@@ -83,6 +88,7 @@ export default {
                 columns: [
                     { prop: 'createBy', label: '申请人', tags: userOption, width: 100 },
                     { prop: 'createTime', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
+                    { prop: 'partys', label: '审核人', fieldType: 'slot', slotName: 'partys', minWidth: 120 },
                     { prop: 'executor', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', minWidth: 100 },
                     { prop: 'executeDate', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
                     { prop: 'reason', label: '调班原因', width: 150 },
@@ -97,8 +103,8 @@ export default {
                         { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt' }
                     ]*/
                     actions: [
-                        { key: 'agree', label: '同意', type: 'success', icon: 'ibps-icon-check', hidden: function (row) { return row.status !== '待审批' && row.status !== '待审核' } },
-                        { key: 'disagree', label: '不同意', type: 'danger', icon: 'ibps-icon-close', hidden: function (row) { return row.status !== '待审批' && row.status !== '待审核' } },
+                        { key: 'agree', label: '同意', type: 'success', icon: 'ibps-icon-check', hidden: (row) => { return this.showAgreeBtn(row) } },
+                        { key: 'disagree', label: '不同意', type: 'danger', icon: 'ibps-icon-close', hidden: (row) => { return this.showAgreeBtn(row) } },
                         { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt', hidden: function (row) { return false } }
                     ]
                 }
@@ -114,6 +120,13 @@ export default {
             this.loading = true
             queryAdjustment(this.getSearchFormData()).then(res => {
                 ActionUtils.handleListData(this, res.data)
+                res.data.dataResult.forEach((el) => { // 遍历子表提取审核人字段
+                    el.partys = this.getPartysList(el.adjustmentDetailPoList)
+                })
+                if (!this.isRoleFilter()) { // 如果不是高权限角色
+                    // 审核人审批人过滤
+                    this.listData = this.filteredData(res.data.dataResult)
+                }
                 this.loading = false
             }).catch(() => {
                 this.loading = false
@@ -174,23 +187,70 @@ export default {
                     })
                 }
             }
-
-            if (this.isRoleFilter()) { // 超级管理员和高权限角色不做审批人过滤
-            } else {
-                // 审批人过滤
-                const { userId } = this.$store.getters || ''
-                if (userId) {
-                    parameters[0].parameters.push({
-                        'key': 'Q^executor_^SL',
-                        'value': userId
-                    })
-                }
-            }
             const param = {
                 parameters: parameters,
                 ...ActionUtils.formatParams(null, this.pagination, this.sorts)
             }
             return param
+        },
+        // 审核人审批人过滤(审核人不在父表字段内所以没办法用数组)
+        filteredData (data) {
+            const { userId = '' } = this.$store.getters
+            const result = data.reduce((acc, item) => {
+                if (userId && (item.partys.some(obj => obj.value === userId && item.createBy !== userId) || (item.executor && item.executor.includes(userId)))) {
+                    acc.push(item)
+                }
+                return acc
+            }, [])
+            return result
+        },
+        /**
+         * 处理审核人数据
+         */
+        getPartysList (poList) {
+            const self = this
+            const result = poList.map(item => ({
+                value: item.party,
+                status: item.status,
+                label: (self.userOption.filter(o => o.value === item.party))[0].label,
+                type: 'success'
+            }))
+            return result
+        },
+        /**
+         * 处理审核人样式
+         */
+        getTagClass (party) {
+            switch (party.status) {
+                case '已通过':
+                    return 'el-tag--success'
+                case '已拒绝':
+                    return 'el-tag--danger'
+                case '待审核':
+                    return 'el-tag--primary'
+                default:
+                    return 'el-tag--primary'
+            }
+        },
+        /**
+         * 展示每行同意/不同意按钮 返回false则展示
+         */
+        showAgreeBtn (row) {
+            const { userId = '' } = this.$store.getters
+            const statusList = ['待审核', '审核中', '待审批']
+            if (!statusList.includes(row.status)) { // 申请单不在审核审批状态 不展示
+                return true
+            }
+            const partyObj = row.partys.find(item => item.value === userId)
+            // 当前用户是未审核的审核人 是未审批的审批人 展示
+            if (partyObj && partyObj.status === '待审核') {
+                return false
+            }
+            // 当前用户是未审批的审批人 展示
+            if (row.executor.includes(userId) && row.status !== '待审批') {
+                return false
+            }
+            return false
         },
         /**
          * 处理分页事件
@@ -309,15 +369,18 @@ export default {
          * 判断是否由审核进入审批状态
          */
         isNextStep (data) {
-            if (data.status === '待审核') {
+            if (data.status === '待审核' || data.status === '审核中') {
                 if (data.adjustmentDetailPoList.length > 0) { // 审核人数是否>0
-                    data.adjustmentDetailPoList.forEach((el) => {
-                        if (el.party) { // 判断多个审核人状态
-                            return '审核中'
-                        } else {
-                            return '待审批'
-                        }
-                    })
+                    const { userId = '' } = this.$store.getters
+                    const i = data.adjustmentDetailPoList.findIndex(item => item.party === userId)
+                    if (i !== -1) { // 把当前用户的调班申请审批状态改为已通过
+                        data.adjustmentDetailPoList[i].status = '已通过'
+                    }
+                    if (data.adjustmentDetailPoList.every(item => item.status === '已通过')) { // 判断多个审核人状态
+                        return '待审批'
+                    } else {
+                        return '审核中'
+                    }
                 } else {
                     return '待审批'
                 }
@@ -347,15 +410,17 @@ export default {
             }
             this.$common.request('update', updateParams).then(async () => {
                 const sonTableName = 't_adjustment_detail'
+                const { userId = '' } = this.$store.getters
                 const sonUpdateParams = {
                     tableName: sonTableName,
                     updList: [
                         {
                             where: {
-                                parent_id_: data.id
+                                parent_id_: data.id,
+                                party_: userId
                             },
                             param: {
-                                status_: data.status
+                                status_: key === 'agree' ? '已通过' : '已拒绝'
                             }
                         }]
                 }
@@ -391,6 +456,7 @@ export default {
             const tableName = 't_adjustment'
             let uparr = []
             let sonuparr = []
+            const { userId = '' } = this.$store.getters
             data.forEach((el) => {
                 if (el.status === '已通过' || el.status === '已拒绝') {
                     // this.$message.warning('所选数据中有已通过/已拒绝的申请单，请取消选择！')
@@ -407,10 +473,11 @@ export default {
                 })
                 sonuparr.push({
                     where: {
-                        parent_id_: el.id
+                        parent_id_: el.id,
+                        party_: userId
                     },
                     param: {
-                        status_: el.status
+                        status_: key === 'massAgree' ? '已通过' : '已拒绝'
                     }
                 })
             })
@@ -464,9 +531,11 @@ export default {
                     // 修改调班人排班数据
                     const index = this.getDays(startDate, el.beforeDate) // 计算得出是d几天
                     staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = staffScheduleDetailPoList[userResIndex][`d${index + 1}`].replace(el.beforeAdjust, el.afterAdjust)
-                    // 修改目标人排班数据
-                    const partyIndex = this.getDays(startDate, el.afterDate) // 计算得出是d几天
-                    staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`].replace(el.afterAdjust, el.beforeAdjust)
+                    if (data.type !== 'paiban') {
+                        // 修改目标人排班数据
+                        const partyIndex = this.getDays(startDate, el.afterDate) // 计算得出是d几天
+                        staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`].replace(el.afterAdjust, el.beforeAdjust)
+                    }
                 })
                 // 保存修改后的排班
                 submitData.staffScheduleDetailPoList = staffScheduleDetailPoList

@@ -82,7 +82,8 @@ export default {
                 requestPage: this.requestPage,
                 parameters: [
                     { key: 'Q^she_bei_bian_hao_^S', value: this.params.id },
-                    { key: 'Q^marks_^S', value: 'record' }
+                    { key: 'Q^marks_^S', value: 'record' },
+                    { key: 'Q^shi_shi_ri_qi_^SNE', value: 'value' } // 过滤空值 value需有值
                 ],
                 sorts: [
                     { field: 'bian_zhi_shi_jian', order: 'desc' }

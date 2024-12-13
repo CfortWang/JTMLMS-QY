@@ -19,6 +19,9 @@
             :task-id="taskId"
             :wai-jian="waiJian"
             :instance-id="instanceId"
+            :data-resultitem="dataResultitem"
+            :time-modification="timeModification"
+            :time-modificationbtn="timeModificationbtn"
             :task-change-id="taskChangeId"
             :copy-flow="copyFlow"
             :add-data-cont="addDataCont"
@@ -46,6 +49,18 @@ export default {
         },
         instanceId: { // 流程实例ID
             type: String
+        },
+        dataResultitem: { // 流程实例
+            type: Object
+        },
+        timeModification: { // 修改流程时间
+            type: Boolean,
+            default: false
+        },
+        // 修改流程时间按钮
+        timeModificationbtn: {
+            type: Boolean,
+            default: false
         },
         taskId: { // 流程任务ID
             type: String

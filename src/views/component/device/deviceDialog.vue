@@ -65,7 +65,7 @@
                                                 :multiple="false"
                                                 size="mini"
                                                 :filter="filter"
-                                                filterable
+                                                filtrate
                                                 style="width:100%"
                                             />
                                         </el-form-item>
@@ -81,7 +81,7 @@
                                                 size="mini"
                                                 style="width:100%"
                                                 :filter="filter"
-                                                filterable
+                                                filtrate
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -180,7 +180,7 @@
                                                 :multiple="false"
                                                 size="mini"
                                                 :filter="filter"
-                                                filterable
+                                                filtrate
                                                 style="width:100%"
                                             />
                                         </el-form-item>
@@ -389,7 +389,7 @@
                                                                 size="mini"
                                                                 style="width:100%"
                                                                 :filter="filter"
-                                                                filterable
+                                                                filtrate
                                                             />
                                                         </el-form-item>
                                                     </el-col>
@@ -773,7 +773,7 @@ export default {
                 { label: '停用、报废记录', name: 'seven', component: 'ScrappedRecord', isKeepAlive: true }
             ],
             filter: [{
-                descVal: '2',
+                descVal: '1',
                 includeSub: true,
                 old: 'position',
                 partyId: this.$store.getters.userInfo.employee.positions,

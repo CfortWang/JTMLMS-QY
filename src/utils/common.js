@@ -140,7 +140,7 @@ export const getFormatDate = (type, length, date = new Date()) => {
  */
 export const replaceNullWithEmpty = obj => {
     function replaceValue (value) {
-        if (value === null) {
+        if (value === null || typeof value === 'undefined') {
             return ''
         } else if (typeof value === 'object') {
             if (Array.isArray(value)) {

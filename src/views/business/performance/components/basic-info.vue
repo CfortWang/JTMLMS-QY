@@ -243,7 +243,7 @@ export default {
                         const end = new Date(that.info.jieShuShiJian)
                         return t.getTime() > end.getTime()
                     }
-                    return t.getTime() >= Date.now()
+                    return t.getTime() > Date.now()
                 }
             },
             endPickerOptions: {
@@ -252,9 +252,9 @@ export default {
                     // 禁用当前日期之后和开始日期之前的日期
                     if (that.info.kaiShiShiJian) {
                         const start = new Date(that.info.kaiShiShiJian)
-                        return t.getTime() < start.getTime() || t.getTime() >= Date.now()
+                        return t.getTime() < start.getTime() || t.getTime() > Date.now()
                     }
-                    return t.getTime() >= Date.now()
+                    return t.getTime() > Date.now()
                 }
             }
         }

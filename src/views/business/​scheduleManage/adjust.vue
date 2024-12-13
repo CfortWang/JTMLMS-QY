@@ -20,6 +20,11 @@
             <template slot="dateRange" slot-scope="scope">
                 <span>{{ `${scope.row.startDate} 至 ${scope.row.endDate}` }}</span>
             </template>
+            <template slot="partys" slot-scope="scope">
+                <span v-for="party in scope.row.partys" :key="party.value">
+                    <span :class="getTagClass(party)" class="el-tag el-tag--small el-tag--light" style="margin-left: 5px;">{{ party.label }}</span>
+                </span>
+            </template>
         </ibps-crud>
         <adjust-edit
             v-if="showAdjustEdit"
@@ -78,7 +83,8 @@ export default {
                 columns: [
                     { prop: 'createBy', label: '申请人', tags: userOption, width: 100 },
                     { prop: 'createTime', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
-                    { prop: 'executor', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', minWidth: 100 },
+                    { prop: 'partys', label: '审核人', fieldType: 'slot', slotName: 'partys', minWidth: 120 },
+                    { prop: 'executor', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', minWidth: 120 },
                     { prop: 'executeDate', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
                     { prop: 'reason', label: '调班原因', width: 150 },
                     { prop: 'status', label: '状态', tags: stateType, width: 100 },
@@ -105,6 +111,10 @@ export default {
             this.loading = true
             queryAdjustment(this.getSearchFormData()).then(res => {
                 ActionUtils.handleListData(this, res.data)
+                // 处理审核人数据
+                res.data.dataResult.forEach((el) => {
+                    el.partys = this.getPartysList(el.adjustmentDetailPoList)
+                })
                 this.loading = false
             }).catch(() => {
                 this.loading = false
@@ -143,6 +153,34 @@ export default {
                 this.pagination,
                 this.sorts
             )
+        },
+        /**
+         * 处理审核人数据
+         */
+        getPartysList (poList) {
+            const self = this
+            const result = poList.map(item => ({
+                value: item.party,
+                status: item.status,
+                label: (self.userOption.filter(o => o.value === item.party))[0].label,
+                type: 'success'
+            }))
+            return result
+        },
+        /**
+         * 处理审核人样式
+         */
+        getTagClass (party) {
+            switch (party.status) {
+                case '已通过':
+                    return 'el-tag--success'
+                case '已拒绝':
+                    return 'el-tag--danger'
+                case '待审核':
+                    return 'el-tag--primary'
+                default:
+                    return 'el-tag--primary'
+            }
         },
         /**
          * 处理分页事件
@@ -239,18 +277,18 @@ export default {
                             }
                         }]
                 }
-                await this.$common.request('update', sonUpdateParams) // 更新子表
-                ActionUtils.successMessage()
-                this.search()
-                // 告知审核人该单已取消
-                // sendMessage(data, data.createBy)
+                // 更新子表
+                this.$common.request('update', sonUpdateParams).then(() => {
+                    ActionUtils.successMessage()
+                    this.search()
+                    // 告知审核人该单已取消(除非是自己的排版变更取消)
+                    if (data.dbType !== 'paiban') {
+                        data.adjustmentDetailPoList.forEach((el) => { // 遍历子表提取审核人字段
+                            sendMessage(data, el.party)
+                        })
+                    }
+                }).catch((e) => { console.error(e) })
             }).catch((e) => { console.error(e) })
-            /*
-            saveAdjustment(data).then(() => {
-                ActionUtils.successMessage()
-                this.search()
-            }).catch((e) => { console.error(e) })
-            */
         },
         /**
          * 处理删除

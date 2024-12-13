@@ -361,6 +361,7 @@ export default {
             // 初始化表单数据的方法
             const initializeFormData = (data) => {
                 const { scheduleId, reason, executor, executeDate, adjustmentDetailPoList } = data || {}
+                this.reScheduleValue = data.type
                 // this.reScheduleValue = 'paiban'
                 self.formData = {
                     scheduleId,
@@ -789,7 +790,16 @@ export default {
                     diDian: second || first,
                     overview: getOverview(adjustList),
                     status: statusVal,
+                    type: this.reScheduleValue,
+                    /*
+                    dataStatus: "string",
+                    delBeforeSave: true,
+                    dsAlias: "string",
+                    executeDate: '',
+                    "type": "string",
+                    */
                     executor: this.scheduleInfo.executor.replace(/\[|\]|\"/g, '').replace(/,/g, ',') || '',
+                    // type: this.reScheduleValue,
                     adjustmentDetailPoList: adjustList.map(i => ({
                         recordId: i.recordId,
                         beforeDate: i.beforeDate,
@@ -802,18 +812,6 @@ export default {
                 }
                 this.submitForm(submitData)
                 // sendMessage(submitData, '1169304256906264576')
-                // 提交后通知审核人、审批人
-                if (statusVal === '待审核') {
-                    const partyArray = adjustList.map(obj => obj.party)
-                    partyArray.forEach(el => {
-                        sendMessage(submitData, el)
-                    })
-                } else if (statusVal === '待审批') {
-                    const executorList = submitData.executor.split(',')
-                    executorList.forEach(el => {
-                        sendMessage(submitData, el)
-                    })
-                }
             })
         },
         // 提交数据
@@ -822,6 +820,18 @@ export default {
                 this.$message.success(`${this.params.action === 'edit' ? '提交' : '申请'}成功`)
                 this.closeDialog()
                 this.$emit('refresh')
+                // 提交后通知审核人、审批人
+                if (data.status === '待审核') {
+                    const partyArray = data.adjustmentDetailPoList.map(obj => obj.party)
+                    partyArray.forEach(el => {
+                        sendMessage(data, el)
+                    })
+                } else if (data.status === '待审批') {
+                    const executorList = data.executor.split(',')
+                    executorList.forEach(el => {
+                        sendMessage(data, el)
+                    })
+                }
             })
         },
         handleAddParam () {

@@ -337,6 +337,10 @@ export default {
                 ActionUtils.warning('请选择部门')
                 return
             }
+            if (vo.positionVoList.filter(i => i.isMainPost === true).length === 0) {
+                ActionUtils.warning('请设置主部门')
+                return
+            }
             this.dialogLoading = true
             if (!attrValidator && this.isSuper) {
                 ActionUtils.warning('请检查扩展属性是否填写正确')

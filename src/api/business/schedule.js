@@ -236,6 +236,9 @@ export function sendMessage (data, receiverId) {
         case '已通过':
             content = '调班申请单[' + data.overview + ']' + ' 已通过'
             break
+        case '已取消':
+            content = '调班申请单[' + data.overview + ']' + '已取消'
+            break
         default:
             // 如果data.status的值不在上述列举的情况中，可以在这里添加默认处理逻辑
             content = '调班申请单[' + data.overview + ']'

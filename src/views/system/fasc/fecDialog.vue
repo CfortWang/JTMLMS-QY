@@ -59,8 +59,10 @@
                                     template-key="fjzly"
                                     :multiple="false"
                                     :temp-search="true"
-                                    label-value="fang_jian_ming_ha"
+                                    label-key="fang_jian_ming_ha"
                                     value-key="fang_jian_ming_ha"
+                                    :allow-create="false"
+                                    :filterable="false"
                                     @change-link-data="fangJianChange"
                                 />
                             </el-form-item>
@@ -75,8 +77,10 @@
                                     template-key="fjzly"
                                     :multiple="false"
                                     :temp-search="true"
-                                    label-value="fang_jian_ming_ha"
+                                    label-key="fang_jian_ming_ha"
                                     value-key="fang_jian_ming_ha"
+                                    :allow-create="false"
+                                    :filterable="false"
                                     @change-link-data="fangJianChange"
                                 />
                             </el-form-item>
@@ -103,8 +107,10 @@
                                     template-key="jksbxz"
                                     :multiple="false"
                                     :temp-search="true"
-                                    label-value="deviceInfo"
+                                    label-key="deviceInfo"
                                     value-key="deviceInfo"
+                                    :allow-create="false"
+                                    :filterable="false"
                                     @change-link-data="deviceno2Change"
                                 />
                             </el-form-item>
@@ -139,8 +145,10 @@
                                     template-key="sbxzsshj"
                                     :multiple="false"
                                     :temp-search="true"
-                                    label-value="yuan_she_bei_bian"
+                                    label-key="yuan_she_bei_bian"
                                     value-key="yuan_she_bei_bian"
+                                    :allow-create="false"
+                                    :filterable="false"
                                     @change-link-data="deviceno1Change"
                                 />
                             </el-form-item>

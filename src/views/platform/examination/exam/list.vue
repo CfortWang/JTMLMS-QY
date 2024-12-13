@@ -85,7 +85,8 @@ export default {
     },
     mixins: [FixHeight],
     data () {
-        const roleList = ['xtgljs', 'pxglxzfzr']
+        // const roleList = ['xtgljs', 'pxglxzfzr']
+        const roleList = ['xtgljs']
         const { isSuper, role, userId, userList = [] } = this.$store.getters || {}
         const { first, second } = this.$store.getters.level || {}
         const hasRole = isSuper || role.some(r => roleList.includes(r.alias))
@@ -193,7 +194,7 @@ export default {
                             type: 'primary',
                             icon: 'ibps-icon-edit',
                             hidden: (row, index) => {
-                                return row.examState !== '未发布'
+                                return row.examState !== '未发布' || (!this.hasRole && this.userId !== row.createBy)
                             }
                         },
                         {

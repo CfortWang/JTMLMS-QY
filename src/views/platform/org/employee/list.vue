@@ -642,7 +642,8 @@ export default {
                 email: '邮箱',
                 mobile: '手机号码',
                 address: '地址',
-                unit: '单位名称'
+                unit: '单位名称',
+                mainDept: '主部门'
             }
             const importColumn = Object.keys(column).map(key => {
                 return {
@@ -669,13 +670,18 @@ export default {
         },
         // 组装导入数据
         async handleImportData (list) {
-            const hasError = list.some(i => !i.dept || !i.role)
+            const { deptList = [] } = this.$store.getters || {}
+            list.forEach(item => {
+                const mainDept = deptList.find(i => i.positionName === item.mainDept.trim().replace(/\r/g, ''))
+                item.mainDept = mainDept?.positionId || ''
+            })
+            const hasError = list.some(i => !i.dept || !i.role || !i.mainDept)
             if (hasError) {
-                return this.$message.error('存在【所属部门】或【岗位角色】为空的数据，请检查后再尝试！')
+                return this.$message.error('存在【所属部门】、【主部门】或【岗位角色】异常的数据，请检查后再尝试！')
             }
             console.log(list)
             const roleList = await this.getRoleList()
-            const { deptList = [] } = this.$store.getters || {}
+
             const roleItem = {
                 pk: '',
                 ip: null,
@@ -712,7 +718,8 @@ export default {
                 hasChild: false
             }
             const createParams = []
-            list.forEach(item => {
+            for (let i = 0; i < list.length; i++) {
+                const item = list[i]
                 const userItem = {
                     id: '',
                     account: item.account,
@@ -769,13 +776,16 @@ export default {
                     posItemList,
                     roleItemList
                 }
+                if (user.positions.indexOf(item.mainDept) < 0) {
+                    return this.$message.error(`第${i + 1}行主部门不在所属部门范围内`)
+                }
                 const employee = {
                     partyEmployeePo: user,
                     user,
                     positionVoList: posItemList.map(p => ({
                         id: p.id,
                         name: p.name,
-                        isMainPost: false,
+                        isMainPost: item.mainDept === p.id,
                         isPrincipal: false
                     })),
                     roleVoList: roleItemList.map(r => ({
@@ -789,7 +799,7 @@ export default {
                     userGroupPoList: []
                 }
                 createParams.push(employee)
-            })
+            }
             console.log(createParams)
             this.createEmployee(createParams)
         },

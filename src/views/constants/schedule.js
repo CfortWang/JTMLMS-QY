@@ -176,7 +176,7 @@ export const stateType = [
     {
         label: '审核中',
         value: '审核中',
-        type: 'info'
+        type: 'primary'
     },
     {
         label: '待审批',
