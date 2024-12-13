@@ -160,6 +160,8 @@ export default {
             data.buttons.function_buttons = this.dealButtom(data.buttons.function_buttons)
             // 增加过滤信息
             data.filter_conditions = this.dealFilter(data.filter_conditions)
+            // 处理查询条件默认值，数据模板中的查询条件默认值如果与模板归档中的配置冲突，则优先使用归档中的配置
+            data.query_columns = this.dealQueryColumns(data.query_columns)
             return [data]
         },
         dealButtom (buttons) {
@@ -192,7 +194,7 @@ export default {
                 ]
             }
             const newDataList = dataList.map(data => {
-                const rules = data.filter.rules.filter(i => i.id !== 'find_in_set' && !i.value.includes('cscript.findPositionId()'))
+                const rules = data.filter.rules.filter(i => i.id !== 'find_in_set' && !i.value.includes('cscript.findPositionId'))
                 const newRules = [
                     ...this.filterParams.map(item => ({
                         id: item.field,
@@ -204,14 +206,31 @@ export default {
                     levelFilter
                 ]
                 // 关联关系固定为AND
-                return { ...data, filter: { ...data.filter, condition: 'AND', rules: newRules }}
+                return { ...data, filter: { ...data.filter, condition: 'AND', rules: newRules.filter(i => i) }}
             })
             return newDataList
+        },
+        dealQueryColumns (data) {
+            if (!data || !data.length || !this.filterParams || !this.filterParams.length) {
+                return []
+            }
+            const allParamsKey = this.filterParams.map(i => i.field)
+            data.forEach(item => {
+                if (allParamsKey.includes(item.name)) {
+                    item.default_value = undefined
+                }
+            })
+            return data
         },
         // 获取当前用户地点信息 equal-等于 in-在…之内
         getLevelFilter () {
             const { second = '' } = this.$store.getters.level
             const { deptList = [] } = this.$store.getters
+            // 当参数中含有地点配置时，无需再额外处理
+            const hasLocationParams = this.filterParams.some(i => i.id === 'di_dian_' && i.value.includes('cscript.findPositionId'))
+            if (hasLocationParams) {
+                return undefined
+            }
             if (second) {
                 return {
                     field: 'di_dian_',
