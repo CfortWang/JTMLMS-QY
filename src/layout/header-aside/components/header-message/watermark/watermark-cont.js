@@ -12,13 +12,13 @@ const setWatermark = (str = null, str1 = null) => { // 传入多个str 或者传
     can.height = 300
 
     const cans = can.getContext('2d')
-    cans.rotate(-20 * Math.PI / 180)
+    cans.rotate(-25 * Math.PI / 180)
     cans.font = '22px Vedana'
     cans.fillStyle = '#E7ECF0'
     cans.textAlign = 'left'
     cans.textBaseline = 'Middle'
-    cans.fillText(str, can.width / 20, can.height / 1.5)
-    cans.fillText(str1, can.width / 20, can.height / 1.3) // 这里渲染多行就可以展示多行，具体效果看上图，这里要调整高度的比例就可以做到换行的效果
+    cans.fillText(str, 0, can.height / 1.5)
+    cans.fillText(str1, 0, can.height / 1.3) // 这里渲染多行就可以展示多行，具体效果看上图，这里要调整高度的比例就可以做到换行的效果
 
     const div = document.createElement('div')
     div.id = id
