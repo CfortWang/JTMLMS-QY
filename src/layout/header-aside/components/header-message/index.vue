@@ -164,7 +164,7 @@ export default {
                 })
             }
             const limitDate = new Date(notAfter).toLocaleDateString('zh-CN')
-            Watermark.set(`${customerInfo}试用版本`, `试用日期截止至${limitDate}`)
+            Watermark.set(`${customerInfo}`, `试用日期截止至${limitDate}`)
         }
         this.loadData()
         Bus.$on('getMessageCount', count => {
