@@ -76,20 +76,6 @@
                                 >{{ scope.row.file_info_ }}</el-tag>
                             </div>
                         </template>
-                        <!-- 阅览/收藏具名插槽 -->
-                        <template
-                            slot="readStatus"
-                            slot-scope="scope"
-                        >
-                            <img
-                                :src="scope.row.cy_id_ ? openFilePng : closeFilePng"
-                                style="vertical-align: middle; height: 30px;"
-                            > /
-                            <img
-                                :src="scope.row.sc_id_ ? hadColetcPng : noColectPng"
-                                style="vertical-align: middle; height: 30px;"
-                            >
-                        </template>
                         <template v-if="showCaoZuoColumn" slot="caozuo" slot-scope="scope">
                             <div style="color:#1E90FF; " class="hover-hand" @click="updateDate(scope)">
                                 <i class="el-icon-edit-outline" style="cursor: pointer;" />
@@ -149,20 +135,15 @@
 </template>
 <script>
 import ActionUtils from '@/utils/action'
-import { getFileType, getFileByUserId } from '@/api/permission/file'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import FixHeight from '@/mixins/height'
 import IbpsTypeTree from '@/business/platform/cat/type/tree'
-import { findTreeData } from '@/api/platform/cat/type'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import closeFilePng from '@/assets/images/icons/closeFile.png'
 import openFilePng from '@/assets/images/icons/openFile.png'
-import hadColetcPng from '@/assets/images/icons/hadColetc.png'
-import noColectPng from '@/assets/images/icons/noColect.png'
 import wordPng from '@/assets/images/icons/word.png'
 import fileTraining from '@/views/component/fileTraining'
-import column from '@/components/ibps-crud/mixin/column'
 import UpdateFile from './updateFile'
 
 export default {
@@ -175,20 +156,14 @@ export default {
     },
     mixins: [FixHeight],
     data () {
-        const depArrs = []
-        var fileDownloadAuthority = false
-        const { deptList, role } = this.$store.getters
-        for (var i of deptList) {
-            depArrs.push(`wj.bian_zhi_bu_men_ like '${i.positionId}'`)
-        }
-        const roleKey = ['xtgljs', 'syszr', 'dagly', 'xxgljs']
-        for (const i of roleKey) {
-            if (role.some(so => { return so.alias === i })) {
-                fileDownloadAuthority = true
-                break
-            }
-        }
+        const roleList = ['xtgljs', 'syszr', 'wjglzzc', 'wjgly', 'wjxzjs']
+        const { isSuper, role, deptList = [] } = this.$store.getters || {}
+        const hasRole = isSuper || role.some(r => roleList.includes(r.alias))
+        const depArrs = deptList.map(i => `wj.bian_zhi_bu_men_ like '${i.positionId}'`)
         return {
+            isSuper,
+            hasRole,
+            depArrs,
             dialogFormVisibles: false,
             fileLookShow: false,
             sonData: '',
@@ -198,7 +173,7 @@ export default {
             //   rightsArr: ['join', 'delete'],
             //   rowHandle: true,
             width: 210,
-            oldorgId: '',
+            oldorgId: null,
             height: document.clientHeight,
             loading: false,
             filterText: '',
@@ -224,12 +199,7 @@ export default {
             listConfig: {
                 // 工具栏
                 toolbars: [
-                    { key: 'search' },
-                    {
-                        key: 'colect',
-                        label: '收藏或取消收藏',
-                        type: 'success'
-                    }
+                    { key: 'search' }
                 ],
                 // 查询条件
                 searchForm: {
@@ -258,11 +228,7 @@ export default {
                 buMenAuthority: [],
                 authority: []
             }, // 存放所点击列表的分类信息
-            depArrs,
-            fileDownloadAuthority,
             closeFilePng,
-            hadColetcPng,
-            noColectPng,
             openFilePng,
             wordPng,
             dialogVisible: false,
@@ -297,15 +263,12 @@ export default {
                 { prop: 'wen_jian_ming_che', label: '文件名称' }
             ]
             this.listConfig.columns = [
-                { prop: 'status', label: '阅览 / 收藏', slotName: 'readStatus', width: 100 },
                 // { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', minWidth: 100 },
                 { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 150 },
                 { prop: 'wen_jian_ming_che', label: '文件名称', minWidth: 150 },
                 { prop: 'ban_ben_', label: '版本', width: 65 },
                 { prop: 'file_info_', label: '查阅', slotName: 'wenjinachayue', minWidth: 150 },
                 { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom', width: 150 },
-                // { prop: 'read', label: '阅览状态', slotName: 'readStatus', minWidth: 60 },
-                // { prop: 'collect', label: '收藏状态', slotName: 'collectStatus', minWidth: 60 },
                 { prop: 'cha_yue_jie_zhi_s', label: '查阅截止时间', sortable: 'custom', minWidth: 120 }
             ]
         }
@@ -321,8 +284,8 @@ export default {
                 { prop: 'biao_dan_ming_che', label: '表单名称', width: 250 },
                 { prop: 'shi_wu_shuo_ming_', label: '事务说明', width: 250 },
                 { prop: 'fu_jian_', label: '附件', slotName: 'file', minWidth: 250 },
-                { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 120 },
-                { prop: 'ry_name', label: '上传人', width: 70 }
+                { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 140 },
+                { prop: 'ry_name', label: '上传人', width: 90 }
             ]
         }
     },
@@ -557,13 +520,14 @@ export default {
             return columns.filter(column => column.prop !== prop)
         },
         handleNodeClick (nodeId, nodeData, treeDatas) {
-            if (nodeData.name !== '文件分类') {
-                const pathId = nodeData.path.split('.')
+            // 判断是否显示外部文件更新按钮
+            if (nodeData.depth !== 0) {
+                const pathId = nodeData.path ? nodeData.path.split('.') : []
                 const pathNameList = pathId.map(id => {
                     const node = treeDatas.find(item => item.id === id)
                     return node ? node.name : ''
                 })
-                if (pathNameList.includes('外部文件') && this.$store.getters.isSuper) {
+                if (pathNameList.includes('外部文件') && this.isSuper) {
                     this.showCaoZuoColumn = true
                     if (!this.hasColumnByProp(this.listConfig.columns, 'cao_zuo')) {
                         this.listConfig.columns.push({ prop: 'cao_zuo', label: '操作', slotName: 'caozuo', width: 100 })
@@ -576,11 +540,12 @@ export default {
             this.show = 'detail'
             this.addDataCont = { fenLei: nodeData.name, fenLeiId: nodeId }
             const fileTypes = []
-            if (this.oldorgId === nodeId && (nodeData.name !== '文件分类')) {
+            // 避免重复请求
+            if (this.oldorgId === nodeId) {
                 return
             }
             // 判断是否存在下级菜单
-            const noHadNext = nodeData.children === undefined
+            const noHadNext = !nodeData.children || !nodeData.children.length
             if (noHadNext && this.pageKey === 'wjkzgl-ywyxjlsc') {
                 const chongfu = this.listConfig.toolbars.filter(el => {
                     return el.key === 'add'
@@ -600,37 +565,41 @@ export default {
                 shiJiSql: [],
                 sheBeiSql: []
             }
-            // 判断是否有下级菜单
-            if (nodeData.children === undefined) {
-                const authorityName = JSON.parse(nodeData.authorityName)
+            const processAuthority = (nodeId, authorityName) => {
                 fileTypes.push(nodeId)
-                if (authorityName.chaYue === '公用查阅') {
-                    this.fileTypesDatas.comAuthority.push(nodeId)
+                if (!authorityName || !authorityName.chaYue) {
+                    return
                 }
-                if (authorityName.chaYue === '部门查阅') {
-                    this.fileTypesDatas.buMenAuthority.push(nodeId)
-                }
-                if (authorityName.chaYue === '受限查阅') {
-                    this.fileTypesDatas.authority.push(nodeId)
-                }
-            } else {
-                const getTail = item => item.children && item.children.length > 0 ? item.children.map(m => getTail(m)) : [item]
-                // eslint-disable-next-line no-undef
-                const result = _.flattenDeep(nodeData.children.map(m => getTail(m)))
-                for (var i of result) {
-                    fileTypes.push(i.id)
-                    const authorityName = JSON.parse(i.authorityName)
-                    if (authorityName.chaYue === '公用查阅') {
-                        this.fileTypesDatas.comAuthority.push(i.id)
-                    }
-                    if (authorityName.chaYue === '部门查阅') {
-                        this.fileTypesDatas.buMenAuthority.push(i.id)
-                    }
-                    if (authorityName.chaYue === '受限查阅') {
-                        this.fileTypesDatas.authority.push(i.id)
-                    }
+                switch (authorityName.chaYue) {
+                    case '公用查阅':
+                        this.fileTypesDatas.comAuthority.push(nodeId)
+                        break
+                    case '部门查阅':
+                        this.fileTypesDatas.buMenAuthority.push(nodeId)
+                        break
+                    case '受限查阅':
+                        this.fileTypesDatas.authority.push(nodeId)
+                        break
                 }
             }
+            // 递归获取所有子节点
+            // 存在子节点时，需获取当前节点及所有子节点信息 - task3329
+            const getTail = item => {
+                const result = [item] // 将自身信息添加到结果中
+                if (item.children && item.children.length > 0) {
+                    // 如果有子节点，则递归获取子节点的信息
+                    item.children.forEach(child => {
+                        result.push(...getTail(child)) // 将子节点信息添加到结果中
+                    })
+                }
+                return result
+            }
+
+            const result = getTail(nodeData)
+            result.forEach(({ id, authorityName }) => {
+                const parsedAuthority = JSON.parse(authorityName)
+                processAuthority(id, parsedAuthority)
+            })
             this.oldorgId = nodeId
             this.sqlWhere = {
                 fileType: fileTypes.join(',')
@@ -648,15 +617,15 @@ export default {
             this.refreshData()
         },
         /**
-     * 获取格式化参数
-     */
+         * 获取格式化参数
+         */
         getSearcFormData () {
             this.searchWhere = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             //   this.getDatas()
         },
         /**
- * 处理按钮事件
- */
+         * 处理按钮事件
+         */
         handleAction (command, position, selection, data, index, button) {
             switch (command) {
                 case 'search':// 查询
@@ -705,8 +674,8 @@ export default {
             }
         },
         /**
-    * 处理排序
-    */
+        * 处理排序
+        */
         handleSortChange (sort) {
             this.sqlWhere.sorts = sort
             this.getDatas()
@@ -729,9 +698,6 @@ export default {
                 this.bianlistData.dataResult = JSON.parse(JSON.stringify(filterDatas))
             }
             ActionUtils.handleListData(this, this.bianlistData)
-        },
-        getScSrc (id) {
-            return id ? this.hadColetcPng : this.noColectPng
         },
         async handleColect (data) {
             const addScDatas = []
