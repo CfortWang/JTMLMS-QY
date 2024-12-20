@@ -217,6 +217,7 @@
                     </el-table-column>
                 </el-table>
             </div>
+            <!--
             <div class="config-item">
                 <div class="title">
                     <i class="ibps-icon-star" />
@@ -235,44 +236,45 @@
                         {{ btn.label }}
                     </el-button>
                 </div>
-                <el-table
-                    ref="ruleTable"
-                    :data="formData.scheduleRule"
-                    border
-                    stripe
-                    highlight-current-row
-                    style="width: 100%"
-                    :max-height="maxHeight"
-                    class="rule-table"
-                    @selection-change="selection => handleSelectionChange(selection, 'scheduleRule')"
+               
+            <el-table
+                ref="ruleTable"
+                :data="formData.scheduleRule"
+                border
+                stripe
+                highlight-current-row
+                style="width: 100%"
+                :max-height="maxHeight"
+                class="rule-table"
+                @selection-change="selection => handleSelectionChange(selection, 'scheduleRule')"
+            >
+                <el-table-column type="selection" width="45" header-align="center" align="center" />
+                <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
+                <el-table-column
+                    v-for="(item, fIndex) in ruleColumn"
+                    :key="fIndex"
+                    :prop="item.key"
+                    :label="item.label"
+                    :width="item.width"
+                    :min-width="item.minWidth"
+                    header-align="center"
+                    align="center"
                 >
-                    <el-table-column type="selection" width="45" header-align="center" align="center" />
-                    <el-table-column type="index" label="序号" width="50" header-align="center" align="center" />
-                    <el-table-column
-                        v-for="(item, fIndex) in ruleColumn"
-                        :key="fIndex"
-                        :prop="item.key"
-                        :label="item.label"
-                        :width="item.width"
-                        :min-width="item.minWidth"
-                        header-align="center"
-                        align="center"
-                    >
-                        <template slot-scope="scope">
-                            <el-switch
-                                v-if="item.type === 'switch'"
-                                v-model="scope.row[item.key]"
-                                :disabled="readonly"
-                            />
-                            <el-input
-                                v-else
-                                v-model="scope.row[item.key]"
-                                :disabled="readonly"
-                            />
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </div>
+                    <template slot-scope="scope">
+                        <el-switch
+                            v-if="item.type === 'switch'"
+                            v-model="scope.row[item.key]"
+                            :disabled="readonly"
+                        />
+                        <el-input
+                            v-else
+                            v-model="scope.row[item.key]"
+                            :disabled="readonly"
+                        />
+                    </template>
+                </el-table-column>
+            </el-table>
+            </div> -->
         </el-form>
         <add-classes
             :visible.sync="showSchedule"

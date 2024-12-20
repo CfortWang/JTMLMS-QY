@@ -111,7 +111,7 @@ export default {
     },
     computed: {
         shiFouGuoShen () {
-            if (!this.formData.shiFouGuoShen || this.formData.shiFouGuoShen === '已退回') {
+            if (!this.formData.shiFouGuoShen || this.formData.shiFouGuoShen === '已退回' || this.formData.shiFouGuoShen === '已暂存') {
                 return true
             }
             return false

@@ -280,18 +280,25 @@
                         </el-col>
                     </el-row>
                     <el-row v-show="lei_xing_!=='12-紫外灯消毒'">
-                        <el-col :span="22">
-                            <el-form-item label="控制条件：">
-                                <el-input v-model="form.kong_zhi_tiao_jia" type="textarea" :rows="2" size="mini" />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row>
                         <el-col :span="24">
-                            <FacilityData v-if="form.lie_biao_shu_ju_" :is-cul="false" :form-data="{lieBiaoShuJu:form.lie_biao_shu_ju_}" @change-data="onFacilityData" />
-                        </el-col>
-                    </el-row>
-                </el-form>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="控制条件：">
+                                        <el-input v-model="form.kong_zhi_tiao_jia" type="textarea" :rows="2" size="mini" style="width:80%" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="控制标准：">
+                                        <el-input v-model="form.kong_zhi_biao_zhu" type="textarea" :rows="2" size="mini" style="width:80%" />
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="24">
+                                    <FacilityData v-if="form.lie_biao_shu_ju_" :is-cul="false" :form-data="{lieBiaoShuJu:form.lie_biao_shu_ju_}" @change-data="onFacilityData" />
+                                </el-col>
+                            </el-row>
+                        </el-col></el-row></el-form>
             </div>
         </div>
         <span slot="footer" class="dialog-footer">
@@ -350,6 +357,7 @@ export default {
                 jian_ce_gang_wei_: '',
                 shi_fou_qi_yong_: '1',
                 kong_zhi_tiao_jia: '',
+                kong_zhi_biao_zhu: '',
                 jian_ce_ri_qi_: '',
                 ri_qi_lie_biao_: '',
                 zi_wai_deng_wai_j: '', // 紫外灯外键
@@ -710,6 +718,7 @@ export default {
                 this.form.jian_ce_gang_wei_ = parentForm.gang_wei_
                 this.form.jian_ce_ri_qi_ = parentForm.jian_ce_ri_qi_
                 this.form.kong_zhi_tiao_jia = parentForm.tiao_jian_
+                this.form.kong_zhi_biao_zhu = parentForm.kong_zhi_biao_zhu
                 this.form.jian_ce_zhou_qi_ = parentForm.zhou_qi_
                 this.form.ri_qi_lie_biao_ = parentForm.ri_qi_lie_biao_
                 this.form.lie_biao_shu_ju_ = parentForm.lie_biao_shu_ju_

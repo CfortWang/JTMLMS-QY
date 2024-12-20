@@ -131,7 +131,7 @@
                     <el-radio-group v-model="form.biDuiLeiXing">
                         <el-radio label="能力验证（PT）">能力验证（PT）</el-radio>
                         <el-radio label="室间质评（EQA）">室间质评（EQA）</el-radio>
-                        <el-radio label="室间比对">室间比对</el-radio>
+                        <el-radio label="实验室比对">实验室比对</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-row>
@@ -159,7 +159,7 @@
                         label-key="ming_cheng_"
                     />
                 </el-form-item>
-                <el-form-item v-if="form.biDuiLeiXing=='室间质评（EQA）'||form.biDuiLeiXing=='室间比对'" label="室间质评组织方或室间比对方" prop="shiYanShiJianBiDu">
+                <el-form-item v-if="form.biDuiLeiXing=='室间质评（EQA）'||form.biDuiLeiXing=='实验室比对'" label="室间质评组织方或室间比对方" prop="shiYanShiJianBiDu">
                     <ibps-link-data
                         v-model="form.shiYanShiJianBiDu"
                         style="height: 28px;line-height: 28px;font-size: 14px;"
@@ -396,7 +396,7 @@ export default {
                     this.form.shiYanShiJianBiDu = ''
                 } else if (value === '室间质评（EQA）') {
                     this.form.zuZhiDanWei = ''
-                } else if (value === '室间比对') {
+                } else if (value === '实验室比对') {
                     this.form.zuZhiDanWei = ''
                 }
             }
@@ -530,7 +530,7 @@ export default {
                 columns: this.getDataValue(),
                 data: [],
                 nameKey: 'name',
-                title: '室间质评活动计划一览表'
+                title: '外部质量控制活动计划'
             }).then(() => {
                 ActionUtils.success('导出成功')
             })
@@ -540,7 +540,7 @@ export default {
             const columns = [
                 {
                     field_name: 'biDuiLeiXing',
-                    label: '能力验证类型',
+                    label: '验证类型',
                     name: 'biDuiLeiXing'
                 },
                 {
@@ -555,7 +555,7 @@ export default {
                 },
                 {
                     field_name: 'shiYanShiJianBiDu',
-                    label: '室间质评组织方或比对方',
+                    label: '室间质评组织方或室间比对方',
                     name: 'shiYanShiJianBiDu'
                 },
                 {

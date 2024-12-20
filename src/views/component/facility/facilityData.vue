@@ -184,6 +184,7 @@ export default {
             const result = []
             if (this.isFirst) {
                 console.log(ans)
+                console.log('formData', this.formData)
             }
             ans.forEach(item => {
                 if (!Object.hasOwn(item, 'label')) {
@@ -221,8 +222,13 @@ export default {
                 }
 
                 // this.formData.jianCeShiJian = '2024-10-20' // 测试用
-                if (item.rate && this.formData.jianCeShiJian) {
-                    const jianCeShiJian = this.formData.jianCeShiJian.slice(0, 10)
+                if (!item.result && (item.rate && (this.formData.jianCeShiJian || this.readonly))) {
+                    let jianCeShiJian = ''
+                    if (this.readonly) {
+                        jianCeShiJian = this.formData.bianZhiShiJian?.slice(0, 10)
+                    } else {
+                        jianCeShiJian = this.formData.jianCeShiJian?.slice(0, 10)
+                    }
                     const thatDate = new Date(jianCeShiJian)
                     let day = thatDate.getDay() // 周几
                     if (day === 0) { // 周日得到结果为0 需要特判

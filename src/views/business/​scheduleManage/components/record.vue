@@ -66,7 +66,7 @@ export default {
                 return
             }
             // const sql = `select a.id_ as dataId, a.parent_id_ as parentId, a.record_id_ as recordId, a.before_adjust_ as beforeAdjust, a.before_date_ as beforeDate, a.after_adjust_ as afterAdjust, a.after_date_ as afterDate, a.party_ as party, b.create_by_ as createBy, date_format(b.create_time_,'%Y-%m-%d %H:%i') AS createTime, b.di_dian_ as location, b.reason_ as reason, b.executor_ as executor, b.execute_date_ as executeDate, b.overview_ as overview, b.schedule_id_ as scheduleId from t_adjustment_detail a left join t_adjustment b on a.parent_id_ = b.id_ and b.schedule_id_ = '${this.scheduleId}'`
-            const sql = 'select * from t_adjustment where status in ( "已通过") and schedule_id_ = ' + this.scheduleId
+            const sql = 'select * from t_adjustment where status in ( "已通过") and schedule_id_ = ' + this.scheduleId + ' order by update_time_ DESC'
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {

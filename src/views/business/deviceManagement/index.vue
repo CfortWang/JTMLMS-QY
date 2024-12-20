@@ -187,6 +187,14 @@ export default {
 
                 const scrapDataList=JSON.parse(JSON.stringify(scrapData))
                 for (var i = 0; i < scrapData.length; i++) {
+                    if (i < scrapData.length - 1) {
+                        const a = JSON.parse(JSON.stringify(scrapData[i][1]))
+                        const b = JSON.parse(JSON.stringify(scrapData[i + 1][1]))
+                        if (parseInt(a) < parseInt(b)) {
+                            scrapData[i][1] = b
+                            scrapData[i + 1][1] = a
+                        }
+                    }
                 scrapDataList[i][0] = scrapData[i][4]
                 scrapDataList[i][1] = scrapData[i][5]
                 scrapDataList[i][2] = scrapData[i][3]

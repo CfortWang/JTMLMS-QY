@@ -654,10 +654,11 @@ export function buildComponent (name, column, preview, vm) {
                             // next: '<i class="icon-chevron-right">前进</i>'
                         },
                         headerToolbar: { // 日历头部按钮位置
-                            left: 'prev,next today',
+                            // left: 'prev,next today',
                             // start: '',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                            right: 'prev,next today',
+                            center: 'title'
+                            // right: 'dayGridMonth,timeGridWeek,timeGridDay'
                             // end: 'prev,next,today,month,agendaWeek,agendaDay,listWeek'
                         },
                         events: this.scheduleData, // 日程数组

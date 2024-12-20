@@ -472,9 +472,9 @@ export default {
         updateFile () {
             const hasRole = localStorage.getItem('hasHighRole') || 0
             // const roleKey = ['xtgljs', 'wjglzzc', 'wjgly', 'zhsfzr']
-            const curRole = this.role.map(i => i.alias)
+            // const curRole = this.role.map(i => i.alias)
             // const isPower = curRole.some(i => roleKey.includes(i))
-            if (this.isSuper || hasRole === 1) {
+            if (this.isSuper || hasRole == 1) {
                 const a = document.createElement('a')
                 a.href = this.optionFile.url
                 a.download = this.optionFile.data.fileName

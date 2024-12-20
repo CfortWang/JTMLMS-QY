@@ -32,6 +32,7 @@
                         filterable
                         clearable
                         placeholder="请选择"
+                        value-key="id_"
                     >
                         <el-option
                             v-for="item in field.options"
@@ -183,6 +184,9 @@ export default {
                 }
                 .el-select {
                     width: 100%;
+                }
+                .el-range-editor--small.el-input__inner {
+                    width: calc(100% - 100px);
                 }
             }
         }

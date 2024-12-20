@@ -137,6 +137,11 @@
                                 <el-input v-model="form.tiao_jian_" type="textarea" :rows="2" size="mini" style="width:100%" />
                             </el-form-item>
                         </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="默认控制标准：">
+                                <el-input v-model="form.kong_zhi_biao_zhu" type="textarea" :rows="2" size="mini" style="width:100%" />
+                            </el-form-item>
+                        </el-col>
                     </el-row>
                     <el-row :gutter="20">
                         <el-col :span="24">

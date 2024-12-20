@@ -188,6 +188,7 @@ export default {
             if (!params.hasOwnProperty('Q^inst.status_^S')) {
                 params['Q^inst.status_^NE'] = 'running'
             }
+            params['Q^TYPE_ID_^S'] = this.typeId
             return ActionUtils.formatParams(params, this.pagination, this.sorts)
         },
         /**

@@ -120,8 +120,8 @@
                     </el-descriptions-item>
                     <el-descriptions-item label="风险类型">
                         <div>
-                            <el-radio v-model="infoFxssbData.feng_xian_lei_xin" label="质量" size="mini" :disabled="readonly">质量</el-radio>
-                            <el-radio v-model="infoFxssbData.feng_xian_lei_xin" label="安全" size="mini" :disabled="readonly">安全</el-radio>
+                            <el-radio v-model="infoFxssbData.feng_xian_lei_xin" label="质量" size="mini" :disabled="isEdit">质量</el-radio>
+                            <el-radio v-model="infoFxssbData.feng_xian_lei_xin" label="安全" size="mini" :disabled="isEdit">安全</el-radio>
                         </div>
                     </el-descriptions-item>
                     <el-descriptions-item label="时机" :span="1">
@@ -136,16 +136,17 @@
 
                     </el-descriptions-item>
 
-                    <el-descriptions-item label="范围" :span="1">
+                    <el-descriptions-item label="范围" :span="2">
                         <el-input v-model="infoFxssbData.fan_wei_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
                     <el-descriptions-item label="方法" :span="1">
                         <el-input v-model="infoFxssbData.fang_fa_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
-                    <el-descriptions-item label="风险系数计算方式" :span="2">
+                    <el-descriptions-item label="风险系数计算方式" :span="1">
                         <span class="required-star">*</span>
-                        <el-radio v-model="infoFxssbData.ji_suan_fang_shi_" label="1" size="mini" :disabled="isEdit">S * O（严重度*发生率）</el-radio>
-                        <el-radio v-model="infoFxssbData.ji_suan_fang_shi_" label="2" size="mini" :disabled="isEdit">S * O * D（严重度*发生率*可检测度）</el-radio>
+                        <el-radio v-model="infoFxssbData.ji_suan_fang_shi_" label="1" size="mini" :disabled="isEdit">风险矩阵法</el-radio>
+                        <el-radio v-model="infoFxssbData.ji_suan_fang_shi_" label="2" size="mini" :disabled="isEdit">FMEA法
+                        </el-radio>
                     </el-descriptions-item>
 
                     <el-descriptions-item label="目的" :span="5">
@@ -777,7 +778,7 @@ export default {
                 if (this.isEdit) {
                     await this.goEdit(flag)
                 } else {
-                    this.$confirm('风险系数计算公式保存后不可再修改，是否继续?', '提示', {
+                    this.$confirm('风险类型和风险系数计算公式保存后不可再修改，是否继续?', '提示', {
                         confirmButtonText: '继续',
                         cancelButtonText: '取消',
                         type: 'warning'

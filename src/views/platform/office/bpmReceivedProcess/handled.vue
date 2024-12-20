@@ -139,6 +139,7 @@ export default {
                     break
             }
             delete params.end
+            params['Q^TYPE_ID_^S'] = this.typeId
             return ActionUtils.formatParams(params, this.pagination, this.sorts)
         },
         /**

@@ -1205,7 +1205,7 @@ export default {
             return data.length > 0
         },
         generateRandomString () {
-            return `JKY-${Math.floor(Math.random() * 88888) + 10000}`
+            return `JYK-${Math.floor(Math.random() * 88888) + 10000}`
         },
         async init () {
             this.loading = true

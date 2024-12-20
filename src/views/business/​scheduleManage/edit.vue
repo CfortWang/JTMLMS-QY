@@ -284,7 +284,7 @@
                             v-for="item in ordinateList"
                             :key="item.value"
                             class="ordinate-item"
-                            :style="{ color: viewType === 'users' ? '#606266' : `${item.color}`, height:viewType === 'users' ? '60px' : '130px' }"
+                            :style="{ color: viewType === 'users' ? '#606266' : `${item.color}`}"
                         >
                             {{ item.label }}
                         </div>
@@ -298,7 +298,7 @@
                                 :key="cIndex"
                                 ref="shiftItem"
                                 class="shift-item"
-                                :style="{ display: viewType === 'users' ? 'grid' : 'flex', height:viewType === 'users' ? '59px' : '129px'}"
+                                :style="{ display: viewType === 'users' ? 'grid' : 'flex'}"
                                 @mouseenter=" hoveredIndex = !readonly && `${row.value}-${cIndex}`"
                                 @mouseleave=" hoveredIndex = !readonly && null"
                                 @click.prevent="!readonly && handleShiftClick($event, {row, rIndex, column, cIndex})"
@@ -842,6 +842,7 @@ export default {
             }
         },
         handleStepChange (val) {
+            this.handleClose()
             if (this.activeStep === 1 && val) {
                 const valid = this.validateForm()
                 if (!valid) {
@@ -1387,13 +1388,15 @@ export default {
                 margin: 10px 0 20px 10px;
                 position: relative;
                 display: flex;
+                flex-direction: row;
+                align-items: stretch;
                 float: left;
                 overflow-y: auto;
                 white-space: nowrap;
                 .ordinate {
                     width: 80px;
                     padding: 0 10px;
-                    height: 100%;
+                    // height: 100%;
                     // background-color: #f0f0f0;
                     display: flex;
                     flex-shrink: 0;
@@ -1403,8 +1406,9 @@ export default {
                         align-items: center;
                         justify-content: center;
                         text-align: center;
-                        height: 60px;
+                        min-height: 60px;
                         flex-shrink: 0;
+                        flex-grow: 1;
                     }
                 }
                 .shift-content {
@@ -1415,7 +1419,7 @@ export default {
                         .shift-item {
                             position: relative;
                             width: 59px;
-                            height: 59px;
+                            min-height: 59px;
                             font-size: 14px;
                             border: 1px solid #ccc;
                             border-bottom: none;

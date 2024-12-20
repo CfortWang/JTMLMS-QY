@@ -34,7 +34,7 @@
                                 size="mini"
                             >{{ item.name }}</el-tag>
                         </div>
-                        <div>
+                        <div style="display: flex; align-items: center;">
                             <template v-if="todaySchedule.length">
                                 <span>今日班次：</span>
                                 <el-tag
@@ -46,12 +46,14 @@
                                 >{{ item }}</el-tag>
                             </template>
                             <span v-else>今日无排班，祝您休息愉快！</span>
-                            <a style="color: #409eff;" @click="showMySchedule">我的排班</a>
-                            <!-- <el-button
+                            <!--<a style="color: #409eff;" @click="showMySchedule">我的排班</a>-->
+                            <el-button
                                 type="primary"
                                 size="mini"
+                                plain
                                 @click="showMySchedule"
-                            >我的排班</el-button> -->
+                                style="display: flex; align-items: center; padding: 4px 5px;"
+                            ><i class="el-icon-date"  style="margin-right: 3px;" ></i>我的排班</el-button>
                         </div>
                     </div>
                 </div>

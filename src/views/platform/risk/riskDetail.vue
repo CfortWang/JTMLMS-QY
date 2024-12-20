@@ -301,28 +301,19 @@ export default {
             form: {
                 xuan_ze_feng_xian: ''
             },
-            activeName: '严重程度分级描述',
+            activeName: '风险等级及应对措施说明',
             content: [
-                { label: '严重程度分级描述', value: `1级：轻微，不会对检验科人员、设备、环境、形象造成损害；不会对检验质量造成影响；造成轻微的财产损失；无检验科信息泄露。
-2级：一般，对检验科人员、设备、环境、形象造成轻微损害，对检验质量和TAT造成影响，能通过现场及时处置解决或缓解出现的损害和影响；造成一定的财产损失；未造成投诉；无检验科信息泄露。
-3级：较严重，对检验科人员、设备、环境、形象造成损害，对检验质量和TAT造成影响，无法通过现场及时处置解决或缓解出现的损害和影响；被投诉至检验科管理层；造成较大的财产的损失；有检验科信息泄露。
-4级：严重，对检验科人员造成较大伤害；对仪器设备造成损坏；对周边较少的人员或环境产生损害；对检验质量、TAT、临床诊疗造成严重影响；造成重大的的经济损失；被投诉至上级主管部门；造成不良的社会影响。
-5级：非常严重，对检验科人员造成重大伤害甚至死亡；对仪器设备造成损毁；极度影响检验质量和TAT，对临床造成极大误诊致使病人死亡；对周边人员或环境产生重大损害；造成恶劣的社会影响；导致检验科停工停业。 ` },
-                { label: '发生概率分级表说明', value: `1级:基本不可能发生，评估范围内未发生过，类似区域/行业也极少发生。
-2级:较不可能发生，评估范围内未发生过，类似区域/行业偶有发生。
-3级:可能发生，评估范围内发生过，类似区域/行业也偶有发生； 评估范围内未发生过，但类似区域/行业发生频率较高。
-4级:很有可能发生，评估范围内发生频率较高。
-5级:必定会发生，评估范围内发生频率很高。` },
-                { label: '事件可检测度描述', value: `1级:确定，当某项风险发生时，根据现有的控制手段及检测方法，能准确识别出。
-2级:大，当某项风险发生时，根据现有的控制手段及检测方法，识别出的概率较大。
-3级:中等，当某项风险发生时，根据现有的控制手段及检测方法，识别出的概率中等。
-4级:小，当某项风险发生时，根据现有的控制手段及检测方法，识别出的概率较小。
-5级:不可测，当某项风险发生时，根据现有的控制手段及检测方法，不可识别。` },
-                { label: '风险等级及应对措施说明', value: `低风险:1-4，风险较低,当采取措施消除风险引起的成本比风险本身引起的损失较大时，接受风险。
-中风险:5-11，可采取措施降低风险。
-高风险:12-25，应采取措施规避或降低风险。` }
+                { label: '严重程度分级描述', value: '/' },
+                { label: '发生概率分级表说明', value: '/' },
+                { label: '事件可检测度描述', value: '/' },
+                { label: '风险等级及应对措施说明', value: `未找到配置数据，使用默认配置：
+低：[[1,1],[1,2],[1,3],[2,1],[2,2],[3,1]]，可保持已有的安全措施。
+中：[[1,4],[1,5],[2,3],[2,4],[3,2],[3,3],[4,1],[4,2],[5,1]]，需采取有效措施对风险进行控制。
+高：[[2,5],[3,4],[3,5],[4,3],[4,4],[5,2],[5,3]]，需采取有效措施对风险进行控制。
+极高：[[4,5],[5,4],[5,5]]，需采取有效措施对风险进行控制。` }
             ],
-            fengXianDengJi2: { label: '风险等级及应对措施说明', value: `可忽略的:1-8，稍有危险，可以接受。
+            fengXianDengJi2: { label: '风险等级及应对措施说明', value: `未找到配置数据，使用默认配置：
+可忽略的:1-8，稍有危险，可以接受。
 可接受的:9-27，一般危险，需要注意。
 中度的:28-63，显著危险，需要整改。
 重大的:64-99，高度危险，需立即整改。
@@ -347,13 +338,14 @@ export default {
             tableList: [],
             Ids: [],
             fengXianJiSuan: [],
-            muban: '1'
+            muban: '1',
+            leixing: '安全'
         }
     },
     computed: {
         descriptionContent () {
-            const msg1 = '1.当前风险系数计算公式为模板一。2.风险系数 RPN = Severity(严重度) × Occurrence(发生度）。'
-            const msg2 = '1.当前风险系数计算公式为模板二。2.风险系数 RPN = Severity(严重度) × Occurrence(发生度）× Likelihood of Detection(检测度)。'
+            const msg1 = '1.当前风险系数计算公式为模板一：风险矩阵法。2.风险等级由严重程度和发生频度组成的坐标值映射成为矩阵坐标。'
+            const msg2 = '1.当前风险系数计算公式为模板二：FMEA法。2.风险系数 RPN = Severity(严重度) × Occurrence(发生度）× Likelihood of Detection(检测度)。'
             switch (this.muban) {
                 case '1':
                     return msg1
@@ -472,12 +464,15 @@ export default {
                 this.Ids = []
             }
             this.muban = this.params.ji_suan_fang_shi_
-            console.log('模板类型：', this.muban)
+            this.leixing = this.params.feng_xian_lei_xin
+            if (this.muban === '2') {
+                this.content[3] = this.fengXianDengJi2
+            }
             // 获取风险等级相关
-            const degreeSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='严重程度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' ORDER BY fen_ji_ ASC`
-            const gailvSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='发生概率' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' ORDER BY fen_ji_ ASC`
-            const dengjiSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='风险等级' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}'`
-            const jianCeSql = `select yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='可检测度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' ORDER BY fen_ji_ ASC`
+            const degreeSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='严重程度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
+            const gailvSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='发生概率' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
+            const dengjiSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='风险等级' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}'`
+            const jianCeSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='可检测度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
             Promise.all([
                 this.$common.request('sql', degreeSql),
                 this.$common.request('sql', gailvSql),
@@ -501,6 +496,9 @@ export default {
                 if (responses[3].variables != null && responses[3].variables.data != null && responses[3].variables.data.length > 0) {
                     jianCeData = responses[3].variables.data
                 }
+                if (degreeData.length === 0 || gailvData.length === 0 || dengjiData.length === 0 || (this.muban === '2' && jianCeData.length === 0)) {
+                    throw new Error(`检测到风险类型为${this.leixing}且计算方式为${this.muban === '1' ? '风险矩阵法' : 'FMEA法'}的配置数据不完整，请配置完成后再使用！`)
+                }
                 let degreeWord = ''
                 let gailvWord = ''
                 let dengjiWord = ''
@@ -518,29 +516,25 @@ export default {
                     jianCeWord += `${el.fen_ji_}级：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
                 }
                 if (degreeData.length > 0) {
-                    console.log('严重程度使用配置值')
                     this.content[0].value = degreeWord
                     this.yan_zhong_cheng_d_List = degreeData.map(item => item.fen_ji_)
                 }
                 if (gailvData.length > 0) {
-                    console.log('发生概率使用配置值')
                     this.content[1].value = gailvWord
                     this.fa_sheng_pin_du_List = gailvData.map(item => item.fen_ji_)
                 }
                 if (jianCeData.length > 0) {
-                    console.log('可检测度使用配置值')
                     this.content[2].value = jianCeWord
                     this.ke_jian_ce_du_List = jianCeData.map(item => item.fen_ji_)
                 }
                 if (dengjiData.length > 0) {
-                    console.log('风险等级使用配置值')
                     this.content[3].value = dengjiWord
                 }
                 this.fengXianJiSuan = dengjiData
                 this.loading = false
             }).catch(error => {
                 // 处理错误
-                console.error('Error fetching data:', error)
+                this.$message.warning(error.message)
                 this.loading = false
             })
         },
@@ -590,22 +584,33 @@ export default {
                         let rate = ''
                         rate = +row.yan_zhong_cheng_d * +row.fa_sheng_pin_du_
                         if (this.fengXianJiSuan.length === 0) {
-                            if (rate >= 1 && rate <= 4) {
-                                degree = '低风险'
+                            if (rate >= 1 && rate < 4) {
+                                degree = '低'
                             }
-                            if (rate >= 5 && rate <= 11) {
-                                degree = '中风险'
+                            if (rate > 4 && rate <= 9) {
+                                degree = '中'
                             }
-                            if (rate >= 12 && rate <= 25) {
-                                degree = '高风险'
+                            if (rate >= 10 && rate <= 16) {
+                                degree = '高'
+                            }
+                            if (rate >= 20 && rate <= 25) {
+                                degree = '极高'
+                            }
+                            if (rate === 4) {
+                                if (+row.yan_zhong_cheng_d === 2 && +row.fa_sheng_pin_du_ === 2) {
+                                    degree = '低'
+                                } else {
+                                    degree = '中'
+                                }
                             }
                         } else {
                             for (let i = 0; i < this.fengXianJiSuan.length; i++) {
                                 const item = this.fengXianJiSuan[i]
                                 if (item.yan_zhong_cheng_d) {
-                                    const [a, b] = item.yan_zhong_cheng_d.split('-')
-                                    if (a && b) {
-                                        if (rate >= +a.trim() && rate <= +b.trim()) {
+                                    const arr = JSON.parse(item.yan_zhong_cheng_d) || []
+                                    for (let j = 0; j < arr.length; j++) {
+                                        const [a, b] = arr[j]
+                                        if (+a === +row.yan_zhong_cheng_d && +b === +row.fa_sheng_pin_du_) {
                                             degree = item.fen_ji_
                                             break
                                         }
@@ -614,7 +619,7 @@ export default {
                             }
                         }
 
-                        this.$set(row, 'feng_xian_ying_du', (!row.feng_xian_ying_du && degree === '低风险') ? '风险接受' : '风险降低')
+                        this.$set(row, 'feng_xian_ying_du', (!row.feng_xian_ying_du && degree === '低') ? '风险接受' : '风险降低')
                         row.feng_xian_zhi_shu = rate + ''
                         row.feng_xian_deng_ji = degree
                     }

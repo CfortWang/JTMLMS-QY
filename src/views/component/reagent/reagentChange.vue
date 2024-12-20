@@ -3,7 +3,7 @@
         <div v-if="show" class="reagentChange">
             <el-row type="flex">
                 <el-col class="button">
-                    <div class="title">平行实验/留样再测</div>
+                    <div class="title">平行试验/留样再测</div>
                     <div v-if="nodeId === 'Activity_0xkc1ji' || readonly" />
                     <div v-else>
                         <!-- <el-button type="primary" size="mini" icon="ibps-icon-edit" @click="openDialog">配置样品</el-button>

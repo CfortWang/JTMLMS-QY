@@ -52,6 +52,7 @@
                     filterable
                     clearable
                     :placeholder=" readonly ? '' : '请选择排班'"
+                    @clear="clearSchedule"
                     @change="handleScheduleChange"
                 >
                     <el-option
@@ -354,6 +355,9 @@ export default {
                 await self.getScheduleList(self)
             } else {
                 await self.getScheduleInfo(scheduleId, self)
+                if (self.params.action === 'edit') { // 编辑时获取排版列表
+                    await self.getScheduleList(self)
+                }
             }
             if (self.$utils.isEmpty(id)) {
                 return
@@ -421,7 +425,9 @@ export default {
                     label: s.title,
                     value: s.id
                 }))
-                await self.handleScheduleChange(id)
+                if (this.params.action !== 'view') {
+                    await self.handleScheduleChange(id)
+                }
             })
         },
         async getBlockAdjustRequest (self) { // 获取锁定班次
@@ -430,48 +436,53 @@ export default {
             const res = await self.$common.request('sql', sql) // 获取当前审核状态中的申请单数据
             self.blockList = self.getBlockResult(res.variables.data || [], 'default')
         },
+        clearSchedule () { // 清空操作 清空排班数据
+            this.formData.adjustList = []
+        },
         async handleScheduleChange (val) { // 排班改变刷新数据
             const self = this
-            await getStaffSchedule({ id: val }).then((res) => {
-                const schedule = res.data
-                if (self.$utils.isEmpty(schedule)) {
-                    return self.$message.error('数据有误！所选排班不存在！')
-                }
-                const config = schedule.config ? JSON.parse(schedule.config) : {}
-                self.scheduleInfo = {
-                    id: schedule.id,
-                    startDate: schedule.startDate,
-                    endDate: schedule.endDate,
-                    scheduleShift: config.scheduleShift,
-                    scheduleStaff: self.userList.filter(u => config.scheduleStaff.includes(u.userId) && u.userId !== self.userId),
-                    shiftList: schedule.staffScheduleDetailPoList,
-                    executor: JSON.stringify(config.approver) || ''
-                }
-                self.currentShift = self.scheduleInfo.shiftList.find(s => s.userId === self.userId) // 当前排班中我的排版表
-                if (!self.currentShift) {
-                    return self.$message.warning('所选排班中未含有您的信息，请重新选择！')
-                }
-                self.$set(self, 'pickerOptions', {
-                    disableDate: (time) => {
-                        const startDate = new Date(schedule.startDate)
-                        const endDate = new Date(schedule.endDate)
-                        return time < startDate || time > endDate
+            if (val) {
+                await getStaffSchedule({ id: val }).then((res) => {
+                    const schedule = res.data
+                    if (self.$utils.isEmpty(schedule)) {
+                        return self.$message.error('数据有误！所选排班不存在！')
                     }
-                })
-                if (self.formData.adjustList.length < 1) { // 编辑新增状态初始化
-                    self.formData.adjustList = []
-                }
-                if (this.params.action !== 'view') {
-                    self.getBlockAdjustRequest(self).then(() => { // 获取被锁定的班次
-                        self.beforeDateList = self.initDateOptions(schedule.startDate, self.currentShift)
-                        const filterid = self.$store.getters.userId || ''
-                        if (self.beforeDateList.length > 0 && Object.keys(self.blockList).length > 0) {
-                            // 过滤当前自己被占用的日期和班次
-                            self.beforeDateList = self.filterBlockList(self.blockList, self.beforeDateList, filterid)
+                    const config = schedule.config ? JSON.parse(schedule.config) : {}
+                    self.scheduleInfo = {
+                        id: schedule.id,
+                        startDate: schedule.startDate,
+                        endDate: schedule.endDate,
+                        scheduleShift: config.scheduleShift,
+                        scheduleStaff: self.userList.filter(u => config.scheduleStaff.includes(u.userId) && u.userId !== self.userId),
+                        shiftList: schedule.staffScheduleDetailPoList,
+                        executor: JSON.stringify(config.approver) || ''
+                    }
+                    self.currentShift = self.scheduleInfo.shiftList.find(s => s.userId === self.userId) // 当前排班中我的排版表
+                    if (!self.currentShift) {
+                        return self.$message.warning('所选排班中未含有您的信息，请重新选择！')
+                    }
+                    self.$set(self, 'pickerOptions', {
+                        disableDate: (time) => {
+                            const startDate = new Date(schedule.startDate)
+                            const endDate = new Date(schedule.endDate)
+                            return time < startDate || time > endDate
                         }
                     })
-                }
-            })
+                    if (self.formData.adjustList.length < 1) { // 编辑新增状态初始化
+                        self.formData.adjustList = []
+                    }
+                    if (this.params.action !== 'view') {
+                        self.getBlockAdjustRequest(self).then(() => { // 获取被锁定的班次
+                            self.beforeDateList = self.initDateOptions(schedule.startDate, self.currentShift)
+                            const filterid = self.$store.getters.userId || ''
+                            if (self.beforeDateList.length > 0 && Object.keys(self.blockList).length > 0) {
+                                // 过滤当前自己被占用的日期和班次
+                                self.beforeDateList = self.filterBlockList(self.blockList, self.beforeDateList, filterid)
+                            }
+                        })
+                    }
+                })
+            }
 
             // this.scheduleList.find(i => i.id === val)
             // this.pickerOptions = {
@@ -538,12 +549,24 @@ export default {
             })
             return result
         },
+        /**
+         * 过滤锁定班次，返回被过滤后的排班van数据
+         * @param bList  锁定班次数组
+         * @param dateList 需要过滤的用户数组
+         * @param filterid 需要过滤的用户id
+         */
         filterBlockList (bList, dateList, filterid) { // 根据锁定数据，过滤当前列表
             const filterBList = bList[filterid] || []
             const { startDate } = this.scheduleInfo
+            // 将日期在今天之前的排班也锁定
+            dateList.forEach((el) => {
+                if (this.equalDate(el.value)) {
+                    el.disabled = true
+                }
+            })
             filterBList.forEach((el) => {
                 const index = this.getDays(startDate, el.value)
-                if (dateList[index].value === el.value) {
+                if (dateList[index].value === el.value && dateList[index].disabled !== true) {
                     const arr1 = dateList[index].banci.split(',')
                     const arr2 = el.banci.split(',')
                     const result = arr2.some(item => arr1.includes(item))
@@ -929,6 +952,20 @@ export default {
         },
         handleSelectionChange (v) {
             this.selectionIndex = v.map(item => this.formData.adjustList.indexOf(item))
+        },
+        equalDate (dateStr) { // 比较传参是否在今天日期之前，是则返回true
+            // 获取今天的日期，只保留年月日部分
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
+            // 要比较的日期字符串
+            // 将日期字符串解析为日期对象
+            const dateObj = new Date(dateStr.split('-')[0], parseInt(dateStr.split('-')[1]) - 1, dateStr.split('-')[2])
+            // 进行比较
+            if (dateObj >= today) {
+                return false
+            } else {
+                return true
+            }
         },
         handleRemove (removeIndex, type) {
             const self = this

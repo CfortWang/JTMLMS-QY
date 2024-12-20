@@ -303,7 +303,8 @@ export default {
                 ri_qi_lie_biao_: '',
                 mo_kuai_lu_jing_: '',
                 lie_biao_shu_ju_: '',
-                kai_shi_shi_jian_: ''
+                kai_shi_shi_jian_: '',
+                kong_zhi_biao_zhu: ''
             },
             subForm: [
 
@@ -560,6 +561,7 @@ export default {
                 item.bu_men_ = this.form.bian_zhi_bu_men_
                 item.jian_ce_gang_wei_ = this.form.gang_wei_
                 item.kong_zhi_tiao_jia = this.form.tiao_jian_
+                item.kong_zhi_biao_zhu = this.form.kong_zhi_biao_zhu
                 item.jian_ce_ri_qi_ = this.form.jian_ce_ri_qi_
                 item.ri_qi_lie_biao_ = this.form.ri_qi_lie_biao_
                 item.jian_ce_zhou_qi_ = this.form.zhou_qi_
@@ -580,6 +582,9 @@ export default {
                 }
                 if (item.kong_zhi_tiao_jia === '') {
                     item.kong_zhi_tiao_jia = this.form.tiao_jian_
+                }
+                if (item.kong_zhi_biao_zhu === '') {
+                    item.kong_zhi_biao_zhu = this.form.kong_zhi_biao_zhu
                 }
                 if (item.jian_ce_ri_qi_ === '') {
                     item.jian_ce_ri_qi_ = this.form.jian_ce_ri_qi_
@@ -765,6 +770,7 @@ export default {
                                 zhou_qi_: this.form.zhou_qi_,
                                 gang_wei_: this.form.gang_wei_,
                                 tiao_jian_: this.form.tiao_jian_,
+                                kong_zhi_biao_zhu: this.form.kong_zhi_biao_zhu,
                                 she_bei_bian_hao_: this.form.she_bei_bian_hao_,
                                 jian_ce_ri_qi_: this.form.jian_ce_ri_qi_,
                                 ri_qi_lie_biao_: this.form.ri_qi_lie_biao_,
@@ -796,6 +802,7 @@ export default {
                                     jian_ce_ri_qi_: item.jian_ce_ri_qi_,
                                     jian_ce_zhou_qi_: item.jian_ce_zhou_qi_,
                                     kong_zhi_tiao_jia: item.kong_zhi_tiao_jia,
+                                    kong_zhi_biao_zhu: item.kong_zhi_biao_zhu,
                                     lie_biao_shu_ju_: item.lie_biao_shu_ju_,
                                     qu_yu_: item.qu_yu_,
                                     ri_qi_lie_biao_: item.ri_qi_lie_biao_,
@@ -828,6 +835,7 @@ export default {
                                     jian_ce_gang_wei_: item.jian_ce_gang_wei_,
                                     shi_fou_qi_yong_: item.shi_fou_qi_yong_,
                                     kong_zhi_tiao_jia: item.kong_zhi_tiao_jia,
+                                    kong_zhi_biao_zhu: item.kong_zhi_biao_zhu,
                                     jian_ce_ri_qi_: item.jian_ce_ri_qi_,
                                     ri_qi_lie_biao_: item.ri_qi_lie_biao_,
                                     lie_biao_shu_ju_: item.lie_biao_shu_ju_,
@@ -877,6 +885,7 @@ export default {
                                     jian_ce_ri_qi_: item.jian_ce_ri_qi_,
                                     jian_ce_zhou_qi_: item.jian_ce_zhou_qi_,
                                     kong_zhi_tiao_jia: item.kong_zhi_tiao_jia,
+                                    kong_zhi_biao_zhu: item.kong_zhi_biao_zhu,
                                     lie_biao_shu_ju_: item.lie_biao_shu_ju_,
                                     qu_yu_: item.qu_yu_,
                                     ri_qi_lie_biao_: item.ri_qi_lie_biao_,

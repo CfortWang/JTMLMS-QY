@@ -63,9 +63,14 @@
                     </template>
                 </el-table-column>
                 <!-- 审批时间 -->
-                <el-table-column :label="options[1].label" width="135">
+                <el-table-column v-if="!timeModification" :label="options[1].label" width="135">
                     <template slot-scope="{row, $index}">
                         {{ row[options[1].value] }}
+                    </template>
+                </el-table-column>
+                <el-table-column v-if="timeModification" :label="options[1].label" width="200">
+                    <template slot-scope="{row, $index}">
+                        <el-date-picker v-model="row[options[1].value]" type="datetime" placeholder="选择日期时间" value-format="yyyy-MM-dd HH:mm:ss" :default-time="row[options[1].value]" />
                     </template>
                 </el-table-column>
                 <!-- 审批意见 -->
@@ -222,7 +227,12 @@ export default {
         unComplate: {
             type: String
         },
-        params: Object
+        params: Object,
+        // 修改流程时间
+        timeModification: {
+            type: Boolean,
+            default: false
+        }
     },
     data () {
         return {

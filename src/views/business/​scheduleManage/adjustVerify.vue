@@ -73,7 +73,8 @@ export default {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary', hidden: false },
                     { key: 'massAgree', icon: 'ibps-icon-check', label: '批量同意', type: 'success', hidden: false },
-                    { key: 'massDisagree', icon: 'ibps-icon-close', label: '批量不同意', type: 'danger', hidden: false }
+                    { key: 'massDisagree', icon: 'ibps-icon-close', label: '批量不同意', type: 'danger', hidden: false },
+                    { key: 'remove', icon: 'ibps-icon-close', label: '删除', type: 'danger', hidden: !this.isRoleFilter() }
                 ],
                 searchForm: {
                     labelWidth: 80,
@@ -404,7 +405,8 @@ export default {
                             id_: data.id
                         },
                         param: {
-                            status: data.status
+                            status: data.status,
+                            execute_date_: data.status === ('已通过' || '已拒绝') ? this.getTimeNow() : ''
                         }
                     }]
             }
@@ -420,7 +422,8 @@ export default {
                                 party_: userId
                             },
                             param: {
-                                status_: key === 'agree' ? '已通过' : '已拒绝'
+                                status_: key === 'agree' ? '已通过' : '已拒绝',
+                                audit_time_: data.status === ('已通过' || '已拒绝') ? this.getTimeNow() : ''
                             }
                         }]
                 }
@@ -468,7 +471,8 @@ export default {
                         id_: el.id
                     },
                     param: {
-                        status: el.status
+                        status: el.status,
+                        execute_date_: el.status === ('已通过' || '已拒绝') ? this.getTimeNow() : ''
                     }
                 })
                 sonuparr.push({
@@ -477,7 +481,8 @@ export default {
                         party_: userId
                     },
                     param: {
-                        status_: key === 'massAgree' ? '已通过' : '已拒绝'
+                        status_: key === 'massAgree' ? '已通过' : '已拒绝',
+                        audit_time_: el.status === ('已通过' || '已拒绝') ? this.getTimeNow() : ''
                     }
                 })
             })
@@ -551,6 +556,17 @@ export default {
                 return 0
             }
             return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24))
+        },
+        getTimeNow () {
+            const currentDate = new Date()
+            const year = currentDate.getFullYear()
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0')
+            const day = currentDate.getDate().toString().padStart(2, '0')
+            const hours = currentDate.getHours().toString().padStart(2, '0')
+            const minutes = currentDate.getMinutes().toString().padStart(2, '0')
+            // 拼接
+            const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`
+            return formattedDateTime
         },
         /**
          * 行双击事件

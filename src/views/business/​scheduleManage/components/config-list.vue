@@ -95,7 +95,7 @@ export default {
                     labelWidth: 80,
                     itemWidth: 150,
                     forms: [
-                        { prop: 'Q^title_^SL', label: '配置项名称' },
+                        { prop: 'Q^name_^SL', label: '配置名称' },
                         { prop: 'Q^schedule_type_^SL', label: '排班类型', fieldType: 'select', options: scheduleType },
                         { prop: ['Q^create_time_^DL', 'Q^create_time_^DG'], label: '创建时间', fieldType: 'daterange', itemWidth: 200 }
                     ]

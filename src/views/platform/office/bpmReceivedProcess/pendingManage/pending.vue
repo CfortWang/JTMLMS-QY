@@ -148,7 +148,7 @@ export default {
             listConfig: {
                 // 工具栏
                 toolbars: [
-                    { key: 'search' },
+                    { key: 'search' }
                     // {
                     //     key: 'agree',
                     //     label: '提交/通过',
@@ -233,11 +233,13 @@ export default {
             if (params.hasOwnProperty('Q^temp.proc_def_name_^SL')) {
                 const temp = params['Q^temp.proc_def_name_^SL']
                 delete params['Q^temp.proc_def_name_^SL']
+                params['Q^TYPE_ID_^S'] = this.typeId
                 res = ActionUtils.formatParams(params, this.pagination, this.sorts)
                 res.customs = {
                     procDefName: temp
                 }
             } else {
+                params['Q^TYPE_ID_^S'] = this.typeId
                 res = ActionUtils.formatParams(params, this.pagination, this.sorts)
             }
             return res
