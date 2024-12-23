@@ -20,10 +20,10 @@
         <div class="container">
             <div class="left" :style="{width:initWidth}">
                 <div class="form">
-                    <el-form ref="form" label-width="90px" :model="form" :rules="rules">
-                        <el-row>
-                            <el-col :span="24">
-                                <el-form-item label="部门：" prop="bian_zhi_bu_men_">
+                    <el-form ref="form" label-width="120px" :model="form" :rules="rules">
+                        <el-row :gutter="20">
+                            <el-col :span="12">
+                                <el-form-item label="部门" prop="bian_zhi_bu_men_" class="required">
                                     <ibps-user-selector
                                         v-model="form.bian_zhi_bu_men_"
                                         type="position"
@@ -36,17 +36,35 @@
                                     />
                                 </el-form-item>
                             </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="岗位分组" prop="bu_men_fen_zu_">
+                                    <ibps-custom-dialog
+                                        v-model="form.bu_men_fen_zu_"
+                                        size="mini"
+                                        template-key="gwfzdhk"
+                                        store="id"
+                                        :multiple="false"
+                                        :dynamic-params="{
+                                            suo_shu_bu_men_: form.bian_zhi_bu_men_
+                                        }"
+                                        type="dialog"
+                                        class="custom-dialog"
+                                        placeholder="请选择"
+                                        icon="el-icon-search"
+                                    />
+                                </el-form-item>
+                            </el-col>
                         </el-row>
                         <el-row>
                             <el-col :span="24">
-                                <el-form-item label="表单名称：" prop="biao_dan_ming_che">
+                                <el-form-item label="表单名称" prop="biao_dan_ming_che" class="required">
                                     <el-input v-model="form.biao_dan_ming_che" size="mini" placeholder="请输入" />
                                 </el-form-item>
                             </el-col>
                         </el-row>
                         <el-row>
                             <el-col :span="24">
-                                <el-form-item label="表单模板：" prop="biao_dan_mo_ban_">
+                                <el-form-item label="表单模板" prop="biao_dan_mo_ban_" class="required">
                                     <ibps-attachment
                                         v-model="form.biao_dan_mo_ban_"
                                         :download="true"
@@ -61,7 +79,7 @@
                         </el-row>
                         <el-row>
                             <el-col :span="24">
-                                <el-form-item label="归档路径：" prop="gui_dang_lu_jing_">
+                                <el-form-item label="归档路径" prop="gui_dang_lu_jing_" class="required">
                                     <ibps-custom-dialog
                                         v-model="form.gui_dang_lu_jing_"
                                         size="mini"
@@ -77,11 +95,24 @@
                         </el-row>
                         <el-row>
                             <el-col :span="24">
-                                <el-form-item label="审批流程" prop="shen_pi_liu_cheng">
+                                <el-form-item label="审批流程" prop="shen_pi_liu_cheng" class="required">
                                     <el-radio-group v-model="form.shen_pi_liu_cheng">
                                         <el-radio label="无需审批">无需审批</el-radio>
                                         <el-radio label="需要审批">需要审批</el-radio>
                                     </el-radio-group>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="24">
+                                <el-form-item label="备注" prop="bei_zhu_">
+                                    <el-input
+                                        v-model="form.bei_zhu_"
+                                        type="textarea"
+                                        :maxlength="400"
+                                        show-word-limit
+                                        :rows="4"
+                                    />
                                 </el-form-item>
                             </el-col>
                         </el-row>
@@ -212,7 +243,7 @@ export default {
         }
     },
     data () {
-        const { userId, position, level } = this.$store.getters
+        const { userId, position, level, mainPosition } = this.$store.getters
         return {
             filter: [{
                 descVal: '1',
@@ -227,6 +258,7 @@ export default {
             dialogVisible: true,
             userId: userId,
             position: position,
+            mainPosition,
             level: level.second || level.first,
             loading: false,
             title: '表单模板配置',
@@ -245,7 +277,9 @@ export default {
                 biao_dan_mo_ban_: '',
                 gui_dang_lu_jing_: '',
                 shen_pi_liu_cheng: '',
-                bian_zhi_bu_men_: ''
+                bian_zhi_bu_men_: '',
+                bu_men_fen_zu_: '',
+                bei_zhu_: ''
             },
             typeOption: [
                 { label: '提前预设', value: 'presets', tips: '流程流转时，将直接推送到指定人员或角色的待办' },
@@ -269,13 +303,22 @@ export default {
                 ]
             },
             subForm: [],
-            multipleSelection: []
+            multipleSelection: [],
+            isInit: false
         }
     },
     watch: {
-
+        'form.bian_zhi_bu_men_': {
+            handler (val) {
+                if (!this.isInit) {
+                    this.isInit = true
+                    return
+                }
+                this.form.bu_men_fen_zu_ = ''
+            },
+            deep: true
+        }
     },
-
     mounted () {
         console.log('params', this.params)
         this.init()
@@ -428,7 +471,7 @@ export default {
                 this.form = this.params
                 // JSON 解析
                 const liu_cheng_shu_ju_ = JSON.parse(this.form.liu_cheng_shu_ju_)
-                console.log(liu_cheng_shu_ju_.nodeList)
+                // console.log(liu_cheng_shu_ju_.nodeList)
                 liu_cheng_shu_ju_.nodeList.forEach((item, index) => {
                     this.$set(this.subForm, index, {
                         jie_dian_ming_cheng_: item.nodeName,
@@ -441,9 +484,11 @@ export default {
                 this.form.di_dian_ = this.level
                 this.form.bian_zhi_ren_ = this.userId
                 const positons = this.position.split(',')
-                this.form.bian_zhi_bu_men_ = positons[positons.length - 1]
+                this.form.bian_zhi_bu_men_ = this.mainPosition ? this.mainPosition.id : positons[positons.length - 1]
+                this.form.bu_men_fen_zu_ = ''
                 this.form.bian_zhi_shi_jian = dayjs().format('YYYY-MM-DD HH:mm:ss')
-                this.form.shen_pi_liu_cheng = '需要审批'
+                this.form.shen_pi_liu_cheng = '不需要审批'
+                this.form.bei_zhu_ = ''
             }
         }
     }
@@ -456,24 +501,37 @@ export default {
         .el-dialog__header {
             text-align: center;
         }
+        .el-form-item__label {
+            text-align: left;
+            font-size: 12px !important;
+            padding-left: 30px;
+            position: relative;
+            &:before {
+                position: absolute;
+                left: 24px;
+            }
+        }
+        .el-form-item__content{
+            font-size: 12px !important;
+        }
     }
-.dialog-title{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    div{
-        z-index: 99999999;
-        position: absolute;
-        right:8vw;
+    .dialog-title{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        div{
+            z-index: 99999999;
+            position: absolute;
+            right:8vw;
+        }
+        .dialogtitle{
+            font-size: 22px;
+            font-family: SimHei;
+            font-weight: bold;
+            color: #222;
+        }
     }
-    .dialogtitle{
-        font-size: 22px;
-        font-family: SimHei;
-        font-weight: bold;
-        color: #222;
-    }
-}
-.container {
+    .container {
         display: flex;
         width: 100%;
         justify-content: center;
@@ -499,14 +557,5 @@ export default {
         }
     }
 }
-    ::v-deep {
-        .el-form-item__label{
-            text-align: left;
-            font-size: 12px !important;
-        }
-        .el-form-item__content{
-            font-size: 12px !important;
-        }
-    }
 
 </style>
