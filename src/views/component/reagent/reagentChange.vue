@@ -43,7 +43,7 @@
                         </el-table-column>
                         <el-table-column label="实际差值" prop="sjcz" />
                         <el-table-column label="实际偏倚" prop="pq" />
-                        <el-table-column label="限定范围" prop="xdfw" />
+                        <el-table-column :label="isHz?'允许差值':'限定范围'" prop="xdfw" />
                         <el-table-column label="允许偏倚" prop="yxpq" />
                         <el-table-column label="是否相符" prop="sfxf">
                             <template slot-scope="{row}">
@@ -146,7 +146,8 @@ export default {
                 limit: 20,
                 pageNo: 1
             },
-            importTableDialogVisible: false
+            importTableDialogVisible: false,
+            isHz: false
         }
     },
     computed: {
@@ -206,6 +207,11 @@ export default {
         }
     },
     mounted () {
+        const { first = '' } = this.$store.getters.level
+        const { deptList = [] } = this.$store.getters || {}
+        const t1 = deptList.find(i => i.positionId === first) || {}
+        this.isHz = t1.positionName === '惠州市第三人民医院'
+        console.log(t1.positionName)
         this.nodeId = this.params ? this.params.nodeId : ''
         this.spanLength = this.params ? this.params.spanLength : 0
         this.disabled = this.readonly || this.nodeId === 'Activity_0xkc1ji'
@@ -261,7 +267,7 @@ export default {
             },
             {
                 field_name: 'xdfw',
-                label: '限定范围',
+                label: this.isHz ? '允许差值' : '限定范围',
                 name: 'xdfw'
             },
             {

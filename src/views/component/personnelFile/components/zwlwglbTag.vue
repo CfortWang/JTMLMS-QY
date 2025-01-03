@@ -216,7 +216,7 @@ export default {
     }
     .hand-btn{
         width: 99.5%;
-        height: 5.5%;
+        height: 10px;
         text-align: right;
         margin: 0.5% 0;
     }

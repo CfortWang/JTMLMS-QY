@@ -11,6 +11,15 @@
         >
             <div class="containerDiv">
                 <div>
+                    <strong class="label">所属排班：</strong>{{ banci.scheduleName }}
+                </div>
+                <div>
+                    <strong class="label">排班类型：</strong>{{ banci.scheduleTypeLabel }}
+                </div>
+                <div>
+                    <strong class="label">排班创建人：</strong>{{ banci.scheduleCreateBy }}
+                </div>
+                <div>
                     <strong class="label">班次名称：</strong>{{ banci.name }}
                 </div>
                 <div>
@@ -21,7 +30,7 @@
                 </div>
                 <div>
                     <strong class="label">对应颜色：</strong>
-                    <div :style="{ background: banci.color, height: '20px', width: '50px', display: 'inline-block' }"></div>
+                    <div :style="{ background: banci.bcolor, height: '20px', width: '50px', display: 'inline-block' }"></div>
                 </div>
                 <div>
                     <strong class="label">时间段：</strong>
@@ -105,10 +114,12 @@ export default {
           align-items: center;
          .position-list {
               display: flex;
+              flex-wrap: wrap;
               list-style: none;
               padding-left: 0;
               li {
                   margin-right: 10px;
+                  margin-top: 10px;
               }
           }
       }

@@ -1,14 +1,16 @@
 <template>
-    <div class="kphdglb20241107">
+    <div class="publicList20241107">
         <div class="titleAll">
             <el-divider direction="vertical" />
-            <span>科研项目</span>
+            <span>{{ planeData.title }}</span>
         </div>
         <div class="hand-btn" />
         <div class="contentAll">
             <el-table
-                ref="reviewTableKPHD"
+                v-if="planeData.hasOwnProperty('config')"
+                :ref="'reviewTable'+tabName"
                 :data="nowData.filter((e,m) => Math.floor(m/10)===currentPage-1 )"
+
                 stripe
                 height="92%"
                 highlight-current-row
@@ -26,53 +28,29 @@
                     min-width="5%"
                 />
                 <el-table-column
-                    label="科普名称"
-                    min-width="15%"
+                    v-for="(item,i) in planeData.config.config"
+                    :key="tabName+i"
+                    :label="item.label"
+                    :min-width="item.width"
                 >
                     <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("kePuMingCheng") > 0 ? scope.row.kePuMingCheng:'/' }}
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    label="科普编号"
-                    min-width="14%"
-                >
-                    <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("kePuBianHao") > 0 ? scope.row.kePuBianHao:'/' }}
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    label="活动时间"
-                    min-width="14%"
-                >
-                    <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("huoDongShiJian") > 0 ? scope.row.huoDongShiJian:'/' }}
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    label="科普形式"
-                    min-width="14%"
-                >
-                    <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("kePuXingShi") > 0 ? scope.row.kePuXingShi:'/' }}
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    label="备注"
-                    min-width="12%"
-                >
-                    <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("beiZhu") > 0 ? scope.row.beiZhu:'/' }}
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    label="附件"
-                    min-width="21%"
-                >
-                    <template slot-scope="scope">
-                        <div class="grid-content bg-purple-light">
+                        <span v-if="item.type==='text'">{{ scope.row.hasOwnProperty(item.field) > 0 ? scope.row[item.field]:'/' }}</span>
+                        <div v-else-if="item.type==='user'||item.type==='position'" class="grid-content bg-purple-light">
+                            <ibps-user-selector
+                                v-model="scope.row[item.field]"
+                                :type="item.type"
+                                readonly-text="text"
+                                :disabled="true"
+                                :multiple="false"
+                                size="mini"
+                                style="width:100%"
+                                :filter="filter"
+                                filtrate
+                            />
+                        </div>
+                        <div v-else-if="item.type==='file'" class="grid-content bg-purple-light">
                             <ibps-attachment
-                                v-model="scope.row.fuJian"
+                                v-model="scope.row[item.field]"
                                 :download="true"
                                 multiple
                                 accept="*"
@@ -81,6 +59,21 @@
                                 limlt="5"
                             />
                         </div>
+                        <div v-else-if="item.type==='dialog'" class="grid-content bg-purple-light">
+                            <ibps-custom-dialog
+                                v-model="scope.row[item.field]"
+                                size="mini"
+                                :template-key="item.dialogKey"
+                                multiple
+                                :disabled="true"
+                                type="dialog"
+                                class="custom-dialog"
+                                placeholder="请选择"
+                                icon="el-icon-search"
+                                style="width:100%"
+                            />
+                        </div>
+                        <div v-else>/</div>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -109,17 +102,21 @@
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import option from '../constants/option.js'
 import dialogDeltail from './dialogDeltail'
+import ibpsUserSelector from '@/business/platform/org/selector'
 
 export default {
     components: {
         IbpsAttachment,
-        dialogDeltail
+        dialogDeltail,
+        ibpsUserSelector,
+        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
+
     },
     props: {
         planeData: {
-            type: Array,
+            type: Object,
             default: function () {
-                return []
+                return {}
             }
         },
         buttonType: {
@@ -133,31 +130,13 @@ export default {
         btnType: {
             type: String,
             default: ''
+        },
+        tabName: {
+            type: String,
+            default: ''
         }
     },
     data () {
-        const checkTimeJS = (rule, value, callback) => {
-            console.log(value)
-
-            if (!value) {
-                return callback(new Error('请选择日期'))
-            }
-            setTimeout(() => {
-                const now = this.$common.getDateNow()
-                const nowTime = new Date(now).getTime()
-                const valueTime = new Date(value).getTime()
-                const obj = this.nowData.find(t => t.jieshuriqi === value)
-                const ksTime = obj.bianzhiriqi !== null ? new Date(obj.bianzhiriqi).getTime() : ''
-
-                if (ksTime === '') {
-                    callback(new Error('请先选择开始时间'))
-                } else if (nowTime < valueTime) {
-                    callback(new Error('请选择小于当前日期的时间'))
-                } else if (ksTime >= valueTime) {
-                    callback(new Error('请选择大于开始日期的时间'))
-                }
-            }, 100)
-        }
         return {
             activeName: 'first',
             nowData: [],
@@ -165,14 +144,24 @@ export default {
             multipleSelection: [],
             currentPage: 1,
             dialogDetails: false,
-            dialogData: []
+            dialogData: [],
+            filter: [{
+                descVal: '1',
+                includeSub: true,
+                old: 'position',
+                partyId: this.$store.getters.userInfo.employee.positions,
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }]
         }
     },
     watch: {
         planeData: {
             handler: function (val, oldVal) {
                 // eslint-disable-next-line no-undef
-                this.nowData = structuredClone(val)
+                this.nowData = structuredClone(val.data || [])
                 this.nowDataObj = { nowData: [...this.nowData] }
             },
             deep: true,
@@ -182,7 +171,7 @@ export default {
             handler: function (val, oldVal) {
                 if (val === 'exitEdit') {
                     // eslint-disable-next-line no-undef
-                    this.nowData = structuredClone(this.planeData)
+                    this.nowData = structuredClone(this.planeData.data || [])
                     this.nowDataObj = { nowData: [...this.nowData] }
                 }
                 // else if (val === 'save' || val === 'temporaryStorage' || val === 'submit') {
@@ -191,22 +180,32 @@ export default {
             deep: true
         }
     },
+    created () {
+        setTimeout(() => {
+            console.log(this.planeData, 'ttttttt')
+        }, 2000)
+    },
     methods: {
         handleSelectionChange (val) {
             this.multipleSelection = val
         },
         handleCurrentChange (val) {
-            console.log(this.$refs, `当前页: ${val}`)
-            this.$refs.reviewTableKPHD.$parent.$parent.$parent.$parent.$parent.tabSetData(val)
+            // console.log(`当前页: ${val}`)
+            this.$refs.reviewTableZWLW.$parent.$parent.$parent.$parent.$parent.tabSetData(val)
         },
         handleClick (val) {
             this.dialogDetails = true
-            this.dialogData = [
-                [{ name: '科普名称', contant: val.kePuMingCheng, type: 'text' }, { name: '活动时间', contant: val.huoDongShiJian, type: 'text' }],
-                [{ name: '科普编号', contant: val.kePuBianHao, type: 'text' }, { name: '科普形式', contant: val.kePuXingShi, type: 'text' }],
-                [{ name: '备注', contant: val.beiZhu, type: 'text' }, { name: '附件', contant: val.fuJian, type: 'file' }]
-            ]
-            // console.log(this.dialogData)
+            this.dialogData = this.planeData.config.dialog
+            this.dialogData.forEach((item, i) => {
+                if (item.length > 1) {
+                    item.forEach(it => {
+                        it.contant = val[it.field]
+                    })
+                } else {
+                    item[0].contant = val[item[0].field]
+                }
+            })
+            console.log(this.dialogData)
         },
         changeDetails (val) {
             this.dialogDetails = val
@@ -215,7 +214,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.kphdglb20241107{
+.publicList20241107{
     font-size: 12px;
     color: #2f2f36;
     .titleAll{

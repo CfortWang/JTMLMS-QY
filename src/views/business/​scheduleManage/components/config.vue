@@ -93,6 +93,7 @@
                                     v-model="formData.scheduleStaff"
                                     :options="getCascaderOptions()"
                                     :show-all-levels="false"
+                                    style="width: 100%;"
                                     clearable
                                     :props="{
                                         value: 'value',
@@ -384,7 +385,8 @@ export default {
             }
             this.loading = true
             try {
-                const res = await getScheduleConfig({ id: this.params.configId })
+                const { first, second } = this.$store.getters.level || {}
+                const res = await getScheduleConfig({ id: this.params.configId, diDian: second || first })
                 if (res.data) {
                     initializeFormData(res.data)
                 }

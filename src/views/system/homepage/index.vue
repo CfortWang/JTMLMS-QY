@@ -682,8 +682,7 @@ export default {
                     break
                 case 'banci':
                 {
-                    const filterObj = events.filter(item => item.alias === clickId)
-                    this.banciInfo = filterObj[0]
+                    this.banciInfo = dateArr
                     this.banciDialogVisible = true
                     break
                 }

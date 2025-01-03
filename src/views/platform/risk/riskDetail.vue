@@ -60,9 +60,20 @@
                 />
                 <div class="tab">
                     <el-tabs v-model="activeName">
-                        <el-tab-pane v-for="(item) in content" :key="item.label" :label="item.label" :name="item.label">
-                            <div class="text">
-                                <pre>{{ item.value }}</pre>
+                        <el-tab-pane v-for="(item) in content.filter(i=>!!!i.hide)" :key="item.label" :label="item.label" :name="item.label">
+                            <div class="content">
+                                <div class="left">
+                                    <pre>{{ item.value }}</pre>
+                                </div>
+                                <div v-if="activeName==='风险等级及应对措施说明' && muban==='1'" class="right">
+                                    <el-image
+                                        style="width: 100%; height: 100%"
+                                        :src="photo"
+                                        fit="contain"
+                                        :preview-src-list="[photo]"
+                                        alt="风险矩阵参照图"
+                                    />
+                                </div>
                             </div>
                         </el-tab-pane>
                     </el-tabs>
@@ -280,6 +291,7 @@
 <script>
 import dayjs from 'dayjs'
 import ibpsUserSelector from '@/business/platform/org/selector'
+import { getImage } from '@/api/platform/file/attachment'
 export default {
     components: {
         ibpsUserSelector,
@@ -307,10 +319,10 @@ export default {
                 { label: '发生概率分级表说明', value: '/' },
                 { label: '事件可检测度描述', value: '/' },
                 { label: '风险等级及应对措施说明', value: `未找到配置数据，使用默认配置：
-低：[[1,1],[1,2],[1,3],[2,1],[2,2],[3,1]]，可保持已有的安全措施。
-中：[[1,4],[1,5],[2,3],[2,4],[3,2],[3,3],[4,1],[4,2],[5,1]]，需采取有效措施对风险进行控制。
-高：[[2,5],[3,4],[3,5],[4,3],[4,4],[5,2],[5,3]]，需采取有效措施对风险进行控制。
-极高：[[4,5],[5,4],[5,5]]，需采取有效措施对风险进行控制。` }
+低：可保持已有的安全措施。
+中：需采取有效措施对风险进行控制。
+高：需采取有效措施对风险进行控制。
+极高：需采取有效措施对风险进行控制。` }
             ],
             fengXianDengJi2: { label: '风险等级及应对措施说明', value: `未找到配置数据，使用默认配置：
 可忽略的:1-8，稍有危险，可以接受。
@@ -338,11 +350,14 @@ export default {
             tableList: [],
             Ids: [],
             fengXianJiSuan: [],
-            muban: '1',
+            muban: '2',
             leixing: '安全'
         }
     },
     computed: {
+        photo () {
+            return getImage('risk_fxjz') // 风险矩阵参照图
+        },
         descriptionContent () {
             const msg1 = '1.当前风险系数计算公式为模板一：风险矩阵法。2.风险等级由严重程度和发生频度组成的坐标值映射成为矩阵坐标。'
             const msg2 = '1.当前风险系数计算公式为模板二：FMEA法。2.风险系数 RPN = Severity(严重度) × Occurrence(发生度）× Likelihood of Detection(检测度)。'
@@ -510,7 +525,11 @@ export default {
                     gailvWord += `${el.fen_ji_}级：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
                 }
                 for (const el of dengjiData) {
-                    dengjiWord += `${el.fen_ji_}：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
+                    if (this.muban === '1') {
+                        dengjiWord += `${el.fen_ji_}：${el.miao_shu_}\n`
+                    } else if (this.muban === '2') {
+                        dengjiWord += `${el.fen_ji_}：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
+                    }
                 }
                 for (const el of jianCeData) {
                     jianCeWord += `${el.fen_ji_}级：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
@@ -530,6 +549,8 @@ export default {
                 if (dengjiData.length > 0) {
                     this.content[3].value = dengjiWord
                 }
+
+                this.muban === '1' && (this.content[2].hide = true)
                 this.fengXianJiSuan = dengjiData
                 this.loading = false
             }).catch(error => {
@@ -850,7 +871,14 @@ export default {
         pre{
             overflow: auto;
             margin: 0;
-            padding-bottom: 10px;
+        }
+        .content{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .right{
+                width: 300px;
+            }
         }
     }
     .choose{

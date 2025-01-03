@@ -50,7 +50,7 @@ function datenum (v, date1904) {
     return (epoch - new Date(Date.UTC(1899, 11, 30))) / (24 * 60 * 60 * 1000)
 }
 
-function sheet_from_array_of_arrays (data, opts) {
+function sheet_from_array_of_arrays (data, columnStyles = {}) {
     var ws = {}
     var range = { s: { c: 10000000, r: 10000000 }, e: { c: 0, r: 0 }}
     for (var R = 0; R !== data.length; ++R) {
@@ -62,18 +62,42 @@ function sheet_from_array_of_arrays (data, opts) {
             var cell = { v: data[R][C] }
             if (cell.v == null) continue
             var cell_ref = XLSX.utils.encode_cell({ c: C, r: R })
-
-            if (typeof cell.v === 'number') cell.t = 'n'
-            else if (typeof cell.v === 'boolean') cell.t = 'b'
-            else if (cell.v instanceof Date) {
+            var style = columnStyles[C] || {}
+            if (typeof cell.v === 'number') {
                 cell.t = 'n'
-                cell.z = XLSX.SSF._table[14]
+                if (style.numFmt) cell.z = style.numFmt
+            } else if (typeof cell.v === 'boolean') {
+                cell.t = 'b'
+            } else if (cell.v instanceof Date) {
+                cell.t = 'n'
+                cell.z = style.numFmt || XLSX.SSF._table[14]
                 cell.v = datenum(cell.v)
-            } else cell.t = 's'
+            } else {
+                cell.t = 's'
+                cell.z = '@'
+            }
+
+            if (style.font) cell.s = { font: style.font }
+            if (style.alignment) cell.s = { ...(cell.s || {}), alignment: style.alignment }
+            if (style.border) cell.s = { ...(cell.s || {}), border: style.border }
+            if (style.fill) cell.s = { ...(cell.s || {}), fill: style.fill }
 
             ws[cell_ref] = cell
         }
     }
+    // 设置整列样式
+    ws['!cols'] = data[0].map((_, index) => {
+        return {
+            width: 15, // 列宽，单位为字符
+            numFmt: '', // 数字格式
+            style: {
+                font: style.font, // 字体样式
+                alignment: style.alignment, // 对齐方式
+                border: style.border, // 边框样式
+                fill: style.fill // 填充样式
+            }
+        }
+    })
     if (range.s.c < 10000000) ws['!ref'] = XLSX.utils.encode_range(range)
     return ws
 }

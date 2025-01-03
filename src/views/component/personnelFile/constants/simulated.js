@@ -419,10 +419,127 @@ export const data = '{"id":"","diDian":"1257660949100232704","shiFouGuoShen":"�
 //     jxjyxmxshdglb: 'jxjy',
 //     bmsm: 'bmsm'
 // }
+export function correlationSql (type, val) {
+    let sql = ``
+    const col = {
+        jyrykhjlb: 'bei_kao_he_ren_yu',
+        lhrynlqr: 'bei_shou_quan_ren',
+        lhrypxjlb: 'pei_xun_ren_yuan_',
+        lhpxsqb: 'can_jia_ren_yuan_',
+        kaoshijilu: 'examinee'
+    }
+    if (type === 'jyrykhjlb' || type === 'lhrynlqr' || type === 'lhrypxjlb' || type === 'lhpxsqb') {
+        sql = `select * from t_${type} where FIND_IN_SET(${val},${col[type]}) and shi_fou_guo_shen_ = '已完成' `
+    } else if (type === 'kaoshijilu') {
+        sql = `select * from v_${type} where FIND_IN_SET(${val},${col[type]})`
+    }
+    return sql
+}
+export const correlationConfig = {
+    jyrykhjlb: {
+        config: [
+            { label: '考核时机', width: '15%', type: 'text', field: 'kao_he_shi_ji_' },
+            { label: '岗位类型', width: '10%', type: 'text', field: 'gang_wei_lei_xing' },
+            { label: '考核时间', width: '15%', type: 'text', field: 'bian_zhi_shi_jian' },
+            { label: '总分', width: '10%', type: 'text', field: 'zong_fen_' },
+            { label: '考核结果', width: '12%', type: 'text', field: 'kao_he_jie_guo_' },
+            { label: '附件', width: '14%', type: 'file', field: 'shang_chuan_fu_ji' },
+            { label: '表单', width: '14%', type: 'file', field: 'kuai_zhao_' }
+
+        ],
+        dialog: [
+            [{ name: '被考核人员', field: 'bei_kao_he_ren_yu', type: 'user' }, { name: '考核时间', field: 'bian_zhi_shi_jian', type: 'text' }],
+            [{ name: '考核时机', field: 'kao_he_shi_ji_', type: 'text' }, { name: '总分', field: 'zong_fen_', type: 'text' }],
+            [{ name: '岗位类型', field: 'gang_wei_lei_xing', type: 'text' }, { name: '考核结果', field: 'kao_he_jie_guo_', type: 'text' }],
+            [{ name: '附件', field: 'shang_chuan_fu_ji', type: 'file' }],
+            [{ name: '表单', field: 'kuai_zhao_', type: 'file' }]
+        ]
+    },
+    lhrynlqr: {
+        config: [
+            { label: '授权使用设备', width: '20%', type: 'dialog', field: 'shou_quan_shi_yon', dialogKey: 'sbwxdhk' },
+            { label: '授权岗位', width: '16%', type: 'dialog', field: 'shou_quan_gang_we', dialogKey: 'gwzzdhkrysqy' },
+            { label: '直属上级', width: '10%', type: 'user', field: 'shen_he_ren_' },
+            { label: '检验专业', width: '10%', type: 'text', field: 'jian_yan_zhuan_ye' },
+            { label: '考核结果', width: '10%', type: 'text', field: 'kao_he_jie_guo_' },
+            { label: '附件', width: '12%', type: 'file', field: 'shang_chuan_fu_ji' },
+            { label: '表单', width: '12%', type: 'file', field: 'kuai_zhao_' }
+
+        ],
+        dialog: [
+            [{ name: '授权使用设备', field: 'shou_quan_shi_yon', type: 'dialog', dialogKey: 'sbwxdhk' }, { name: '考核结果', field: 'kao_he_jie_guo_', type: 'text' }],
+            [{ name: '授权岗位', field: 'shou_quan_gang_we', type: 'dialog', dialogKey: 'gwzzdhkrysqy' }, { name: '考核日期', field: 'kao_he_shi_jian_', type: 'text' }],
+            [{ name: '直属上级', field: 'shen_he_ren_', type: 'user' }, { name: '检验专业', field: 'jian_yan_zhuan_ye', type: 'text' }],
+            [{ name: '附件', field: 'shang_chuan_fu_ji', type: 'file' }],
+            [{ name: '表单', field: 'kuai_zhao_', type: 'file' }]
+        ]
+    },
+    lhrypxjlb: {
+        config: [
+            { label: '培训名称', width: '15%', type: 'text', field: 'pei_xun_nei_rong_' },
+            { label: '培训老师', width: '12%', type: 'text', field: 'pei_xun_lao_shi_' },
+            { label: '培训时间', width: '12%', type: 'text', field: 'pei_xun_shi_jian_' },
+            { label: '培训地点', width: '10%', type: 'text', field: 'pei_xun_di_dian_' },
+            { label: '培训内容', width: '12%', type: 'text', field: 'pei_xun_xue_xi_ne' },
+            { label: '见证性材料', width: '14%', type: 'file', field: 'jian_zheng_xing_c' },
+            { label: '表单', width: '14%', type: 'file', field: 'kuai_zhao_' }
+
+        ],
+        dialog: [
+            [{ name: '培训名称', field: 'pei_xun_nei_rong_', type: 'text' }, { name: '培训目标', field: 'pei_xun_mu_di_', type: 'text' }],
+            [{ name: '培训开始时间', field: 'pei_xun_shi_jian_', type: 'text' }, { name: '培训结束时间', field: 'pei_xun_jie_shu_s', type: 'text' }],
+            [{ name: '培训老师', field: 'pei_xun_lao_shi_', type: 'text' }, { name: '培训地点', field: 'pei_xun_di_dian_', type: 'text' }],
+            [{ name: '培训内容', field: 'pei_xun_xue_xi_ne', type: 'text' }],
+            [{ name: '见证性材料', field: 'jian_zheng_xing_c', type: 'file' }],
+            [{ name: '图片', field: 'tu_pian_', type: 'file' }],
+            [{ name: '表单', field: 'kuai_zhao_', type: 'file' }]
+        ]
+    },
+    lhpxsqb: {
+        config: [
+            { label: '培训主题', width: '23%', type: 'text', field: 'pei_xun_nei_rong_' },
+            { label: '开始时间', width: '10%', type: 'text', field: 'pei_xun_kai_shi_s' },
+            { label: '结束时间', width: '10%', type: 'text', field: 'pei_xun_jie_shu_s' },
+            { label: '培训机构', width: '17%', type: 'text', field: 'pei_xun_ji_gou_' },
+            { label: '附件', width: '15%', type: 'file', field: 'pei_xun_fu_jian_' },
+            { label: '表单', width: '15%', type: 'file', field: 'kuai_zhao_' }
+
+        ],
+        dialog: [
+            [{ name: '培训主题', field: 'pei_xun_nei_rong_', type: 'text' }],
+            [{ name: '培训目的', field: 'pei_xun_mu_di_', type: 'text' }],
+            [{ name: '开始时间', field: 'pei_xun_kai_shi_s', type: 'text' }, { name: '结束时间', field: 'pei_xun_jie_shu_s', type: 'text' }],
+            [{ name: '培训机构', field: 'pei_xun_ji_gou_', type: 'text' }, { name: '培训老师', field: 'pei_xun_lao_shi_', type: 'text' }],
+            [{ name: '培训地点', field: 'pei_xun_di_dian_', type: 'text' }, { name: '参会形式', field: 'can_hui_xing_shi_', type: 'text' }],
+            [{ name: '培训天数', field: 'pei_xun_tian_shu_', type: 'text' }, { name: '培训时长', field: 'pei_xun_shi_chang', type: 'text' }],
+            [{ name: '是否有证书', field: 'shi_fou_you_zheng', type: 'text' }, { name: '发证单位', field: 'fa_zheng_dan_wei_', type: 'text' }],
+            [{ name: '是否通过考核', field: 'shi_fou_kao_he_', type: 'text' }, { name: '考核情况', field: 'kao_he_qing_kuang', type: 'text' }],
+            [{ name: '附件', field: 'pei_xun_fu_jian_', type: 'file' }],
+            [{ name: '表单', field: 'kuai_zhao_', type: 'file' }]
+        ]
+    },
+    kaoshijilu: {
+        config: [
+            { label: '考试名称', width: '19%', type: 'text', field: 'examName' },
+            { label: '考试开始时间', width: '15%', type: 'text', field: 'startDate' },
+            { label: '考试题库', width: '20%', type: 'text', field: 'bankName' },
+            { label: '考试类别', width: '12%', type: 'text', field: 'examType' },
+            { label: '考试得分', width: '12%', type: 'text', field: 'resultScore' },
+            { label: '考试总分', width: '12%', type: 'text', field: 'totalScore' }
+
+        ],
+        dialog: [
+            [{ name: '考试名称', field: 'examName', type: 'text' }, { name: '考试开始时间', field: 'startDate', type: 'text' }],
+            [{ name: '考试题库', field: 'bankName', type: 'text' }, { name: '考试类别', field: 'examType', type: 'text' }],
+            [{ name: '考试总分', field: 'totalScore', type: 'text' }, { name: '考试得分', field: 'resultScore', type: 'text' }]
+        ]
+    }
+}
 export default {
     baseDataObj,
     externalSourceDataObj,
     tabName,
-    data
+    data,
+    correlationSql
     // baseName
 }

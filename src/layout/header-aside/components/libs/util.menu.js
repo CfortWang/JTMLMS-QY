@@ -14,13 +14,26 @@ export function elMenuItem (h, menu, indexKey = 'path', stcss) {
     else if (menu.iconSvg) icon = <ibps-icon-svg name={ menu.iconSvg }/>
     else icon = <i class='ibps-icon ibps-icon-file-o'/>
     const index = menu[indexKey] || uniqueId('ibps-menu-empty-')
-    return <el-menu-item
-        style='height:37px;line-height:37px;font-weight: bold; font-size:13px;'
-        key={ index }
-        index={ index }>
-        {css} { icon }
-        <span slot='title'>{ menu.name || this.$t('layout.header-aside.menu-item.label-default')}</span>
-    </el-menu-item>
+    const tooltipContent = menu.name || this.$t('layout.header-aside.menu-item.label-default')
+    if (menu.level >= 1) {
+        return <el-tooltip effect='light' content={tooltipContent} placement='left' open-delay={500}>
+            <el-menu-item
+                style='height:37px;line-height:37px;font-weight: bold; font-size:13px;'
+                key={index}
+                index={index}>
+                {css} {icon}
+                <span slot='title'>{tooltipContent}</span>
+            </el-menu-item>
+        </el-tooltip>
+    } else {
+        return <el-menu-item
+            style='height:37px;line-height:37px;font-weight: bold; font-size:13px;'
+            key={ index }
+            index={ index }>
+            {css} { icon }
+            <span slot='title'>{tooltipContent}</span>
+        </el-menu-item>
+    }
 }
 export function elMenuItem2 (menu, indexKey = 'path', stcss) {
     let icon = null
@@ -49,14 +62,25 @@ export function elSubmenu (h, menu, indexKey = 'path') {
     else if (menu.iconSvg) icon = <ibps-icon-svg slot='title' name={ menu.iconSvg }/>
     else icon = <i slot='title' class='ibps-icon ibps-icon-folder-o'/>
     const index = menu[indexKey] || uniqueId('ibps-menu-empty-')
+    const tooltipContent = menu.name || this.$t('layout.header-aside.menu-item.label-default')
     return <el-submenu
         key={ index }
-  	    style='box-shadow:0 2px 2px rgba(0, 0, 0, .1), 0 0 1px rgba(0, 0, 0, .02);font-weight: bold;'
+        style='box-shadow:0 2px 2px rgba(0, 0, 0, .1), 0 0 1px rgba(0, 0, 0, .02);font-weight: bold;'
         index={ index }>
         { icon }
-        <span slot='title' style='font-size:13px'>{menu.name || this.$t('layout.header-aside.menu-item.label-default') }</span>
+        <span slot='title' style='font-size:13px' title={tooltipContent}>{tooltipContent}</span>
         { menu.children.map(child => createMenu.call(this, h, child, indexKey, '|')) }
     </el-submenu>
+    // <el-tooltip effect='light' content={tooltipContent} placement='left' open-delay={500}>
+    //     <el-submenu
+    //         key={index}
+    //         style='box-shadow:0 2px 2px rgba(0, 0, 0, .1), 0 0 1px rgba(0, 0, 0, .02);font-weight: bold;'
+    //         index={index}>
+    //         {icon}
+    //         <span slot='title' style='font-size:13px'>{tooltipContent}</span>
+    //         {menu.children.map(child => createMenu.call(this, h, child, indexKey, '|'))}
+    //     </el-submenu>
+    // </el-tooltip>
 }
 export function elSubmenu2 (menu, indexKey = 'path') {
     let icon = null

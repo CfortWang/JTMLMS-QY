@@ -268,6 +268,12 @@
             @close="(visible) => (importTableDialogVisible = visible)"
             @action-event="handleImportTableActionEvent"
         />
+        <import-zip
+            :visible="importZipDialogVisible"
+            title="导入"
+            @close="(visible) => (importZipDialogVisible = visible)"
+            @action-event="handleImportZipActionEvent"
+        />
 
         <xlsxFile
             v-if="xlsxFileVisible"
@@ -322,7 +328,7 @@ import IbpsImportColumnsDialog from '../components/import-columns-dialog'
 import CustomDataDisplayMixin from '@/business/platform/system/mixins/customDataDisplay'
 import FormPrintTemplate from '@/business/platform/form/form-print/template'
 import importTable from '@/business/platform/form/formrender/dynamic-form/components/import-table'
-
+import importZip from '@/business/platform/form/formrender/dynamic-form/components/import-zip.vue'
 import JTemplate from '../utils/JTemplate' // 自定义脚本
 import JDialogTemplate from '../utils/JDialogTemplate' // 对话框自定义脚本
 
@@ -335,7 +341,7 @@ import Vue from 'vue'
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
 import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
 import generalModules from '@/views/system/jbdScan/generalModules.vue'
-
+import { importZip as importzip } from '@/api/upload/zip'
 export default {
     name: 'list',
     components: {
@@ -354,6 +360,7 @@ export default {
         DictionaryFormat,
         Scan,
         importTable,
+        importZip,
         Print: () => import('../components/print'),
         LabelPrint: () => import('../components/labelPrint'),
         xlsxFile,
@@ -468,6 +475,7 @@ export default {
             printList: [],
 
             importTableDialogVisible: false,
+            importZipDialogVisible: false,
             position: null,
             importList: [],
             importValue: null,
@@ -1812,10 +1820,19 @@ export default {
         },
 
         // 自定义导入  小林
-        handleImport (data = []) {
-            this.importList = data
-            this.importValue = this.getKeys(this.importList)
-            this.importTableDialogVisible = true
+        handleImport (data = [], type = 'excel') {
+            switch (type) {
+                case 'excel':
+                    this.importList = data
+                    this.importValue = this.getKeys(this.importList)
+                    this.importTableDialogVisible = true
+                    break
+                case 'zip':
+                    this.importZipDialogVisible = true
+                    break
+                default:
+                    break
+            }
         },
         handleImportTableActionEvent (file, options) {
             this.loading = false
@@ -1836,6 +1853,13 @@ export default {
                 this.afterScript('multipleImport', this.position, this.selection, list, () => {})
                 // ActionUtils.success('导入成功')
             })
+        },
+        async handleImportZipActionEvent (file, options) {
+            // 调用上传接口
+            await importzip(file)
+            this.importZipDialogVisible = false
+            this.search()
+            ActionUtils.success('导入成功')
         },
         setValue (data) {
             return Object.values(data).reduce((obj, item) => {
@@ -1900,7 +1924,7 @@ export default {
              * type:dialog，表示对话框列表
              * tempSearch为true的时候是列表搜索框点击打开的对话框
              * 数据模板脚本里打开的对话框列表，不需要执行本模块代码，否则会执行到底层列表的onload脚本：洗眼器
-             * 但是在表单页面打开对话框的时候需要执行本模块代码：考试管理对话框（如模板内需注册组件的场景，若不执行脚本则组件未注册，后续逻辑无法正确执行）
+             * 但是在表单页面打开对话框的时候需要执行本模块代码：考试管理对话框
              */
             if (this.dataTemplate.type === 'default' || (this.dataTemplate.type === 'dialog' && !this.tempSearch) || this.tempSearch) {
                 // 判断对话框模板脚本是否存在onload，如果存在就执行，如果不存在就不执行JTemplate._onLoad(this)

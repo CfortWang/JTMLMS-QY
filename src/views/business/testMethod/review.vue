@@ -30,7 +30,7 @@
             />
             <el-table-column
                 label="检验方法"
-                width="140"
+                width="300"
             >
                 <template v-slot="{ row }">
                     <span style="margin-left: 10px">{{ getJianYanFangFaName(row.jianYanFangFa) }}</span>
@@ -47,9 +47,10 @@
             <el-table-column
                 prop="xiangMuMingCheng"
                 label="检测项目"
-                width="140"
+                width="300"
             />
-            <el-table-column
+            <!-- 12.30 -->
+            <!-- <el-table-column
                 prop="sheBeiMingCheng"
                 label="设备名称"
                 width="220"
@@ -63,7 +64,7 @@
                 prop="faXianWenTi"
                 label="发现的问题"
                 width="220"
-            />
+            /> -->
             <el-table-column label="操作">
                 <template v-slot="{ row,$index }">
                     <span v-if="btnShsow" class="spanto" @click="handleEdit(row,$index)"><i class="el-icon-edit-outline" />编辑</span>
@@ -188,6 +189,7 @@ export default {
         },
         statData: {
             handler (val) {
+                console.log('点击子表确定val', val)
                 const t = val.map(item => ({
                     'id': '',
                     'parentId': '',
@@ -302,6 +304,7 @@ export default {
         },
         handleEdit (row, index) {
             // 编辑操作
+            console.log('点击编辑', row)
             this.selectEditchange = true
             this.selectEditData = row
             this.selectEditData.rowIndex = index

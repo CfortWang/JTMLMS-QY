@@ -46,6 +46,12 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="选择排班" prop="scheduleId">
+                <template slot="label">
+                    <span>选择排班</span>
+                    <el-tooltip content="只能选择已发布状态的排班" placement="top">
+                        <i class="el-icon-question"></i>
+                    </el-tooltip>
+                </template>
                 <el-select
                     v-model="formData.scheduleId"
                     :disabled="readonly"
@@ -73,6 +79,18 @@
                     :maxlength="1024"
                     :disabled="readonly"
                     :placeholder=" readonly ? '' : '请输入调班原因'"
+                />
+            </el-form-item>
+            <el-form-item v-if="params.action == 'view' && formData.status == '已拒绝'" label="拒绝原因" prop="rejectReason">
+                <el-input
+                    v-model="formData.rejectReason"
+                    type="textarea"
+                    :rows="4"
+                    clearable
+                    show-word-limit
+                    :maxlength="1024"
+                    :disabled="readonly"
+                    :placeholder="params.action + formData.status"
                 />
             </el-form-item>
             <el-form-item label="调班班次">
@@ -154,7 +172,9 @@
                                 :disabled="readonly"
                                 multiple
                                 filterable
+                                multiple-limit="3"
                                 :placeholder=" readonly ? '' : '请选择调班班次'"
+                                @change="vaildBanci($event, scope.row, beforeDateList, 'before')"
                             >
                                 <el-option
                                     v-for="item in scope.row.beforeShiftList"
@@ -191,7 +211,6 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        v-if= "reScheduleValue!=='paiban'"
                         prop="afterDate"
                         label="目标日期"
                         width="150"
@@ -207,9 +226,10 @@
                         <template slot-scope="scope">
                             <el-select
                                 v-model="scope.row.afterDate"
-                                :disabled="readonly || reScheduleValue==='paiban'"
+                                :disabled="readonly"
                                 :placeholder=" readonly ? '' : '请选择目标日期'"
                                 @change="handleDateChange($event, scope.$index, 'afterShiftList')"
+                                @visible-change="(visible) => {getPaiBanDate(visible,scope.$index)}"
                             >
                                 <el-option
                                     v-for="item in afterDateList"
@@ -240,8 +260,9 @@
                                 :disabled="readonly"
                                 multiple
                                 filterable
+                                multiple-limit="3"
                                 :placeholder=" readonly ? '' : '请选择目标班次'"
-                                @visible-change="(visible) => {getPaiBanBanci(visible,scope.$index)}"
+                                @change="vaildBanci($event, scope.row, afterDateList, 'after')"
                             >
                                 <el-option
                                     v-for="item in scope.row.afterShiftList"
@@ -263,9 +284,7 @@
 
 <script>
 // import {  } from '@/views/constants/schedule'
-import { getAdjustment, saveAdjustment, queryStaffSchedule, getStaffSchedule, sendMessage } from '@/api/business/schedule'
-import { queryDataById } from '@/api/platform/data/dataTemplate'
-
+import { getAdjustment, saveAdjustment, queryStaffSchedule, getStaffSchedule, sendMessage, saveStaffSchedule } from '@/api/business/schedule'
 export default {
     props: {
         visible: {
@@ -292,6 +311,7 @@ export default {
             maxHeight: document.body.clientHeight - 438 + 'px',
             dialogVisible: this.visible,
             formLabelWidth: '110px',
+            getAdjustmentData: null,
             formData: {
                 scheduleId: '',
                 reason: '',
@@ -321,15 +341,6 @@ export default {
             ],
             pickerOptions: {}
         }
-    },
-    computed: {
-        /*
-        beforeShiftList () {
-            return []
-        },
-        afterShiftList () {
-            return []
-        }*/
     },
     watch: {
         visible: {
@@ -364,27 +375,30 @@ export default {
             }
             // 初始化表单数据的方法
             const initializeFormData = (data) => {
-                const { scheduleId, reason, executor, executeDate, adjustmentDetailPoList } = data || {}
+                const { scheduleId, reason, status, rejectReason, executor, executeDate, adjustmentDetailPoList } = data || {}
                 this.reScheduleValue = data.type
                 // this.reScheduleValue = 'paiban'
                 self.formData = {
                     scheduleId,
                     reason,
+                    status,
+                    rejectReason,
                     adjustList: adjustmentDetailPoList.map((i, index) => ({
                         ...i,
                         beforeAdjust: i.beforeAdjust ? i.beforeAdjust.split(',') : [],
                         afterAdjust: i.afterAdjust ? i.afterAdjust.split(',') : [],
                         beforeShiftList: self.handleDateInit(i.beforeDate, index, 'beforeShiftList', i.createBy, i.beforeAdjust),
-                        afterShiftList: this.reScheduleValue === 'paiban' ? self.getPaiBanBanci(true, index, i.afterAdjust.split(',')) : self.handleDateInit(i.afterDate, index, 'afterShiftList', i.party, i.afterAdjust)
+                        afterShiftList: self.handleDateInit(i.afterDate, index, 'afterShiftList', i.party, i.afterAdjust)
                     }))
                 }
                 console.log('formData', self.formData)
             }
             self.loading = true
             try {
-                const res = await getAdjustment({ id: self.params.id })
-                if (res.data) {
-                    initializeFormData(res.data)
+                // const res = await getAdjustment({ id: self.params.id })
+                this.getAdjustmentData = await getAdjustment({ id: self.params.id })
+                if (this.getAdjustmentData.data) {
+                    initializeFormData(this.getAdjustmentData.data)
                 }
             } catch (error) {
                 console.error('加载排班配置失败', error)
@@ -393,8 +407,12 @@ export default {
             }
         },
         getScheduleList (self) { // 获取排班下拉的列表
+            const { first, second } = this.$store.getters.level || {}
             const params = {
-                parameters: [],
+                parameters: [{
+                    key: 'Q^di_dian_^S',
+                    value: second || first
+                }],
                 requestPage: {
                     pageNo: 1,
                     limit: 99999
@@ -403,7 +421,7 @@ export default {
             }
             queryStaffSchedule(params).then((res) => {
                 self.scheduleList = res.data.dataResult
-                self.scheduleOptions = self.scheduleList.map(s => ({
+                self.scheduleOptions = self.scheduleList.filter(s => s.status === '已发布').map(s => ({
                     label: s.title,
                     value: s.id
                 }))
@@ -426,7 +444,7 @@ export default {
                     value: s.id
                 }))
                 if (this.params.action !== 'view') {
-                    await self.handleScheduleChange(id)
+                    self.handleScheduleChange(id)
                 }
             })
         },
@@ -435,6 +453,8 @@ export default {
             const sql = 'select * from t_adjustment_detail where status_ in ( "待审核", "审核中", "待审批") and parent_id_ in (select id_ from t_adjustment where schedule_id_ = ' + scheduleId + ' )'
             const res = await self.$common.request('sql', sql) // 获取当前审核状态中的申请单数据
             self.blockList = self.getBlockResult(res.variables.data || [], 'default')
+            // 清除列表中被申请数据
+            this.vaildExpireData(self.blockList)
         },
         clearSchedule () { // 清空操作 清空排班数据
             this.formData.adjustList = []
@@ -494,7 +514,85 @@ export default {
             //     }
             // }
         },
-        rowValidate (row, index) {
+        /** 校验数据中有无日期过期或班次被锁定数据，有则清空该条数据
+         *
+         * @param dateList 已经过滤的数据
+         * */
+        vaildExpireData (blockList) {
+            this.formData.adjustList.forEach((adjustItem) => {
+                const createBy = adjustItem.createBy
+                if (blockList[createBy]) {
+                    const blockListForUser = blockList[createBy] // 锁定数据中用户数据
+                    const beforeDate = adjustItem.beforeDate
+                    blockListForUser.forEach((blockEntry) => {
+                        if (blockEntry.value === beforeDate) {
+                            const banci = blockEntry.banci
+                            if (adjustItem.beforeAdjust.includes(banci)) {
+                                const nameObj = this.scheduleInfo.scheduleShift.find(obj => obj.alias === banci)
+                                this.$message.warning(adjustItem.beforeDate + '调班班次【' + nameObj?.name + '】已被申请,请重新选择')
+                                adjustItem.beforeAdjust = adjustItem.beforeAdjust.filter(item => item !== banci)
+                            }
+                        }
+                    })
+                }
+                const party = adjustItem.party
+                if (blockList[party]) {
+                    const blockListForUser = blockList[party] // 锁定数据中用户数据
+                    const afterDate = adjustItem.afterDate
+                    blockListForUser.forEach((blockEntry) => {
+                        if (blockEntry.value === afterDate) {
+                            const banci = blockEntry.banci
+                            if (adjustItem.afterAdjust.includes(banci)) {
+                                const nameObj = this.scheduleInfo.scheduleShift.find(obj => obj.alias === banci)
+                                this.$message.warning(adjustItem.afterDate + '目标班次【' + nameObj?.name + '】已被申请,请重新选择')
+                                adjustItem.afterAdjust = adjustItem.afterAdjust.filter(item => item !== banci)
+                            }
+                        }
+                    })
+                }
+            })
+        },
+        vaildBanci (chooseArr, row) {
+            // 校验调班那天是否有重复班次
+            if (this.reScheduleValue === 'diaoban' && chooseArr.length > 0) {
+                const duplicateElements = [] // 用户重复班次数组
+                const userAfterData = this.beforeDateList.find(obj => obj.value === row.afterDate)
+                row.afterAdjust.some(element => {
+                    if (userAfterData.banci.includes(element)) {
+                        duplicateElements.push(element)
+                    }
+                })
+                if (duplicateElements.length > 0) { // 用户当天有目标班次 不能换
+                    const val = duplicateElements.map(el => {
+                        const nameObj = this.scheduleInfo.scheduleShift.find(obj => obj.alias === el)
+                        return nameObj?.name
+                    }).filter(Boolean).join(', ')
+                    // 把该重复元素从目标班次删除
+                    row.afterAdjust = row.afterAdjust.filter(item => !duplicateElements.includes(item))
+                    this.$message.warning(row.afterDate + '您已有【' + val + '】班次，不能作为目标班次！')
+                    return true
+                }
+                const partyElements = []// 目标人员重复班次数组
+                const partyBeforeData = this.afterDateList.find(obj => obj.value === row.beforeDate)
+                row.beforeAdjust.some(element => {
+                    if (partyBeforeData.banci.includes(element)) {
+                        partyElements.push(element)
+                    }
+                    return false
+                })
+                if (partyElements.length > 0) { // 目标人员有重复班次 也不能换
+                    const val = partyElements.map(el => {
+                        const nameObj = this.scheduleInfo.scheduleShift.find(obj => obj.alias === el)
+                        return nameObj?.name
+                    }).filter(Boolean).join(', ')
+                    // 把该重复元素从目标班次删除
+                    row.beforeAdjust = row.beforeAdjust.filter(item => !partyElements.includes(item))
+                    this.$message.warning(row.beforeDate + '目标人员已有【' + val + '】班次，不能作为调班班次！')
+                    return true
+                }
+            }
+        },
+        rowValidate (row, index) { // 行必填检验
             if (!row.beforeDate) {
                 this.$message.warning(`第${index}行` + '调班日期未选择！')
                 return true
@@ -503,7 +601,7 @@ export default {
                 this.$message.warning(`第${index}行` + '调班班次未选择！')
                 return true
             }
-            if (this.reScheduleValue === 'diaoban') { // 排班变更目标日期目标人员不用填
+            if (this.reScheduleValue === 'diaoban') { // 排班变更目标人员不用填
                 if (!row.afterDate) {
                     this.$message.warning(`第${index}行` + '目标人员未选择！')
                     return true
@@ -512,10 +610,10 @@ export default {
                     this.$message.warning(`第${index}行` + '目标日期未选择！')
                     return true
                 }
-            }
-            if (row.afterAdjust.length < 1) {
-                this.$message.warning(`第${index}行` + '目标班次未选择！')
-                return true
+                if (row.afterAdjust.length < 1) {
+                    this.$message.warning(`第${index}行` + '目标班次未选择！')
+                    return true
+                }
             }
         },
         initDateOptions (startDateStr, obj) { // 初始化日期下拉数据
@@ -559,11 +657,11 @@ export default {
             const filterBList = bList[filterid] || []
             const { startDate } = this.scheduleInfo
             // 将日期在今天之前的排班也锁定
-            dateList.forEach((el) => {
-                if (this.equalDate(el.value)) {
-                    el.disabled = true
-                }
-            })
+            // dateList.forEach((el) => {
+            //     if (this.equalDate(el.value)) {
+            //         el.disabled = true
+            //     }
+            // })
             filterBList.forEach((el) => {
                 const index = this.getDays(startDate, el.value)
                 if (dateList[index].value === el.value && dateList[index].disabled !== true) {
@@ -590,6 +688,10 @@ export default {
             console.log('已过滤日期班次：', dateList)
             return dateList
         },
+        /**
+         * @param data 被锁定的数据
+         * @param type 类型区分是初始化时还是编辑中，因为初始化数据的字段和编辑行的不一致
+         */
         getBlockResult (data, type) {
             if (data.length < 1) {
                 return {}
@@ -676,6 +778,12 @@ export default {
                 // 获取所选日期对应数据
                 let selectObj = this.beforeDateList.filter(item => item.value === val) // 调班人自己的数据
                 if (type === 'afterShiftList') {
+                    if (this.reScheduleValue === 'paiban') { // 排班变更模式下 日期 班次初始化为全部日期班次
+                        this.afterDateList = this.getDateArray(this.scheduleInfo.startDate, this.scheduleInfo.endDate)
+                        const shiftArr = this.scheduleInfo.scheduleShift
+                        shiftArr.push({})
+                        return shiftArr
+                    }
                     this.handlePartyChange(userid, this.formData.adjustList[index], index, 'init')
                     selectObj = this.afterDateList.filter(item => item.value === val) // 目标人员数据
                 }
@@ -724,15 +832,12 @@ export default {
                 this.handleDateChange(row.afterDate, index, 'afterShiftList')
             }
         },
-        getPaiBanBanci (visible, index, afterAdjust) { // 排班变更方式，班次全部可选，目标人员和日期不可选
+        getPaiBanDate (visible, index, afterAdjust) { // 排班变更方式，日期全部可选，目标人员不可选
             if (this.reScheduleValue === 'paiban' && visible === true) {
-                this.formData.adjustList[index]['afterShiftList'] = this.scheduleInfo.scheduleShift
-                if (afterAdjust) {
-                    this.formData.adjustList[index]['afterAdjust'] = afterAdjust
-                    return this.formData.adjustList[index]['afterShiftList']
-                }
-            } else {
-                return
+                const startDate = this.scheduleInfo.startDate
+                const endDate = this.scheduleInfo.endDate
+                const datearr = this.getDateArray(startDate, endDate)
+                this.afterDateList = datearr
             }
         },
         handleFormAction ({ key }) {
@@ -790,8 +895,9 @@ export default {
                     return this.$message.warning('请完善表单必填项信息！')
                 }
                 const { first, second } = this.$store.getters.level || {}
-                const { scheduleId, reason, adjustList } = this.formData || {}
+                const { scheduleId, reason, adjustList, rejectReason } = this.formData || {}
                 let statusVal = '已暂存'
+                const executorVal = this.scheduleInfo.executor.replace(/\[|\]|\"/g, '').replace(/,/g, ',') || ''
                 if (key === 'tempSave') { // 暂存
                 } else { // 提交
                     // 对最后一行进行行校验
@@ -802,7 +908,7 @@ export default {
                     if (this.rowValidate(this.formData.adjustList[this.formData.adjustList.length - 1], this.formData.adjustList.length)) {
                         return
                     }
-                    statusVal = adjustList.some((i) => { return this.$utils.isNotEmpty(i.party) && this.reScheduleValue !== 'paiban' }) ? '待审核' : '待审批'
+                    statusVal = adjustList.some((i) => { return this.$utils.isNotEmpty(i.party) && this.reScheduleValue !== 'paiban' }) ? '待审核' : (executorVal === '' ? '已通过' : '待审批')
                 }
                 // return
                 const submitData = {
@@ -814,6 +920,7 @@ export default {
                     overview: getOverview(adjustList),
                     status: statusVal,
                     type: this.reScheduleValue,
+                    rejectReason,
                     /*
                     dataStatus: "string",
                     delBeforeSave: true,
@@ -821,11 +928,12 @@ export default {
                     executeDate: '',
                     "type": "string",
                     */
-                    executor: this.scheduleInfo.executor.replace(/\[|\]|\"/g, '').replace(/,/g, ',') || '',
+                    executor: executorVal,
                     // type: this.reScheduleValue,
                     adjustmentDetailPoList: adjustList.map(i => ({
                         recordId: i.recordId,
                         beforeDate: i.beforeDate,
+                        rejectReason: i.rejectReason,
                         beforeAdjust: i.beforeAdjust ? i.beforeAdjust.join(',') : '',
                         party: i.party ? i.party : this.$store.getters.userId,
                         status: statusVal,
@@ -839,10 +947,11 @@ export default {
         },
         // 提交数据
         submitForm (data) {
-            saveAdjustment(data).then(res => {
-                this.$message.success(`${this.params.action === 'edit' ? '提交' : '申请'}成功`)
-                this.closeDialog()
-                this.$emit('refresh')
+            const self = this
+            saveAdjustment(data).then(async (res) => {
+                self.$message.success(`${self.params.action === 'edit' ? '提交' : '申请'}成功`)
+                self.closeDialog()
+                self.$emit('refresh')
                 // 提交后通知审核人、审批人
                 if (data.status === '待审核') {
                     const partyArray = data.adjustmentDetailPoList.map(obj => obj.party)
@@ -854,7 +963,47 @@ export default {
                     executorList.forEach(el => {
                         sendMessage(data, el)
                     })
+                } else if (data.status === '已通过') { // 通过申请修改排班数据(只有排版变更且无排版审批人才可能在提交时变为已通过)
+                    self.handleAccess(self)
                 }
+            })
+        },
+        /**
+         * 处理已通过的申请单，修改排班数据
+         */
+        async handleAccess (self) {
+            const response = await getStaffSchedule({ id: self.formData.scheduleId })
+            const submitData = response.data
+            const { staffScheduleDetailPoList, startDate } = response.data
+            self.formData.adjustList.forEach(async (el) => {
+                const userId = this.$store.getters.userId || ''
+                const userResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === userId) // 获取调班人的排班详情
+                // 排版变更
+                const index = this.getDays(startDate, el.afterDate) // 计算得出是d几天
+                const partyIndex = this.getDays(startDate, el.beforeDate) // 计算得出是d几天
+                el.afterAdjust.forEach((item) => {
+                    if (!staffScheduleDetailPoList[userResIndex][`d${index + 1}`].includes(item)) { // 排班原本不包含的班次才加进去 避免重复
+                        if (staffScheduleDetailPoList[userResIndex][`d${index + 1}`] !== '') {
+                            staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = staffScheduleDetailPoList[userResIndex][`d${index + 1}`].concat(',' + item) // 申请人目标日期改变
+                        } else {
+                            staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = item
+                        }
+                    }
+                })
+                el.beforeAdjust.forEach((item, i) => {
+                    if (i === (el.beforeAdjust.length - 1)) {
+                        staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item, '') // 申请人申请日期除去原来的班次
+                    } else { // 当不在最后一项时，把附带的逗号也除去
+                        staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item + ',', '') // 申请人申请日期除去原来的班次和逗号
+                    }
+                })
+            })
+            // 保存修改后的排班
+            // submitData.staffScheduleDetailPoList = staffScheduleDetailPoList
+            saveStaffSchedule(submitData).then(() => {
+                console.log('排班已更新')
+            }).catch((err) => {
+                console.log(err)
             })
         },
         handleAddParam () {
@@ -952,6 +1101,31 @@ export default {
         },
         handleSelectionChange (v) {
             this.selectionIndex = v.map(item => this.formData.adjustList.indexOf(item))
+        },
+        /** 返回一个从开始日期到结束日期的日期数组(今天之前的不可用)
+         * @param startDate
+         * @param endDate
+         * */
+        getDateArray (startDate, endDate) {
+            const dateArray = []
+            const start = new Date(startDate)
+            const end = new Date(endDate)
+            // const currentDateNow = new Date() // 获取当前日期
+            const aliasList = this.scheduleInfo.scheduleShift.map(item => item.alias)
+            const banci = aliasList.join(',')
+            for (let currentDate = start; currentDate <= end; currentDate.setDate(currentDate.getDate() + 1)) {
+                const dateObj = {
+                    banci: banci + ',休息',
+                    disabled: false,
+                    // currentDate < currentDateNow, // 修改此处判断，若日期小于当前日期则设为disabled:true,
+                    key: `d${currentDate.getDate()}`,
+                    label: currentDate.toISOString().split('T')[0],
+                    value: currentDate.toISOString().split('T')[0]
+                }
+                dateArray.push(dateObj)
+            }
+
+            return dateArray
         },
         equalDate (dateStr) { // 比较传参是否在今天日期之前，是则返回true
             // 获取今天的日期，只保留年月日部分

@@ -2,7 +2,6 @@
     <div v-if="structure === 'list'">
         <template v-if="!readonly">
             <el-select
-                v-if="!initLoading"
                 v-model="selectData"
                 v-load-more="loadMore"
                 :filterable="filterable"
@@ -27,7 +26,6 @@
                     :value="labelFilter(item, 'value')"
                 />
             </el-select>
-            <el-select v-else v-model="initValue" :placeholder="placeholder" style="width: 100%" />
         </template>
         <!--只读-->
         <template v-else>
@@ -209,7 +207,7 @@ export default {
             selectDataOptions: [],
             pagination: {
                 page: 1,
-                limit: 100,
+                limit: 10,
                 count: 0
             }
         }
@@ -351,12 +349,12 @@ export default {
             })
         },
         loadMore () {
-            this.pagination.page = this.pagination.page + 1
             const pageSize = this.pagination.limit * this.pagination.page
             if (pageSize >= this.pagination.count) {
                 return
             }
-            const data = this.treeData.slice(pageSize, pageSize + this.pagination.limit + 1)
+            this.pagination.page = this.pagination.page + 1
+            const data = this.treeData.slice(pageSize, pageSize + this.pagination.limit)
             if (this.$utils.isNotEmpty(data)) {
                 data.forEach(d => {
                     this.selectDataOptions.push(d)
@@ -406,6 +404,26 @@ export default {
                 this.loadTreeData()
             }
         },
+        /**
+         * 初始化的时候  将选中的数据移动到最前面 防止因为分页找不到对应的label
+         */
+        handleData (data = []) {
+            if (data.length === 0 || !this.selectData) return data
+            const newData = JSON.parse(JSON.stringify(data)) // 深拷贝避免缓存数据被修改
+            const selectiton = this.multiple ? this.selectData : [this.selectData]
+            // 将n条数据与前n条数据做交换
+            for (let i = 0; i < selectiton.length; i++) {
+                const item = selectiton[i]
+                const index = newData.findIndex(i => i[this.valueKey] === item)
+                if (index > -1 && index !== i) {
+                    const temp = newData[index]
+                    newData[index] = newData[i]
+                    newData[i] = temp
+                }
+                // console.log(JSON.parse(JSON.stringify(newData)))
+            }
+            return newData
+        },
         loadTreeData (init = false) {
             if (init) {
                 this.listData = []
@@ -446,13 +464,24 @@ export default {
             }).then(response => {
                 this.showEmptyText = this.emptyText
                 const responseData = response.data
-                const data = responseData.dataResult || []
+                let data = responseData.dataResult || []
+
+                // 当多选的数据大于分页数时 动态调整分页容量
+                if (this.multiple && this.selectData.length > this.pagination.limit) {
+                    this.pagination.limit = Math.ceil(this.selectData.length / 10) * 10
+                    this.defaultPagination.limit = this.pagination.limit
+                }
+                data = this.handleData(data, init)
 
                 if (this.structure === 'list') {
                     // 处理分页
                     this.handlerPagination(JSON.parse(JSON.stringify(this.defaultPagination)))
                     this.pagination.count = data.length
-                    this.selectDataOptions = data.slice(this.pagination.page - 1, this.pagination.limit + 1)
+
+                    this.selectDataOptions = []
+                    this.$nextTick(() => {
+                        this.selectDataOptions = data.slice(this.pagination.page - 1, this.pagination.limit)
+                    })
 
                     this.treeData = data
                 } else {

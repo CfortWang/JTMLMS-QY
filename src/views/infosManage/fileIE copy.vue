@@ -294,7 +294,8 @@ export default {
         unitConversions (str) {
             // 使用正则表达式匹配括号内的数字
             const match = str.match(/（(\d+)）/)
-            // console.log('match', match)
+            // const match = str.match(/\((\d+)\)/)
+            console.log('match', match)
             // 如果找到了匹配，则返回匹配到的数字；否则返回空字符串
             if (!match) { return }
             if (match[1] < 1024) { return match[0] + match[1] }
@@ -394,8 +395,7 @@ export default {
             // 重复发放的文件，在权限表会存在重复的文件信息
             //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian
             //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
-            const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,wj.shu_ju_lai_yuan_ AS shu_ju_lai_yuan_,file.ext_ AS ext_,
-			file.FILE_PATH_ AS file_path_,concat(file.file_name_,'.',file.ext_,'（大小：',
+            const selectSql = `select  wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,wj.shu_ju_lai_yuan_ AS shu_ju_lai_yuan_,concat(file.file_name_,'.',file.ext_,'（大小：',
                CASE
                 WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
                 WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
@@ -420,8 +420,7 @@ export default {
             // 受限文件:结合查阅授权模块的截止时间
             // select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,concat(file.file_name_,'.',file.ext_,'（',file.total_bytes_,'）') as file_info_,
 
-            const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,wj.shu_ju_lai_yuan_ AS shu_ju_lai_yuan_,file.ext_ AS ext_,
-			file.FILE_PATH_ AS file_path_,concat(file.file_name_,'.',file.ext_,'（',
+            const authoritySql = `select wj.id_ as id,cy.id_ as cy_id_,sc.id_ as sc_id_,wj.shu_ju_lai_yuan_ AS shu_ju_lai_yuan_,concat(file.file_name_,'.',file.ext_,'（',
                      CASE
                     WHEN file.total_bytes_ >= 1024 * 1024 THEN CONCAT(ROUND(file.total_bytes_ / (1024.0 * 1024), 2), ' M')
                     WHEN file.total_bytes_ >= 1024 THEN CONCAT(ROUND(file.total_bytes_ / 1024.0, 2), ' K')
@@ -484,7 +483,7 @@ export default {
             }
             const fileSearchSql = needSelType.join('union all')
             // ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
-            const sql = this.pageKey === 'nbwj' ? `select sq.id,sq.cy_id_,sq.sc_id_,sq.shu_ju_lai_yuan_,sq.file_info_,sq.wen_jian_xi_lei_,sq.wen_jian_bian_hao,sq.wen_jian_ming_che,sq.ban_ben_,sq.ext_,sq.file_path_,COALESCE(wjxz.gai_zhang_fu_jian,sq.fu_jian_) AS fu_jian_,sq.fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s from (${fileSearchSql}) sq LEFT JOIN t_wjxzxdjlb wjxz ON sq.shu_ju_lai_yuan_ = wjxz.id_ ORDER BY sq.wen_jian_bian_hao ${ascDesc},sq.wen_jian_ming_che DESC` : oldRecordSql
+            const sql = this.pageKey === 'nbwj' ? `select sq.id,sq.cy_id_,sq.sc_id_,sq.shu_ju_lai_yuan_,sq.file_info_,sq.wen_jian_xi_lei_,sq.wen_jian_bian_hao,sq.wen_jian_ming_che,sq.ban_ben_,COALESCE(wjxz.gai_zhang_fu_jian,sq.fu_jian_) AS fu_jian_,sq.fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s from (${fileSearchSql}) sq LEFT JOIN t_wjxzxdjlb wjxz ON sq.shu_ju_lai_yuan_ = wjxz.id_ ORDER BY sq.wen_jian_bian_hao ${ascDesc},sq.wen_jian_ming_che DESC` : oldRecordSql
             // console.log(sql, 'sssssssssssssssssss')
             curdPost('sql', sql).then(res => {
                 const tableDatas = res.variables.data
@@ -633,7 +632,7 @@ export default {
                     this.refreshData()
                     break
                 case 'remove':
-                    if (!data || !data.length) {
+                    if (data.length === 0) {
                         this.$message({
                             message: '请选择数据再进行删除',
                             type: 'error'
@@ -735,9 +734,11 @@ export default {
             this.refreshData()
         },
         handleClickTag (val) {
+            // console.log('val', val)
+            // const sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
             // this.$common.request('sql', sql).then(res => {
             //     console.log('res', res)
-            //     this.fileInfos = {}
+            //     this.fileInfos = {}// 本人添加
             //     const { data = [] } = res.variables || {}
             //     if (!data.length) {
             //         this.$message.warning('没有可查阅的文件，请查明原因！')
@@ -745,16 +746,20 @@ export default {
             //     }
             //     this.fileInfos = { id: val.id, FILE_NAME_: val.wen_jian_ming_che, fileInfos: data[0], func: this.handleUpdate, ban_ben_: val.ban_ben_ }
             //     this.dialogVisible = true
-            // 查看文件
+            // 本人修改
             this.fileArray = []
             // this.handleFileInfo(val)
             const sql1 = `select t_wjxxb.*, t_wjxzxdjlb.xiu_ding_ban_ben_, t_wjxzxdjlb.xiu_ding_nei_rong,t_wjxzxdjlb.yuan_yin_
             from  t_wjxxb
             INNER JOIN t_wjxzxdjlb ON  t_wjxxb.shu_ju_lai_yuan_ = t_wjxzxdjlb.id_ WHERE  tou_ban_wen_jian_='${val.id}' AND t_wjxxb.shi_fou_guo_shen_='有效'`
-            // 查看文件修订历史记录
-            const sql = `select w.* FROM t_wjxzxdjlb w JOIN (select zuo_fei_cao_zuo_ FROM t_wjxzxdjlb WHERE id_ = (select shu_ju_lai_yuan_ FROM t_wjxxb WHERE id_ = '${val.id}') and zuo_fei_cao_zuo_ IS NOT NULL and zuo_fei_cao_zuo_!='' ) sub ON w.zuo_fei_cao_zuo_ = sub.zuo_fei_cao_zuo_ where w.zuo_fei_cao_zuo_ IS NOT NULL and w.zuo_fei_cao_zuo_!=''and w.shi_fou_guo_shen_='已完成' `
+            // 1
+            const sql = `select wjxzxdjlb.* FROM t_wjxxb wjxxb 
+            LEFT JOIN t_wjxzxdjlb wjxzxdjlb ON 
+            wjxxb.wen_jian_fu_jian_ = wjxzxdjlb.wen_jian_fu_jian_
+            WHERE wjxxb.id_ = '${val.id}' ORDER BY wjxzxdjlb.create_time_ DESC`
             this.$common.request('sql', sql).then(res => {
                 const list = res.variables.data
+                // console.log('list', list)
                 list.forEach(el => {
                     const obj = {
                         zId: val.id,
@@ -778,14 +783,12 @@ export default {
             })
         },
         handleFileInfo (val) {
-            // 修订附件作废附件不再使用，修订在文件附件上操作
-            const sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
-            //  let sql = ''
-            // if (val.cao_zuo_lei_xing_ === '修订') {
-            //     sql = `select * from ibps_file_attachment where id_= '${val.xiu_ding_fu_jian_}'`
-            // } else {
-            //     sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
-            // }
+            let sql = ''
+            if (val.cao_zuo_lei_xing_ === '修订') {
+                sql = `select * from ibps_file_attachment where id_= '${val.xiu_ding_fu_jian_}'`
+            } else {
+                sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
+            }
             this.$common.request('sql', sql).then(res => {
                 this.fileInfos = {}// 本人添加
                 const { data = [] } = res.variables || {}

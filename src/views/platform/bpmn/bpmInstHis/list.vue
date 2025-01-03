@@ -292,6 +292,19 @@ export default {
             }
         }
     },
+    watch: {
+        dialogFormVisible: {
+            handler: function (val, oldVal) {
+                if (val === false) {
+                    // console.log(val)
+
+                    ActionUtils.setFirstPagination(this.pagination)
+                    this.search()
+                }
+            }
+
+        }
+    },
     created () {
         this.loadData()
         this.getConfig()

@@ -20,10 +20,22 @@
                 placement="top"
             >
                 <el-card class="card">
-                    <div class="applicant">申请人：{{ item.creator }}</div>
-                    <div class="reason">原因：{{ item.reason }}</div>
-                    <div class="detail">详情：{{ item.overview }}</div>
-                    <div class="approve">通过时间：{{ item.updateTime }}</div>
+                    <div class="applicant">
+                        <span class="leftText">申请人:</span>
+                        <span class="rightText">{{item.creator }}</span>
+                    </div>
+                    <div class="reason">
+                        <span class="leftText">原因:</span>
+                        <span class="rightText">{{item.reason }}</span>
+                    </div>
+                    <div class="detail">
+                        <span class="leftText">详情:</span>
+                        <span class="rightText">{{item.overview }}</span>
+                    </div>
+                    <div class="approve">
+                        <span class="leftText">通过时间:</span>
+                        <span class="rightText">{{item.updateTime }}</span>
+                    </div>
                 </el-card>
             </el-timeline-item>
         </el-timeline>
@@ -140,13 +152,42 @@ export default {
                     &:first_child {
                         margin-top: 0;
                     }
+
                 }
             }
-            .applicant, .reason, .detail {
+            .applicant, .reason, .detail{
                 line-height: 1.5;
+                display: flex;
+                flex-direction: row;
+                //align-items: flex-start;
+                justify-content: flex-start;
+                .leftText{
+                    text-align: right;
+                    flex:0 1 20%
+                }
+                .rightText{
+                    margin-left: 0.5em;
+                    flex:0 1 80%;
+                    text-align: left;
+                }
             }
             .detail {
                 white-space: pre-wrap;
+            }
+            .approve{
+                line-height: 1.5;
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                .leftText{
+                    text-align: right;
+                    flex:0 1 20%
+                }
+                .rightText{
+                    margin-left: 0.5em;
+                    flex:0 1 80%;
+                    text-align: left;
+                }
             }
         }
     }

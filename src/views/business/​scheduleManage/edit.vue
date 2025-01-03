@@ -362,10 +362,7 @@ import { previewFile } from '@/api/platform/file/attachment'
 import { mapValues, keyBy } from 'lodash'
 import html2canvas from 'html2canvas'
 import ActionUtils from '@/utils/action'
-import Json from '@/business/platform/serv/components/json.vue'
-import color from '@/store/modules/ibps/modules/color'
-import height from '@/mixins/height'
-import { reset } from '@/api/platform/auth/client'
+import { BASE_URL } from '@/constant'
 
 export default {
     name: 'schedule',
@@ -402,6 +399,7 @@ export default {
             activeStep: 1,
             formData: {
                 title: '',
+                id: '',
                 dateRange: [],
                 config: '',
                 scheduleStaff: [],
@@ -410,6 +408,8 @@ export default {
                 scheduleShift: [],
                 scheduleRule: []
             },
+            isDateChanged: false, // 用于标识日期是否已经改变过
+            prevDateRange: [],
             rules: {},
             scheduleColumn,
             title: this.readonly ? '创建排班' : '编辑排班',
@@ -496,6 +496,17 @@ export default {
         //     return mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
         // }
     },
+    watch: {
+        'formData.dateRange': {
+            handler (newValue, oldValue) {
+                if (oldValue.length > 0) {
+                    this.isDateChanged = true
+                    this.prevDateRange = oldValue
+                }
+            },
+            immediate: false // 不需要在组件初始化时执行，仅在日期真正改变时执行
+        }
+    },
     created () {
         this.loadData()
     },
@@ -550,6 +561,7 @@ export default {
         },
         loadData () {
             this.loading = true
+            const self = this
             // 获取配置数据
             queryScheduleConfig({
                 parameters: [],
@@ -561,14 +573,18 @@ export default {
             }).then(async res => {
                 const { dataResult } = res.data || {}
                 this.configList = dataResult
-                this.configOptions = this.transformConfigData(dataResult)
+                const { first, second } = this.$store.getters.level || {}
+                self.configOptions = self.transformConfigData(dataResult)
+                self.configOptions.forEach((el) => {
+                    el.options = el.options.filter(obj => obj.diDian === (second || first))
+                })
                 // console.log(this.configOptions)
                 if (this.$utils.isEmpty(this.pageParams.id)) {
                     this.loading = false
                     return
                 }
                 const response = await getStaffSchedule({ id: this.pageParams.id })
-                const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config, status } = response.data
+                const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config, status, id } = response.data
                 const temp = config ? JSON.parse(config) : {}
                 this.responseData = response.data
                 console.log('responseData:', response.data)
@@ -576,6 +592,7 @@ export default {
                 this.formData = {
                     title,
                     status,
+                    id,
                     config: temp.id,
                     dateRange: [startDate, endDate],
                     approver: temp.approver || [],
@@ -724,10 +741,36 @@ export default {
             }))
         },
         handleDateChange (dates) {
-            if (this.$utils.isEmpty(dates)) {
-                this.pickerOptions.disabledDate = (time) => {
-                    return false
+            if (!this.isDateChanged) {
+                // 第一次选择日期，直接处理业务逻辑，不弹出确认框
+                if (this.$utils.isEmpty(dates)) {
+                    this.pickerOptions.disabledDate = (time) => {
+                        return false
+                    }
                 }
+            } else {
+                // 不是第一次选择日期，弹出确认框
+                this.$confirm(
+                    `确定更改排班时间吗？排班数据将会重置`,
+                    '提示:',
+                    {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }
+                ).then(() => {
+                    if (this.$utils.isEmpty(dates)) {
+                        this.pickerOptions.disabledDate = (time) => {
+                            return false
+                        }
+                    }
+                    this.scheduleData = mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
+                }).catch(() => {
+                    // 取消操作时的逻辑处理,日期复原
+                    if (this.prevDateRange) {
+                        this.formData.dateRange = this.prevDateRange
+                    }
+                })
             }
         },
         getDateList (dateRange) {
@@ -826,7 +869,7 @@ export default {
                     this.historyVisible = true
                     break
                 case 'export':
-                    this.handleExport()
+                    this.handleExport(this)
                     break
                 case 'record':
                     this.recordVisible = true
@@ -903,7 +946,7 @@ export default {
         },
         validateForm () {
             const { scheduleRule, approver, status, ...rest } = this.formData
-            const result = Object.keys(rest).some(k => this.$utils.isEmpty(rest[k]))
+            const result = Object.keys(rest).some(k => this.$utils.isEmpty(rest[k]) && k !== 'id')
             return !result
         },
         // dealData (data) {
@@ -978,7 +1021,8 @@ export default {
         },
         handleSave (type) {
             const { staffScheduleDetailPoList, overview } = this.dealData(this.scheduleData) || {}
-            const { dateRange, title, config, approver, scheduleType, status, scheduleShift, scheduleStaff, scheduleRule } = this.formData
+            const { dateRange, title, config, approver, scheduleType, status, scheduleShift, scheduleStaff, scheduleRule, id } = this.formData
+            const { first, second } = this.$store.getters.level || {}
             const configData = {
                 id: config,
                 approver,
@@ -987,10 +1031,11 @@ export default {
                 scheduleRule
             }
             const submitData = {
-                id: this.pageParams.id,
-                pk: this.pageParams.id,
+                id: this.pageParams.id || id,
+                pk: this.pageParams.id || id,
+                diDian: second || first,
                 title,
-                status: type ? '已发布' : (status || '未发布'),
+                status: type ? '已发布' : '未发布',
                 startDate: dateRange[0],
                 endDate: dateRange[1],
                 type: scheduleType,
@@ -1000,28 +1045,52 @@ export default {
             }
             console.log(submitData)
             this.loading = true
-            saveStaffSchedule(submitData).then(() => {
-                this.$message.success('保存成功')
-                if (type) {
-                    this.handleSaveNews()
-                } else {
-                    this.loading = false
-                    this.closeDialog()
-                    this.$emit('callback')
+            saveStaffSchedule(submitData).then(async (res) => {
+                if (res.variables.id) {
+                    this.formData.id = res.variables.id
+                    const response = await getStaffSchedule({ id: this.formData.id })
+                    this.responseData = response.data
                 }
                 // 增加一条调班申请记录，用于查看排班管理员修改历史。
-                this.submitAdjust(submitData)
+                this.submitAdjust(submitData).then(() => {
+                    if (type) { // 提交
+                        this.handleSaveNews().then(() => {
+                            this.loading = false
+                            this.activeStep = 3
+                            this.$message.success('提交成功')
+                            this.$confirm('退出当前页面？', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(() => {
+                                this.closeDialog()
+                                this.$emit('callback')
+                            }).catch(() => {
+                                this.$emit('callback')
+                            })
+                        }).catch(() => {
+                            this.$message.error('提交失败')
+                        })
+                    } else { // 保存
+                        this.$message.success('保存成功')
+                        this.loading = false
+                        // this.closeDialog()
+                        this.$emit('callback')
+                    }
+                })
             }).catch(() => {
+                this.$message.error('保存失败')
                 this.loading = false
             })
         },
-        handleSaveNews () {
+        async handleSaveNews () {
             this.activeStep = 2
             this.$nextTick(async () => {
                 const element = this.$refs.schedule
                 console.log(element)
-                const fileId = await this.captureAndUpload(element)
-                const fileUrl = await previewFile(fileId)
+                const filePath = await this.captureAndUpload(element)
+                const fileUrl = BASE_URL + filePath
+                // await previewFile(fileId)
                 const { userId, name } = this.$store.getters
                 const { first, second } = this.$store.getters.level
                 const { title, dateRange } = this.formData
@@ -1044,11 +1113,7 @@ export default {
                     userId: userId,
                     userName: name
                 }
-                this.$common.saveNews(news).then(() => {
-                    this.loading = false
-                    this.closeDialog()
-                    this.$emit('callback')
-                })
+                return this.$common.saveNews(news)
             })
         },
         captureAndUpload (element) {
@@ -1063,7 +1128,7 @@ export default {
                         gateway: true,
                         data
                     }).then(res => {
-                        resolve(res.data.id || '')
+                        resolve(res.data.filePath || '')
                     }).catch(error => {
                         reject(error)
                     })
@@ -1077,6 +1142,11 @@ export default {
                 })
             }
             return new Promise((resolve, reject) => {
+                // 修改变形样式
+                const abscissaElement = document.querySelector('.abscissa')
+                if (abscissaElement) {
+                    abscissaElement.style.margin = '0 20px 0 90px'
+                }
                 html2canvas(element).then(canvas => {
                     canvasToBlob(canvas).then(blob => {
                         uploadImage(blob).then(fileId => {
@@ -1086,21 +1156,31 @@ export default {
                 })
             })
         },
-        async handleExport () {
-            const element = this.$refs.schedule
-            // 使用 html2canvas 渲染 DOM 元素
-            html2canvas(element, {
-                scrollX: 0,
-                scrollY: -10,
-                width: element.scrollWidth,
-                height: element.scrollHeight
-            }).then(canvas => {
-                const link = document.createElement('a')
-                link.href = canvas.toDataURL('image/png')
-                link.download = `${this.formData.title || '排班'}.png`
-                link.click()
-            }).catch(err => {
-                console.error('导出失败', err)
+        async handleExport (self) {
+            this.loading = true
+            const step = this.activeStep
+            this.activeStep = 2
+            self.$nextTick(() => {
+                const element = self.$refs.schedule
+                if (element) {
+                    // 使用 html2canvas 渲染 DOM 元素
+                    html2canvas(element, {
+                        scrollX: 0,
+                        scrollY: -10,
+                        width: element.scrollWidth,
+                        height: element.scrollHeight
+                    }).then(canvas => {
+                        const link = document.createElement('a')
+                        link.href = canvas.toDataURL('image/png')
+                        link.download = `${self.formData.title || '排班'}.png`
+                        link.click()
+                        this.activeStep = step
+                        this.loading = false
+                    }).catch(err => {
+                        this.loading = false
+                        console.error('导出失败', err)
+                    })
+                }
             })
         },
         handleReset () {
@@ -1248,7 +1328,7 @@ export default {
             return result.join('。')
         },
         // 提交调班申请数据
-        submitAdjust (submitData) {
+        async submitAdjust (submitData) {
             let overView = ''
             if (submitData.id) {
                 overView = this.getOverViews(this.responseData || null, submitData.staffScheduleDetailPoList)
@@ -1266,7 +1346,7 @@ export default {
                 updateTime: Date.now(),
                 adjustmentDetailPoList: []
             }
-            saveAdjustment(adjustData)
+            await saveAdjustment(adjustData)
         },
         closeDialog () {
             this.$emit('close', false)
@@ -1284,6 +1364,9 @@ export default {
         }
         .el-dialog__footer {
             display: none;
+        }
+        .el-dialog__body {
+            overflow: hidden;
         }
     }
     .edit-dialog-header {
@@ -1335,7 +1418,7 @@ export default {
             width: fit-content;
             overflow-x: auto;
             font-size: 14px;
-            position: relative;
+            //position: relative;
             .abscissa {
                 // width: 100%;
                 margin: 0 20px 0 110px;

@@ -10,6 +10,8 @@ import Bus from '@/utils/EventBus'
 import newPng from '@/assets/images/homepage/new.png'
 import { BASE_URL } from '@/constant'
 import dayjs from 'dayjs'
+import { scheduleType } from '@/views/constants/schedule'
+
 /**
  * 创建组件
  */
@@ -586,14 +588,18 @@ export function buildComponent (name, column, preview, vm) {
                     return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24))
                 },
                 getScheduleData () {
-                    const sql = `select a.*, b.title_, b.start_date_, b.end_date_, b.config_, b.overview_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and a.user_id_ = '${this.userId}'`
+                    const { first, second } = this.$store.getters.level || {}
+                    const sql = `select a.*, b.title_,b.type_, b.start_date_, b.end_date_, b.config_, b.overview_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}'`
                     return new Promise((resolve, reject) => {
                         this.$common.request('sql', sql).then(res => {
                             const { data = [] } = res.variables || {}
                             const eventList = []
+                            const self = this
                             data.forEach(item => {
                                 const days = this.getDays(item.start_date_, item.end_date_)
                                 const config = item.config_ ? JSON.parse(item.config_) : {}
+                                const scheduleTypeLabel = scheduleType.filter(obj => obj.value === item.type_)[0]?.label || ''
+                                const scheduleCreateBy = self.userList.filter(obj => obj.userId === item.create_by_)[0]?.userName || ''
                                 const { scheduleShift } = config
                                 this.scheduleShift = scheduleShift
                                 for (let i = 1; i <= days; i++) {
@@ -604,7 +610,9 @@ export function buildComponent (name, column, preview, vm) {
                                         shiftList.forEach(s => {
                                             const t = scheduleShift.find(i => i.alias === s)
                                             eventList.push({
-                                                color: t ? t.color : '',
+                                                scheduleName: item.title_ ? item.title_ : '', // 排班表名字
+                                                scheduleTypeLabel: scheduleTypeLabel || '', // 排班类型
+                                                scheduleCreateBy: scheduleCreateBy || '', // 排班创建人
                                                 content: t.dateRange.map(d => {
                                                     return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
                                                 }).join('\n'),
@@ -613,7 +621,9 @@ export function buildComponent (name, column, preview, vm) {
                                                 end: date,
                                                 jieShuShiJian: date,
                                                 zhuangTai: '',
-                                                id: i
+                                                id: i,
+                                                bcolor: t.color,
+                                                ...t
                                             })
                                         })
                                     }
@@ -628,11 +638,11 @@ export function buildComponent (name, column, preview, vm) {
                         })
                     })
                 },
-                handleScheduleEventClick (param) {
+                handleScheduleEventClick (param) { // 排班点击事件
                     this.$emit(
                         'open',
                         'banci',
-                        [param.event.startStr, param.event._def.extendedProps.jieShuShiJian],
+                        param.event._def.extendedProps,
                         this.scheduleShift,
                         param.event._def.title
                     )
@@ -661,8 +671,8 @@ export function buildComponent (name, column, preview, vm) {
                             // right: 'dayGridMonth,timeGridWeek,timeGridDay'
                             // end: 'prev,next,today,month,agendaWeek,agendaDay,listWeek'
                         },
-                        events: this.scheduleData, // 日程数组
-                        eventClick: this.handleScheduleEventClick, // 日程点击信息展示
+                        events: this.scheduleData, // 排班数组
+                        eventClick: this.handleScheduleEventClick, // 排班点击信息展示
                         scheduleShift: this.scheduleShift
                     }
                     this.$emit('action-event', 'mySchedule', scheduleConfig)

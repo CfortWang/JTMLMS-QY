@@ -169,6 +169,7 @@ import AddSignTaskDialog from '@/business/platform/bpmn/form-ext/add-sign-task'
 import FormPrintTemplate from '@/business/platform/form/form-print/template'
 
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
+import { SHOW_TIMT_MODIFICATION } from '@/constant'
 
 export default {
     components: {
@@ -304,10 +305,10 @@ export default {
         },
         timeModification_: {
             handler: function (val, oldVal) {
-                // if (val) {
-                // this.readonly = false
-                // console.log(this.readonly)
-
+                if (val) {
+                    this.readonly = false
+                    console.log(this.readonly)
+                }
                 this.buttons = this.buildButtons(this.responseData.buttons.slice(1, 4), this.attributes) || []
                 // }
             }
@@ -610,7 +611,7 @@ export default {
              * 构建操作按钮
              */
         buildButtons (toolbars, params) {
-            if (this.timeModificationbtn) {
+            if (this.timeModificationbtn && SHOW_TIMT_MODIFICATION) {
                 toolbars.push({
                     'alias': 'timeModification',
                     'name': this.timeModification_ ? '保存修改' : '修改数据'

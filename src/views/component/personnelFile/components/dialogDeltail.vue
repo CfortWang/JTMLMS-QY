@@ -21,6 +21,33 @@
                 <div class="rowSty">
                     <div class="nameSty">{{ e.name }} </div>
                     <div v-if="e.type==='text'" class="contant">{{ e.contant }}</div>
+                    <div v-else-if="e.type==='user' || e.type==='position'" class="contant">
+                        <ibps-user-selector
+                            v-model="e.contant"
+                            :type="e.type"
+                            readonly-text="text"
+                            :disabled="true"
+                            :multiple="false"
+                            size="mini"
+                            style="width:100%"
+                            :filter="filter"
+                            filtrate
+                        />
+                    </div>
+                    <div v-if="e.type==='dialog'" class="contant">
+                        <ibps-custom-dialog
+                            v-model="e.contant"
+                            size="mini"
+                            :template-key="e.dialogKey"
+                            multiple
+                            :disabled="true"
+                            type="dialog"
+                            class="custom-dialog"
+                            placeholder="请选择"
+                            icon="el-icon-search"
+                            style="width:100%"
+                        />
+                    </div>
                     <div v-else-if="e.type==='file'" class="contant">
                         <ibps-attachment
                             v-model="e.contant"
@@ -42,10 +69,13 @@
 </template>
 <script>
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
+import ibpsUserSelector from '@/business/platform/org/selector'
 
 export default {
     components: {
-        IbpsAttachment
+        IbpsAttachment,
+        ibpsUserSelector,
+        IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
     },
     props: {
         dialogData: {
@@ -61,7 +91,16 @@ export default {
     },
     data () {
         return {
-
+            filter: [{
+                descVal: '1',
+                includeSub: true,
+                old: 'position',
+                partyId: this.$store.getters.userInfo.employee.positions,
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }]
         }
     }
 }

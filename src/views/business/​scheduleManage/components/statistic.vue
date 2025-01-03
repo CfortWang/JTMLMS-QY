@@ -99,7 +99,7 @@ export default {
             const avgText = Object.entries(avg).map(([shift, avg]) => `${shift}【${avg}】`).join('，')
             const userOption = JSON.parse(JSON.stringify(chartOption))
             userOption.title.text = '人员班次统计'
-            userOption.title.subtext = `人数共计：${this.userList.length}，班次共计：${series.length}，人均班次为：${avgText}`
+            userOption.title.subtext = `人数共计：${this.userList.length}人，班次共计：${series.length}类，人均班次为：${avgText}`
             userOption.legend.data = Object.keys(seriesData)
             userOption.xAxis.data = categories
             userOption.series = series
@@ -157,7 +157,7 @@ export default {
             const avgText = Object.entries(avg).map(([shift, avg]) => `${shift}【${avg}】`).join('，')
             const dateOption = JSON.parse(JSON.stringify(chartOption))
             dateOption.title.text = '日期班次统计'
-            dateOption.title.subtext = `日期共计：${this.userList.length}，班次共计：${series.length}，日均班次为：${avgText}`
+            dateOption.title.subtext = `日期共计：${this.userList.length}天，班次共计：${series.length}，日均班次为：${avgText}`
             dateOption.legend.data = Object.keys(seriesData)
             dateOption.xAxis.data = categories
             dateOption.series = series

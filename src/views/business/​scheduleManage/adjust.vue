@@ -22,7 +22,7 @@
             </template>
             <template slot="partys" slot-scope="scope">
                 <span v-for="party in scope.row.partys" :key="party.value">
-                    <span :class="getTagClass(party)" class="el-tag el-tag--small el-tag--light" style="margin-left: 5px;">{{ party.label }}</span>
+                    <span v-if="party.value !== scope.row.createBy" :class="getTagClass(party)" class="el-tag el-tag--small el-tag--light" style="margin-left: 5px;">{{ party.label }}</span>
                 </span>
             </template>
         </ibps-crud>
@@ -95,7 +95,8 @@ export default {
                     // effect: 'display',
                     actions: [
                         { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit', hidden: function (row) { return row.status !== '已暂存' && row.status !== '已取消' } },
-                        { key: 'cancel', label: '取消', type: 'danger', icon: 'ibps-icon-cancel', hidden: function (row) { return row.status !== '待审核' } },
+                        { key: 'cancel', label: '取消', type: 'danger', icon: 'ibps-icon-cancel', hidden: function (row) { return !(row.status === '待审核' && row.createBy === this.$store.getters.userId) } },
+                        { key: 'edit', label: '再次申请', type: 'primary', icon: 'ibps-icon-edit', hidden: function (row) { return row.status !== '已拒绝' } },
                         { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt' }
                     ]
                 }
@@ -147,6 +148,8 @@ export default {
                     paramjson['Q^create_By_^S'] = userId
                 }
             }
+            const { first, second } = this.$store.getters.level || {}
+            paramjson['Q^di_dian_^S'] = (second || first)
             return ActionUtils.formatParams(
                 // this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
                 paramjson,

@@ -21,7 +21,7 @@
             </template>
             <template slot="partys" slot-scope="scope">
                 <span v-for="party in scope.row.partys" :key="party.value">
-                    <span :class="getTagClass(party)" class="el-tag el-tag--small el-tag--light" style="margin-left: 5px;">{{ party.label }}</span>
+                    <span v-if="party.value !== scope.row.createBy" :class="getTagClass(party)" class="el-tag el-tag--small el-tag--light" style="margin-left: 5px;">{{ party.label }}</span>
                 </span>
             </template>
         </ibps-crud>
@@ -32,6 +32,33 @@
             :readonly="readonly"
             @refresh="loadData"
             @close="() => showAdjustEdit = false" />
+        <el-dialog
+            title="拒绝原因"
+            :visible.sync="rejectdialogVisible"
+            style="padding: 10px;"
+            top="5vh"
+            width="50%"
+            class="dialog adjust-dialog"
+        >
+            <el-form class="adjust-form">
+                <el-form-item>
+                    <el-input
+                        v-model="rejectReason"
+                        type="textarea"
+                        :rows="4"
+                        clearable
+                        show-word-limit
+                        :maxlength="256"
+                        placeholder="请输入拒绝原因"
+                    />
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="rejectdialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleRejectConfirm">确定拒绝</el-button>
+            </div>
+        </el-dialog>
+
     </div>
 </template>
 
@@ -40,7 +67,6 @@ import { queryAdjustment, removeAdjustment, saveAdjustment, sendMessage, getStaf
 import { stateType } from '@/views/constants/schedule'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
-import { status } from '@/api/platform/job/scheduler'
 
 export default {
     components: {
@@ -64,6 +90,10 @@ export default {
             showAgreeBtnList: [],
             readonly: false,
             params: {},
+            ismass: false, // 标记是否批量操作
+            rejectdialogVisible: false,
+            rejectReason: '',
+            currentRejectData: {}, // 当前拒绝单据
             listConfig: {
                 /*  toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary', hidden: false },
@@ -188,6 +218,8 @@ export default {
                     })
                 }
             }
+            const { first, second } = this.$store.getters.level || {}
+            parameters[0].parameters.push({'key': 'Q^di_dian_^S', 'value': (second || first) })
             const param = {
                 parameters: parameters,
                 ...ActionUtils.formatParams(null, this.pagination, this.sorts)
@@ -248,10 +280,10 @@ export default {
                 return false
             }
             // 当前用户是未审批的审批人 展示
-            if (row.executor.includes(userId) && row.status !== '待审批') {
+            if (row.executor.includes(userId) && row.status === '待审批') {
                 return false
             }
-            return false
+            return true
         },
         /**
          * 处理分页事件
@@ -291,10 +323,10 @@ export default {
                     break
                 */
                 case 'massAgree':
-                    this.handleMassAgree(command, data)
+                    this.handleMassAgree(command, data, selection)
                     break
                 case 'massDisagree':
-                    this.handleMassAgree(command, data)
+                    this.handleMassAgree(command, data, selection)
                     break
                 case 'agree':
                     this.handleAgree(command, data)
@@ -377,24 +409,46 @@ export default {
                     if (i !== -1) { // 把当前用户的调班申请审批状态改为已通过
                         data.adjustmentDetailPoList[i].status = '已通过'
                     }
-                    if (data.adjustmentDetailPoList.every(item => item.status === '已通过')) { // 判断多个审核人状态
-                        return '待审批'
+                    if (data.adjustmentDetailPoList.every(item => item.status === '已通过')) { // 判断多个审核人状态为已通过
+                        if (data.executor) { // 存在审批人
+                            return '待审批'
+                        } else { // 不存在审批人，审核通过直接结束流程
+                            return '已通过'
+                        }
                     } else {
                         return '审核中'
                     }
                 } else {
-                    return '待审批'
+                    if (data.executor) { // 存在审批人
+                        return '待审批'
+                    } else { // 不存在审批人，审核通过直接结束流程
+                        return '已通过'
+                    }
                 }
             }
             // '待审批' 状态则直接通过
             return '已通过'
         },
+        // 拒绝dialog-确定
+        handleRejectConfirm () {
+            let data = this.currentRejectData
+            if (this.ismass) { // 批量拒绝
+                data.forEach((el) => {
+                    el.rejectReason = this.rejectReason
+                })
+                this.updateMassData('disagree', data)
+                this.rejectdialogVisible = false
+            } else { // 单条拒绝
+                data.rejectReason = this.rejectReason
+                this.updateData('disagree', data, '已拒绝')
+                this.rejectdialogVisible = false
+            }
+        },
         /**
-         * 处理单条同意/不同意
+         * 单条同意/不同意请求
          */
-        async handleAgree (key, data) {
-            // console.log(data)
-            data.status = (key === 'agree' ? this.isNextStep(data) : '已拒绝')
+        updateData (key, data, statusval) {
+            data.status = statusval
             // 改为通用接口
             const tableName = 't_adjustment'
             const updateParams = {
@@ -406,6 +460,7 @@ export default {
                         },
                         param: {
                             status: data.status,
+                            reject_reason_: data.rejectReason,
                             execute_date_: data.status === ('已通过' || '已拒绝') ? this.getTimeNow() : ''
                         }
                     }]
@@ -423,6 +478,7 @@ export default {
                             },
                             param: {
                                 status_: key === 'agree' ? '已通过' : '已拒绝',
+                                // reject_reason_: data.rejectReason,
                                 audit_time_: data.status === ('已通过' || '已拒绝') ? this.getTimeNow() : ''
                             }
                         }]
@@ -437,25 +493,23 @@ export default {
                 this.sendMsg(data) // 发送系统通知
                 this.search()
             }).catch((e) => { console.error(e) })
-            /*
-            saveAdjustment(data).then(() => {
-                ActionUtils.successMessage()
-                if (data.status === '已通过') {
-                    this.handleAccess(data)
-                }
-                this.sendMsg(data) // 发送系统通知
-                this.search()
-            }).catch((e) => { console.error(e) })*/
+        },
+        /* 点击单条同意/不同意
+         */
+        async handleAgree (key, data) {
+            // 判断状态，如果是已通过直接执行更新逻辑，如果是已拒绝则打开对话框等待填写原因后执行更新逻辑
+            if (key === 'agree') {
+                const status = this.isNextStep(data)
+                this.updateData(key, data, status)
+            } else {
+                this.currentRejectData = data
+                this.rejectdialogVisible = true
+            }
         },
         /**
-         * 批量处理同意/不同意
+         * 批量同意/不同意请求
          */
-        async handleMassAgree (key, data) {
-            // console.log(key, data)
-            if (data.length < 1) {
-                ActionUtils.warning('请选择数据！')
-                return
-            }
+        updateMassData (key, data) {
             const tableName = 't_adjustment'
             let uparr = []
             let sonuparr = []
@@ -472,6 +526,7 @@ export default {
                     },
                     param: {
                         status: el.status,
+                        reject_reason_: data.rejectReason,
                         execute_date_: el.status === ('已通过' || '已拒绝') ? this.getTimeNow() : ''
                     }
                 })
@@ -482,6 +537,7 @@ export default {
                     },
                     param: {
                         status_: key === 'massAgree' ? '已通过' : '已拒绝',
+                        // reject_reason_: data.rejectReason,
                         audit_time_: el.status === ('已通过' || '已拒绝') ? this.getTimeNow() : ''
                     }
                 })
@@ -510,6 +566,34 @@ export default {
             }).catch((e) => { console.error(e) })
         },
         /**
+         * 批量处理同意/不同意
+         */
+        async handleMassAgree (key, data, selection) {
+            if (!data || data.length < 1) {
+                ActionUtils.warning('请选择数据！')
+                return
+            }
+            let flag = []
+            data = data.filter((row, index) => {
+                if (this.showAgreeBtn(row)) {
+                    flag.push(index + 1)
+                    return false
+                }
+                return true
+            })
+            if (flag.length > 0) {
+                this.$message.warning('所选数据中【序号：' + flag.join(',') + '】您无权限处理或已结束审核审批!')
+                return
+            }
+            if (key === 'massAgree') {
+                this.updateMassData(key, data)
+            } else {
+                this.ismass = true
+                this.currentRejectData = data
+                this.rejectdialogVisible = true
+            }
+        },
+        /**
          * 处理删除
          */
         handleRemove (ids) {
@@ -530,16 +614,54 @@ export default {
                 const { staffScheduleDetailPoList, startDate } = response.data
                 data.adjustmentDetailPoList.forEach(async (el) => {
                     const userId = el.createBy
-                    const partyId = el.party
                     const userResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === userId) // 获取调班人的排班详情
-                    const partyResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === partyId) // 获取目标人的排班详情
-                    // 修改调班人排班数据
-                    const index = this.getDays(startDate, el.beforeDate) // 计算得出是d几天
-                    staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = staffScheduleDetailPoList[userResIndex][`d${index + 1}`].replace(el.beforeAdjust, el.afterAdjust)
                     if (data.type !== 'paiban') {
+                        const partyId = el.party
+                        const partyResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === partyId) // 获取目标人的排班详情
+                        // 修改调班人排班数据
+                        const index = this.getDays(startDate, el.afterDate) // 计算得出是d几天
+                        staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = staffScheduleDetailPoList[userResIndex][`d${index + 1}`].concat(',' + el.afterAdjust) // 申请人目标日期改变
+                        const partyIndex = this.getDays(startDate, el.beforeDate) // 计算得出是d几天
+                        const beforeAdjustList = el.beforeAdjust.split(',')
+                        beforeAdjustList.forEach((item, i) => {
+                            if (i === (beforeAdjustList.length - 1)) {
+                                staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item, '') // 申请人申请日期除去原来的班次
+                            } else { // 当不在最后一项时，把附带的逗号也除去
+                                staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item + ',', '') // 申请人申请日期除去原来的班次和逗号
+                            }
+                        })
                         // 修改目标人排班数据
-                        const partyIndex = this.getDays(startDate, el.afterDate) // 计算得出是d几天
-                        staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`].replace(el.afterAdjust, el.beforeAdjust)
+                        staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`].concat(',' + el.beforeAdjust)// 调班人申请日期改变
+                        const afterAdjustList = el.afterAdjust.split(',')
+                        afterAdjustList.forEach((item, i) => {
+                            if (i === (afterAdjustList.length - 1)) {
+                                staffScheduleDetailPoList[partyResIndex][`d${index + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${index + 1}`].replace(item, '')// 调班人目标日期除去原来班次
+                            } else {
+                                staffScheduleDetailPoList[partyResIndex][`d${index + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${index + 1}`].replace(item + ',', '')// 调班人目标日期除去原来班次和逗号
+                            }
+                        })
+                    } else {
+                        // 排版变更
+                        const index = this.getDays(startDate, el.afterDate) // 计算得出是d几天
+                        const partyIndex = this.getDays(startDate, el.beforeDate) // 计算得出是d几天
+                        const afterAdjustArr = el.afterAdjust.split(',')
+                        afterAdjustArr.forEach((item) => {
+                            if (!staffScheduleDetailPoList[userResIndex][`d${index + 1}`].includes(item)) { // 排班原本不包含的班次才加进去 避免重复
+                                if (staffScheduleDetailPoList[userResIndex][`d${index + 1}`] !== '') {
+                                    staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = staffScheduleDetailPoList[userResIndex][`d${index + 1}`].concat(',' + item) // 申请人目标日期改变
+                                } else {
+                                    staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = item
+                                }
+                            }
+                        })
+                        const beforeAdjustList = el.beforeAdjust.split(',')
+                        beforeAdjustList.forEach((item, i) => {
+                            if (i === (beforeAdjustList.length - 1)) {
+                                staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item, '') // 申请人申请日期除去原来的班次
+                            } else { // 当不在最后一项时，把附带的逗号也除去
+                                staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item + ',', '') // 申请人申请日期除去原来的班次和逗号
+                            }
+                        })
                     }
                 })
                 // 保存修改后的排班
@@ -578,4 +700,21 @@ export default {
     }
 }
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+ .adjust-dialog {
+        ::v-deep {
+            .el-dialog {
+                min-width: 1024px;
+                &__header {
+                    padding: 15px 20px 16px;
+                }
+            }
+        }
+    }
+.adjust-form {
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            overflow: auto;
+        }
+</style>

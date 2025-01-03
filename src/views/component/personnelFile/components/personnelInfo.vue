@@ -30,7 +30,7 @@
                         <el-button v-if="buttonType===3" type="primary" icon="ibps-icon-check-square-o" @click="changeButton('sendBack')">退回</el-button>
                         <el-button v-if="buttonType===0&&buttonShow===true" type="primary" icon="el-icon-edit-outline" @click="changeButtonShow(false,'edit')">编辑</el-button>
                         <el-button v-if="buttonType===0&&buttonShow===false" type="warning" icon="el-icon-switch-button" @click="changeButtonShow(true,'exitEdit')">退出编辑</el-button>
-                        <el-button v-if="type==='dialog'||buttonType===3||buttonType===4" type="danger" icon="el-icon-close" autofocus @click="showSubmit()">关闭</el-button>
+                        <el-button v-if="type==='dialog'||buttonType===3||buttonType===4 || ($parent.$attrs&&$parent.$attrs.params&&$parent.$attrs.params.instanceId)" type="danger" icon="el-icon-close" autofocus @click="showSubmit()">关闭</el-button>
                     </div>
                 </div>
                 <div class="contentFooter">
@@ -67,9 +67,12 @@
                         </el-col>
                         <el-col :span="8" class="contentFooterC">
                             <p>岗位：</p>
-                            <div v-if="typeof userList.find(t => t.userId === submitperInfoData.id) != 'undefined'" class="posSty">
+                            <div v-if="typeof userList.find(t => t.userId === submitperInfoData.id) != 'undefined'" ref="posBox" class="posSty">
                                 <el-tag v-for="(item,i) in userList.find(t => t.userId === submitperInfoData.id).roles.split(',')" :key="i" class="interspaceTag" size="mini">{{ item }}</el-tag>
                             </div>
+                            <el-tooltip v-if="moreShow&&typeof userList.find(t => t.userId === submitperInfoData.id) != 'undefined'" class="item" effect="dark" :content="getContent(userList.find(t => t.userId === submitperInfoData.id).roles.split(','))" placement="bottom-end">
+                                <el-button id="resetFormButton" type="primary" icon="el-icon-more" size="mini" circle plain @click="clickHandler" />
+                            </el-tooltip>
                         </el-col>
                     </el-row>
                 </div>
@@ -121,7 +124,8 @@ export default {
             userList,
             submitperInfoData: {},
             buttonShow: true,
-            flowDiagramVisible: false
+            flowDiagramVisible: false,
+            moreShow: false
         }
     },
     watch: {
@@ -143,13 +147,22 @@ export default {
             immediate: true
         }
     },
+    mounted () {
+        setTimeout(() => {
+            this.handleResize()
+        }, 1000)
+        // window.addEventListener('resize', this.handleResize)
+    },
+    beforeDestroy () {
+        // window.removeEventListener('resize', this.handleResize)
+    },
     methods: {
         getPhoto (photo) {
             return getFile(photo)
         },
         showSubmit () {
-            // console.log(this, '222222222222')
             this.$emit('showTF', false)
+            // window.removeEventListener('resize', this.handleResize)
         },
         changeButtonShow (val, name) {
             if (this.$parent.userId !== '') {
@@ -183,7 +196,6 @@ export default {
             }
         },
         changeButton (val) {
-            console.log(val, 'aaaaaaaaaaaaaaaaaaaaa')
             this.$emit('changeBtn', val, this.submitperInfoData)
             setTimeout(() => {
                 this.$emit('changeBtn', '', {})
@@ -199,6 +211,20 @@ export default {
         },
         errorHandler () {
             return true
+        },
+        clickHandler () {
+            document.getElementById('resetFormButton').blur()
+        },
+        getContent (val) {
+            return val.join('，')
+        },
+        handleResize () {
+            const height = this.$refs.posBox ? this.$refs.posBox.scrollHeight : 0
+            if (height > 30) {
+                this.moreShow = true
+            } else {
+                this.moreShow = false
+            }
         }
     }
 }
@@ -277,10 +303,15 @@ export default {
                         font-size: 14px;
                     }
                     .interspaceTag{
-                        margin: 0 2px;
+                        margin: 0 2px 10px 2px;
                     }
                     .posSty{
                         width: 80%;
+                        height:24px;
+                        overflow: hidden;
+                    }
+                    .el-button--mini.is-circle{
+                        padding: 2px;
                     }
                 }
             }

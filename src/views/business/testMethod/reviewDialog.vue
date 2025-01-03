@@ -44,7 +44,7 @@
             <el-form-item label="项目名称" prop="deng_ji_bu_men_">
                 <el-input v-model="ruleForm.xiangMuMingCheng" :disabled="!selectEditchanges" placeholder="请输入项目名称" />
             </el-form-item>
-            <el-form-item label="设备名称" prop="deng_ji_bu_men_">
+            <!-- <el-form-item label="设备名称" prop="deng_ji_bu_men_">
                 <el-input v-model="ruleForm.sheBeiMingCheng" :disabled="!selectEditchanges" placeholder="请输入设备名称" /></el-form-item>
             <el-form-item label="设备编号" prop="deng_ji_bu_men_">
                 <el-input v-model="ruleForm.sheBeiBianHao" :disabled="!selectEditchanges" placeholder="请输入设备编号" /></el-form-item>
@@ -53,11 +53,10 @@
             </el-form-item>
             <el-form-item label="校准品及批号" prop="deng_ji_bu_men_">
                 <div class="setBorder" :disabled="!selectEditchanges">{{ ruleForm.jiaozhuiPin?ruleForm.jiaozhuiPin:'/' }}</div>
-            </el-form-item>
-            <el-form-item label="上次性能验证" prop="deng_ji_bu_men_">
+            </el-form-item> -->
+            <!-- <el-form-item label="上次性能验证" prop="deng_ji_bu_men_">
                 <div class="setMargin" :inert="isInert">
                     <div style="height: 32px" />
-                    <!-- <div>{{ firstItemText }}</div> -->
                     <el-checkbox-group v-model="ruleForm.xing_neng_yan_zheng">
                         <el-row :gutter="20">
                             <el-col v-for="(item, index) in yangzheng" :key="index" :span="8">
@@ -66,7 +65,7 @@
                         </el-row>
                     </el-checkbox-group>
                 </div>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="评审内容" prop="deng_ji_bu_men_">
                 <div>
                     <el-table
@@ -132,7 +131,7 @@
                     </el-table>
                 </div>
             </el-form-item>
-            <el-form-item label="评审结论" prop="deng_ji_bu_men_">
+            <!-- <el-form-item label="评审结论" prop="deng_ji_bu_men_">
                 <div :inert="isInert" class="setMargin">
                     <div style="height: 32px" />
                     <el-checkbox-group v-model="ruleForm.ping_shen_jie_lun">
@@ -143,10 +142,10 @@
                         </el-row>
                     </el-checkbox-group>
                 </div>
-            </el-form-item>
-            <el-form-item label="发现的问题" prop="deng_ji_bu_men_">
+            </el-form-item> -->
+            <!-- <el-form-item label="发现的问题" prop="deng_ji_bu_men_">
                 <el-input v-model="ruleForm.faXianWenTi" class="custom-input" type="textarea" :disabled="!selectEditchanges" />
-            </el-form-item>
+            </el-form-item> -->
         </el-form>
         <div slot="footer" class="el-dialog--center">
             <ibps-toolbar
@@ -215,7 +214,8 @@ export default {
                 jiaozhuiPin: '',
                 xing_neng_yan_zheng: [],
                 ping_shen_jie_lun: [],
-                faXianWenTi: ''
+                faXianWenTi: '',
+                jianYanXiangMu: ''
             },
             rules: {
                 jianYanFangFa: [{ required: true, message: '请填写数据' }],
@@ -273,7 +273,8 @@ export default {
                           //   jieLun: JSON.stringify(this.jieLun),
                           jieLun: this.ruleForm.ping_shen_jie_lun,
                           pinShen1: JSON.stringify(this.pinShen1),
-                          faXianWenTi: this.ruleForm.faXianWenTi
+                          faXianWenTi: this.ruleForm.faXianWenTi,
+                          jianYanXiangMu: this.ruleForm.jianYanXiangMu
                       }
                       this.$emit('getData', obj, this.selectEditData.rowIndex)
                       this.$emit('getcolse')
@@ -286,13 +287,14 @@ export default {
         breakData (newValeu) {
             const sql = `select * from neng_li_fan_wei_ where id_='${newValeu}'`
             this.$common.request('sql', sql).then(res => {
+                console.log('res', res)
                 this.ruleForm.xiangMuMingCheng = res.variables.data[0].jian_yan_xiang_mu
                 this.ruleForm.sheBeiMingCheng = res.variables.data[0].she_bei_
                 this.ruleForm.sheBeiBianHao = res.variables.data[0].she_bei_bian_hao_
                 this.ruleForm.shiJi = res.variables.data[0].shi_ji_
                 this.ruleForm.jiaozhuiPin = res.variables.data[0].yang_pin_lei_xing
-                this.ruleForm.jianYanXiangMu = res.variables.data[0].parent_id_
                 this.ruleForm.xiaoZhunPinJiPiHa = res.variables.data[0].xiao_zhun_wu_
+                this.ruleForm.jianYanXiangMu = res.variables.data[0].parent_id_
             })
         },
 
@@ -311,6 +313,7 @@ export default {
             this.pinShen1 = JSON.parse(selectEditDatas.pinShen1)
             // this.jieLun = JSON.parse(selectEditDatas.jieLun)
             this.ruleForm.ping_shen_jie_lun = selectEditDatas.jieLun
+            this.ruleForm.jianYanXiangMu = selectEditDatas.jianYanXiangMu
         }
     }
 }

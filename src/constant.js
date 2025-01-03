@@ -65,3 +65,5 @@ export const REPORT_PATH = __IBPS_CONFIG__.REPORT_PATH || '金通医学实验室
 export const SHOW_PLAINTEXT = __IBPS_CONFIG__.SHOW_PLAINTEXT || env.NODE_ENV === 'development'
 // 是否加密 GET 请求参数
 export const ENCRYPT_GET_PARAMS = __IBPS_CONFIG__.ENCRYPT_GET_PARAMS || false
+// 是否可以在体系运行记录盒里修改已完成记录
+export const SHOW_TIMT_MODIFICATION = __IBPS_CONFIG__.SHOW_TIMT_MODIFICATION || false

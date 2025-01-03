@@ -78,7 +78,9 @@
         // 是否显示开启明文SQL
         SHOW_PLAINTEXT: false,
         // 是否加密 GET 请求参数
-        ENCRYPT_GET_PARAMS: false
+        ENCRYPT_GET_PARAMS: false,
+        // 是否可以在体系运行记录盒里修改已完成记录
+        SHOW_TIMT_MODIFICATION: true
     }
 
 })(window)

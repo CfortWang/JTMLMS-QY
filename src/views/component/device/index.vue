@@ -265,7 +265,7 @@
                     <template slot="deviceStatus">
                         <el-select v-model="search.deviceStatus" placeholder="请选择" size="mini" :clearable="true">
                             <el-option
-                                v-for="item in ['合格','限用','停用']"
+                                v-for="item in ['合格','限用','停用','报废']"
                                 :key="item"
                                 :label="item"
                                 :value="item"

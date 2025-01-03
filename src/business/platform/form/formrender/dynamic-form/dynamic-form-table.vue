@@ -30,9 +30,15 @@
                         :sum-text="sumText"
                         :summary-method="hasSummaryMethod ? summaryMethod : null"
                         border
+                        row-key="$index"
                         @selection-change="handleSelectionChange"
                     >
-                        <el-table-column v-if="!tableReadonly" type="selection" width="50" />
+                        <el-table-column
+                            v-if="!tableReadonly"
+                            type="selection"
+                            width="50"
+                            :reserve-selection="true"
+                        />
                         <el-table-column
                             v-if="field.field_options.index"
                             type="index"
@@ -231,7 +237,8 @@ import IbpsImport from '@/plugins/import'
 const JForm = window.JForm
 // 获取子表展示数据
 const getShowData = (data, current = 1, size = defaultPageSize) => {
-    return data && data.length ? JSON.parse(JSON.stringify(data)).slice((current - 1) * size, current * size) : []
+    // return data && data.length ? JSON.parse(JSON.stringify(data)).slice((current - 1) * size, current * size) : []
+    return data && data.length ? data.slice((current - 1) * size, current * size) : []
 }
 
 export default {
@@ -283,7 +290,7 @@ export default {
             npmDialogFormVisible: false, // 弹窗
             defId: '', // 编辑dialog需要使用
             currentPage: 1,
-            totalCount:  0,
+            totalCount: 0,
             dataModel: initData,
             copDataModel: initData,
             multipleSelection: '',

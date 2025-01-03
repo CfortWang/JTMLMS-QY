@@ -104,10 +104,10 @@ export default {
                 columns: [
                     { prop: 'name', label: '配置名称', width: 150 },
                     { prop: 'scheduleType', label: '排班类型', tags: scheduleType, width: 100, sortable: 'custom' },
-                    { prop: 'isEffective', label: '是否生效', slotName: 'isEffective', width: 100 },
+                    { prop: 'isEffective', label: '是否生效', slotName: 'isEffective', width: 85, align: 'center' },
                     { prop: 'approver', label: '调班审批人', tags: userOption, dataType: 'stringArray', minWidth: 140 },
                     { prop: 'createBy', label: '创建人', tags: userOption, width: 90 },
-                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 }
+                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 120 }
                 ],
                 rowHandle: {
                     effect: 'display',
@@ -139,11 +139,10 @@ export default {
          */
         getSearchFormData () {
             console.log(this.pagination)
-            return ActionUtils.formatParams(
-                this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
-                this.pagination,
-                this.sorts
-            )
+            const { first, second } = this.$store.getters.level || {}
+            const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            searchParam['Q^di_dian_^S'] = second || first
+            return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         /**
          * 处理分页事件

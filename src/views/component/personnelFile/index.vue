@@ -136,6 +136,7 @@ export default {
     },
     created () {
         console.log(this)
+        this.$parent.$parent.showClose = false
         if (this.$attrs.params) {
             const sql1 = `select a.CREATE_BY_ from ibps_bpm_inst a join ibps_bpm_task_pendding b on b.proc_inst_id_=a.id_ where b.PROC_DEF_KEY_ = 'Process_08xwabfNEW' and b.task_id_ ='${this.$attrs.params.taskId}'`
             // const sql1 = `select CREATE_BY_ FROM ibps_bpm_oper_log WHERE PROC_INST_ID_ = (SELECT PROC_INST_ID_ FROM ibps_bpm_bus_rel WHERE BUSINESSKEY_ = "${this.$attrs.params.attrs.id}" LIMIT 1 )AND OPER_TYPE_ IN('start')`
@@ -177,7 +178,7 @@ export default {
             })
         },
         showTF (val) {
-            if (this.$attrs.params && this.$attrs.params.attrs.flow) {
+            if ((this.$attrs.params && this.$attrs.params.attrs.flow) || (this.$attrs.params && this.$attrs.params.instanceId)) {
                 this.$emit('close', false)
             }
             this.dialogVisible = val
@@ -368,9 +369,6 @@ export default {
             }
         },
         tipsShow (val, name) {
-            // console.log(val, this.tipsControls, val && this.tipsControls === false, 'tttttttttttttt')
-
-            console.log(this.infoNumArr, '23123213213123213123123213213123')
             if (val && this.tipsControls === false) {
                 this.infoNumArr = []
 

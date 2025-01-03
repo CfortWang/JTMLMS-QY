@@ -79,9 +79,9 @@ export default {
             listConfig: {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary', hidden: false },
-                    { key: 'create', icon: 'ibps-icon-plus', label: '创建', type: 'success', hidden: false },
-                    { key: 'remove', icon: 'ibps-icon-close', label: '删除', type: 'danger', hidden: false },
-                    { key: 'config', icon: 'ibps-icon-cogs', label: '配置', type: 'info', hidden: false }
+                    { key: 'create', icon: 'ibps-icon-plus', label: '创建', type: 'success', hidden: !this.isRoleFilter() && !this.isZhsfzr() },
+                    { key: 'remove', icon: 'ibps-icon-close', label: '删除', type: 'danger', hidden: !this.isRoleFilter() && !this.isZhsfzr() },
+                    { key: 'config', icon: 'ibps-icon-cogs', label: '配置', type: 'info', hidden: !this.isRoleFilter() && !this.isZhsfzr() }
                 ],
                 searchForm: {
                     labelWidth: 80,
@@ -98,14 +98,17 @@ export default {
                     { prop: 'type', label: '排班类型', tags: scheduleType, width: 120 },
                     { prop: 'dateRange', label: '排班时间范围', slotName: 'dateRange', width: 180 },
                     { prop: 'createBy', label: '创建人', tags: userOption, width: 100 },
-                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 }
+                    { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
+                    { prop: 'status', label: '状态', width: 120 }
                 ],
                 rowHandle: {
                     effect: 'display',
                     actions: [
-                        { key: 'adjust', label: '申请调班', type: 'primary', icon: 'ibps-icon-exchange' },
-                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit' },
-                        { key: 'preview', label: '查看', type: 'primary', icon: 'ibps-icon-eye' }
+                        { key: 'adjust', label: '申请调班', type: 'primary', icon: 'ibps-icon-exchange', hidden: false },
+                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit', hidden: (row) => {
+                            return !this.isRoleFilter() && this.$store.getters.userId !== row.createBy
+                        } },
+                        { key: 'preview', label: '查看', type: 'primary', icon: 'ibps-icon-eye', hidden: false }
                         // { key: 'report', label: '实验报告', type: 'success', icon: 'ibps-icon-file-text-o' }
                     ]
                 }
@@ -130,11 +133,10 @@ export default {
          * 获取格式化参数
          */
         getSearchFormData () {
-            return ActionUtils.formatParams(
-                this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
-                this.pagination,
-                this.sorts
-            )
+            const { first, second } = this.$store.getters.level || {}
+            const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            searchParam['Q^di_dian_^S'] = second || first
+            return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         /**
          * 处理分页事件
@@ -155,6 +157,35 @@ export default {
          */
         search () {
             this.loadData()
+        },
+        /**
+         * 判断当前用户是否为超级管理员和高权限角色和专业组组长
+         */
+        isRoleFilter () {
+            const highRoles = this.$store.getters.userInfo.highRoles || [] // 高权限角色
+            const userRole = this.$store.getters.userInfo.role || [] // 用户权限角色
+            let isHighRole = false
+            userRole.forEach(el => {
+                const roleAlias = el.alias
+                if (highRoles.includes(roleAlias)) {
+                    isHighRole = true
+                }
+                if (roleAlias === 'zhsfzr') {
+                    isHighRole = true
+                }
+            })
+            return (this.$store.getters.isSuper || isHighRole)
+        },
+        isZhsfzr () {
+            const userRole = this.$store.getters.userInfo.role || [] // 用户权限角色
+            let isZhsfzrRole = false
+            userRole.forEach(el => {
+                const roleAlias = el.alias
+                if (roleAlias === 'zhsfzr') {
+                    isZhsfzrRole = true
+                }
+            })
+            return isZhsfzrRole
         },
         /**
          * 处理按钮事件
