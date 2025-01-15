@@ -429,9 +429,9 @@ export function correlationSql (type, val) {
         kaoshijilu: 'examinee'
     }
     if (type === 'jyrykhjlb' || type === 'lhrynlqr' || type === 'lhrypxjlb' || type === 'lhpxsqb') {
-        sql = `select * from t_${type} where FIND_IN_SET(${val},${col[type]}) and shi_fou_guo_shen_ = '已完成' `
+        sql = `select * from t_${type} where FIND_IN_SET('${val}',${col[type]}) and shi_fou_guo_shen_ = '已完成' `
     } else if (type === 'kaoshijilu') {
-        sql = `select * from v_${type} where FIND_IN_SET(${val},${col[type]})`
+        sql = `select * from v_examination where FIND_IN_SET('${val}',${col[type]}) and examState = '已完成' ORDER BY createTime asc`
     }
     return sql
 }
@@ -524,14 +524,14 @@ export const correlationConfig = {
             { label: '考试开始时间', width: '15%', type: 'text', field: 'startDate' },
             { label: '考试题库', width: '20%', type: 'text', field: 'bankName' },
             { label: '考试类别', width: '12%', type: 'text', field: 'examType' },
-            { label: '考试得分', width: '12%', type: 'text', field: 'resultScore' },
+            { label: '考试得分', width: '12%', type: 'text', field: 'maxScore' },
             { label: '考试总分', width: '12%', type: 'text', field: 'totalScore' }
 
         ],
         dialog: [
             [{ name: '考试名称', field: 'examName', type: 'text' }, { name: '考试开始时间', field: 'startDate', type: 'text' }],
             [{ name: '考试题库', field: 'bankName', type: 'text' }, { name: '考试类别', field: 'examType', type: 'text' }],
-            [{ name: '考试总分', field: 'totalScore', type: 'text' }, { name: '考试得分', field: 'resultScore', type: 'text' }]
+            [{ name: '考试总分', field: 'totalScore', type: 'text' }, { name: '考试得分', field: 'maxScore', type: 'text' }]
         ]
     }
 }

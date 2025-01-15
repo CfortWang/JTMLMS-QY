@@ -242,12 +242,18 @@ export default {
          */
         getPartysList (poList) {
             const self = this
-            const result = poList.map(item => ({
-                value: item.party,
-                status: item.status,
-                label: (self.userOption.filter(o => o.value === item.party))[0].label,
-                type: 'success'
-            }))
+            const result = poList.reduce((acc, currentItem) => {
+                const existing = acc.find(item => item.value === currentItem.party)
+                if (!existing) {
+                    acc.push({
+                        value: currentItem.party,
+                        status: currentItem.status,
+                        label: (self.userOption.filter(o => o.value === currentItem.party))[0].label,
+                        type: 'success'
+                    })
+                }
+                return acc
+            }, [])
             return result
         },
         /**
@@ -605,65 +611,47 @@ export default {
         },
         /**
          * 处理已通过的申请单，修改排班数据
-         */
+         * */
         async handleAccess (data) {
             if (data.adjustmentDetailPoList.length > 0) {
                 const scheduleId = data.scheduleId
                 const response = await getStaffSchedule({ id: scheduleId })
                 const submitData = response.data
                 const { staffScheduleDetailPoList, startDate } = response.data
+
+                // 提取根据日期计算索引的逻辑到独立函数
+                const getIndexByDate = (date) => this.getDays(startDate, date)
+
                 data.adjustmentDetailPoList.forEach(async (el) => {
                     const userId = el.createBy
-                    const userResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === userId) // 获取调班人的排班详情
+                    const userResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === userId)
+
                     if (data.type !== 'paiban') {
                         const partyId = el.party
-                        const partyResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === partyId) // 获取目标人的排班详情
-                        // 修改调班人排班数据
-                        const index = this.getDays(startDate, el.afterDate) // 计算得出是d几天
-                        staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = staffScheduleDetailPoList[userResIndex][`d${index + 1}`].concat(',' + el.afterAdjust) // 申请人目标日期改变
-                        const partyIndex = this.getDays(startDate, el.beforeDate) // 计算得出是d几天
-                        const beforeAdjustList = el.beforeAdjust.split(',')
-                        beforeAdjustList.forEach((item, i) => {
-                            if (i === (beforeAdjustList.length - 1)) {
-                                staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item, '') // 申请人申请日期除去原来的班次
-                            } else { // 当不在最后一项时，把附带的逗号也除去
-                                staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item + ',', '') // 申请人申请日期除去原来的班次和逗号
-                            }
-                        })
-                        // 修改目标人排班数据
-                        staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${partyIndex + 1}`].concat(',' + el.beforeAdjust)// 调班人申请日期改变
-                        const afterAdjustList = el.afterAdjust.split(',')
-                        afterAdjustList.forEach((item, i) => {
-                            if (i === (afterAdjustList.length - 1)) {
-                                staffScheduleDetailPoList[partyResIndex][`d${index + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${index + 1}`].replace(item, '')// 调班人目标日期除去原来班次
-                            } else {
-                                staffScheduleDetailPoList[partyResIndex][`d${index + 1}`] = staffScheduleDetailPoList[partyResIndex][`d${index + 1}`].replace(item + ',', '')// 调班人目标日期除去原来班次和逗号
-                            }
-                        })
+                        const partyResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === partyId)
+
+                        // 计算调班人和目标人相关日期的索引
+                        const index = getIndexByDate(el.afterDate)
+                        const partyIndex = getIndexByDate(el.beforeDate)
+
+                        // 处理调班人排班数据
+                        this.removeScheduleDataWithRegex(userResIndex, partyIndex, el.beforeAdjust, staffScheduleDetailPoList)
+                        this.updateScheduleDataWithRegex(userResIndex, index, el.afterAdjust, staffScheduleDetailPoList)
+
+                        // 处理目标人排班数据
+                        this.removeScheduleDataWithRegex(partyResIndex, index, el.afterAdjust, staffScheduleDetailPoList)
+                        this.updateScheduleDataWithRegex(partyResIndex, partyIndex, el.beforeAdjust, staffScheduleDetailPoList)
                     } else {
-                        // 排版变更
-                        const index = this.getDays(startDate, el.afterDate) // 计算得出是d几天
-                        const partyIndex = this.getDays(startDate, el.beforeDate) // 计算得出是d几天
-                        const afterAdjustArr = el.afterAdjust.split(',')
-                        afterAdjustArr.forEach((item) => {
-                            if (!staffScheduleDetailPoList[userResIndex][`d${index + 1}`].includes(item)) { // 排班原本不包含的班次才加进去 避免重复
-                                if (staffScheduleDetailPoList[userResIndex][`d${index + 1}`] !== '') {
-                                    staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = staffScheduleDetailPoList[userResIndex][`d${index + 1}`].concat(',' + item) // 申请人目标日期改变
-                                } else {
-                                    staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = item
-                                }
-                            }
-                        })
+                        // 排班变更情况
+                        const index = getIndexByDate(el.afterDate)
+                        const partyIndex = getIndexByDate(el.beforeDate)
                         const beforeAdjustList = el.beforeAdjust.split(',')
-                        beforeAdjustList.forEach((item, i) => {
-                            if (i === (beforeAdjustList.length - 1)) {
-                                staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item, '') // 申请人申请日期除去原来的班次
-                            } else { // 当不在最后一项时，把附带的逗号也除去
-                                staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item + ',', '') // 申请人申请日期除去原来的班次和逗号
-                            }
-                        })
+                        this.removeScheduleDataForPaibanWithRegex(userResIndex, partyIndex, beforeAdjustList, staffScheduleDetailPoList)
+                        const afterAdjustArr = el.afterAdjust.split(',')
+                        this.updateScheduleDataForPaibanWithRegex(userResIndex, index, afterAdjustArr, staffScheduleDetailPoList)
                     }
                 })
+
                 // 保存修改后的排班
                 submitData.staffScheduleDetailPoList = staffScheduleDetailPoList
                 saveStaffSchedule(submitData).then(() => {
@@ -672,6 +660,42 @@ export default {
                     console.log(err)
                 })
             }
+        },
+        // 使用正则表达式处理更新排班数据（添加班次），确保无多余逗号
+        updateScheduleDataWithRegex (index, targetIndex, adjustData, scheduleList) {
+            const currentData = scheduleList[index][`d${targetIndex + 1}`] || ''
+            const cleanedData = currentData.replace(/,$/, '') // 去除末尾可能存在的逗号
+            const newData = [cleanedData, adjustData].filter(Boolean).join(',') // 拼接数据，中间用逗号隔开，去除空字符串
+            scheduleList[index][`d${targetIndex + 1}`] = newData
+        },
+
+        // 使用正则表达式处理移除排班数据（去除原有班次），确保无多余逗号
+        removeScheduleDataWithRegex (index, targetIndex, adjustData, scheduleList) {
+            const targetData = scheduleList[index][`d${targetIndex + 1}`] || ''
+            const dataList = adjustData.split(',')
+            const updatedData = dataList.reduce((acc, item) => {
+                const pattern = new RegExp(`,?${item}(,|$)`, 'g') // 匹配逗号+要移除的项或者要移除的项+结尾逗号或结尾（全局匹配）
+                return acc.replace(pattern, '')
+            }, targetData)
+            scheduleList[index][`d${targetIndex + 1}`] = updatedData.replace(/,$/, '') // 去除末尾可能出现的多余逗号
+        },
+
+        // 用于排班变更时使用正则表达式更新排班数据的函数（避免重复添加班次），确保无多余逗号
+        updateScheduleDataForPaibanWithRegex (index, targetIndex, adjustData, scheduleList) {
+            const currentData = scheduleList[index][`d${targetIndex + 1}`] || ''
+            const dataToAdd = adjustData.filter(item => !currentData.includes(item))
+            const newData = [currentData, dataToAdd.join(',')].filter(Boolean).join(',')
+            scheduleList[index][`d${targetIndex + 1}`] = newData.replace(/,$/, '')
+        },
+
+        // 用于排班变更时使用正则表达式移除排班数据的函数，确保无多余逗号
+        removeScheduleDataForPaibanWithRegex (index, targetIndex, adjustData, scheduleList) {
+            const targetData = scheduleList[index][`d${targetIndex + 1}`] || ''
+            const updatedData = adjustData.reduce((acc, item) => {
+                const pattern = new RegExp(`,?${item}(,|$)`, 'g') // 匹配逗号+要移除的项或者要移除的项+结尾逗号或结尾（全局匹配）
+                return acc.replace(pattern, '')
+            }, targetData)
+            scheduleList[index][`d${targetIndex + 1}`] = updatedData.replace(/,$/, '') // 去除末尾可能出现的多余逗号
         },
         getDays (start, end) { // 根据日期获取排序 d1、d2、d3...
             if (!start || !end) {

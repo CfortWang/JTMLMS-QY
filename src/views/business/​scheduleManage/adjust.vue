@@ -162,12 +162,18 @@ export default {
          */
         getPartysList (poList) {
             const self = this
-            const result = poList.map(item => ({
-                value: item.party,
-                status: item.status,
-                label: (self.userOption.filter(o => o.value === item.party))[0].label,
-                type: 'success'
-            }))
+            const result = poList.reduce((acc, currentItem) => {
+                const existing = acc.find(item => item.value === currentItem.party)
+                if (!existing) {
+                    acc.push({
+                        value: currentItem.party,
+                        status: currentItem.status,
+                        label: (self.userOption.filter(o => o.value === currentItem.party))[0].label,
+                        type: 'success'
+                    })
+                }
+                return acc
+            }, [])
             return result
         },
         /**

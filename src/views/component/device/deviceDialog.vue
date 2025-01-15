@@ -699,7 +699,7 @@
                                                     />
                                                 </el-form-item>
                                             </el-col>
-                                            <el-col :span="24">
+                                            <!-- <el-col :span="24">
                                                 <el-form-item label="说明书分类：">
                                                     <SelectType :field="{}" @change-data="changeData" />
                                                 </el-form-item>
@@ -708,7 +708,7 @@
                                                 <el-form-item label="文件路径：">
                                                     <span>{{ form.wenJianXiLei }}</span>
                                                 </el-form-item>
-                                            </el-col>
+                                            </el-col> -->
                                         </el-row>
                                     </el-form>
 
@@ -970,17 +970,17 @@ export default {
             }
         },
         // 根据编制部门动态获取对应文件存放处数据
-        'form.bianZhiBuMen': {
-            handler (value) {
-                if (value) {
-                    if (this.isFirstbianZhiBuMen) {
-                        this.isFirstbianZhiBuMen = false
-                        return
-                    }
-                    this.handleData(value)
-                }
-            }
-        },
+        // 'form.bianZhiBuMen': {
+        //     handler (value) {
+        //         if (value) {
+        //             if (this.isFirstbianZhiBuMen) {
+        //                 this.isFirstbianZhiBuMen = false
+        //                 return
+        //             }
+        //             this.handleData(value)
+        //         }
+        //     }
+        // },
         // 根据最近检定时间动态计算对应有效期至
         'form.yiXiaoRiQi': {
             handler (value) {
@@ -1183,8 +1183,7 @@ export default {
                         this.$message.warning(error.message)
                     }
                 } else {
-                    console.log('error submit!!')
-                    return false
+                    return this.$message.warning('请填写必填项！')
                 }
             })
         },

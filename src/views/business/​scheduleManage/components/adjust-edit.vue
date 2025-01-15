@@ -435,7 +435,7 @@ export default {
                 self.scheduleInfo = {
                     startDate: data.startDate,
                     scheduleShift: config.scheduleShift,
-                    scheduleStaff: self.userList.filter(u => config.scheduleStaff.includes(u.userId) && u.userId !== this.userId),
+                    scheduleStaff: this.params.action === 'view' ? self.userList : self.userList.filter(u => config.scheduleStaff.includes(u.userId) && u.userId !== this.userId),
                     shiftList: data.staffScheduleDetailPoList,
                     executor: JSON.stringify(config.approver) || ''
                 }
@@ -970,41 +970,40 @@ export default {
         },
         /**
          * 处理已通过的申请单，修改排班数据
-         */
+         * */
         async handleAccess (self) {
             const response = await getStaffSchedule({ id: self.formData.scheduleId })
             const submitData = response.data
             const { staffScheduleDetailPoList, startDate } = response.data
+            const getIndexByDate = (date) => this.getDays(startDate, date)
             self.formData.adjustList.forEach(async (el) => {
                 const userId = this.$store.getters.userId || ''
-                const userResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === userId) // 获取调班人的排班详情
-                // 排版变更
-                const index = this.getDays(startDate, el.afterDate) // 计算得出是d几天
-                const partyIndex = this.getDays(startDate, el.beforeDate) // 计算得出是d几天
-                el.afterAdjust.forEach((item) => {
-                    if (!staffScheduleDetailPoList[userResIndex][`d${index + 1}`].includes(item)) { // 排班原本不包含的班次才加进去 避免重复
-                        if (staffScheduleDetailPoList[userResIndex][`d${index + 1}`] !== '') {
-                            staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = staffScheduleDetailPoList[userResIndex][`d${index + 1}`].concat(',' + item) // 申请人目标日期改变
-                        } else {
-                            staffScheduleDetailPoList[userResIndex][`d${index + 1}`] = item
-                        }
-                    }
-                })
-                el.beforeAdjust.forEach((item, i) => {
-                    if (i === (el.beforeAdjust.length - 1)) {
-                        staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item, '') // 申请人申请日期除去原来的班次
-                    } else { // 当不在最后一项时，把附带的逗号也除去
-                        staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`] = staffScheduleDetailPoList[userResIndex][`d${partyIndex + 1}`].replace(item + ',', '') // 申请人申请日期除去原来的班次和逗号
-                    }
-                })
+                const userResIndex = staffScheduleDetailPoList.findIndex(item => item.userId === userId)
+                const index = getIndexByDate(el.afterDate)
+                const partyIndex = getIndexByDate(el.beforeDate)
+                this.removeScheduleDataForPaibanWithRegex(userResIndex, partyIndex, el.beforeAdjust, staffScheduleDetailPoList)
+                this.updateScheduleDataForPaibanWithRegex(userResIndex, index, el.afterAdjust, staffScheduleDetailPoList)
             })
-            // 保存修改后的排班
-            // submitData.staffScheduleDetailPoList = staffScheduleDetailPoList
-            saveStaffSchedule(submitData).then(() => {
-                console.log('排班已更新')
-            }).catch((err) => {
-                console.log(err)
-            })
+            submitData.staffScheduleDetailPoList = staffScheduleDetailPoList
+            saveStaffSchedule(submitData).then(() => console.log('排班已更新')).catch(err => console.log(err))
+        },
+
+        // 用于排班变更时使用正则表达式更新排班数据的函数（避免重复添加班次），确保无多余逗号
+        updateScheduleDataForPaibanWithRegex (index, targetIndex, adjustData, scheduleList) {
+            const currentData = scheduleList[index][`d${targetIndex + 1}`] || ''
+            const dataToAdd = adjustData.filter(item => !currentData.includes(item))
+            const newData = [currentData, dataToAdd.join(',')].filter(Boolean).join(',')
+            scheduleList[index][`d${targetIndex + 1}`] = newData.replace(/,$/, '')
+        },
+
+        // 用于排班变更时使用正则表达式移除排班数据的函数，确保无多余逗号
+        removeScheduleDataForPaibanWithRegex (index, targetIndex, adjustData, scheduleList) {
+            const targetData = scheduleList[index][`d${targetIndex + 1}`] || ''
+            const updatedData = adjustData.reduce((acc, item) => {
+                const pattern = new RegExp(`,?${item}(,|$)`, 'g') // 匹配逗号+要移除的项或者要移除的项+结尾逗号或结尾（全局匹配）
+                return acc.replace(pattern, '')
+            }, targetData)
+            scheduleList[index][`d${targetIndex + 1}`] = updatedData.replace(/,$/, '') // 去除末尾可能出现的多余逗号
         },
         handleAddParam () {
             // 把前面填写的行加入班次日期锁定
