@@ -66,6 +66,13 @@
                     </template>
 
                     <template
+                        slot="deviceStateSlot"
+                        slot-scope="{row}"
+                    >
+                        <span>{{ stateList[row.sheBeiZhuangTa] || row.sheBeiZhuangTa }}</span>
+                    </template>
+
+                    <template
                         slot="placeSlot"
                         slot-scope="{row}"
                     >
@@ -265,10 +272,10 @@
                     <template slot="deviceStatus">
                         <el-select v-model="search.deviceStatus" placeholder="请选择" size="mini" :clearable="true">
                             <el-option
-                                v-for="item in ['合格','限用','停用','报废']"
-                                :key="item"
-                                :label="item"
-                                :value="item"
+                                v-for="(v,k) in stateList"
+                                :key="k"
+                                :label="v"
+                                :value="k"
                             />
                         </el-select>
                     </template>
@@ -302,7 +309,7 @@
                 </ibps-crud>
             </template>
         </ibps-container>
-        <DeviceDialog v-if="deviceDialogShow" :params="params" @close="close" />
+        <DeviceDialog v-if="deviceDialogShow" :params="params" :state-list="stateList" @close="close" />
         <input id="" ref="file1" type="file" name="" accept=".xlsx,.xls" @change="handleUploadChange1">
         <input id="" ref="file2" type="file" name="" accept=".xlsx,.xls" @change="handleUploadChange2">
 
@@ -319,7 +326,7 @@
             def-id="1120718364969271296"
             @close="visible => npmDialogFormVisible = visible"
         />
-        <DeviceTag :scan-visible="printVisible" :obj="printObj" @scanOff="scanOff" />
+        <DeviceTag :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" />
         <el-dialog
             :close-on-click-modal="false"
             :close-on-press-escape="false"
@@ -336,6 +343,7 @@
 </template>
 
 <script>
+import { getSetting } from '@/utils/query'
 import image01 from '@/assets/images/device/01.png'
 import image02 from '@/assets/images/device/02.png'
 import image03 from '@/assets/images/device/03.png'
@@ -485,7 +493,7 @@ export default {
                     { prop: 'sheBeiMingCheng', label: '设备名称', sortable: true },
                     { prop: 'sheBeiLeiXing', label: '设备类型', sortable: true },
                     { prop: 'guiGeXingHao', label: '规格型号', sortable: true },
-                    { prop: 'sheBeiZhuangTa', label: '设备状态', sortable: true },
+                    { prop: 'sheBeiZhuangTa', label: '设备状态', sortable: true, slotName: 'deviceStateSlot' },
                     { prop: 'guanLiRen', label: '保管人', slotName: 'userSlot', sortable: true },
                     { prop: 'weiHuFangShi', label: '设备分组', slotName: 'deviceSlot', sortable: true },
                     { prop: 'cunFangWeiZhi', label: '放置地点', slotName: 'placeSlot', sortable: true },
@@ -611,10 +619,16 @@ export default {
                 '季度保养': this.generateRule(3, `每季度第`, `个月`),
                 '年保养': this.generateRule(12, `每年第`, `个月`),
                 '按需保养': ['/']
-            }
+            },
+            stateList: { '停用': '停用', '报废': '报废', '合格': '合格' }
         }
     },
-    mounted () {
+    async mounted () {
+        const stateList = await getSetting(this, 'device', 'stateList')
+        if (stateList) {
+            console.debug(stateList)
+            this.stateList = stateList
+        }
         this.getDatas()
     },
     methods: {
@@ -1349,6 +1363,7 @@ export default {
             let importData = this.switchDeviceObj(data, this.deviceColumns)
             importData.forEach(i => {
                 delete i.sheBeiShiBieH // 设备编号需自动生成
+                i.sheBeiZhuangTa = '合格'
             })
             const currentPosition = this.level
             const { userList = [], deptList = [] } = this.$store.getters || {}

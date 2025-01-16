@@ -268,11 +268,13 @@
             @close="(visible) => (importTableDialogVisible = visible)"
             @action-event="handleImportTableActionEvent"
         />
-        <import-zip
-            :visible="importZipDialogVisible"
+        <upload-file
+            :visible="uploadFileDialogVisible"
             title="导入"
-            @close="(visible) => (importZipDialogVisible = visible)"
-            @action-event="handleImportZipActionEvent"
+            :accept="accept"
+            :upload-title="uploadTitle"
+            @close="(visible) => (uploadFileDialogVisible = visible)"
+            @action-event="handleUploadFileActionEvent"
         />
 
         <xlsxFile
@@ -328,7 +330,7 @@ import IbpsImportColumnsDialog from '../components/import-columns-dialog'
 import CustomDataDisplayMixin from '@/business/platform/system/mixins/customDataDisplay'
 import FormPrintTemplate from '@/business/platform/form/form-print/template'
 import importTable from '@/business/platform/form/formrender/dynamic-form/components/import-table'
-import importZip from '@/business/platform/form/formrender/dynamic-form/components/import-zip.vue'
+import uploadFile from '@/business/platform/form/formrender/dynamic-form/components/import-zip.vue'
 import JTemplate from '../utils/JTemplate' // 自定义脚本
 import JDialogTemplate from '../utils/JDialogTemplate' // 对话框自定义脚本
 
@@ -341,7 +343,7 @@ import Vue from 'vue'
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
 import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
 import generalModules from '@/views/system/jbdScan/generalModules.vue'
-import { importZip as importzip } from '@/api/upload/zip'
+import { upload } from '@/api/upload/zip'
 export default {
     name: 'list',
     components: {
@@ -360,7 +362,7 @@ export default {
         DictionaryFormat,
         Scan,
         importTable,
-        importZip,
+        uploadFile,
         Print: () => import('../components/print'),
         LabelPrint: () => import('../components/labelPrint'),
         xlsxFile,
@@ -404,6 +406,9 @@ export default {
     data () {
         const { first = '', second = '' } = this.$store.getters.level || {}
         return {
+            accept: '',
+            uploadUrl: '',
+            uploadTitle: '',
             first,
             second,
             npmDialogFormVisible: false, // 弹窗
@@ -475,7 +480,7 @@ export default {
             printList: [],
 
             importTableDialogVisible: false,
-            importZipDialogVisible: false,
+            uploadFileDialogVisible: false,
             position: null,
             importList: [],
             importValue: null,
@@ -1819,19 +1824,24 @@ export default {
             return { [pidKey]: selection }
         },
 
-        // 自定义导入  小林
-        handleImport (data = [], type = 'excel') {
-            switch (type) {
-                case 'excel':
-                    this.importList = data
-                    this.importValue = this.getKeys(this.importList)
-                    this.importTableDialogVisible = true
-                    break
-                case 'zip':
-                    this.importZipDialogVisible = true
-                    break
-                default:
-                    break
+        /**
+         * 自定义导入 accept文件类型  uploadUrl接口地址 uploadTitle描述文本
+         */
+        handleImport (data = [], option = {}) {
+            const { accept = '', uploadUrl = '', uploadTitle = '请选择导入文件' } = option
+            // 原逻辑
+            if (uploadUrl === '') {
+                this.importList = data
+                this.importValue = this.getKeys(this.importList)
+                this.importTableDialogVisible = true
+            } else {
+                this.uploadFileDialogVisible = true
+                this.accept = accept
+                this.uploadUrl = uploadUrl
+                if (this.uploadUrl[0] !== '/') {
+                    this.uploadUrl = '/' + this.uploadUrl
+                }
+                this.uploadTitle = uploadTitle
             }
         },
         handleImportTableActionEvent (file, options) {
@@ -1854,10 +1864,10 @@ export default {
                 // ActionUtils.success('导入成功')
             })
         },
-        async handleImportZipActionEvent (file, options) {
+        async handleUploadFileActionEvent (file, options) {
             // 调用上传接口
-            await importzip(file)
-            this.importZipDialogVisible = false
+            await upload(file, this.uploadUrl)
+            this.uploadFileDialogVisible = false
             this.search()
             ActionUtils.success('导入成功')
         },

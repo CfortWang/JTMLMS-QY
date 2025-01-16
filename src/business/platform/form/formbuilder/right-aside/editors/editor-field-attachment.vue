@@ -89,7 +89,7 @@ export default {
       fileTypeOptions,
       fileStoreOptions,
       uploadTypeOptions,
-      media: ''
+      media: this.fieldItem.field_options.media
     }
   },
   computed: {

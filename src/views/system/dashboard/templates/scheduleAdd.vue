@@ -21,7 +21,7 @@
             :model="calendarForm"
             :rules="rules"
             label-width="82px"
-            label-height="300px"
+            label-height="500px"
         >
             <el-col :span="6">
                 <el-tree
@@ -51,7 +51,7 @@
                     <el-input
                         v-model="calendarForm.neiRong"
                         type="textarea"
-                        :rows="5"
+                        :autosize="{ minRows: 5, maxRows: 10}"
                         placeholder="请输入事件内容"
                         clearable
                     />
@@ -314,7 +314,7 @@ export default {
     .el-tree-node__content > .el-tree-node__expand-icon {
         padding: 0px;
     }
-    max-height: 300px;
+    max-height: 500px;
     overflow: auto;
 }
 </style>

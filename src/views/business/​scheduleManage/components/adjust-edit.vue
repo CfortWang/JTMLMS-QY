@@ -139,6 +139,7 @@
                             <el-select
                                 v-model="scope.row.beforeDate"
                                 :disabled="readonly"
+                                clearable
                                 :placeholder=" readonly ? '' : '请选择调班日期'"
                                 @change="handleDateChange($event, scope.$index, 'beforeShiftList')"
                             >
@@ -172,9 +173,10 @@
                                 :disabled="readonly"
                                 multiple
                                 filterable
+                                clearable
                                 multiple-limit="3"
                                 :placeholder=" readonly ? '' : '请选择调班班次'"
-                                @change="vaildBanci($event, scope.row, beforeDateList, 'before')"
+                                @change="vaildBanci($event, scope.row, 'before')"
                             >
                                 <el-option
                                     v-for="item in scope.row.beforeShiftList"
@@ -198,6 +200,7 @@
                                 v-model="scope.row.party"
                                 :disabled="readonly || reScheduleValue==='paiban'"
                                 filterable
+                                clearable
                                 :placeholder=" readonly ? '' : '请选择目标人员'"
                                 @change="handlePartyChange($event, scope.row, scope.$index, 'change')"
                             >
@@ -227,6 +230,7 @@
                             <el-select
                                 v-model="scope.row.afterDate"
                                 :disabled="readonly"
+                                clearable
                                 :placeholder=" readonly ? '' : '请选择目标日期'"
                                 @change="handleDateChange($event, scope.$index, 'afterShiftList')"
                                 @visible-change="(visible) => {getPaiBanDate(visible,scope.$index)}"
@@ -259,10 +263,11 @@
                                 v-model="scope.row.afterAdjust"
                                 :disabled="readonly"
                                 multiple
+                                clearable
                                 filterable
                                 multiple-limit="3"
                                 :placeholder=" readonly ? '' : '请选择目标班次'"
-                                @change="vaildBanci($event, scope.row, afterDateList, 'after')"
+                                @change="vaildBanci($event, scope.row, 'after')"
                             >
                                 <el-option
                                     v-for="item in scope.row.afterShiftList"
@@ -552,7 +557,7 @@ export default {
                 }
             })
         },
-        vaildBanci (chooseArr, row) {
+        vaildBanci (chooseArr, row, type) {
             // 校验调班那天是否有重复班次
             if (this.reScheduleValue === 'diaoban' && chooseArr.length > 0) {
                 const duplicateElements = [] // 用户重复班次数组
@@ -571,6 +576,8 @@ export default {
                     row.afterAdjust = row.afterAdjust.filter(item => !duplicateElements.includes(item))
                     this.$message.warning(row.afterDate + '您已有【' + val + '】班次，不能作为目标班次！')
                     return true
+                } else if (duplicateElements.length === 0 && type === 'after') {
+                    return false
                 }
                 const partyElements = []// 目标人员重复班次数组
                 const partyBeforeData = this.afterDateList.find(obj => obj.value === row.beforeDate)
@@ -589,7 +596,10 @@ export default {
                     row.beforeAdjust = row.beforeAdjust.filter(item => !partyElements.includes(item))
                     this.$message.warning(row.beforeDate + '目标人员已有【' + val + '】班次，不能作为调班班次！')
                     return true
+                } else if (duplicateElements.length === 0 && type === 'before') {
+                    return false
                 }
+
             }
         },
         rowValidate (row, index) { // 行必填检验
@@ -1014,6 +1024,8 @@ export default {
             if (this.formData.adjustList.length > 0 && this.rowValidate(this.formData.adjustList[this.formData.adjustList.length - 1], this.formData.adjustList.length)) { // 校验不通过则返回true
                 return
             }
+            // 把目标日期清空
+            this.afterDateList = []
             this.formData.adjustList.push({
                 recordId: '',
                 beforeDate: '',
@@ -1159,7 +1171,7 @@ export default {
                     delList.push(self.formData.adjustList[i])
                     self.formData.adjustList.splice(i, 1)
                 })
-                this.delFilterList(delList) // 删除的数据解除班次锁定
+                self.delFilterList(delList) // 删除的数据解除班次锁定
             }).catch(() => {})
         },
         transformData (dataset, data, from, to) {

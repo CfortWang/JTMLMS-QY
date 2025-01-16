@@ -125,7 +125,7 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="设备状态：" prop="sheBeiZhuangTa">
-                                            <span>{{ form.sheBeiZhuangTa }}</span>
+                                            <span>{{ showState }}</span>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -497,7 +497,7 @@
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
-                                                <el-row>
+                                                <!-- <el-row>
                                                     <el-col>
                                                         <el-form-item label="是否限用：">
                                                             <el-select v-model="form.xiaoZhunWuCha" placeholder="请选择" size="mini" style="width:100%">
@@ -517,7 +517,7 @@
                                                             <el-input v-model="form.caiGouHeTong" size="mini" />
                                                         </el-form-item>
                                                     </el-col>
-                                                </el-row>
+                                                </el-row> -->
                                                 <el-row>
                                                     <!-- todo -->
                                                     <el-col>
@@ -759,6 +759,12 @@ export default {
             default: function () {
                 return {}
             }
+        },
+        stateList: {
+            type: Object,
+            default: function () {
+                return { '停用': '停用', '报废': '报废', '合格': '合格' }
+            }
         }
     },
     data () {
@@ -928,6 +934,9 @@ export default {
                 return photos
             }
             return []
+        },
+        showState () {
+            return this.stateList[this.form.sheBeiZhuangTa] || this.form.sheBeiZhuangTa
         }
     },
     watch: {

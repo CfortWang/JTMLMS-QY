@@ -263,6 +263,11 @@ export default {
             type: Boolean,
             default: false
         },
+        // 修改流程时间
+        timeModification: {
+            type: Boolean,
+            default: false
+        },
         mainCode: String, // 主表名
         params: Object // 参数
     },
@@ -500,6 +505,20 @@ export default {
             },
             deep: true,
             immediate: true
+        },
+        timeModification: {
+            handler (timeModification) {
+                // console.log(this.timeModification, 'abc')
+                if (timeModification) {
+                    // 点击体系运行记录盒修改数据，子表返回状态可编辑
+                    this.tableRights = 'e'
+                    this.columnsRights = this.getRealRightsTime()
+
+                    this.buttonsRights = 'e'
+                }
+            },
+            deep: true
+            // immediate: true
         }
     },
     beforeDestroy () {
@@ -581,6 +600,17 @@ export default {
                 return rights
             }
         },
+        // 体系运行记录盒放开权限
+        getRealRightsTime () {
+            const columnsRights = {}
+            if (this.nameColumns && this.nameColumns.length > 0) {
+                this.nameColumns.forEach((column) => {
+                    columnsRights[column.name] = 'e'
+                })
+            }
+            // console.log(columnsRights)
+            return columnsRights
+        },
         getColumnsRights (rights = {}) {
             const columnsRights = {}
             if (this.nameColumns && this.nameColumns.length > 0) {
@@ -588,6 +618,7 @@ export default {
                     columnsRights[column.name] = this.getRealRights(rights[column.name] || FormUtils.getDefaultRigths(column))
                 })
             }
+            // console.log(columnsRights, '000')
             return columnsRights
         },
         getButtonsRights (rights = {}) {
@@ -1052,7 +1083,6 @@ export default {
                     fields: this.columnsRights
                 }
             }
-            // console.log('调试', this.dialogFormData)
             const attrs = {
                 hide_name: true
             }

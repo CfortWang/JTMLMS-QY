@@ -30,7 +30,13 @@
                     min-width="20%"
                 >
                     <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("bianZhiShiJian") > 0 ? scope.row.bianZhiShiJian:'/' }}
+                        <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:200px">
+                                <div v-html="scope.row.bianZhiShiJian" />
+                            </div>
+                            <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("bianZhiShiJian") > 0 ? scope.row.bianZhiShiJian:'/' }}</div>
+                        </el-tooltip>
+                        <!-- {{ scope.row.hasOwnProperty("bianZhiShiJian") > 0 ? scope.row.bianZhiShiJian:'/' }} -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -38,7 +44,13 @@
                     min-width="45%"
                 >
                     <template slot-scope="scope">
-                        <div class="text-overflow">{{ scope.row.hasOwnProperty("shuoMing") > 0 ? scope.row.shuoMing:'/' }}</div>
+                        <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:400px">
+                                <div v-html="scope.row.shuoMing" />
+                            </div>
+                            <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("shuoMing") > 0 ? scope.row.shuoMing:'/' }}</div>
+                        </el-tooltip>
+                        <!-- <div class="text-overflow">{{ scope.row.hasOwnProperty("shuoMing") > 0 ? scope.row.shuoMing:'/' }}</div> -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -119,7 +131,8 @@ export default {
             multipleSelection: [],
             currentPage: 1,
             dialogDetails: false,
-            dialogData: []
+            dialogData: [],
+            isShowTooltip: true
         }
     },
     watch: {
@@ -146,6 +159,11 @@ export default {
         }
     },
     methods: {
+        inputOnMouseOver (e) {
+            const { offsetWidth, scrollWidth } = e.target || {}
+            this.isShowTooltip = offsetWidth < scrollWidth
+            console.log(this.isShowTooltip)
+        },
         handleSelectionChange (val) {
             this.multipleSelection = val
         },
@@ -246,6 +264,11 @@ export default {
             ::v-deep .el-date-editor.el-input.el-input--mini.el-input--prefix.el-input--suffix.el-date-editor--date{
                 width: 100%;
             }
+        }
+        .ellipsis {
+            white-space: nowrap; /* 确保文本不换行 */
+            overflow: hidden; /* 隐藏超出容器的文本 */
+            text-overflow: ellipsis; /* 显示省略号 */
         }
     }
 }

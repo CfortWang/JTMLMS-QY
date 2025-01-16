@@ -30,7 +30,13 @@
                     min-width="15%"
                 >
                     <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("lunWenTiMu") > 0 ? scope.row.lunWenTiMu:'/' }}
+                        <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:200px">
+                                <div v-html="scope.row.lunWenTiMu" />
+                            </div>
+                            <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("lunWenTiMu") > 0 ? scope.row.lunWenTiMu:'/' }}</div>
+                        </el-tooltip>
+                        <!-- {{ scope.row.hasOwnProperty("lunWenTiMu") > 0 ? scope.row.lunWenTiMu:'/' }} -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -38,7 +44,13 @@
                     min-width="15%"
                 >
                     <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("qiKanMingCheng") > 0 ? scope.row.qiKanMingCheng:'/' }}
+                        <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:200px">
+                                <div v-html="scope.row.qiKanMingCheng" />
+                            </div>
+                            <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("qiKanMingCheng") > 0 ? scope.row.qiKanMingCheng:'/' }}</div>
+                        </el-tooltip>
+                        <!-- {{ scope.row.hasOwnProperty("qiKanMingCheng") > 0 ? scope.row.qiKanMingCheng:'/' }} -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -46,7 +58,13 @@
                     min-width="15%"
                 >
                     <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("qiJuanHao") > 0 ? scope.row.qiJuanHao:'/' }}
+                        <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:200px">
+                                <div v-html="scope.row.qiJuanHao" />
+                            </div>
+                            <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("qiJuanHao") > 0 ? scope.row.qiJuanHao:'/' }}</div>
+                        </el-tooltip>
+                        <!-- {{ scope.row.hasOwnProperty("qiJuanHao") > 0 ? scope.row.qiJuanHao:'/' }} -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -54,7 +72,13 @@
                     min-width="15%"
                 >
                     <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("faBiaoShiJian") > 0 ? scope.row.faBiaoShiJian:'/' }}
+                        <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:200px">
+                                <div v-html="scope.row.faBiaoShiJian" />
+                            </div>
+                            <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("faBiaoShiJian") > 0 ? scope.row.faBiaoShiJian:'/' }}</div>
+                        </el-tooltip>
+                        <!-- {{ scope.row.hasOwnProperty("faBiaoShiJian") > 0 ? scope.row.faBiaoShiJian:'/' }} -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -62,7 +86,13 @@
                     min-width="15%"
                 >
                     <template slot-scope="scope">
-                        {{ scope.row.hasOwnProperty("qiKanLeiBie") > 0 ? scope.row.qiKanLeiBie:'/' }}
+                        <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:200px">
+                                <div v-html="scope.row.qiKanLeiBie" />
+                            </div>
+                            <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("qiKanLeiBie") > 0 ? scope.row.qiKanLeiBie:'/' }}</div>
+                        </el-tooltip>
+                        <!-- {{ scope.row.hasOwnProperty("qiKanLeiBie") > 0 ? scope.row.qiKanLeiBie:'/' }} -->
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -143,7 +173,8 @@ export default {
             multipleSelection: [],
             currentPage: 1,
             dialogDetails: false,
-            dialogData: []
+            dialogData: [],
+            isShowTooltip: true
         }
     },
     watch: {
@@ -170,6 +201,11 @@ export default {
         }
     },
     methods: {
+        inputOnMouseOver (e) {
+            const { offsetWidth, scrollWidth } = e.target || {}
+            this.isShowTooltip = offsetWidth < scrollWidth
+            console.log(this.isShowTooltip)
+        },
         handleSelectionChange (val) {
             this.multipleSelection = val
         },
@@ -266,6 +302,11 @@ export default {
             ::v-deep .el-date-editor.el-input.el-input--mini.el-input--prefix.el-input--suffix.el-date-editor--date{
                 width: 100%;
             }
+        }
+        .ellipsis {
+            white-space: nowrap; /* 确保文本不换行 */
+            overflow: hidden; /* 隐藏超出容器的文本 */
+            text-overflow: ellipsis; /* 显示省略号 */
         }
     }
 }

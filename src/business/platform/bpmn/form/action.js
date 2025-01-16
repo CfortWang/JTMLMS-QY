@@ -782,7 +782,7 @@ export default {
                         await this.saveData(jsonData, true, defData, snapshot)
                     }
                 }
-                this.timeModification_ = false
+                // this.timeModification_ = false
             } else {
                 this.timeModification_ = true
             }

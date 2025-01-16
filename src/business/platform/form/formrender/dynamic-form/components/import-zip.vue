@@ -22,14 +22,14 @@
                 <el-upload
                     ref="upload"
                     action="https://www.bpmhome.cn/post"
-                    accept=".zip"
+                    :accept="accept"
                     :file-list="fileList"
                     :on-change="handleChange"
                     :before-upload="handleUpload"
                     :auto-upload="false"
                 >
                     <el-button type="primary" icon="el-icon-upload">选择文件</el-button>
-                    <div slot="tip" class="el-upload__tip"> 请导入Zip文件</div>
+                    <div slot="tip" class="el-upload__tip"> {{ uploadTitle }}</div>
                 </el-upload>
             </el-form-item>
             <!-- <el-form-item label="格式数据：">
@@ -54,6 +54,12 @@ import ActionUtils from '@/utils/action'
 
 export default {
     props: {
+        uploadTitle: {
+            type: String
+        },
+        accept: {
+            type: String
+        },
         visible: {
             type: Boolean,
             default: false

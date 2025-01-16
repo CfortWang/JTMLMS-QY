@@ -438,6 +438,7 @@
             :dynamic-params="dynamicParams"
             :has-dynamic-params="hasDynamicParams"
             :placeholder="selectPlaceholder"
+            :allow-create="allowCreategl"
             :multiple="multipleString"
             :structure="structure"
             :value-key="valueKey"
@@ -843,6 +844,10 @@ export default {
         // 下拉是否允许创建，仅数据来源为静态数据时生效
         allowCreate () {
             return this.fieldOptions['allowCreate'] && this.fieldOptions['datasource'] === 'custom'
+        },
+        // 关联数据是否允许自行输入
+        allowCreategl () {
+            return this.fieldOptions['allowCreate'] !== false
         },
         // 编辑器按钮
         ueditorConfig () {

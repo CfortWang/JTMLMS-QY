@@ -34,7 +34,12 @@
                     :min-width="item.width"
                 >
                     <template slot-scope="scope">
-                        <span v-if="item.type==='text'">{{ scope.row.hasOwnProperty(item.field) > 0 ? scope.row[item.field]:'/' }}</span>
+                        <el-tooltip v-if="item.type==='text'" class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:200px">
+                                <div v-html="scope.row.hasOwnProperty(item.field) > 0 ? scope.row[item.field]:'/'" />
+                            </div>
+                            <p class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty(item.field) > 0 ? scope.row[item.field]:'/' }}</p>
+                        </el-tooltip>
                         <div v-else-if="item.type==='user'||item.type==='position'" class="grid-content bg-purple-light">
                             <ibps-user-selector
                                 v-model="scope.row[item.field]"
@@ -73,7 +78,14 @@
                                 style="width:100%"
                             />
                         </div>
+                        <el-tooltip v-else-if="item.type==='enumeration'" class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                            <div slot="content" style="max-width:200px">
+                                <div v-html="scope.row.hasOwnProperty(item.field) > 0 ? enumeratedArray[item.assemble][scope.row[item.field]]:'/'" />
+                            </div>
+                            <p class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty(item.field) > 0 ? enumeratedArray[item.assemble][scope.row[item.field]]:'/' }}</p>
+                        </el-tooltip>
                         <div v-else>/</div>
+
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -154,7 +166,15 @@ export default {
                 scriptContent: '',
                 type: 'user',
                 userType: 'position'
-            }]
+            }],
+            isShowTooltip: true,
+            enumeratedArray: {
+                numberBoolean: {
+                    '0': '否',
+                    '1': '是'
+                }
+            }
+
         }
     },
     watch: {
@@ -186,6 +206,11 @@ export default {
         }, 2000)
     },
     methods: {
+        inputOnMouseOver (e) {
+            const { offsetWidth, scrollWidth } = e.target || {}
+            this.isShowTooltip = offsetWidth < scrollWidth
+            console.log(this.isShowTooltip)
+        },
         handleSelectionChange (val) {
             this.multipleSelection = val
         },
@@ -284,6 +309,11 @@ export default {
             ::v-deep .el-date-editor.el-input.el-input--mini.el-input--prefix.el-input--suffix.el-date-editor--date{
                 width: 100%;
             }
+        }
+        .ellipsis {
+            white-space: nowrap; /* 确保文本不换行 */
+            overflow: hidden; /* 隐藏超出容器的文本 */
+            text-overflow: ellipsis; /* 显示省略号 */
         }
     }
 }

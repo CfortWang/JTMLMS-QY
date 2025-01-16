@@ -15,40 +15,40 @@
             <dv-border-box-1>
                 <div class="vessel">
                     <div class="area">
-                        <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
+                        <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:31.66%;">
                             <middleCard v-if="mergeData[0].numData.length>0" v-model="mergeData[0].numData" :title="mergeData[0].title" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
                         <dv-decoration-2 :key="`line1`" :dur="6" style="width:100%;height:2.5%;" />
-                        <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
-                            <pie-chart v-if="mergeData[1].numData.length>0" :title="mergeData[1].title" v-model="mergeData[1].numData" :width="'98%'" :height="'98%'" :id="1"/>
+                        <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:31.66%;">
+                            <pie-chart v-if="mergeData[1].numData.length>0" :id="1" v-model="mergeData[1].numData" :title="mergeData[1].title" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
                         <dv-decoration-2 :key="`line2`" :dur="6" style="width:100%;height:2.5%;" />
-                        <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
-                            <bar-chart v-if="mergeData[2].numData.length>0" :title="mergeData[2].title" v-model="mergeData[2].numData" :width="'98%'" :height="'98%'" :id="1" />
+                        <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:31.66%;">
+                            <bar-chart v-if="mergeData[2].numData.length>0" :id="1" v-model="mergeData[2].numData" :title="mergeData[2].title" :stack="true" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
                     </div>
                     <dv-decoration-2 :key="`line3`" :reverse="true" :dur="6" style="width:1%;height:100%;" />
                     <div class="area midArea">
-                        <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:41.5%;">
-                            <entirety :title="mergeData[7].title" v-model="mergeData[7].numData" :width="'98%'" :height="'98%'"/>
+                        <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:41.5%;">
+                            <entirety v-model="mergeData[7].numData" :title="mergeData[7].title" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
                         <dv-decoration-2 :key="`line5`" :dur="6" style="width:100%;height:2.5%;" />
-                        <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:56.18%;">
-                            <bar-chart v-if="mergeData[3].numData.length>0" :title="mergeData[3].title" v-model="mergeData[3].numData" :colorIndex="1" :width="'98%'" :height="'98%'" :id="2" />
+                        <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:56.18%;">
+                            <CarouselTabl v-if="mergeData[6].numData.data.length>0" v-model="mergeData[6].numData" :title="mergeData[6].title" />
                         </dv-border-box-7>
                     </div>
                     <dv-decoration-2 :key="`line4`" :reverse="true" :dur="6" style="width:1%;height:100%;" />
                     <div class="area">
-                        <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
-                            <bar-chart v-if="mergeData[4].numData.length>0" :title="mergeData[4].title" v-model="mergeData[4].numData" :lineTF="true" :width="'98%'" :height="'98%'" :id="3" />
+                        <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:31.66%;">
+                            <bar-chart v-if="mergeData[4].numData.length>0" :id="3" v-model="mergeData[4].numData" :title="mergeData[4].title" :line-t-f="true" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
                         <dv-decoration-2 :key="`6`" :dur="6" style="width:100%;height:2.5%;" />
-                        <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
-                            <bar-chart v-if="mergeData[5].numData.length>0" :title="mergeData[5].title" v-model="mergeData[5].numData" :width="'98%'" :height="'98%'" :id="4" />
+                        <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:31.66%;">
+                            <bar-chart v-if="mergeData[5].numData.length>0" :id="4" v-model="mergeData[5].numData" :title="mergeData[5].title" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
                         <dv-decoration-2 :key="`line7`" :dur="6" style="width:100%;height:2.5%;" />
-                        <dv-border-box-7 :color="dvColor" :backgroundColor="dvBackColor" style="width:100%;height:31.66%;">
-                            <CarouselTabl v-if="mergeData[6].numData.data.length>0" :title="mergeData[6].title" v-model="mergeData[6].numData"/> 
+                        <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:31.66%;">
+                            <bar-chart v-if="mergeData[3].numData.length>0" :id="2" v-model="mergeData[3].numData" :title="mergeData[3].title" :stack="true" :color-index="0" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
                     </div>
                 </div>
@@ -66,12 +66,12 @@ export default {
         PieChart: () => import('./components/pieChart.vue'),
         middleCard: () => import('./components/getPieView'),
         CarouselTabl: () => import('./components/CarouselTabl'),
-        entirety: () => import('./components/entirety'),
+        entirety: () => import('./components/entirety')
     },
     data () {
         const { deptList = [] } = this.$store.getters || {}
-        let chooseDept = deptList.filter(e => e.depth == 4)
-        chooseDept.unshift({positionId: " ",positionName: "全科室"})
+        const chooseDept = deptList.filter(e => e.depth == 4)
+        chooseDept.unshift({ positionId: ' ', positionName: '全科室' })
         return {
             deptList,
             chooseDept,
@@ -80,32 +80,32 @@ export default {
             title: '设备管理看板',
             fontSize: 18,
             // show: true,
-            hoverClassAdd:'w',
+            hoverClassAdd: 'w',
             dvColor: ['rgb(22,47,98)', 'rgba(116, 142, 194, 1)'],
             dvBackColor: 'rgba(6, 30, 93, 0)',
-            mergeData:[
+            mergeData: [
                 {
-                    title: '检验科各型设备分布情况',
+                    title: '设备类型统计',
                     numData: dataobj.distributionDataObj
                 },
                 {
-                    title: '各组设备总数分布情况',
+                    title: '设备数量统计',
                     numData: dataobj.numDistributionDataObj
                 },
                 {
-                    title: '部门设备寿命情况统计',
+                    title: '设备使用寿命统计',
                     numData: dataobj.lifeTimeData
                 },
                 {
-                    title: '各部门设备完好情况',
+                    title: '设备状况统计',
                     numData: dataobj.intactData
                 },
                 {
-                    title: '各部门设备维护完成情况',
+                    title: '设备维护完成情况',
                     numData: dataobj.completeData
                 },
                 {
-                    title: '各部门设备检定/校准完成情况',
+                    title: '设备检定/校准完成情况',
                     numData: dataobj.verificationData
                 },
                 // {
@@ -119,17 +119,17 @@ export default {
                 //         hoverPause: true
                 //     }
                 // },
-                 {
-                    title: "检验科设备信息",
+                {
+                    title: '设备维修情况统计',
                     numData: {
-                           // header: ["部门", "设备名称", "设备编号", "状态"],
-                        header: ["部门", "设备名称", "设备编号", "状态","维修次数"],
-                        headerBGC: "rgba(0,0,0,0)",
+                        // header: ["部门", "设备名称", "设备编号", "状态"],
+                        header: ['部门', '设备名称', '设备编号', '状态', '维修次数'],
+                        headerBGC: 'rgba(0,0,0,0)',
                         data: dataobj.scrapData,
-                        columnWidth: ["100", "220", "110","110","120"],
+                        columnWidth: ['120', '270', '220', '90', '110'],
                         rowNum: 5,
                         hoverPause: true
-                        }
+                    }
                 },
                 {
                     title: '设备整体情况',
@@ -165,27 +165,27 @@ export default {
             })
             this.initializeData()
             equipDashBoard().then(res => {
-                let data = res.data[0] || {}
-                
-                const numDistributionDataObj = data.numDistributionDataObj.filter((item,i)=>{
-                    return item.name.indexOf('综合')===-1
+                const data = res.data[0] || {}
+
+                const numDistributionDataObj = data.numDistributionDataObj.filter((item, i) => {
+                    return item.name.indexOf('综合') === -1
                 })
-                const lifeTimeData = data.lifeTimeData.filter((item,i)=>{
-                    return item.org.indexOf('综合')===-1
-                })
-                
-                const intactData = data.intactData.filter((item,i)=>{
-                    return item.org.indexOf('综合')===-1
-                })
-                console.log(data.verificationData)
-                const verificationData = data.intactData.filter((item,i)=>{
-                    return item.org.indexOf('综合')===-1
-                })
-                const scrapData = data.scrapData.filter((item,i)=>{
-                    return item[0].indexOf('综合')===-1
+                const lifeTimeData = data.lifeTimeData.filter((item, i) => {
+                    return item.org.indexOf('综合') === -1
                 })
 
-                const scrapDataList=JSON.parse(JSON.stringify(scrapData))
+                const intactData = data.intactData.filter((item, i) => {
+                    return item.org.indexOf('综合') === -1
+                })
+                console.log(data.verificationData)
+                const verificationData = data.verificationData.filter((item, i) => {
+                    return item.org.indexOf('综合') === -1
+                })
+                const scrapData = data.scrapData.filter((item, i) => {
+                    return item[0].indexOf('综合') === -1
+                })
+
+                const scrapDataList = JSON.parse(JSON.stringify(scrapData))
                 for (var i = 0; i < scrapData.length; i++) {
                     if (i < scrapData.length - 1) {
                         const a = JSON.parse(JSON.stringify(scrapData[i][1]))
@@ -195,34 +195,37 @@ export default {
                             scrapData[i + 1][1] = a
                         }
                     }
-                scrapDataList[i][0] = scrapData[i][4]
-                scrapDataList[i][1] = scrapData[i][5]
-                scrapDataList[i][2] = scrapData[i][3]
-                scrapDataList[i][3] = scrapData[i][7]
-                scrapDataList[i][4] = "&nbsp;&nbsp;&nbsp;&nbsp;"+scrapData[i][1]+'次'
-                scrapDataList[i].splice(5, 3)
+                    scrapDataList[i][0] = scrapData[i][4]
+                    scrapDataList[i][1] = scrapData[i][5]
+                    scrapDataList[i][2] = scrapData[i][3]
+                    scrapDataList[i][3] = scrapData[i][7]
+                    scrapDataList[i][4] = '&nbsp;&nbsp;&nbsp;&nbsp;' + scrapData[i][1] + '次'
+                    scrapDataList[i].splice(5, 3)
                 }
                 this.mergeData[0].numData = data.distributionDataObj || []
                 this.mergeData[1].numData = numDistributionDataObj
                 this.mergeData[2].numData = lifeTimeData
                 this.mergeData[3].numData = intactData
                 this.mergeData[4].numData = []
-                if(data.completeData !== null && data.completeData.length>0){
+                if (data.completeData !== null && data.completeData.length > 0) {
                     data.completeData.forEach(element => {
-                        if(element.org.indexOf('综合')===-1){
-                            this.mergeData[4].numData.push({...element,rate: element.numP!==0?(element.numC/element.numP).toFixed(2) * 100:0})
+                        if (element.org.indexOf('综合') === -1) {
+                            console.log((element.numC / element.numP).toFixed(4), (element.numC / element.numP).toFixed(4) * 100)
+                            this.mergeData[4].numData.push({ ...element, rate: (element.numP !== 0 ? ((element.numC * 100) / element.numP).toFixed(2) : 0) + '%' })
                         }
                     })
                 }
                 this.mergeData[5].numData = verificationData
                 this.mergeData[6].numData.data = scrapDataList
-                this.mergeData[7].numData = data.entiretyData || []
+                const { upKeep, ...b } = data.entiretyData
+                this.mergeData[7].numData = b || []
+                console.log(data.entiretyData, b, this.mergeData[7].numData)
                 loading.close()
             })
         },
         goBack () {
             this.$router.back(-1)
-        },
+        }
     }
 }
 </script>
@@ -265,7 +268,7 @@ export default {
                     justify-content: space-evenly;
                     align-content: space-evenly;
                     .area{
-                        width: 26%;
+                        width: 28%;
                         height: 100%;
                         .dv-border-box-7{
                             .border-box-content{
@@ -275,7 +278,7 @@ export default {
                         }
                     }
                     .midArea{
-                        width: 45%;
+                        width: 41%;
                     }
                 }
             }

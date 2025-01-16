@@ -49,6 +49,7 @@
                         :code="code"
                         :params="formParams"
                         :cur-active-step.sync="activeStep"
+                        :time-modification="timeModification"
                     />
                     <!--其他类型-->
                     <ibps-dynamic-form-item
@@ -448,9 +449,9 @@ export default {
                 // 字段
                 rightsValue = permissions.fields[name] ? permissions.fields[name] : null
             }
-            // if (this.$route.path === '/xxgl/jssllb') {
-            //     return rightsValue
-            // }
+            if (this.$route.path === '/xxgl/jssllb') {
+                return rightsValue
+            }
             if (this.readonly && !isNonInputField && !isSpecial) {
                 // 只读权限
                 // 修复空权限默认值的bug

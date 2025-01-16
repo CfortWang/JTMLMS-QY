@@ -47,7 +47,7 @@
                     </el-popover>
                     <el-button type="primary" icon="el-icon-view" @click="lookFile">查看文件信息</el-button>
                     <el-button type="primary" icon="el-icon-s-fold" @click="hideLeft">{{ leftContent }}</el-button>
-                    <el-button type="primary" icon="el-icon-download" @click="updateFile">下载文件</el-button>
+                    <el-button v-if="updateShow" type="primary" icon="el-icon-download" @click="updateFile">下载文件</el-button>
                     <el-button type="danger" icon="el-icon-close" @click="closeDialog">关闭</el-button>
                 </el-col>
             </el-row>
@@ -139,6 +139,7 @@ export default {
         // const userId = this.$store.getters.userInfo.employee.id// 本人修改
 
         return {
+            updateShow: false,
             type: 'success',
             curFileName: '',
             dialogVisible: false,
@@ -268,6 +269,10 @@ export default {
         const curRole = this.role.map(i => i.alias)
         const isPower = curRole.some(item => roleKey.includes(item))
         this.deleteShow = !!((isPower || this.isPower))
+        const hasRole = localStorage.getItem('hasHighRole') || 0
+        if (this.isSuper || hasRole == 1) {
+            this.updateShow = true
+        }
     },
     methods: {
         getUserName (data) {

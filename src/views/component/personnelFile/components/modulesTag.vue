@@ -333,6 +333,9 @@ export default {
         ::v-deep .el-tabs--left .el-tabs__item.is-left{
             // text-align: left;
         }
+        ::v-deep .el-tabs__item{
+            padding: 0 20px 0 0 !important;
+        }
     }
     .tabsAll{
         height: 100%;
@@ -356,6 +359,7 @@ export default {
         .paddingInner{
             padding: 12px 0 0 0;
             height: 100%;
+            width: 100%;
         }
     }
 

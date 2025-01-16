@@ -36,7 +36,13 @@
                 >
                     <template slot-scope="scope">
                         <div v-if="judgeTag()">
-                            <div>{{ scope.row.hasOwnProperty("kaiShiShiJian") > 0 ? scope.row.kaiShiShiJian:'/' }}</div>
+                            <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                                <div slot="content" style="max-width:200px">
+                                    <div v-html="scope.row.kaiShiShiJian" />
+                                </div>
+                                <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("kaiShiShiJian") > 0 ? scope.row.kaiShiShiJian:'/' }}</div>
+                            </el-tooltip>
+                            <!-- <div>{{ scope.row.hasOwnProperty("kaiShiShiJian") > 0 ? scope.row.kaiShiShiJian:'/' }}</div> -->
                         </div>
                         <div v-else class="grid-content">
                             <el-form-item :prop="'nowData.'+ (10*(currentPage-1) +scope.$index)+'.kaiShiShiJian'" :rules="rules.kaiShiShiJian">
@@ -58,7 +64,13 @@
                 >
                     <template slot-scope="scope">
                         <div v-if="judgeTag()">
-                            <div>{{ scope.row.hasOwnProperty("jieShuShiJian") > 0 ? scope.row.jieShuShiJian:'/' }}</div>
+                            <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                                <div slot="content" style="max-width:200px">
+                                    <div v-html="scope.row.jieShuShiJian" />
+                                </div>
+                                <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("jieShuShiJian") > 0 ? scope.row.jieShuShiJian:'/' }}</div>
+                            </el-tooltip>
+                            <!-- <div>{{ scope.row.hasOwnProperty("jieShuShiJian") > 0 ? scope.row.jieShuShiJian:'/' }}</div> -->
                         </div>
                         <div v-else class="grid-content">
                             <el-form-item :prop="'nowData.'+ (10*(currentPage-1) +scope.$index)+'.jieShuShiJian'" :rules="rules.jieShuShiJian">
@@ -80,7 +92,13 @@
                 >
                     <template slot-scope="scope">
                         <div v-if="judgeTag()">
-                            <div>{{ scope.row.hasOwnProperty("xueXiao") > 0 ? scope.row.xueXiao:'/' }}</div>
+                            <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                                <div slot="content" style="max-width:200px">
+                                    <div v-html="scope.row.xueXiao" />
+                                </div>
+                                <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("xueXiao") > 0 ? scope.row.xueXiao:'/' }}</div>
+                            </el-tooltip>
+                            <!-- <div>{{ scope.row.hasOwnProperty("xueXiao") > 0 ? scope.row.xueXiao:'/' }}</div> -->
                         </div>
                         <div v-else class="grid-content">
                             <el-form-item :prop="'nowData.'+ (10*(currentPage-1) +scope.$index)+'.xueXiao'" :rules="rules.school">
@@ -100,7 +118,13 @@
                 >
                     <template slot-scope="scope">
                         <div v-if="judgeTag()">
-                            <div>{{ scope.row.hasOwnProperty("zhuanYe") > 0 ? scope.row.zhuanYe:'/' }}</div>
+                            <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                                <div slot="content" style="max-width:200px">
+                                    <div v-html="scope.row.zhuanYe" />
+                                </div>
+                                <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("zhuanYe") > 0 ? scope.row.zhuanYe:'/' }}</div>
+                            </el-tooltip>
+                            <!-- <div>{{ scope.row.hasOwnProperty("zhuanYe") > 0 ? scope.row.zhuanYe:'/' }}</div> -->
                         </div>
                         <div v-else class="grid-content">
                             <el-form-item :prop="'nowData.'+ (10*(currentPage-1) +scope.$index)+'.zhuanYe'" :rules="rules.optional">
@@ -120,7 +144,13 @@
                 >
                     <template slot-scope="scope">
                         <div v-if="judgeTag()">
-                            <div>{{ scope.row.hasOwnProperty("xueLiXueWei") > 0 ? scope.row.xueLiXueWei:'/' }}</div>
+                            <el-tooltip class="item" effect="dark" placement="top" :disabled="!isShowTooltip">
+                                <div slot="content" style="max-width:200px">
+                                    <div v-html="scope.row.xueLiXueWei" />
+                                </div>
+                                <div class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty("xueLiXueWei") > 0 ? scope.row.xueLiXueWei:'/' }}</div>
+                            </el-tooltip>
+                            <!-- <div>{{ scope.row.hasOwnProperty("xueLiXueWei") > 0 ? scope.row.xueLiXueWei:'/' }}</div> -->
                         </div>
                         <div v-else class="grid-content">
                             <el-form-item :prop="'nowData.'+ (10*(currentPage-1) +scope.$index)+'.xueLiXueWei'" :rules="rules.optional">
@@ -248,7 +278,8 @@ export default {
                 ]
             },
             multipleSelection: [],
-            currentPage: 1
+            currentPage: 1,
+            isShowTooltip: true
         }
     },
     watch: {
@@ -275,6 +306,11 @@ export default {
         }
     },
     methods: {
+        inputOnMouseOver (e) {
+            const { offsetWidth, scrollWidth } = e.target || {}
+            this.isShowTooltip = offsetWidth < scrollWidth
+            console.log(this.isShowTooltip)
+        },
         judgeTag () {
             // return this.planeData.length>0&& this.btnShow === true && this.buttonType!==1 ? true : false
             return !!(this.btnShow === true && this.buttonType !== 1 && this.buttonType !== 4)
@@ -399,6 +435,11 @@ export default {
             ::v-deep .el-date-editor.el-input.el-input--mini.el-input--prefix.el-input--suffix.el-date-editor--date{
                 width: 100%;
             }
+        }
+        .ellipsis {
+            white-space: nowrap; /* 确保文本不换行 */
+            overflow: hidden; /* 隐藏超出容器的文本 */
+            text-overflow: ellipsis; /* 显示省略号 */
         }
     }
 

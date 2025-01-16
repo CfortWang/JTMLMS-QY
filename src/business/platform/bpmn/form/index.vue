@@ -307,7 +307,7 @@ export default {
             handler: function (val, oldVal) {
                 if (val) {
                     this.readonly = false
-                    console.log(this.readonly)
+                    // console.log(this.readonly)
                 }
                 this.buttons = this.buildButtons(this.responseData.buttons.slice(1, 4), this.attributes) || []
                 // }

@@ -30,7 +30,7 @@ export default {
         },
         rowHandleDefaultWidth () {
             if (this.rowHandleDisplay) {
-                return this.rowHandleDisplayButtonnumber * 70 + 50
+                return this.rowHandle.width || this.rowHandleDisplayButtonnumber * 70 + 50
             } else {
                 return this.$i18n.locale === 'en' ? 75 : 50
             }

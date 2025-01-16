@@ -30,7 +30,7 @@
                                         <el-option
                                             v-for="(value,key) in config"
                                             :key="key"
-                                            :label="key.split('-')[1]"
+                                            :label="value['label'] || key.split('-')[1]"
                                             :value="key"
                                         />
                                     </el-select>
@@ -220,6 +220,7 @@
 </template>
 
 <script>
+import { getSetting } from '@/utils/query'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import xlsx from 'xlsx'
 import fs from 'file-saver'
@@ -319,74 +320,77 @@ export default {
             ],
             config: {
                 '01-室内温湿度监控': {
-                    keyword: '',
-                    path: '/sshjgl/wdjc/snwsdjkcd'
+                    label: '室内温湿度监控',
+                    path: '/sshjgl/wdjc/snwsdjkcd',
+                    showDevice: false
                 },
                 '02-冰箱温度监控': {
-                    keyword: '冰箱，冰柜，冷藏，冷冻，低温，恒温，生化培养箱',
+                    label: '冰箱温度监控',
                     path: '/sshjgl/wdjc/bxwdjc',
                     showDevice: true
                 },
                 '03-温浴箱温度监控': {
-                    keyword: '',
+                    label: '温浴箱温度监控',
                     path: '/sshjgl/wdjc/wyxwdjkywh',
                     showDevice: true
                 },
                 '04-阴凉柜温度监控': {
-                    keyword: '',
+                    label: '阴凉柜温度监控',
                     path: '/sshjgl/wdjc/ylgwdjc',
                     showDevice: true
                 },
                 '05-纯水机水质监测': {
-                    keyword: '',
+                    label: '纯水机水质监测',
                     path: '/sshjgl/csjszjcb',
                     showDevice: true
                 },
                 '06-每日安全检查': {
-                    keyword: '',
-                    path: '/sshjgl/aqgl/mraqjc'
+                    label: '每日安全检查',
+                    path: '/sshjgl/aqgl/mraqjc',
+                    showDevice: false
                 },
                 '07-每月安全检查': {
-                    keyword: '',
-                    path: '/sshjgl/aqgl/myaqjc'
+                    label: '每月安全检查',
+                    path: '/sshjgl/aqgl/myaqjc',
+                    showDevice: true
                 },
                 '08-含氯有效性监测': {
-                    keyword: '',
-                    path: '/sshjgl/aqgl/hlyxxjc'
+                    label: '含氯有效性监测',
+                    path: '/sshjgl/aqgl/hlyxxjc',
+                    showDevice: false
                 },
                 // '09-紫外灯辐照测定': {
-                //     keyword: '',
                 //     path: '/sshjgl/aqgl/zwdfzd',
-                //     showDevice: true
                 // },
                 '10-洗眼器检查': {
-                    keyword: '',
+                    label: '洗眼器检查',
                     path: '/sshjgl/aqgl/xyqjc',
                     showDevice: true
                 },
                 '11-紧急淋浴器检查': {
-                    keyword: '',
+                    label: '紧急淋浴器检查',
                     path: '/sshjgl/aqgl/jjlyqjc',
                     showDevice: true
                 },
                 '12-紫外灯消毒': {
-                    keyword: '',
+                    label: '紫外灯消毒',
                     path: '/sshjgl/aqgl/jykzwdxdjlb',
                     showDevice: true
                 },
                 '13-高压灭菌': {
-                    keyword: '',
+                    label: '高压灭菌',
                     path: '/sshjgl/aqgl/gymjjlb',
                     showDevice: true
                 },
                 '14-空气消毒机': {
-                    keyword: '',
+                    label: '空气消毒机',
                     path: '/sshjgl/aqgl/xdjsyjlb',
                     showDevice: true
                 },
                 '15-日常防护消毒': {
-                    keyword: '',
-                    path: '/sshjgl/aqgl/rcfhxd'
+                    label: '日常防护消毒',
+                    path: '/sshjgl/aqgl/rcfhxd',
+                    showDevice: false
                 }
             },
             subIdList: [],
@@ -405,7 +409,7 @@ export default {
             return this.isSearch ? this.searchData : this.subForm
         },
         isShowDevice () {
-            return this.form.lei_xing_ !== '' && this.form.lei_xing_ !== '01-室内温湿度监控' && this.form.lei_xing_ !== '06-每日安全检查' && this.form.lei_xing_ !== '08-含氯有效性监测' && this.form.lei_xing_ !== '15-日常防护消毒'
+            return this.config[this.form.lei_xing_]?.showDevice
         },
         deviceIsRequired () {
             return this.form.lei_xing_ === '02-冰箱温度监控' || this.form.lei_xing_ === '05-纯水机水质监测' || this.form.lei_xing_ === '03-温浴箱温度监控' || this.form.lei_xing_ === '04-阴凉柜温度监控'
@@ -459,7 +463,12 @@ export default {
             }
         }
     },
-    mounted () {
+    async mounted () {
+        const config = await getSetting(this, 'facilityEnv', 'typeList')
+        if (config) {
+            console.debug(config)
+            this.config = config
+        }
         this.init()
         if (this.isEdit) {
             this.loadData()

@@ -114,6 +114,12 @@ export default {
         scanVisible: {
             type: Boolean,
             default: false
+        },
+        stateList: {
+            type: Object,
+            default: function () {
+                return { '停用': '停用', '报废': '报废', '合格': '合格' }
+            }
         }
     },
     data () {
@@ -214,18 +220,7 @@ export default {
             return value != null && value != undefined
         },
         switchProve (status) {
-            switch (status) {
-                case '合格':
-                    return '合格证'
-                case '停用':
-                    return '停用证'
-                case '限用':
-                    return '限用证'
-                case '报废':
-                    return '报废证'
-                default:
-                    return '测试证'
-            }
+            return `${this.stateList[status] || '测试'}证`
         },
         switchSlogan (status) {
             switch (status) {
@@ -340,7 +335,7 @@ export default {
     position: relative;
     top: -45px;
     left: -50px;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     color: #000000;
 }

@@ -59,6 +59,10 @@
                             limlt="5"
                         />
                     </div>
+                    <div v-else-if="e.type==='enumeration'" class="contant">
+                        {{ enumeratedArray[e.assemble][e.contant] }}
+
+                    </div>
                 </div>
             </el-col>
         </el-row>
@@ -100,7 +104,13 @@ export default {
                 scriptContent: '',
                 type: 'user',
                 userType: 'position'
-            }]
+            }],
+            enumeratedArray: {
+                numberBoolean: {
+                    '0': '否',
+                    '1': '是'
+                }
+            }
         }
     }
 }

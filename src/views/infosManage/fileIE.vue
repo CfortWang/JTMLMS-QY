@@ -247,17 +247,17 @@ export default {
     },
     created () {
         this.pageKey = this.$route.name
-        this.categoryKey = this.$route.name === 'nbwj' ? 'FILE_TYPE' : 'FLOW_TYPE'
+        this.categoryKey = this.pageKey === 'nbwj' ? 'FILE_TYPE' : 'FLOW_TYPE'
         this.userId = this.$store.getters.userInfo.employee.id
         const roleList = this.$store.getters.userInfo.role
         // 系统管理角色添加删除按钮
         const hasRole = roleList.some(item => item.name === '系统管理角色')
-        if (this.$route.name === 'wjkzgl-ywyxjlsc') {
+        if (this.pageKey === 'wjkzgl-ywyxjlsc' || this.pageKey === 'ywtxyxjl') {
             // 系统管理角色不做分类过滤
             this.listConfig.toolbars.push({ key: 'remove' })
             this.selection = true
         }
-        if (this.$route.name === 'nbwj') {
+        if (this.pageKey === 'nbwj') {
             this.listConfig.searchForm.forms = [
                 { prop: 'wen_jian_bian_hao', label: '文件编号' },
                 { prop: 'wen_jian_ming_che', label: '文件名称' }
@@ -272,7 +272,7 @@ export default {
                 { prop: 'cha_yue_jie_zhi_s', label: '查阅截止时间', sortable: 'custom', minWidth: 120 }
             ]
         }
-        if (this.$route.name === 'wjkzgl-ywyxjlsc' || this.$route.name === 'ywtxyxjl') {
+        if (this.pageKey === 'wjkzgl-ywyxjlsc' || this.pageKey === 'ywtxyxjl') {
             this.listConfig.searchForm.forms = [
                 { prop: 'nian_du_', label: '记录月份', fieldType: 'date', dateType: 'year', width: 50 },
                 { prop: 'bian_zhi_shi_jian', label: '上传时间', fieldType: 'daterange', width: 200 }

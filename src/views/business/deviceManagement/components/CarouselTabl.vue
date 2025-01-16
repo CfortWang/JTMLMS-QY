@@ -2,7 +2,7 @@
     <div style="width: 98%;height: 98%;overflow: hidden;padding: 1%;">
         <div class="title" style="vertical-align: top; height: 10%;font-size: 24px;color: white;font-weight:600;">{{ title }}</div>
         <div v-show="showChart" style="width:100%;height: 87%;display: flex;justify-content: center;">
-            <dv-scroll-board :key="scrollBoardKey" :config="configData" style="width:100%;height:100%" />
+            <dv-scroll-board :key="scrollBoardKey" :config="configData" style="width:100%;height:100%;font-size: 12px" />
         </div>
         <div v-show="!showChart" :class="$style.nullShow">暂无数据</div>
     </div>
@@ -12,7 +12,7 @@
 export default {
     props: {
         value: {
-            type: Object,
+            type: Object
         },
         title: {
             type: String,
@@ -29,15 +29,15 @@ export default {
     watch: {
         value: {
             handler (newVal, oldVal) {
-                if(newVal.data.length>0){
+                if (newVal.data.length > 0) {
                     this.configData = { ...newVal }
                     this.scrollBoardKey++
                     this.showChart = true
-                }else{
+                } else {
                     this.shoshowChartw = false
                 }
             },
-            deep: true,
+            deep: true
             // immediate: true
         }
     },

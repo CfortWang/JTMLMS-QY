@@ -424,14 +424,16 @@ export function correlationSql (type, val) {
     const col = {
         jyrykhjlb: 'bei_kao_he_ren_yu',
         lhrynlqr: 'bei_shou_quan_ren',
-        lhrypxjlb: 'pei_xun_ren_yuan_',
+        lhrypxjlb: 'peixunrenyuan',
         lhpxsqb: 'can_jia_ren_yuan_',
         kaoshijilu: 'examinee'
     }
-    if (type === 'jyrykhjlb' || type === 'lhrynlqr' || type === 'lhrypxjlb' || type === 'lhpxsqb') {
+    if (type === 'jyrykhjlb' || type === 'lhrynlqr' || type === 'lhpxsqb') {
         sql = `select * from t_${type} where FIND_IN_SET('${val}',${col[type]}) and shi_fou_guo_shen_ = '已完成' `
     } else if (type === 'kaoshijilu') {
-        sql = `select * from v_examination where FIND_IN_SET('${val}',${col[type]}) and examState = '已完成' ORDER BY createTime asc`
+        sql = `select * from v_examination where FIND_IN_SET('${val}',${col[type]}) and paperState = '已完成' ORDER BY createTime asc`
+    } else if (type === 'lhrypxjlb') {
+        sql = `select * from v_wodepeixun where FIND_IN_SET('${val}',${col[type]}) and shi_fou_guo_shen_ = '已结束' `
     }
     return sql
 }
@@ -459,40 +461,41 @@ export const correlationConfig = {
         config: [
             { label: '授权使用设备', width: '20%', type: 'dialog', field: 'shou_quan_shi_yon', dialogKey: 'sbwxdhk' },
             { label: '授权岗位', width: '16%', type: 'dialog', field: 'shou_quan_gang_we', dialogKey: 'gwzzdhkrysqy' },
-            { label: '直属上级', width: '10%', type: 'user', field: 'shen_he_ren_' },
+            { label: '审核人', width: '10%', type: 'user', field: 'shen_he_ren_' },
             { label: '检验专业', width: '10%', type: 'text', field: 'jian_yan_zhuan_ye' },
-            { label: '考核结果', width: '10%', type: 'text', field: 'kao_he_jie_guo_' },
+            { label: '能力评估结果', width: '10%', type: 'text', field: 'kao_he_jie_guo_' },
             { label: '附件', width: '12%', type: 'file', field: 'shang_chuan_fu_ji' },
             { label: '表单', width: '12%', type: 'file', field: 'kuai_zhao_' }
 
         ],
         dialog: [
-            [{ name: '授权使用设备', field: 'shou_quan_shi_yon', type: 'dialog', dialogKey: 'sbwxdhk' }, { name: '考核结果', field: 'kao_he_jie_guo_', type: 'text' }],
+            [{ name: '授权使用设备', field: 'shou_quan_shi_yon', type: 'dialog', dialogKey: 'sbwxdhk' }, { name: '能力评估结果', field: 'kao_he_jie_guo_', type: 'text' }],
             [{ name: '授权岗位', field: 'shou_quan_gang_we', type: 'dialog', dialogKey: 'gwzzdhkrysqy' }, { name: '考核日期', field: 'kao_he_shi_jian_', type: 'text' }],
-            [{ name: '直属上级', field: 'shen_he_ren_', type: 'user' }, { name: '检验专业', field: 'jian_yan_zhuan_ye', type: 'text' }],
+            [{ name: '审核人', field: 'shen_he_ren_', type: 'user' }, { name: '检验专业', field: 'jian_yan_zhuan_ye', type: 'text' }],
+            [{ name: '考核记录', field: 'xuan_ze_kao_he_ji', type: 'dialog', dialogKey: 'jyrykhdhkrysqy' }, { name: '是否合格', field: 'shi_fou_he_ge_', type: 'text' }],
             [{ name: '附件', field: 'shang_chuan_fu_ji', type: 'file' }],
             [{ name: '表单', field: 'kuai_zhao_', type: 'file' }]
         ]
     },
     lhrypxjlb: {
         config: [
-            { label: '培训名称', width: '15%', type: 'text', field: 'pei_xun_nei_rong_' },
+            { label: '培训主题', width: '15%', type: 'text', field: 'pei_xun_nei_rong_' },
             { label: '培训老师', width: '12%', type: 'text', field: 'pei_xun_lao_shi_' },
             { label: '培训时间', width: '12%', type: 'text', field: 'pei_xun_shi_jian_' },
             { label: '培训地点', width: '10%', type: 'text', field: 'pei_xun_di_dian_' },
             { label: '培训内容', width: '12%', type: 'text', field: 'pei_xun_xue_xi_ne' },
             { label: '见证性材料', width: '14%', type: 'file', field: 'jian_zheng_xing_c' },
-            { label: '表单', width: '14%', type: 'file', field: 'kuai_zhao_' }
+            { label: '表单', width: '14%', type: 'file', field: 'jlbkuai_zhao_' }
 
         ],
         dialog: [
-            [{ name: '培训名称', field: 'pei_xun_nei_rong_', type: 'text' }, { name: '培训目标', field: 'pei_xun_mu_di_', type: 'text' }],
+            [{ name: '培训主题', field: 'pei_xun_nei_rong_', type: 'text' }, { name: '培训目标', field: 'pei_xun_mu_di_', type: 'text' }],
             [{ name: '培训开始时间', field: 'pei_xun_shi_jian_', type: 'text' }, { name: '培训结束时间', field: 'pei_xun_jie_shu_s', type: 'text' }],
             [{ name: '培训老师', field: 'pei_xun_lao_shi_', type: 'text' }, { name: '培训地点', field: 'pei_xun_di_dian_', type: 'text' }],
             [{ name: '培训内容', field: 'pei_xun_xue_xi_ne', type: 'text' }],
             [{ name: '见证性材料', field: 'jian_zheng_xing_c', type: 'file' }],
-            [{ name: '图片', field: 'tu_pian_', type: 'file' }],
-            [{ name: '表单', field: 'kuai_zhao_', type: 'file' }]
+            [{ name: '图片', field: 'tu_pian_id_', type: 'file' }],
+            [{ name: '表单', field: 'jlbkuai_zhao_', type: 'file' }]
         ]
     },
     lhpxsqb: {
@@ -520,18 +523,24 @@ export const correlationConfig = {
     },
     kaoshijilu: {
         config: [
-            { label: '考试名称', width: '19%', type: 'text', field: 'examName' },
-            { label: '考试开始时间', width: '15%', type: 'text', field: 'startDate' },
-            { label: '考试题库', width: '20%', type: 'text', field: 'bankName' },
-            { label: '考试类别', width: '12%', type: 'text', field: 'examType' },
-            { label: '考试得分', width: '12%', type: 'text', field: 'maxScore' },
-            { label: '考试总分', width: '12%', type: 'text', field: 'totalScore' }
+            { label: '考试名称', width: '25%', type: 'text', field: 'examName' },
+            { label: '考试类型', width: '15%', type: 'text', field: 'examType' },
+            { label: '考试达标状态', width: '15%', type: 'text', field: 'examDesc' },
+            { label: '开始时间', width: '20%', type: 'text', field: 'startDate' },
+            { label: '考试总分', width: '15%', type: 'text', field: 'totalScore' }
 
         ],
         dialog: [
-            [{ name: '考试名称', field: 'examName', type: 'text' }, { name: '考试开始时间', field: 'startDate', type: 'text' }],
-            [{ name: '考试题库', field: 'bankName', type: 'text' }, { name: '考试类别', field: 'examType', type: 'text' }],
-            [{ name: '考试总分', field: 'totalScore', type: 'text' }, { name: '考试得分', field: 'maxScore', type: 'text' }]
+            [{ name: '考试名称', field: 'examName', type: 'text' }, { name: '考试类型', field: 'examType', type: 'text' }],
+            [{ name: '是否随机', field: 'isRandom', type: 'enumeration', assemble: 'numberBoolean' }, { name: '计分方式', field: 'scoringType', type: 'text' }],
+            [{ name: '考试题库', field: 'bankName', type: 'text' }, { name: '题库类型', field: 'bankType', type: 'text' }],
+            [{ name: '考试题数', field: 'questionCount', type: 'text' }, { name: '考试总分', field: 'totalScore', type: 'text' }],
+            [{ name: '考试时长', field: 'duration', type: 'text' }, { name: '考试状态', field: 'examState', type: 'text' }],
+            [{ name: '考试完成状态', field: 'paperState', type: 'text' }, { name: '考试达标状态', field: 'examDesc', type: 'text' }],
+            [{ name: '开始时间', field: 'startDate', type: 'text' }, { name: '限考时间', field: 'limitDate', type: 'text' }],
+            [{ name: '限考次数', field: 'limitCount', type: 'text' }, { name: '达标占比', field: 'qualifiedRadio', type: 'text' }],
+            [{ name: '最高得分', field: 'maxScore', type: 'text' }, { name: '最近得分', field: 'recentScore', type: 'text' }],
+            [{ name: '平均得分', field: 'averageScore', type: 'text' }]
         ]
     }
 }

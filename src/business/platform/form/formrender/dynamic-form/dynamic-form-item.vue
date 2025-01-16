@@ -46,6 +46,7 @@
                     :rights="fieldRights"
                     :readonly="readonly"
                     :params="params"
+                    :time-modification="timeModification"
                     v-on="listeners"
                 />
                 <!--字段-->

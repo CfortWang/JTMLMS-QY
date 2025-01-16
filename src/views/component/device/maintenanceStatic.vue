@@ -37,17 +37,43 @@
                     </div>
                 </div>
                 <div class="agend">
-                    <div class="item">
-                        <div class="green-circle" />
-                        <span>全部完成</span>
-                    </div>
-                    <div class="item">
-                        <div class="orange-circle" />
-                        <span>部分完成</span>
-                    </div>
-                    <div class="item">
-                        <div class="red-circle" />
-                        <span>全部未完成</span>
+                    <div class="descript">
+                        <div class="item">
+                            <div class="green-circle" />
+                            <span>全部完成</span>
+                        </div>
+                        <div class="item">
+                            <div class="orange-circle" />
+                            <span>部分完成</span>
+                        </div>
+                        <div class="item">
+                            <div class="red-circle" />
+                            <span>全部未完成</span>
+                        </div>
+                        <div class="item">
+                            <div class="grey-bg" />
+                            <span>设备未使用</span>
+                        </div>
+                        <div class="item">
+                            <div class="red-bg" />
+                            <span>设备异常</span>
+                        </div>
+                        <div class="item" style="margin-left:60px">
+                            <span>设备异常次数：{{ formatData.repairCount }}</span>
+                        </div>
+                        <div class="item">
+                            <span>设备总维护次数：{{ formatData.maintenanceCount }}</span>
+                        </div>
+                        <div class="item">
+                            <span>设备故障率：{{ formatData.faultRate }} %</span>
+                            <el-tooltip
+                                effect="dark"
+                                content="设备故障率计算公式：异常次数/总维护次数*100%，待处理与未使用不计入总维护次数中。"
+                                placement="top"
+                            >
+                                <i class="el-icon-question question-icon" />
+                            </el-tooltip>
+                        </div>
                     </div>
                     <div class="item-time">
                         <span>统计时间：{{ curTime }}</span>
@@ -59,9 +85,17 @@
                         <div v-for="item in type" :key="item" class="item">{{ item }}</div>
                     </div>
                     <div class="column">
-                        <div v-for="(item,index) in formatData" :key="index" class="content-item">
+                        <div v-for="(item,index) in formatData.list" :key="index" class="content-item">
                             <div class="item">{{ index+1 }}</div>
-                            <div v-for="(i,ind) in item" :key="ind" class="item">
+                            <div
+                                v-for="(i,ind) in item"
+                                :key="ind"
+                                class="item"
+                                :class="{
+                                    unusual: i.status === false, // 异常
+                                    unused: i.isUsed === false // 未使用
+                                }"
+                            >
                                 <el-tooltip v-show="i.count>0" class="item" effect="light" placement="top-start">
                                     <template slot="content">
                                         <div>
@@ -78,9 +112,9 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <div v-if="i.todo===0" class="green-circle" />
-                                    <div v-else-if="i.done===0" class="red-circle" />
-                                    <div v-else class="orange-circle" />
+                                    <div v-if="i.todo === 0 && i.isUsed" class="green-circle" />
+                                    <div v-if="i.done === 0 && i.todo !== 0" class="red-circle" />
+                                    <div v-if="i.todo !== 0 && i.done !== 0" class="orange-circle" />
                                 </el-tooltip>
                             </div>
                         </div>
@@ -153,7 +187,7 @@ export default {
 
             },
             dataList: [],
-            type: ['日保养', '周保养', '月保养', '季度保养', '半年保养', '年保养', '按需保养']
+            type: ['日保养', '周保养', '月保养', '季度保养', '半年保养', '年保养', '按需保养', '间隔保养']
         }
     },
     computed: {
@@ -194,6 +228,8 @@ export default {
             }
         },
         formatData () {
+            let repairCount = 0 // 异常
+            let maintenanceCount = 0 // 维护
             const fliterData = this.dataList
             const result = []
             fliterData.forEach(item => {
@@ -220,21 +256,32 @@ export default {
                         data: [],
                         count: 0,
                         todo: 0,
-                        done: 0
+                        done: 0,
+                        status: true,
+                        isUsed: true
                     }
                     const t = result.find(j => j.wei_hu_lei_xing_ === item)
                     if (t) {
                         const tempList = t.children.filter(k => k.ji_hua_shi_jian_ === fullDay)
                         obj.count = tempList.length
                         obj.todo = tempList.filter(k => k.shi_fou_guo_shen_ === '待处理').length
-                        obj.done = tempList.filter(k => k.shi_fou_guo_shen_ === '已完成').length
-                        obj.data = tempList.filter(k => k.shi_fou_guo_shen_ === '已完成')
+                        const yiwancheng = tempList.filter(k => k.shi_fou_guo_shen_ === '已完成')
+                        obj.done = yiwancheng.length
+                        obj.data = yiwancheng
+                        const weixiu = tempList.filter(item => item.wei_hu_zhuang_tai === '异常')
+                        obj.isUsed = !tempList.some(item => item.wei_hu_zhuang_tai === '未使用')
+                        obj.status = weixiu.length === 0
+                        repairCount += weixiu.length
+                        maintenanceCount += yiwancheng.filter(item => item.wei_hu_zhuang_tai !== '未使用').length
                     }
                     arr.push(obj)
                 })
                 answer[i] = arr
             }
-            return answer
+            // 故障率
+            const faultRate = maintenanceCount === 0 ? '0.00' : ((repairCount / maintenanceCount) * 100).toFixed(2)
+            // console.log('data', answer)
+            return { list: answer, repairCount, maintenanceCount, faultRate }
         }
     },
     mounted () {
@@ -305,7 +352,7 @@ export default {
             const exportData = this.type.map((item, index) => {
                 const obj = { 'leiXing': item }
                 for (let i = 1; i < this.monthDays + 1; i++) {
-                    const t = this.formatData[i - 1][index]
+                    const t = this.formatData.list[i - 1][index]
                     const text = `已完成：${t.done};待处理：${t.todo}`
                     obj[Object.keys(this.deviceColumns)[i]] = text
                 }
@@ -347,10 +394,10 @@ export default {
         },
         async init () {
             this.loading = true
-            this.title = `[${this.params.ri_qi_}/${this.params.she_bei_ming_chen}]月度设备维护统计`
+            this.title = `[${this.params.original_device_n}/${this.params.she_bei_ming_chen}]月度设备维护统计`
             const y = +this.month.split('-')[0]
             const m = +this.month.split('-')[1]
-            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,b.id_ AS subId,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,c.id_ AS addtionId,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.ri_qi_='${this.params.ri_qi_}' and a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m}`
+            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,a.bian_zhi_bu_men_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.original_device_n,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,c.she_bei_lei_xing_,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.ri_qi_='${this.params.ri_qi_}' and a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m}`
             const { variables: { data }} = await this.$common.request('sql', sql)
             this.dataList = data
             this.dataList.forEach(item => {
@@ -408,36 +455,50 @@ export default {
             padding:20px;
             overflow-y: auto;
             .agend{
-                .item-time{
-                    margin-left: 40px;
-                    width: 200px;
-                }
                 margin: 20px 0 10px 0;
                 display: flex;
-                .item{
-                    width: 100px;
+                justify-content: space-between;
+                .descript{
                     display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    .green-circle {
-                        width: 12px;
-                        height: 12px;
-                        background-color: #67C23A;
-                        border-radius: 50%;
-                    }
-                    .red-circle {
-                        width: 12px;
-                        height: 12px;
-                        background-color: #F56C6C;
-                        border-radius: 50%;
-                    }
-                    .orange-circle {
-                        width: 12px;
-                        height: 12px;
-                        background-color: #E6A23C;
-                        border-radius: 50%;
+                    gap: 18px;
+                    .item{
+                        width: auto;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        .green-circle {
+                            width: 12px;
+                            height: 12px;
+                            background-color: #67C23A;
+                            border-radius: 50%;
+                        }
+                        .red-circle {
+                            width: 12px;
+                            height: 12px;
+                            background-color: #F56C6C;
+                            border-radius: 50%;
+                        }
+                        .orange-circle {
+                            width: 12px;
+                            height: 12px;
+                            background-color: #E6A23C;
+                            border-radius: 50%;
+                        }
+                        .red-bg {
+                            width: 12px;
+                            height: 12px;
+                            background-color: #F56C6C;
+                            opacity: .7;
+                        }
+                        .grey-bg{
+                            width: 12px;
+                            height: 12px;
+                            background-color: #a6b1bd;
+                            opacity: .7;
+                        }
                     }
                 }
+
             }
             .search{
                 .label{
@@ -489,6 +550,14 @@ export default {
                         line-height: 30px;
                     }
                     .content-item{
+                        .unusual{
+                            background-color: #F56C6C !important;
+                            opacity: .7 !important;
+                        }
+                        .unused{
+                             background-color: #a6b1bd;
+                             opacity: .7;
+                        }
                         >.item{
                             position: relative;
                             height: 50px;

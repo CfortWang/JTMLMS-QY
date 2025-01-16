@@ -36,8 +36,8 @@
                         <div style="display:flex">
                             <span class="required-star">*</span>
                             <ibps-user-selector
+                                v-model="infoFxssbData.bian_zhi_bu_men_"
                                 type="position"
-                                :value="infoFxssbData.bian_zhi_bu_men_"
                                 readonly-text="text"
                                 :disabled="readonly"
                                 :multiple="false"
@@ -139,13 +139,12 @@
                     <el-descriptions-item label="范围" :span="2">
                         <el-input v-model="infoFxssbData.fan_wei_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
-                    <el-descriptions-item label="方法" :span="1">
+                    <el-descriptions-item label="方法" :span="onlyoneWay?2:1">
                         <el-input v-model="infoFxssbData.fang_fa_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
-                    <el-descriptions-item label="风险系数计算方式" :span="1">
+                    <el-descriptions-item v-if="!onlyoneWay" label="风险系数计算方式" :span="1">
                         <span class="required-star">*</span>
-                        <el-radio v-model="infoFxssbData.ji_suan_fang_shi_" label="1" size="mini" :disabled="isEdit">风险矩阵法</el-radio>
-                        <el-radio v-model="infoFxssbData.ji_suan_fang_shi_" label="2" size="mini" :disabled="isEdit">FMEA法
+                        <el-radio v-for="(v,k) in culWays" :key="k" v-model="infoFxssbData.ji_suan_fang_shi_" :label="k" size="mini" :disabled="isEdit">{{ v }}
                         </el-radio>
                     </el-descriptions-item>
 
@@ -254,6 +253,7 @@
 </template>
 
 <script>
+import { getSetting } from '@/utils/query'
 import dayjs from 'dayjs'
 import RiskPeopleTable from './riskPeopleTable.vue'
 import ibpsUserSelector from '@/business/platform/org/selector'
@@ -349,7 +349,14 @@ export default {
             isZuZhang: true,
             isFinished: false,
             preParams: {},
-            Ids: []
+            Ids: [],
+            culWays: { '1': '风险矩阵法', '2': 'FMEA法' }
+        }
+    },
+    computed: {
+        onlyoneWay () {
+            const keys = Object.keys(this.culWays)
+            return keys.length === 1
         }
     },
     watch: {
@@ -396,7 +403,12 @@ export default {
         }
     },
 
-    mounted () {
+    async mounted () {
+        const culWays = await getSetting(this, 'risk', 'culWays')
+        if (culWays) {
+            console.debug(culWays)
+            this.culWays = culWays
+        }
         this.init()
     },
     beforeDestroy () {
@@ -778,7 +790,7 @@ export default {
                 if (this.isEdit) {
                     await this.goEdit(flag)
                 } else {
-                    this.$confirm('风险类型和风险系数计算公式保存后不可再修改，是否继续?', '提示', {
+                    this.$confirm(`风险类型${this.onlyoneWay ? '' : '和风险系数计算公式'}保存后不可再修改，是否继续?`, '提示', {
                         confirmButtonText: '继续',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -888,6 +900,7 @@ export default {
                 this.$nextTick(() => {
                     this.infoFxssbData.shi_wu_shuo_ming_ = `年度：${this.infoFxssbData.nian_du_}；组长：${this.infoFxssbData.zu_chang_}；评估开始日期：${this.infoFxssbData.kai_shi_ri_qi_}；风险类型：${this.infoFxssbData.feng_xian_lei_xin}`
                 })
+                this.onlyoneWay && (this.infoFxssbData.ji_suan_fang_shi_ = Object.keys(this.culWays)[0])
             }
         }
     }

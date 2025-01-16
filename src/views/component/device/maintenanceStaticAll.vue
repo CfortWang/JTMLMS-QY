@@ -48,6 +48,17 @@
                         />
                     </div>
                     <div class="item">
+                        <div class="label">设备类型：</div>
+                        <el-select v-model="deviceType" placeholder="请选择" size="mini" :clearable="true">
+                            <el-option
+                                v-for="item in ['检验系统','通用设备']"
+                                :key="item"
+                                :label="item"
+                                :value="item"
+                            />
+                        </el-select>
+                    </div>
+                    <div class="item">
                         <div class="label">设备编号：</div>
                         <div class="content">
                             <el-input v-model="deviceNo" size="mini" />
@@ -62,21 +73,43 @@
                 </div>
                 <div class="hearder">
                     <div class="agend">
-                        <div class="item">
-                            <div class="green-circle" />
-                            <span>全部完成</span>
-                        </div>
-                        <div class="item">
-                            <div class="orange-circle" />
-                            <span>部分完成</span>
-                        </div>
-                        <div class="item">
-                            <div class="red-circle" />
-                            <span>全部未完成</span>
-                        </div>
-                        <div class="item">
-                            <div class="red-bg" />
-                            <span>设备状况异常</span>
+                        <div class="descript">
+                            <div class="item">
+                                <div class="green-circle" />
+                                <span>全部完成</span>
+                            </div>
+                            <div class="item">
+                                <div class="orange-circle" />
+                                <span>部分完成</span>
+                            </div>
+                            <div class="item">
+                                <div class="red-circle" />
+                                <span>全部未完成</span>
+                            </div>
+                            <div class="item">
+                                <div class="grey-bg" />
+                                <span>设备未使用</span>
+                            </div>
+                            <div class="item">
+                                <div class="red-bg" />
+                                <span>设备异常</span>
+                            </div>
+                            <div class="item" style="margin-left:60px">
+                                <span>设备异常次数：{{ formatData.repairCount }}</span>
+                            </div>
+                            <div class="item">
+                                <span>设备总维护次数：{{ formatData.maintenanceCount }}</span>
+                            </div>
+                            <div class="item">
+                                <span>设备故障率：{{ formatData.faultRate }} %</span>
+                                <el-tooltip
+                                    effect="dark"
+                                    content="设备故障率计算公式：异常次数/总维护次数*100%，待处理与未使用不计入总维护次数中。"
+                                    placement="top"
+                                >
+                                    <i class="el-icon-question question-icon" />
+                                </el-tooltip>
+                            </div>
                         </div>
                         <div class="item-time">
                             <span>统计时间：{{ curTime }}</span>
@@ -87,14 +120,22 @@
                 <div v-if="fliterData.length>0" class="table">
                     <div class="column">
                         <div class="item">设备名称/日期</div>
-                        <div v-for="(item,index) in fliterData" :key="index" class="item" style="cursor:pointer" @click="goLookStatic(item)">
-                            <span style="padding:0 6px">{{ item.ri_qi_ }}/{{ item.she_bei_ming_chen }}</span>
+                        <div v-for="(item) in fliterData" :key="item.original_device_n" class="item" style="cursor:pointer" @click="goLookStatic(item)">
+                            <span style="padding:0 6px" :title="item.she_bei_ming_chen">{{ item.original_device_n }}/{{ item.she_bei_ming_chen }}</span>
                         </div>
                     </div>
                     <div class="column">
-                        <div v-for="(item,index) in formatData" :key="index" class="content-item">
+                        <div v-for="(item,index) in formatData.list" :key="index" class="content-item">
                             <div class="item">{{ index+1 }}</div>
-                            <div v-for="(i,ind) in item" :key="ind" class="item" :class="i.status?'':'unusual'">
+                            <div
+                                v-for="(i,ind) in item"
+                                :key="ind"
+                                class="item"
+                                :class="{
+                                    unusual: i.status === false, // 异常
+                                    unused: i.isUsed === false // 未使用
+                                }"
+                            >
                                 <el-tooltip v-show="i.count>0" class="item" effect="light" placement="top-start">
                                     <template slot="content">
                                         <div>
@@ -111,9 +152,9 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <div v-if="i.todo===0" class="green-circle" />
-                                    <div v-else-if="i.done===0" class="red-circle" />
-                                    <div v-else class="orange-circle" />
+                                    <div v-if="i.todo === 0 && i.isUsed" class="green-circle" />
+                                    <div v-if="i.done === 0 && i.todo !== 0" class="red-circle" />
+                                    <div v-if="i.todo !== 0 && i.done !== 0" class="orange-circle" />
                                 </el-tooltip>
                             </div>
                         </div>
@@ -160,6 +201,9 @@ export default {
         }
         const { userId, position, level, mainPosition } = this.$store.getters
         return {
+            faultRate: 0,
+            maintenanceCount: 0,
+            repairCount: 0,
             dialogParams: {},
             MaintenanceStaticVisible: false,
             pickerOptions: {
@@ -170,6 +214,7 @@ export default {
             curTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             deviceNo: '',
             deviceName: '',
+            deviceType: '',
             monthList: monthList,
             month: monthValue,
             monthDays: monthDays,
@@ -250,14 +295,17 @@ export default {
                 fliterData = fliterData.filter(item => item.bian_zhi_bu_men_ === this.position)
             }
             if (this.deviceNo) {
-                fliterData = fliterData.filter(item => item.ri_qi_.indexOf(this.deviceNo) > -1)
+                fliterData = fliterData.filter(item => item.original_device_n?.indexOf(this.deviceNo) > -1)
+            }
+            if (this.deviceType) {
+                fliterData = fliterData.filter(item => item.she_bei_lei_xing_?.indexOf(this.deviceType) > -1)
             }
             if (this.deviceName) {
-                fliterData = fliterData.filter(item => item.she_bei_ming_chen.indexOf(this.deviceName) > -1)
+                fliterData = fliterData.filter(item => item.she_bei_ming_chen?.indexOf(this.deviceName) > -1)
             }
             const result = []
             fliterData.forEach(item => {
-                const { ri_qi_, she_bei_ming_chen } = item
+                const { ri_qi_, she_bei_ming_chen, original_device_n, she_bei_lei_xing_ } = item
                 const t = result.find(i => i.ri_qi_ === ri_qi_)
                 if (t) {
                     t.children.push(item)
@@ -265,6 +313,8 @@ export default {
                     result.push({
                         she_bei_ming_chen: she_bei_ming_chen,
                         ri_qi_: ri_qi_,
+                        original_device_n,
+                        she_bei_lei_xing_,
                         children: [item]
                     })
                 }
@@ -273,6 +323,8 @@ export default {
             return result
         },
         formatData () {
+            let repairCount = 0 // 异常
+            let maintenanceCount = 0 // 维护
             const answer = new Array(this.monthDays)
             for (let i = 0; i < this.monthDays; i++) {
                 const arr = []
@@ -285,20 +337,28 @@ export default {
                         count: 0,
                         todo: 0,
                         done: 0,
-                        status: true
+                        status: true,
+                        isUsed: true
                     }
                     const tempList = item.children.filter(k => k.ji_hua_shi_jian_ === fullDay)
                     obj.count = tempList.length
                     obj.todo = tempList.filter(k => k.shi_fou_guo_shen_ === '待处理').length
-                    obj.done = tempList.filter(k => k.shi_fou_guo_shen_ === '已完成').length
-                    obj.data = tempList.filter(k => k.shi_fou_guo_shen_ === '已完成')
-                    obj.status = !obj.data.some(item => item.wei_hu_zhuang_tai === '异常')
+                    const yiwancheng = tempList.filter(k => k.shi_fou_guo_shen_ === '已完成')
+                    obj.done = yiwancheng.length
+                    obj.data = yiwancheng
+                    const weixiu = obj.data.filter(item => item.wei_hu_zhuang_tai === '异常')
+                    obj.isUsed = !obj.data.some(item => item.wei_hu_zhuang_tai === '未使用')
+                    obj.status = weixiu.length === 0
+                    repairCount += weixiu.length
+                    maintenanceCount += yiwancheng.filter(item => item.wei_hu_zhuang_tai !== '未使用').length
                     arr.push(obj)
                 })
                 answer[i] = arr
             }
+            // 故障率
+            const faultRate = maintenanceCount === 0 ? '0.00' : ((repairCount / maintenanceCount) * 100).toFixed(2)
             // console.log('data', answer)
-            return answer
+            return { list: answer, repairCount, maintenanceCount, faultRate }
         }
     },
     mounted () {
@@ -370,7 +430,7 @@ export default {
             const exportData = this.type.map((item, index) => {
                 const obj = { 'leiXing': item }
                 for (let i = 1; i < this.monthDays + 1; i++) {
-                    const t = this.formatData[i - 1][index]
+                    const t = this.formatData.list[i - 1][index]
                     const text = `已完成：${t.done};待处理：${t.todo}`
                     obj[Object.keys(this.deviceColumns)[i]] = text
                 }
@@ -415,8 +475,9 @@ export default {
             this.title = `月度设备维护统计`
             const y = +this.month.split('-')[0]
             const m = +this.month.split('-')[1]
-            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,a.bian_zhi_bu_men_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,b.id_ AS subId,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,c.id_ AS addtionId,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m} and a.di_dian_='${this.level}'`
+            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,a.bian_zhi_bu_men_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.original_device_n,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,c.she_bei_lei_xing_,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m} and a.di_dian_='${this.level}'`
             const { variables: { data }} = await this.$common.request('sql', sql)
+            // console.log('data', data)
             this.dataList = data
             this.dataList.forEach(item => {
                 if (!Object.hasOwn(item, 'wei_hu_lei_xing_') || !item.wei_hu_lei_xing_) {
@@ -475,40 +536,48 @@ export default {
             .agend{
                 margin: 20px 0 10px 0;
                 display: flex;
-                .item-time{
-                    margin-left: 40px;
-                    width: 200px;
-                }
-                .item{
-                    width: 100px;
+                justify-content: space-between;
+                .descript{
                     display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    .green-circle {
-                        width: 12px;
-                        height: 12px;
-                        background-color: #67C23A;
-                        border-radius: 50%;
-                    }
-                    .red-circle {
-                        width: 12px;
-                        height: 12px;
-                        background-color: #F56C6C;
-                        border-radius: 50%;
-                    }
-                    .orange-circle {
-                        width: 12px;
-                        height: 12px;
-                        background-color: #E6A23C;
-                        border-radius: 50%;
-                    }
-                    .red-bg {
-                        width: 12px;
-                        height: 12px;
-                        background-color: #F56C6C;
-                        opacity: .7;
+                    gap: 18px;
+                    .item{
+                        width: auto;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        .green-circle {
+                            width: 12px;
+                            height: 12px;
+                            background-color: #67C23A;
+                            border-radius: 50%;
+                        }
+                        .red-circle {
+                            width: 12px;
+                            height: 12px;
+                            background-color: #F56C6C;
+                            border-radius: 50%;
+                        }
+                        .orange-circle {
+                            width: 12px;
+                            height: 12px;
+                            background-color: #E6A23C;
+                            border-radius: 50%;
+                        }
+                        .red-bg {
+                            width: 12px;
+                            height: 12px;
+                            background-color: #F56C6C;
+                            opacity: .7;
+                        }
+                        .grey-bg{
+                            width: 12px;
+                            height: 12px;
+                            background-color: #a6b1bd;
+                            opacity: .7;
+                        }
                     }
                 }
+
             }
             .search{
                 display: flex;
@@ -538,11 +607,16 @@ export default {
                     >.item{
                         height: 46px;
                         line-height: 46px;
-                        min-width: 100px;
                         border-bottom: 1px solid #333;
                         border-right: 1px solid #333;
                         border-left: 1px solid #333;
-                        white-space: nowrap;
+                        span{
+                            display: inline-block;
+                            max-width: 320px;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            overflow: hidden;
+                        }
                     }
                     @media screen and (max-width: 1800px) {
                          >.item{
@@ -554,6 +628,12 @@ export default {
                          >.item{
                             height: 34px;
                             line-height: 34px;
+                        }
+                    }
+                    @media screen and (max-width: 1450px) {
+                         >.item{
+                            height: 28px;
+                            line-height: 28px;
                         }
                     }
                     >.item:nth-child(1){
@@ -570,8 +650,12 @@ export default {
                     }
                     .content-item{
                         .unusual{
-                            background-color: #F56C6C;
-                            opacity: .7;
+                            background-color: #F56C6C !important;
+                            opacity: .7 !important;
+                        }
+                        .unused{
+                             background-color: #a6b1bd;
+                             opacity: .7;
                         }
                         >.item{
                             position: relative;
@@ -597,6 +681,13 @@ export default {
                                 line-height: 34px;
 
                             }
+                        }
+                        @media screen and (max-width: 1450px) {
+                         >.item{
+                            height: 28px;
+                            width: 28px;
+                            line-height: 28px;
+                        }
                         }
                         >.item:nth-child(1){
                             font-weight: 600;

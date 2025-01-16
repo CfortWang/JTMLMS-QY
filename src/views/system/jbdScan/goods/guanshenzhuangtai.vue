@@ -264,7 +264,7 @@ export default {
                 {
                     stepIndex: 80,
                     title: '管审报告',
-                    post: '质量负责人/检验科主任'
+                    post: '质量负责人/主任'
                 },
                 {
                     stepIndex: 100,
