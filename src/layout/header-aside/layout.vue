@@ -243,7 +243,7 @@ export default {
         const { hiddenAsideMenu = false } = this.$route.meta || {}
         return {
             // [侧边栏宽度] 正常状态
-            asideWidth: '200px',
+            asideWidth: '240px',
             // [侧边栏宽度] 折叠状态
             asideWidthCollapse: '65px',
             isSuper,

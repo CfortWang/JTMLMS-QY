@@ -212,7 +212,7 @@ export default {
         },
         dealQueryColumns (data) {
             if (!data || !data.length || !this.filterParams || !this.filterParams.length) {
-                return []
+                return data || []
             }
             const allParamsKey = this.filterParams.map(i => i.field)
             data.forEach(item => {
