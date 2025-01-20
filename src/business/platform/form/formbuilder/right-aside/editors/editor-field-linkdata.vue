@@ -24,7 +24,8 @@
                 <template slot="label">是否可添加<help-tip prop="allowCreategl" />
                 </template>
                 <el-switch
-                    v-model="fieldOptions.allowCreate"
+                    v-model="allowCreate"
+                    @change="changeAllowCreate"
                 />
             </el-form-item>
             <el-form-item>
@@ -126,9 +127,21 @@ export default {
         DataTemplateLinkdata
     },
     mixins: [EditorMixin, DataTemplateMixin],
+    data () {
+        return {
+            allowCreate: true
+        }
+    },
     computed: {
         multiple () {
             return this.fieldOptions.multiple === 'Y'
+        }
+    },
+    created () {
+        if (this.fieldOptions.allowCreate !== false) {
+            this.allowCreate = true
+        } else {
+            this.allowCreate = false
         }
     },
     methods: {
@@ -138,6 +151,9 @@ export default {
                 this.setDataTemplateDefaultValue()
             }
             this.changeDataSource(val, 'value_source')
+        },
+        changeAllowCreate (val) {
+            this.fieldOptions.allowCreate = val
         }
     }
 }

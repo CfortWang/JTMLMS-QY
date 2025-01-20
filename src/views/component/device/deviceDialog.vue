@@ -735,6 +735,7 @@
 </template>
 
 <script>
+import { getSetting } from '@/utils/query'
 import dayjs from 'dayjs'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import { getequipmentCard, saveEquipmentCard } from '@/api/platform/device/device'
@@ -778,6 +779,7 @@ export default {
                 { label: '维修记录', name: 'six', component: 'RepairRecord', isKeepAlive: true },
                 { label: '停用、报废记录', name: 'seven', component: 'ScrappedRecord', isKeepAlive: true }
             ],
+            tabList: {},
             filter: [{
                 descVal: '1',
                 includeSub: true,
@@ -1006,8 +1008,12 @@ export default {
         }
     },
 
-    mounted () {
-        console.log(this.params)
+    async mounted () {
+        const tabList = await getSetting(this, 'device', 'tabList')
+        if (tabList) {
+            console.debug(tabList)
+            this.tabList = tabList
+        }
         this.init()
     },
     methods: {
@@ -1219,22 +1225,22 @@ export default {
             this.loading = true
             this.isEdit = !!(this.params && this.params.id)
             this.isSheKou = this.deptList[0].positionId === '1166372468122714112' // 判断是否是蛇口医院
-            // 加载tab
-            const sql = `select tabs_option_ from t_ipcc where org_ = '${this.org}' limit 1`
-            const { variables: { data: optionData }} = await this.$common.request('sql', sql)
-            if (optionData.length > 0 && optionData?.[0]?.tabs_option_) {
-                const optionArr = optionData[0].tabs_option_.split(',')
-                const newTab = []
-                for (let i = 0; i < optionArr.length; i++) {
-                    const item = optionArr[i]
-                    const t = this.tabItems.find(j => j.label === item)
+
+            // 根据全局配置动态生成tab
+            const newTab = []
+            for (const key in this.tabList) {
+                if (Object.hasOwnProperty.call(this.tabList, key)) {
+                    const newLabel = this.tabList[key]
+                    const t = this.tabItems.find(i => i.label === key)
                     if (t) {
+                        t.label = newLabel
                         newTab.push(t)
                     }
                 }
+            }
+            if (newTab.length > 0) {
                 this.tabItems = newTab
             }
-            console.log('tab', this.tabItems)
 
             if (this.isEdit) {
                 const { data } = await getequipmentCard({ id: this.params.id })

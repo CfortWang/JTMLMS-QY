@@ -426,7 +426,8 @@ export function correlationSql (type, val) {
         lhrynlqr: 'bei_shou_quan_ren',
         lhrypxjlb: 'peixunrenyuan',
         lhpxsqb: 'can_jia_ren_yuan_',
-        kaoshijilu: 'examinee'
+        kaoshijilu: 'examinee',
+        tjbgb: 'xing_ming_'
     }
     if (type === 'jyrykhjlb' || type === 'lhrynlqr' || type === 'lhpxsqb') {
         sql = `select * from t_${type} where FIND_IN_SET('${val}',${col[type]}) and shi_fou_guo_shen_ = '已完成' `
@@ -434,6 +435,8 @@ export function correlationSql (type, val) {
         sql = `select * from v_examination where FIND_IN_SET('${val}',${col[type]}) and paperState = '已完成' ORDER BY createTime asc`
     } else if (type === 'lhrypxjlb') {
         sql = `select * from v_wodepeixun where FIND_IN_SET('${val}',${col[type]}) and shi_fou_guo_shen_ = '已结束' `
+    } else if (type === 'tjbgb') {
+        sql = `select * from t_${type} where FIND_IN_SET('${val}',${col[type]})`
     }
     return sql
 }
@@ -541,6 +544,18 @@ export const correlationConfig = {
             [{ name: '限考次数', field: 'limitCount', type: 'text' }, { name: '达标占比', field: 'qualifiedRadio', type: 'text' }],
             [{ name: '最高得分', field: 'maxScore', type: 'text' }, { name: '最近得分', field: 'recentScore', type: 'text' }],
             [{ name: '平均得分', field: 'averageScore', type: 'text' }]
+        ]
+    },
+    tjbgb: {
+        config: [
+            { label: '体检日期', width: '20%', type: 'text', field: 'ti_jian_shi_jian_' },
+            { label: '体检机构', width: '30%', type: 'text', field: 'ti_jian_ji_gou_' },
+            { label: '附件', width: '40%', type: 'file', field: 'fu_jian_' }
+
+        ],
+        dialog: [
+            [{ name: '体检日期', field: 'ti_jian_shi_jian_', type: 'text' }, { name: '体检机构', field: 'ti_jian_ji_gou_', type: 'text' }],
+            [{ name: '附件', field: 'fu_jian_', type: 'file' }]
         ]
     }
 }

@@ -98,6 +98,9 @@
             <el-tab-pane v-if="judgeTag('kaoshijilu')" label="考试记录" name="kaoshijilu" class="tabPane">
                 <public-list ref="kaoshijilu" class="paneAll" :plane-data="judgeDataAll('kaoshijilu')" :tab-name="'kaoshijilu'" :button-type="buttonType" :btn-show="btnShow" :btn-type="btnType" @changeButtonShow="changeButtonShow" @changeBaseData="changeBaseData" />
             </el-tab-pane>
+            <el-tab-pane v-if="judgeTag('tjbgb')" label="体检报告" name="tjbgb" class="tabPane">
+                <public-list ref="tjbgb" class="paneAll" :plane-data="judgeDataAll('tjbgb')" :tab-name="'tjbgb'" :button-type="buttonType" :btn-show="btnShow" :btn-type="btnType" @changeButtonShow="changeButtonShow" @changeBaseData="changeBaseData" />
+            </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -163,6 +166,14 @@ export default {
         activeName: {
             type: String,
             default: 'ryjbqk'
+        },
+        personID: {
+            type: String,
+            default: ''
+        },
+        type: {
+            type: String,
+            default: 'dialog'
         }
     },
     data () {
@@ -228,12 +239,15 @@ export default {
                 case 'kaoshijilu':
                     this.handleClickRY({ name: 'kaoshijilu' })
                     break
+                case 'tjbgb':
+                    this.handleClickRY({ name: 'tjbgb' })
+                    break
                 default:
                     break
             }
         },
         handleClickRY (val) {
-            const arr = ['jyrykhjlb', 'lhrynlqr', 'lhrypxjlb', 'lhpxsqb', 'kaoshijilu']
+            const arr = ['jyrykhjlb', 'lhrynlqr', 'lhrypxjlb', 'lhpxsqb', 'kaoshijilu', 'tjbgb']
             arr.forEach(item => {
                 if (typeof this.$refs[item] !== 'undefined' && typeof this.$refs[item].$refs['reviewTable' + item] !== 'undefined') {
                     setTimeout(() => {
@@ -241,7 +255,7 @@ export default {
                     }, 200)
                 }
             })
-            this.$common.request('sql', correlationSql(val.name, this.userId)).then((result) => {
+            this.$common.request('sql', correlationSql(val.name, this.type === 'dialog' ? this.personID : this.userId)).then((result) => {
                 this.$set(this.tagData[val.name], 'data', result.variables.data || [])
                 this.$set(this.tagData[val.name], 'config', correlationConfig[val.name])
             }).catch((err) => {

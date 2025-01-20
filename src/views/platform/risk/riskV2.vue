@@ -136,13 +136,13 @@
 
                     </el-descriptions-item>
 
-                    <el-descriptions-item label="范围" :span="2">
+                    <el-descriptions-item label="范围" :span="onlyoneWay?2:1">
                         <el-input v-model="infoFxssbData.fan_wei_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
                     <el-descriptions-item label="方法" :span="onlyoneWay?2:1">
                         <el-input v-model="infoFxssbData.fang_fa_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
-                    <el-descriptions-item v-if="!onlyoneWay" label="风险系数计算方式" :span="1">
+                    <el-descriptions-item v-if="!onlyoneWay" label="风险系数计算方式" :span="2">
                         <span class="required-star">*</span>
                         <el-radio v-for="(v,k) in culWays" :key="k" v-model="infoFxssbData.ji_suan_fang_shi_" :label="k" size="mini" :disabled="isEdit">{{ v }}
                         </el-radio>
@@ -233,7 +233,7 @@
                         type="success"
                         :closable="false"
                     />
-                    <RiskPeopleTable ref="RiskPeopleTableRef" :params="params" :people-ids="infoFxssbData.ping_gu_ren_yuan_" @goBack="goRefresh" />
+                    <RiskPeopleTable ref="RiskPeopleTableRef" :params="params" :people-ids="infoFxssbData.ping_gu_ren_yuan_" :cul-ways="culWays" @goBack="goRefresh" />
                 </div>
 
             </div>
@@ -246,7 +246,7 @@
             :readonly="readonly"
             @close="visible => DialogVisible = visible"
         /> -->
-        <RiskDetail ref="RiskDetailRef" @close="goRefresh" />
+        <RiskDetail ref="RiskDetailRef" :cul-ways="culWays" @close="goRefresh" />
         <el-image-viewer v-if="showViewer" :on-close="closeViewer" :url-list="[FlowPic]" />
 
     </el-dialog>

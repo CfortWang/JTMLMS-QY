@@ -168,14 +168,14 @@
                 />
                 <div class="unit">%</div>
             </el-form-item>
-            <el-form-item v-if="!readonly || form.ping_fen_ren_" prop="ping_fen_ren_">
+            <!-- <el-form-item v-if="!readonly || form.ping_fen_ren_" prop="ping_fen_ren_">
                 <template slot="label">
                     默认评分人
                     <el-tooltip effect="dark" content="设置该题库试题的默认评分人，该题库下所有未设置评分人的题目都以该评分人为准。" placement="top">
                         <i class="el-icon-question question-icon">：</i>
                     </el-tooltip>
-                </template>
-                <!-- <el-cascader
+                </template> -->
+            <!-- <el-cascader
                     v-model="form.ping_fen_ren_"
                     :options="getRaterOptions()"
                     :show-all-levels="false"
@@ -187,7 +187,7 @@
                         checkStrictly: false
                     }"
                 /> -->
-                <el-select
+            <!-- <el-select
                     v-model="form.ping_fen_ren_"
                     filterable
                     width="100%"
@@ -205,7 +205,7 @@
                         :value="item.userId"
                     />
                 </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item v-if="!readonly || form.miao_shu_" label="题库描述：" prop="miao_shu_">
                 <el-input
                     v-model="form.miao_shu_"

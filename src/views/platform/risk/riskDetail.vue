@@ -297,6 +297,12 @@ export default {
         ibpsUserSelector,
         IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog')
     },
+    props: {
+        culWays: {
+            type: Object,
+            default: () => ({})
+        }
+    },
     data () {
         const { userId, position, level } = this.$store.getters
         return {
@@ -330,6 +336,10 @@ export default {
 中度的:28-63，显著危险，需要整改。
 重大的:64-99，高度危险，需立即整改。
 不可接受的:100-125，极其危险，不能继续作业。` },
+            fengXianDengJi3: { label: '风险等级及应对措施说明', value: `未找到配置数据，使用默认配置：
+低风险:1-4，风险较低,当采取措施消除风险引起的成本比风险本身引起的损失较大时，接受风险。
+中风险:5-11，可采取措施降低风险或风险规避。
+高风险:12-25，应采取措施规避或降低风险。` },
             yan_zhong_cheng_d_List: ['1', '2', '3', '4', '5'],
             fa_sheng_pin_du_List: ['1', '2', '3', '4', '5'],
             ke_jian_ce_du_List: ['1', '2', '3', '4', '5'],
@@ -359,13 +369,16 @@ export default {
             return getImage('risk_fxjz') // 风险矩阵参照图
         },
         descriptionContent () {
-            const msg1 = '1.当前风险系数计算公式为模板一：风险矩阵法。2.风险等级由严重程度和发生频度组成的坐标值映射成为矩阵坐标。'
-            const msg2 = '1.当前风险系数计算公式为模板二：FMEA法。2.风险系数 RPN = Severity(严重度) × Occurrence(发生度）× Likelihood of Detection(检测度)。'
+            const msg1 = `1.当前风险系数计算公式为模板一：'${this.culWays[this.muban]}'。2.风险等级由严重程度和发生频度组成的坐标值映射成为矩阵坐标。`
+            const msg2 = `1.当前风险系数计算公式为模板二：'${this.culWays[this.muban]}'。2.风险系数 RPN = Severity(严重度) × Occurrence(发生度）× Likelihood of Detection(检测度)。`
+            const msg3 = `1.当前风险系数计算公式为模板三：'${this.culWays[this.muban]}'。2.风险系数 RPN = Severity(严重程度) × Possibility(发生的可能性）。`
             switch (this.muban) {
                 case '1':
                     return msg1
                 case '2':
                     return msg2
+                case '3':
+                    return msg3
                 default:
                     break
             }
@@ -482,6 +495,8 @@ export default {
             this.leixing = this.params.feng_xian_lei_xin
             if (this.muban === '2') {
                 this.content[3] = this.fengXianDengJi2
+            } else if (this.muban === '3') {
+                this.content[3] = this.fengXianDengJi3
             }
             // 获取风险等级相关
             const degreeSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='严重程度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
@@ -511,8 +526,9 @@ export default {
                 if (responses[3].variables != null && responses[3].variables.data != null && responses[3].variables.data.length > 0) {
                     jianCeData = responses[3].variables.data
                 }
+                (this.muban === '1' || this.muban === '3') && (this.content[2].hide = true)
                 if (degreeData.length === 0 || gailvData.length === 0 || dengjiData.length === 0 || (this.muban === '2' && jianCeData.length === 0)) {
-                    throw new Error(`检测到风险类型为${this.leixing}且计算方式为${this.muban === '1' ? '风险矩阵法' : 'FMEA法'}的配置数据不完整，请配置完成后再使用！`)
+                    throw new Error(`检测到风险类型为${this.leixing}且计算方式为'${this.culWays[this.muban] || this.muban}'的配置数据不完整，建议配置完成后再使用！`)
                 }
                 let degreeWord = ''
                 let gailvWord = ''
@@ -527,7 +543,7 @@ export default {
                 for (const el of dengjiData) {
                     if (this.muban === '1') {
                         dengjiWord += `${el.fen_ji_}：${el.miao_shu_}\n`
-                    } else if (this.muban === '2') {
+                    } else {
                         dengjiWord += `${el.fen_ji_}：${el.yan_zhong_cheng_d}，${el.miao_shu_}\n`
                     }
                 }
@@ -549,8 +565,6 @@ export default {
                 if (dengjiData.length > 0) {
                     this.content[3].value = dengjiWord
                 }
-
-                this.muban === '1' && (this.content[2].hide = true)
                 this.fengXianJiSuan = dengjiData
                 this.loading = false
             }).catch(error => {
@@ -681,6 +695,40 @@ export default {
                         }
 
                         this.$set(row, 'feng_xian_ying_du', (!row.feng_xian_ying_du && (degree === '可忽略的' || degree === '可接受的')) ? '风险接受' : '风险降低')
+                        row.feng_xian_zhi_shu = rate + ''
+                        row.feng_xian_deng_ji = degree
+                    }
+                } else if (this.muban === '3') {
+                    if (row.yan_zhong_cheng_d && row.fa_sheng_pin_du_) {
+                        let degree = ''
+                        let rate = ''
+                        rate = +row.yan_zhong_cheng_d * +row.fa_sheng_pin_du_
+                        if (this.fengXianJiSuan.length === 0) {
+                            if (rate >= 1 && rate <= 4) {
+                                degree = '低风险'
+                            }
+                            if (rate >= 5 && rate <= 11) {
+                                degree = '中风险'
+                            }
+                            if (rate >= 12 && rate <= 25) {
+                                degree = '高风险'
+                            }
+                        } else {
+                            for (let i = 0; i < this.fengXianJiSuan.length; i++) {
+                                const item = this.fengXianJiSuan[i]
+                                if (item.yan_zhong_cheng_d) {
+                                    const [a, b] = item.yan_zhong_cheng_d.split('-')
+                                    if (a && b) {
+                                        if (rate >= +a.trim() && rate <= +b.trim()) {
+                                            degree = item.fen_ji_
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        this.$set(row, 'feng_xian_ying_du', (!row.feng_xian_ying_du && (degree === '低风险')) ? '风险接受' : '风险降低')
                         row.feng_xian_zhi_shu = rate + ''
                         row.feng_xian_deng_ji = degree
                     }

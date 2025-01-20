@@ -222,6 +222,43 @@
                     placeholder="请选择需参加考试的人员"
                 />
             </el-form-item>
+            <el-form-item prop="ping_fen_ren_">
+                <template slot="label">
+                    评分人
+                    <el-tooltip effect="dark" content="设置该考试的评分人，选择的评分人与题目评分人都可以进行试题评阅" placement="top">
+                        <i class="el-icon-question question-icon">：</i>
+                    </el-tooltip>
+                </template>
+                <!-- <el-cascader
+                    v-model="form.ping_fen_ren_"
+                    :options="getRaterOptions()"
+                    :show-all-levels="false"
+                    collapse-tags
+                    :props="{
+                        value: 'value',
+                        label: 'label',
+                        multiple: true,
+                        checkStrictly: false
+                    }"
+                /> -->
+                <el-select
+                    v-model="form.ping_fen_ren_"
+                    filterable
+                    style="width:100%"
+                    clearable
+                    multiple
+                    :multiple-limit="16"
+                    :disabled="isDisabled"
+                    placeholder="请选择评分人"
+                >
+                    <el-option
+                        v-for="item in userList"
+                        :key="item.userId"
+                        :label="item.userName"
+                        :value="item.userId"
+                    />
+                </el-select>
+            </el-form-item>
             <el-form-item prop="isCountLimit" class="inline-item">
                 <template slot="label">
                     限考次数
@@ -473,7 +510,8 @@ export default {
                 sui_ji_ti_shu_: [],
                 hours: 2,
                 minutes: 30,
-                chou_ti_fang_shi_: '1'
+                chou_ti_fang_shi_: '1',
+                ping_fen_ren_: ''
             },
             pickerOptions: {
                 disabledDate (time) {
@@ -667,7 +705,7 @@ export default {
                 this.randButtonDisabled = true
                 this.$message.info('非未发布状态的考试仅可修改限考时间！')
             }
-            const sql = `select id_, create_by_, ti_ku_id_, guan_lian_id_, kao_shi_ming_chen, kao_shi_lei_xing_, chuang_jian_shi_j, fa_bu_shi_jian_, fa_bu_ren_, xian_kao_shi_jian, xian_kao_ci_shu_, kao_shi_shi_chang, can_kao_ren_yuan_, zhuang_tai_, da_biao_zhan_bi_, ji_fen_fang_shi_, kao_shi_miao_shu_, yun_xu_bao_ming_, sui_ji_chou_ti_, sui_ji_ti_shu_,chou_ti_zong_fen_,ti_mu_zong_shu_,chou_ti_fang_shi_ from t_exams where id_ = '${this.id}'`
+            const sql = `select id_, create_by_, ti_ku_id_, guan_lian_id_, kao_shi_ming_chen, kao_shi_lei_xing_, chuang_jian_shi_j, fa_bu_shi_jian_, fa_bu_ren_, xian_kao_shi_jian, xian_kao_ci_shu_, kao_shi_shi_chang, can_kao_ren_yuan_, zhuang_tai_, da_biao_zhan_bi_, ji_fen_fang_shi_, kao_shi_miao_shu_, yun_xu_bao_ming_, sui_ji_chou_ti_, sui_ji_ti_shu_,chou_ti_zong_fen_,ti_mu_zong_shu_,chou_ti_fang_shi_,ping_fen_ren_ from t_exams where id_ = '${this.id}'`
             this.$common.request('sql', sql).then((res) => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
@@ -684,6 +722,9 @@ export default {
                     data[0].isTimeLimit = '1'
                     data[0].hours = Math.floor(data[0].kao_shi_shi_chang / (1000 * 60 * 60))
                     data[0].minutes = (data[0].kao_shi_shi_chang % (1000 * 60 * 60)) / (60 * 1000)
+                }
+                if (data[0].ping_fen_ren_) {
+                    data[0].ping_fen_ren_ = data[0].ping_fen_ren_.split(',') || []
                 }
                 this.form = data[0]
                 if (this.form.sui_ji_chou_ti_ === '1') {
@@ -754,6 +795,7 @@ export default {
                         }
                     }
                     this.form.sui_ji_ti_shu_ = this.form.sui_ji_ti_shu_.join(',')
+                    this.form.ping_fen_ren_ = this.form.ping_fen_ren_ ? this.form.ping_fen_ren_.join(',') : ''
 
                     const { isTimeLimit, xian_kao_shi_jian = '' } = this.form || {}
                     // 转换考试时长

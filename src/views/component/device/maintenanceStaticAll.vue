@@ -298,7 +298,7 @@ export default {
                 fliterData = fliterData.filter(item => item.original_device_n?.indexOf(this.deviceNo) > -1)
             }
             if (this.deviceType) {
-                fliterData = fliterData.filter(item => item.she_bei_lei_xing_?.indexOf(this.deviceType) > -1)
+                fliterData = fliterData.filter(item => item.she_bei_lei_xing_ === this.deviceType)
             }
             if (this.deviceName) {
                 fliterData = fliterData.filter(item => item.she_bei_ming_chen?.indexOf(this.deviceName) > -1)
@@ -475,7 +475,7 @@ export default {
             this.title = `月度设备维护统计`
             const y = +this.month.split('-')[0]
             const m = +this.month.split('-')[1]
-            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,a.bian_zhi_bu_men_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.original_device_n,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,c.she_bei_lei_xing_,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m} and a.di_dian_='${this.level}'`
+            const sql = `select a.id_ AS mainId, a.shi_fou_guo_shen_, a.bian_zhi_bu_men_, c.wei_hu_xiang_mu_c, a.bian_zhi_ren_, a.she_bei_ming_chen, a.she_bei_bian_hao_, a.ri_qi_, a.original_device_n, a.zhu_zhou_qi_, a.nei_rong_qing_kua, a.ji_hua_shi_jian_, c.she_bei_lei_xing_, c.wei_hu_ri_qi_, c.wei_hu_lei_xing_, c.ri_qi_shu_zi_, d.bei_zhu_, d.wei_hu_zhuang_tai FROM t_mjsbwhbyjlby a LEFT JOIN v_device_devicemaintenance c ON a.she_bei_bian_hao_ = c.id_ LEFT JOIN t_mjsbwhbyjlzby d ON a.id_ = d.parent_id_ where a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m} and a.di_dian_='${this.level}'`
             const { variables: { data }} = await this.$common.request('sql', sql)
             // console.log('data', data)
             this.dataList = data

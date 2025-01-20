@@ -261,27 +261,27 @@ export default {
     },
     data () {
         const checkTimeJS = (rule, value, callback) => {
-            if (value) {
-                setTimeout(() => {
-                    const now = this.$common.getDateNow()
-                    const nowTime = new Date(now).getTime()
-                    const valueTime = new Date(value).getTime()
-                    const obj = this.nowData.find(t => t.liZhiShiJian === value)
-                    const ksTime = obj && obj.ruZhiShiJian !== null ? new Date(obj.ruZhiShiJian).getTime() : ''
-
-                    if (ksTime === '') {
-                        callback(new Error('请先选择开始时间'))
-                    } else if (nowTime < valueTime) {
-                        callback(new Error('请选择小于当前日期的时间'))
-                    } else if (ksTime >= valueTime) {
-                        callback(new Error('请选择大于开始日期的时间'))
-                    } else {
-                        callback()
-                    }
-                }, 100)
-            } else {
-                return callback(new Error('请选择时间'))
-            }
+            // if (value) {
+            setTimeout(() => {
+                const now = this.$common.getDateNow()
+                const nowTime = new Date(now).getTime()
+                const valueTime = new Date(value).getTime()
+                const obj = this.nowData.find(t => t.liZhiShiJian === value)
+                const ksTime = obj && obj.ruZhiShiJian !== null ? new Date(obj.ruZhiShiJian).getTime() : ''
+                console.log(value)
+                if (value !== null && ksTime === '') {
+                    callback(new Error('请先选择开始时间'))
+                } else if (value !== null && nowTime < valueTime) {
+                    callback(new Error('请选择小于当前日期的时间'))
+                } else if (value !== null && ksTime >= valueTime) {
+                    callback(new Error('请选择大于开始日期的时间'))
+                } else {
+                    callback()
+                }
+            }, 100)
+            // } else {
+            //     return callback(new Error('请选择时间'))
+            // }
         }
         return {
             activeName: 'first',

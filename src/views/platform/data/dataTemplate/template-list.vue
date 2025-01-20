@@ -34,6 +34,10 @@ export default {
         typeName: {
             type: String,
             default: ''
+        },
+        typeId: {
+            type: String,
+            default: ''
         }
     },
     data () {
@@ -71,10 +75,21 @@ export default {
             deep: true,
             immediate: true
         },
-        templateId: {
+        // 不同的 typeId 可能会有相同的 templateId
+        // templateId: {
+        //     handler (val) {
+        //         console.log('templateId', val)
+        //         if (this.$utils.isNotEmpty(val)) {
+        //             this.dataTemplateId = val
+        //             this.loadDataTemplate()
+        //         }
+        //     },
+        //     immediate: true
+        // },
+        typeId: {
             handler (val) {
                 if (this.$utils.isNotEmpty(val)) {
-                    this.dataTemplateId = val
+                    this.dataTemplateId = this.templateId
                     this.loadDataTemplate()
                 }
             },

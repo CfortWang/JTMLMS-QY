@@ -10,7 +10,7 @@ export default {
     },
     data () {
         const { userList = [], deptList = [] } = this.$store.getters
-        const defaultWidth = 225
+        const defaultWidth = 360
         return {
             userList,
             deptList,

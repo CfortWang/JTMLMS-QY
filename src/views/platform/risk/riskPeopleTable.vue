@@ -47,7 +47,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <RiskDetail ref="RiskDetailRef" />
+        <RiskDetail ref="RiskDetailRef" :cul-ways="culWays" />
     </div>
 </template>
 
@@ -63,11 +63,15 @@ export default {
     props: {
         params: {
             type: Object,
-            default: () => {}
+            default: () => ({})
         },
         peopleIds: {
             type: String,
             default: ''
+        },
+        culWays: {
+            type: Object,
+            default: () => ({})
         }
     },
     data () {

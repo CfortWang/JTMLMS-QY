@@ -309,57 +309,57 @@ export default {
                 this.loading = false
             })
 
-            // 为补签的人发考试与消息 更新试卷人员信息
-            if (row.ti_ku_ming_cheng_) {
-                // todo 1.给考试参加人员替换掉2.结束培训判断谁没签到提示补签
+            // 为补签的人发考试与消息 更新试卷人员信息  1.17 考试与培训取消关联
+            // if (row.ti_ku_ming_cheng_) {
+            //     // todo 1.给考试参加人员替换掉2.结束培训判断谁没签到提示补签
 
-                const sql1 = `select qb.id_ as tkid,qb.ti_ku_ming_cheng_ as bankName, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.xian_kao_ci_shu_ as limitCount, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.can_kao_ren_yuan_ as examinee, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber,ex.chou_ti_zong_fen_ as randScore,ex.ti_mu_zong_shu_ as randTotal  from t_exams ex, t_question_bank qb where ex.ti_ku_id_ = qb.id_ and ex.id_ = '${row.ti_ku_ming_cheng_}'`
-                this.$common.request('sql', sql1).then(res => {
-                    const { data = [] } = res.variables || {}
-                    if (!data.length) {
-                        return
-                    } else {
-                        if (data[0].isRand === '1') {
-                            data[0].questionCount = data[0].randTotal
-                            data[0].totalScore = data[0].randScore
-                        }
-                        console.log('data对象', data)
-                        const { first, second } = this.$store.getters.level || {}
-                        const { tkid, examName, questionCount, totalScore, duration, qualifiedRadio, limitDate, limitCount } = data[0] || {}
-                        const paramWhere = [{
-                            exam_id_: row.ti_ku_ming_cheng_,
-                            ti_ku_id_: tkid,
-                            di_dian_: second || first,
-                            kao_shi_ren_: this.params.peixunrenyuan,
-                            bu_men_: '',
-                            bao_ming_shi_jian: this.$common.getDateNow(19),
-                            ti_ku_zong_fen_: totalScore,
-                            zhuang_tai_: '未开始',
-                            sheng_yu_shi_chan: duration,
-                            da_biao_zhan_bi_: qualifiedRadio
-                        }]
-                        const addParams = {
-                            tableName: 't_examination',
-                            paramWhere
-                        }
-                        console.log('添加考试信息', addParams)
-                        this.$common.request('add', addParams).then(res => {
-                            // 发送通知
-                            const limitTime = duration === '不限' || !duration ? '不限' : this.transformTime(duration)
-                            const msgContent = `您参加的考试【${examName}】已发布，该考试限考时间【${limitDate}】，限考次数【${limitCount}】，考试时长【${limitTime}】，题数【${questionCount}】，总分【${totalScore}】，请及时完成考试！`
-                            console.log('消息msgContent', msgContent)
-                            this.$common.sendMsg({
-                                subject: '考试信息提醒',
-                                content: msgContent,
-                                receiverId: this.params.peixunrenyuan,
-                                canreplay: '0'
-                            })
-                        }).then(res => {
-                            this.$message.success('补签报名考试成功，参与人员可到考试中心考试!')
-                        })
-                    }
-                })
-            }
+            //     const sql1 = `select qb.id_ as tkid,qb.ti_ku_ming_cheng_ as bankName, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.xian_kao_ci_shu_ as limitCount, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.can_kao_ren_yuan_ as examinee, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber,ex.chou_ti_zong_fen_ as randScore,ex.ti_mu_zong_shu_ as randTotal  from t_exams ex, t_question_bank qb where ex.ti_ku_id_ = qb.id_ and ex.id_ = '${row.ti_ku_ming_cheng_}'`
+            //     this.$common.request('sql', sql1).then(res => {
+            //         const { data = [] } = res.variables || {}
+            //         if (!data.length) {
+            //             return
+            //         } else {
+            //             if (data[0].isRand === '1') {
+            //                 data[0].questionCount = data[0].randTotal
+            //                 data[0].totalScore = data[0].randScore
+            //             }
+            //             console.log('data对象', data)
+            //             const { first, second } = this.$store.getters.level || {}
+            //             const { tkid, examName, questionCount, totalScore, duration, qualifiedRadio, limitDate, limitCount } = data[0] || {}
+            //             const paramWhere = [{
+            //                 exam_id_: row.ti_ku_ming_cheng_,
+            //                 ti_ku_id_: tkid,
+            //                 di_dian_: second || first,
+            //                 kao_shi_ren_: this.params.peixunrenyuan,
+            //                 bu_men_: '',
+            //                 bao_ming_shi_jian: this.$common.getDateNow(19),
+            //                 ti_ku_zong_fen_: totalScore,
+            //                 zhuang_tai_: '未开始',
+            //                 sheng_yu_shi_chan: duration,
+            //                 da_biao_zhan_bi_: qualifiedRadio
+            //             }]
+            //             const addParams = {
+            //                 tableName: 't_examination',
+            //                 paramWhere
+            //             }
+            //             console.log('添加考试信息', addParams)
+            //             this.$common.request('add', addParams).then(res => {
+            //                 // 发送通知
+            //                 const limitTime = duration === '不限' || !duration ? '不限' : this.transformTime(duration)
+            //                 const msgContent = `您参加的考试【${examName}】已发布，该考试限考时间【${limitDate}】，限考次数【${limitCount}】，考试时长【${limitTime}】，题数【${questionCount}】，总分【${totalScore}】，请及时完成考试！`
+            //                 console.log('消息msgContent', msgContent)
+            //                 this.$common.sendMsg({
+            //                     subject: '考试信息提醒',
+            //                     content: msgContent,
+            //                     receiverId: this.params.peixunrenyuan,
+            //                     canreplay: '0'
+            //                 })
+            //             }).then(res => {
+            //                 this.$message.success('补签报名考试成功，参与人员可到考试中心考试!')
+            //             })
+            //         }
+            //     })
+            // }
             // 补签更新培训记录表"参加人员"字段与"参加人数字段" 更新操作
             // 更新培训记录表 todo
         },
