@@ -279,7 +279,7 @@ export default {
             ]
             this.listConfig.columns = [
                 // { prop: 'fen_lei_', label: '表单分类', width: 120 },
-                { prop: 'nian_du_', label: '记录月份', width: 100 },
+                { prop: 'nian_du_', label: '记录月份', dateFormat: 'yyyy-MM', width: 100 },
                 { prop: 'org_name', label: '部门', width: 100 },
                 { prop: 'biao_dan_ming_che', label: '表单名称', width: 250 },
                 { prop: 'shi_wu_shuo_ming_', label: '事务说明', width: 250 },

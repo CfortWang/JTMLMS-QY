@@ -213,7 +213,7 @@ export default {
             first,
             userList,
             deptList,
-            width: 210,
+            width: 360,
             selection: false,
             dialogFormVisible: false,
             // 编辑dialog需要使用
@@ -223,7 +223,7 @@ export default {
             timeModificationbtn: true,
             // 主键 如果主键不是pk需要传主键
             pkKey: 'id',
-            tableTitle: '',
+            tableTitle: '体系运行记录',
             typeId: '',
             srcUrl: '',
             fileId: '',
@@ -738,7 +738,7 @@ export default {
             }
         },
         handleExpandCollapse (isExpand) {
-            this.width = isExpand ? 230 : 30
+            this.width = isExpand ? this.width : 30
         },
         // 处理编辑
         handleEdit (id = '') {

@@ -3,6 +3,7 @@ import { getToken, getUuid } from '@/utils/auth'
 import Utils from '@/utils/util'
 import common from '@/utils/common'
 import router from '@/router'
+import { getSetting } from '@/utils/query'
 
 export default {
     namespaced: true,
@@ -78,15 +79,7 @@ export default {
                          * 初定角色为：系统管理角色、主任、质量负责人、文件管理负责人、文件管理员，文件下载角色
                          */
                         info.highRoles = ['xtgljs', 'syszr', 'zlfzr', 'wjglzzc', 'wjgly', 'wjxzjs']
-                        const { role = [] } = info || {}
-                        const hasHighRole = role.some(item => info.highRoles.includes(item.alias))
-                        // 用于文件预览页判定是否开启下载权限
-                        localStorage.setItem('hasHighRole', hasHighRole ? 1 : 0)
 
-                        // 设置当前
-                        await dispatch('ibps/user/set', info, {
-                            root: true
-                        })
                         let level = {}
                         if (info.positions && info.positions.length) {
                             // 当存在第二级为空时，说明具备最高级权限
@@ -107,6 +100,18 @@ export default {
                         await dispatch('ibps/system/loadSystem', null, {
                             root: true
                         })
+                        // 尝试从配置数据中获取 否则使用默认
+                        const highRoles = await getSetting('system', 'highRoles')
+                        highRoles && (info.highRoles = highRoles)
+                        const { role = [] } = info || {}
+                        const hasHighRole = role.some(item => info.highRoles.includes(item.alias))
+                        // 用于文件预览页判定是否开启下载权限
+                        localStorage.setItem('hasHighRole', hasHighRole ? 1 : 0)
+                        // 设置当前
+                        await dispatch('ibps/user/set', info, {
+                            root: true
+                        })
+
                         resolve(info)
                     }).catch(error => {
                         reject(error)

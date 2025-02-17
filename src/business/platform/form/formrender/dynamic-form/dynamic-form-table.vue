@@ -812,6 +812,7 @@ export default {
                         this.dataModel.splice(i, 1)
                     }
                 }
+                this.$refs.elTable.clearSelection()
                 this.totalCount = this.dataModel.length
                 // 后置事件
                 this.afterScript(this.actionCode, position, {

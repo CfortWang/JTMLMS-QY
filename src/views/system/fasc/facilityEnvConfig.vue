@@ -391,6 +391,11 @@ export default {
                     label: '日常防护消毒',
                     path: '/sshjgl/aqgl/rcfhxd',
                     showDevice: false
+                },
+                '16-设备排出废液': {
+                    label: '设备排出废液',
+                    path: '/sshjgl/aqgl/sbpcfyxd',
+                    showDevice: true
                 }
             },
             subIdList: [],
@@ -412,7 +417,7 @@ export default {
             return this.config[this.form.lei_xing_]?.showDevice
         },
         deviceIsRequired () {
-            return this.form.lei_xing_ === '02-冰箱温度监控' || this.form.lei_xing_ === '05-纯水机水质监测' || this.form.lei_xing_ === '03-温浴箱温度监控' || this.form.lei_xing_ === '04-阴凉柜温度监控'
+            return this.form.lei_xing_ === '02-冰箱温度监控' || this.form.lei_xing_ === '05-纯水机水质监测' || this.form.lei_xing_ === '03-温浴箱温度监控' || this.form.lei_xing_ === '04-阴凉柜温度监控' || this.form.lei_xing_ === '16-设备排出废液'
         },
         isEdit () {
             return !!(this.parentData instanceof Object && this.parentData.mainId)
@@ -464,7 +469,7 @@ export default {
         }
     },
     async mounted () {
-        const config = await getSetting(this, 'facilityEnv', 'typeList')
+        const config = await getSetting('facilityEnv', 'typeList')
         if (config) {
             console.debug(config)
             this.config = config

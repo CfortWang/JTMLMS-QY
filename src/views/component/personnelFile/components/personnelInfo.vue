@@ -2,7 +2,7 @@
  * @Author: cyy szjbdcyy@126.com
  * @Date: 2024-11-07 16:00:14
  * @LastEditors: cyy szjbdcyy@126.com
- * @LastEditTime: 2024-11-08 16:42:35
+ * @LastEditTime: 2025-02-13 14:32:36
  * @FilePath: \zdqy_firm_former\src\views\component\personnelFile\components\personnelInfo.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -22,7 +22,9 @@
                         <span v-else>{{ submitperInfoData.name }}</span>
                     </div>
                     <div>
-                        <el-button v-if="(buttonType===0&&buttonShow===false)||buttonType===3||buttonType===4" type="primary" icon="el-icon-picture" @click="changeButton('flowChart')">流程图</el-button>
+                        <el-button v-if="$parent.$attrs&&$parent.$attrs.params&&$parent.$attrs.params.instanceId" type="primary" icon="el-icon-picture" @click="changeButton('approvalHistory')">审批历史</el-button>
+                        <el-button v-if="(buttonType===0&&buttonShow===false)||buttonType===3||buttonType===4 || ($parent.$attrs&&$parent.$attrs.params&&$parent.$attrs.params.instanceId)" type="primary" icon="el-icon-picture" @click="changeButton('flowChart')">流程图</el-button>
+                        <!-- <el-button type="primary" icon="el-icon-picture" @click="changeButton('flowChart')">流程图</el-button> -->
                         <!-- <el-button v-if="buttonType===0&&buttonShow===false" type="primary" icon="ibps-icon-save" @click="changeButton('temporaryStorage')">暂存</el-button> -->
                         <el-button v-if="buttonType===0&&buttonShow===false" type="primary" icon="el-icon-s-promotion" @click="changeButton('submit')">提交</el-button>
                         <el-button v-if="buttonType===1" type="primary" icon="ibps-icon-save" @click="changeButton('save')">保存</el-button>
@@ -78,21 +80,38 @@
                 </div>
             </div>
         </div>
+        <!-- 1315609540510613504 -->
         <flow-diagram-dialog
             :visible="flowDiagramVisible"
-            :def-id="'1315609540510613504'"
+            :def-id="$parent.$attrs&&$parent.$attrs.params&&($parent.$attrs.params.instanceId||$parent.$attrs.params.taskId)?'':'1315609540510613504'"
             :task-id="$parent.$attrs.hasOwnProperty('params')&&$parent.$attrs.params.hasOwnProperty('taskId') ? $parent.$attrs.params.taskId : ''"
-            :inst-id="''"
+            :inst-id="$parent.$attrs.hasOwnProperty('params')&&$parent.$attrs.params.hasOwnProperty('instanceId') ? $parent.$attrs.params.instanceId : ''"
             @close="visible => (flowDiagramVisible = visible)"
         />
+        <approval-history-dialog
+            :visible="approvalHistoryVisible"
+            :inst-id="$parent.$attrs.hasOwnProperty('params')&&$parent.$attrs.params.hasOwnProperty('instanceId') ? $parent.$attrs.params.instanceId : ''"
+            @close="visible => approvalHistoryVisible= visible"
+        />
+        <!-- <approval-history
+            ref="approvalHistory"
+            :biz-key="bizKey"
+            :task-id="$parent.$attrs.hasOwnProperty('params')&&$parent.$attrs.params.hasOwnProperty('taskId') ? $parent.$attrs.params.taskId : ''"
+            :inst-id="$parent.$attrs.hasOwnProperty('params')&&$parent.$attrs.params.hasOwnProperty('instanceId') ? $parent.$attrs.params.instanceId : ''"
+            @error="()=>showApprovalHistory=false"
+        /> -->
     </div>
 </template>
 <script>
 import { getFile } from '@/utils/avatar'
 import FlowDiagramDialog from '@/business/platform/bpmn/components/flow-diagram/dialog'
+import ApprovalHistoryDialog from '@/business/platform/bpmn/components/approval-history/dialog'
+
+// import ApprovalHistory from '@/business/platform/bpmn/components/approval-history'
 export default {
     components: {
-        FlowDiagramDialog
+        FlowDiagramDialog,
+        ApprovalHistoryDialog
     },
     props: {
         buttonType: {
@@ -125,6 +144,7 @@ export default {
             submitperInfoData: {},
             buttonShow: true,
             flowDiagramVisible: false,
+            approvalHistoryVisible: false,
             moreShow: false
         }
     },
@@ -205,6 +225,10 @@ export default {
                 case 'flowChart':
                     this.flowDiagramVisible = true
                     break
+                case 'approvalHistory':
+                    this.approvalHistoryVisible = true
+                    break
+
                 default:
                     break
             }

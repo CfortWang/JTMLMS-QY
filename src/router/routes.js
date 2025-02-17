@@ -274,6 +274,16 @@ const frameIn = [
                     hiddenAsideMenu: true
                 },
                 component: _import('/platform/office/bpmReceivedTask/handled2')
+            },
+            {
+                path: '/xxgl/jssllb',
+                name: 'operationRecord',
+                meta: {
+                    title: '体系运行记录',
+                    auth: true,
+                    hiddenAsideMenu: true
+                },
+                component: _import('/platform/bpmn/bpmInstHis/list')
             }
         ]
     }

@@ -1009,7 +1009,7 @@ export default {
     },
 
     async mounted () {
-        const tabList = await getSetting(this, 'device', 'tabList')
+        const tabList = await getSetting('device', 'tabList')
         if (tabList) {
             console.debug(tabList)
             this.tabList = tabList

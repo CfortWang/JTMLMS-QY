@@ -142,6 +142,8 @@ export default {
             updateShow: false,
             type: 'success',
             curFileName: '',
+            curZid: '',
+            timeId: '',
             dialogVisible: false,
             operation_status: 'fileTraining',
             title: '',
@@ -295,6 +297,10 @@ export default {
         },
 
         closeDialog () {
+            // 关闭时存入查阅时间
+            if (this.browseTime && this.browseTime > 0 && this.timeId) {
+                this.handleUpdate()
+            }
             this.$emit('colseVisible', false)
             const fvView = this.$refs.fvView
             // 销毁子组件方法
@@ -318,6 +324,11 @@ export default {
             // this.digData = null
         },
         hadLoadedFile (v) {
+            // 计时开始，添加查看记录
+            if (!this.curZid) {
+                this.handleAdd(this.leftData[0]?.zId, 0)
+            }
+
             this.setBrowseTime()
             this.hadLoad = true
         },
@@ -361,6 +372,12 @@ export default {
 
         toggleActive (activity, index) {
             if (this.activeIndex === index) { return }
+            // 切换文件修订历史时，保存上一个文件查看记录，新增当前文件查看记录
+            if (this.browseTime && this.browseTime > 0 && this.timeId) {
+                this.handleUpdate()
+                this.handleAdd(this.curZid || this.leftData[0]?.zId, 0)
+            }
+
             this.activeIndex = index
             this.digData = activity
             this.fileShow(activity)
@@ -371,22 +388,23 @@ export default {
             clearInterval(this.clearTimeSet)
             this.browseTime = 0
             this.curFileName = activity.FILE_NAME_
+            this.curZid = activity.zid
             this.checkNum(activity)// 阅读量
             // this.$forceUpdate()// 触发监听器
         },
         // 阅读量函数
-        checkNum (activity) {
+        async checkNum (activity) {
             const sql = `select t_wjcyjl.* from t_wjcyjl
                 INNER JOIN t_wjxxb ON t_wjcyjl.parent_id_ = t_wjxxb.id_
                 WHERE t_wjxxb.shu_ju_lai_yuan_ = '${activity.id}' order by create_time_ desc`
             // const sql1 = `select * from t_wjcyjl where parent_id_= '${activity.id}' order by create_time_ desc`
-            this.$common.request('sql', sql).then((res) => {
+            await this.$common.request('sql', sql).then((res) => {
                 const { data = [] } = res.variables || {}
                 this.lookNum = data.length
                 this.showList = data
             })
         },
-        handleUpdate (fileId, time) {
+        handleAdd (fileId, time) {
             const addParams = {
                 tableName: 't_wjcyjl',
                 paramWhere: [
@@ -399,21 +417,40 @@ export default {
                 ]
             }
             curdPost('add', addParams).then(res => {
-                this.refreshData()
+                // this.refreshData()
+                const { cont = [] } = res.variables || {}
+                this.timeId = cont[0]?.id_ || ''
+            })
+        },
+        handleUpdate () {
+            const updateParams = {
+                tableName: 't_wjcyjl',
+                updList: [{
+                    where: {
+                        id_: this.timeId
+                    },
+                    param: {
+                        // shi_chang_: this.browseTime
+                        shi_chang_: 20
+                    }
+                }]
+            }
+            curdPost('update', updateParams).then((res) => {
+
             })
         },
         hideLeft () {
             this.leftShow = !this.leftShow
         },
 
-        lookFile () {
+        async lookFile () {
             // console.log(document.querySelector('iframe').contentWindow.document)
             // console.log(document.querySelector('iframe').contentWindow.document.body.innerHTML);
             if (this.digData) {
-                this.checkNum(this.digData)
+                await this.checkNum(this.digData)
             } else {
                 this.digData = this.leftData[0]
-                this.checkNum(this.digData)
+                await this.checkNum(this.digData)
             }
             this.innerVisible = true
         },

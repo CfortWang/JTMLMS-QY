@@ -390,7 +390,7 @@ export default {
             return this.lei_xing_ !== '01-室内温湿度监控' && this.lei_xing_ !== '06-每日安全检查' && this.lei_xing_ !== '08-含氯有效性监测' && this.lei_xing_ !== '15-日常防护消毒'
         },
         deviceIsRequired () {
-            return this.lei_xing_ === '02-冰箱温度监控' || this.lei_xing_ === '05-纯水机水质监测' || this.lei_xing_ === '03-温浴箱温度监控' || this.lei_xing_ === '04-阴凉柜温度监控'
+            return this.lei_xing_ === '02-冰箱温度监控' || this.lei_xing_ === '05-纯水机水质监测' || this.lei_xing_ === '03-温浴箱温度监控' || this.lei_xing_ === '04-阴凉柜温度监控' || this.lei_xing_ === '16-设备排出废液'
         },
         labelShow () {
             if (this.form.jian_ce_zhou_qi_) {

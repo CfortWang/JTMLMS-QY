@@ -624,7 +624,7 @@ export default {
         }
     },
     async mounted () {
-        const stateList = await getSetting(this, 'device', 'stateList')
+        const stateList = await getSetting('device', 'stateList')
         if (stateList) {
             console.debug(stateList)
             this.stateList = stateList

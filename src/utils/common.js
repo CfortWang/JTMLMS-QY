@@ -12,6 +12,7 @@ import { bpmTaskSave } from '@/api/platform/bpmn/bpmTask'
 import { onlyOfficeToPdf } from '@/api/platform/form/seal'
 import { downloadFile as download } from '@/business/platform/file/utils'
 import { removeFormData } from '@/api/platform/data/dataTemplate'
+import { queryPageList as queryRole } from '@/api/platform/org/employee'
 // 引入工具类
 import Utils from '@/utils/util'
 import ActionUtils from '@/utils/action'
@@ -179,6 +180,7 @@ export default {
     download,
     removeFormData,
     replaceNullWithEmpty,
+    queryRole,
     Utils,
     ActionUtils
 }

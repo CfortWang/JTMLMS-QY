@@ -404,7 +404,7 @@ export default {
     },
 
     async mounted () {
-        const culWays = await getSetting(this, 'risk', 'culWays')
+        const culWays = await getSetting('risk', 'culWays')
         if (culWays) {
             console.debug(culWays)
             this.culWays = culWays

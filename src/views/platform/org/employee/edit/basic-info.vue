@@ -253,7 +253,7 @@ export default {
             },
             dialogFormVisible: false,
             limit: 1, // 规定上传个数
-            accept: '.jpeg,.gif,.png,.jpg', // 规定上传类型
+            accept: '.jpeg,.gif,.png,.jpg,.JPEG,.GIF,.PNG,.JPG', // 规定上传类型
             formName: 'employeeForm',
             formData: {},
             isSuper: this.$store.getters.isSuper,
