@@ -158,7 +158,8 @@ export default {
                 // 工具栏
                 toolbars: [
                     { key: 'import' },
-                    { key: 'export' }
+                    { key: 'export' },
+                    { key: 'remove', type: 'primary' }
                 ],
 
                 // 表格字段配置
