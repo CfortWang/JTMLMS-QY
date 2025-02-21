@@ -148,12 +148,9 @@ export default {
         },
         changeCompress (val) {
             if (val === 'Y') {
-                this.fieldOptions = {
-                    ...this.fieldOptions,
-                    compress_width: 1000,
-                    compress_size: 0.2,
-                    quality: 0.8
-                }
+                this.fieldOptions.compress_width = 1000
+                this.fieldOptions.compress_size = 0.2
+                this.fieldOptions.quality = 0.8
             }
         }
     }
