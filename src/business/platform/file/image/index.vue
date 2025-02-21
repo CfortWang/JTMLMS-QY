@@ -86,6 +86,7 @@
             :accept="accept"
             :file-size="size"
             :compress-option="compressOption"
+            file-type="image"
             @close="visible => uploaderSelectorVisible = visible"
             @action-event="handleUpload"
         />

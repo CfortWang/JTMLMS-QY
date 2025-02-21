@@ -81,6 +81,11 @@ export default {
         compressOption: {
             type: Object,
             default: () => {}
+        },
+        // 控件类型：附图上传-image, 附件上传-attachment
+        fileType: {
+            type: String,
+            default: 'attachment'
         }
     },
     data () {
@@ -116,7 +121,8 @@ export default {
             }
 
             const { isCompress, maxWidth, maxFileSize, quality } = this.compressOption || {}
-            if (isCompress !== 'N' && options.file.type.startsWith('image/')) {
+            // 仅满足压缩条件的附图组件需压缩，附件组件中的图片不做压缩处理
+            if (isCompress !== 'N' && this.fileType === 'image') {
                 return compress(options.file, maxWidth, maxFileSize, quality).then((file) => {
                     return uploadFile(file, {})
                 })

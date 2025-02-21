@@ -26,6 +26,7 @@
                     :limit="limit"
                     :upload-method="uploadMethod"
                     :compress-option="compressOption"
+                    :file-type="fileType"
                     @callback="uploadCallback"
                 />
             </el-tab-pane>
@@ -106,6 +107,10 @@ export default {
         compressOption: {
             type: Object,
             default: () => {}
+        },
+        fileType: {
+            type: String,
+            default: 'attachment'
         }
     },
     data () {
