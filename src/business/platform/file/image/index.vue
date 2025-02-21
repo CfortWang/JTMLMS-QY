@@ -85,6 +85,7 @@
             :multiple="multiple"
             :accept="accept"
             :file-size="size"
+            :compress-option="compressOption"
             @close="visible => uploaderSelectorVisible = visible"
             @action-event="handleUpload"
         />
@@ -103,6 +104,7 @@ import IbpsUploaderSelectorDialog from '@/business/platform/file/uploader'
 import IbpsImageViewer from '@/components/ibps-file-viewer/image'
 import { TRANSFER_DATA } from '@/constant'
 import VueDraggable from 'vuedraggable'
+import { compress } from '../utils/compress.js'
 
 export default {
     name: 'ibps-image',
@@ -144,6 +146,15 @@ export default {
         uploadType: { // 上传方式 （ default:直接打开上传，attachment：ibps上传附件打开上传 ）
             type: String,
             default: 'attachment'
+        },
+        compressOption: {
+            type: Object,
+            default: () => ({
+                isCompress: 'Y', // 是否压缩
+                maxWidth: 1000, // 最大宽度（px）
+                maxFileSize: Math.round(1024 * 1024 * 0.2), // 200KB
+                quality: 0.8 // 图片质量（0-1）
+            })
         },
         store: {
             type: String,
@@ -414,6 +425,16 @@ export default {
          * 文件上传
          */
         httpRequest (options) {
+            const { isCompress, maxWidth, maxFileSize, quality } = this.compressOption || {}
+            if (isCompress === 'Y') {
+                return compress(options.file, maxWidth, maxFileSize, quality).then((file) => {
+                    return uploadFile(file, {}).then((response) => {
+                        const data = response.data
+                        this.setCacheData(data)
+                        this.fileList.push(data)
+                    })
+                })
+            }
             return uploadFile(options.file, {}).then((response) => {
                 const data = response.data
                 this.setCacheData(data)

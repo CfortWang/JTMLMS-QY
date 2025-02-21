@@ -62,6 +62,8 @@
 import { uploadFile, remove, deleteFile } from '@/api/platform/file/attachment'
 import { uploadTemplateFile } from '@/api/platform/file/onlyoffice'
 import { fileTypes, allFileTypes, accept as acceptTypes } from '@/business/platform/file/constants/fileTypes'
+import { compress } from '../utils/compress.js'
+
 export default {
     props: {
         height: String,
@@ -74,6 +76,11 @@ export default {
         uploadMethod: {
             type: String,
             default: 'normal'
+        },
+        // 图片压缩配置
+        compressOption: {
+            type: Object,
+            default: () => {}
         }
     },
     data () {
@@ -106,6 +113,13 @@ export default {
             const uploadMap = {
                 normal: uploadFile,
                 onlyoffice: uploadTemplateFile
+            }
+
+            const { isCompress, maxWidth, maxFileSize, quality } = this.compressOption || {}
+            if (isCompress !== 'N' && options.file.type.startsWith('image/')) {
+                return compress(options.file, maxWidth, maxFileSize, quality).then((file) => {
+                    return uploadFile(file, {})
+                })
             }
             return uploadMap[this.uploadMethod || 'normal'](options.file, {})
         },

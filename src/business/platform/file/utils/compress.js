@@ -16,7 +16,8 @@ if (!HTMLCanvasElement.prototype.toBlob) {
     })
 }
 
-export const compress = (file, maxWidth = 800, maxFileSize = 500 * 1024, quality = 0.8) => new Promise((resolve, reject) => {
+export const compress = (file, maxWidth = 1000, maxFileSize = 0.2, quality = 1) => new Promise((resolve, reject) => {
+    console.log(file, maxWidth, maxFileSize, quality)
     if (!file.type.startsWith('image/')) {
         reject(new Error('File is not an image'))
         return
@@ -39,7 +40,7 @@ export const compress = (file, maxWidth = 800, maxFileSize = 500 * 1024, quality
         const [imgWidth, imgHeight] = [img.width, img.height]
 
         // 判断是否需要压缩：宽度超限 或 文件大小超限
-        const needCompress = imgWidth > maxWidth || (maxFileSize > 0 && file.size > maxFileSize)
+        const needCompress = imgWidth > maxWidth || (maxFileSize > 0 && file.size > Math.round(maxFileSize * 1024 * 1024))
 
         if (!needCompress) {
             resolve(file)

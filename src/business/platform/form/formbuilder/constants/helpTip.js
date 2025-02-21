@@ -297,9 +297,17 @@ export default {
             【单位】：M </br>`
     },
     imageWidthAndHeight: {
-        title: '关于图片宽高尺寸',
-        content: ` 此属性用于设置图片宽和高。</br>
+        title: '关于图片展示宽高',
+        content: ` 此属性用于设置图片组件展示的宽和高。</br>
             【单位】：px </br>`
+    },
+    imageCompressWidth: {
+        title: '关于图片限宽',
+        content: ` 当图片大小超出时或宽度超限时，将触发压缩，图片将被缩放至该宽度。默认1000px</br>【单位】：px </br>`
+    },
+    imageCompressSize: {
+        title: '关于图片压缩大小',
+        content: ` 当图片大小超出时或宽度超限时，将触发压缩。默认0.2Mb</br>【单位】：Mb </br>`
     },
     imageLimit: {
         title: '关于图片数量限制',

@@ -25,6 +25,7 @@
                     :init="dialogVisible"
                     :limit="limit"
                     :upload-method="uploadMethod"
+                    :compress-option="compressOption"
                     @callback="uploadCallback"
                 />
             </el-tab-pane>
@@ -101,6 +102,10 @@ export default {
         uploadMethod: {
             type: String,
             default: 'normal'
+        },
+        compressOption: {
+            type: Object,
+            default: () => {}
         }
     },
     data () {

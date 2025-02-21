@@ -54,7 +54,7 @@
                 :key="o.val+i"
                 :label="i"
                 :border="fieldOptions.border"
-                :style="{marginTop: '5px', display: fieldOptions.arrangement==='vertical' ? 'block' : null}"
+                :style="{marginTop: '5px', display: fieldOptions.arrangement === 'vertical' ? 'block' : ''}"
             >
                 {{ o.label }}
             </component>
@@ -71,7 +71,7 @@
                 :key="o.val+i"
                 :label="i"
                 :border="fieldOptions.border"
-                :style="{ display: fieldOptions.arrangement==='vertical' ? 'block' : null}"
+                :style="{ display: fieldOptions.arrangement==='vertical' ? 'block' : ''}"
                 disabled
             > {{ o.label }}
             </component>
@@ -272,6 +272,12 @@
             :tip="fieldOptions.tip"
             :size="fieldOptions.size"
             :upload-type="fieldOptions.uploadType"
+            :compress-option="{
+                isCompress: fieldOptions.is_compress,
+                maxWidth: fieldOptions.compress_width,
+                maxFileSize: fieldOptions.compress_size,
+                quality: fieldOptions.quality
+            }"
         />
         <!-- =======================系统字段==============================-->
         <!-- 当前层级 -->

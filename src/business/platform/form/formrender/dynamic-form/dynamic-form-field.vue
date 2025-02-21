@@ -132,7 +132,7 @@
                     :key="o.val"
                     :label="o.val"
                     :border="fieldOptions.border"
-                    :style="{ display: fieldOptions.arrangement === 'vertical' ? 'block' : null }"
+                    :style="{ display: fieldOptions.arrangement === 'vertical' ? 'block' : '' }"
                     class="ibps-pt-5"
                     @click.native.stop.prevent="handleRadioChange(o.val)"
                 >
@@ -160,7 +160,7 @@
                     :key="o.val"
                     :label="o.val"
                     :border="fieldOptions.border"
-                    :style="{ display: fieldOptions.arrangement === 'vertical' ? 'block' : null }"
+                    :style="{ display: fieldOptions.arrangement === 'vertical' ? 'block' : '' }"
                 >
                     {{ o.label }}
                 </component>
@@ -508,6 +508,12 @@
             :tip="fieldOptions.tip"
             :size="fieldOptions.size"
             :upload-type="fieldOptions.uploadType"
+            :compress-option="{
+                isCompress: fieldOptions.is_compress,
+                maxWidth: fieldOptions.compress_width,
+                maxFileSize: fieldOptions.compress_size,
+                quality: fieldOptions.quality
+            }"
             :disabled="readonly"
             v-on="$listeners"
         />
