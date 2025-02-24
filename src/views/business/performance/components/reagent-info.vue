@@ -28,7 +28,7 @@
                     stripe
                     highlight-current-row
                     style="width: 100%"
-                    max-height="250px"
+                    :max-height="pdf === 'pdf' ? '100%' : '250px'"
                     class="reagent-table"
                     @selection-change="handleSelectionChange"
                 >
@@ -83,6 +83,10 @@ export default {
         readonly: {
             type: Boolean,
             default: false
+        },
+        pdf: {
+            type: String,
+            default: ''
         }
     },
     data () {

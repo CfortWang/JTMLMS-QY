@@ -81,6 +81,65 @@
                 </template>
             </div>
         </div>
+        <el-dialog fullscreen :show-close="false" :modal="false" :visible.sync="dialogFormVisible">
+            <el-form id="pdfDom">
+                <div style="text-align: center;font-size: 20px;font-weight: bold;margin-bottom: 20px;">{{ configData.methodName }}</div>
+                <experimental-desc
+                    :step="configData.step"
+                    :criterion="configData.criterion"
+                    :formulas="configData.formulas"
+                    :references="configData.references"
+                    :readonly="true"
+                />
+                <basic-info :info="form" :readonly="true" />
+                <reagent-info :info="form.reagentPoList" :readonly="true" :pdf="pdf" />
+                <param-info
+                    v-if="$utils.isNotEmpty(configData.params)"
+                    :form-id="formId"
+                    :info="form.shiYanCanShu"
+                    :config-data="configData.params"
+                    :readonly="true"
+                    @updateParams="handleUpdateParams"
+                />
+
+                <experimental-data
+                    :exp="form.jiSuanJieGuo"
+                    :form-id="formId"
+                    :readonly="true"
+                    :pdf="pdf"
+                    @export="handleExport"
+                    @import="handleImport"
+                />
+                <precision
+                    v-if="$utils.isNotEmpty(form.jiSuanJieGuo)"
+                    :info="form.jiSuanJieGuo"
+                    :readonly="true"
+                    :pdf="pdf"
+                    @recalculate="handleRecalculate"
+                />
+                <conclusion
+                    :result="form.shiYanJieLun"
+                    :files="form.fuJian"
+                    :readonly="true"
+                    :pdf="pdf"
+                    @updateData="handleUpdateData"
+                />
+
+            </el-form>
+            <div slot="title" class="config-dialog-header">
+                <div class="title">{{ configData.methodName }}</div>
+                <div class="operate">
+                    <template>
+                        <el-button style="width: 80px;" type="success" @click="getpdf()">
+                            导出
+                        </el-button>
+                        <el-button style="width: 80px;" type="danger" @click="dialogFormVisible = false">
+                            取消
+                        </el-button>
+                    </template>
+                </div>
+            </div>
+        </el-dialog>
     </el-dialog>
 </template>
 
@@ -88,6 +147,8 @@
 import { formRules } from './constants/index'
 import ActionUtils from '@/utils/action'
 import { getExperimental, saveExperimental, getConfigDetail, recalculate, exportTemplate, importTemplate } from '@/api/business/pv'
+import html2Canvas from 'html2canvas'
+import JsPDF from 'jspdf'
 export default {
     components: {
         ExperimentalDesc: () => import('./components/experimental-desc'),
@@ -116,6 +177,8 @@ export default {
         const { userId } = this.$store.getters || {}
         return {
             dialogVisible: this.visible,
+            dialogFormVisible: false,
+            pdf: 'pdf',
             formLabelWidth: '110px',
             configData: {},
             formId: this.params.recordId,
@@ -146,7 +209,8 @@ export default {
             loading: false,
             loadCompleted: false,
             toolbars: [
-                { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
+                { key: 'pdf', icon: 'ibps-icon-cube', label: '导出为PDF', type: 'primary' },
+                // { key: 'test', icon: 'ibps-icon-gg', label: '测试', type: 'warning', hidden: this.readonly },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'success', hidden: this.readonly },
                 // { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'primary', hidden: this.readonly },
                 // { key: 'generate', icon: 'ibps-icon-cube', label: '生成报告', type: 'success', hidden: this.readonly },
@@ -172,6 +236,43 @@ export default {
         this.loadData()
     },
     methods: {
+        getpdf () {
+            const newDiv = document.querySelector('#pdfDom')
+            const title = this.params.methodKey
+            html2Canvas(newDiv, {
+                allowTaint: false,
+                taintTest: false,
+                logging: false,
+                useCORS: true,
+                dpi: window.devicePixelRatio * 4, // 将分辨率提高到特定的DPI 提高四倍
+                scale: 4 // 按比例增加分辨率
+            }
+            ).then(function (canvas) {
+                const contentWidth = canvas.width
+                const contentHeight = canvas.height
+                const pageHeight = contentWidth / 592.28 * 841.89
+                var leftHeight = contentHeight
+                var position = 0
+                const imgWidth = 595.28
+                const imgHeight = 592.28 / contentWidth * contentHeight
+                const pageData = canvas.toDataURL('image/jpeg', 1.0)
+                const PDF = new JsPDF('', 'pt', 'a4')
+                if (leftHeight < pageHeight) {
+                    PDF.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight)
+                } else {
+                    while (leftHeight > 0) {
+                        PDF.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
+                        leftHeight -= pageHeight
+                        position -= 841.89
+                        if (leftHeight > 0) {
+                            PDF.addPage()
+                        }
+                    }
+                }
+                PDF.save(title + '.pdf')
+            }
+            )
+        },
         // 获取数据
         loadData () {
             this.loading = true
@@ -186,6 +287,7 @@ export default {
                 data.jiSuanJieGuo = data.jiSuanJieGuo ? JSON.parse(data.jiSuanJieGuo) : {}
                 this.form = Object.assign(this.form, data)
                 this.loadCompleted = true
+                console.log(data.jiSuanJieGuo)
             }).catch(() => {
                 this.loading = false
             })
@@ -218,6 +320,9 @@ export default {
                     break
                 case 'test':
                     this.handleTest()
+                    break
+                case 'pdf':
+                    this.dialogFormVisible = true
                     break
                 default:
                     break
@@ -374,7 +479,7 @@ export default {
                             dangerouslyUseHTMLString: true,
                             customClass: 'errorTips',
                             type: 'error'
-                        }).then(() => {}).catch(() => {})
+                        }).then(() => { }).catch(() => { })
                     })
                 }
                 reader.readAsBinaryString(file)
@@ -452,6 +557,70 @@ export default {
                 padding: 15px 20px 16px;
             }
         }
+
+    #pdfDom {
+        padding: 60px 100px;
+        box-sizing: border-box;
+
+        .info-container {
+            margin-bottom: 20px !important
+        }
+
+        ::v-deep {
+            .info-item {
+                .title {
+                    height: 20px;
+                    line-height: 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+
+                    .ibps-icon-star {
+                        color: #FB9600;
+                        margin-right: 5px;
+                    }
+                }
+
+                .el-form-item {
+                    margin-bottom: 0 !important;
+
+                    &__label {
+                        font-size: 14px !important;
+                        color: #606266;
+                    }
+
+                    &__content {
+
+                        .el-input,
+                        .el-select,
+                        .el-input-number {
+                            width: 100%;
+                        }
+
+                        .el-textarea .el-input__count {
+                            padding: 0 5px;
+                            line-height: initial;
+                        }
+
+                        .el-radio,
+                        .el-checkbox {
+                            margin-right: 10px;
+                        }
+                    }
+                }
+
+                .el-table th.el-table__cell>.cell,
+                .el-table td.el-table__cell {
+                    color: #606266;
+                    font-size: 14px !important;
+                }
+
+                .el-button--mini {
+                    padding: 5px 12px;
+                }
+            }
+        }
+    }
         .config-dialog-header {
             display: flex;
             justify-content: space-between;

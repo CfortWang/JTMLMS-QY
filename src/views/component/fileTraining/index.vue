@@ -30,25 +30,60 @@
         <template #title>
             <el-row>
                 <el-col :span="11" class="titleHander">{{ title }}</el-col>
-                <el-col :span="3" class="read" style="text-align: right;">阅读量:{{ lookNum }}</el-col>
-                <el-col :span="10" style="text-align: right;">
+                <el-col
+                    :span="3"
+                    class="read"
+                    style="text-align: right"
+                >阅读量:{{ lookNum }}</el-col>
+                <el-col :span="10" style="text-align: right">
                     <el-popover
                         v-model="deleteVisible"
                         placement="top"
                         width="160"
                     >
-
                         <p>文件删除之后将不能查看，确定要删除该文件吗？</p>
                         <div style="text-align: right; margin: 0">
-                            <el-button size="mini" type="text" @click="deleteVisible = false">取消</el-button>
-                            <el-button type="primary" size="mini" @click="deleteFile">确定</el-button>
+                            <el-button
+                                size="mini"
+                                type="text"
+                                @click="deleteVisible = false"
+                            >取消</el-button>
+                            <el-button
+                                type="primary"
+                                size="mini"
+                                @click="deleteFile"
+                            >确定</el-button>
                         </div>
-                        <el-button v-if="deleteShow" slot="reference" type="danger" icon="el-icon-delete" class="deleteBtn" @click="deleteVisible=true">删除</el-button>
+                        <el-button
+                            v-if="deleteShow"
+                            slot="reference"
+                            type="danger"
+                            icon="el-icon-delete"
+                            class="deleteBtn"
+                            @click="deleteVisible = true"
+                        >删除</el-button>
                     </el-popover>
-                    <el-button type="primary" icon="el-icon-view" @click="lookFile">查看文件信息</el-button>
-                    <el-button type="primary" icon="el-icon-s-fold" @click="hideLeft">{{ leftContent }}</el-button>
-                    <el-button v-if="updateShow" type="primary" icon="el-icon-download" @click="updateFile">下载文件</el-button>
-                    <el-button type="danger" icon="el-icon-close" @click="closeDialog">关闭</el-button>
+                    <el-button
+                        type="primary"
+                        icon="el-icon-view"
+                        @click="lookFile"
+                    >查看文件信息</el-button>
+                    <el-button
+                        type="primary"
+                        icon="el-icon-s-fold"
+                        @click="hideLeft"
+                    >{{ leftContent }}</el-button>
+                    <el-button
+                        v-if="updateShow"
+                        type="primary"
+                        icon="el-icon-download"
+                        @click="updateFile"
+                    >下载文件</el-button>
+                    <el-button
+                        type="danger"
+                        icon="el-icon-close"
+                        @click="closeDialog"
+                    >关闭</el-button>
                 </el-col>
             </el-row>
         </template>
@@ -60,19 +95,77 @@
                         <el-timeline-item
                             v-for="(activity, index) in leftData"
                             :key="index"
-                            :timestamp="activity.fa_fang_shi_jian_"
+                            :timestamp="'发布日期：' + activity.fa_bu_shi_jian_"
                             :type="index === activeIndex ? type : ''"
                             @click.stop.native="toggleActive(activity, index)"
                         >
                             <div class="timeline-content">
-                                <el-tooltip class="itemStyle" effect="dark" placement="right-end" :content="showContent(activity,index)">
-                                    <div>版本号:{{ activity.ban_ben_ }}/修订人：{{ getUserName(activity.bian_zhi_ren_) }}</div>
+                                <el-tooltip
+                                    class="itemStyle"
+                                    effect="dark"
+                                    placement="right-end"
+                                    :content="showContent(activity, index)"
+                                >
+                                    <div>
+                                        <!-- <div>版本号:{{ activity.ban_ben_ }}/修订人：{{ getUserName(activity.bian_zhi_ren_) }}</div> -->
+                                        <el-collapse
+                                            v-model="activeName"
+                                            accordion
+                                        >
+                                            <el-collapse-item :name="index + 1">
+                                                <template slot="title">
+                                                    <div>
+                                                        版本号：{{
+                                                            activity.ban_ben_
+                                                        }}&nbsp;&nbsp;&nbsp;&nbsp;修订人：{{
+                                                            getUserName(
+                                                                activity.bian_zhi_ren_
+                                                            )
+                                                        }}
+                                                    </div>
+                                                </template>
+                                                <!-- 附件 -->
+                                                <div
+                                                    v-if="
+                                                        activity.zhen_fu_jian_
+                                                    "
+                                                >
+                                                    <ibps-attachment
+                                                        v-model="
+                                                            activity.zhen_fu_jian_
+                                                        "
+                                                        allow-download
+                                                        download
+                                                        multiple
+                                                        accept="*"
+                                                        store="id"
+                                                        readonly
+                                                    />
+                                                </div>
+                                                <div v-else>
+                                                    <i
+                                                        class="el-icon-warning-outline"
+                                                        type="warning"
+                                                    >
+                                                        暂无附件</i>
+                                                </div>
+                                            </el-collapse-item>
+                                        </el-collapse>
+                                    </div>
                                 </el-tooltip>
                             </div>
                         </el-timeline-item>
                     </el-timeline>
                 </el-col>
-                <el-col :span="computedSpan"><fView v-if="refresh" ref="fvView" :option-file="optionFile" :operation_status="operation_status" @hadLoadedFile="hadLoadedFile" /></el-col>
+                <el-col
+                    :span="computedSpan"
+                ><fView
+                    v-if="refresh"
+                    ref="fvView"
+                    :option-file="optionFile"
+                    :operation_status="operation_status"
+                    @hadLoadedFile="hadLoadedFile"
+                /></el-col>
             </el-row>
         </div>
         <!-- 查看文件信息弹窗 @close="closeDialog"-->
@@ -90,22 +183,23 @@
 </template>
 <script>
 /**
-     * 文件预览
-     * 1、'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'  类型支持
-     * 2、图片支持缩放
-     * 3、音频，语音支持
-     * ==================
-     * 下一版本支持
-     * 1、pdf支持缩放
-     * 2、音频，语音多格式支持
-     * 3、压缩包支持
-     */
+ * 文件预览
+ * 1、'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'  类型支持
+ * 2、图片支持缩放
+ * 3、音频，语音支持
+ * ==================
+ * 下一版本支持
+ * 1、pdf支持缩放
+ * 2、音频，语音多格式支持
+ * 3、压缩包支持
+ */
 import fView from '@/business/platform/file/attachment/editFile/fView.vue'
 import { SYSTEM_URL, BASE_API } from '@/api/baseUrl'
 import ViewFile from '@/views/viewFile/index.vue'
 import Template from '@/business/platform/form/form-print/template.vue'
 import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import FileDialog from './fileDialog.vue'
+import IbpsAttachment from '@/business/platform/file/attachment/selector'
 // import * as selectbox from 'bpmn-js-properties-panel/lib/factory/SelectEntryFactory'
 // import func from 'vue-editor-bridge'
 export default {
@@ -114,7 +208,8 @@ export default {
         fView,
         ViewFile,
         Template,
-        FileDialog
+        FileDialog,
+        'ibps-attachment': IbpsAttachment
     },
     props: {
         visible: {
@@ -139,6 +234,7 @@ export default {
         // const userId = this.$store.getters.userInfo.employee.id// 本人修改
 
         return {
+            activeName: 1,
             updateShow: false,
             type: 'success',
             curFileName: '',
@@ -178,7 +274,6 @@ export default {
             deleteVisible: false,
             deleteShow: false,
             leftContent: '隐藏修订历史'
-
         }
     },
     // 本人修改
@@ -190,9 +285,8 @@ export default {
             if (this.leftData.length <= 0) {
                 return 0
             }
-            return this.leftData.findIndex(i => i === this.digData)
+            return this.leftData.findIndex((i) => i === this.digData)
         }
-
     },
     watch: {
         visible: {
@@ -217,12 +311,15 @@ export default {
                 this.leftData = newVal
                 const temp = JSON.parse(JSON.stringify(newVal))
                 temp.sort((a, b) => {
-                    return new Date(b.fa_fang_shi_jian_).getTime() - new Date(a.fa_fang_shi_jian_).getTime()
+                    return (
+                        new Date(b.fa_fang_shi_jian_).getTime() -
+                        new Date(a.fa_fang_shi_jian_).getTime()
+                    )
                 })
                 if (newVal !== temp) {
                     this.leftData = temp
                 }
-                temp.forEach(val => {
+                temp.forEach((val) => {
                     this.fileShow(temp[0])
                 })
                 // newVal.forEach(val => {
@@ -268,9 +365,9 @@ export default {
         document.addEventListener('visibilitychange', this.handlePageChange)
         this.checkDialogBody()
         const roleKey = ['xtgljs']
-        const curRole = this.role.map(i => i.alias)
-        const isPower = curRole.some(item => roleKey.includes(item))
-        this.deleteShow = !!((isPower || this.isPower))
+        const curRole = this.role.map((i) => i.alias)
+        const isPower = curRole.some((item) => roleKey.includes(item))
+        this.deleteShow = !!(isPower || this.isPower)
         const hasRole = localStorage.getItem('hasHighRole') || 0
         if (this.isSuper || hasRole == 1) {
             this.updateShow = true
@@ -278,14 +375,16 @@ export default {
     },
     methods: {
         getUserName (data) {
-            const user = this.userList.find(item => item.userId === data)
+            const user = this.userList.find((item) => item.userId === data)
             return user ? user.userName : '未知用户'
         },
         showContent (activity, index) {
             if (activity.cao_zuo_lei_xing_ === '新增') {
                 return '第一版本'
             }
-            return activity.xiu_ding_nei_rong ? activity.xiu_ding_nei_rong : '无修订原因'
+            return activity.xiu_ding_nei_rong
+                ? activity.xiu_ding_nei_rong
+                : '无修订原因'
         },
 
         handlePageChange () {
@@ -328,7 +427,6 @@ export default {
             if (!this.curZid) {
                 this.handleAdd(this.leftData[0]?.zId, 0)
             }
-
             this.setBrowseTime()
             this.hadLoad = true
         },
@@ -339,10 +437,20 @@ export default {
             }, 1000)
         },
         getDialogHeightHeight () {
-            return ((document.documentElement.clientHeight || document.body.clientHeight) - 60) + 'px'
+            return (
+                (document.documentElement.clientHeight ||
+                    document.body.clientHeight) -
+                60 +
+                'px'
+            )
         },
         startTimer () {
-            if (this.dialogVisible && this.hadLoad && this.out && this.clearTimeSet == null) {
+            if (
+                this.dialogVisible &&
+                this.hadLoad &&
+                this.out &&
+                this.clearTimeSet == null
+            ) {
                 this.clearTimeSet = setInterval(() => {
                     this.browseTime++
                 }, 1000)
@@ -360,26 +468,31 @@ export default {
         async idChange (id) {
             const sql = `select id_ FROM t_wjxxb WHERE shu_ju_lai_yuan_ = '${id}'`
             return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then((res) => {
-                    const { data = [] } = res.variables || {}
-                    const firstId = data[0]?.id_
-                    resolve(firstId) // 解析 Promise 时返回 firstId
-                }).catch(error => {
-                    reject(error) // 捕获错误并拒绝 Promise
-                })
+                this.$common
+                    .request('sql', sql)
+                    .then((res) => {
+                        const { data = [] } = res.variables || {}
+                        const firstId = data[0]?.id_
+                        resolve(firstId) // 解析 Promise 时返回 firstId
+                    })
+                    .catch((error) => {
+                        reject(error) // 捕获错误并拒绝 Promise
+                    })
             })
         },
 
         toggleActive (activity, index) {
-            if (this.activeIndex === index) { return }
+            if (this.activeIndex === index) {
+                return
+            }
             // 切换文件修订历史时，保存上一个文件查看记录，新增当前文件查看记录
             if (this.browseTime && this.browseTime > 0 && this.timeId) {
                 this.handleUpdate()
                 this.handleAdd(this.curZid || this.leftData[0]?.zId, 0)
             }
-
             this.activeIndex = index
             this.digData = activity
+            this.curZid = activity.zid
             this.fileShow(activity)
             if (this.browseTime >= 30) {
                 this.upFunc(this.tmpId, this.browseTime)
@@ -388,8 +501,7 @@ export default {
             clearInterval(this.clearTimeSet)
             this.browseTime = 0
             this.curFileName = activity.FILE_NAME_
-            this.curZid = activity.zid
-            this.checkNum(activity)// 阅读量
+            this.checkNum(activity) // 阅读量
             // this.$forceUpdate()// 触发监听器
         },
         // 阅读量函数
@@ -416,7 +528,7 @@ export default {
                     }
                 ]
             }
-            curdPost('add', addParams).then(res => {
+            curdPost('add', addParams).then((res) => {
                 // this.refreshData()
                 const { cont = [] } = res.variables || {}
                 this.timeId = cont[0]?.id_ || ''
@@ -425,19 +537,19 @@ export default {
         handleUpdate () {
             const updateParams = {
                 tableName: 't_wjcyjl',
-                updList: [{
-                    where: {
-                        id_: this.timeId
-                    },
-                    param: {
-                        // shi_chang_: this.browseTime
-                        shi_chang_: 20
+                updList: [
+                    {
+                        where: {
+                            id_: this.timeId
+                        },
+                        param: {
+                            // shi_chang_: this.browseTime
+                            shi_chang_: 20
+                        }
                     }
-                }]
+                ]
             }
-            curdPost('update', updateParams).then((res) => {
-
-            })
+            curdPost('update', updateParams).then((res) => {})
         },
         hideLeft () {
             this.leftShow = !this.leftShow
@@ -456,7 +568,7 @@ export default {
         },
         a () {
             fetch(this.optionFile.url)
-                .then(response => {
+                .then((response) => {
                     if (response.ok) {
                         // 如果响应状态码为 200-299，则创建下载链接
                         const a = document.createElement('a')
@@ -471,10 +583,14 @@ export default {
                             message: '文件未找到，请联系管理员',
                             type: 'warning'
                         })
-                        console.error('文件未找到:', response.status, response.statusText)
+                        console.error(
+                            '文件未找到:',
+                            response.status,
+                            response.statusText
+                        )
                     }
                 })
-                .catch(error => {
+                .catch((error) => {
                     // 捕获网络请求错误
                     this.$message({
                         message: '网络请求失败，请联系管理员',
@@ -487,8 +603,8 @@ export default {
             this.deleteVisible = false
             // const roleKey = ['xtgljs', 'syszr', 'wjgly', 'wjglzzc']
             const roleKey = ['xtgljs']
-            const curRole = this.role.map(i => i.alias)
-            const isPower = curRole.some(item => roleKey.includes(item))
+            const curRole = this.role.map((i) => i.alias)
+            const isPower = curRole.some((item) => roleKey.includes(item))
             if (this.isSuper || isPower) {
                 const deleteParams = {
                     tableName: 't_wjxxb',
@@ -535,9 +651,11 @@ export default {
                 try {
                     this.dialogVisible = true
                     this.title = `文件：《${val.FILE_NAME_}》`
-                    this.idChange(val.id).then(res => {
+                    this.idChange(val.id).then((res) => {
                         this.tmpId = res
-                        if (val.func) { this.upFunc = val.func }
+                        if (val.func) {
+                            this.upFunc = val.func
+                        }
                         const data = {
                             ext: val.fileInfos.EXT_,
                             fileName: val.fileInfos.FILE_NAME_,
@@ -601,58 +719,82 @@ export default {
                 this.mouseMoveHandler = () => {
                     console.log('鼠标移动事件！！！！')
                 }
-                this.dialogBody.addEventListener('mousemove', this.mouseMoveHandler, true)
+                this.dialogBody.addEventListener(
+                    'mousemove',
+                    this.mouseMoveHandler,
+                    true
+                )
             }
         },
         removeMouseMoveListener () {
             if (this.dialogBody && this.mouseMoveHandler) {
-                this.dialogBody.removeEventListener('mousemove', this.mouseMoveHandler, true)
+                this.dialogBody.removeEventListener(
+                    'mousemove',
+                    this.mouseMoveHandler,
+                    true
+                )
                 this.mouseMoveHandler = null
             }
         },
         updateInnerVisible (newVal) {
             this.innerVisible = newVal
         }
-
     }
 }
 </script>
 <style lang="scss">
-    .ibps-file-preview-dialog {
-      width: 80%;
-      z-index:99999;
-        .el-dialog__body {
-            padding: 0;
-
-        }
-        .file-type-txt {
-            height: calc(88vh) !important;
-        }
-        .itemStyle:hover{
-            cursor: pointer;
-        }
-        .titleHander, .read{
-            line-height: 32px;
-        }
-        .deleteBtn{
-            margin: 0 10px 0 0;
-        }
+.ibps-file-preview-dialog {
+    width: 80%;
+    z-index: 99999;
+    .el-dialog__body {
+        padding: 0;
     }
-    .left-content{
-        .left-title{
-            text-align: left;
-            padding: 15px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        .el-timeline{
-            padding: 0 15px;
-        }
-
+    .file-type-txt {
+        height: calc(88vh) !important;
     }
-    // .file-read-num{
-    //     display: inline-block;
-    //     margin-left: 60px;
-    // }
+    .itemStyle:hover {
+        cursor: pointer;
+    }
+    .titleHander,
+    .read {
+        line-height: 32px;
+    }
+    .deleteBtn {
+        margin: 0 10px 0 0;
+    }
+}
+.left-content {
+    .left-title {
+        text-align: left;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .el-timeline {
+        padding: 0 15px;
+    }
+    /* 清除分割线 */
+    .el-collapse-item__wrap,
+    .el-collapse-item__header {
+        border-bottom: none !important;
+    }
+    .el-collapse {
+        border: none !important;
+    }
+    .el-collapse-item__header {
+        height: 30px;
+        line-height: 30px;
+    }
+    .el-collapse-item__content {
+        padding: 0px;
+    }
+    .el-timeline-item {
+        padding-bottom: 10px;
+    }
+}
+// .file-read-num{
+//     display: inline-block;
+//     margin-left: 60px;
+// }
 </style>
 

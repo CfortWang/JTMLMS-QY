@@ -32,7 +32,7 @@
                                 stripe
                                 highlight-current-row
                                 style="width: 100%"
-                                max-height="250px"
+                                :max-height="pdf === 'pdf' ? '100%' : '250px'"
                                 :show-header="!table.hideHeader"
                                 :span-method="getSpanMethod(table)"
                             >
@@ -99,6 +99,10 @@ export default {
         readonly: {
             type: Boolean,
             default: false
+        },
+        pdf: {
+            type: String,
+            default: ''
         }
     },
     data () {
@@ -148,7 +152,7 @@ export default {
             })).sort((a, b) => a.title.localeCompare(b.title)) : []
             const chartData = chartDataDTO ? Object.keys(chartDataDTO).map(k => ({
                 title: k,
-                id: chartDataDTO[k].name,
+                id: chartDataDTO[k].name + this.pdf,
                 data: chartDataDTO[k].data,
                 note: chartDataDTO[k].note,
                 option: chartDataDTO[k].option

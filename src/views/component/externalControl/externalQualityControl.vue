@@ -341,9 +341,9 @@ export default {
                 huoDongMingCheng: [
                     { required: true, message: '请输入活动名称', trigger: 'blur' }
                 ],
-                xuHao: [
-                    { required: true, message: '请输入序号', trigger: 'blur' }
-                ],
+                // xuHao: [
+                //     { required: true, message: '请输入序号', trigger: 'blur' }
+                // ],
                 zuZhiDanWei: [
                     { required: true, message: '请选择', trigger: 'change' }
                 ],

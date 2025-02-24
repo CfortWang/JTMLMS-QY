@@ -28,7 +28,7 @@
                         stripe
                         highlight-current-row
                         style="width: 100%"
-                        max-height="250px"
+			            :max-height="pdf === 'pdf' ? '100%' : '250px'"
                     >
                         <el-table-column
                             v-for="(h, hIndex) in expData.dataDTO.header"
@@ -90,6 +90,10 @@ export default {
         readonly: {
             type: Boolean,
             default: false
+        },
+        pdf: {
+            type: String,
+            default: ''
         }
     },
     data () {

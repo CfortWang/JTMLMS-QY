@@ -49,7 +49,10 @@
                 </span>
               </span>
               <span v-else>
-                <span v-if="item.auditor">
+                <span v-if="item.auditor &&item.status == 'pending'">
+                  暂定执行人:{{ item.auditorName }}
+                </span>
+                <span v-else-if="item.auditor &&item.status != 'pending'">
                   执行人:{{ item.auditorName }}<template v-if="item.interpose === 1"><span class="red">(干预审批)</span></template>
                 </span>
                 <span v-else-if="item.qualifiedExecutor">

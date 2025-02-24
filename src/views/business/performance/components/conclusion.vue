@@ -9,7 +9,9 @@
                 <el-row :gutter="20" class="form-row">
                     <el-col :span="24">
                         <el-form-item label="结论" prop="shiYanJieLun" :show-message="false">
-                            <ibps-ueditor v-model="expResult" :config="ueditorConfig" :readonly="true" />
+                            <div v-if="pdf === 'pdf'" v-html="expResult" />
+                            <ibps-ueditor v-else v-model="expResult" :config="ueditorConfig" :readonly="readonly" />
+
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -51,6 +53,10 @@ export default {
         readonly: {
             type: Boolean,
             default: false
+        },
+        pdf: {
+            type: String,
+            default: ''
         }
     },
     data () {

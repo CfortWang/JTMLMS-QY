@@ -24,19 +24,8 @@
                         <el-row type="flex" justify="center" :gutter="20">
                             <el-col :span="16">
                                 <el-row :gutter="20">
-                                    <el-col v-if="isEdit" :span="8">
-                                        <el-form-item label="设备名称：" prop="sheBeiMingCheng">
-                                            <template slot="label">
-                                                <span class="required">设备名称：</span>
-                                            </template>
-                                            <el-input v-model="form.sheBeiMingCheng" size="mini" />
-                                        </el-form-item>
-                                    </el-col>
-                                    <el-col v-if="!isEdit" :span="8">
-                                        <el-form-item label="设备名称：" prop="sheBeiMingChen">
-                                            <template slot="label">
-                                                <span class="required">设备名称：</span>
-                                            </template>
+                                    <el-col :span="8">
+                                        <el-form-item label="设备验收记录：" prop="sheBeiMingChen">
                                             <ibps-custom-dialog
                                                 v-model="form.sheBeiMingChen"
                                                 size="mini"
@@ -47,7 +36,16 @@
                                                 placeholder="请选择"
                                                 icon="el-icon-search"
                                                 style="width:100%"
+                                                @change-link-data="sheBeiMingChenChange"
                                             />
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <el-form-item label="设备名称：" prop="sheBeiMingCheng">
+                                            <template slot="label">
+                                                <span class="required">设备名称：</span>
+                                            </template>
+                                            <el-input v-model="form.sheBeiMingCheng" size="mini" />
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -916,9 +914,6 @@ export default {
                 shiFouXiaoZhun: [
                     { required: true, message: '是否校准不能为空', trigger: 'blur' }
                 ],
-                sheBeiMingChen: [
-                    { required: true, message: '请选择设备', trigger: 'blur' }
-                ],
                 chuChangRiQi: [
                     { required: true, message: '出厂日期不能为空', trigger: 'blur' }
                 ]
@@ -966,20 +961,6 @@ export default {
                 this.form.cunFangDiDian = data[0].fang_jian_ming_ha
             }
         },
-        'form.sheBeiMingChen': {
-            async handler (val) {
-                if (this.isEdit) return
-                const sql = `select * from t_yqsbysb where id_='${val}'`
-                const { variables: { data }} = await this.$common.request('sql', sql)
-                if (data.length > 0) {
-                    this.form.sheBeiMingCheng = data[0].ming_cheng_str_
-                    this.form.guiGeXingHao = data[0].xing_hao_gui_ge_
-                    this.form.jiShenXuHao = data[0].chu_chang_bian_ha
-                    this.form.changShang = data[0].sheng_chan_chang_
-                    this.form.yuanSheBeiBian = data[0].she_bei_bian_hao_
-                }
-            }
-        },
         // 根据编制部门动态获取对应文件存放处数据
         // 'form.bianZhiBuMen': {
         //     handler (value) {
@@ -1017,6 +998,13 @@ export default {
         this.init()
     },
     methods: {
+        sheBeiMingChenChange (key, data) {
+            this.form.sheBeiMingCheng = data.ming_cheng_str_
+            this.form.guiGeXingHao = data.xing_hao_gui_ge_
+            this.form.jiShenXuHao = data.chu_chang_bian_ha
+            this.form.changShang = data.sheng_chan_chang_
+            this.form.yuanSheBeiBian = data.she_bei_bian_hao_
+        },
         // 根据供应商自动带出供应商名称和电话
         shiFouQiJianHChange (key, data) {
             this.form.lianXiFangShi = data.lian_xi_dian_hua_
