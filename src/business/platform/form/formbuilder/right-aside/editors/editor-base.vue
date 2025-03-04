@@ -41,6 +41,8 @@
           :data="boFields"
           placeholder="请绑定属性"
           :empty-text="emptyText"
+          :filterable="true"
+          filter-label="name"
           @change="changeBoName"
         />
       </el-form-item>
