@@ -55,7 +55,7 @@
                         "
                     >
                         <!-- 部门选择 -->
-                        <SelectPositions :filterGroup="true" @handleFunc="handleFunc" />
+                        <SelectPositions :filter-group="true" @handleFunc="handleFunc" />
                         <div
                             style="
                                 width: 30%;
@@ -174,6 +174,7 @@ export default {
         const colorGroup1 = ['#d20962', '#f47721', '#00bce4', '#7552cc']
         const colorGroup2 = ['#00a78e', '#7d3f98', '#f85a40']
         return {
+            depth3: '',
             level: level.second || level.first,
             monthValues: [],
             startDate: '',
@@ -974,21 +975,25 @@ export default {
         },
         // 部门信息统计
         positionsInfoData () {
-            const positionsWhere =
-                this.positions.length !== 0
-                    ? `(${this.positions.join(' or ')} )`
-                    : `en.path_ = '没有选择部门'`
-            const sql = `select jh.*from (select  en.id_ ,en.name_ AS enName,  
-            sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,
-            sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,
-            sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,
-            sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,
-            sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,
-            sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,
-            sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT
-            ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji
-            FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_ 
-            )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where ${positionsWhere} and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY enName) jh`
+            // const positionsWhere =
+            //     this.positions.length !== 0
+            //         ? `(${this.positions.join(' or ')} )`
+            //         : `en.path_ = '没有选择部门'`
+            // const sql = `select jh.*from (select  en.id_ ,en.name_ AS enName,
+            // sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,
+            // sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,
+            // sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,
+            // sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,
+            // sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,
+            // sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,
+            // sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT
+            // ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji
+            // FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_
+            // )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where ${positionsWhere} and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY enName) jh`
+
+            const sql = `select jh.enName, IFNULL(jh.boShi,0) as boShi,IFNULL(jh.shuoShi,0) as shuoShi,IFNULL(jh.benKe,0) as benKe,IFNULL(jh.daZhuan,0) as daZhuan,IFNULL(jh.chuJi,0) as chuJi, IFNULL(jh.zhongJi,0) as zhongJi, IFNULL(jh.gaoJi,0) as gaoJi from (select  en.id_ ,en.name_ AS enName,               sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,             sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,             sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,             sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_              )gy right JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where en.DEPTH_ like '%4%' and en.PARENT_ID_ like '%${this.depth3}%' and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY en.id_) jh                                                                                                                                                                                                         
+            UNION
+            select jh.enName, IFNULL(jh.boShi,0) as boShi,IFNULL(jh.shuoShi,0) as shuoShi,IFNULL(jh.benKe,0) as benKe,IFNULL(jh.daZhuan,0) as daZhuan,IFNULL(jh.chuJi,0) as chuJi, IFNULL(jh.zhongJi,0) as zhongJi, IFNULL(jh.gaoJi,0) as gaoJi from (select  en.id_ ,en.name_ AS enName,               sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,             sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,             sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,             sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_              )gy right JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where (en.id_ like '%${this.depth3}%' or en.PARENT_ID_ like '%${this.depth3}%') and en.id_!='1166373874003083264' and en.name_ not like '%综合%' ) jh`
             curdPost('sql', sql).then((res) => {
                 const data = res.variables.data
                 // 组装数据集，以学历职称为列，以部门为行:{" 大专":['1','2','3']}
@@ -1154,7 +1159,7 @@ export default {
             if (this.positionsIdArr.length) {
                 const users = this.getPositionPeopleIds(this.positionsIdArr[0])
                 const userIds = users.map(user => user.userId)
-                const renyuan =userIds.map(i => `'${i}'`).join(',')!=='' ? `and kao_shi_ren_ in (${userIds.map(i => `'${i}'`).join(',')})`:''
+                const renyuan = userIds.map(i => `'${i}'`).join(',') !== '' ? `and kao_shi_ren_ in (${userIds.map(i => `'${i}'`).join(',')})` : ''
                 const sql = `select * from t_examination where zhuang_tai_ = '已完成' ${renyuan} `
                 let { variables: { data }} = await this.$common.request('sql', sql)
                 if (this.startDate && this.endDate) {
@@ -1214,6 +1219,7 @@ export default {
             this.optionTrainingStatisticsConfig.series[2].data = data.map(item => item.participationRate)
         },
         handleFunc (e) {
+            this.depth3 = e.v[0]
             this.sqlPositionsDatasIni = e.i
             this.positionIni = e.v
             this.simplifyPosition(e.v)

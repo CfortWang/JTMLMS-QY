@@ -102,7 +102,7 @@
                                     </el-col>
                                 </el-row>
                                 <el-row :gutter="20">
-                                    <el-col :span="8">
+                                    <el-col v-if="!hideSysDeviceNo" :span="8">
                                         <el-form-item label="设备编号：" prop="sheBeiShiBieH">
                                             <template slot="label">
                                                 <span>设备编号</span>
@@ -110,13 +110,13 @@
                                                     <i class="el-icon-question question-icon">：</i>
                                                 </el-tooltip>
                                             </template>
-                                            <span>{{ form.sheBeiShiBieH }}</span>
+                                            <span>{{ form.sheBeiShiBieH || '/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="原设备编号：" prop="yuanSheBeiBian">
                                             <template slot="label">
-                                                <span class="required">原设备编号：</span>
+                                                <span class="required">{{ hideSysDeviceNo?'设备编号':'原设备编号' }}：</span>
                                             </template>
                                             <el-input v-model="form.yuanSheBeiBian" size="mini" />
                                         </el-form-item>
@@ -733,7 +733,6 @@
 </template>
 
 <script>
-import { getSetting } from '@/utils/query'
 import dayjs from 'dayjs'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import { getequipmentCard, saveEquipmentCard } from '@/api/platform/device/device'
@@ -764,6 +763,16 @@ export default {
             default: function () {
                 return { '停用': '停用', '报废': '报废', '合格': '合格' }
             }
+        },
+        hideSysDeviceNo: {
+            type: Boolean,
+            default: false
+        },
+        tabList: {
+            type: Object,
+            default: function () {
+                return {}
+            }
         }
     },
     data () {
@@ -777,7 +786,6 @@ export default {
                 { label: '维修记录', name: 'six', component: 'RepairRecord', isKeepAlive: true },
                 { label: '停用、报废记录', name: 'seven', component: 'ScrappedRecord', isKeepAlive: true }
             ],
-            tabList: {},
             filter: [{
                 descVal: '1',
                 includeSub: true,
@@ -877,9 +885,6 @@ export default {
             rules: {
                 sheBeiMingCheng: [
                     { required: true, message: '设备名称不能为空', trigger: 'blur' }
-                ],
-                sheBeiShiBieH: [
-                    { required: true, message: '设备编号不能为空', trigger: 'blur' }
                 ],
                 yuanSheBeiBian: [
                     { required: true, message: '原设备编号不能为空', trigger: 'blur' }
@@ -989,12 +994,7 @@ export default {
         }
     },
 
-    async mounted () {
-        const tabList = await getSetting('device', 'tabList')
-        if (tabList) {
-            console.debug(tabList)
-            this.tabList = tabList
-        }
+    mounted () {
         this.init()
     },
     methods: {
@@ -1125,6 +1125,7 @@ export default {
         async goAdd () {
             try {
                 this.loading = true
+                this.form.sheBeiShiBieH = await this.getNextAlias()
                 await saveEquipmentCard(this.form)
                 this.$message.success('添加成功')
                 this.closeDialog(true)
@@ -1209,7 +1210,21 @@ export default {
         generateRandomString () {
             return `JYK-${Math.floor(Math.random() * 88888) + 10000}`
         },
+        getNextAlias () {
+            return new Promise((resolve, reject) => {
+                this.$common.getNextIdByAlias({
+                    'alias': 'sbbh'
+                }).then(response => {
+                    resolve(response.data)
+                }).catch((error) => {
+                    reject(error)
+                })
+            })
+        },
         async init () {
+            if (this.hideSysDeviceNo) {
+                this.rules.yuanSheBeiBian[0].message = '设备编号不能为空'
+            }
             this.loading = true
             this.isEdit = !!(this.params && this.params.id)
             this.isSheKou = this.deptList[0].positionId === '1166372468122714112' // 判断是否是蛇口医院
@@ -1237,10 +1252,10 @@ export default {
                 this.isFirstbianZhiBuMen = false
                 this.isFirstyiXiaoRiQi = false
                 // 随机生成一个不重复的设备编号
-                this.form.sheBeiShiBieH = this.generateRandomString()
-                for (; await this.checkIsRepeat(this.form.sheBeiShiBieH);) {
-                    this.form.sheBeiShiBieH = this.generateRandomString()
-                }
+                // this.form.sheBeiShiBieH = this.generateRandomString()
+                // for (; await this.checkIsRepeat(this.form.sheBeiShiBieH);) {
+                //     this.form.sheBeiShiBieH = this.generateRandomString()
+                // }
                 this.form.jieShouRiQi = dayjs().format('YYYY-MM-DD')
                 this.form.qiYongRiQi = dayjs().format('YYYY-MM-DD')
                 this.form.xiaoZhunWuCha = '否'

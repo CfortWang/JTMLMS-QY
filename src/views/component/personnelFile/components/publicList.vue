@@ -84,6 +84,9 @@
                             </div>
                             <p class="ellipsis" @mouseover="inputOnMouseOver($event)">{{ scope.row.hasOwnProperty(item.field) > 0 ? enumeratedArray[item.assemble][scope.row[item.field]]:'/' }}</p>
                         </el-tooltip>
+                        <div v-else-if="item.type==='secondaryTreatment'" class="grid-content bg-purple-light">
+                            <div v-html="treatment(item.field, scope.row)" />
+                        </div>
                         <div v-else>/</div>
 
                     </template>
@@ -225,15 +228,59 @@ export default {
                 if (item.length > 1) {
                     item.forEach(it => {
                         it.contant = val[it.field]
+                        it.allData = val
                     })
                 } else {
                     item[0].contant = val[item[0].field]
+                    item[0].allData = val
                 }
             })
             console.log(this.dialogData)
         },
         changeDetails (val) {
             this.dialogDetails = val
+        },
+        treatment (val, data) {
+            switch (val) {
+                case 'panduandefen':
+                    return data.hasOwnProperty('scoringType')
+                        ? data['scoringType'] === '平均分'
+                            ? (data['averageScore'] * 1).toFixed(2)
+                            : data['scoringType'] === '最高分'
+                                ? (data['maxScore'] * 1).toFixed(2)
+                                : data['scoringType'] === '最近得分'
+                                    ? (data['recentScore'] * 1).toFixed(2)
+                                    : ''
+                        : ''
+                case 'panduanexamDesc':
+                    if (data['paperState'] === '已完成') {
+                        // 计算是否达标
+                        const passScore =
+                    (+data['totalScore'] * +data['qualifiedRadio']) / 100
+                        let curScore = null
+                        if (data['scoringType'] === '平均分') {
+                            curScore = +data['averageScore']
+                        }
+                        if (data['scoringType'] === '最高分') {
+                            curScore = +data['maxScore']
+                        }
+                        if (data['scoringType'] === '最近得分') {
+                            curScore = +data['recentScore']
+                        }
+                        if (curScore >= passScore) {
+                            return `<div style="color:#67c23a;">已达标</div>`
+                        }
+                        return `<div style="color:#f43636;">未达标</div>`
+                    } else {
+                        // 未完成分两种：未开始和待批阅
+                        if (data['submittedCount'] > 0) {
+                            return `<div style="color:#ffa500;">待批阅</div>`
+                        }
+                        return '/'
+                    }
+                default:
+                    break
+            }
         }
     }
 }
@@ -265,13 +312,17 @@ export default {
     }
     .contentAll{
         height: 85%;
-        overflow-y: auto;
+        width: 99.5%;
+        overflow-y: hidden;
+        overflow-x: auto;
         ::v-deep .ibps-attachment-selector{
             min-width: 0;
         }
         .tableCol{
             height: 92%;
-            overflow-y: auto;
+            overflow-y: hidden;
+            overflow-x: auto;
+
             ::v-deep .el-table__fixed-right{
                 .el-table__fixed-body-wrapper{
                     .el-table__body{
@@ -290,17 +341,17 @@ export default {
                     }
                 }
             }
-            ::v-deep .el-table__body-wrapper::-webkit-scrollbar {
-                display: none; /* for Chrome, Safari, and Opera */
-            }
+            // ::v-deep .el-table__body-wrapper::-webkit-scrollbar {
+            //     display: none; /* for Chrome, Safari, and Opera */
+            // }
 
-            ::v-deep .el-table__body-wrapper {
-                -ms-overflow-style: none;  /* for Internet Explorer, Edge */
-                scrollbar-width: none;  /* for Firefox */
-            }
-            ::v-deep .el-table__fixed-right-patch{
-                width: 0 !important;
-            }
+            // ::v-deep .el-table__body-wrapper {
+            //     -ms-overflow-style: none;  /* for Internet Explorer, Edge */
+            //     scrollbar-width: none;  /* for Firefox */
+            // }
+            // ::v-deep .el-table__fixed-right-patch{
+            //     width: 0 !important;
+            // }
         }
         .tableCol::-webkit-scrollbar{
             display: none;

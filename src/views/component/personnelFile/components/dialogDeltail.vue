@@ -63,6 +63,9 @@
                         {{ enumeratedArray[e.assemble][e.contant] }}
 
                     </div>
+                    <div v-else-if="e.type==='secondaryTreatment'" class="contant">
+                        <div v-html="treatment(e.field, e.allData)" />
+                    </div>
                 </div>
             </el-col>
         </el-row>
@@ -110,6 +113,50 @@ export default {
                     '0': '否',
                     '1': '是'
                 }
+            }
+        }
+    },
+    methods: {
+        treatment (val, data) {
+            switch (val) {
+                case 'panduandefen':
+                    return data.hasOwnProperty('scoringType')
+                        ? data['scoringType'] === '平均分'
+                            ? (data['averageScore'] * 1).toFixed(2)
+                            : data['scoringType'] === '最高分'
+                                ? (data['maxScore'] * 1).toFixed(2)
+                                : data['scoringType'] === '最近得分'
+                                    ? (data['recentScore'] * 1).toFixed(2)
+                                    : ''
+                        : ''
+                case 'panduanexamDesc':
+                    if (data['paperState'] === '已完成') {
+                        // 计算是否达标
+                        const passScore =
+                    (+data['totalScore'] * +data['qualifiedRadio']) / 100
+                        let curScore = null
+                        if (data['scoringType'] === '平均分') {
+                            curScore = +data['averageScore']
+                        }
+                        if (data['scoringType'] === '最高分') {
+                            curScore = +data['maxScore']
+                        }
+                        if (data['scoringType'] === '最近得分') {
+                            curScore = +data['recentScore']
+                        }
+                        if (curScore >= passScore) {
+                            return `<div style="color:#67c23a;">已达标</div>`
+                        }
+                        return `<div style="color:#f43636;">未达标</div>`
+                    } else {
+                        // 未完成分两种：未开始和待批阅
+                        if (data['submittedCount'] > 0) {
+                            return `<div style="color:#ffa500;">待批阅</div>`
+                        }
+                        return '/'
+                    }
+                default:
+                    break
             }
         }
     }

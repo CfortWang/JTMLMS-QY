@@ -225,7 +225,7 @@ export default {
             })
         },
         handleTreeAction (command, position, selection, data) {
-            if (data.sn === 0 && data.name === '文件分类') {
+            if (data?.sn === 0 && data?.name === '文件分类') {
                 const object = {
                     diDian: this.level,
                     buMen: '',

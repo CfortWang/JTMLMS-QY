@@ -635,11 +635,34 @@ export default {
                 this.questionData = data.concat(this.questionData)
             })
         },
+        // 查询使用该题库的考试
+        async checkExistExam () {
+            if (this.formId) {
+                const sql = `select id_,kao_shi_ming_chen from t_exams where ti_ku_id_='${this.formId}' order by create_time_ desc`
+                const { variables: { data = [] } = {}} = await this.$common.request('sql', sql)
+                return data
+            }
+            return []
+        },
         handleSubmit () {
-            this.$refs.form.validate((valid) => {
+            this.$refs.form.validate(async (valid) => {
                 if (valid) {
-                    // 表单验证通过，提交表单
-                    this.submitForm()
+                    if (this.form.suo_shu_fan_wei_ === '组级' && !this.form.bian_zhi_bu_men_) {
+                        this.$message.warning('所属范围为组级，请选择对应的专业组！')
+                    } else {
+                        const examsList = await this.checkExistExam()
+                        if (examsList.length > 0) {
+                            this.$confirm(`当前题库存在正在进行中的“${examsList.length}场”考试，考试名称为：【${examsList.map(i => i.kao_shi_ming_chen).join('，')}】，考试中更改题库可能会影响考试数据结果，是否继续?`, '提示', {
+                                confirmButtonText: '继续',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(() => {
+                                this.submitForm()
+                            }).catch(() => {})
+                        } else {
+                            this.submitForm()
+                        }
+                    }
                 } else {
                     ActionUtils.saveErrorMessage()
                 }

@@ -526,24 +526,27 @@ export const correlationConfig = {
     },
     kaoshijilu: {
         config: [
-            { label: '考试名称', width: '25%', type: 'text', field: 'examName' },
-            { label: '考试类型', width: '15%', type: 'text', field: 'examType' },
-            { label: '考试达标状态', width: '15%', type: 'text', field: 'examDesc' },
-            { label: '开始时间', width: '20%', type: 'text', field: 'startDate' },
-            { label: '考试总分', width: '15%', type: 'text', field: 'totalScore' }
+            { label: '考试名称', width: '15%', type: 'text', field: 'examName' },
+            { label: '考试题库', width: '15%', type: 'text', field: 'bankName' },
+            { label: '题库类型', width: '15%', type: 'text', field: 'bankType' },
+            { label: '考试题数', width: '10%', type: 'text', field: 'questionCount' },
+            { label: '考试总分', width: '10%', type: 'text', field: 'totalScore' },
+            { label: '得分', width: '10%', type: 'secondaryTreatment', field: 'panduandefen' },
+            { label: '考试达标状态', width: '10%', type: 'secondaryTreatment', field: 'panduanexamDesc' },
+            { label: '开始时间', width: '15%', type: 'text', field: 'startDate' },
+            { label: '参考次数', width: '10%', type: 'text', field: 'submittedCount' },
+            { label: '完成次数', width: '10%', type: 'text', field: 'completedCount' },
+            { label: '达标分值占比', width: '10%', type: 'text', field: 'qualifiedRadio' },
+            { label: '计分方式', width: '10%', type: 'text', field: 'scoringType' }
 
         ],
         dialog: [
-            [{ name: '考试名称', field: 'examName', type: 'text' }, { name: '考试类型', field: 'examType', type: 'text' }],
-            [{ name: '是否随机', field: 'isRandom', type: 'enumeration', assemble: 'numberBoolean' }, { name: '计分方式', field: 'scoringType', type: 'text' }],
-            [{ name: '考试题库', field: 'bankName', type: 'text' }, { name: '题库类型', field: 'bankType', type: 'text' }],
-            [{ name: '考试题数', field: 'questionCount', type: 'text' }, { name: '考试总分', field: 'totalScore', type: 'text' }],
-            [{ name: '考试时长', field: 'duration', type: 'text' }, { name: '考试状态', field: 'examState', type: 'text' }],
-            [{ name: '考试完成状态', field: 'paperState', type: 'text' }, { name: '考试达标状态', field: 'examDesc', type: 'text' }],
-            [{ name: '开始时间', field: 'startDate', type: 'text' }, { name: '限考时间', field: 'limitDate', type: 'text' }],
-            [{ name: '限考次数', field: 'limitCount', type: 'text' }, { name: '达标占比', field: 'qualifiedRadio', type: 'text' }],
-            [{ name: '最高得分', field: 'maxScore', type: 'text' }, { name: '最近得分', field: 'recentScore', type: 'text' }],
-            [{ name: '平均得分', field: 'averageScore', type: 'text' }]
+            [{ name: '考试名称', field: 'examName', type: 'text' }, { name: '考试达标状态', field: 'panduanexamDesc', type: 'secondaryTreatment' }],
+            [{ name: '考试题库', field: 'bankName', type: 'text' }, { name: '开始时间', field: 'startDate', type: 'text' }],
+            [{ name: '题库类型', field: 'bankType', type: 'text' }, { name: '参考次数', field: 'submittedCount', type: 'text' }],
+            [{ name: '考试题数', field: 'questionCount', type: 'text' }, { name: '完成次数', field: 'completedCount', type: 'text' }],
+            [{ name: '考试总分', field: 'totalScore', type: 'text' }, { name: '达标分值占比', field: 'qualifiedRadio', type: 'text' }],
+            [{ name: '得分', field: 'panduandefen', type: 'secondaryTreatment' }, { name: '计分方式', field: 'scoringType', type: 'text' }]
         ]
     },
     tjbgb: {

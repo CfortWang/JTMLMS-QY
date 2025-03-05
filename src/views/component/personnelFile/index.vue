@@ -261,6 +261,8 @@ export default {
                             })
                         })
                     } else if (this.btnType === 'agree') {
+                        this.personInfoData.shouQuanQianZ = this.userId
+                        this.personInfoData.updateTime = this.$common.getDateNow(19)
                         agree(
                             {
                                 'opinion': '同意',
@@ -301,6 +303,8 @@ export default {
                     } else if (this.btnType === '') {
                         console.log('重置')
                     } else if (this.btnType === 'save') {
+                        this.personInfoData.shouQuanQianZ = this.userId
+                        this.personInfoData.updateTime = this.$common.getDateNow(19)
                         this.saveOperate()
                         // const sql = `select b.id_,b.name_ from ibps_bpm_inst a join ibps_bpm_tasks b on b.PROC_DEF_KEY_=a.PROC_DEF_KEY_ where b.PROC_DEF_KEY_ = 'Process_08xwabfNEW' and a.CREATE_BY_ ='${this.personID}'`
                         // this.$common.request('sql', sql).then(res => {

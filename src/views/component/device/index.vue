@@ -309,7 +309,7 @@
                 </ibps-crud>
             </template>
         </ibps-container>
-        <DeviceDialog v-if="deviceDialogShow" :params="params" :state-list="stateList" @close="close" />
+        <DeviceDialog v-if="deviceDialogShow" :params="params" :state-list="stateList" :tab-list="tabList" :hide-sys-device-no="hideSysDeviceNo" @close="close" />
         <input id="" ref="file1" type="file" name="" accept=".xlsx,.xls" @change="handleUploadChange1">
         <input id="" ref="file2" type="file" name="" accept=".xlsx,.xls" @change="handleUploadChange2">
 
@@ -509,41 +509,42 @@ export default {
             deviceColumns: {
                 bianZhiBuMen: '部门',
                 sheBeiMingCheng: '设备名称',
-                sheBeiShiBieH: '设备编号（导入无需填写）',
+                // sheBeiShiBieH: '设备编号（导入无需填写）',
                 yuanSheBeiBian: '原设备编号（必填，且不可重复）',
                 sheBeiZhuangTa: '设备状态（合格/停用/限用）',
                 sheBeiLeiXing: '设备类型（检验系统/通用设备/软件/信息系统）',
+                shiFouWeiHu: '是否维护（是/否）',
+                shiFouXiaoZhun: '是否校准（是/否）',
+                weiHuFangShi: '设备分组',
                 guiGeXingHao: '规格型号',
-                cunFangDiDian: '存放地点',
+                cunFangDiDian: '存放地点（格式：房间号+空格+房间名）',
                 guanLiRen: '保管人',
                 ziChanBianHao: '资产编号',
                 gongYingShang: '供应商',
                 lianXiFangShi: '联系方式',
                 changShang: '厂商',
-                chuChangRiQi: '出厂日期',
                 jiShenXuHao: '机身序号',
                 zhuCeZhengHao: '注册证号',
-                ceLiangGongZuo: '测量范围',
-                huanJingYaoQiu: '环境要求',
-                dianYuanYaoQiu: '电源要求',
+                chuChangRiQi: '出厂日期',
                 yanShouRiQi: '验收日期',
                 jieShouRiQi: '接收日期',
-                jieShouZhuangTai: '接收时状态（新设备/二手或翻新设备）',
                 qiYongRiQi: '投入日期',
-                shiFouXiaoZhun: '是否校准（是/否）',
                 yiXiaoRiQi: '已校日期',
                 xiaoZhunZQ: '检定/校准周期（以月为单位）',
                 xiaoZhunYouXia: '校准有效期至',
+                shiYongKeShi: '检定/校准单位',
+                ceLiangGongZuo: '测量/工作范围',
+                huanJingYaoQiu: '环境要求',
+                dianYuanYaoQiu: '电源要求',
+                jieShouZhuangTai: '接收时状态（新设备/二手或翻新设备）',
                 jianDingXiao: '检定/校准参数',
                 zuiDaYunCha: 'U/精确度/最大允差',
                 zhengShuBianHa: '证书编号',
                 xiuZhengZhiXiu: '修正值/修正因子',
-                // wenDuYingYong:'温度应用修正值',
-                // shiDuYingYong:'湿度应用修正值',
-                shiFouWeiHu: '是否维护（是/否）',
+                wenDuYingYong: '温度应用修正值',
+                shiDuYingYong: '湿度应用修正值',
                 biXuDeHuanJin: '核查人',
                 biXuSheShi: '核查日期',
-                weiHuFangShi: '设备分组',
                 heChaXiaoZhun: '使用年限（年）'
             },
             projectColums: {
@@ -620,14 +621,29 @@ export default {
                 '年保养': this.generateRule(12, `每年第`, `个月`),
                 '按需保养': ['/']
             },
-            stateList: { '停用': '停用', '报废': '报废', '合格': '合格' }
+            stateList: { '停用': '停用', '报废': '报废', '合格': '合格' },
+            hideSysDeviceNo: false,
+            tabList: {}
         }
     },
     async mounted () {
-        const stateList = await getSetting('device', 'stateList')
+        const { stateList, hideSysDeviceNo, tabList } = await getSetting('device')
         if (stateList) {
-            console.debug(stateList)
+            console.debug('stateList', stateList)
             this.stateList = stateList
+        }
+        if (hideSysDeviceNo) {
+            this.hideSysDeviceNo = hideSysDeviceNo
+            // 列表隐藏设备编号 将原设备编号改为设备编号
+            this.listConfig.columns = this.listConfig.columns.filter(i => i.prop !== 'sheBeiShiBieH')
+            this.listConfig.columns.find(i => i.prop === 'yuanSheBeiBian').label = '设备编号'
+            // 查询条件隐藏设备编号 将原设备编号改为设备编号
+            this.listConfig.searchForm.forms = this.listConfig.searchForm.forms.filter(i => i.slotName !== 'nowNumber')
+            this.listConfig.searchForm.forms.find(i => i.slotName === 'preNumber').label = '设备编号'
+        }
+        if (tabList) {
+            console.debug('tabList', tabList)
+            this.tabList = tabList
         }
         this.getDatas()
     },
@@ -959,7 +975,9 @@ export default {
         },
         async switchExportData (data) {
             const deviceGroupSql = `select id_,wei_hu_gang_wei_ from t_sbwhgwpzb` // 设备分组信息
+            const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb` // 供应商信息
             const { variables: { data: deviceGroupData }} = await this.$common.request('sql', deviceGroupSql)
+            const { variables: { data: gysData }} = await this.$common.request('sql', supplierSql)
             const exportData = JSON.parse(JSON.stringify(data))
             for (let i = 0; i < exportData.length; i++) {
                 const item = exportData[i]
@@ -967,6 +985,10 @@ export default {
                 item.guanLiRen = this.switchIdToUserName(item.guanLiRen.split(',')[0])
                 item.biXuDeHuanJin = this.switchIdToUserName(item.biXuDeHuanJin.split(',')[0])
                 item.weiHuFangShi = this.switchDeviceIdToName(item.weiHuFangShi, deviceGroupData)
+                item.shiYongKeShi = this.switchGYSIdToName(item.shiYongKeShi, gysData)
+                if (this.stateList[item.sheBeiZhuangTa]) {
+                    item.sheBeiZhuangTa = this.stateList[item.sheBeiZhuangTa]
+                }
             }
             return exportData
         },
@@ -976,6 +998,11 @@ export default {
             const valList = val?.split(',') || []
             valList.forEach(item => result.push((deviceGroupList?.find(i => i.id_ === item)?.wei_hu_gang_wei_) || ''))
             return result.join(',')
+        },
+        // 供应商id 转 供应商名称 检定/校准单位
+        switchGYSIdToName (val, gysList) {
+            const result = gysList.find(item => item.id_ === val)?.gong_ying_shang_m || ''
+            return result
         },
         // 部门id 转 部门名称
         switchIdToDept (id) {
@@ -1294,6 +1321,17 @@ export default {
                 } else {
                     element.shiFouQiJianH = ''
                 }
+
+                if (element.shiYongKeShi.trim()) {
+                    const supplier = supplierList.find(i => i.gong_ying_shang_m === element.shiYongKeShi.trim())
+                    if (supplier) {
+                        element.shiYongKeShi = supplier.id_
+                    } else {
+                        element.shiYongKeShi = ''
+                    }
+                } else {
+                    element.shiYongKeShi = ''
+                }
             })
         },
         /**
@@ -1363,7 +1401,11 @@ export default {
             let importData = this.switchDeviceObj(data, this.deviceColumns)
             importData.forEach(i => {
                 delete i.sheBeiShiBieH // 设备编号需自动生成
-                i.sheBeiZhuangTa = '合格'
+                // i.sheBeiZhuangTa = '合格'
+                const keyFound = Object.entries(this.stateList).find(([key, value]) => value === i.sheBeiZhuangTa)
+                if (keyFound) {
+                    i.sheBeiZhuangTa = keyFound[0]
+                }
             })
             const currentPosition = this.level
             const { userList = [], deptList = [] } = this.$store.getters || {}
