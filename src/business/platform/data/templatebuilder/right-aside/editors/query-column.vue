@@ -11,6 +11,9 @@
         <el-form-item label="显示名称" prop="label">
             <el-input v-model="formData.label" placeholder="显示名称" />
         </el-form-item>
+        <el-form-item label="字段标识" prop="name">
+            <el-input v-model="formData.name" placeholder="字段标识" readonly disabled />
+        </el-form-item>
         <template v-if="datasetType === 'thirdparty'">
             <!-- <el-form-item label="参数类型">
                 <el-select v-model="formData.paramType" placeholder="">

@@ -11,12 +11,10 @@
         <el-form-item label="显示名称" prop="label">
             <el-input v-model="formData.label" placeholder="显示名称" />
         </el-form-item>
-        <!-- 默认显示标识 -->
-        <template v-if="1 || datasetType === 'thirdparty'">
-            <el-form-item label="标识（name）" prop="name">
-                <el-input v-model="formData.name" placeholder="标识（name）" readonly />
-            </el-form-item>
-        </template>
+        <!-- 默认显示字段标识 原显示条件: v-if="datasetType === 'thirdparty'"-->
+        <el-form-item label="字段标识" prop="name">
+            <el-input v-model="formData.name" placeholder="字段标识" readonly disabled />
+        </el-form-item>
         <el-form-item label="权限" prop="rights">
             <rights-selector v-model="formData.rights" />
         </el-form-item>
