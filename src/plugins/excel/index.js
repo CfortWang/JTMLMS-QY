@@ -1,7 +1,7 @@
 import papa from 'papaparse'
 import ExcelJS from 'exceljs'
 
-const ibpsExcelImport = {
+const ibpsExcel = {
     // 导入 CSV（保持原逻辑不变）
     csv (file) {
         return new Promise((resolve, reject) => {
@@ -132,4 +132,4 @@ const ibpsExcelImport = {
     }
 }
 
-export default ibpsExcelImport
+export default ibpsExcel
