@@ -33,7 +33,7 @@ export const preview = (tableForm, url) => {
                     'custom-class': 'ibps-dialog-91 btn-cover'
                 },
             },
-            async (tpl) => {
+            (tpl) => {
                 tableForm.dialogTemplate = tpl
                 const hasHighRole = localStorage.getItem('hasHighRole')
                 if (hasHighRole === 1) {
@@ -43,7 +43,7 @@ export const preview = (tableForm, url) => {
                     const toolbarCover = document.createElement('div')
                     toolbarCover.classList.add('toolbar-cover')
                     toolbarCover.addEventListener('click', () => {
-                        confirm('无权操作，请联系管理员开放相关权限！', '提示')
+                        confirm('无权操作，请联系系统管理员！', '提示')
                     })
                     document.querySelector('.btn-cover').children[1].appendChild(toolbarCover)
                 }, 1000)
