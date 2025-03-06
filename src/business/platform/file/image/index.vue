@@ -304,6 +304,10 @@ export default {
             this.cacheData[v[this.valueKey]] = v
         },
         setRealFileList (v) {
+            if (this.realFileList.some(item => item[this.valueKey] === v)) {
+                // 已存在，不重复添加
+                return
+            }
             this.realFileList.push(this.cacheData[v])
         },
         /**
@@ -483,9 +487,11 @@ export default {
         },
         // 下载
         onDownloadImage (index) {
-            this.setRealFileList(this.fileList[index][this.valueKey])
+            const value = this.fileList[index][this.valueKey]
+            this.setRealFileList(value)
+            const file = this.realFileList.find(item => item.id === value)
             this.$nextTick(() => {
-                downloadFile(this.realFileList[index])
+                downloadFile(file)
             })
         },
         // 图片上传数量限制
