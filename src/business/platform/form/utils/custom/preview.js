@@ -3,7 +3,6 @@ import Pdfh5 from 'pdfh5'
 import 'pdfh5/css/pdfh5.css'
 import { snapshoot, download } from '@/api/platform/file/attachment' // 印章，快照
 import ActionUtils from '@/utils/action'
-import store from '@/store'
 
 export const preview = (tableForm, url) => {
     let isMobile = false
@@ -34,12 +33,10 @@ export const preview = (tableForm, url) => {
                     'custom-class': 'ibps-dialog-91 btn-cover'
                 },
             },
-            (tpl) => {
+            async (tpl) => {
                 tableForm.dialogTemplate = tpl
-                const { role } = store.getters.userInfo || {}
-                // 系统管理角色、检验科主任、检验科副主任、文件管理员、技术负责人、质量负责人可下载打印
-                const hasRole = role.some(item => ['xtgljs', 'syszr', 'jykfzr', 'wjgly', 'jsfzr', 'zlfzr', 'jyy'].includes(item.alias))
-                if (1 || hasRole) {
+                const hasHighRole = localStorage.getItem('hasHighRole')
+                if (hasHighRole === 1) {
                     return
                 }
                 setTimeout(() => {
