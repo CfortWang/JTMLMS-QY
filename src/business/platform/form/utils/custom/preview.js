@@ -35,8 +35,8 @@ export const preview = (tableForm, url) => {
             },
             (tpl) => {
                 tableForm.dialogTemplate = tpl
-                const hasHighRole = localStorage.getItem('hasHighRole')
-                if (hasHighRole === 1) {
+                const hasHighRole = localStorage.getItem('hasHighRole') === '1'
+                if (hasHighRole) {
                     return
                 }
                 setTimeout(() => {

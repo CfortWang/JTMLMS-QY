@@ -368,8 +368,8 @@ export default {
         const curRole = this.role.map((i) => i.alias)
         const isPower = curRole.some((item) => roleKey.includes(item))
         this.deleteShow = !!(isPower || this.isPower)
-        const hasRole = localStorage.getItem('hasHighRole') || 0
-        if (this.isSuper || hasRole == 1) {
+        const hasRole = localStorage.getItem('hasHighRole') === '1'
+        if (this.isSuper || hasRole) {
             this.updateShow = true
         }
     },
@@ -628,11 +628,11 @@ export default {
         //     this.innerVisible = val
         // },
         updateFile () {
-            const hasRole = localStorage.getItem('hasHighRole') || 0
+            const hasRole = localStorage.getItem('hasHighRole') === '1'
             // const roleKey = ['xtgljs', 'wjglzzc', 'wjgly', 'zhsfzr']
             // const curRole = this.role.map(i => i.alias)
             // const isPower = curRole.some(i => roleKey.includes(i))
-            if (this.isSuper || hasRole == 1) {
+            if (this.isSuper || hasRole) {
                 const a = document.createElement('a')
                 a.href = this.optionFile.url
                 a.download = this.optionFile.data.fileName
