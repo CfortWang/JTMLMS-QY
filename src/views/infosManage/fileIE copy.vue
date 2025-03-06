@@ -156,9 +156,8 @@ export default {
     },
     mixins: [FixHeight],
     data () {
-        const roleList = ['xtgljs', 'syszr', 'wjglzzc', 'wjgly', 'wjxzjs']
         const { isSuper, role, deptList = [] } = this.$store.getters || {}
-        const hasRole = isSuper || role.some(r => roleList.includes(r.alias))
+        const hasRole = localStorage.getItem('hasHighRole') === '1'
         const depArrs = deptList.map(i => `wj.bian_zhi_bu_men_ like '${i.positionId}'`)
         return {
             isSuper,
