@@ -57,7 +57,7 @@
 
 <script>
 import { queryPageList, deleteFile } from '@/api/platform/file/attachment'
-import { downloadFile } from '@/business/platform/file/utils'
+import { downloadFile, downloadFileByZip } from '@/business/platform/file/utils'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import IbpsUploader from '@/business/platform/file/uploader'
@@ -124,6 +124,11 @@ export default {
                         key: 'upLoad',
                         label: '上传',
                         icon: 'ibps-icon-upload'
+                    },
+                    {
+                        key: 'downloadZip',
+                        label: '批量下载',
+                        icon: 'ibps-icon-download'
                     },
                     {
                         key: 'remove'
@@ -294,6 +299,11 @@ export default {
                     break
                 case 'download': // 下载
                     this.handleDownload(data)
+                    break
+                case 'downloadZip': // 批量下载
+                    ActionUtils.selectedMultiRecord(selection).then((id) => {
+                        downloadFileByZip(id)
+                    })
                     break
                 case 'remove': // 删除
                     ActionUtils.removeRecord(selection).then((ids) => {

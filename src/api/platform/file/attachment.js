@@ -111,6 +111,19 @@ export function download (params) {
     })
 }
 /**
+ * 打包下载文件
+ * @param {*} params
+ */
+export function downloadZip (params) {
+    return request({
+        url: SYSTEM_URL() + '/file/downloadZip',
+        method: 'get',
+        isLoading: true,
+        responseType: 'arraybuffer',
+        params: params
+    })
+}
+/**
  * 根据文件id获取文件流
  * @param {*} params
  */
@@ -196,3 +209,4 @@ export function snapshoot (params) {
         params: params
     })
 }
+
