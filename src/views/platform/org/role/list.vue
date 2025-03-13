@@ -152,7 +152,10 @@ export default {
                     }, {
                         key: 'assignResource',
                         label: '资源分配',
-                        icon: 'ibps-icon-dashboard'
+                        icon: 'ibps-icon-dashboard',
+                        hidden () {
+                            return !isSuper
+                        }
                     }, {
                         key: 'appAssignResource',
                         label: 'App资源分配',
