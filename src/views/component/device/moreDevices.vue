@@ -1,6 +1,6 @@
 <template>
     <div class="table">
-        <div class="button">
+        <div v-if="!readonly" class="button">
             <el-button size="mini" icon="el-icon-plus" type="success" @click="goAdd">添加</el-button>
             <el-button size="mini" icon="el-icon-close" type="danger" @click="goDelete">删除</el-button>
         </div>
@@ -65,6 +65,10 @@ export default {
         listData: {
             type: Array,
             default: () => []
+        },
+        readonly: {
+            type: Boolean,
+            default: false
         }
     },
     data () {

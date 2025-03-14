@@ -180,6 +180,7 @@ export default {
         },
         // 初始化数据
         initData (data) {
+            data = data.replace(/\n/g, '')
             const ans = JSON.parse(data)
             const result = []
             if (this.isFirst) {

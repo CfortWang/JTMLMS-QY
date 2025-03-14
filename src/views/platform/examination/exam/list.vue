@@ -40,6 +40,9 @@
             <template slot="randWay" slot-scope="{row}">
                 <div>{{ row.isRand==='1' ?['未知','题型','难度'][+row.randWay]:'/' }}</div>
             </template>
+            <template slot="examTime" slot-scope="{row}">
+                <div>{{ transformTime(row.duration) }}</div>
+            </template>
         </ibps-crud>
         <exam-edit
             v-if="showEditDialog"
@@ -288,7 +291,7 @@ export default {
                                 bankName: item.bankName,
                                 examinee: item.examinee,
                                 questionCount: item.isRand === '1' ? parseFloat(item.randTotal) : parseFloat(item.questionCount),
-                                duration: this.transformTime(item.duration),
+                                duration: item.duration,
                                 limitCount: item.limitCount,
                                 limitDate: item.limitDate,
                                 qualifiedRadio: item.qualifiedRadio,

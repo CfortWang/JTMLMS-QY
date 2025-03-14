@@ -1366,7 +1366,7 @@ export default {
             display: none;
         }
         .el-dialog__body {
-            overflow: hidden;
+           // overflow: hidden;
         }
     }
     .edit-dialog-header {

@@ -94,7 +94,7 @@
                         slot="customButton"
                         slot-scope="{row}"
                     >
-                        <el-button type="text" icon="el-icon-edit-outline" @click="goEdit(row)">修改</el-button>
+                        <el-button type="text" :icon="hasRole?'el-icon-edit-outline':'ibps-icon-eye'" @click="goEdit(row)">{{ hasRole?'修改':'查阅' }}</el-button>
                         <!-- <el-button type="text" icon="el-icon-view" @click="goLook(row)">查阅</el-button> -->
                         <el-button type="text" icon="ibps-icon-table" @click="goLookForm(row)">表单</el-button>
 
@@ -309,7 +309,15 @@
                 </ibps-crud>
             </template>
         </ibps-container>
-        <DeviceDialog v-if="deviceDialogShow" :params="params" :state-list="stateList" :tab-list="tabList" :hide-sys-device-no="hideSysDeviceNo" @close="close" />
+        <DeviceDialog
+            v-if="deviceDialogShow"
+            :params="params"
+            :state-list="stateList"
+            :tab-list="tabList"
+            :hide-sys-device-no="hideSysDeviceNo"
+            :readonly="!hasRole"
+            @close="close"
+        />
         <input id="" ref="file1" type="file" name="" accept=".xlsx,.xls" @change="handleUploadChange1">
         <input id="" ref="file2" type="file" name="" accept=".xlsx,.xls" @change="handleUploadChange2">
 
@@ -349,6 +357,7 @@ import image02 from '@/assets/images/device/02.png'
 import image03 from '@/assets/images/device/03.png'
 import image04 from '@/assets/images/device/04.png'
 import { getImage } from '@/api/platform/file/attachment'
+import { download } from '@/api/platform/file/attachment'
 
 import xlsx from 'xlsx'
 import fs from 'file-saver'
@@ -464,8 +473,8 @@ export default {
                     { key: 'customPrint', label: '打印标签', icon: 'ibps-icon-cog', type: 'warning' },
                     { key: 'customExport', label: '导出数据', icon: 'ibps-icon-sign-in', type: 'primary' },
                     { key: 'customImport', label: '导入数据', icon: 'ibps-icon-sign-in', type: 'primary' },
-                    { key: 'customSetting', label: '设置分组配置', icon: 'ibps-icon-cogs', type: 'info' },
-                    { key: 'customRemove', label: '删除', icon: 'ibps-icon-close', type: 'danger' }
+                    { key: 'customSetting', label: '岗位/分组配置', icon: 'ibps-icon-cogs', type: 'info' },
+                    { key: 'customRemove', label: '删除', icon: 'ibps-icon-close', type: 'danger', hidden: () => { return !this.hasRole } }
                 ],
                 // 查询条件
                 searchForm: {
@@ -479,7 +488,7 @@ export default {
                         { prop: '', label: '设备状态', fieldType: 'slot', slotName: 'deviceStatus' },
                         { prop: '', label: '放置地点', fieldType: 'slot', slotName: 'place' },
                         { prop: '', label: '管理人', fieldType: 'slot', slotName: 'managePeople' },
-                        { prop: '', label: '设备分组', fieldType: 'slot', slotName: 'deviceClass' }
+                        { prop: '', label: '岗位/分组', fieldType: 'slot', slotName: 'deviceClass' }
 
                     ]
                 },
@@ -495,7 +504,7 @@ export default {
                     { prop: 'guiGeXingHao', label: '规格型号', sortable: true },
                     { prop: 'sheBeiZhuangTa', label: '设备状态', sortable: true, slotName: 'deviceStateSlot' },
                     { prop: 'guanLiRen', label: '保管人', slotName: 'userSlot', sortable: true },
-                    { prop: 'weiHuFangShi', label: '设备分组', slotName: 'deviceSlot', sortable: true },
+                    { prop: 'weiHuFangShi', label: '岗位/分组', slotName: 'deviceSlot', sortable: true },
                     { prop: 'cunFangWeiZhi', label: '放置地点', slotName: 'placeSlot', sortable: true },
                     { prop: '', label: '操作', width: 130, slotName: 'customButton' }
                 ]
@@ -515,16 +524,18 @@ export default {
                 sheBeiLeiXing: '设备类型（检验系统/通用设备/软件/信息系统）',
                 shiFouWeiHu: '是否维护（是/否）',
                 shiFouXiaoZhun: '是否校准（是/否）',
-                weiHuFangShi: '设备分组',
+                weiHuFangShi: '岗位/分组',
                 guiGeXingHao: '规格型号',
                 cunFangDiDian: '存放地点（格式：房间号+空格+房间名）',
                 guanLiRen: '保管人',
                 ziChanBianHao: '资产编号',
+                ziChanYuanZhi: '资产原值(元)',
                 gongYingShang: '供应商',
                 lianXiFangShi: '联系方式',
                 changShang: '厂商',
                 jiShenXuHao: '机身序号',
                 zhuCeZhengHao: '注册证号',
+                heChaXiaoZhun: '使用年限（年）',
                 chuChangRiQi: '出厂日期',
                 yanShouRiQi: '验收日期',
                 jieShouRiQi: '接收日期',
@@ -542,19 +553,18 @@ export default {
                 zhengShuBianHa: '证书编号',
                 xiuZhengZhiXiu: '修正值/修正因子',
                 wenDuYingYong: '温度应用修正值',
-                shiDuYingYong: '湿度应用修正值',
-                biXuDeHuanJin: '核查人',
-                biXuSheShi: '核查日期',
-                heChaXiaoZhun: '使用年限（年）'
+                shiDuYingYong: '湿度应用修正值'
+                // biXuDeHuanJin: '核查人',
+                // biXuSheShi: '核查日期',
             },
             projectColums: {
-                yuanSheBeiBian: '设备编号*',
+                yuanSheBeiBian: '原设备编号*',
                 sheBeiMingCheng: '设备名称*',
                 weiHuLeiXing: '维护类型*(日保养/周保养/月保养/季度保养/半年保养/年保养/按需保养)',
                 weiHuRiQi: '维护日期*',
                 weiHuXiangMuC: '维护项目*'
             },
-            dateFieldRange: ['chuChangRiQi', 'yanShouRiQi', 'jieShouRiQi', 'qiYongRiQi', 'yiXiaoRiQi', 'xiaoZhunYouXia', 'biXuSheShi'],
+            dateFieldRange: ['chuChangRiQi', 'yanShouRiQi', 'jieShouRiQi', 'qiYongRiQi', 'yiXiaoRiQi', 'xiaoZhunYouXia'],
             requiredFieldMap: {
                 bianZhiBuMen: '部门',
                 sheBeiMingCheng: '设备名称',
@@ -570,8 +580,8 @@ export default {
                 'jieShouRiQi': '接收日期',
                 'qiYongRiQi': '投入日期',
                 'yiXiaoRiQi': '已校日期',
-                'xiaoZhunYouXia': '校准有效期至',
-                'biXuSheShi': '核查日期'
+                'xiaoZhunYouXia': '校准有效期至'
+                // 'biXuSheShi': '核查日期'
             },
             validationRules: {
                 '设备状态': {
@@ -597,7 +607,8 @@ export default {
             },
             numberFieldsMap: {
                 'xiaoZhunZQ': '检定/校准周期（以月为单位）',
-                'heChaXiaoZhun': '使用年限（年）'
+                'heChaXiaoZhun': '使用年限（年）',
+                'ziChanYuanZhi': '资产原值(元)'
             },
             maintenanceRequiredFieldMap: {
                 yuanSheBeiBian: '原设备编号',
@@ -623,11 +634,17 @@ export default {
             },
             stateList: { '停用': '停用', '报废': '报废', '合格': '合格' },
             hideSysDeviceNo: false,
-            tabList: {}
+            tabList: {},
+            hasRole: true
         }
     },
     async mounted () {
-        const { stateList, hideSysDeviceNo, tabList } = await getSetting('device')
+        const { stateList, hideSysDeviceNo, tabList, hasDeviceRole } = await getSetting('device') || {}
+        if (hasDeviceRole) {
+            console.debug('hasDeviceRole', hasDeviceRole)
+            const { role, isSuper } = this.$store.getters || {}
+            this.hasRole = isSuper || role.some(r => hasDeviceRole.includes(r.alias))
+        }
         if (stateList) {
             console.debug('stateList', stateList)
             this.stateList = stateList
@@ -732,7 +749,7 @@ export default {
                 })
                 parameters.parameters.push(obj)
             }
-            // 设备分组搜索(可多选)
+            // 岗位/分组搜索(可多选)
             if (this.search.deviceClass) {
                 const obj = { relation: 'OR', parameters: [] }
                 this.search.deviceClass.split(',').forEach(item => {
@@ -858,6 +875,7 @@ export default {
             this.customDialogVisible = true
         },
         handleCustomRemove (selection) {
+            if (!this.hasRole) return
             console.log('selection', selection)
             if (!selection || selection.length === 0) {
                 return this.$message.warning('请选择要删除的数据！')
@@ -974,7 +992,7 @@ export default {
             }
         },
         async switchExportData (data) {
-            const deviceGroupSql = `select id_,wei_hu_gang_wei_ from t_sbwhgwpzb` // 设备分组信息
+            const deviceGroupSql = `select id_,wei_hu_gang_wei_ from t_sbwhgwpzb` // 岗位/分组信息
             const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb` // 供应商信息
             const { variables: { data: deviceGroupData }} = await this.$common.request('sql', deviceGroupSql)
             const { variables: { data: gysData }} = await this.$common.request('sql', supplierSql)
@@ -983,7 +1001,7 @@ export default {
                 const item = exportData[i]
                 item.bianZhiBuMen = this.switchIdToDept(item.bianZhiBuMen.split(',')[0])
                 item.guanLiRen = this.switchIdToUserName(item.guanLiRen.split(',')[0])
-                item.biXuDeHuanJin = this.switchIdToUserName(item.biXuDeHuanJin.split(',')[0])
+                // item.biXuDeHuanJin = this.switchIdToUserName(item.biXuDeHuanJin.split(',')[0])
                 item.weiHuFangShi = this.switchDeviceIdToName(item.weiHuFangShi, deviceGroupData)
                 item.shiYongKeShi = this.switchGYSIdToName(item.shiYongKeShi, gysData)
                 if (this.stateList[item.sheBeiZhuangTa]) {
@@ -992,7 +1010,7 @@ export default {
             }
             return exportData
         },
-        // 设备分组id 转 设备分组名称
+        // 岗位/分组id 转 岗位/分组名称
         switchDeviceIdToName (val, deviceGroupList) {
             const result = []
             const valList = val?.split(',') || []
@@ -1042,8 +1060,25 @@ export default {
                 const sql = `select b.yuan_she_bei_bian as yuanSheBeiBian,b.she_bei_ming_cheng_ as sheBeiMingCheng,a.parent_id_,a.wei_hu_xiang_mu_c as weiHuXiangMuC,a.wei_hu_ri_qi_ as weiHuRiQi,a.wei_hu_lei_xing_ as weiHuLeiXing,a.ri_qi_shu_zi_ as riQiShuZi from t_whzqjxm a,t_sbdj b where a.parent_id_=b.id_ and a.parent_id_ in (${selection.map(i => `'${i}'`).join(',')})`
                 const { variables: { data }} = await this.$common.request('sql', sql)
                 exportData = data
+                this.xlsx(exportData, this.projectColums, '设备维护项目数据' + this.getTimeStamp())
+            } else {
+                const attachmentId = 'device_maintainProject'
+                const res = await download({ attachmentId })
+                // 判断 ArrayBuffer 的大小，主要用于兼容没有文件的情况
+                if (res.data?.byteLength === 0) {
+                    this.xlsx([], this.projectColums, '设备维护项目模板' + this.getTimeStamp())
+                } else {
+                    // const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+                    const a = document.createElement('a')
+                    a.style.display = 'none'
+                    // a.href = URL.createObjectURL(blob)
+                    a.href = res.request.responseURL
+                    // a.download = '设备维护项目导入模板'
+                    document.body.appendChild(a)
+                    a.click()
+                    document.body.removeChild(a)
+                }
             }
-            this.xlsx(exportData, this.projectColums, '设备维护项目数据' + this.getTimeStamp())
             this.$message.success('导出维护项目成功！')
         },
         // value 转 key
@@ -1370,17 +1405,17 @@ export default {
                     element.guanLiRen = ''
                 }
                 // 处理核查人
-                if (element.biXuDeHuanJin !== '') {
-                    const checkPerson = employeeList.find(i => i.userName === element.biXuDeHuanJin.trim())
-                    if (checkPerson) {
-                        const checkPersonId = checkPerson.userId
-                        element.biXuDeHuanJin = checkPersonId
-                    } else {
-                        element.biXuDeHuanJin = ''
-                    }
-                } else {
-                    element.biXuDeHuanJin = ''
-                }
+                // if (element.biXuDeHuanJin !== '') {
+                //     const checkPerson = employeeList.find(i => i.userName === element.biXuDeHuanJin.trim())
+                //     if (checkPerson) {
+                //         const checkPersonId = checkPerson.userId
+                //         element.biXuDeHuanJin = checkPersonId
+                //     } else {
+                //         element.biXuDeHuanJin = ''
+                //     }
+                // } else {
+                //     element.biXuDeHuanJin = ''
+                // }
             })
         },
         handleDeviceGroupInfo (list, deviceGroupList) {
@@ -1398,7 +1433,7 @@ export default {
             const workBook = xlsx.read(dataBinary, { type: 'binary', cellDates: true })
             const workSheet = workBook.Sheets[workBook.SheetNames[0]]
             const data = xlsx.utils.sheet_to_json(workSheet)
-            let importData = this.switchDeviceObj(data, this.deviceColumns)
+            let importData = this.switchDeviceObj(data, { ...this.deviceColumns, t: '设备分组' }) // 这个t用于兼容老版本的模板
             importData.forEach(i => {
                 delete i.sheBeiShiBieH // 设备编号需自动生成
                 // i.sheBeiZhuangTa = '合格'
@@ -1407,11 +1442,22 @@ export default {
                     i.sheBeiZhuangTa = keyFound[0]
                 }
             })
+            const isNewVersion = importData.some(i => i.weiHuFangShi) // 判断是否是最新模板
+            if (isNewVersion) { // 使用岗位/分组
+                importData.forEach(i => {
+                    delete i.t
+                })
+            } else { // 使用设备分组
+                importData.forEach(i => {
+                    i.weiHuFangShi = i.t
+                    delete i.t
+                })
+            }
             const currentPosition = this.level
             const { userList = [], deptList = [] } = this.$store.getters || {}
             const positionSql = `select id_,fang_jian_ming_ha from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息
             const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb where di_dian_ = ${currentPosition}` // 供应商信息
-            const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 设备分组信息
+            const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 岗位/分组信息
             const currentTime = dayjs().format('YYYY-MM-DD HH:mm')
             const currentApartment = this.$store.getters.userInfo.employee.positions
             const currentUser = this.userId
@@ -1561,7 +1607,7 @@ export default {
             const { userList = [], deptList = [] } = this.$store.getters || {}
             const positionSql = `select id_,fang_jian_ming_ha from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息
             const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb where di_dian_ = ${currentPosition}` // 供应商信息
-            const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 设备分组信息
+            const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 岗位/分组信息
             const currentTime = dayjs().format('YYYY-MM-DD HH:mm')
             const currentApartment = this.$store.getters.userInfo.employee.positions
             const currentUser = this.userId

@@ -30,7 +30,7 @@
                                                 v-model="form.sheBeiMingChen"
                                                 size="mini"
                                                 template-key="sbysdhk"
-                                                :disabled="false"
+                                                :disabled="readonly"
                                                 type="dialog"
                                                 class="custom-dialog"
                                                 placeholder="请选择"
@@ -45,7 +45,8 @@
                                             <template slot="label">
                                                 <span class="required">设备名称：</span>
                                             </template>
-                                            <el-input v-model="form.sheBeiMingCheng" size="mini" />
+                                            <el-input v-if="!readonly" v-model="form.sheBeiMingCheng" size="mini" />
+                                            <span v-else>{{ form.sheBeiMingCheng ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -59,7 +60,7 @@
                                                 v-model="form.bianZhiBuMen"
                                                 type="position"
                                                 readonly-text="text"
-                                                :disabled="false"
+                                                :disabled="readonly"
                                                 :multiple="false"
                                                 size="mini"
                                                 :filter="filter"
@@ -89,6 +90,7 @@
                                                 <span class="required">建档时间：</span>
                                             </template>
                                             <el-date-picker
+                                                v-if="!readonly"
                                                 v-model="form.bianZhiShiJian"
                                                 style="width:100%"
                                                 type="datetime"
@@ -98,6 +100,7 @@
                                                 value-format="yyyy-MM-dd HH:mm"
                                                 size="mini"
                                             />
+                                            <span v-else>{{ form.bianZhiShiJian ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -118,19 +121,20 @@
                                             <template slot="label">
                                                 <span class="required">{{ hideSysDeviceNo?'设备编号':'原设备编号' }}：</span>
                                             </template>
-                                            <el-input v-model="form.yuanSheBeiBian" size="mini" />
+                                            <el-input v-if="!readonly" v-model="form.yuanSheBeiBian" size="mini" />
+                                            <span v-else>{{ form.yuanSheBeiBian ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="设备状态：" prop="sheBeiZhuangTa">
-                                            <span>{{ showState }}</span>
+                                            <span>{{ showState ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
                                 <el-row :gutter="20">
                                     <el-col :span="8">
                                         <el-form-item label="设备类型：" prop="sheBeiLeiXing">
-                                            <el-select v-model="form.sheBeiLeiXing" placeholder="请选择" size="mini" style="width:100%">
+                                            <el-select v-if="!readonly" v-model="form.sheBeiLeiXing" placeholder="请选择" size="mini" style="width:100%">
                                                 <el-option
                                                     v-for="item in ['检验系统','通用设备','软件','信息系统']"
                                                     :key="item"
@@ -138,6 +142,7 @@
                                                     :value="item"
                                                 />
                                             </el-select>
+                                            <span v-else>{{ form.sheBeiLeiXing ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
@@ -145,7 +150,8 @@
                                             <template slot="label">
                                                 <span class="required">规格型号：</span>
                                             </template>
-                                            <el-input v-model="form.guiGeXingHao" size="mini" />
+                                            <el-input v-if="!readonly" v-model="form.guiGeXingHao" size="mini" />
+                                            <span v-else>{{ form.guiGeXingHao ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
@@ -153,7 +159,7 @@
                                             <template slot="label">
                                                 <span class="required">接收时状态：</span>
                                             </template>
-                                            <el-select v-model="form.jieShouZhuangTai" placeholder="请选择" size="mini" style="width:100%">
+                                            <el-select v-if="!readonly" v-model="form.jieShouZhuangTai" placeholder="请选择" size="mini" style="width:100%">
                                                 <el-option
                                                     v-for="item in ['新设备','二手或翻新设备']"
                                                     :key="item"
@@ -161,6 +167,7 @@
                                                     :value="item"
                                                 />
                                             </el-select>
+                                            <span v-else>{{ form.jieShouZhuangTai ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -174,7 +181,7 @@
                                                 v-model="form.guanLiRen"
                                                 type="user"
                                                 readonly-text="text"
-                                                :disabled="false"
+                                                :disabled="readonly"
                                                 :multiple="false"
                                                 size="mini"
                                                 :filter="filter"
@@ -192,7 +199,7 @@
                                                 v-model="form.cunFangWeiZhi"
                                                 size="mini"
                                                 template-key="fjxzkdd"
-                                                :disabled="false"
+                                                :disabled="readonly"
                                                 type="dialog"
                                                 class="custom-dialog"
                                                 placeholder="请选择"
@@ -203,7 +210,8 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="固定资产号：">
-                                            <el-input v-model="form.ziChanBianHao" size="mini" />
+                                            <el-input v-if="!readonly" v-model="form.ziChanBianHao" size="mini" />
+                                            <span v-else>{{ form.ziChanBianHao ||'/' }}</span>
                                         </el-form-item>
 
                                     </el-col>
@@ -211,7 +219,8 @@
                                 <el-row :gutter="20">
                                     <el-col :span="8">
                                         <el-form-item label="厂家/品牌：">
-                                            <el-input v-model="form.changShang" size="mini" />
+                                            <el-input v-if="!readonly" v-model="form.changShang" size="mini" />
+                                            <span v-else>{{ form.changShang ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
@@ -220,6 +229,7 @@
                                                 <span class="required">出厂日期</span>
                                             </template>
                                             <el-date-picker
+                                                v-if="!readonly"
                                                 v-model="form.chuChangRiQi"
                                                 style="width:100%"
                                                 type="date"
@@ -228,11 +238,13 @@
                                                 value-format="yyyy-MM-dd"
                                                 size="mini"
                                             />
+                                            <span v-else>{{ form.chuChangRiQi ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="出厂编号：">
-                                            <el-input v-model="form.jiShenXuHao" size="mini" />
+                                            <el-input v-if="!readonly" v-model="form.jiShenXuHao" size="mini" />
+                                            <span v-else>{{ form.jiShenXuHao ||'/' }}</span>
                                         </el-form-item>
 
                                     </el-col>
@@ -244,7 +256,7 @@
                                                 v-model="form.shiFouQiJianH"
                                                 size="mini"
                                                 template-key="gysxxdhk"
-                                                :disabled="false"
+                                                :disabled="readonly"
                                                 type="dialog"
                                                 class="custom-dialog"
                                                 placeholder="请选择"
@@ -256,12 +268,14 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="供应商电话：">
-                                            <el-input v-model="form.lianXiFangShi" size="mini" />
+                                            <el-input v-if="!readonly" v-model="form.lianXiFangShi" size="mini" />
+                                            <span v-else>{{ form.lianXiFangShi ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="注册证号：">
-                                            <el-input v-model="form.zhuCeZhengHao" size="mini" />
+                                            <el-input v-if="!readonly" v-model="form.zhuCeZhengHao" size="mini" />
+                                            <span v-else>{{ form.zhuCeZhengHao ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -304,6 +318,7 @@
                                                     <el-col>
                                                         <el-form-item label="购进日期：">
                                                             <el-date-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.gouJinRiQi"
                                                                 style="width:100%"
                                                                 type="date"
@@ -312,6 +327,7 @@
                                                                 value-format="yyyy-MM-dd"
                                                                 size="mini"
                                                             />
+                                                            <span v-else>{{ form.gouJinRiQi ||'/' }}</span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -319,6 +335,7 @@
                                                     <el-col>
                                                         <el-form-item label="接收日期：">
                                                             <el-date-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.jieShouRiQi"
                                                                 style="width:100%"
                                                                 type="date"
@@ -327,6 +344,7 @@
                                                                 value-format="yyyy-MM-dd"
                                                                 size="mini"
                                                             />
+                                                            <span v-else>{{ form.jieShouRiQi ||'/' }}</span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -334,6 +352,7 @@
                                                     <el-col>
                                                         <el-form-item label="验收日期：">
                                                             <el-date-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.yanShouRiQi"
                                                                 style="width:100%"
                                                                 type="date"
@@ -342,6 +361,7 @@
                                                                 value-format="yyyy-MM-dd"
                                                                 size="mini"
                                                             />
+                                                            <span v-else>{{ form.yanShouRiQi ||'/' }}</span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -349,6 +369,7 @@
                                                     <el-col>
                                                         <el-form-item label="投入日期：">
                                                             <el-date-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.qiYongRiQi"
                                                                 style="width:100%"
                                                                 type="date"
@@ -357,6 +378,7 @@
                                                                 value-format="yyyy-MM-dd"
                                                                 size="mini"
                                                             />
+                                                            <span v-else>{{ form.qiYongRiQi ||'/' }}</span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -364,6 +386,7 @@
                                                     <el-col>
                                                         <el-form-item label="核查日期：">
                                                             <el-date-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.biXuSheShi"
                                                                 style="width:100%"
                                                                 type="date"
@@ -372,6 +395,7 @@
                                                                 value-format="yyyy-MM-dd"
                                                                 size="mini"
                                                             />
+                                                            <span v-else>{{ form.biXuSheShi ||'/' }}</span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -382,7 +406,7 @@
                                                                 v-model="form.biXuDeHuanJin"
                                                                 type="user"
                                                                 readonly-text="text"
-                                                                :disabled="false"
+                                                                :disabled="readonly"
                                                                 :multiple="false"
                                                                 size="mini"
                                                                 style="width:100%"
@@ -395,28 +419,35 @@
                                                 <el-row>
                                                     <el-col>
                                                         <el-form-item label="电源要求：">
-                                                            <el-input v-model="form.dianYuanYaoQiu" size="mini" />
+                                                            <el-input v-if="!readonly" v-model="form.dianYuanYaoQiu" size="mini" />
+                                                            <span v-else>{{ form.dianYuanYaoQiu ||'/' }}</span>
+
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row>
                                                     <el-col>
                                                         <el-form-item label="环境要求：">
-                                                            <el-input v-model="form.huanJingYaoQiu" size="mini" />
+                                                            <el-input v-if="!readonly" v-model="form.huanJingYaoQiu" size="mini" />
+                                                            <span v-else>{{ form.huanJingYaoQiu ||'/' }}</span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row>
                                                     <el-col>
                                                         <el-form-item label="使用年限(年)：">
-                                                            <el-input v-model="form.heChaXiaoZhun" size="mini" type="number" />
+                                                            <el-input v-if="!readonly" v-model="form.heChaXiaoZhun" size="mini" type="number" />
+                                                            <span v-else>{{ form.heChaXiaoZhun ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row>
                                                     <el-col>
                                                         <el-form-item label="资产原值(元)：">
-                                                            <el-input v-model="form.ziChanYuanZhi" size="mini" type="number" />
+                                                            <el-input v-if="!readonly" v-model="form.ziChanYuanZhi" size="mini" type="number" />
+                                                            <span v-else>{{ form.ziChanYuanZhi ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -426,7 +457,7 @@
                                                 <el-row>
                                                     <el-col>
                                                         <el-form-item label="是否维护：">
-                                                            <el-select v-model="form.shiFouWeiHu" placeholder="请选择" size="mini" style="width:100%">
+                                                            <el-select v-if="!readonly" v-model="form.shiFouWeiHu" placeholder="请选择" size="mini" style="width:100%">
                                                                 <el-option
                                                                     v-for="item in ['是','否']"
                                                                     :key="item"
@@ -434,18 +465,20 @@
                                                                     :value="item"
                                                                 />
                                                             </el-select>
+                                                            <span v-else>{{ form.shiFouWeiHu ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row>
                                                     <el-col>
-                                                        <el-form-item label="设备分组：">
+                                                        <el-form-item label="岗位/分组：">
                                                             <ibps-custom-dialog
                                                                 v-model="form.weiHuFangShi"
                                                                 size="mini"
                                                                 template-key="sbbqdhk"
                                                                 multiple
-                                                                :disabled="false"
+                                                                :disabled="readonly"
                                                                 type="dialog"
                                                                 class="custom-dialog"
                                                                 placeholder="请选择"
@@ -458,7 +491,7 @@
                                                 <el-row>
                                                     <el-col>
                                                         <el-form-item label="是否24H开机：">
-                                                            <el-select v-model="form.jianKongYiJu" placeholder="请选择" size="mini" style="width:100%">
+                                                            <el-select v-if="!readonly" v-model="form.jianKongYiJu" placeholder="请选择" size="mini" style="width:100%">
                                                                 <el-option
                                                                     v-for="item in ['是','否']"
                                                                     :key="item"
@@ -466,6 +499,8 @@
                                                                     :value="item"
                                                                 />
                                                             </el-select>
+                                                            <span v-else>{{ form.jianKongYiJu ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -473,12 +508,15 @@
                                                     <el-col>
                                                         <el-form-item label="开机时间：">
                                                             <el-time-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.kaiShiShiYong"
                                                                 placeholder="任意时间点"
                                                                 size="mini"
                                                                 style="width:100%"
                                                                 value-format="HH:mm:ss"
                                                             />
+                                                            <span v-else>{{ form.kaiShiShiYong ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -486,13 +524,15 @@
                                                     <el-col>
                                                         <el-form-item label="关机时间：">
                                                             <el-time-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.shiJiShiYongF"
                                                                 placeholder="任意时间点"
                                                                 size="mini"
                                                                 style="width:100%"
                                                                 value-format="HH:mm:ss"
                                                             />
-                                                        </el-form-item>
+                                                            <span v-else>{{ form.shiJiShiYongF ||'/' }}
+                                                            </span></el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <!-- <el-row>
@@ -533,7 +573,7 @@
                                                 <el-row>
                                                     <el-col>
                                                         <el-form-item label="是否校准：" prop="shiFouXiaoZhun">
-                                                            <el-select v-model="form.shiFouXiaoZhun" placeholder="请选择" size="mini" style="width:100%">
+                                                            <el-select v-if="!readonly" v-model="form.shiFouXiaoZhun" placeholder="请选择" size="mini" style="width:100%">
                                                                 <el-option
                                                                     v-for="item in ['是','否']"
                                                                     :key="item"
@@ -541,13 +581,17 @@
                                                                     :value="item"
                                                                 />
                                                             </el-select>
+                                                            <span v-else>{{ form.shiFouXiaoZhun ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
                                                         <el-form-item label="检定/校准周期(月)：" label-width="140">
-                                                            <el-input v-model="form.xiaoZhunZQ" size="mini" type="number" style="width:100%" />
+                                                            <el-input v-if="!readonly" v-model="form.xiaoZhunZQ" size="mini" type="number" style="width:100%" />
+                                                            <span v-else>{{ form.xiaoZhunZQ ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -558,7 +602,7 @@
                                                                 v-model="form.shiYongKeShi"
                                                                 size="mini"
                                                                 template-key="gysxxdhk"
-                                                                :disabled="false"
+                                                                :disabled="readonly"
                                                                 type="dialog"
                                                                 class="custom-dialog"
                                                                 placeholder="请选择"
@@ -572,6 +616,7 @@
                                                     <el-col>
                                                         <el-form-item label="最近校准时间：">
                                                             <el-date-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.yiXiaoRiQi"
                                                                 style="width:100%"
                                                                 type="date"
@@ -580,6 +625,8 @@
                                                                 value-format="yyyy-MM-dd"
                                                                 size="mini"
                                                             />
+                                                            <span v-else>{{ form.yiXiaoRiQi ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -587,6 +634,7 @@
                                                     <el-col>
                                                         <el-form-item label="校准有效期至：">
                                                             <el-date-picker
+                                                                v-if="!readonly"
                                                                 v-model="form.xiaoZhunYouXia"
                                                                 style="width:100%"
                                                                 type="date"
@@ -595,48 +643,62 @@
                                                                 value-format="yyyy-MM-dd"
                                                                 size="mini"
                                                             />
+                                                            <span v-else>{{ form.xiaoZhunYouXia ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
                                                         <el-form-item label="校准证书编号：">
-                                                            <el-input v-model="form.zhengShuBianHa" size="mini" />
+                                                            <el-input v-if="!readonly" v-model="form.zhengShuBianHa" size="mini" />
+                                                            <span v-else>{{ form.zhengShuBianHa ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="false">
                                                     <el-col>
                                                         <el-form-item label="校准机构：">
-                                                            <el-input v-model="form.shiWuShuoMing" size="mini" />
+                                                            <el-input v-if="!readonly" v-model="form.shiWuShuoMing" size="mini" />
+                                                            <span v-else>{{ form.shiWuShuoMing ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
                                                     <el-col>
                                                         <el-form-item label="检定/校准参数：">
-                                                            <el-input v-model="form.jianDingXiao" size="mini" />
+                                                            <el-input v-if="!readonly" v-model="form.jianDingXiao" size="mini" />
+                                                            <span v-else>{{ form.jianDingXiao ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
                                                     <el-col>
                                                         <el-form-item label="测量范围：">
-                                                            <el-input v-model="form.ceLiangGongZuo" size="mini" />
+                                                            <el-input v-if="!readonly" v-model="form.ceLiangGongZuo" size="mini" />
+                                                            <span v-else>{{ form.ceLiangGongZuo ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
                                                     <el-col>
                                                         <el-form-item label="U/精确度/最大允差：" label-width="130">
-                                                            <el-input v-model="form.zuiDaYunCha" size="mini" style="width:100%" />
+                                                            <el-input v-if="!readonly" v-model="form.zuiDaYunCha" size="mini" style="width:100%" />
+                                                            <span v-else>{{ form.zuiDaYunCha ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
                                                     <el-col>
                                                         <el-form-item label="修正值：">
-                                                            <el-input v-model="form.xiuZhengZhiXiu" size="mini" />
+                                                            <el-input v-if="!readonly" v-model="form.xiuZhengZhiXiu" size="mini" />
+                                                            <span v-else>{{ form.xiuZhengZhiXiu ||'/' }}
+                                                            </span>
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
@@ -668,7 +730,7 @@
                                                         :download="true"
                                                         multiple
                                                         accept="*"
-                                                        :readonly="false"
+                                                        :readonly="readonly"
                                                         style="width:100%"
                                                     />
                                                 </el-form-item>
@@ -680,7 +742,7 @@
                                                         :download="true"
                                                         multiple
                                                         accept="*"
-                                                        :readonly="false"
+                                                        :readonly="readonly"
                                                         style="width:100%"
                                                     />
                                                 </el-form-item>
@@ -692,7 +754,7 @@
                                                         :download="true"
                                                         multiple
                                                         accept="*"
-                                                        :readonly="false"
+                                                        :readonly="readonly"
                                                         style="width:100%"
                                                     />
                                                 </el-form-item>
@@ -720,7 +782,7 @@
                                         </keep-alive>
                                     </template>
                                     <template v-else>
-                                        <component :is="item.component" :ref="item.ref" :list-data="form[item.data]" />
+                                        <component :is="item.component" :ref="item.ref" :readonly="readonly" :list-data="form[item.data]" />
                                     </template>
                                 </el-tab-pane>
                             </el-tabs>
@@ -752,6 +814,10 @@ export default {
         IbpsImage: () => import('@/business/platform/file/image')
     },
     props: {
+        readonly: {
+            type: Boolean,
+            default: false
+        },
         params: {
             type: Object,
             default: function () {
@@ -799,7 +865,6 @@ export default {
             isFirstyiXiaoRiQi: true,
             isFirstbianZhiBuMen: true,
             isSheKou: false,
-            readonly: false,
             activeName: 'one',
             dialogVisible: true,
             userId: userId,
@@ -810,7 +875,7 @@ export default {
             loading: false,
             title: '设备档案卡',
             toolbars: [
-                { key: 'save', label: '保存' },
+                { key: 'save', label: '保存', hidden: () => { return this.readonly } },
                 { key: 'cancel', label: '退出', type: 'danger', icon: 'ibps-icon-close' }
             ],
             initWidth: '1480px',

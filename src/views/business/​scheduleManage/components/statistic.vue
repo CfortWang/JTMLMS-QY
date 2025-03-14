@@ -68,33 +68,15 @@ export default {
                 itemStyle: {
                     color: colors[key]
                 },
-                barMaxWidth: '90%',
-                barMinWidth: '80%',
+                barWidth: 'auto', // 设置为自适应模式
+                barMaxWidth: 100, // 柱子最大宽度（像素）
+                barMinWidth: 15, // 柱子最小宽度（像素）
                 stack: 'stack1',
                 emphasis: {
                     focus: 'series'
                 }
-                /*
-                markLine: {
-                    silent: true,
-                    precision: 2,
-                    data: [
-                        {
-                            name: '平均值',
-                            type: 'average'
-                        }
-                    ]
-                }*/
-                // label: {
-                //     show: true,
-                //     position: 'top',
-                //     textStyle: {
-                //         color: '#333',
-                //         fontSize: 14
-                //     }
-                // }
             }))
-
+            // 在 xAxis 配置中添加 axisLabel 配置
             const avg = mapValues(seriesData, values => mean(values).toFixed(2))
             const avgText = Object.entries(avg).map(([shift, avg]) => `${shift}【${avg}】`).join('，')
             const userOption = JSON.parse(JSON.stringify(chartOption))
@@ -102,8 +84,19 @@ export default {
             userOption.title.subtext = `人数共计：${this.userList.length}人，班次共计：${series.length}类，人均班次为：${avgText}`
             userOption.legend.data = Object.keys(seriesData)
             userOption.xAxis.data = categories
+            userOption.xAxis.name = '人员姓名'
+            userOption.yAxis.name = '班次次数（次）'
             userOption.series = series
             console.log(userOption)
+            // 在 xAxis 配置中添加 axisLabel 配置
+            if (categories.length > 20) { // 当人数超过20人时缩小字体
+                userOption.xAxis.axisLabel = {
+                    interval: 0, // 强制显示所有标签
+                    rotate: 45, // 标签旋转 45 度避免重叠
+                    fontSize: 12 // 适当缩小字体
+                }
+            }
+
             userChart.setOption(userOption)
         },
         renderDateChart () {
@@ -134,33 +127,31 @@ export default {
                 itemStyle: {
                     color: colors[key]
                 },
-                barMaxWidth: '90%',
-                barMinWidth: '80%',
+                barWidth: 'auto', // 设置为自适应模式
+                barMaxWidth: 100, // 柱子最大宽度（像素）
+                barMinWidth: 15, // 柱子最小宽度（像素）
                 stack: 'stack1',
                 emphasis: {
                     focus: 'series'
                 }
-                /*
-                markLine: {
-                    silent: true,
-                    precision: 2,
-                    data: [
-                        {
-                            name: '平均值',
-                            type: 'average'
-                        }
-                    ]
-                }*/
             }))
-
             const avg = mapValues(seriesData, values => mean(values).toFixed(2))
             const avgText = Object.entries(avg).map(([shift, avg]) => `${shift}【${avg}】`).join('，')
             const dateOption = JSON.parse(JSON.stringify(chartOption))
             dateOption.title.text = '日期班次统计'
-            dateOption.title.subtext = `日期共计：${this.userList.length}天，班次共计：${series.length}，日均班次为：${avgText}`
+            dateOption.title.subtext = `日期共计：${categories.length}天，班次共计：${series.length}类，日均班次为：${avgText}`
             dateOption.legend.data = Object.keys(seriesData)
             dateOption.xAxis.data = categories
+            dateOption.xAxis.name = '日期'
+            dateOption.yAxis.name = '班次次数（次）'
             dateOption.series = series
+            if (categories.length > 20) { // 当数据超过20时缩小字体
+                dateOption.xAxis.axisLabel = {
+                    interval: 0, // 强制显示所有标签
+                    rotate: 45, // 标签旋转 45 度避免重叠
+                    fontSize: 12 // 适当缩小字体
+                }
+            }
             dateChart.setOption(dateOption)
         },
         // 渲染班次人数统计图
@@ -230,11 +221,11 @@ export default {
     width: 100%;
     min-height: calc(100vh - 150px);
     #userChart, #dateChart, #shiftChart {
-        width: 100%;
+        //width: 100%;
         height: 400px;
     }
     #dateChart, #shiftChart {
-        margin-top: 20px;
+        margin-top: 50px;
     }
 }
 </style>

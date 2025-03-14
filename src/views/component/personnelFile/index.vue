@@ -385,11 +385,13 @@ export default {
         checkData (val) {
             const nameArr = ['name', 'jianDingZiGeZ', 'gender']
             let identification = 0
-            nameArr.forEach((item, i) => {
-                if (val[item] === '' || val[item] === null) {
-                    identification = 1
-                }
-            })
+            if (this.buttonType === 1) {
+                nameArr.forEach((item, i) => {
+                    if (val[item] === '' || val[item] === null) {
+                        identification = 1
+                    }
+                })
+            }
             return identification === 0
         },
         tipsMess (val) {
