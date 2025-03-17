@@ -104,7 +104,14 @@
                             </el-col>
                             <el-col :span="19">
                                 <el-form-item v-if="!readonly" prop="from" class="from">
-                                    <el-select v-if="form.type!=='thirdparty'" v-model="form.from" filterable placeholder="请选择或者搜索关键字后选择" style="width:100%">
+                                    <el-select
+                                        v-if="form.type!=='thirdparty'"
+                                        v-model="form.from"
+                                        filterable
+                                        placeholder="请选择或者搜索关键字后选择"
+                                        style="width:100%"
+                                        @change="changeFrom"
+                                    >
                                         <el-option
                                             v-for="item in fromOptions"
                                             :key="item.value"
@@ -337,6 +344,17 @@ export default {
             this.form.from = ''
             this.fromOptions = []
             this.loadDataTableOrView(type)
+        },
+        async changeFrom (value) {
+            // 新建数据集时，不可与已有数据集共用数据表，编辑数据集时，不可自身之外的数据集共用数据表
+            const params = this.$utils.isNotEmpty(this.form.id) ? ` and id_ != '${this.form.id}'` : ''
+            const sql = `select * from ibps_data_dataset where from_ = '${value}'${params}`
+            const res = await this.$common.request('sql', sql)
+            const { data = [] } = res.variables || {}
+            if (data.length) {
+                this.form.from = ''
+                return this.$message.warning('已存在相同来源数据集，请勿重复创建！')
+            }
         },
         // 子集Key数据获取
         loadDataTableOrView (type = 'table') {
