@@ -92,8 +92,19 @@
                         class="card"
                     >
                         <div class="stem">
-                            <span>{{ `【${qIndex + 1}】${q.stem}` }}</span>
-                            <el-tag type="primary" size="small">{{ `${q.questionScore}分` }}</el-tag>
+                            <div class="left">
+                                <span>{{ `【${qIndex + 1}】${q.stem}` }}</span>
+                                <el-tag type="primary" size="small">{{ `${q.questionScore}分` }}</el-tag>
+                            </div>
+                            <span v-if="q.rate>0">
+                                <el-rate
+                                    :value="q.rate"
+                                    show-text
+                                    :texts="texts"
+                                    :colors="colors"
+                                    disabled
+                                />
+                            </span>
                         </div>
                         <div v-if="q.img && q.img.length" class="img">
                             <ibps-image
@@ -148,22 +159,26 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <div class="title">参考答案：</div>
+                                <div class="title">
+                                    <span>参考答案</span>
+                                </div>
                                 <div class="answer-content">
-                                    <el-radio-group v-if="q.questionType === '单选题'" :value="q.rightKey">
+                                    <span v-if="q.questionType === '单选题'">{{ q.rightKey || '' }}</span>
+                                    <!-- <el-radio-group v-if="q.questionType === '单选题'" :value="q.rightKey">
                                         <el-radio
                                             v-for="(o, i) in q.options"
                                             :key="`${index}${qIndex}${i}`"
                                             :label="o.label"
                                         >{{ `${o.label}.${o.value}` }}</el-radio>
-                                    </el-radio-group>
-                                    <el-checkbox-group v-else-if="q.questionType === '多选题'" :value="q.rightKey">
+                                    </el-radio-group> -->
+                                    <span v-else-if="q.questionType === '多选题'">{{ q.rightKey.join(';') || '' }}</span>
+                                    <!-- <el-checkbox-group v-else-if="q.questionType === '多选题'" :value="q.rightKey">
                                         <el-checkbox
                                             v-for="(o, i) in q.options"
                                             :key="`${index}${qIndex}${i}`"
                                             :label="o.label"
                                         >{{ `${o.label}.${o.value}` }}</el-checkbox>
-                                    </el-checkbox-group>
+                                    </el-checkbox-group> -->
                                     <el-radio-group v-else-if="q.questionType === '判断题'" :value="q.rightKey">
                                         <el-radio-button label="√">√</el-radio-button>
                                         <el-radio-button label="×">×</el-radio-button>
@@ -179,6 +194,10 @@
                                         />
                                     </template>
                                 </div>
+                                <div class="title" style="margin-top:20px">
+                                    <span>答案解析</span>
+                                </div>
+                                <div style="white-space: pre-wrap;" class="answer-content">{{ q.resolution || '无' }}</div>
                             </div>
                         </div>
                     </div>
@@ -265,6 +284,7 @@ export default {
         return {
             title: '考试详情',
             dialogVisible: this.visible,
+            showResolution: false,
             toolbars: [{ key: 'cancel', label: '退出' }],
             paperList: [],
             paperData: [],
@@ -277,7 +297,9 @@ export default {
                 { value: 'true', label: '正确' },
                 { value: 'noFinished', label: '未评分' }
             ],
-            paperStatus: 'all'
+            paperStatus: 'all',
+            texts: ['易', '偏易', '适中', '偏难', '难'],
+            colors: { 1: '#00FF00', 2: '#7FFF00', 3: '#FFFF00', 4: '#FFA500', 5: '#FF0000' }
         }
     },
     computed: {
@@ -324,6 +346,21 @@ export default {
         window.removeEventListener('keyup', this.handleKeyPress)
     },
     methods: {
+        changeResolution (index, qIndex) {
+            this.paperData.list[index].questions[qIndex].showResolution = !this.paperData.list[index].questions[qIndex].showResolution
+        },
+        changeAll () {
+            this.showResolution = !this.showResolution
+            this.paperList.forEach(item => {
+                item.list.forEach(i => {
+                    i.questions.forEach(ii => {
+                        ii.showResolution = this.showResolution
+                    })
+                })
+            })
+            const t = this.toolbars.find(item => item.key === 'change')
+            t.label = this.showResolution ? '查看答案' : '查看解析'
+        },
         // 获取题库数据
         async loadData () {
             if (!this.bankId) {
@@ -347,6 +384,9 @@ export default {
                 case 'cancel':
                     this.closeDialog()
                     break
+                case 'change':
+                    this.changeAll()
+                    break
                 default:
                     break
             }
@@ -363,7 +403,7 @@ export default {
         },
         getQuestionData () {
             const param = this.examId ? `and e.exam_id_ = '${this.examId}'` : 'and e.exam_id_ is null'
-            const sql = `select e.id_ as dataId, e.exam_id_ as examId, e.kao_shi_ren_ as examinee, e.bu_men_ as dept, e.zhuang_tai_ as status, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime, e.ti_ku_zong_fen_ as totalScore, e.de_fen_ as resultScore, ed.ti_mu_id_ as questionId, ed.ti_gan_ as stem, ed.ti_xing_ as questionType, ed.fen_zhi_ as questionScore, ed.fu_tu_ as img, ed.xuan_xiang_lei_xi as optionsType, ed.xuan_xiang_ as options, ed.can_kao_da_an_ as rightKey, ed.ping_fen_fang_shi as rateType, ed.ping_fen_ren_ as rater, ed.hui_da_ as answer, ed.ping_yue_shi_jian as rateTime, ed.de_fen_ as score, ed.jie_xi_ as analysis, q.ti_ku_ming_cheng_ as paperName, case when e.exam_id_ is not null then ex.da_biao_zhan_bi_ else q.da_biao_zhan_bi_ end as qualifiedRadio, case when e.exam_id_ is not null then ex.ji_fen_fang_shi_ else q.ji_fen_fang_shi_ end as scoringType, case when e.exam_id_ is not null then ex.kao_shi_ming_chen else '自主考核' end as examName, case when e.exam_id_ is not null then ex.xian_kao_shi_jian else '不限' end as limitDate from t_examination e left join t_examination_detail ed on e.id_ = ed.parent_id_ left join  t_question_bank q on e.ti_ku_id_ = q.id_ left join  t_exams ex on e.exam_id_ = ex.id_ where e.ti_ku_id_ = '${this.bankId}' ${param} and e.kao_shi_ren_ = '${this.examineeId}' and (e.zhuang_tai_ = '已完成' or e.zhuang_tai_ = '已交卷') order by field(ed.ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            const sql = `select e.id_ as dataId, e.exam_id_ as examId,ed.nan_du_+0 as rate,ed.da_an_jie_xi_ as resolution, e.kao_shi_ren_ as examinee, e.bu_men_ as dept, e.zhuang_tai_ as status, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime, e.ti_ku_zong_fen_ as totalScore, e.de_fen_ as resultScore, ed.ti_mu_id_ as questionId, ed.ti_gan_ as stem, ed.ti_xing_ as questionType, ed.fen_zhi_ as questionScore, ed.fu_tu_ as img, ed.xuan_xiang_lei_xi as optionsType, ed.xuan_xiang_ as options, ed.can_kao_da_an_ as rightKey, ed.ping_fen_fang_shi as rateType, ed.ping_fen_ren_ as rater, ed.hui_da_ as answer, ed.ping_yue_shi_jian as rateTime, ed.de_fen_ as score, ed.jie_xi_ as analysis, q.ti_ku_ming_cheng_ as paperName, case when e.exam_id_ is not null then ex.da_biao_zhan_bi_ else q.da_biao_zhan_bi_ end as qualifiedRadio, case when e.exam_id_ is not null then ex.ji_fen_fang_shi_ else q.ji_fen_fang_shi_ end as scoringType, case when e.exam_id_ is not null then ex.kao_shi_ming_chen else '自主考核' end as examName, case when e.exam_id_ is not null then ex.xian_kao_shi_jian else '不限' end as limitDate from t_examination e left join t_examination_detail ed on e.id_ = ed.parent_id_ left join  t_question_bank q on e.ti_ku_id_ = q.id_ left join  t_exams ex on e.exam_id_ = ex.id_ where e.ti_ku_id_ = '${this.bankId}' ${param} and e.kao_shi_ren_ = '${this.examineeId}' and (e.zhuang_tai_ = '已完成' or e.zhuang_tai_ = '已交卷') order by field(ed.ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -374,6 +414,7 @@ export default {
                     }
                     const result = []
                     data.map(item => {
+                        item.showResolution = false
                         // 数据转换
                         if (['单选题', '多选题'].includes(item.questionType)) {
                             item.options = JSON.parse(item.options)
@@ -575,10 +616,15 @@ export default {
                     .stem {
                         display: flex;
                         margin-bottom: 10px;
-                        align-items: flex-start;
-                        > span:first-child {
-                            line-height: 1.5;
-                            margin-right: 10px;
+                        justify-content: space-between;
+                        align-items: center;
+                        .left{
+                            display: flex;
+                            align-items: center;
+                             > span:first-child {
+                                line-height: 1.5;
+                                margin-right: 10px;
+                            }
                         }
                     }
                     .img {
@@ -597,6 +643,9 @@ export default {
                                 font-size: 16px;
                                 color: #01a39e;
                                 margin-bottom: 10px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
                                 .score {
                                     vertical-align: middle;
                                 }

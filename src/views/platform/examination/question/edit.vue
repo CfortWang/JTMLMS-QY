@@ -280,6 +280,16 @@
                     />
                 </el-form-item>
             </template>
+            <el-form-item label="答案解析：" prop="da_an_jie_xi_">
+                <el-input
+                    v-model="form.da_an_jie_xi_"
+                    type="textarea"
+                    :rows="3"
+                    :autosize="readonly"
+                    :disabled="readonly"
+                    placeholder="请输入题目答案解析"
+                />
+            </el-form-item>
             <el-form-item label="备注：" prop="bei_zhu_">
                 <el-input
                     v-model="form.bei_zhu_"
@@ -369,7 +379,8 @@ export default {
                 fen_zhi_: '',
                 bei_zhu_: '',
                 zhuang_tai_: '启用',
-                nan_du_: 0
+                nan_du_: 0,
+                da_an_jie_xi_: ''
             },
             questionTags: [],
             toolbars: [
@@ -504,7 +515,7 @@ export default {
             if (this.$utils.isEmpty(this.id)) {
                 return
             }
-            const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, biao_qian_, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_,nan_du_ from t_questions where id_ = '${this.id}'`
+            const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, biao_qian_, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_,nan_du_,da_an_jie_xi_ from t_questions where id_ = '${this.id}'`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {

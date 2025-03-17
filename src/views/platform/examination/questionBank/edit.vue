@@ -601,7 +601,7 @@ export default {
                 return
             }
             const sql1 = `select id_, bian_zhi_ren_, bian_zhi_bu_men_, bian_zhi_shi_jian, ti_ku_ming_cheng_, ti_ku_fen_lei_, ti_ku_zhuang_tai_, shi_fou_gong_kai_, xian_kao_ci_shu_, ping_fen_ren_, miao_shu_, suo_shu_fan_wei_, kao_shi_shi_chang, da_biao_zhan_bi_ from t_question_bank where id_ = '${this.formId}'`
-            const sql2 = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, biao_qian_ as quesTag, zhuang_tai_ as quesState,nan_du_ as questionLevel from t_questions where parent_id_ = '${this.formId}' order by chu_ti_shi_jian_ desc`
+            const sql2 = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, biao_qian_ as quesTag, zhuang_tai_ as quesState,nan_du_ as questionLevel,da_an_jie_xi_ as resolution, from t_questions where parent_id_ = '${this.formId}' order by chu_ti_shi_jian_ desc`
             Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then(([res1, res2]) => {
                 const { data: bankData = [] } = res1.variables || {}
                 const { data: questionData = [] } = res2.variables || {}
@@ -629,7 +629,7 @@ export default {
             })
         },
         addSelectQuestion () {
-            const sql = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, biao_qian_ as quesTag, zhuang_tai_ as quesState,nan_du_ as questionLevel from t_questions where find_in_set(id_, '${this.quesIdList}')`
+            const sql = `select id_ as quesId, chu_ti_ren_ as creator, bu_men_ as createDept, chu_ti_shi_jian_ as createTime, xu_hao_ as sn, ti_gan_ as content, ti_xing_ as quesType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as answer, zheng_que_da_an_ as rightKey, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, fen_zhi_ as score, bei_zhu_ as note, xuan_xiang_shu_ as optionCount, biao_qian_ as quesTag, zhuang_tai_ as quesState,nan_du_ as questionLevel,da_an_jie_xi_ as resolution from t_questions where find_in_set(id_, '${this.quesIdList}')`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 this.questionData = data.concat(this.questionData)
@@ -713,7 +713,8 @@ export default {
                 bei_zhu_: item.note || '',
                 zhuang_tai_: item.quesState,
                 biao_qian_: item.quesTag || '',
-                nan_du_: item.questionLevel || 0
+                nan_du_: item.questionLevel || 0,
+                da_an_jie_xi_: item.resolution || ''
             }))
             await this.$common.request('add', {
                 tableName: 't_questions',

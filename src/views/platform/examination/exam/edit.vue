@@ -874,7 +874,8 @@ export default {
                         bei_zhu_: item.bei_zhu_ || '',
                         zhuang_tai_: item.zhuang_tai_,
                         biao_qian_: item.biao_qian_ || '',
-                        nan_du_: item.nan_du_ || 0
+                        nan_du_: item.nan_du_ || 0,
+                        da_an_jie_xi_: item.da_an_jie_xi_ || ''
                     }))
                 }
                 await this.$common.request('add', addParams)

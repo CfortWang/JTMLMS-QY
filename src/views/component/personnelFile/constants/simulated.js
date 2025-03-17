@@ -432,7 +432,7 @@ export function correlationSql (type, val) {
     if (type === 'jyrykhjlb' || type === 'lhrynlqr' || type === 'lhpxsqb') {
         sql = `select * from t_${type} where FIND_IN_SET('${val}',${col[type]}) and shi_fou_guo_shen_ = '已完成' `
     } else if (type === 'kaoshijilu') {
-        sql = `select * from v_examination where FIND_IN_SET('${val}',${col[type]}) and paperState = '已完成' ORDER BY createTime asc`
+        sql = `select * from v_examination where FIND_IN_SET('${val}',${col[type]}) and paperState = '已完成' and examType!='自主考核' ORDER BY createTime asc`
     } else if (type === 'lhrypxjlb') {
         sql = `select * from v_wodepeixun where FIND_IN_SET('${val}',${col[type]}) and shi_fou_guo_shen_ = '已结束' `
     } else if (type === 'tjbgb') {

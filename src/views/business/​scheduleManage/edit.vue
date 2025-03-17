@@ -25,7 +25,7 @@
                         :size="btn.size || 'mini'"
                         @click="handleAction(btn.key)"
                     >
-                        {{ btn.label }}
+                        {{ btn.key ==='undo'? undoButtonLabel : btn.label }}
                     </el-button>
                 </template>
             </div>
@@ -188,6 +188,22 @@
             </el-table>
         </el-form>
         <div v-if="activeStep === 2" ref="scheduleContainer" class="schedule-container">
+            <div class="shift-legend">
+                <div class="legend-title">班次说明：</div>
+                <div class="legend-items">
+                    <div
+                        v-for="(shift, index) in formData.scheduleShift" 
+                        :key="index"
+                        class="legend-item"
+                    >
+                        <div
+                            class="color-block" 
+                            :style="{ backgroundColor: shift.color }"
+                        ></div>
+                        <span class="shift-name">{{ shift.name }}</span>
+                    </div>
+                </div>
+            </div>
             <div ref="schedule" class="schedule-box">
                 <div ref="scrollTarget" class="abscissa" :style="{ left: leftOffset + 'px' }">
                     <div v-for="(month, mIndex) in Object.keys(dateObj)" :key="mIndex" class="abs-type">
@@ -309,8 +325,8 @@
                                     class="shift"
                                     :style="{ color: viewType === 'users' ? `${shift.color}` : `${ordinateList[rIndex].color}`}"
                                 >
-                                    {{ viewType === 'users'? shift.alias : shift.userName }}
-                                    <!-- <div :style="{ color: `${shift.color}` }">{{ shift.alias }}</div> -->
+                                    <div v-if="viewType !== 'users'">{{ viewType === 'users'? shift.alias : shift.userName }}</div>
+                                    <div v-if="viewType === 'users'" :style="{ width: '20px', height: '20px', backgroundColor: `${shift.color}`, margin: '0 auto', borderRadius: '2px' }"></div>
                                 </div>
                                 <div v-if="hoveredIndex === `${row.value}-${cIndex}` && !readonly" class="overlay">
                                     <i class="el-icon-edit" />
@@ -416,6 +432,7 @@ export default {
             configList: [],
             configOptions: [],
             maxHeight: '250px',
+            undoButtonLabel: '撤销批量修改(0)',
             toolbars: [
                 { key: 'prev', icon: 'el-icon-d-arrow-left', label: '上一步', type: 'primary', steps: '2,3', show: true },
                 { key: 'next', icon: 'el-icon-d-arrow-right', label: '下一步', type: 'primary', steps: '1,2', show: true },
@@ -427,7 +444,8 @@ export default {
                 // { key: 'edit', icon: 'el-icon-edit', label: '编辑', type: 'primary', steps: '2,3' },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', show: (!this.readonly) },
                 { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', steps: '3', show: (!this.readonly) },
-                { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger', show: true }
+                { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger', show: true },
+                { key: 'undo', icon: 'el-icon-refresh-left', label: '撤销批量修改', type: 'info', steps: '2', show: (!this.readonly) }
             ],
             viewType: 'users',
             scheduleData: {},
@@ -453,6 +471,8 @@ export default {
                 operateType: 'copy',
                 pasteType: 'all'
             },
+            historyStack: [], // 新增历史记录栈
+            maxHistorySteps: 10, // 最大历史记录步数
             pickerOptions: {
                 disabledDate: (time) => {
                     const { dateRange } = this.formData
@@ -492,9 +512,6 @@ export default {
                 }))
             }
         }
-        // scheduleData () {
-        //     return mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
-        // }
     },
     watch: {
         'formData.dateRange': {
@@ -505,6 +522,13 @@ export default {
                 }
             },
             immediate: false // 不需要在组件初始化时执行，仅在日期真正改变时执行
+        },
+        historyStack: {
+            handler (newVal) {
+                this.undoButtonLabel = `撤销批量修改(${newVal.length})` // 更新标签
+            },
+            immediate: true, // 初始化时立即执行
+            deep: true // 深度监听
         }
     },
     created () {
@@ -880,6 +904,9 @@ export default {
                 case 'cancel':
                     this.closeDialog()
                     break
+                case 'undo':
+                    this.handleUndo()
+                    break
                 default:
                     break
             }
@@ -1250,6 +1277,8 @@ export default {
             return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24))
         },
         handleShiftSetting (type) {
+            // 保存当前状态到历史记录
+            this.pushHistory()
             const { cycle, dates, operateType, current } = this.shiftForm || {}
             if ((operateType === 'copy' && this.$utils.isEmpty(dates)) || (operateType === 'cycle' && this.$utils.isEmpty(cycle))) {
                 return this.$message.warning('请补充必填信息！')
@@ -1286,6 +1315,26 @@ export default {
                 })
             }
             this.resetShiftSetting()
+        },
+        pushHistory () {
+            // 保留最多maxHistorySteps步历史记录
+            if (this.historyStack.length >= this.maxHistorySteps) {
+                this.historyStack.shift()
+            }
+            // 深拷贝当前排班数据
+            this.historyStack.push(JSON.parse(JSON.stringify(this.scheduleData)))
+        },
+        handleUndo () {
+            if (this.historyStack.length === 0) {
+                this.$message.warning('已无更多可撤销操作')
+                return
+            }
+            // 取出最近的历史记录
+            const history = this.historyStack.pop()
+            // 恢复排班数据
+            this.scheduleData = history
+            this.$message.success('撤销成功')
+            this.$forceUpdate() // 强制更新视图
         },
         /** 获取排班变化描述 */
         getOverViews (responseData, newData) {
@@ -1585,6 +1634,41 @@ export default {
                 z-index: 1000;
                 background: #fff;
                 box-shadow: 0 2px 20px rgba(228, 231, 237, 1);
+            }
+        }
+        .shift-legend {
+            display: flex;
+            align-items: center;
+            margin: 0px 0 10px 110px;
+            border-radius: 4px;
+            .legend-title {
+                font-weight: bold;
+                margin-right: 15px;
+                color: #606266;
+            }
+
+            .legend-items {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px; // 色块间距
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .color-block {
+                width: 20px;
+                height: 20px;
+                border-radius: 2px;
+                flex-shrink: 0;
+            }
+
+            .shift-name {
+                font-size: 12px;
+                color: #909399;
             }
         }
     }
