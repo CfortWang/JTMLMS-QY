@@ -47,7 +47,7 @@
 import { findRoleResTreeChecked as getTreeData, updateResource as save } from '@/api/platform/auth/resources'
 import { findRoleResTreeChecked as getAppTreeData, updateResource as saveApp } from '@/api/platform/auth/appres'
 
-// import { findAllSubsystem } from '@/api/platform/auth/subsystem'
+import { findAllSubsystem } from '@/api/platform/auth/subsystem'
 import ActionUtils from '@/utils/action'
 import Tree from '../components/tree'
 
@@ -74,7 +74,7 @@ export default {
             width: 600,
             height: document.clientHeight,
             // systemId: '',
-            // subsystemList: [],
+            subsystemList: [],
 
             isSuper,
             treeData: [],
@@ -109,20 +109,21 @@ export default {
         },
         loadData () {
             this.loadTreeData()
+            this.loadSubsystemData()
         },
-        // loadSubsystemData () {
-        //     findAllSubsystem().then(response => {
-        //         this.subsystemList = response.data
-        //         this.systemId = this.subsystemList && this.subsystemList.length > 0 ? this.subsystemList[0].id : ''
-        //         this.loadTreeData()
-        //     }).catch(() => {
-        //     // 异常
-        //     })
-        // },
-        // changeSystem (value) {
-        //     this.systemId = value
-        //     this.loadTreeData()
-        // },
+        loadSubsystemData () {
+            findAllSubsystem().then(response => {
+                this.subsystemList = response.data
+                this.systemId = this.subsystemList && this.subsystemList.length > 0 ? this.subsystemList[0].id : ''
+                this.loadTreeData()
+            }).catch(() => {
+            // 异常
+            })
+        },
+        changeSystem (value) {
+            this.systemId = value
+            this.loadTreeData()
+        },
         // 获取tree数据
         loadTreeData () {
             this.dialogLoading = true
@@ -166,7 +167,7 @@ export default {
                 return data
             }
             return data.filter((item) => {
-                return !item.tenantType === 'forbidden'
+                return item.tenantType !== 'forbidden'
             })
         },
         // 保存数据
