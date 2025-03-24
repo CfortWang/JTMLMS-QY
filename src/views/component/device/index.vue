@@ -28,7 +28,7 @@
                             v-model="row.bianZhiBuMen"
                             type="position"
                             readonly-text="text"
-                            :multiple="true"
+                            :multiple="false"
                             :disabled="true"
                         />
 
@@ -69,7 +69,13 @@
                         slot="deviceStateSlot"
                         slot-scope="{row}"
                     >
-                        <span>{{ stateList[row.sheBeiZhuangTa] || row.sheBeiZhuangTa }}</span>
+                        <span>{{ stateList[row.sheBeiZhuangTa] || row.sheBeiZhuangTa || '' }}</span>
+                    </template>
+                    <template
+                        slot="deviceTypeSlot"
+                        slot-scope="{row}"
+                    >
+                        <span>{{ typeList[row.sheBeiLeiXing] || row.sheBeiLeiXing || '' }}</span>
                     </template>
 
                     <template
@@ -262,10 +268,10 @@
                     <template slot="deviceType">
                         <el-select v-model="search.deviceType" placeholder="请选择" size="mini" :clearable="true">
                             <el-option
-                                v-for="item in ['检验系统','通用设备','软件','信息系统']"
-                                :key="item"
-                                :label="item"
-                                :value="item"
+                                v-for="(v,k) in typeList"
+                                :key="k"
+                                :label="v"
+                                :value="k"
                             />
                         </el-select>
                     </template>
@@ -313,6 +319,7 @@
             v-if="deviceDialogShow"
             :params="params"
             :state-list="stateList"
+            :type-list="typeList"
             :tab-list="tabList"
             :hide-sys-device-no="hideSysDeviceNo"
             :readonly="!hasRole"
@@ -500,7 +507,7 @@ export default {
                     { prop: 'sheBeiShiBieH', label: '设备编号', sortable: true },
                     { prop: 'yuanSheBeiBian', label: '原设备编号', sortable: true },
                     { prop: 'sheBeiMingCheng', label: '设备名称', sortable: true },
-                    { prop: 'sheBeiLeiXing', label: '设备类型', sortable: true },
+                    { prop: 'sheBeiLeiXing', label: '设备类型', sortable: true, slotName: 'deviceTypeSlot' },
                     { prop: 'guiGeXingHao', label: '规格型号', sortable: true },
                     { prop: 'sheBeiZhuangTa', label: '设备状态', sortable: true, slotName: 'deviceStateSlot' },
                     { prop: 'guanLiRen', label: '保管人', slotName: 'userSlot', sortable: true },
@@ -635,11 +642,12 @@ export default {
             stateList: { '停用': '停用', '报废': '报废', '合格': '合格' },
             hideSysDeviceNo: false,
             tabList: {},
-            hasRole: true
+            hasRole: true,
+            typeList: { '检验系统': '检验系统', '通用设备': '通用设备', '软件': '软件', '信息系统': '信息系统' }
         }
     },
     async mounted () {
-        const { stateList, hideSysDeviceNo, tabList, hasDeviceRole } = await getSetting('device') || {}
+        const { stateList, hideSysDeviceNo, tabList, hasDeviceRole, typeList } = await getSetting('device') || {}
         if (hasDeviceRole) {
             console.debug('hasDeviceRole', hasDeviceRole)
             const { role, isSuper } = this.$store.getters || {}
@@ -648,6 +656,10 @@ export default {
         if (stateList) {
             console.debug('stateList', stateList)
             this.stateList = stateList
+        }
+        if (typeList) {
+            console.debug('typeList', typeList)
+            this.typeList = typeList
         }
         if (hideSysDeviceNo) {
             this.hideSysDeviceNo = hideSysDeviceNo
@@ -1006,6 +1018,9 @@ export default {
                 item.shiYongKeShi = this.switchGYSIdToName(item.shiYongKeShi, gysData)
                 if (this.stateList[item.sheBeiZhuangTa]) {
                     item.sheBeiZhuangTa = this.stateList[item.sheBeiZhuangTa]
+                }
+                if (this.typeList[item.sheBeiLeiXing]) {
+                    item.sheBeiLeiXing = this.typeList[item.sheBeiLeiXing]
                 }
             }
             return exportData
@@ -1441,6 +1456,10 @@ export default {
                 if (keyFound) {
                     i.sheBeiZhuangTa = keyFound[0]
                 }
+                const keyFound2 = Object.entries(this.typeList).find(([key, value]) => value === i.sheBeiLeiXing)
+                if (keyFound2) {
+                    i.sheBeiLeiXing = keyFound2[0]
+                }
             })
             const isNewVersion = importData.some(i => i.weiHuFangShi) // 判断是否是最新模板
             if (isNewVersion) { // 使用岗位/分组
@@ -1459,7 +1478,7 @@ export default {
             const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb where di_dian_ = ${currentPosition}` // 供应商信息
             const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 岗位/分组信息
             const currentTime = dayjs().format('YYYY-MM-DD HH:mm')
-            const currentApartment = this.$store.getters.userInfo.employee.positions
+            const currentApartment = this.$store.getters.userInfo.employee.positions.split(',').at(-1) || ''
             const currentUser = this.userId
 
             const partOneInvalidResult = this.deviceInvalidPartOne(importData)

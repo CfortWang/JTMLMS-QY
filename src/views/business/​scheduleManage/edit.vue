@@ -45,17 +45,40 @@
             class="schedule-form"
             @submit.native.prevent
         >
-            <el-form-item label="排班名称" prop="title" required :show-message="false">
-                <el-input
-                    v-model="formData.title"
-                    type="text"
-                    clearable
-                    show-word-limit
-                    :maxlength="64"
-                    :disabled="readonly"
-                    placeholder="请输入排班名称"
-                />
-            </el-form-item>
+            <el-row :gutter="20" class="form-row">
+                <el-col :span="12">
+                    <el-form-item label="选择历史排班" prop="oldScheduleId" :show-message="false">
+                        <el-select
+                            v-model="formData.oldScheduleId"
+                            :disabled="readonly"
+                            filterable
+                            clearable
+                            :placeholder=" readonly ? '' : '请选择历史排班'"
+                            @change="handleScheduleChange"
+                        >
+                            <el-option
+                                v-for="item in scheduleOptions"
+                                :key="item.id"
+                                :label="item.title"
+                                :value="item.id"
+                            />
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="排班名称" prop="title" required :show-message="false">
+                        <el-input
+                            v-model="formData.title"
+                            type="text"
+                            clearable
+                            show-word-limit
+                            :maxlength="64"
+                            :disabled="readonly"
+                            placeholder="请输入排班名称"
+                        />
+                    </el-form-item>
+                </el-col>
+            </el-row>
             <el-row :gutter="20" class="form-row">
                 <el-col :span="12">
                     <el-form-item prop="dateRange" required :show-message="false">
@@ -192,7 +215,7 @@
                 <div class="legend-title">班次说明：</div>
                 <div class="legend-items">
                     <div
-                        v-for="(shift, index) in formData.scheduleShift" 
+                        v-for="(shift, index) in formData.scheduleShift"
                         :key="index"
                         class="legend-item"
                     >
@@ -213,9 +236,12 @@
                                 v-for="(date, dIndex) in dateObj[month]"
                                 :ref="`day${dIndex}`"
                                 :key="dIndex"
-                                class="date"
+                                class="dateweek"
                                 @click="!readonly && showShiftSetting($event, date)"
-                            >{{ date.split('-')[2] }}</div>
+                            >
+                                <div class="date">{{ date.split('-')[2] }}</div>
+                                <div  class="week" :class="{ 'weekend-bg': getDayOfWeek(date).isWeekend }">{{ getDayOfWeek(date).text }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -343,6 +369,7 @@
                 :schedule-data="scheduleData"
                 :date-list="dateList"
                 :user-list="ordinateList"
+                :scheduleShift="formData.scheduleShift"
                 @close="handleClose"
             />
         </div>
@@ -371,7 +398,7 @@
 
 <script>
 import { cycleOptions, scheduleType, scheduleColumn } from '../../constants/schedule'
-import { queryScheduleConfig, getStaffSchedule, saveStaffSchedule, saveAdjustment } from '@/api/business/schedule'
+import { queryScheduleConfig, getStaffSchedule, saveStaffSchedule, saveAdjustment, queryStaffSchedule } from '@/api/business/schedule'
 import request from '@/utils/request'
 import { SYSTEM_URL } from '@/api/baseUrl'
 import { previewFile } from '@/api/platform/file/attachment'
@@ -422,7 +449,8 @@ export default {
                 isApproval: 'Y',
                 approver: [],
                 scheduleShift: [],
-                scheduleRule: []
+                scheduleRule: [],
+                oldScheduleId: ''
             },
             isDateChanged: false, // 用于标识日期是否已经改变过
             prevDateRange: [],
@@ -440,12 +468,12 @@ export default {
                 // { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info', steps: '2,3' },
                 { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning', steps: '2,3', show: true },
                 { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', steps: '2,3', show: true },
+                { key: 'undo', icon: 'el-icon-refresh-left', label: '撤销批量修改', type: 'info', steps: '2', show: (!this.readonly) },
                 { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', steps: '2', show: (!this.readonly) },
                 // { key: 'edit', icon: 'el-icon-edit', label: '编辑', type: 'primary', steps: '2,3' },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', show: (!this.readonly) },
                 { key: 'submit', icon: 'ibps-icon-send', label: '提交', type: 'success', steps: '3', show: (!this.readonly) },
-                { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger', show: true },
-                { key: 'undo', icon: 'el-icon-refresh-left', label: '撤销批量修改', type: 'info', steps: '2', show: (!this.readonly) }
+                { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger', show: true }
             ],
             viewType: 'users',
             scheduleData: {},
@@ -473,6 +501,7 @@ export default {
             },
             historyStack: [], // 新增历史记录栈
             maxHistorySteps: 10, // 最大历史记录步数
+            scheduleOptions: [], // 选择排班选项
             pickerOptions: {
                 disabledDate: (time) => {
                     const { dateRange } = this.formData
@@ -583,9 +612,28 @@ export default {
             //     scheduleContent.style.paddingLeft = '0px'
             // }
         },
+        getScheduleList (self) { // 获取选择排班下拉的选项
+            const { first, second } = this.$store.getters.level || {}
+            const params = {
+                parameters: [{
+                    key: 'Q^di_dian_^S',
+                    value: second || first
+                }],
+                requestPage: {
+                    pageNo: 1,
+                    limit: 99999
+                },
+                sorts: []
+            }
+            queryStaffSchedule(params).then((res) => {
+                const scheduleList = res.data.dataResult || []
+                self.scheduleOptions = scheduleList
+            })
+        },
         loadData () {
             this.loading = true
             const self = this
+            this.getScheduleList(self)
             // 获取配置数据
             queryScheduleConfig({
                 parameters: [],
@@ -641,6 +689,14 @@ export default {
             }).catch(() => {
                 this.loading = false
             })
+        },
+        getDayOfWeek (date) {
+            const days = ['日', '一', '二', '三', '四', '五', '六']
+            const dayIndex = new Date(date).getDay()
+            return {
+                text: `${days[dayIndex]}`, // 返回星期几的文字
+                isWeekend: dayIndex === 0 || dayIndex === 6 // 判断是否是周末
+            }
         },
         transformConfigData (data) {
             return data.reduce((acc, item) => {
@@ -921,7 +977,7 @@ export default {
                 }
                 this.dateObj = this.getDateList(this.formData.dateRange)
                 this.dateList = Object.values(this.dateObj).flat()
-                if (!this.pageParams.id) {
+                if (!this.pageParams.id && !this.formData.oldScheduleId) {
                     this.scheduleData = mapValues(keyBy(this.ordinateList, 'value'), () => Array.from({ length: this.dateList.length }, () => []))
                 } else {
                     this.updateScheduleData()
@@ -934,6 +990,39 @@ export default {
             }
             this.handleListener('addEventListener')
             this.activeStep += val
+        },
+        async handleScheduleChange (val) { // 选择排班带出配置
+            const self = this
+            if (val) {
+                await getStaffSchedule({ id: val }).then((res) => {
+                    debugger
+                    const { staffScheduleDetailPoList: records, title, endDate, startDate, overview, config,type } = res.data
+                    const temp = config ? JSON.parse(config) : {}
+                    self.responseData = res.data
+                    self.formData = {
+                        ...self.formData,
+                        title,
+                        config: temp.id,
+                        dateRange: [startDate, endDate],
+                        approver: temp.approver || [],
+                        overview: overview,
+                        scheduleType: type,
+                        scheduleRule: temp.scheduleRule || [],
+                        scheduleShift: temp.scheduleShift || [],
+                        scheduleStaff: temp.scheduleStaff || []
+                    }
+                    self.shiftList = self.formData.scheduleShift.filter(s => s.isEnabled === 'Y').map(s => ({
+                        ...s,
+                        positions: s.positions.join('，'),
+                        dateRange: s.dateRange.map(d => {
+                            return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
+                        })
+                    }))
+                    console.log('formData', self.formData)
+                    self.scheduleData = self.transformScheduleData(records, overview, temp)
+                    self.responseData = { ...self.responseData, records, overview, temp }
+                })
+            }
         },
         /**
          * 更新排班数据
@@ -973,20 +1062,9 @@ export default {
         },
         validateForm () {
             const { scheduleRule, approver, status, ...rest } = this.formData
-            const result = Object.keys(rest).some(k => this.$utils.isEmpty(rest[k]) && k !== 'id')
+            const result = Object.keys(rest).some(k => this.$utils.isEmpty(rest[k]) && k !== 'id' && k !== 'oldScheduleId')
             return !result
         },
-        // dealData (data) {
-        //     const result = Object.entries(data).map(([userId, days]) => {
-        //         const userObj = { userId }
-        //         days.forEach((day, index) => {
-        //             // userObj[`d${index + 1}`] = day.map(({ dateRange, name, alias }) => ({ dateRange, name, alias })) || []
-        //             userObj[`d${index + 1}`] = day.map(({ alias }) => alias).join(',') || ''
-        //         })
-        //         return userObj
-        //     })
-        //     return result
-        // },
         dealData (data) {
             if (this.viewType === 'shifts') { // 班次排班需还原数据
                 data = this.reverseForScheduleData(this.scheduleData, this.userNameList, this.formData.scheduleShift, this.formData.overview)
@@ -1048,7 +1126,7 @@ export default {
         },
         handleSave (type) {
             const { staffScheduleDetailPoList, overview } = this.dealData(this.scheduleData) || {}
-            const { dateRange, title, config, approver, scheduleType, status, scheduleShift, scheduleStaff, scheduleRule, id } = this.formData
+            const { dateRange, title, config, approver, scheduleType, status, scheduleShift, scheduleStaff, scheduleRule, id, oldScheduleId } = this.formData
             const { first, second } = this.$store.getters.level || {}
             const configData = {
                 id: config,
@@ -1062,6 +1140,7 @@ export default {
                 pk: this.pageParams.id || id,
                 diDian: second || first,
                 title,
+                oldScheduleId,
                 status: type ? '已发布' : '未发布',
                 startDate: dateRange[0],
                 endDate: dateRange[1],
@@ -1488,17 +1567,34 @@ export default {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        .date {
-                            width: 59px;
-                            height: 28px;
-                            line-height: 30px;
-                            text-align: center;
-                            border: 1px solid #ccc;
-                            border-right: none;
+                        .dateweek{
+                            .date {
+                                width: 59px;
+                                height: 28px;
+                                line-height: 30px;
+                                text-align: center;
+                                border: 1px solid #ccc;
+                                border-right: none;
+                                cursor: pointer;
+                                color: #409eff;
+                            }
+                            .week {
+                                width: 59px;
+                                height: 28px;
+                                line-height: 30px;
+                                text-align: center;
+                                border: 1px solid #ccc;
+                                border-right: none;
+                                border-top: none;
+                                color: rgb(96, 98, 102);
+
+                            }
                             cursor: pointer;
-                            color: #409eff;
                             &:hover {
-                                background: #ecf5ff;
+                                    background: #ecf5ff;
+                            }
+                            .weekend-bg {
+                                background-color: rgb(223 223 223 / 90%); // 周末的背景色
                             }
                         }
                     }
@@ -1642,9 +1738,9 @@ export default {
             margin: 0px 0 10px 110px;
             border-radius: 4px;
             .legend-title {
-                font-weight: bold;
+                //font-weight: bold;
                 margin-right: 15px;
-                color: #606266;
+                color: rgb(96, 98, 102);
             }
 
             .legend-items {
@@ -1668,7 +1764,7 @@ export default {
 
             .shift-name {
                 font-size: 12px;
-                color: #909399;
+                color: rgb(96, 98, 102);
             }
         }
     }

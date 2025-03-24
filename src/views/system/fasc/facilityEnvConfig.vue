@@ -295,7 +295,7 @@ export default {
                 di_dian_: level.second || level.first,
                 bian_zhi_ren_: userId,
                 lei_xing_: '',
-                bian_zhi_bu_men_: position && position.split(',')[0],
+                bian_zhi_bu_men_: position && position.split(',').at(-1),
                 zhou_qi_: '',
                 gang_wei_: '',
                 tiao_jian_: '',

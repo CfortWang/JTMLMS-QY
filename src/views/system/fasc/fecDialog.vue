@@ -532,15 +532,16 @@ export default {
     },
     methods: {
         deviceno1Change (key, data) {
-            this.form.deviceid1_ = data.id_
-            this.form.devicename1_ = data.she_bei_ming_cheng_
+            this.form.deviceid1_ = data.id_ || ''
+            this.form.devicename1_ = data.she_bei_ming_cheng_ || ''
         },
         deviceno2Change (key, data) {
-            this.form.deviceid2_ = data.deviceId
+            this.form.deviceid2_ = data.deviceId || ''
         },
         fangJianChange (key, data) {
-            this.form.fang_jian_id_ = data.id_
-            this.form.qu_yu_ = data.qu_yu_
+            this.form.fang_jian_id_ = data.id_ || ''
+            this.form.qu_yu_ = data.qu_yu_ || ''
+            this.form.kong_zhi_biao_zhu = data.kong_zhi_biao_zhu || ''
         },
         // 接收自定义组件数据
         onFacilityData (...arg) {

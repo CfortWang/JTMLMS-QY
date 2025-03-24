@@ -140,7 +140,23 @@
                         <el-input v-model="infoFxssbData.fan_wei_" :disabled="readonly" size="mini" />
                     </el-descriptions-item>
                     <el-descriptions-item label="方法" :span="onlyoneWay?2:1">
-                        <el-input v-model="infoFxssbData.fang_fa_" :disabled="readonly" size="mini" />
+                        <el-select
+                            v-model="infoFxssbData.fang_fa_"
+                            size="mini"
+                            style="width: 100%"
+                            :disabled="readonly"
+                            filterable
+                            allow-create
+                            clearable
+                            placeholder="请选择方法"
+                        >
+                            <el-option
+                                v-for="item in fangFaOptions"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value"
+                            />
+                        </el-select>
                     </el-descriptions-item>
                     <el-descriptions-item v-if="!onlyoneWay" label="风险系数计算方式" :span="2">
                         <span class="required-star">*</span>
@@ -350,7 +366,18 @@ export default {
             isFinished: false,
             preParams: {},
             Ids: [],
-            culWays: { '1': '风险矩阵法', '2': 'FMEA法' }
+            culWays: { '1': '风险矩阵法', '2': 'FMEA法' },
+            fangFaOptions: [
+                { value: '定量风险评估法', label: '定量风险评估法' },
+                { value: '风险矩阵', label: '风险矩阵' },
+                { value: '头脑风暴法（集体讨论法）', label: '头脑风暴法（集体讨论法）' },
+                { value: '德尔菲法（专家调查法）', label: '德尔菲法（专家调查法）' },
+                { value: '情景分析', label: '情景分析' },
+                { value: '检查表', label: '检查表' },
+                { value: '故障树分析', label: '故障树分析' },
+                { value: '蒙特卡罗模拟分析法', label: '蒙特卡罗模拟分析法' },
+                { value: '贝叶斯统计及贝叶斯网络', label: '贝叶斯统计及贝叶斯网络' }
+            ]
         }
     },
     computed: {
@@ -516,7 +543,10 @@ export default {
                                         ji_hua_bian_hao_: this.infoFxssbData.ji_hua_bian_hao_,
                                         ni_cai_qu_kong_zh: item.ni_cai_qu_cuo_shi,
                                         qian_zai_yuan_yin: item.qian_zai_yuan_yin,
-                                        ji_suan_fang_shi_: this.infoFxssbData.ji_suan_fang_shi_
+                                        ji_suan_fang_shi_: this.infoFxssbData.ji_suan_fang_shi_,
+                                        yuan_feng_xian_de: item.feng_xian_deng_ji,
+                                        yuan_feng_xian_yi: item.feng_xian_ying_du,
+                                        parent_id_: item.id_ || ''
                                     }
                                 }
                             }).filter(i => i !== undefined),

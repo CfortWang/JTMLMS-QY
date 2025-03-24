@@ -997,9 +997,7 @@ export default {
                 sqlparty += ` UNION ALL SELECT ${i + 2} `
             })
 
-            const sql = `select jh.enName, IFNULL(jh.boShi,0) as boShi,IFNULL(jh.shuoShi,0) as shuoShi,IFNULL(jh.benKe,0) as benKe,IFNULL(jh.daZhuan,0) as daZhuan,IFNULL(jh.chuJi,0) as chuJi, IFNULL(jh.zhongJi,0) as zhongJi, IFNULL(jh.gaoJi,0) as gaoJi from (select  en.id_ ,en.name_ AS enName,               sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,             sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,             sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,             sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_              )gy right JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where en.DEPTH_ like '%4%' and en.PARENT_ID_ like '%${this.depth3}%' and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY en.id_) jh                                                                                                                                                                                                         
-            UNION
-            select (select name_ from ibps_party_entity where id_='${this.depth3}') as enName,IFNULL(sum(zui_gao_xue_li_x_ like '%博士%'),0) as boShi, IFNULL(sum(zui_gao_xue_li_x_ like '%硕士%'),0) as shuoShi,IFNULL(sum(zui_gao_xue_li_x_ = '本科'),0) as benKe,IFNULL(sum(zui_gao_xue_li_x_ = '大专'),0) as daZhuan, IFNULL(sum(zhi_cheng_deng_ji = '初级'),0) as chuJi,IFNULL(sum(zhi_cheng_deng_ji = '中级'),0) as zhongJi, IFNULL(sum(zhi_cheng_deng_ji = '高级'),0) as gaoJi from t_ryjbqk where parent_id_ in (SELECT b.id_ as bid FROM (select a.* from (SELECT id_, name_,TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(positions_, ',', n), ',', -1)) AS positions_ FROM ibps_party_employee JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers WHERE LENGTH(positions_) - LENGTH(REPLACE(positions_, ',', '')) >= n - 1) a GROUP BY name_) b WHERE b.positions_ IN ( SELECT id_  FROM ibps_party_entity  WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position'))`
+            const sql = `select jh.enName, IFNULL(jh.boShi,0) as boShi,IFNULL(jh.shuoShi,0) as shuoShi,IFNULL(jh.benKe,0) as benKe,IFNULL(jh.daZhuan,0) as daZhuan,IFNULL(jh.chuJi,0) as chuJi, IFNULL(jh.zhongJi,0) as zhongJi, IFNULL(jh.gaoJi,0) as gaoJi from (select  en.id_ ,en.name_ AS enName,               sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,             sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,             sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,             sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_              )gy right JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where en.DEPTH_ like '%4%' and en.PARENT_ID_ like '%${this.depth3}%' and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY en.id_) jh UNION select (select name_ from ibps_party_entity where id_='${this.depth3}') as enName,IFNULL(sum(zui_gao_xue_li_x_ like '%博士%'),0) as boShi, IFNULL(sum(zui_gao_xue_li_x_ like '%硕士%'),0) as shuoShi,IFNULL(sum(zui_gao_xue_li_x_ = '本科'),0) as benKe,IFNULL(sum(zui_gao_xue_li_x_ = '大专'),0) as daZhuan, IFNULL(sum(zhi_cheng_deng_ji = '初级'),0) as chuJi,IFNULL(sum(zhi_cheng_deng_ji = '中级'),0) as zhongJi, IFNULL(sum(zhi_cheng_deng_ji = '高级'),0) as gaoJi from t_ryjbqk where parent_id_ in (SELECT b.id_ as bid FROM (select a.* from (SELECT id_, name_,TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(positions_, ',', n), ',', -1)) AS positions_ FROM ibps_party_employee JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers WHERE LENGTH(positions_) - LENGTH(REPLACE(positions_, ',', '')) >= n - 1) a GROUP BY name_) b WHERE b.positions_ IN ( SELECT id_  FROM ibps_party_entity  WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position'))`
 
             curdPost('sql', sql).then((res) => {
                 const data = res.variables.data
@@ -1166,12 +1164,12 @@ export default {
             if (this.positionsIdArr.length) {
                 const users = this.getPositionPeopleIds(this.positionsIdArr[0])
                 const userIds = users.map(user => user.userId)
-                const renyuan = userIds.map(i => `'${i}'`).join(',') !== '' ? `and kao_shi_ren_ in (${userIds.map(i => `'${i}'`).join(',')})` : ''
-                const sql = `select * from t_examination where zhuang_tai_ = '已完成' ${renyuan} `
+                const renyuan = userIds.map(i => `'${i}'`).join(',') !== '' ? `and examinee in (${userIds.map(i => `'${i}'`).join(',')})` : ''
+                const sql = `select * from v_examination where paperState = '已完成' and examType!='自主考核' ${renyuan} GROUP BY examinee,examId ORDER BY createTime asc `
                 let { variables: { data }} = await this.$common.request('sql', sql)
                 if (this.startDate && this.endDate) {
                     data = data.filter(item => {
-                        return new Date(item.jie_shu_shi_jian_).getTime() >= new Date(this.startDate).getTime() && new Date(item.jie_shu_shi_jian_).getTime() <= new Date(this.endDate).getTime()
+                        return new Date(item.startDate).getTime() >= new Date(this.startDate).getTime() && new Date(item.startDate).getTime() <= new Date(this.endDate).getTime()
                     })
                 }
                 // console.log('考试1', data)
@@ -1179,9 +1177,9 @@ export default {
                     let count = 0
                     let passCount = 0
                     data.forEach(item => {
-                        if (item.kao_shi_ren_ === user.userId) {
+                        if (item.examinee === user.userId) {
                             count++
-                            if (+item.de_fen_ * 100 >= +item.ti_ku_zong_fen_ * +item.da_biao_zhan_bi_) {
+                            if (+(item.scoringType === '平均分' ? item.averageScore : item.scoringType === '最高分' ? item.maxScore : item.recentScore) * 100 >= +item.totalScore * +item.qualifiedRadio) {
                                 passCount++
                             }
                         }

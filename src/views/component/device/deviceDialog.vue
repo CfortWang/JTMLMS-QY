@@ -136,13 +136,13 @@
                                         <el-form-item label="设备类型：" prop="sheBeiLeiXing">
                                             <el-select v-if="!readonly" v-model="form.sheBeiLeiXing" placeholder="请选择" size="mini" style="width:100%">
                                                 <el-option
-                                                    v-for="item in ['检验系统','通用设备','软件','信息系统']"
-                                                    :key="item"
-                                                    :label="item"
-                                                    :value="item"
+                                                    v-for="(v,k) in typeList"
+                                                    :key="k"
+                                                    :label="v"
+                                                    :value="k"
                                                 />
                                             </el-select>
-                                            <span v-else>{{ form.sheBeiLeiXing ||'/' }}</span>
+                                            <span v-else>{{ typeList[form.sheBeiLeiXing]|| form.sheBeiLeiXing ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8">
@@ -838,6 +838,12 @@ export default {
             type: Object,
             default: function () {
                 return {}
+            }
+        },
+        typeList: {
+            type: Object,
+            default: function () {
+                return { '检验系统': '检验系统', '通用设备': '通用设备', '软件': '软件', '信息系统': '信息系统' }
             }
         }
     },
