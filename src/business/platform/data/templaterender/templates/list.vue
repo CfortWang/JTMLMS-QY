@@ -729,8 +729,8 @@ export default {
                         tableEl.setSelectionRadio(row)
                     }
                     // fixbug: 替换所有选中列表中的数据为最新数据，避免脚本返回的选中数据不更新
-                    const index = this.selectionAll.findIndex(item => this.getPkValue(item) === pkValue)
-                    this.selectionAll[index] = row
+                    // const index = this.selectionAll.findIndex(item => this.getPkValue(item) === pkValue)
+                    // this.selectionAll[index] = row
                 }
             })
         },
