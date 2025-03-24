@@ -212,7 +212,20 @@ export default {
          * 文件类型的限制
          */
         fileExtType () {
-            return this.accept === '*' || (this.multiple ? this.fileList : [this.fileList]).every(f => this.accept.split(',').includes(`.${f.ext}`))
+            const { accept, multiple, fileList } = this
+
+            if (accept === '*') {
+                return true
+            }
+
+            // 将 accept 中的扩展名统一转换为小写，并去除空格
+            const acceptedExtensions = accept.split(',').map(ext => ext.trim().toLowerCase().replace('.', ''))
+
+            const files = multiple ? fileList : [fileList]
+
+            return files.every(f => {
+                return acceptedExtensions.includes(f.ext.toLowerCase().replace('.', ''))
+            })
         },
         handleConfirm () {
             const arr = []
