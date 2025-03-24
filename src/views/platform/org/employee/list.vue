@@ -79,6 +79,7 @@ import CustomDataDisplayMixin from '@/business/platform/system/mixins/customData
 import importTable from '@/business/platform/form/formrender/dynamic-form/components/import-table'
 import MoreSearch from './more-search'
 import IbpsImport from '@/plugins/import'
+import { encryptByAes } from '@/utils/encrypt'
 export default {
     components: {
         Edit,
@@ -723,7 +724,7 @@ export default {
                 const userItem = {
                     id: '',
                     account: item.account,
-                    password: this.defaultPwd,
+                    password: encryptByAes(this.defaultPwd, 'pwd'),
                     isSuper: 'N',
                     name: item.username,
                     status: 'actived',
