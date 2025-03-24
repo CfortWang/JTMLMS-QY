@@ -93,7 +93,6 @@ export default {
             uploadData: {}, // 可以添加分类、文件等信息
             fileList: [],
             dialogVisible: false,
-            targetExt: false,
             dialogImageUrl: '',
             fileTypes: fileTypes,
             allFileTypes: allFileTypes,
@@ -169,33 +168,49 @@ export default {
          * 文件类型的检测
          */
         fileExtType (file) {
-            const accept = this.accept
-            const acceptTypes = this.acceptTypes
-            const fileTypes = this.fileTypes
-            const arr = file.name.split('.')
-            const result = arr[arr.length - 1]
-            let type = ''
-            this.targetExt = false
-            for (const i in acceptTypes) {
-                if (acceptTypes[i] === accept) {
-                    type = i
-                }
+            const { accept, acceptTypes, fileTypes } = this
+            const fileExtension = this.getFileExtension(file.name)
+
+            if (!fileExtension) {
+                return false
             }
-            if (type !== '' && this.accept !== '*') {
-                // 现存的附件类型
-                const targetFileTypes = fileTypes[type]
-                this.targetExt = targetFileTypes.includes(result)
-            } else {
-                if (this.accept === '*') {
-                    // 不限制
-                    this.targetExt = true
-                } else {
-                    // 自定义
-                    const targetFileTypes = this.accept.split(',')
-                    this.targetExt = targetFileTypes.includes('.' + result)
-                }
+
+            if (this.accept === '*') {
+                // 不限制
+                return true
             }
-            return this.targetExt
+
+            const type = Object.keys(acceptTypes).find(key => acceptTypes[key] === accept) || ''
+            if (type) {
+                // 扩展名转换小写判断
+                const targetFileTypes = fileTypes[type].map(ext => ext.toLowerCase())
+                return targetFileTypes.includes(fileExtension.toLowerCase())
+            }
+
+            const targetFileTypes = this.accept.split(',').map(ext => ext.trim().toLowerCase().replace('.', ''))
+            return targetFileTypes.includes(fileExtension.toLowerCase())
+        },
+        /**
+         * 获取文件后缀
+         * @param {string} fileName - 文件名
+         * @returns {string|null} - 文件后缀（不带点），如果没有后缀则返回 null
+         */
+        getFileExtension (fileName) {
+            if (!fileName || typeof fileName !== 'string') {
+                return null
+            }
+
+            if (fileName.startsWith('.')) {
+                return null
+            }
+
+            // 获取最后一个点之后的部分
+            const lastDotIndex = fileName.lastIndexOf('.')
+            if (lastDotIndex === -1) {
+                return null // 没有后缀
+            }
+
+            return fileName.slice(lastDotIndex + 1).toLowerCase()
         },
         /**
          * 文件类型的限制

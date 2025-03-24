@@ -124,7 +124,6 @@ export default {
             allFileTypes: allFileTypes,
             acceptTypes: acceptTypes,
             size: null,
-            targetExt: false,
             acceptRule: '',
             uploadFileList: [],
             onlineFileList: [],
@@ -210,29 +209,10 @@ export default {
             this.format = format
         },
         /**
-             * 文件类型的限制
-             */
+         * 文件类型的限制
+         */
         fileExtType () {
-            let targetFileTypes = []
-            this.targetExt = false
-            if (this.accept === '*') {
-                // 不限制
-                targetFileTypes = '*'
-            } else {
-                // 自定义
-                targetFileTypes = this.accept.split(',')
-            }
-            const fileList = this.multiple ? this.fileList : [this.fileList]
-            if (targetFileTypes !== '*') {
-                this.targetExt = fileList.every(i => {
-                    // console.log(targetFileTypes, `.${i.ext}`)
-                    return targetFileTypes.includes(`.${i.ext}`)
-                })
-            } else {
-                this.targetExt = true
-            }
-            // console.log(fileList, this.targetExt)
-            return this.targetExt
+            return this.accept === '*' || (this.multiple ? this.fileList : [this.fileList]).every(f => this.accept.split(',').includes(`.${f.ext}`))
         },
         handleConfirm () {
             const arr = []

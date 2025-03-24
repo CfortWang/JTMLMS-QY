@@ -114,7 +114,6 @@ export default {
             },
             fileList: [],
             multipleSelection: [],
-            targetExt: false,
             fileTypes: fileTypes,
             allFileTypes: allFileTypes,
             acceptTypes: acceptTypes,
@@ -224,8 +223,8 @@ export default {
             this.$emit('callback', val)
         },
         /**
-             * @description 行点击时触发的事件
-             */
+         * @description 行点击时触发的事件
+         */
         handleRowClick (row, event, column) {
             // 点击行，触发选中
             if (this.$utils.isNotEmpty(this.fileSize) && this.fileSize < row.totalBytes) {
@@ -254,40 +253,56 @@ export default {
             this.$emit('format', this.format)
         },
         /**
-             * 文件类型的检测
-             */
+         * 文件类型的检测
+         */
         fileExtType (file) {
-            const accept = this.accept
-            const acceptTypes = this.acceptTypes
-            const fileTypes = this.fileTypes
-            const arr = file.name.split('.')
-            const result = arr[arr.length - 1]
-            let type = ''
-            this.targetExt = false
-            for (const i in acceptTypes) {
-                if (acceptTypes[i] === accept) {
-                    type = i
-                }
+            const { accept, acceptTypes, fileTypes } = this
+            const fileExtension = this.getFileExtension(file.name)
+
+            if (!fileExtension) {
+                return false
             }
-            if (type !== '' && this.accept !== '*') {
-                // 现存的附件类型
-                const targetFileTypes = fileTypes[type]
-                this.targetExt = targetFileTypes.includes(result)
-            } else {
-                if (this.accept === '*') {
-                    // 不限制
-                    this.targetExt = true
-                } else {
-                    // 自定义
-                    const targetFileTypes = this.accept.split(',')
-                    this.targetExt = targetFileTypes.includes('.' + result)
-                }
+
+            if (this.accept === '*') {
+                // 不限制
+                return true
             }
-            return this.targetExt
+
+            const type = Object.keys(acceptTypes).find(key => acceptTypes[key] === accept) || ''
+            if (type) {
+                // 扩展名转换小写判断
+                const targetFileTypes = fileTypes[type].map(ext => ext.toLowerCase())
+                return targetFileTypes.includes(fileExtension.toLowerCase())
+            }
+
+            const targetFileTypes = this.accept.split(',').map(ext => ext.trim().toLowerCase().replace('.', ''))
+            return targetFileTypes.includes(fileExtension.toLowerCase())
         },
         /**
-             * @description 单选点击时触发的事件[阻止冒泡后单选值补充]
-             */
+         * 获取文件后缀
+         * @param {string} fileName - 文件名
+         * @returns {string|null} - 文件后缀（不带点），如果没有后缀则返回 null
+         */
+        getFileExtension (fileName) {
+            if (!fileName || typeof fileName !== 'string') {
+                return null
+            }
+
+            if (fileName.startsWith('.')) {
+                return null
+            }
+
+            // 获取最后一个点之后的部分
+            const lastDotIndex = fileName.lastIndexOf('.')
+            if (lastDotIndex === -1) {
+                return null // 没有后缀
+            }
+
+            return fileName.slice(lastDotIndex + 1).toLowerCase()
+        },
+        /**
+         * @description 单选点击时触发的事件[阻止冒泡后单选值补充]
+         */
         changeRowRadio (row) {
             if (this.$utils.isNotEmpty(this.fileSize) && this.fileSize < row.totalBytes) {
                 this.$message({
@@ -338,32 +353,32 @@ export default {
             this.loadData()
         },
         /**
-             * @description 每页条数改变
-             */
+         * @description 每页条数改变
+         */
         handlePaginationSizeChange (pageSize) {
             this.handlePaginationChange({ pageSize: pageSize })
         },
         /**
-             * @description 当前页码改变
-             */
+         * @description 当前页码改变
+         */
         handlePaginationCurrentChange (currentPage) {
             this.handlePaginationChange({ currentPage: currentPage })
         },
         /**
-             * @description 上一页
-             */
+         * @description 上一页
+         */
         handlePaginationPrevClick (currentPage) {
             this.handlePaginationChange({ currentPage: currentPage })
         },
         /**
-             * @description 下一页
-             */
+         * @description 下一页
+         */
         handlePaginationNextClick (currentPage) {
             this.handlePaginationChange({ currentPage: currentPage })
         },
         /**
-             * 处理分页事件
-             */
+         * 处理分页事件
+         */
         handlePaginationChange ({ pageSize, currentPage }) {
             ActionUtils.setPagination(this.pagination, {
                 limit: pageSize || this.pageSize,
@@ -372,8 +387,8 @@ export default {
             this.loadData()
         },
         /**
-             * @description 组件属性默认值
-             */
+         * @description 组件属性默认值
+         */
         handleAttribute (attribute, defaultValue) {
             if (attribute === false || attribute === 0 || attribute === '') {
                 return attribute

@@ -336,11 +336,6 @@ export default {
             const opt = this.treeDataOptions.find(opt => {
                 return opt.value === item[this.pkKey]
             })
-            // 添加个年份的判断
-            if (key === 'label' && opt && opt[key] && opt[key].slice(5, 10) === '01-01') {
-                if (opt[key].slice(5, 10) == '00:00:00') return (opt[key] = opt[key].slice(0, 4))
-                else if (this.props['label'] === 'nian_fen_') return (opt[key] = opt[key].slice(0, 4))
-            }
             return opt ? opt[key] : ''
         },
         getTreeData (id) {
