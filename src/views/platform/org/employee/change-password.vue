@@ -116,8 +116,6 @@ export default {
                     type: 'warning',
                     label: this.$t('platform.org.employee.change-password.reset'),
                     icon: 'ibps-icon-reply',
-                    // 还原默认按钮需传值原始密码，但是原始秘密无法获取。存在逻辑问题，隐藏。
-                    // hidden: () => { return true }
                     hidden: () => { return !this.isReset }
                 },
                 { key: 'cancel' }
@@ -217,10 +215,16 @@ export default {
          * 还原默认
          */
         restoreDefault () {
-            this.password.newPassword = '123456'
-            this.password.repeatPassword = '123456'
-            this.restoreDefaultPassW = 'restoreDefault'
-            this.saveData()
+            this.$confirm(`将重置用户密码为【123456】，是否确认操作？`, '提示', {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.password.newPassword = '123456'
+                this.password.repeatPassword = '123456'
+                this.restoreDefaultPassW = 'restoreDefault'
+                this.saveData()
+            }).catch(() => {})
         },
         // 关闭当前窗口
         closeDialog () {
