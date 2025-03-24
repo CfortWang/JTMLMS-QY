@@ -121,6 +121,7 @@ import PositionInfo from './position-info'
 import RoleInfo from './role-info'
 import GroupInfo from './group-info'
 import PersonalCode from './personal-qrcode'
+import { encryptByAes } from '@/utils/encrypt'
 
 export default {
     components: {
@@ -162,7 +163,7 @@ export default {
             defaultEmployee: {
                 id: '',
                 account: '',
-                password: 'jyk123456',
+                password: '',
                 isSuper: 'N',
                 name: '',
                 status: 'actived',
@@ -332,6 +333,9 @@ export default {
             const vo = this.formatSubmitData()
             if (!this.$utils.isEmpty(this.formId) && !this.ceroParams) {
                 delete vo.partyEmployeePo.password
+            } else {
+                // 创建用户时密码加密处理
+                vo.partyEmployeePo.password = encryptByAes(vo.partyEmployeePo.password, 'pwd')
             }
             if (vo.positionVoList.length === 0) {
                 ActionUtils.warning('请选择部门')

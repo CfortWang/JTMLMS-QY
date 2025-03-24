@@ -124,6 +124,7 @@
 import { mapActions } from 'vuex'
 import Utils from '@/utils/util'
 import I18n from '@/utils/i18n'
+import { encryptByAes } from '@/utils/encrypt'
 const loginForm = process.env.NODE_ENV === 'development'
     ? {
         username: 'shekou',
@@ -355,7 +356,9 @@ export default {
                     text: this.$t('common.loading'),
                     background: 'rgba(0, 0, 0, 0.7)'
                 })
-                this.login({ form: this.loginForm }).then(data => {
+                const submitData = structuredClone(this.loginForm)
+                submitData.password = encryptByAes(submitData.password, 'pwd')
+                this.login({ form: submitData }).then(data => {
                     localStorage.setItem('statistic', data.statistic)
                     // 更新路由 尝试去获取 cookie 里保存的需要重定向的页面完整地址
                     const redirect = this.$route.query.redirect

@@ -122,7 +122,8 @@
                     <el-input v-if="canEdit" v-model="formData.mobile" clearable />
                     <span v-else>{{ formData.mobile }}</span>
                 </el-form-item>
-                <el-form-item v-if="!readonly">
+                <!-- 功能逻辑存在问题，弃用 -->
+                <!-- <el-form-item v-if="!readonly">
                     <template slot="label">
                         入职/转岗培训
                         <help-tip title="" content="开启时，保存数据后将为当前用户开启入职/转岗培训" />
@@ -153,7 +154,7 @@
                         type="dialog"
                         placeholder="请选择培训人员带教老师"
                     />
-                </el-form-item>
+                </el-form-item> -->
             </el-form>
         </el-col>
     </el-row>
