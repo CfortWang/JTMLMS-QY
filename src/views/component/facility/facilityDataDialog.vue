@@ -52,6 +52,14 @@
                                         :value="item"
                                     />
                                 </el-select>
+                                <el-select v-if="form.period==='quarter'" v-model="form.date" placeholder="请选择" size="mini" style="width:100%">
+                                    <el-option
+                                        v-for="item in 3"
+                                        :key="item"
+                                        :label="`第${item}个月`"
+                                        :value="item"
+                                    />
+                                </el-select>
                                 <div v-if="form.period==='repeat'" style="display:flex;align-items: center;width:100%">
                                     <el-select v-model="form.date" placeholder="请选择" size="mini" style="width:100%">
                                         <el-option
@@ -131,7 +139,7 @@ export default {
                 date: '',
                 startTime: dayjs().format('YYYY-MM-DD')
             },
-            periodList: [{ label: '日监测', value: 'day' }, { label: '周监测', value: 'week' }, { label: '月监测', value: 'month' }, { label: '按时间间隔监测', value: 'repeat' }],
+            periodList: [{ label: '日监测', value: 'day' }, { label: '周监测', value: 'week' }, { label: '月监测', value: 'month' }, { label: '季度监测', value: 'quarter' }, { label: '按时间间隔监测', value: 'repeat' }],
             weekDays: [{ label: '周一', value: 1 }, { label: '周二', value: 2 }, { label: '周三', value: 3 }, { label: '周四', value: 4 }, { label: '周五', value: 5 }, { label: '周六', value: 6 }, { label: '周日', value: 7 }]
         }
     },
@@ -165,6 +173,9 @@ export default {
                         break
                     case 'month':
                         rate = '每个月第' + this.form.date + '天'
+                        break
+                    case 'quarter':
+                        rate = '每个季度第' + this.form.date + '个月'
                         break
                     case 'repeat':
                         rate = this.form.startTime + '起每隔' + this.form.date + '天'

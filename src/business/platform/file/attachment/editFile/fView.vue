@@ -8,7 +8,7 @@
 -->
 <template>
     <div>
-        <editor ref="editor" :option="option" :operation_status="operation_status" @updateFile="updateFile" @hadLoadedFile="hadLoadedFile" />
+        <editor ref="editor" :option="option" :operation_status="operation_status" :copy="copy" @updateFile="updateFile" @hadLoadedFile="hadLoadedFile" />
     </div>
 </template>
 
@@ -28,6 +28,10 @@ export default {
         operation_status: {
             type: String,
             default: ''
+        },
+        copy: {
+            type: Boolean,
+            default: false
         }
     },
     data () {

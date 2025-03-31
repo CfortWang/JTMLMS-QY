@@ -311,7 +311,6 @@ export default {
     watch: {
         planeData: {
             handler: function (val, oldVal) {
-                console.log(val, 'vvvvvvvvvvvvvvvvvvvvvvvvv')
                 // eslint-disable-next-line no-undef
                 this.nowData = structuredClone(val)
             },
@@ -320,7 +319,6 @@ export default {
         },
         btnType: {
             handler: function (val, oldVal) {
-                // console.log(val, 'vvvvvvvvvvvvvvvvvvvvvvvvv')
                 if (val === 'exitEdit') {
                     // eslint-disable-next-line no-undef
                     this.nowData = structuredClone(this.planeData)

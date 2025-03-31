@@ -70,6 +70,21 @@ export const questionType = [
     }
 ]
 
+export const surveyQuestionType = [
+    {
+        label: '单选题',
+        value: '单选题'
+    },
+    {
+        label: '多选题',
+        value: '多选题'
+    },
+    {
+        label: '问答题',
+        value: '问答题'
+    }
+]
+
 export const rateType = {
     '单选题': '自动',
     '多选题': '自动',
@@ -101,6 +116,25 @@ export const defaultOptions = [
         value: 'D',
         radio: '',
         checkbox: [],
+        content: ''
+    }
+]
+
+export const surveyDefaultOptions = [
+    {
+        value: 'A',
+        content: ''
+    },
+    {
+        value: 'B',
+        content: ''
+    },
+    {
+        value: 'C',
+        content: ''
+    },
+    {
+        value: 'D',
         content: ''
     }
 ]

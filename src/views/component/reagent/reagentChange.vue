@@ -19,7 +19,7 @@
                 <el-col>
                     <el-table ref="reagent" :data="reagentDataFilter" :span-method="spanMethod">
                         <el-table-column
-                            label="检验项目"
+                            :label="formData.yiYuan === '深圳肿瘤' ? '检查项目' : '检验项目'"
                             prop="jyxm"
                         />
                         <el-table-column label="浓度" prop="nd">
@@ -28,7 +28,7 @@
                                 <span v-else>{{ row.nd|| '/' }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column label="样品编号" prop="ypbh" />
+                        <el-table-column :label="formData.yiYuan === '深圳肿瘤' ? '病理号' : '样品编号'" prop="ypbh" />
                         <el-table-column label="旧试剂测得结果" prop="jsjcdjg">
                             <template slot-scope="{row}">
                                 <el-input v-if="!disabled" v-model="row.jsjcdjg" :min="0" size="mini" placeholder="请输入" type="number" />
@@ -232,7 +232,7 @@ export default {
             },
             {
                 field_name: 'jyxm',
-                label: '检验项目',
+                label: this.formData.yiYuan === '深圳肿瘤' ? '检查项目' : '检验项目',
                 name: 'jyxm'
             },
             {
@@ -242,7 +242,7 @@ export default {
             },
             {
                 field_name: 'ypbh',
-                label: '样品编号',
+                label: this.formData.yiYuan === '深圳肿瘤' ? '病理号' : '样品编号',
                 name: 'ypbh'
             },
             {

@@ -440,6 +440,10 @@ export default {
         isDisabled: {
             type: Boolean,
             default: false
+        },
+        userIds: {
+            type: String,
+            default: ''
         }
     },
     data () {
@@ -494,7 +498,7 @@ export default {
                 guan_lian_id_: '',
                 xian_kao_shi_jian: '不限',
                 xian_kao_ci_shu_: '不限',
-                can_kao_ren_yuan_: '',
+                can_kao_ren_yuan_: this.userIds || '',
                 kao_shi_shi_chang: '',
                 zhuang_tai_: '未发布',
                 da_biao_zhan_bi_: 60,

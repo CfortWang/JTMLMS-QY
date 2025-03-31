@@ -22,6 +22,7 @@
 <script>
 import * as echarts from 'echarts'
 import { quarterChartOption } from '../constants/option'
+import { quarterChartOptionbl } from '../constants/optionbl'
 export default {
     name: 'chart',
     components: {},
@@ -37,6 +38,10 @@ export default {
         chooseYear: {
             type: String,
             default: ''
+        },
+        name: {
+            type: String,
+            default: () => ''
         }
     },
     data () {
@@ -70,24 +75,56 @@ export default {
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
             setTimeout(() => {
                 this.info.forEach((item, index) => {
-                    const chart = echarts.init(document.getElementById(`card${index}`))
-                    const option = JSON.parse(JSON.stringify(quarterChartOption))
-                    const xData = item.data.map((i, dIndex) => i.statisticalTime.replace('第', '\n第'))
-                    const yData = item.data.map(i => this.$utils.isEmpty(i.result) ? null : i.result)
-                    const yMax = Math.max(...yData)
-                    const yMin = Math.min(...yData)
-                    const limit = item.data.map(i => i.limitValue).filter(i => i !== undefined)[0]
-                    const limitValue = item.data.map(i => i.originalData).filter(i => i)[0]
-                    option.yAxis.max = Math.max(parseFloat(limit), parseFloat(yMax))
-                    // option.yAxis.min = Math.min(parseFloat(limit), parseFloat(yMin))
-                    option.title.text = item.title
-                    option.title.textStyle.fontSize = this.fontSize
-                    option.title.subtext = `限值${limitValue.replace(/@/g, '')}`
-                    option.xAxis.data = xData
-                    option.series[0].data = yData
-                    option.series[0].markLine.data[0].yAxis = limit
-                    option.series[0].markLine.data[0].label.formatter = limit
-                    chart.setOption(option)
+                    if (this.name !== '病理') {
+                        console.log(item)
+                        const chart = echarts.init(document.getElementById(`card${index}`))
+                        const option = JSON.parse(JSON.stringify(quarterChartOption))
+                        const xData = item.data.map((i, dIndex) => i.statisticalTime.replace('第', '\n第'))
+                        const yData = item.data.map(i => this.$utils.isEmpty(i.result) ? null : i.result)
+                        const yMax = Math.max(...yData)
+                        const yMin = Math.min(...yData)
+                        const limit = item.data.map(i => i.limitValue).filter(i => i !== undefined)[0]
+                        const limitValue = item.data.map(i => i.originalData).filter(i => i)[0]
+                        option.yAxis.max = Math.max(parseFloat(limit), parseFloat(yMax))
+                        // option.yAxis.min = Math.min(parseFloat(limit), parseFloat(yMin))
+                        option.title.text = item.title
+                        option.title.textStyle.fontSize = this.fontSize
+                        option.title.subtext = `限值${limitValue.replace(/@/g, '')}`
+                        option.xAxis.data = xData
+                        option.series[0].data = yData
+                        option.series[0].markLine.data[0].yAxis = limit
+                        option.series[0].markLine.data[0].label.formatter = limit
+                        chart.setOption(option)
+                    } else {
+                        console.log(item)
+
+                        const chart = echarts.init(document.getElementById(`card${index}`))
+                        const option = JSON.parse(JSON.stringify(quarterChartOptionbl))
+                        const xData = item.data.map((i, dIndex) => i.statisticalTime.replace('第', '\n第'))
+                        const yData = item.data.map(i => this.$utils.isEmpty(i.result) ? null : i.result)
+                        const limit = item.data.map(i => i.limitValue).filter(i => i !== undefined)[0]
+                        const limitValue = item.data.map(i => i.originalData).filter(i => i)[0]
+                        // option.yAxis.max = Math.max(parseFloat(limit), parseFloat(yMax))
+                        // option.yAxis.min = Math.min(parseFloat(limit), parseFloat(yMin))
+                        option.title.text = item.title
+                        option.title.textStyle.fontSize = this.fontSize
+                        option.title.subtext = `限值${limitValue.replace(/@/g, '')}`
+                        option.xAxis.data = xData
+                        console.log(yData)
+
+                        option.series[0].data = yData
+                        // option.series[0].data = [null, null, 70, 98, 100, 90, 90]
+                        option.series[0].name = item.title
+                        const lData = item.data.map(i => this.$utils.isEmpty(i.limitValue) ? null : i.limitValue)
+                        option.series[1].data = lData
+                        // option.series[1].data = [null, null, 90, 90, 100, 100, 90]
+                        option.series[1].name = '达标标准率'
+                        option.legend.data = [item.title, '达标标准率']
+                        // option.series[0].markLine.data[0].yAxis = limit
+                        // option.series[0].markLine.data[0].label.formatter = limit
+                        chart.setOption(option)
+                        console.log(option)
+                    }
                 })
             }, 100)
         }

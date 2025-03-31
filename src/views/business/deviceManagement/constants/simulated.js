@@ -152,6 +152,28 @@ export const verificationData = [
         numW: 40
     }
 ]
+export const originalAssets = [
+    {
+        org: '生化组',
+        assets: 60
+    },
+    {
+        org: '免疫组',
+        assets: 60
+    },
+    {
+        org: '临检组',
+        assets: 60
+    },
+    {
+        org: '微生物组',
+        assets: 60
+    },
+    {
+        org: '检验科',
+        assets: 60
+    }
+]
 export const scrapData = [
     [
         '微生物组',
@@ -289,5 +311,6 @@ export default {
     completeData,
     verificationData,
     scrapData,
-    entiretyData
+    entiretyData,
+    originalAssets
 }

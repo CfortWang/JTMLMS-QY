@@ -10,6 +10,8 @@
                 @expand-collapse="handleExpandCollapse"
             />
         </div>
+        <!-- :row-handle="listConfig.rowHandle" -->
+        <!-- 隐藏操作列 -->
         <ibps-crud
             ref="crud"
             :height="height"
@@ -19,7 +21,6 @@
             :search-form="listConfig.searchForm"
             :pk-key="pkKey"
             :columns="listConfig.columns"
-            :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
             :selection-row="false"

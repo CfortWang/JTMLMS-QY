@@ -669,27 +669,21 @@
                                                 <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
                                                     <el-col>
                                                         <el-form-item label="检定/校准参数：">
-                                                            <el-input v-if="!readonly" v-model="form.jianDingXiao" size="mini" />
-                                                            <span v-else>{{ form.jianDingXiao ||'/' }}
-                                                            </span>
+                                                            <el-input v-model="form.jianDingXiao" size="mini" type="textarea" :autosize="{maxRows:4,minRows:2}" :readonly="readonly" />
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
                                                     <el-col>
-                                                        <el-form-item label="测量范围：">
-                                                            <el-input v-if="!readonly" v-model="form.ceLiangGongZuo" size="mini" />
-                                                            <span v-else>{{ form.ceLiangGongZuo ||'/' }}
-                                                            </span>
+                                                        <el-form-item label="预期测量范围：">
+                                                            <el-input v-model="form.ceLiangGongZuo" type="textarea" size="mini" :autosize="{maxRows:4,minRows:2}" :readonly="readonly" />
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是' && !isSheKou">
                                                     <el-col>
                                                         <el-form-item label="U/精确度/最大允差：" label-width="130">
-                                                            <el-input v-if="!readonly" v-model="form.zuiDaYunCha" size="mini" style="width:100%" />
-                                                            <span v-else>{{ form.zuiDaYunCha ||'/' }}
-                                                            </span>
+                                                            <el-input v-model="form.zuiDaYunCha" type="textarea" size="mini" style="width:100%" :autosize="{maxRows:4,minRows:2}" :readonly="readonly" />
                                                         </el-form-item>
                                                     </el-col>
                                                 </el-row>

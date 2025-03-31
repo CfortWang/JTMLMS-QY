@@ -208,6 +208,7 @@
                                             <div class="item">是否校准：{{ row.shiFouXiaoZhun || '/' }}</div>
                                             <div class="item">校准周期：{{ row.xiaoZhunZQ?`${row.xiaoZhunZQ}月` : '/' }}</div>
                                             <div class="item">最近校准时间：{{ row.yiXiaoRiQi || '/' }}</div>
+                                            <div class="item">校准有效期至：{{ row.xiaoZhunYouXia || '/' }}</div>
                                         </div>
                                     </el-col>
                                 </el-row>
@@ -246,6 +247,19 @@
                     <template slot="time">
                         <el-date-picker
                             v-model="search.time"
+                            size="mini"
+                            type="daterange"
+                            :picker-options="pickerOptions"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期"
+                            align="right"
+                            value-format="yyyy-MM-dd"
+                        />
+                    </template>
+                    <template slot="validity">
+                        <el-date-picker
+                            v-model="search.validity"
                             size="mini"
                             type="daterange"
                             :picker-options="pickerOptions"
@@ -451,7 +465,8 @@ export default {
                 deviceStatus: '',
                 place: '',
                 managePeople: '',
-                deviceClass: ''
+                deviceClass: '',
+                validity: ''
             },
             loading: false,
             pkKey: 'id', // 主键  如果主键不是pk需要传主键
@@ -495,8 +510,8 @@ export default {
                         { prop: '', label: '设备状态', fieldType: 'slot', slotName: 'deviceStatus' },
                         { prop: '', label: '放置地点', fieldType: 'slot', slotName: 'place' },
                         { prop: '', label: '管理人', fieldType: 'slot', slotName: 'managePeople' },
-                        { prop: '', label: '岗位/分组', fieldType: 'slot', slotName: 'deviceClass' }
-
+                        { prop: '', label: '岗位/分组', fieldType: 'slot', slotName: 'deviceClass' },
+                        { prop: '', label: '校准有效期', fieldType: 'slot', slotName: 'validity' }
                     ]
                 },
                 // 表格字段配置
@@ -551,7 +566,7 @@ export default {
                 xiaoZhunZQ: '检定/校准周期（以月为单位）',
                 xiaoZhunYouXia: '校准有效期至',
                 shiYongKeShi: '检定/校准单位',
-                ceLiangGongZuo: '测量/工作范围',
+                ceLiangGongZuo: '预期测量范围',
                 huanJingYaoQiu: '环境要求',
                 dianYuanYaoQiu: '电源要求',
                 jieShouZhuangTai: '接收时状态（新设备/二手或翻新设备）',
@@ -715,6 +730,12 @@ export default {
                 const obj = { relation: 'AND', parameters: [] }
                 obj.parameters.push({ key: 'Q^bian_zhi_shi_jian^DL^yyyy-MM-dd', value: this.search.time[0], param: this.$utils.guid() })
                 obj.parameters.push({ key: 'Q^bian_zhi_shi_jian^DG^yyyy-MM-dd', value: this.search.time[1], param: this.$utils.guid() })
+                parameters.parameters.push(obj)
+            }
+            if (this.search.validity && this.search.validity.length === 2) {
+                const obj = { relation: 'AND', parameters: [] }
+                obj.parameters.push({ key: 'Q^xiao_zhun_you_xia^DL^yyyy-MM-dd', value: this.search.validity[0], param: this.$utils.guid() })
+                obj.parameters.push({ key: 'Q^xiao_zhun_you_xia^DG^yyyy-MM-dd', value: this.search.validity[1], param: this.$utils.guid() })
                 parameters.parameters.push(obj)
             }
             // 设备编号搜索

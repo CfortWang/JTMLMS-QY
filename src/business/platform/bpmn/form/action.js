@@ -178,19 +178,19 @@ export default {
                 data: JSON.stringify(replaceFormData),
                 opinion
             }).then(response => {
-                loading.close()
-                this.$alert(`已保存表单内容！`, {
-                    showClose: false
-                }).then(() => {
-                    // 后置事件
-                    this.afterScript(this.actionName, {
-                        data: response.data,
-                        variables: response.variables
-                    }, () => {
+                // 后置事件
+                this.afterScript(this.actionName, {
+                    data: response.data,
+                    variables: response.variables
+                }, () => {
+                    loading.close()
+                    this.$alert(`已保存表单内容！`, {
+                        showClose: false
+                    }).then(() => {
                         // 回调上个页面
                         // this.callbackPage()
-                    })
-                }).catch(() => { })
+                    }).catch(() => { })
+                })
             })
         },
         /**
@@ -240,22 +240,22 @@ export default {
             })
             // 1、直接启动
             startFlow(jsonData).then(response => {
-                loading.close()
-                this.$alert(`启动成功！`, {
-                    showClose: false
-                }).then(() => {
-                    const { bizKey = '', proInstId = '' } = response.variables || {}
-                    // this.createSnapshot(bizKey, proInstId)
-                    this.startFlowDialogVisible = false
-                    // 后置事件
-                    this.afterScript(this.actionName, {
-                        data: response.data,
-                        variables: response.variables
-                    }, () => {
+                const { bizKey = '', proInstId = '' } = response.variables || {}
+                // this.createSnapshot(bizKey, proInstId)
+                this.startFlowDialogVisible = false
+                // 后置事件
+                this.afterScript(this.actionName, {
+                    data: response.data,
+                    variables: response.variables
+                }, () => {
+                    loading.close()
+                    this.$alert(`启动成功！`, {
+                        showClose: false
+                    }).then(() => {
                         // 回调上个页面
                         this.callbackPage()
-                    })
-                }).catch(() => { })
+                    }).catch(() => { })
+                })
             }).catch(() => {
                 loading.close()
             })
@@ -286,22 +286,22 @@ export default {
                 text: this.$t('common.saving')
             })
             saveDraft(jsonData).then(response => {
-                loading.close()
                 const { proInstId, bizKey } = response.variables || {}
                 this.proInstId = proInstId
                 this.bizKey = bizKey
-                this.$alert(`保存成功！`, {
-                    showClose: false
-                }).then(() => {
-                    // 后置事件
-                    this.afterScript(this.actionName, {
-                        data: response.data,
-                        variables: response.variables
-                    }, () => {
+                // 后置事件
+                this.afterScript(this.actionName, {
+                    data: response.data,
+                    variables: response.variables
+                }, () => {
+                    loading.close()
+                    this.$alert(`保存成功！`, {
+                        showClose: false
+                    }).then(() => {
                         // 回调上个页面
                         // this.callbackPage()
-                    })
-                }).catch(() => { })
+                    }).catch(() => { })
+                })
             }).catch(() => {
                 loading.close()
             })
@@ -380,28 +380,28 @@ export default {
             }
         },
         handleResponse (actionName, loading, response) {
-            loading.close()
-            this.$alert(response.message, {
-                showClose: false
-            }).then(() => {
-                // 关闭窗口
-                if (actionName === 'agree' || actionName === 'oppose' || actionName === 'abandon') {
-                    this.agreeDialogVisible = false
-                } else if (actionName === 'rejectToPrevious' || actionName === 'rejectToStart' || actionName === 'reject') {
-                    this.rejectDialogVisible = false
-                }
-                if (actionName === 'agree') {
-                    // this.createSnapshot()
-                }
-                // 后置事件
-                this.afterScript(this.actionName, {
-                    data: response.data,
-                    variables: response.variables
-                }, () => {
+            // 关闭窗口
+            if (actionName === 'agree' || actionName === 'oppose' || actionName === 'abandon') {
+                this.agreeDialogVisible = false
+            } else if (actionName === 'rejectToPrevious' || actionName === 'rejectToStart' || actionName === 'reject') {
+                this.rejectDialogVisible = false
+            }
+            if (actionName === 'agree') {
+                // this.createSnapshot()
+            }
+            // 后置事件
+            this.afterScript(this.actionName, {
+                data: response.data,
+                variables: response.variables
+            }, () => {
+                loading.close()
+                this.$alert(response.message, {
+                    showClose: false
+                }).then(() => {
                     // 回调上个页面
                     this.callbackPage()
-                })
-            }).catch(() => { })
+                }).catch(() => { })
+            })
         },
         handleEndProcess () {
             if (this.isBpmOpinionHide) {
@@ -430,23 +430,23 @@ export default {
                 taskId: this.taskId ? this.taskId : this.endProcessTaskId,
                 endReason: params.opinion
             }).then(response => {
-                loading.close()
-                this.$alert(response.message, {
-                    showClose: false
-                }).then(() => {
-                    this.approveDialogVisible = false
-                    // 更改数据状态为已终止
-                    const { code = '' } = this.getFormEL().formDefData || {}
-                    const { id = '' } = this.getFormEL().formData || {}
-                    if (!id || !code) {
-                        return
-                    }
-                    this.updateState(id, code, '已终止', null)
-                    // 后置事件
-                    this.afterScript(this.actionName, {
-                        data: response.data,
-                        variables: response.variables
-                    }, () => {
+                this.approveDialogVisible = false
+                // 更改数据状态为已终止
+                const { code = '' } = this.getFormEL().formDefData || {}
+                const { id = '' } = this.getFormEL().formData || {}
+                if (!id || !code) {
+                    return
+                }
+                this.updateState(id, code, '已终止', null)
+                // 后置事件
+                this.afterScript(this.actionName, {
+                    data: response.data,
+                    variables: response.variables
+                }, () => {
+                    loading.close()
+                    this.$alert(response.message, {
+                        showClose: false
+                    }).then(() => {
                         // 回调上个页面
                         this.callbackPage()
                     })
@@ -470,16 +470,16 @@ export default {
                 messageType: params.messageType,
                 addReason: params.opinion
             }).then(response => {
-                loading.close()
-                this.$alert(response.message, {
-                    showClose: false
-                }).then(() => {
-                    this.addSignTaskDialogVisible = false
-                    // 后置事件
-                    this.afterScript(this.actionName, {
-                        data: response.data,
-                        variables: response.variables
-                    }, () => {
+                this.addSignTaskDialogVisible = false
+                // 后置事件
+                this.afterScript(this.actionName, {
+                    data: response.data,
+                    variables: response.variables
+                }, () => {
+                    loading.close()
+                    this.$alert(response.message, {
+                        showClose: false
+                    }).then(() => {
                         // 回调上个页面
                         this.callbackPage()
                     })
@@ -523,19 +523,19 @@ export default {
                     text: this.$t('common.saving')
                 })
                 lock({ taskId: this.taskId }).then(response => {
-                    loading.close()
-                    this.$alert(`锁定任务成功！`, {
-                        showClose: false
-                    }).then(() => {
-                        // 后置事件
-                        this.afterScript(this.actionName, {
-                            data: response.data,
-                            variables: response.variables
-                        }, () => {
+                    // 后置事件
+                    this.afterScript(this.actionName, {
+                        data: response.data,
+                        variables: response.variables
+                    }, () => {
+                        loading.close()
+                        this.$alert(`锁定任务成功！`, {
+                            showClose: false
+                        }).then(() => {
                             // 回调上个页面
                             this.callbackPage()
-                        })
-                    }).catch(() => { })
+                        }).catch(() => { })
+                    })
                 }).catch(() => {
                     loading.close()
                 })
@@ -553,19 +553,19 @@ export default {
                     text: this.$t('common.saving')
                 })
                 unlock({ taskId: this.taskId }).then(response => {
-                    loading.close()
-                    this.$alert(`解锁任务成功！`, {
-                        showClose: false
-                    }).then(() => {
-                        // 后置事件
-                        this.afterScript(this.actionName, {
-                            data: response.data,
-                            variables: response.variables
-                        }, () => {
+                    // 后置事件
+                    this.afterScript(this.actionName, {
+                        data: response.data,
+                        variables: response.variables
+                    }, () => {
+                        loading.close()
+                        this.$alert(`解锁任务成功！`, {
+                            showClose: false
+                        }).then(() => {
                             // 回调上个页面
                             this.callbackPage()
-                        })
-                    }).catch(() => { })
+                        }).catch(() => { })
+                    })
                 }).catch(() => {
                     loading.close()
                 })
@@ -583,19 +583,19 @@ export default {
                     text: this.$t('common.saving')
                 })
                 unlock({ taskId: this.taskId }).then(response => {
-                    loading.close()
-                    this.$alert(`强制解锁任务成功！`, {
-                        showClose: false
-                    }).then(() => {
-                        // 后置事件
-                        this.afterScript(this.actionName, {
-                            data: response.data,
-                            variables: response.variables
-                        }, () => {
+                    // 后置事件
+                    this.afterScript(this.actionName, {
+                        data: response.data,
+                        variables: response.variables
+                    }, () => {
+                        loading.close()
+                        this.$alert(`强制解锁任务成功！`, {
+                            showClose: false
+                        }).then(() => {
                             // 回调上个页面
                             this.callbackPage()
-                        })
-                    }).catch(() => { })
+                        }).catch(() => { })
+                    })
                 }).catch(() => {
                     loading.close()
                 })
@@ -613,19 +613,19 @@ export default {
                     text: this.$t('common.saving')
                 })
                 suspendProcess({ taskId: this.taskId }).then(response => {
-                    loading.close()
-                    this.$alert(`挂起任务成功！`, {
-                        showClose: false
-                    }).then(() => {
-                        // 后置事件
-                        this.afterScript(this.actionName, {
-                            data: response.data,
-                            variables: response.variables
-                        }, () => {
+                    // 后置事件
+                    this.afterScript(this.actionName, {
+                        data: response.data,
+                        variables: response.variables
+                    }, () => {
+                        loading.close()
+                        this.$alert(`挂起任务成功！`, {
+                            showClose: false
+                        }).then(() => {
                             // 回调上个页面
                             this.callbackPage()
-                        })
-                    }).catch(() => { })
+                        }).catch(() => { })
+                    })
                 }).catch(() => {
                     loading.close()
                 })
@@ -645,15 +645,15 @@ export default {
                 recoverProcess({
                     taskId: this.taskId
                 }).then(response => {
-                    loading.close()
-                    this.$alert(`恢复任务成功！`, {
-                        showClose: false
-                    }).then(() => {
-                        // 后置事件
-                        this.afterScript(this.actionName, {
-                            data: response.data,
-                            variables: response.variables
-                        }, () => {
+                    // 后置事件
+                    this.afterScript(this.actionName, {
+                        data: response.data,
+                        variables: response.variables
+                    }, () => {
+                        loading.close()
+                        this.$alert(`恢复任务成功！`, {
+                            showClose: false
+                        }).then(() => {
                             // 回调上个页面
                             this.callbackPage()
                         })

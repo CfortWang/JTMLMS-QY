@@ -54,6 +54,10 @@ export default {
         stack: {
             type: Boolean,
             default: false
+        },
+        legendVal: {
+            type: Boolean,
+            default: true
         }
     },
     data () {
@@ -67,7 +71,8 @@ export default {
                 numP: '待处理',
                 numC: '已完成',
                 numJ: '计划数',
-                numW: '完成数'
+                numW: '完成数',
+                assets: '金额（万元）'
             },
             correspondenceUn: {
                 rate: '完成率'
@@ -154,6 +159,7 @@ export default {
                 legend: {
                     left: 'left',
                     top: '40',
+                    show: this.legendVal,
                     textStyle: {
                         color: '#fff'
                     },
@@ -206,7 +212,7 @@ export default {
                                     let temp = ''
                                     const start = i * len
                                     const end = start + len
-                                    if (i == rowNumber - 1) {
+                                    if (i === rowNumber - 1) {
                                         temp = params.substring(start, paramsLen)
                                     } else {
                                         temp = params.substring(start, end) + '\n'
@@ -225,7 +231,27 @@ export default {
                         color: '#fff',
                         min: 0,
                         formatter: function (value) {
-                            return (value + '').indexOf('.') === -1 ? value : ''
+                            const mid = (value + '').indexOf('.') === -1 ? value + '' : ''
+                            let str = ''
+                            const paramsLen = mid.length
+                            const len = 4
+                            const rowNumber = Math.ceil(paramsLen / len)
+                            if (paramsLen > len) {
+                                for (let i = 0; i < rowNumber; i++) {
+                                    let temp = ''
+                                    const start = i * len
+                                    const end = start + len
+                                    if (i === rowNumber - 1) {
+                                        temp = mid.substring(start, paramsLen)
+                                    } else {
+                                        temp = mid.substring(start, end) + '\n'
+                                    }
+                                    str += temp
+                                }
+                            } else {
+                                str = mid
+                            }
+                            return str
                         }
                     }
                     // interval: interval

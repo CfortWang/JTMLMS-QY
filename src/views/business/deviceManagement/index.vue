@@ -40,7 +40,7 @@
                     <dv-decoration-2 :key="`line4`" :reverse="true" :dur="6" style="width:1%;height:100%;" />
                     <div class="area">
                         <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:31.66%;">
-                            <bar-chart v-if="mergeData[4].numData.length>0" :id="3" v-model="mergeData[4].numData" :title="mergeData[4].title" :line-t-f="true" :width="'98%'" :height="'98%'" />
+                            <bar-chart v-if="mergeData[4].numData.length>0" :id="3" v-model="mergeData[4].numData" :title="mergeData[4].title" :legend-val="false" :width="'98%'" :height="'98%'" />
                         </dv-border-box-7>
                         <dv-decoration-2 :key="`6`" :dur="6" style="width:100%;height:2.5%;" />
                         <dv-border-box-7 :color="dvColor" :background-color="dvBackColor" style="width:100%;height:31.66%;">
@@ -100,9 +100,13 @@ export default {
                     title: '设备状况统计',
                     numData: dataobj.intactData
                 },
+                // {
+                //     title: '设备维护完成情况',
+                //     numData: dataobj.completeData
+                // },
                 {
-                    title: '设备维护完成情况',
-                    numData: dataobj.completeData
+                    title: '设备资产金额情况（万元）',
+                    numData: dataobj.originalAssets
                 },
                 {
                     title: '设备检定/校准完成情况',
@@ -207,15 +211,24 @@ export default {
                 this.mergeData[2].numData = lifeTimeData
                 this.mergeData[3].numData = intactData
                 this.mergeData[4].numData = []
-                if (data.completeData !== null && data.completeData.length > 0) {
-                    data.completeData.forEach(element => {
+                // if (data.completeData !== null && data.completeData.length > 0) {
+                //     data.completeData.forEach(element => {
+                //         if (element.org.indexOf('综合') === -1) {
+                //             console.log((element.numC / element.numP).toFixed(4), (element.numC / element.numP).toFixed(4) * 100)
+                //             this.mergeData[4].numData.push({ ...element, rate: (element.numP !== 0 ? ((element.numC * 100) / element.numP).toFixed(2) : 0) + '%' })
+                //         }
+                //     })
+                // }
+                if (data.originalAssets !== null && data.originalAssets.length > 0) {
+                    data.originalAssets.forEach(element => {
                         if (element.org.indexOf('综合') === -1) {
-                            console.log((element.numC / element.numP).toFixed(4), (element.numC / element.numP).toFixed(4) * 100)
-                            this.mergeData[4].numData.push({ ...element, rate: (element.numP !== 0 ? ((element.numC * 100) / element.numP).toFixed(2) : 0) + '%' })
+                            this.mergeData[4].numData.push({ org: element.org, assets: element.assets })
                         }
                     })
                 }
+                console.log(this.mergeData[4].numData, 'this.mergeData[4].numData')
                 this.mergeData[5].numData = verificationData
+                // this.mergeData[5].numData = originalAssets
                 this.mergeData[6].numData.data = scrapDataList
                 const { upKeep, ...b } = data.entiretyData
                 this.mergeData[7].numData = b || []

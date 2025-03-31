@@ -16,7 +16,8 @@
                 <el-col>
                     <el-table ref="external" :data="reagentBatchDataFilter" :span-method="objectSpanMethod" @selection-change="handleSelectionChange">
                         <el-table-column type="selection" width="55" />
-                        <el-table-column label="样品序号 （条码号）" prop="biaoBenHao">
+
+                        <el-table-column :label="formData.yiYuan === '深圳肿瘤' ? '病理号':'样品序号 （条码号）'" prop="biaoBenHao">
                             <template slot-scope="{row}">
                                 <el-input v-if="!isRead" v-model="row.biaoBenHao" size="mini" maxlength="32" placeholder="请输入" />
                                 <span v-else>{{ row.biaoBenHao }}</span>
@@ -103,7 +104,8 @@ export default {
                 if (value && value.length) {
                     this.reagentBatchData = value
                 }
-            }
+            },
+            immediate: true
         },
         reagentBatchData: {
             handler (value, old) {

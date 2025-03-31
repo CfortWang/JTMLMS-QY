@@ -26,6 +26,7 @@ export default {
                         this.handleSave()
                         break
                     }
+                    break
                 default:
                     break
             }
@@ -53,7 +54,7 @@ export default {
                                 type: 'warning'
                             }).then(() => {
                                 this.handleStartFlowFromEdit(flowKey)
-                            }).catch(() => {})
+                            }).catch(() => { })
                         } else {
                             this.bpmDefDialogVisible = true
                         }
@@ -128,18 +129,18 @@ export default {
                 text: this.$t('common.saving')
             })
             saveFormData(jsonData).then(response => {
-                loading.close()
-                this.$alert(`保存表单成功！`, {
-                    showClose: false
-                }).then(() => {
-                    // 后置事件
-                    this.afterScript(this.actionName, {
-                        data: response.data,
-                        variables: response.variables
-                    }, () => {
+                // 后置事件  调整触发时机，表单数据保存后，弹框前
+                this.afterScript(this.actionName, {
+                    data: response.data,
+                    variables: response.variables
+                }, () => {
+                    loading.close()
+                    this.$alert(`保存表单成功！`, {
+                        showClose: false
+                    }).then(() => {
                         this.callbackPage()
+                    }).catch(() => {
                     })
-                }).catch(() => {
                 })
             }).catch(() => {
                 loading.close()

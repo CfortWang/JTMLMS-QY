@@ -22,6 +22,7 @@
                         :key="btn.key"
                         :type="btn.type"
                         :icon="btn.icon"
+                        :disabled = "btn.key ==='undo' && viewType !=='users' ?true:false"
                         :size="btn.size || 'mini'"
                         @click="handleAction(btn.key)"
                     >
@@ -223,7 +224,7 @@
                             class="color-block" 
                             :style="{ backgroundColor: shift.color }"
                         ></div>
-                        <span class="shift-name">{{ shift.name }}</span>
+                        <span class="shift-name">{{ shift.name+'/'+shift.alias }}</span>
                     </div>
                 </div>
             </div>
@@ -351,8 +352,9 @@
                                     class="shift"
                                     :style="{ color: viewType === 'users' ? `${shift.color}` : `${ordinateList[rIndex].color}`}"
                                 >
-                                    <div v-if="viewType !== 'users'">{{ viewType === 'users'? shift.alias : shift.userName }}</div>
-                                    <div v-if="viewType === 'users'" :style="{ width: '20px', height: '20px', backgroundColor: `${shift.color}`, margin: '0 auto', borderRadius: '2px' }"></div>
+                                    {{ viewType === 'users'? shift.alias : shift.userName }}
+                                    <!--<div v-if="viewType !== 'users'">{{ viewType === 'users'? shift.alias : shift.userName }}</div>
+                                    <div v-if="viewType === 'users'" :style="{ width: '20px', height: '20px', backgroundColor: `${shift.color}`, margin: '0 auto', borderRadius: '2px' }"></div>-->
                                 </div>
                                 <div v-if="hoveredIndex === `${row.value}-${cIndex}` && !readonly" class="overlay">
                                     <i class="el-icon-edit" />
@@ -460,7 +462,7 @@ export default {
             configList: [],
             configOptions: [],
             maxHeight: '250px',
-            undoButtonLabel: '撤销批量修改(0)',
+            undoButtonLabel: '撤销修改(0)',
             toolbars: [
                 { key: 'prev', icon: 'el-icon-d-arrow-left', label: '上一步', type: 'primary', steps: '2,3', show: true },
                 { key: 'next', icon: 'el-icon-d-arrow-right', label: '下一步', type: 'primary', steps: '1,2', show: true },
@@ -468,7 +470,7 @@ export default {
                 // { key: 'history', icon: 'el-icon-time', label: '排班历史', type: 'info', steps: '2,3' },
                 { key: 'record', icon: 'el-icon-tickets', label: '修改记录', type: 'warning', steps: '2,3', show: true },
                 { key: 'export', icon: 'el-icon-download', label: '导出', type: 'primary', steps: '2,3', show: true },
-                { key: 'undo', icon: 'el-icon-refresh-left', label: '撤销批量修改', type: 'info', steps: '2', show: (!this.readonly) },
+                { key: 'undo', icon: 'el-icon-refresh-left', label: '撤销修改', type: 'info', steps: '2', show: (!this.readonly) },
                 { key: 'reset', icon: 'el-icon-refresh', label: '重置', type: 'warning', steps: '2', show: (!this.readonly) },
                 // { key: 'edit', icon: 'el-icon-edit', label: '编辑', type: 'primary', steps: '2,3' },
                 { key: 'save', icon: 'ibps-icon-save', label: '保存', type: 'primary', show: (!this.readonly) },
@@ -554,7 +556,7 @@ export default {
         },
         historyStack: {
             handler (newVal) {
-                this.undoButtonLabel = `撤销批量修改(${newVal.length})` // 更新标签
+                this.undoButtonLabel = `撤销修改(${newVal.length})` // 更新标签
             },
             immediate: true, // 初始化时立即执行
             deep: true // 深度监听
@@ -651,43 +653,44 @@ export default {
                     el.options = el.options.filter(obj => obj.diDian === (second || first))
                 })
                 // console.log(this.configOptions)
-                if (this.$utils.isEmpty(this.pageParams.id)) {
-                    this.loading = false
+                if (self.$utils.isEmpty(self.pageParams.id)) {
+                    self.loading = false
                     return
                 }
-                const response = await getStaffSchedule({ id: this.pageParams.id })
-                const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config, status, id } = response.data
+                const response = await getStaffSchedule({ id: self.pageParams.id })
+                const { staffScheduleDetailPoList: records, title, endDate, startDate, type, overview, config, status, id, oldScheduleId } = response.data
                 const temp = config ? JSON.parse(config) : {}
-                this.responseData = response.data
+                self.responseData = response.data
                 console.log('responseData:', response.data)
                 console.log('configData:', temp)
-                this.formData = {
+                self.formData = {
                     title,
                     status,
                     id,
                     config: temp.id,
                     dateRange: [startDate, endDate],
                     approver: temp.approver || [],
+                    oldScheduleId: oldScheduleId,
                     overview: overview,
                     scheduleType: type,
                     scheduleRule: temp.scheduleRule || [],
                     scheduleShift: temp.scheduleShift || [],
                     scheduleStaff: temp.scheduleStaff || []
                 }
-                this.shiftList = this.formData.scheduleShift.filter(s => s.isEnabled === 'Y').map(s => ({
+                self.shiftList = self.formData.scheduleShift.filter(s => s.isEnabled === 'Y').map(s => ({
                     ...s,
-                    positions: s.positions.join('，'),
+                    positions: (s.positions || []).join('，'),
                     dateRange: s.dateRange.map(d => {
-                        return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
+                        return d.type === 'allday' ? '全天' : `当天 ${d.startTime}至${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`
                     })
                 }))
-                console.log('formData', this.formData)
-                this.scheduleData = this.transformScheduleData(records, overview, temp)
-                this.responseData = { ...this.responseData, records, overview, temp }
-                console.log('scheduleData', this.scheduleData)
-                this.loading = false
+                console.log('formData', self.formData)
+                self.scheduleData = self.transformScheduleData(records, overview, temp)
+                self.responseData = { ...self.responseData, records, overview, temp }
+                console.log('scheduleData', self.scheduleData)
+                self.loading = false
             }).catch(() => {
-                this.loading = false
+                self.loading = false
             })
         },
         getDayOfWeek (date) {
@@ -923,6 +926,10 @@ export default {
             this.contextMenuVisible = true
         },
         handleSelect ({ selected, params }) {
+            if (selected.length > 0) {
+                // 保存当前状态到历史记录
+                this.pushHistory()
+            }
             this.scheduleData[params.row.value][params.cIndex] = selected
         },
         handleClose () {
@@ -995,7 +1002,6 @@ export default {
             const self = this
             if (val) {
                 await getStaffSchedule({ id: val }).then((res) => {
-                    debugger
                     const { staffScheduleDetailPoList: records, title, endDate, startDate, overview, config,type } = res.data
                     const temp = config ? JSON.parse(config) : {}
                     self.responseData = res.data
@@ -1013,7 +1019,7 @@ export default {
                     }
                     self.shiftList = self.formData.scheduleShift.filter(s => s.isEnabled === 'Y').map(s => ({
                         ...s,
-                        positions: s.positions.join('，'),
+                        positions: (s.positions || []).join('，'),
                         dateRange: s.dateRange.map(d => {
                             return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
                         })
@@ -1397,16 +1403,25 @@ export default {
         },
         pushHistory () {
             // 保留最多maxHistorySteps步历史记录
-            if (this.historyStack.length >= this.maxHistorySteps) {
-                this.historyStack.shift()
-            }
+            // if (this.historyStack.length >= this.maxHistorySteps) {
+            // this.historyStack.shift()
+            // }
             // 深拷贝当前排班数据
-            this.historyStack.push(JSON.parse(JSON.stringify(this.scheduleData)))
+            let saveData = this.scheduleData
+            // 判断当前操作是否在人员排班班次 不是的话要转换一下
+            if (this.viewType !== 'users') {
+                saveData = this.reverseForScheduleData(this.scheduleData, this.userNameList, this.formData.scheduleShift, this.formData.overview)
+            }
+            this.historyStack.push(JSON.parse(JSON.stringify(saveData)))
         },
         handleUndo () {
+            if (this.viewType !== 'users') {
+                this.$message.warning('当前视图无法撤销，请切换视图后再操作！')
+                return
+            }
             if (this.historyStack.length === 0) {
                 this.$message.warning('已无更多可撤销操作')
-                return
+                // return
             }
             // 取出最近的历史记录
             const history = this.historyStack.pop()

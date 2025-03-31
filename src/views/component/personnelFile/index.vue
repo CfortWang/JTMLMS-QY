@@ -137,7 +137,6 @@ export default {
         }
     },
     created () {
-        console.log(this)
         this.$parent.$parent.showClose = false
         if (this.$attrs.params) {
             const sql1 = `select a.CREATE_BY_ from ibps_bpm_inst a join ibps_bpm_task_pendding b on b.proc_inst_id_=a.id_ where b.PROC_DEF_KEY_ = 'Process_08xwabfNEW' and b.task_id_ ='${this.$attrs.params.taskId}'`
@@ -160,7 +159,8 @@ export default {
         init (val) {
             getInfo({ id: val }).then(res => {
                 this.personInfoData = res.data
-                this.stauts = this.personInfoData.ryjbqkInfoPoList[0].shiFouGuoShen
+                this.stauts = this.personInfoData.ryjbqkInfoPoList.length > 0 ? this.personInfoData.ryjbqkInfoPoList[0].shiFouGuoShen : ''
+
                 // 保存基本数据
                 simulated.baseDataObj.ryjbqk.data = res.data.ryjbqkInfoPoList[0]
                 this.$set(this.baseData, 'ryjbqk', simulated.baseDataObj.ryjbqk)
@@ -280,7 +280,6 @@ export default {
                             })
                         })
                     } else if (this.btnType === 'sendBack') {
-                        console.log(this.$attrs.params.taskId)
                         reject(
                             {
                                 'backHandMode': 'normal',
@@ -371,7 +370,7 @@ export default {
                 this.personInfoData = data
             }
             if ((this.btnType === 'save' || this.btnType === 'agree' || this.btnType === 'submit' || this.btnType === 'sendBack') && this.tipsControls === false && !this.checkData(this.personInfoData)) {
-                this.tipsMess('请检查表单数据是否填写正确')
+                this.tipsMess('请检查姓名、性别和工号是否填写正确')
             }
         },
         tipsShow (val, name) {

@@ -117,7 +117,11 @@ export default {
             } else {
                 this.loading = true
                 request({
-                    url: FORM_URL() + `/reagent/reagentConsumablesInventory/updateStock?id=${row.id_}&stock=${row.quantity}`,
+                    url: FORM_URL() + `/reagent/reagentConsumablesInventory/updateStock`,
+                    data: {
+                        type: 'only',
+                        kcList: [{ id: row.id_, quantity: row.quantity }]
+                    },
                     method: 'post'
                 }).then(response => {
                     if (response.state === 200) {

@@ -20,6 +20,10 @@ export default {
         operation_status: {
             type: String,
             default: ''
+        },
+        copy: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -88,7 +92,8 @@ export default {
                         print: this.operation_status !== 'fileTraining',
                         edit: this.operation_status !== 'fileTraining',
                         fillForms: this.operation_status !== 'fileTraining',
-                        review: this.operation_status !== 'fileTraining'
+                        review: this.operation_status !== 'fileTraining',
+                        copy: this.copy
                     },
                     url: option.url
                 },

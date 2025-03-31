@@ -15,16 +15,17 @@ export const checkTime = (rule, value, callback) => {
 export const checkTimeNull = (rule, value, callback) => {
     if (!value) {
         callback()
+    } else {
+        setTimeout(() => {
+            const nowTime = new Date().getTime()
+            const valueTime = new Date(value).getTime()
+            if (nowTime < valueTime) {
+                callback(new Error('请选择小于当前日期的时间'))
+            } else {
+                callback()
+            }
+        }, 100)
     }
-    setTimeout(() => {
-        const nowTime = new Date().getTime()
-        const valueTime = new Date(value).getTime()
-        if (nowTime < valueTime) {
-            callback(new Error('请选择小于当前日期的时间'))
-        } else {
-            callback()
-        }
-    }, 100)
 }
 export const checkLength = (rule, value, callback) => {
     if (!value) {
@@ -41,14 +42,15 @@ export const checkLength = (rule, value, callback) => {
 export const checkLengthNull = (rule, value, callback) => {
     if (!value) {
         callback()
+    } else {
+        setTimeout(() => {
+            if (value.length > 200) {
+                callback(new Error('请将字数限制在200以内'))
+            } else {
+                callback()
+            }
+        }, 100)
     }
-    setTimeout(() => {
-        if (value.length > 200) {
-            callback(new Error('请将字数限制在200以内'))
-        } else {
-            callback()
-        }
-    }, 100)
 }
 export const optional = (rule, value, callback) => {
     if (!value) {

@@ -1039,6 +1039,10 @@ export default {
         },
         // 日期格式调整
         selectTime (val) {
+            if (!val) {
+                this.dataModel = ''
+                return
+            }
             const date = new Date(new Date())
             const year = date.getFullYear()
             const month = this.trans(date.getMonth() + 1)

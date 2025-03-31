@@ -82,7 +82,7 @@ export default {
                             const temp = this.reagentBatchData.find(el => el.inventoryId === al)
                             const item = data.find(el => el.id_ === al)
                             const ck = this.positionData.find(a => a.id_ === item.position)
-                            arry.push(temp || { inventoryId: item.id_, shiJiMingCheng: item.ming_cheng_, bianMa: item.bian_ma, leiBie: item.lei_bie_, shengChengChangJi: item.chang_jia_, guiGe: item.gui_ge_, cunChuWeiZhi: ck ? ck.positionName + ck.quYu : '', cangKuId: item.position, cunChuTiaoJian: item.cun_chu_tiao_jian, shuLiang: '', danWei: item.dan_wei_, piHao: item.batch_num, zhuangTai: item.status_, youXiaoQi: item.exp_date, kuCunLiang: item.quantity, withhold: item.withhold })
+                            arry.push(temp || { inventoryId: item.id_, shiJiMingCheng: item.ming_cheng_, bianMa: item.bian_ma, leiBie: item.lei_bie_, shengChengChangJi: item.gong_ying_shang_ + '/' + item.chang_jia_, guiGe: item.gui_ge_, cunChuWeiZhi: ck ? ck.positionName + ck.quYu : '', cangKuId: item.position, cunChuTiaoJian: item.cun_chu_tiao_jian, shuLiang: '', danWei: item.dan_wei_, piHao: item.batch_num, zhuangTai: item.status_, youXiaoQi: item.exp_date, kuCunLiang: item.quantity, withhold: item.withhold || 0 })
                         })
                         this.reagentBatchData = arry
                     })
@@ -101,7 +101,7 @@ export default {
                         value.split(',').forEach(al => {
                             const temp = this.reagentBatchData.find(el => el.inventoryId === al)
                             const item = data.find(el => el.inventory_id_ === al)
-                            arry.push(temp || { inventoryId: item.inventory_id_, shiJiMingCheng: item.ming_cheng_, bianMa: item.bian_ma, leiBie: item.lei_bie_, shengChengChangJi: item.chang_jia_, guiGe: item.gui_ge_, cunChuTiaoJian: item.cun_chu_tiao_jian, shuLiang: '', danWei: item.dan_wei_, piHao: item.batch_num, zhuangTai: item.status_, youXiaoQi: item.exp_date, kuCunLiang: item.total, withhold: item.total_withhold })
+                            arry.push(temp || { inventoryId: item.inventory_id_, shiJiMingCheng: item.ming_cheng_, bianMa: item.bian_ma, leiBie: item.lei_bie_, shengChengChangJi: item.gong_ying_shang_ + '/' + item.chang_jia_, guiGe: item.gui_ge_, cunChuTiaoJian: item.cun_chu_tiao_jian, shuLiang: '', danWei: item.dan_wei_, piHao: item.batch_num, zhuangTai: item.status_, youXiaoQi: item.exp_date, kuCunLiang: item.total, withhold: item.total_withhold || 0 })
                         })
                         this.reagentBatchData = arry
                     })

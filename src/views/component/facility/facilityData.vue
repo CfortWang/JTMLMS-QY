@@ -222,7 +222,7 @@ export default {
                     item.startTime = ''
                 }
 
-                // this.formData.jianCeShiJian = '2024-10-20' // 测试用
+                // this.formData.jianCeShiJian = '2025-03-01' // 测试用
                 if (!item.result && (item.rate && (this.formData.jianCeShiJian || this.readonly))) {
                     let jianCeShiJian = ''
                     if (this.readonly) {
@@ -236,6 +236,8 @@ export default {
                         day = 7
                     }
                     const dayofMonth = thatDate.getDate() // 多少号
+                    const monthofYear = thatDate.getMonth() + 1 // 多少月
+                    const monthInQuarter = monthofYear % 3 === 0 ? 3 : monthofYear % 3 // 计算当前月在当前季度中的第几个月
                     let dayDiff = ''
                     console.log(`监测时间：${jianCeShiJian},周${day}`)
                     switch (item.period) {
@@ -251,6 +253,11 @@ export default {
                             break
                         case 'month':
                             if (item.date === dayofMonth) {
+                                result.push(item)
+                            }
+                            break
+                        case 'quarter':
+                            if (item.date === monthInQuarter && dayofMonth === 1) {
                                 result.push(item)
                             }
                             break

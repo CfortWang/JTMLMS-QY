@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-dialog
-            title="扫码签到"
+            :title="title"
             :visible.sync="dialogVisible"
             :close-on-click-modal="false"
             :close-on-press-escape="false"
@@ -40,13 +40,17 @@ export default {
         type: {
             type: String,
             default: ''
+        },
+        title: {
+            type: String,
+            default: '扫码签到'
         }
     },
     data () {
         return {
             qrCode: '',
             dialogVisible: this.visible,
-            url:'http://192.168.2.16:8080/',
+            url: 'http://192.168.2.16:8080/'
         }
     },
     // mounted () {
@@ -54,18 +58,18 @@ export default {
     //         this.qrcodeRender()
     //     })
     // },
-    watch:{
+    watch: {
         dialogVisible: {
-            handler: function(val, oldVal) {
-                if(val == true){
+            handler: function (val, oldVal) {
+                if (val === true) {
                     this.$nextTick(() => {
                         this.qrcodeRender()
                     })
                 }
             },
-            deep:true,
-            immediate:true
-        },
+            deep: true,
+            immediate: true
+        }
     },
     methods: {
         downloadCode () {
