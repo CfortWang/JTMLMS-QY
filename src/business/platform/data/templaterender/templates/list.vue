@@ -1025,6 +1025,7 @@ export default {
                 let src = ''
                 this.readonly = false
                 const { userId } = this.$store.getters || {}
+                const [path, ...rest] = button.reportPath.split('&') || []
                 switch (buttonType) {
                     case 'search': // 查询
                         ActionUtils.setFirstPagination(this.pagination)
@@ -1092,7 +1093,7 @@ export default {
                             if (!button.reportPath) {
                                 return this.$message.warning('请先配置对应报表路径！')
                             }
-                            src = this.$reportPath.replace('show', 'pdf') + button.reportPath.split('&')[0] + `&` + this.getReportParams(button.reportPath, selection, data)
+                            src = this.$reportPath.replace('show', 'pdf') + path + this.getReportParams(rest, selection, data)
                             this.$common.preview(this, src)
                         }
                         break
@@ -1101,7 +1102,7 @@ export default {
                             return this.$message.warning('请先配置对应报表路径！')
                         }
                         this.$common.snapshoot({
-                            url: this.$getReportFile(button.reportPath.split('&')[0], this.getReportParams(button.reportPath, selection, data)),
+                            url: this.$getReportFile(path, this.getReportParams(rest, selection, data)),
                             name: selection,
                             type: 'pdf'
                         }).then((res) => {
@@ -2056,23 +2057,35 @@ export default {
             // conso
             this.handleAction(buttonTypeAct, buttonAct.position, selectAct, dataAct, indexAct, buttonAct)
         },
-        getReportParams (path, selection, data) {
-            /**
-             * 1、原报表路径：安全管理/紫外灯辐照度值测定记录表.rpx
-             * 2、补充报表路径：安全管理/紫外灯辐照度值测定记录表.rpx&id_=id_
-             * 2-1、最后那么id_表示在列上的字段属性，增加报表传参的便捷性;
-             * 2-2、有些列表需要展示的是子表的数据，但是报表需要展示的是主表数据，列表唯一字段只能是子表id_,所以主表的id_就不能也叫id_；
-             * 2-3、受限于报表快照生成的参数获取，当前只补充关于id_的逻辑；
-             */
-            const str = `org_=${this.first}&second_=${this.second}&id_=`
-            const arr = path.split('&')
-            if (arr.length === 2) {
-                const fieldArr = arr[1].split('=')
-                return str + `${data[fieldArr[1]]}`
-            } else {
-                // 如果是没有传参，还是原报表路径
-                return str + `${selection}`
+        getReportParams (args, selection, data) {
+            const defaultParams = {
+                org_: this.first,
+                second_: this.second,
+                id_: selection
             }
+            // 无额外参数时直接返回默认参数字符串
+            if (!args || !args.length) {
+                return this.serializeParams(defaultParams)
+            }
+
+            // 解析额外参数，覆盖默认参数
+            const finalParams = args.reduce((acc, item) => {
+                const [key, field] = item.split('=') || []
+                // 无效参数跳过
+                if (!key || !field) return acc
+
+                // 若data中获取不到字段值，可能传参为值并非字段
+                const value = data[field] || field
+                if (this.$utils.isNotEmpty(value)) {
+                    // 同名参数覆盖
+                    acc[key] = value
+                }
+                return acc
+            }, { ...defaultParams })
+            return this.serializeParams(finalParams)
+        },
+        serializeParams (params) {
+            return Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&')
         }
     }
 }
