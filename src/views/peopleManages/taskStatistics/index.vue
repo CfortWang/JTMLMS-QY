@@ -422,11 +422,16 @@ export default {
                         value: 0
                     },
                     {
+                        name: '副高级',
+                        value: 0
+                    },
+                    {
                         name: '高级',
                         value: 0
                     }
+
                 ],
-                color: colorGroup2,
+                color: colorGroup1,
                 config: { title: '职称统计', idSelector: 'ranksid' }
             },
             // 部门学位学历信息统计配置表
@@ -597,7 +602,7 @@ export default {
                         color: '#fff'
                     }
                 },
-                color: colorGroup2,
+                color: colorGroup1,
                 grid: {
                     left: '3%',
                     right: '4%',
@@ -679,6 +684,29 @@ export default {
                                 return name.value === 0
                                     ? ''
                                     : '中:' + name.value
+                            }
+                        }
+                    },
+                    {
+                        name: '副高级职称',
+                        type: 'bar',
+                        stack: 'Search Engine',
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        data: [],
+                        label: {
+                            // 柱体上显示数值
+                            show: true, // 开启显示
+                            textStyle: {
+                                // 数值样式
+                                fontSize: '12px',
+                                color: 'rgba(251, 251, 251, 1)'
+                            },
+                            formatter: function (name) {
+                                return name.value === 0
+                                    ? ''
+                                    : '副高:' + name.value
                             }
                         }
                     },
@@ -946,6 +974,7 @@ export default {
                 sum(a.zhi_cheng_deng_ji = '初级') as chuJi,
                 sum(a.zhi_cheng_deng_ji = '中级') as zhongJi,
                 sum(a.zhi_cheng_deng_ji = '高级') as gaoJi,
+                sum(a.zhi_cheng_deng_ji = '副高') as fuGao,
                 sum(a.zhi_cheng_deng_ji = '' || a.zhi_cheng_deng_ji is null) as other
                 from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where  ${positionsWhere}`
             await curdPost('sql', sql).then((res) => {
@@ -971,7 +1000,8 @@ export default {
             this.ranksPieData.data[1].value = data[0].zhongJi
                 ? data[0].zhongJi
                 : 0
-            this.ranksPieData.data[2].value = data[0].gaoJi ? data[0].gaoJi : 0
+            this.ranksPieData.data[3].value = data[0].gaoJi ? data[0].gaoJi : 0
+            this.ranksPieData.data[2].value = data[0].fuGao ? data[0].fuGao : 0
         },
         // 部门信息统计
         positionsInfoData () {
@@ -997,7 +1027,7 @@ export default {
                 sqlparty += ` UNION ALL SELECT ${i + 2} `
             })
 
-            const sql = `select jh.enName, IFNULL(jh.boShi,0) as boShi,IFNULL(jh.shuoShi,0) as shuoShi,IFNULL(jh.benKe,0) as benKe,IFNULL(jh.daZhuan,0) as daZhuan,IFNULL(jh.chuJi,0) as chuJi, IFNULL(jh.zhongJi,0) as zhongJi, IFNULL(jh.gaoJi,0) as gaoJi from (select  en.id_ ,en.name_ AS enName,               sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,             sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,             sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,             sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi FROM (SELECT             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_              )gy right JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where en.DEPTH_ like '%4%' and en.PARENT_ID_ like '%${this.depth3}%' and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY en.id_) jh UNION select (select name_ from ibps_party_entity where id_='${this.depth3}') as enName,IFNULL(sum(zui_gao_xue_li_x_ like '%博士%'),0) as boShi, IFNULL(sum(zui_gao_xue_li_x_ like '%硕士%'),0) as shuoShi,IFNULL(sum(zui_gao_xue_li_x_ = '本科'),0) as benKe,IFNULL(sum(zui_gao_xue_li_x_ = '大专'),0) as daZhuan, IFNULL(sum(zhi_cheng_deng_ji = '初级'),0) as chuJi,IFNULL(sum(zhi_cheng_deng_ji = '中级'),0) as zhongJi, IFNULL(sum(zhi_cheng_deng_ji = '高级'),0) as gaoJi from t_ryjbqk where parent_id_ in (SELECT b.id_ as bid FROM (select a.* from (SELECT id_, name_,TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(positions_, ',', n), ',', -1)) AS positions_ FROM ibps_party_employee JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers WHERE LENGTH(positions_) - LENGTH(REPLACE(positions_, ',', '')) >= n - 1) a GROUP BY name_) b WHERE b.positions_ IN ( SELECT id_  FROM ibps_party_entity  WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position'))`
+            const sql = `select jh.enName, IFNULL(jh.boShi,0) as boShi,IFNULL(jh.shuoShi,0) as shuoShi,IFNULL(jh.benKe,0) as benKe,IFNULL(jh.daZhuan,0) as daZhuan,IFNULL(jh.chuJi,0) as chuJi, IFNULL(jh.zhongJi,0) as zhongJi, IFNULL(jh.gaoJi,0) as gaoJi, IFNULL(jh.fuGao,0) as fuGao from (select  en.id_ ,en.name_ AS enName,               sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,             sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,             sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,             sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi,             sum(gy.zhi_cheng_deng_ji = '副高') AS fuGao FROM (SELECT             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_              )gy right JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where en.DEPTH_ like '%4%' and en.PARENT_ID_ like '%${this.depth3}%' and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY en.id_) jh UNION select (select name_ from ibps_party_entity where id_='${this.depth3}') as enName,IFNULL(sum(zui_gao_xue_li_x_ like '%博士%'),0) as boShi, IFNULL(sum(zui_gao_xue_li_x_ like '%硕士%'),0) as shuoShi,IFNULL(sum(zui_gao_xue_li_x_ = '本科'),0) as benKe,IFNULL(sum(zui_gao_xue_li_x_ = '大专'),0) as daZhuan, IFNULL(sum(zhi_cheng_deng_ji = '初级'),0) as chuJi,IFNULL(sum(zhi_cheng_deng_ji = '中级'),0) as zhongJi, IFNULL(sum(zhi_cheng_deng_ji = '高级'),0) as gaoJi, IFNULL(sum(zhi_cheng_deng_ji = '副高'),0) as fuGao from t_ryjbqk where parent_id_ in (SELECT b.id_ as bid FROM (select a.* from (SELECT id_, name_,TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(positions_, ',', n), ',', -1)) AS positions_ FROM ibps_party_employee JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers WHERE LENGTH(positions_) - LENGTH(REPLACE(positions_, ',', '')) >= n - 1) a GROUP BY name_) b WHERE b.positions_ IN ( SELECT id_  FROM ibps_party_entity  WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position'))`
 
             curdPost('sql', sql).then((res) => {
                 const data = res.variables.data
@@ -1022,7 +1052,8 @@ export default {
                         'boShi',
                         'chuJi',
                         'zhongJi',
-                        'gaoJi'
+                        'gaoJi',
+                        'fuGao'
                     ]
                     console.log(data)
                     for (let t = 0; t < data.length; t++) {

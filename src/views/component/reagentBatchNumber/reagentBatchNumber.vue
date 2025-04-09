@@ -135,7 +135,8 @@ export default {
                 if (value && value.length) {
                     this.reagentBatchData = JSON.parse(JSON.stringify(value))
                 }
-            }
+            },
+            immediate: true
         }
     },
     mounted () {

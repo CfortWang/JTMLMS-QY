@@ -24,9 +24,14 @@
                         <span>{{ row.withhold||0 }}</span>
                     </template>
                 </el-table-column>
+                <el-table-column label="最低库存量" prop="min_stock">
+                    <template slot-scope="{row}">
+                        <span>{{ row.min_stock||0 }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column label="库存量" prop="quantity">
                     <template slot-scope="{row}">
-                        <span v-if="row.isEdit">{{ row.quantity }}</span>
+                        <span v-if="row.isEdit" :style="{color: row.quantity>row.min_stock?'':'red'}">{{ row.quantity }}</span>
                         <el-input
                             v-else
                             v-model="row.quantity"
@@ -138,7 +143,7 @@ export default {
             }
         },
         onChange () {
-            const sql = `select position,quantity,withhold,id_ from t_Reagent_Inventory  where batch_num='${this.formData.piHao}' and reagent_code='${this.formData.bianMa}'`
+            const sql = `select position,quantity,withhold,min_stock,id_ from t_Reagent_Inventory  where batch_num='${this.formData.piHao}' and reagent_code='${this.formData.bianMa}'`
             this.$common.request('sql', sql).then(res => {
                 const resData = res.variables.data
                 if (resData?.length > 0) {

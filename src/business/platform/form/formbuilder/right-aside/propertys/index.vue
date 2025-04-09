@@ -11,13 +11,16 @@
             <div class="panel panel-default">
                 <div class="panel-heading">表单属性</div>
                 <div class="panel-body">
-                    <el-form-item label="表单标题" prop="name">
+                    <el-form-item label="表单名称" prop="name">
                         <el-input
                             v-model="formDef.name"
                             v-pinyin="{vm:formDef}"
-                            placeholder="请输入表单标题"
+                            placeholder="请输入表单名称"
                             :maxlength="64"
                         />
+                    </el-form-item>
+                    <el-form-item label="表单标题">
+                        <el-input v-model="formDef.attrs.title_field" placeholder="请输入表单标题" :maxlength="64" />
                     </el-form-item>
                     <el-form-item label="表单key" prop="key">
                         <el-input v-model="formDef.key" placeholder="请输入表单key" :disabled="$utils.isNotEmpty(id)" :maxlength="64" />

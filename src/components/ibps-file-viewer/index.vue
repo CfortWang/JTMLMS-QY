@@ -3,8 +3,9 @@
         <image-viewer
             v-if="fileType === 'image'"
             :z-index="zIndex"
-            :url-list="[url]"
+            :url-list="imgList"
             :on-close="closeDialog"
+            :initial-index="imgIndex"
         />
         <template v-if="fileType !== 'image' && fileType">
             <el-dialog
@@ -79,6 +80,10 @@ export default {
         file: {
             type: String,
             require: ''
+        },
+        urlList: {
+            type: Array,
+            default: () => []
         }
     },
     data () {
@@ -101,6 +106,14 @@ export default {
                 editUrl: '',
                 key: ''
             }
+        }
+    },
+    computed: {
+        imgList () {
+            return this.urlList.length > 0 ? this.urlList : [this.url]
+        },
+        imgIndex () {
+            return this.urlList.length > 0 ? this.urlList.indexOf(this.url) : 0
         }
     },
     watch: {

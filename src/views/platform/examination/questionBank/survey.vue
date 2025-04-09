@@ -47,6 +47,8 @@
                 <span>问卷试题信息</span>
                 <div class="table-btn">
                     <el-button v-if="!readonly" type="success" size="mini" icon="el-icon-plus" @click="addItems">添加</el-button>
+                    <el-button v-if="!readonly" type="primary" size="mini" icon="ibps-icon-sign-in" @click="importQuestions">导入题目</el-button>
+                    <el-button v-if="!readonly" type="primary" size="mini" icon="ibps-icon-sign-in" @click="exportQuestions">导出题目</el-button>
                     <el-button v-if="!readonly" type="danger" size="mini" icon="el-icon-delete" @click="removeItems">删除</el-button>
                 </div>
             </div>
@@ -190,10 +192,15 @@
             :readonly="quesReadonly"
             @close="questionDialogClose"
         />
+        <input id="" ref="file" style="display:none" type="file" name="" accept=".xlsx,.xls" @change="handleUploadChange">
     </el-dialog>
 </template>
 
 <script>
+import xlsx from 'xlsx'
+import fs from 'file-saver'
+import dayjs from 'dayjs'
+import { surveyQuestionType } from '../constants'
 import ActionUtils from '@/utils/action'
 export default {
     components: {
@@ -256,6 +263,14 @@ export default {
             ],
             rules: {
                 wen_juan_ming_che: [{ required: true, message: this.$t('validate.required') }]
+            },
+            questionColumns: {
+                'ti_xing_': '*题型',
+                'ti_gan_': '*题干',
+                'xuan_xiang_': '选项',
+                'shi_fou_bi_tian_': '是否必填',
+                'bei_zhu_': '备注',
+                'pai_xu_': '排序'
             }
 
         }
@@ -282,6 +297,89 @@ export default {
         this.getData()
     },
     methods: {
+        // 转换对象的key
+        switchKey (data, originalObj) {
+            const result = []
+            data.forEach(item => {
+                const obj = {}
+                for (const key in originalObj) {
+                    // 对日期格式的数据做兼容处理
+                    if (item[originalObj[key]] instanceof Date) {
+                        obj[key] = dayjs(item[originalObj[key]]).add(8, 'hour').format('YYYY-MM-DD') || ''
+                    } else {
+                        obj[key] = String(item[originalObj[key]] || '').trim().replace(/\r/g, '')
+                    }
+                }
+                result.push(obj)
+            })
+            return result
+        },
+        importQuestions () {
+            this.$refs.file.click()
+        },
+        async handleUploadChange (file) {
+            try {
+                const dataBinary = await this.readFile(file.target.files[0])
+                file.target.value = null // 注意上传后要将input的值设为空
+                const workBook = xlsx.read(dataBinary, { type: 'binary', cellDates: true })
+                const workSheet = workBook.Sheets[workBook.SheetNames[0]]
+                const data = xlsx.utils.sheet_to_json(workSheet)
+                const importData = this.switchKey(data, this.questionColumns)
+                this.switchImportData(importData)
+                this.questionData.push(...importData)
+                this.$message.success('导入题目成功！')
+            } catch (error) {
+                this.$message.warning(error?.message || '导入失败！')
+            }
+        },
+        switchImportData (data) {
+            for (let i = 0; i < data.length; i++) {
+                const item = data[i]
+                const t = surveyQuestionType.find(t => t.label === item.ti_xing_)
+                if (!t) throw new Error(`第${i + 1}行题型不合法！`)
+                if (!item.ti_gan_) throw new Error(`第${i + 1}行缺少题干信息！`)
+                if (!item.shi_fou_bi_tian_ || item.shi_fou_bi_tian_ !== '否') item.shi_fou_bi_tian_ = '是'
+                if (item.ti_xing_ === '问答题') item.xuan_xiang_ = ''
+                item.pai_xu_ = +(item.pai_xu_ || 0)
+                if (isNaN(item.pai_xu_)) item.pai_xu_ = 0
+                if (item.xuan_xiang_) {
+                    const arr = item.xuan_xiang_.split('\n') || []
+                    const obj = {}
+                    for (let j = 0; j < arr.length; j++) {
+                        const code = String.fromCharCode('A'.charCodeAt() + j)
+                        const o = arr[j]
+                        obj[code] = o
+                    }
+                    item.xuan_xiang_ = JSON.stringify(obj)
+                } else if (item.ti_xing_ === '单选题' || item.ti_xing_ === '多选题') {
+                    throw new Error(`第${i + 1}行至少需要一个选项`)
+                }
+
+                item.bian_zhi_bu_men_ = this.form.bian_zhi_bu_men_
+                item.bian_zhi_ren_ = this.form.bian_zhi_ren_
+                item.bian_zhi_shi_jian = this.$common.getDateNow(19)
+                item.di_dian_ = this.form.di_dian_
+            }
+        },
+        switchExportData (data) {
+            const exportData = JSON.parse(JSON.stringify(data))
+            for (let i = 0; i < exportData.length; i++) {
+                const item = exportData[i]
+                if (item.xuan_xiang_) {
+                    const t = JSON.parse(item.xuan_xiang_)
+                    item.xuan_xiang_ = Object.values(t).join('\n')
+                }
+            }
+            return exportData
+        },
+        getTimeStamp () {
+            return dayjs().format('YYYYMMDDHHmmss')
+        },
+        async exportQuestions () {
+            const exportData = await this.switchExportData(this.multipleSelection)
+            this.xlsx(exportData, this.questionColumns, '问卷题目' + this.getTimeStamp())
+            this.$message.success('导出题目成功！')
+        },
         questionDialogClose (visible, scope) {
             this.questionDialogVisible = visible
             if (scope) {
@@ -500,6 +598,49 @@ export default {
         },
         updateData (data) {
             this.questionData = data
+        },
+        xlsx (json, fields, filename = '.xlsx') { // 导出xlsx
+            json.forEach(item => {
+                for (const i in item) {
+                    if (fields.hasOwnProperty(i)) {
+                        item[fields[i]] = item[i]
+                    }
+                    delete item[i] // 删除原先的对象属性
+                }
+            })
+            const sheetName = filename // excel的文件名称
+            const wb = xlsx.utils.book_new() // 工作簿对象包含一SheetNames数组，以及一个表对象映射表名称到表对象。XLSX.utils.book_new实用函数创建一个新的工作簿对象。
+            const ws = xlsx.utils.json_to_sheet(json, { header: Object.values(fields) }) // 将JS对象数组转换为工作表。
+            wb.SheetNames.push(sheetName)
+            wb.Sheets[sheetName] = ws
+            const defaultCellStyle = { font: { name: 'Verdana', sz: 13, color: 'FF00FF88' }, fill: { fgColor: { rgb: 'FFFFAA00' }}}// 设置表格的样式
+            const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary', cellStyles: true, defaultCellStyle: defaultCellStyle, showGridLines: false } // 写入的样式
+            const wbout = xlsx.write(wb, wopts)
+            const blob = new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' })
+            fs.saveAs(blob, filename + '.xlsx')
+        },
+        s2ab (s) {
+            let buf
+            if (typeof ArrayBuffer !== 'undefined') {
+                buf = new ArrayBuffer(s.length)
+                const view = new Uint8Array(buf)
+                for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
+                return buf
+            } else {
+                buf = new Array(s.length)
+                for (let i = 0; i !== s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF
+                return buf
+            }
+        },
+        /* 读取文件 将文件转换为二进制 */
+        readFile (file) {
+            return new Promise(resolve => {
+                const reader = new FileReader()
+                reader.readAsBinaryString(file)
+                reader.onload = ev => {
+                    resolve(ev.target.result)
+                }
+            })
         }
     }
 }

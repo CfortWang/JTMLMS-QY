@@ -361,25 +361,25 @@ export default {
                 })
             } else if (actionName === 'rejectToPrevious') {
                 rejectToPrevious(params).then(response => {
-                    this.handleResponse(actionName, loading, response)
+                    this.handleResponse(actionName, loading, response, params)
                 }).catch(() => {
                     loading.close()
                 })
             } else if (actionName === 'rejectToStart') {
                 rejectToStarter(params).then(response => {
-                    this.handleResponse(actionName, loading, response)
+                    this.handleResponse(actionName, loading, response, params)
                 }).catch(() => {
                     loading.close()
                 })
             } else if (actionName === 'reject') {
                 reject(params).then(response => {
-                    this.handleResponse(actionName, loading, response)
+                    this.handleResponse(actionName, loading, response, params)
                 }).catch(() => {
                     loading.close()
                 })
             }
         },
-        handleResponse (actionName, loading, response) {
+        handleResponse (actionName, loading, response, params) {
             // 关闭窗口
             if (actionName === 'agree' || actionName === 'oppose' || actionName === 'abandon') {
                 this.agreeDialogVisible = false
@@ -389,6 +389,7 @@ export default {
             if (actionName === 'agree') {
                 // this.createSnapshot()
             }
+            this.getFormEL().rejectParams = params || {}
             // 后置事件
             this.afterScript(this.actionName, {
                 data: response.data,

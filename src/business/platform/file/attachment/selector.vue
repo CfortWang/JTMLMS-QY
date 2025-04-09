@@ -37,6 +37,7 @@
                 :file="attachment"
                 :visible="filePreviewVisible"
                 :option-file="optionFileView"
+                :file-list="fileList"
                 @close="visible => filePreviewVisible = visible"
             />
         </div>
@@ -173,7 +174,8 @@ export default {
             showFile: false,
             file: '',
             optionFile: {},
-            optionFileView: {}
+            optionFileView: {},
+            fileList: []
         }
     },
     computed: {
@@ -551,6 +553,7 @@ export default {
             this.optionFileView.data = this.attachment // 记录编制的位置，需要替换。
             this.optionFileView.data.index = index
             this.filePreviewVisible = true
+            this.fileList = this.multiple ? this.selectorValue : [this.selectorValue]
         },
         /**
          *  确定

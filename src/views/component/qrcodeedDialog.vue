@@ -44,6 +44,10 @@ export default {
         title: {
             type: String,
             default: '扫码签到'
+        },
+        prefixUrl: {
+            type: String,
+            default: ''
         }
     },
     data () {
@@ -87,7 +91,7 @@ export default {
                 width: 200,
                 height: 200,
                 // text: `${this.url}h5/#/pages/signin/signin?codeId=${this.codeId}`,
-                text: `${PUBLIC_URL}#/bpmn/siginin/index?codeId=${this.codeId}&type=${this.type}`,
+                text: `${PUBLIC_URL}#/bpmn${this.prefixUrl || '/siginin/index'}?codeId=${this.codeId}&type=${this.type}`,
                 // text: `http://demo2.local/#/bpmn/siginin/index?codeId=${this.codeId}&type=${this.type}`,
                 colorDark: '#000000', // 前景色
                 colorLight: '#FFFFFF', // 背景色

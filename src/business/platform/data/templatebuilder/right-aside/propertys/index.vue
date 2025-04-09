@@ -121,7 +121,7 @@
                 </div>
             </div>
             <!--接口配置 -->
-            <div v-if="datasetType=='thirdparty'" class="panel panel-default">
+            <!-- <div v-if="datasetType=='thirdparty'" class="panel panel-default">
                 <div class="panel-heading">第三方接口数据配置</div>
                 <div class="panel-body">
                     <el-button
@@ -131,7 +131,7 @@
                         @click="thirdpartyConfigDialogVisible=true"
                     >第三方接口数据配置</el-button>
                 </div>
-            </div>
+            </div> -->
             <!-- 扩展属性-->
             <div v-if="(dataTemplate.showType === 'compose'&&dataTemplate.composeType === 'treeForm')||dataTemplate.showType!== 'compose'" class="panel panel-default">
                 <div class="panel-heading">扩展属性</div>

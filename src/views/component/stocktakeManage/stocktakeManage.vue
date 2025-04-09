@@ -3,7 +3,7 @@
         <div class="stocktakeManage">
             <el-row type="flex">
                 <el-col class="button">
-                    <div class="title">*</div>
+                    <div class="title">试剂耗材相关信息</div>
                     <div v-if="isRead" />
                     <div v-else>
                         <el-button type="primary" size="mini" icon="ibps-icon-import" @click="handleImport">导入</el-button>
@@ -16,26 +16,26 @@
                 <el-col>
                     <el-table ref="external" :data="reagentBatchDataFilter" @selection-change="handleSelectionChange">
                         <el-table-column type="selection" width="55" />
-                        <el-table-column label="试剂耗材名称" prop="shiJiMingCheng" />
+                        <el-table-column label="试剂耗材名称" width="120" prop="shiJiMingCheng" />
                         <el-table-column label="编码" prop="bianMa" />
                         <el-table-column label="批号" prop="piHao" />
                         <el-table-column label="类别" prop="leiBie" />
                         <el-table-column label="规格" prop="guiGe" />
                         <el-table-column label="单位" prop="danWei" />
                         <el-table-column label="有效期" prop="youXiaoQi" />
-                        <el-table-column label="生产商/供应商" prop="shengChanShang" />
+                        <el-table-column label="生产商/供应商" width="120" prop="shengChanShang" />
                         <el-table-column label="库存量" prop="kuCunLiang" />
                         <el-table-column label="上月结存" prop="shangYueJieCun" />
                         <el-table-column label="本月入库" prop="benYueRuKu" />
                         <el-table-column label="本月出库" prop="benYueChuKu" />
                         <el-table-column label="本月结存" prop="benYueJieCun" />
-                        <el-table-column label="盘存数量" prop="panCunShuLiang">
+                        <el-table-column fixed="right" width="110" label="盘存数量" prop="panCunShuLiang">
                             <template slot-scope="{row}">
                                 <el-input v-if="!isRead" v-model="row.panCunShuLiang" size="mini" type="number" placeholder="请输入" />
                                 <span v-else>{{ row.panCunShuLiang }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column label="存储位置" prop="cunChuWeiZhi">
+                        <el-table-column fixed="right" width="120" label="存储位置" prop="cunChuWeiZhi">
                             <template slot-scope="scope">
                                 <ibps-custom-dialog
                                     v-model="scope.row.cunChuWeiZhi"
@@ -51,7 +51,7 @@
                                 />
                             </template>
                         </el-table-column>
-                        <el-table-column label="备注" prop="beiZhu">
+                        <el-table-column fixed="right" width="120" label="备注" prop="beiZhu">
                             <template slot-scope="{row}">
                                 <el-input v-if="!isRead" v-model="row.beiZhu" size="mini" placeholder="请输入" />
                                 <span v-else>{{ row.beiZhu }}</span>
@@ -143,9 +143,7 @@ export default {
         this.getStoreHouse()
         this.isRead = this.readonly
         setTimeout(() => {
-            console.log(this.formData, 'formData', this.readonly)
             this.$watch('formData.cangKu', function (val, oldVal) {
-                console.log(val, oldVal, '1')
                 if (val) {
                     this.initData(this.formData.yueFen?.slice(0, 7), val)
                 } else {
@@ -266,7 +264,7 @@ export default {
                 const { data = [] } = res
                 const arry = []
                 data.forEach(item => {
-                    arry.push({ shiJiMingCheng: item.ming_cheng_, bianMa: item.bian_ma, piHao: item.batch_num, leiBie: item.lei_bie_, guiGe: item.gui_ge_, danWei: item.dan_wei_, youXiaoQi: item.exp_date, shengChanShang: item.chang_jia_ + '/' + item.gong_ying_shang_, kuCunLiang: item.quantity || 0, panCunShuLiang: '', beiZhu: '', cunChuWeiZhi: item.position, shangYueJieCun: item.lastMonth || 0, benYueRuKu: item.currIn || 0, benYueChuKu: item.currOut || 0, benYueJieCun: item.currBalance || 0 })
+                    arry.push({ kuCunId: item.id_, shiJiMingCheng: item.ming_cheng_, bianMa: item.bian_ma, piHao: item.batch_num, leiBie: item.lei_bie_, guiGe: item.gui_ge_, danWei: item.dan_wei_, youXiaoQi: item.exp_date, shengChanShang: item.chang_jia_ + '/' + item.gong_ying_shang_, kuCunLiang: item.quantity || 0, panCunShuLiang: '', beiZhu: '', cunChuWeiZhi: item.position, shangYueJieCun: item.lastMonth || 0, benYueRuKu: item.currIn || 0, benYueChuKu: item.currOut || 0, benYueJieCun: item.currBalance || 0 })
                 })
                 this.reagentBatchData = arry
             }).catch(() => {
@@ -376,7 +374,7 @@ export default {
         padding: 0px 0px 0px 15px;
         background: #f0ffff;
         .title {
-            color: red;
+            color: #999;
             font-size: 12px;
             font-weight: bold;
             margin-bottom: 0;

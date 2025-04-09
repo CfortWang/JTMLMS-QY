@@ -560,47 +560,44 @@ export default {
                         console.log(addParams)
                         if (addParams.paramWhere.length) {
                             await this.$common.request('add', addParams)
-                            // 3.推送给组长 评估报告流程
-                            const addParams2 = {
-                                tableName: 't_fxkzbg',
-                                paramWhere: [{
-                                    di_dian_: this.level,
-                                    shi_fou_guo_shen_: '已编制',
-                                    bian_zhi_ren_: this.infoFxssbData.zu_chang_id_,
-                                    bian_zhi_bu_men_: this.getPersonPosition(this.infoFxssbData.zu_chang_id_),
-                                    bian_zhi_shi_jian: dayjs().format('YYYY-MM-DD HH:mm'),
-                                    zu_chang_: this.infoFxssbData.zu_chang_,
-                                    zu_chang_id_: this.infoFxssbData.zu_chang_id_,
-                                    feng_xian_lei_xin: this.infoFxssbData.feng_xian_lei_xin,
-                                    kai_shi_ri_qi_: this.infoFxssbData.kai_shi_ri_qi_,
-                                    jie_shu_ri_qi_: this.infoFxssbData.jie_shu_ri_qi_,
-                                    wan_cheng_ri_qi_: this.infoFxssbData.bao_gao_shi_jian_,
-                                    shi_wu_shuo_ming_: this.infoFxssbData.shi_wu_shuo_ming_,
-                                    ji_hua_bian_hao_: this.infoFxssbData.ji_hua_bian_hao_,
-                                    hui_yi_wen_jian_: this.infoFxssbData.hui_yi_fu_jian_
-                                }],
-                                formKey: 'fxbg',
-                                defKey: 'Process_0mrlsj7'
-                            }
-                            console.log(addParams2)
-                            await this.$common.request('add', addParams2)
-                            console.log('流程推送成功')
+                            console.log('改进流程推送成功')
                         } else {
                             console.log('无需推送')
                         }
 
+                        // 3.推送给组长 评估报告流程
+                        const addParams2 = {
+                            tableName: 't_fxkzbg',
+                            paramWhere: [{
+                                di_dian_: this.level,
+                                shi_fou_guo_shen_: '已编制',
+                                bian_zhi_ren_: this.infoFxssbData.zu_chang_id_,
+                                bian_zhi_bu_men_: this.getPersonPosition(this.infoFxssbData.zu_chang_id_),
+                                bian_zhi_shi_jian: dayjs().format('YYYY-MM-DD HH:mm'),
+                                zu_chang_: this.infoFxssbData.zu_chang_,
+                                zu_chang_id_: this.infoFxssbData.zu_chang_id_,
+                                feng_xian_lei_xin: this.infoFxssbData.feng_xian_lei_xin,
+                                kai_shi_ri_qi_: this.infoFxssbData.kai_shi_ri_qi_,
+                                jie_shu_ri_qi_: this.infoFxssbData.jie_shu_ri_qi_,
+                                wan_cheng_ri_qi_: this.infoFxssbData.bao_gao_shi_jian_,
+                                shi_wu_shuo_ming_: this.infoFxssbData.shi_wu_shuo_ming_,
+                                ji_hua_bian_hao_: this.infoFxssbData.ji_hua_bian_hao_,
+                                hui_yi_wen_jian_: this.infoFxssbData.hui_yi_fu_jian_
+                            }],
+                            formKey: 'fxbg',
+                            defKey: 'Process_0mrlsj7'
+                        }
+                        console.log('报告流程推送成功')
+                        await this.$common.request('add', addParams2)
+
                         this.$message.success('提交成功')
                         // 提醒用户推送信息
-                        if (addParams.paramWhere.length) {
-                            this.$alert(`需要改进项${addParams.paramWhere.length}条，已向其中的每位措施制定人推送风险改进流程，同时向组长 ${this.infoFxssbData.zu_chang_} 推送风险报告流程！`, '提交成功', {
-                                confirmButtonText: '确定',
-                                callback: action => {
-                                    this.closeDialog(true)
-                                }
-                            })
-                        } else {
-                            this.closeDialog(true)
-                        }
+                        this.$alert(`需要改进项${addParams.paramWhere.length}条，已向其中的每位措施制定人推送风险改进流程，同时向组长 ${this.infoFxssbData.zu_chang_} 推送风险报告流程！`, '提交成功', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                                this.closeDialog(true)
+                            }
+                        })
                     } else {
                         this.$message.warning('存在未完成风险识别项的评估人员，无法提交！')
                         return
