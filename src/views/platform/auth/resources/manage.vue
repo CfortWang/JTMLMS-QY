@@ -110,7 +110,7 @@ export default {
     data () {
         return {
             show: '',
-            width: 230,
+            width: 360,
             height: document.clientHeight,
             id: '',
             title: '',
@@ -242,8 +242,8 @@ export default {
             }
         },
         /**
-     * 接口授权申请
-     */
+         * 接口授权申请
+         */
         handleApiGrant () {
             this.apiGrantVisible = true
         },
@@ -305,7 +305,7 @@ export default {
             }
         },
         handleExpandCollapse (isExpand) {
-            this.width = isExpand ? 230 : 30
+            this.width = isExpand ? 360 : 30
         },
         handleNodeUpdate (systemId) {
             this.loading = true
