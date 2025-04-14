@@ -43,7 +43,8 @@ export default {
     data () {
         return {
             dataTemplate: {},
-            dataTemplateId: ''
+            dataTemplateId: '',
+            query: {}
         }
     },
     watch: {
@@ -53,12 +54,13 @@ export default {
                     return
                 }
                 this.$nextTick(() => {
-                    const defaultUrl = this.$route.meta.defaultUrl
+                    const { defaultUrl } = this.$route.meta || {}
                     const isDashboard = this.$route.name
                     if (this.$utils.isNotEmpty(defaultUrl)) {
                         // 判断地址是否正确
-                        const url = defaultUrl.split('/')
-                        this.dataTemplateId = url[url.length - 1]
+                        const { id, query } = this.parseUrl(defaultUrl) || {}
+                        this.dataTemplateId = id
+                        this.query = query
                     } else if (isDashboard === 'dashboard') {
                         this.dataTemplateId = this.templateId
                     } else {
@@ -100,6 +102,32 @@ export default {
     //     this.loadDataTemplate()
     // },
     methods: {
+        parseUrl (url) {
+            // 处理URL可能包含的前导/尾随斜杠和空格
+            url = (url || '').trim().replace(/^\/|\/$/g, '')
+            // 分割路径和查询部分
+            const [pathPart, queryPart] = url.split('?')
+
+            // 提取ID
+            const idMatch = pathPart.match(/^d\/(\d+)$/)
+            const id = idMatch ? idMatch[1] : null
+
+            // 解析查询参数
+            const query = {}
+            if (queryPart) {
+                queryPart.split('&').forEach(pair => {
+                    const [key, value] = pair.split('=')
+                    if (key) {
+                        query[key] = value || ''
+                    }
+                })
+            }
+
+            return {
+                id: id ? BigInt(id).toString() : null,
+                query
+            }
+        },
         loadDataTemplate () {
             const loading = this.$loading({
                 lock: false,
@@ -120,7 +148,7 @@ export default {
                         const formData = this.$utils.parseData(response.data)
                         const datasets = buildFelds(formData.fields, data.datasets)
                         data.datasets = datasets
-                        this.dataTemplate = data
+                        this.dataTemplate = { ...data, query: this.query }
                         if (this.typeName) {
                             this.dataTemplate.templates = this.dealData(this.dataTemplate)
                         }
@@ -131,7 +159,7 @@ export default {
                         loading.close()
                     })
                 } else {
-                    this.dataTemplate = data
+                    this.dataTemplate = { ...data, query: this.query }
                     setTimeout(() => {
                         loading.close()
                     }, 1000)
@@ -188,27 +216,26 @@ export default {
             const customBtn = buttons.filter(i => i.show_on_record === 'Y')
             return [...defaultBtn, ...customBtn]
         },
-        dealFilter (dataList) {
+        dealFilter (dataList = []) {
             // 1.去除原过滤条件中的编制部门在其中
             // 2.追加数据模板归档中的过滤条件
             // 3.增加地点过滤（若为第一层级用户，则过滤出所有一二级地点数据；若为第二级用户，则过滤当前地点数据）
             const levelFilter = this.getLevelFilter()
-            if (!dataList.length) {
-                // 无过滤条件时默认地点过滤
-                return [
-                    {
-                        label: '默认条件',
-                        key: this.$utils.guid(),
-                        type: 'condition',
-                        rights: [{ type: 'all' }],
-                        filter: {
-                            condition: 'AND',
-                            rules: [levelFilter]
-                        }
+            // 无过滤条件时默认地点过滤
+            const initList = dataList.length ? dataList : [
+                {
+                    label: '默认条件',
+                    key: this.$utils.guid(),
+                    type: 'condition',
+                    rights: [{ type: 'all' }],
+                    filter: {
+                        condition: 'AND',
+                        rules: [levelFilter]
                     }
-                ]
-            }
-            const newDataList = dataList.map(data => {
+                }
+            ]
+
+            const newDataList = initList.map(data => {
                 const rules = data.filter.rules.filter(i => i.id !== 'find_in_set' && !i.value.includes('cscript.findPositionId'))
                 const newRules = [
                     ...this.filterParams.map(item => ({
