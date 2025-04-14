@@ -16,6 +16,7 @@ import guanshenzhuangtai from './goods/guanshenzhuangtai'
 import bwTag from './goods/bwTag.vue'
 import fzrkTag from './goods/fzrkTag.vue'
 import kucuntag from './goods/kucuntag.vue'
+import deviceTagWeiNing from './goods/deviceTagWeiNing.vue'
 
 export default {
     components: {
@@ -27,7 +28,8 @@ export default {
         guanshenzhuangtai,
         bwTag,
         fzrkTag,
-        kucuntag
+        kucuntag,
+        deviceTagWeiNing
     },
     props: {
         currentScan: String,
@@ -37,7 +39,7 @@ export default {
 
     methods: {
         scanOff (val) {
-            console.log(val);
+            console.log(val)
             this.$emit('scanOff', val)
         }
     }

@@ -10,6 +10,7 @@
                 :params="formParams"
                 :readonly="readonly"
                 :time-modification="timeModification_"
+                :add-data-cont="addDataCont"
                 @action-event="(actionKey, args) => emitEventHandler(actionKey, args)"
                 @callback="callbackPage"
                 @close="closeDialog"

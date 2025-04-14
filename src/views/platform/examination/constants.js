@@ -10,6 +10,10 @@ export const paperTypeOptions = [
     {
         label: 'ISO15189相关考试',
         value: 'ISO15189相关考试'
+    },
+    {
+        label: '核心制度考试',
+        value: '核心制度考试'
     }
     // {
     //     label: '数学题库',

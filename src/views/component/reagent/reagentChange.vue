@@ -183,21 +183,17 @@ export default {
                 if (this.formData.zuJianShuJu) {
                     const data = JSON.parse(this.formData.zuJianShuJu)
                     this.spanLength = data[1] || 0
-                    if (val.length && this.reagentData.length <= 0) {
-                        const arry = []
-                        val.forEach(item => {
-                            arry.push({ jyxm: item.jianCeXiangMu, nd: item.nongDu, ypbh: item.biaoBenHao, jsjcdjg: item.jiuJieGuo, xsjcdjg: item.xinJieGuo, pq: item.jieGuo, fhl: item.biaoZhun, sfxf: item.xiangFu, jl: item.jieLun, xdfw: item.zuiXiaoFanWei, xmfhl: item.xiangMuFuHeLv, sjcz: item.shiJiChaZhi, yxpq: item.yunXuPianYi })
-                        })
-                        setTimeout(() => {
-                            this.reagentData = arry
-                            this.$nextTick(() => {
-                                this.$refs.reagent && this.$refs.reagent.$forceUpdate()
-                            })
-                        })
-                    }
+                }
+                if (val.length && this.reagentData.length <= 0) {
+                    const arry = []
+                    val.forEach(item => {
+                        arry.push({ jyxm: item.jianCeXiangMu, nd: item.nongDu, ypbh: item.biaoBenHao, jsjcdjg: item.jiuJieGuo, xsjcdjg: item.xinJieGuo, pq: item.jieGuo, fhl: item.biaoZhun, sfxf: item.xiangFu, jl: item.jieLun, xdfw: item.zuiXiaoFanWei, xmfhl: item.xiangMuFuHeLv, sjcz: item.shiJiChaZhi, yxpq: item.yunXuPianYi })
+                    })
+                    this.reagentData = arry
                 }
             },
-            deep: true
+            deep: true,
+            immediate: true
         },
         'formData.fangAn': {
             handler (val) {

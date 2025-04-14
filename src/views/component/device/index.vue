@@ -355,7 +355,8 @@
             def-id="1120718364969271296"
             @close="visible => npmDialogFormVisible = visible"
         />
-        <DeviceTag :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" />
+        <DeviceTagWeiNing v-if="tagName==='deviceTagWeiNing'" :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" />
+        <DeviceTag v-else :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" />
         <el-dialog
             :close-on-click-modal="false"
             :close-on-press-escape="false"
@@ -391,9 +392,11 @@ import { queryequipmentCard, removeEquipmentCard, getequipmentCard, saveEquipmen
 import CustomDialog from '@/business/platform/data/templaterender/custom-dialog/dialog'
 import dayjs from 'dayjs'
 import DeviceTag from '@/views/system/jbdScan/goods/deviceTag.vue'
+import DeviceTagWeiNing from '@/views/system/jbdScan/goods/deviceTagWeiNing.vue'
 export default {
     components: {
         DeviceTag,
+        DeviceTagWeiNing,
         DataTemplateFormrenderDialog,
         DeviceDialog,
         ibpsUserSelector,
@@ -658,11 +661,17 @@ export default {
             hideSysDeviceNo: false,
             tabList: {},
             hasRole: true,
-            typeList: { '检验系统': '检验系统', '通用设备': '通用设备', '软件': '软件', '信息系统': '信息系统' }
+            typeList: { '检验系统': '检验系统', '通用设备': '通用设备', '软件': '软件', '信息系统': '信息系统' },
+            tagName: ''
         }
     },
     async mounted () {
         const { stateList, hideSysDeviceNo, tabList, hasDeviceRole, typeList } = await getSetting('device') || {}
+        const { tagName } = await getSetting('deviceTag') || {}
+        if (tagName) {
+            console.debug('tagName', tagName)
+            this.tagName = tagName
+        }
         if (hasDeviceRole) {
             console.debug('hasDeviceRole', hasDeviceRole)
             const { role, isSuper } = this.$store.getters || {}
