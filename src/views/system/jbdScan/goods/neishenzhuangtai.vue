@@ -941,7 +941,7 @@ export default {
             this.checkValue = parseInt(data[1].num / data[0].num * 100)
             let finish = []
             let noFinish = []
-            const sqsl1 = `select a.id_,a.nei_shen_yuan_,a.bei_nei_shen_bu_m,a.kai_shi_shi_jian_,a.jie_shu_shi_jian_,b.shi_fou_guo_shen_ FROM t_nsjcx AS a  LEFT JOIN  t_nsjcbxe AS b ON a.bei_nei_shen_bu_m = b.bei_nei_shen_bu_m WHERE a.parent_id_ = '${ids.id_}' AND b.ji_hua_zong_wai_j = '${ids.ji_hua_zong_wai_j}'  ORDER BY a.create_time_,a.id_ DESC`
+            const sqsl1 = `select a.id_,a.nei_shen_yuan_,a.bei_nei_shen_bu_m,a.kai_shi_shi_jian_,a.jie_shu_shi_jian_,b.shi_fou_guo_shen_ FROM t_nsjcx AS a  LEFT JOIN  t_nsjcbxe AS b ON a.bei_nei_shen_bu_m = b.bei_nei_shen_bu_m WHERE a.parent_id_ = '${ids.id_}' AND b.ji_hua_zong_wai_j = '${ids.ji_hua_zong_wai_j}' GROUP BY a.id_ ORDER BY a.create_time_,a.id_ DESC`
             await curdPost('sql', sqsl1).then((res) => {
                 finish = res.variables.data
             })
