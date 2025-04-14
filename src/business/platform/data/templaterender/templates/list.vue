@@ -1025,7 +1025,7 @@ export default {
                 let src = ''
                 this.readonly = false
                 const { userId } = this.$store.getters || {}
-                const [path, ...rest] = button.reportPath.split('&') || []
+                const [path, ...rest] = button.reportPath?.split('&') || []
                 switch (buttonType) {
                     case 'search': // 查询
                         ActionUtils.setFirstPagination(this.pagination)
@@ -2085,7 +2085,7 @@ export default {
             return this.serializeParams(finalParams)
         },
         serializeParams (params) {
-            return Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&')
+            return '&' + Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&')
         }
     }
 }
