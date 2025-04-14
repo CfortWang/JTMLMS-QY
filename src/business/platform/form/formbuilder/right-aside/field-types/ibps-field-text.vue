@@ -6,6 +6,7 @@
         :field-item="fieldItem"
         :bo-data="boData"
         :fields="fields"
+        types="switchFieldType,label,name,defaultValue,placeholder,desc,display,prepend,append"
       />
       <!-- 校验规则 -->
       <editor-rules

@@ -26,7 +26,10 @@
                         @blur="() => hasFocus = false"
                         @mouseover.native="inputOnMouseOver($event)"
                         v-on="$listeners"
-                    />
+                    >
+                        <template v-if="fieldType !== 'table' && $utils.isNotEmpty(fieldOptions.prepend)" slot="prepend">{{ fieldOptions.prepend }}</template>
+                        <template v-if="fieldType !== 'table' && $utils.isNotEmpty(fieldOptions.append)" slot="append">{{ fieldOptions.append }}</template>
+                    </el-input>
                 </el-tooltip>
             </div>
             <!-- 配置常用语功能，性能较差 -->
