@@ -18,6 +18,7 @@
                     slot="searchForm"
                     v-model="systemId"
                     placeholder="请先设置子系统"
+                    style="width: 100%"
                     @change="changeSystem"
                 >
                     <el-option
