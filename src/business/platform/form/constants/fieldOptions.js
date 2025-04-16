@@ -1,3 +1,4 @@
+import regexOption from '@/utils/regex'
 /**
  * 默认值
  */
@@ -385,38 +386,45 @@ export const pageSizeOptions = [10, 15, 20, 30, 50, 100]
 /**
  * 数据格式【校验】
  */
-export const dataFormatOptions = [{
-    value: 'phone',
-    label: '手机号',
-    // eslint-disable-next-line no-useless-escape
-    regexp: /^((\(\d{2,3}\))|(\d{3}\-))?1\d{10}$/
-},
-{
-    value: 'telephone',
-    label: '电话号码',
-    // eslint-disable-next-line no-useless-escape
-    regexp: /^((\(0[0-9]{2,3}\))|(0[0-9]{2,3})\-)?([2-9][0-9]{6,7})(\-[0-9]{1,4})?$/
-},
-{
-    value: 'zip',
-    label: '邮编',
-    regexp: /^\d{6}$/
-},
-{
-    value: 'idcard',
-    label: '身份证',
-    regexp: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
-},
-{
-    value: 'email',
-    label: '邮箱',
-    // eslint-disable-next-line no-useless-escape
-    regexp: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/
-},
-{
-    value: 'custom',
-    label: '自定义'
-}]
+// export const dataFormatOptions = [{
+//     value: 'phone',
+//     label: '手机号',
+//     // eslint-disable-next-line no-useless-escape
+//     regexp: /^((\(\d{2,3}\))|(\d{3}\-))?1\d{10}$/
+// },
+// {
+//     value: 'telephone',
+//     label: '电话号码',
+//     // eslint-disable-next-line no-useless-escape
+//     regexp: /^((\(0[0-9]{2,3}\))|(0[0-9]{2,3})\-)?([2-9][0-9]{6,7})(\-[0-9]{1,4})?$/
+// },
+// {
+//     value: 'zip',
+//     label: '邮编',
+//     regexp: /^\d{6}$/
+// },
+// {
+//     value: 'idcard',
+//     label: '身份证',
+//     regexp: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
+// },
+// {
+//     value: 'email',
+//     label: '邮箱',
+//     // eslint-disable-next-line no-useless-escape
+//     regexp: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/
+// },
+// {
+//     value: 'custom',
+//     label: '自定义'
+// }]
+export const dataFormatOptions = [
+    {
+        value: 'custom',
+        label: '自定义'
+    },
+    ...regexOption
+]
 const dataFormatMap1 = {}
 dataFormatOptions.forEach(item => {
     dataFormatMap1[item.value] = item

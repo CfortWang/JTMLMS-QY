@@ -14,7 +14,7 @@
       <!-- 校验规则 -->
       <editor-rules
         :field-item="fieldItem"
-        types="required,length"
+        types="required,length,dataFormat"
       />
       <!-- 字段权限 -->
       <editor-rights
