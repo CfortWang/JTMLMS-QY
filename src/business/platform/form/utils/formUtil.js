@@ -824,10 +824,11 @@ const FormUtil = {
         // 正则表达式
         if (fieldOptions['data_format']) {
             let dataFormatValue = fieldOptions['data_format_value']
-            let dataFormatMsg = fieldOptions['data_format_msg']
+            const dataFormatMsg = fieldOptions['data_format_msg']
             if (fieldOptions['data_format'] !== 'custom') {
                 dataFormatValue = dataFormatMap[fieldOptions['data_format']].regexp
-                dataFormatMsg = I18n.t('validate.' + fieldOptions['data_format'])
+                // 内置校验规则更新，校验提示信息可自由配置
+                // dataFormatMsg = I18n.t('validate.' + fieldOptions['data_format'])
             }
             rules.push({
                 pattern: dataFormatValue,
