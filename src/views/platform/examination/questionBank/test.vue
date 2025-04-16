@@ -164,6 +164,7 @@ export default {
         const { duration } = this.examData || {}
         const countdown = duration === '不限' ? 0 : parseInt(duration / 1000)
         return {
+            timer: null,
             pagination: {
                 currentPage: 1,
                 pageSize: 100
@@ -281,7 +282,7 @@ export default {
             // console.log(this.examData)
         },
         startCountdown () {
-            const timer = setInterval(() => {
+            this.timer = setInterval(() => {
                 if (this.countdown > 0) {
                     this.countdown--
                     // 判断是否到达指定时间
@@ -295,7 +296,7 @@ export default {
                     }
                     if (this.countdown === 0) {
                         this.submitForm(this.dealFormData())
-                        clearInterval(timer)
+                        clearInterval(this.timer)
                     }
                 }
             }, 1000)
@@ -585,6 +586,7 @@ export default {
             // console.log(addParams, updateParams)
             this.$common.request('add', addParams).then(() => {
                 this.$common.request('update', updateParams).then(() => {
+                    this.timer && clearInterval(this.timer) // 不管是怎么提交的 都需要清除定时器
                     this.$message.success('提交成功！')
                     this.closeDialog()
                 })

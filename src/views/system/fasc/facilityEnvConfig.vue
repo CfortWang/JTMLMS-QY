@@ -545,7 +545,7 @@ export default {
             })
         },
         loadSubData () {
-            const sql = `select * from t_sshjpzxq where parent_id_='${this.parentData.mainId}'`
+            const sql = `select * from t_sshjpzxq where parent_id_='${this.parentData.mainId}' and (shi_fou_shan_chu_ !='1' OR shi_fou_shan_chu_ IS NULL OR shi_fou_shan_chu_='')`
             this.$common.request('sql', sql).then(res => {
                 const { data = [] } = res.variables || {}
                 // console.log('子表', data)
@@ -860,11 +860,25 @@ export default {
                         await this.$common.request('update', params).then(() => { console.log('子表更新数据成功') })
                     }
                     if (deleteList.length) {
+                        // const params = {
+                        //     tableName: 't_sshjpzxq',
+                        //     paramWhere: { zi_wai_deng_wai_j: deleteList.join(',') }
+                        // }
+                        // await this.$common.request('delete', params).then(() => { console.log('子表删除数据成功') })
+
+                        // 调整为软删除
                         const params = {
                             tableName: 't_sshjpzxq',
-                            paramWhere: { zi_wai_deng_wai_j: deleteList.join(',') }
+                            updList: deleteList.map(item => ({
+                                where: {
+                                    zi_wai_deng_wai_j: item
+                                },
+                                param: {
+                                    shi_fou_shan_chu_: '1'
+                                }
+                            }))
                         }
-                        await this.$common.request('delete', params).then(() => { console.log('子表删除数据成功') })
+                        await this.$common.request('update', params).then(() => { console.log('子表软删除数据成功') })
                     }
                     this.$nextTick(() => {
                         this.$message.success('修改成功！')
@@ -952,9 +966,22 @@ export default {
                 } : null
 
                 // 生成删除请求参数
+                // const deleteParams = deleteList.length ? {
+                //     tableName,
+                //     paramWhere: { she_shi_id_: deleteList.join(',') }
+                // } : null
+
+                // 调整为软删除
                 const deleteParams = deleteList.length ? {
                     tableName,
-                    paramWhere: { she_shi_id_: deleteList.join(',') }
+                    updList: deleteList.map(item => ({
+                        where: {
+                            she_shi_id_: item
+                        },
+                        param: {
+                            shi_fou_shan_chu_: '1'
+                        }
+                    }))
                 } : null
 
                 // 合并所有请求
@@ -969,7 +996,8 @@ export default {
                 }
 
                 if (deleteParams) {
-                    allRequests.push(this.$common.request('delete', deleteParams).then(() => console.log('删除紫外灯数据成功')))
+                    // allRequests.push(this.$common.request('delete', deleteParams).then(() => console.log('删除紫外灯数据成功')))
+                    allRequests.push(this.$common.request('update', deleteParams).then(() => console.log('软删除紫外灯数据成功')))
                 }
 
                 // 执行所有请求

@@ -57,7 +57,8 @@ export default {
             handler (val) {
                 this.$emit('change-data', 'gyspjbzb', val)
             },
-            deep: true
+            deep: true,
+            immediate: true
         }
     },
     methods: {

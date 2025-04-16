@@ -19,6 +19,7 @@
             <el-table ref="external" v-loading="loading" :data="reagentBtnDataFilter" class="ragent-dialog-content">
                 <el-table-column label="仓库" prop="positionName" />
                 <el-table-column label="区域名称" prop="quYu" />
+                <el-table-column label="是否可用" prop="enable_" />
                 <el-table-column label="预扣数量" prop="withhold">
                     <template slot-scope="{row}">
                         <span>{{ row.withhold||0 }}</span>
@@ -29,7 +30,7 @@
                         <span>{{ row.min_stock||0 }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="库存量" prop="quantity">
+                <el-table-column label="库存量" prop="quantity" width="120">
                     <template slot-scope="{row}">
                         <span v-if="row.isEdit" :style="{color: row.quantity>row.min_stock?'':'red'}">{{ row.quantity }}</span>
                         <el-input
@@ -105,7 +106,11 @@ export default {
             })
         },
         handleEdit (row) {
-            row.isEdit = false
+            if (row.enable_ == '是') {
+                row.isEdit = false
+            } else {
+                return this.$message.error('当前库存已锁住，暂不支持修改！')
+            }
         },
         async setTotal () {
             const sql = `select * from v_inventory where batch_num='${this.formData.piHao}' and bian_ma ='${this.formData.bianMa}'`
@@ -143,7 +148,7 @@ export default {
             }
         },
         onChange () {
-            const sql = `select position,quantity,withhold,min_stock,id_ from t_Reagent_Inventory  where batch_num='${this.formData.piHao}' and reagent_code='${this.formData.bianMa}'`
+            const sql = `select position,quantity,enable_,withhold,min_stock,id_ from t_Reagent_Inventory  where batch_num='${this.formData.piHao}' and reagent_code='${this.formData.bianMa}'`
             this.$common.request('sql', sql).then(res => {
                 const resData = res.variables.data
                 if (resData?.length > 0) {

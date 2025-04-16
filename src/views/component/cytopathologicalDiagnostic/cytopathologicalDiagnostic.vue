@@ -270,7 +270,8 @@ export default {
             handler (val) {
                 this.tableData = val
                 // console.log('val', val)
-            }
+            },
+            immediate: true
         }
     },
     created () {

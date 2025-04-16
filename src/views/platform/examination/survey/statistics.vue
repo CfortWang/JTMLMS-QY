@@ -53,13 +53,13 @@
                     <All :statis-item-data="showData" />
                 </div>
                 <div class="title" style="margin-left:8px">统计详情</div>
-                <div v-for="(v,k) in showData" :key="k" class="every">
+                <div v-for="(v,k,ind) in showData" :key="k" class="every">
                     <div class="table-title">
                         <div class="desc">
-                            {{ Object.keys(showData).findIndex(i=>i===k)+1 }}.{{ v[0].ti_gan_ }}
+                            {{ ind+1 }}.{{ v[0].ti_gan_ }}
                         </div>
                         <div class="shown">
-                            填写人数：{{ v.length }}
+                            有效数量/总数量：{{ v.filter(i=>i.da_an_).length }}/{{ v.length }}
                         </div>
                     </div>
                     <div class="item-table">

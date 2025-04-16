@@ -59,11 +59,15 @@ export default {
         visible: {
             type: Boolean,
             default: false
+        },
+        demo1UserType: {
+            type: Array,
+            default: () => []
         }
     },
     data () {
         return {
-            userTypes: [
+            userTypes: this.demo1UserType.length > 0 ? this.demo1UserType : [
                 { label: '门诊患者', value: '门诊患者' },
                 { label: '住院患者', value: '住院患者' },
                 { label: '医务人员', value: '医务人员' },

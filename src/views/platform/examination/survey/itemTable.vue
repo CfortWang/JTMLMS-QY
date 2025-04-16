@@ -79,15 +79,25 @@ export default {
                 if (this.statisItemData[0].xuan_xiang_) {
                     let ind = 1
                     const t = JSON.parse(this.statisItemData[0].xuan_xiang_)
+                    const notChoice = this.statisItemData.filter(item => !item.da_an_).length // 未选项
+                    const validCnt = this.statisItemData.length - notChoice
                     for (const key in t) {
                         const cnt = this.statisItemData.filter(item => item.da_an_ === key).length
                         arr.push({
                             xx: `选项${ind}`,
                             xuan_xiang_: t[key],
                             xiao_ji_: cnt,
-                            bi_li_: (cnt / this.statisItemData.length * 100).toFixed(2) + ' %'
+                            bi_li_: validCnt > 0 ? (cnt / (validCnt) * 100).toFixed(2) + '%' : '0.00%'
                         })
                         ind++
+                    }
+                    if (notChoice > 0) {
+                        arr.push({
+                            xx: `未选`,
+                            xuan_xiang_: '/',
+                            xiao_ji_: notChoice,
+                            bi_li_: '/'
+                        })
                     }
                 }
             } else {

@@ -13,7 +13,11 @@
         @close="closeDialog"
     >
         <el-table ref="elTable" :data="formData" border stripe>
-            <el-table-column label="返回结果字段" prop="label" />
+            <el-table-column label="返回结果字段" prop="label">
+                <template slot-scope="{row}">
+                    <span>{{ row.label===row.name?row.label:`${row.label}（${row.name}）` }}</span>
+                </template>
+            </el-table-column>
             <el-table-column label="绑定显示的属性" prop="field">
                 <template slot-scope="scope">
                     <el-select v-model="scope.row.field" clearable @clear="scope.row.showRule=''">

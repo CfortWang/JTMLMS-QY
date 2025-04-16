@@ -124,7 +124,8 @@ export default {
                     // console.log(this.formData)
                     this.tableData = val
                 }
-            }
+            },
+            immediate: true
         },
         tableData: {
             handler (val) {

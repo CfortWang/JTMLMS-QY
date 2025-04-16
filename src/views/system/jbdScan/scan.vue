@@ -16,7 +16,7 @@ import guanshenzhuangtai from './goods/guanshenzhuangtai'
 import bwTag from './goods/bwTag.vue'
 import fzrkTag from './goods/fzrkTag.vue'
 import kucuntag from './goods/kucuntag.vue'
-import deviceTagWeiNing from './goods/deviceTagWeiNing.vue'
+import deviceTagTemplateTwo from './goods/deviceTagTemplateTwo'
 
 export default {
     components: {
@@ -29,7 +29,7 @@ export default {
         bwTag,
         fzrkTag,
         kucuntag,
-        deviceTagWeiNing
+        deviceTagTemplateTwo
     },
     props: {
         currentScan: String,
