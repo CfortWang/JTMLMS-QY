@@ -210,8 +210,8 @@
                     </el-select>
                     <div v-if="fieldOptions.data_format ==='custom'">
                         <el-input v-model="fieldOptions.data_format_value" placeholder="正则表达式" type="textarea" rows="1" />
-                        <el-input v-model="fieldOptions.data_format_msg" placeholder="提示信息" type="textarea" rows="1" />
                     </div>
+                    <el-input v-model="fieldOptions.data_format_msg" placeholder="提示信息" type="textarea" rows="1" />
                 </div>
             </div>
         </div>
@@ -296,25 +296,25 @@ export default {
         .el-checkbox{
             margin-right: 10px;
         }
-    }
-    ::v-deep .custom-select-dropdown {
-        .el-scrollbar .el-select-dropdown__wrap .el-select-dropdown__list .el-select-dropdown__item {
-            height: auto;
-            min-height: 24px;
-            > div {
+        ::v-deep .custom-select-dropdown {
+            .el-scrollbar .el-select-dropdown__wrap .el-select-dropdown__list .el-select-dropdown__item {
                 height: auto;
-                width: 360px;
-                line-height: 1.5;
-                .label {
-                    font-weight: 600;
-                    color: #606266;
-                }
-                .example {
-                    color: #8492a6;
-                    font-size: 13px;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
+                min-height: 24px;
+                > div {
+                    height: auto;
+                    width: 360px;
+                    line-height: 1.5;
+                    .label {
+                        font-weight: 600;
+                        color: #606266;
+                    }
+                    .example {
+                        color: #8492a6;
+                        font-size: 13px;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                    }
                 }
             }
         }
