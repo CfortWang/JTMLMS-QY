@@ -42,7 +42,7 @@ export default {
                 let cnt = 1
                 for (const key in t) {
                     data.push({
-                        value: this.statisItemData.filter(item => item.da_an_ === key).length,
+                        value: this.statisItemData.filter(item => item.da_an_.includes(key)).length,
                         name: `选项${cnt}`
                     })
                     cnt++
@@ -86,7 +86,7 @@ export default {
                 let cnt = 1
                 for (const key in t) {
                     data.push({
-                        value: this.statisItemData.filter(item => item.da_an_ === key).length,
+                        value: this.statisItemData.filter(item => item.da_an_.includes(key)).length,
                         name: `选项${cnt}`
                     })
                     cnt++

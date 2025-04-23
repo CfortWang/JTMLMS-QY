@@ -263,8 +263,10 @@ export default {
             }).then(res => {
                 const { data = [] } = res
                 const arry = []
+                const oldData = this.reagentBatchData?.length > 0 ? JSON.parse(JSON.stringify(this.reagentBatchData)) : []
                 data.forEach(item => {
-                    arry.push({ kuCunId: item.id_, shiJiMingCheng: item.ming_cheng_, bianMa: item.bian_ma, piHao: item.batch_num, leiBie: item.lei_bie_, guiGe: item.gui_ge_, danWei: item.dan_wei_, youXiaoQi: item.exp_date, shengChanShang: item.chang_jia_ + '/' + item.gong_ying_shang_, kuCunLiang: item.quantity || 0, panCunShuLiang: '', beiZhu: '', cunChuWeiZhi: item.position, shangYueJieCun: item.lastMonth || 0, benYueRuKu: item.currIn || 0, benYueChuKu: item.currOut || 0, benYueJieCun: item.currBalance || 0 })
+                    const temp = oldData.find(b => b.kuCunId == item.id_)
+                    arry.push(temp || { kuCunId: item.id_, shiJiMingCheng: item.ming_cheng_, bianMa: item.bian_ma, piHao: item.batch_num, leiBie: item.lei_bie_, guiGe: item.gui_ge_, danWei: item.dan_wei_, youXiaoQi: item.exp_date, shengChanShang: item.chang_jia_ + '/' + item.gong_ying_shang_, kuCunLiang: item.quantity || 0, panCunShuLiang: '', beiZhu: '', cunChuWeiZhi: item.position, shangYueJieCun: item.lastMonth || 0, benYueRuKu: item.currIn || 0, benYueChuKu: item.currOut || 0, benYueJieCun: item.currBalance || 0 })
                 })
                 this.reagentBatchData = arry
             }).catch(() => {

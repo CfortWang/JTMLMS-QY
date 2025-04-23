@@ -176,6 +176,7 @@ export default {
         return {
             depth3: '',
             level: level.second || level.first,
+            first: level.first,
             monthValues: [],
             startDate: '',
             endDate: '',
@@ -848,6 +849,17 @@ export default {
             }
         }
     },
+    watch: {
+        depth3: {
+            handler (newVal, oldVal) {
+                this.positionsInfoData()
+                this.degreeGradeInfoData()
+                this.employeeInfoData()
+            },
+            deep: true,
+            immediate: true
+        }
+    },
     created () {
         const initendDate = new Date()
         // this.endDate =
@@ -923,7 +935,6 @@ export default {
                 this.startDate = ''
                 this.endDate = ''
             }
-            // console.log(this.startDate, this.endDate)
             this.getTrainingStatisticsData()
             this.getExamStatisticsData()
         },
@@ -935,13 +946,33 @@ export default {
                 this.otherPositions.length !== 0
                     ? `(${this.otherPositions.join(' or ')} )`
                     : `ee.positions_ = '没有选择部门'`
-            const sql = `select a.id_,a.parent_id_,ee.name_,a.zui_gao_xue_li_x_,a.zhi_cheng_deng_ji,ee.jian_ding_zi_ge_z,a.ren_zhi_shi_jian_,
-      a.ru_zhi_shi_jian_ from  t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where a.id_ !='861622496187645952' and ${positionsWhere}`
+            //         const sql = `select a.id_,a.parent_id_,ee.name_,a.zui_gao_xue_li_x_,a.zhi_cheng_deng_ji,ee.jian_ding_zi_ge_z,a.ren_zhi_shi_jian_,
+            //   a.ru_zhi_shi_jian_ from  t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where a.id_ !='861622496187645952' and ee.positions_ like '%${first}%'`
+            const sql = `select
+                            a.id_,
+                            a.parent_id_,
+                            ee.name_,
+                            a.zui_gao_xue_li_x_,
+                            a.zhi_cheng_deng_ji,
+                            ee.jian_ding_zi_ge_z,
+                            a.ren_zhi_shi_jian_,
+                            a.ru_zhi_shi_jian_ 
+                        FROM
+                            t_ryjbqk AS a
+                            JOIN ibps_party_employee AS ee ON a.parent_id_ = ee.id_
+                            JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, ee.POSITIONS_ ) > 0 
+                        WHERE
+                            a.id_ != '861622496187645952' 
+                            and ee.name_ not like '%系统%'
+                            and ee.name_ not like '%金通%'
+                            and ee.name_ not like '%管理%'
+                            and ee.id_ != '702117247933480960'
+                            AND en.PATH_ LIKE '%${this.depth3}%'`
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data
             })
+            this.employeeNum = data.length
             if (this.initOnLoad === 0) {
-                this.employeeNum = data.length
                 this.initOnLoad = 1
             }
             const personIdsArr = []
@@ -966,17 +997,77 @@ export default {
                 this.otherPositions.length !== 0
                     ? `(${this.otherPositions.join(' or ')} )`
                     : `ee.positions_ = '没有选择部门'`
+            // const sql = `select
+            //     sum(a.zui_gao_xue_li_x_ like '%博士%') as boShi,
+            //     sum(a.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,
+            //     sum(a.zui_gao_xue_li_x_ = '本科') as benKe,
+            //     sum(a.zui_gao_xue_li_x_ = '大专') as daZhuan,
+            //     sum(a.zhi_cheng_deng_ji = '初级') as chuJi,
+            //     sum(a.zhi_cheng_deng_ji = '中级') as zhongJi,
+            //     sum(a.zhi_cheng_deng_ji = '高级') as gaoJi,
+            //     sum(a.zhi_cheng_deng_ji = '副高') as fuGao,
+            //     sum(a.zhi_cheng_deng_ji = '' || a.zhi_cheng_deng_ji is null) as other
+            //     from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where  ${positionsWhere}`
+            // const sql = `select
+            //     sum(a.zui_gao_xue_li_x_ like '%博士%') as boShi,
+            //     sum(a.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,
+            //     sum(a.zui_gao_xue_li_x_ = '本科') as benKe,
+            //     sum(a.zui_gao_xue_li_x_ = '大专') as daZhuan,
+            //     sum(a.zhi_cheng_deng_ji = '初级') as chuJi,
+            //     sum(a.zhi_cheng_deng_ji = '中级') as zhongJi,
+            //     sum(a.zhi_cheng_deng_ji = '高级') as gaoJi,
+            //     sum(a.zhi_cheng_deng_ji = '副高') as fuGao,
+            //     sum(a.zhi_cheng_deng_ji = '' || a.zhi_cheng_deng_ji is null) as other
+            //     from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ join ibps_party_entity en on FIND_IN_SET(en.id_, ee.POSITIONS_) > 0  where en.PATH_ like '%${this.depth3}%'`
+            const a = 'SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7'
+            let sqlparty = `SELECT 1 AS n`
+            this.$store.getters.deptList.forEach((it, i) => {
+                sqlparty += ` UNION ALL SELECT ${i + 2} `
+            })
             const sql = `select
-                sum(a.zui_gao_xue_li_x_ like '%博士%') as boShi,
-                sum(a.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,
-                sum(a.zui_gao_xue_li_x_ = '本科') as benKe,
-                sum(a.zui_gao_xue_li_x_ = '大专') as daZhuan,
-                sum(a.zhi_cheng_deng_ji = '初级') as chuJi,
-                sum(a.zhi_cheng_deng_ji = '中级') as zhongJi,
-                sum(a.zhi_cheng_deng_ji = '高级') as gaoJi,
-                sum(a.zhi_cheng_deng_ji = '副高') as fuGao,
-                sum(a.zhi_cheng_deng_ji = '' || a.zhi_cheng_deng_ji is null) as other
-                from t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where  ${positionsWhere}`
+                            ( SELECT name_ FROM ibps_party_entity WHERE id_ = '${this.depth3}' ) AS enName,
+                            IFNULL( sum( zui_gao_xue_li_x_ LIKE '%博士%' ), 0 ) AS boShi,
+                            IFNULL( sum( zui_gao_xue_li_x_ LIKE '%硕士%' ), 0 ) AS shuoShi,
+                            IFNULL( sum( zui_gao_xue_li_x_ = '本科' ), 0 ) AS benKe,
+                            IFNULL( sum( zui_gao_xue_li_x_ = '大专' ), 0 ) AS daZhuan,
+                            IFNULL( sum( zhi_cheng_deng_ji = '初级' ), 0 ) AS chuJi,
+                            IFNULL( sum( zhi_cheng_deng_ji = '中级' ), 0 ) AS zhongJi,
+                            IFNULL( sum( zhi_cheng_deng_ji = '高级' ), 0 ) AS gaoJi,
+                            IFNULL( sum( zhi_cheng_deng_ji = '副高' ), 0 ) AS fuGao 
+                        FROM
+                            t_ryjbqk 
+                        WHERE
+                            parent_id_ IN (
+                            SELECT
+                                b.id_ AS bid 
+                            FROM
+                                (
+                                SELECT
+                                    a.* 
+                                FROM
+                                    (
+                                    SELECT
+                                        id_,
+                                        name_,
+                                        TRIM(
+                                        SUBSTRING_INDEX( SUBSTRING_INDEX( positions_, ',', n ), ',', - 1 )) AS positions_ 
+                                    FROM
+                                        ibps_party_employee
+                                        JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers 
+                                    WHERE
+                                        LENGTH( positions_ ) - LENGTH(
+                                        REPLACE ( positions_, ',', '' )) >= n - 1 
+                                        and name_ not like '%系统%'
+                                        and name_ not like '%金通%'
+                                        and name_ not like '%管理%'
+                                        and id_ != '702117247933480960'
+                                    ) a 
+                                GROUP BY
+                                    name_ 
+                                ) b 
+                        WHERE
+                            b.positions_ IN ( SELECT id_ FROM ibps_party_entity WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position' ))`
+
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data
             })
@@ -1004,7 +1095,7 @@ export default {
             this.ranksPieData.data[2].value = data[0].fuGao ? data[0].fuGao : 0
         },
         // 部门信息统计
-        positionsInfoData () {
+        async positionsInfoData () {
             // const positionsWhere =
             //     this.positions.length !== 0
             //         ? `(${this.positions.join(' or ')} )`
@@ -1020,16 +1111,101 @@ export default {
             // ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji
             // FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_
             // )gy LEFT JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where ${positionsWhere} and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY enName) jh`
-            console.log(this.$store.getters.deptList, 'this.positionsthis.positionsthis.positions')
             const a = 'SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7'
             let sqlparty = `SELECT 1 AS n`
             this.$store.getters.deptList.forEach((it, i) => {
                 sqlparty += ` UNION ALL SELECT ${i + 2} `
             })
 
-            const sql = `select jh.enName, IFNULL(jh.boShi,0) as boShi,IFNULL(jh.shuoShi,0) as shuoShi,IFNULL(jh.benKe,0) as benKe,IFNULL(jh.daZhuan,0) as daZhuan,IFNULL(jh.chuJi,0) as chuJi, IFNULL(jh.zhongJi,0) as zhongJi, IFNULL(jh.gaoJi,0) as gaoJi, IFNULL(jh.fuGao,0) as fuGao from (select  en.id_ ,en.name_ AS enName,               sum(gy.zui_gao_xue_li_x_ like '%博士%') as boShi,             sum(gy.zui_gao_xue_li_x_ like '%硕士%') as shuoShi,             sum(gy.zui_gao_xue_li_x_ = '本科') as benKe,             sum(gy.zui_gao_xue_li_x_ = '大专') as daZhuan,             sum(gy.zhi_cheng_deng_ji = '初级') AS chuJi,             sum(gy.zhi_cheng_deng_ji = '中级') AS zhongJi,             sum(gy.zhi_cheng_deng_ji = '高级') AS gaoJi,             sum(gy.zhi_cheng_deng_ji = '副高') AS fuGao FROM (SELECT             ee.id_ AS eeID,ee.name_ AS eeName,ee.positions_,ry.zui_gao_xue_li_x_,ry.zhi_cheng_deng_ji             FROM t_ryjbqk AS ry JOIN  ibps_party_employee AS ee ON ry.parent_id_= ee.id_              )gy right JOIN   ibps_party_entity en ON FIND_IN_SET(en.id_,gy.positions_)  where en.DEPTH_ like '%4%' and en.PARENT_ID_ like '%${this.depth3}%' and en.id_!='1166373874003083264' and en.name_ not like '%综合%' GROUP BY en.id_) jh UNION select (select name_ from ibps_party_entity where id_='${this.depth3}') as enName,IFNULL(sum(zui_gao_xue_li_x_ like '%博士%'),0) as boShi, IFNULL(sum(zui_gao_xue_li_x_ like '%硕士%'),0) as shuoShi,IFNULL(sum(zui_gao_xue_li_x_ = '本科'),0) as benKe,IFNULL(sum(zui_gao_xue_li_x_ = '大专'),0) as daZhuan, IFNULL(sum(zhi_cheng_deng_ji = '初级'),0) as chuJi,IFNULL(sum(zhi_cheng_deng_ji = '中级'),0) as zhongJi, IFNULL(sum(zhi_cheng_deng_ji = '高级'),0) as gaoJi, IFNULL(sum(zhi_cheng_deng_ji = '副高'),0) as fuGao from t_ryjbqk where parent_id_ in (SELECT b.id_ as bid FROM (select a.* from (SELECT id_, name_,TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(positions_, ',', n), ',', -1)) AS positions_ FROM ibps_party_employee JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers WHERE LENGTH(positions_) - LENGTH(REPLACE(positions_, ',', '')) >= n - 1) a GROUP BY name_) b WHERE b.positions_ IN ( SELECT id_  FROM ibps_party_entity  WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position'))`
+            const sql = `select
+                            jh.enName,
+                            IFNULL( jh.boShi, 0 ) AS boShi,
+                            IFNULL( jh.shuoShi, 0 ) AS shuoShi,
+                            IFNULL( jh.benKe, 0 ) AS benKe,
+                            IFNULL( jh.daZhuan, 0 ) AS daZhuan,
+                            IFNULL( jh.chuJi, 0 ) AS chuJi,
+                            IFNULL( jh.zhongJi, 0 ) AS zhongJi,
+                            IFNULL( jh.gaoJi, 0 ) AS gaoJi,
+                            IFNULL( jh.fuGao, 0 ) AS fuGao 
+                        FROM
+                            (
+                            SELECT
+                                en.id_,
+                                en.name_ AS enName,
+                                sum( gy.zui_gao_xue_li_x_ LIKE '%博士%' ) AS boShi,
+                                sum( gy.zui_gao_xue_li_x_ LIKE '%硕士%' ) AS shuoShi,
+                                sum( gy.zui_gao_xue_li_x_ = '本科' ) AS benKe,
+                                sum( gy.zui_gao_xue_li_x_ = '大专' ) AS daZhuan,
+                                sum( gy.zhi_cheng_deng_ji = '初级' ) AS chuJi,
+                                sum( gy.zhi_cheng_deng_ji = '中级' ) AS zhongJi,
+                                sum( gy.zhi_cheng_deng_ji = '高级' ) AS gaoJi,
+                                sum( gy.zhi_cheng_deng_ji = '副高' ) AS fuGao 
+                            FROM
+                                (
+                                SELECT
+                                    ee.id_ AS eeID,
+                                    ee.name_ AS eeName,
+                                    ee.positions_,
+                                    ry.zui_gao_xue_li_x_,
+                                    ry.zhi_cheng_deng_ji 
+                                FROM
+                                    t_ryjbqk AS ry
+                                    JOIN ibps_party_employee AS ee ON ry.parent_id_ = ee.id_ where ee.name_ not like '%系统%' and ee.name_ not like '%金通%' and ee.name_ not like '%管理%' and ee.id_ != '702117247933480960'
+                                ) gy
+                                RIGHT JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, gy.positions_ ) 
+                            WHERE
+                                en.DEPTH_ LIKE '%4%' 
+                                AND en.PARENT_ID_ LIKE '%${this.depth3}%' 
+                                AND en.id_ != '1166373874003083264' 
+                                AND en.name_ NOT LIKE '%综合%' 
+                            GROUP BY
+                                en.id_ 
+                            ) jh UNION
+                        SELECT
+                            ( SELECT name_ FROM ibps_party_entity WHERE id_ = '${this.depth3}' ) AS enName,
+                            IFNULL( sum( zui_gao_xue_li_x_ LIKE '%博士%' ), 0 ) AS boShi,
+                            IFNULL( sum( zui_gao_xue_li_x_ LIKE '%硕士%' ), 0 ) AS shuoShi,
+                            IFNULL( sum( zui_gao_xue_li_x_ = '本科' ), 0 ) AS benKe,
+                            IFNULL( sum( zui_gao_xue_li_x_ = '大专' ), 0 ) AS daZhuan,
+                            IFNULL( sum( zhi_cheng_deng_ji = '初级' ), 0 ) AS chuJi,
+                            IFNULL( sum( zhi_cheng_deng_ji = '中级' ), 0 ) AS zhongJi,
+                            IFNULL( sum( zhi_cheng_deng_ji = '高级' ), 0 ) AS gaoJi,
+                            IFNULL( sum( zhi_cheng_deng_ji = '副高' ), 0 ) AS fuGao 
+                        FROM
+                            t_ryjbqk 
+                        WHERE
+                            parent_id_ IN (
+                            SELECT
+                                b.id_ AS bid 
+                            FROM
+                                (
+                                SELECT
+                                    a.* 
+                                FROM
+                                    (
+                                    SELECT
+                                        id_,
+                                        name_,
+                                        TRIM(
+                                        SUBSTRING_INDEX( SUBSTRING_INDEX( positions_, ',', n ), ',', - 1 )) AS positions_ 
+                                    FROM
+                                        ibps_party_employee
+                                        JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers 
+                                    WHERE
+                                        LENGTH( positions_ ) - LENGTH(
+                                        REPLACE ( positions_, ',', '' )) >= n - 1 
+                                        and name_ not like '%系统%'
+                                        and name_ not like '%金通%'
+                                        and name_ not like '%管理%'
+                                        and id_ != '702117247933480960'
+                                    ) a 
+                                GROUP BY
+                                    name_ 
+                                ) b 
+                        WHERE
+                            b.positions_ IN ( SELECT id_ FROM ibps_party_entity WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position' ))`
 
-            curdPost('sql', sql).then((res) => {
+            await curdPost('sql', sql).then((res) => {
                 const data = res.variables.data
                 // 组装数据集，以学历职称为列，以部门为行:{" 大专":['1','2','3']}
                 const degreeSeriesDatas = this.PositionsDegreeOption.series
@@ -1052,10 +1228,9 @@ export default {
                         'boShi',
                         'chuJi',
                         'zhongJi',
-                        'gaoJi',
-                        'fuGao'
+                        'fuGao',
+                        'gaoJi'
                     ]
-                    console.log(data)
                     for (let t = 0; t < data.length; t++) {
                         this.PositionsDegreeOption.xAxis[0].data.push(
                             data[t].enName
@@ -1188,7 +1363,9 @@ export default {
         // 通过部门 id 获取部门人员
         getPositionPeopleIds (positionId) {
             const { userList } = this.$store.getters
-            return userList.filter(user => user.positionId.indexOf(positionId) > -1)
+            // return userList.filter(user => user.positionId.indexOf(positionId) > -1)
+
+            return userList.filter(user => user.positionId.indexOf(positionId) > -1 && user.userId !== '702117247933480960' && !user.userName.includes('系统') && !user.userName.includes('金通') && !user.userName.includes('管理'))
         },
         // 根据部门和时间获取考试统计数据
         async getExamStatisticsData () {
@@ -1203,7 +1380,6 @@ export default {
                         return new Date(item.startDate).getTime() >= new Date(this.startDate).getTime() && new Date(item.startDate).getTime() <= new Date(this.endDate).getTime()
                     })
                 }
-                // console.log('考试1', data)
                 const resultData = users.map(user => {
                     let count = 0
                     let passCount = 0
@@ -1225,7 +1401,6 @@ export default {
                 resultData.sort((a, b) => {
                     return a.userId - b.userId
                 })
-                // console.log('考试', resultData)
                 // 格式化统计图需要的数据
                 this.optionExamStatisticsConfig.xAxis.data = resultData.map(item => item.userName)
                 this.optionExamStatisticsConfig.series[0].data = resultData.map(item => item.count)
@@ -1247,12 +1422,12 @@ export default {
             data.sort((a, b) => {
                 return a.id_ - b.id_
             })
-            // console.log('培训', data)
+            const dArr = data.filter(d => !d.name_.includes('系统') && !d.name_.includes('金通') && !d.name_.includes('管理'))
             // 格式化统计图需要的数据
-            this.optionTrainingStatisticsConfig.xAxis.data = data.map(item => item.name_)
-            this.optionTrainingStatisticsConfig.series[0].data = data.map(item => item.planedjoin)
-            this.optionTrainingStatisticsConfig.series[1].data = data.map(item => item.truejoin)
-            this.optionTrainingStatisticsConfig.series[2].data = data.map(item => item.participationRate)
+            this.optionTrainingStatisticsConfig.xAxis.data = dArr.map(item => item.name_)
+            this.optionTrainingStatisticsConfig.series[0].data = dArr.map(item => item.planedjoin)
+            this.optionTrainingStatisticsConfig.series[1].data = dArr.map(item => item.truejoin)
+            this.optionTrainingStatisticsConfig.series[2].data = dArr.map(item => item.participationRate)
         },
         handleFunc (e) {
             this.depth3 = e.v[0]

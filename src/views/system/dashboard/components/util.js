@@ -589,7 +589,7 @@ export function buildComponent (name, column, preview, vm) {
                 },
                 getScheduleData () {
                     const { first, second } = this.$store.getters.level || {}
-                    const sql = `select a.*, b.title_,b.type_, b.start_date_, b.end_date_, b.config_, b.overview_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}'`
+                    const sql = `select a.*, b.title_,b.type_, b.start_date_, b.end_date_, b.config_, b.overview_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
                     return new Promise((resolve, reject) => {
                         this.$common.request('sql', sql).then(res => {
                             const { data = [] } = res.variables || {}

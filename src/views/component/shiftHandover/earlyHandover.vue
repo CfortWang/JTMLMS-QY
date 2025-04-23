@@ -630,7 +630,13 @@ export default {
                             const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
                             const peopleList = [...new Set(data3.map(item => item.ren_yuan_id_))]
                             let shi_ji_qian_dao_r = ''
-                            if (peopleList.length > 0) shi_ji_qian_dao_r = peopleList.join(',')
+                            // 提交校验试剂签到人员不能为空
+                            if (peopleList.length > 0) {
+                                shi_ji_qian_dao_r = peopleList.join(',')
+                            } else {
+                                return false
+                            }
+                            console.log(shi_ji_qian_dao_r, 2)
                             // 2.生成快照
                             const formName = '人员/检验科早交班登记表.rpx'
                             const res = await this.$common.snapshoot({
@@ -717,8 +723,13 @@ export default {
                 }
                 const peopleList = [...new Set(tempPeople)]
                 let shi_ji_qian_dao_r = ''
-                if (peopleList.length > 0) shi_ji_qian_dao_r = peopleList.join(',')
-                console.log(shi_ji_qian_dao_r)
+                // 提交校验试剂签到人员不能为空，保存可以为空
+                if (peopleList.length > 0) {
+                    shi_ji_qian_dao_r = peopleList.join(',')
+                } else if (!flag && peopleList.length == 0) {
+                    return this.$message.warning('实际签到人员不能为空,请完成签到')
+                }
+                console.log(shi_ji_qian_dao_r, 1)
                 // 2.更新主表展示内容
                 const updateParamsRecord = {
                     tableName: 't_jykzjbdjb',

@@ -17,6 +17,19 @@
             @pagination-change="handlePaginationChange"
             @row-dblclick="handleRowDblclick"
         >
+            <template slot="time">
+                <el-date-picker
+                    v-model="daterRange"
+                    size="mini"
+                    type="daterange"
+                    :picker-options="pickerOptions"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    value-format="yyyy-MM-dd"
+                />
+            </template>
             <!-- 自定义多级表头 -->
             <template #prepend-column>
                 <el-table-column key="userName" prop="userName" label="姓名" width="80">
@@ -36,45 +49,26 @@
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column key="gong_hao_" prop="gong_hao_" label="工号" width="80" />
+                    <el-table-column key="gong_hao_" prop="gong_hao_" label="工号" width="70" />
                 </el-table-column>
-                <!-- 班次信息分组 -->
-                <el-table-column label="班次信息">
-                    <el-table-column key="pai_ban_ming_chen" prop="pai_ban_ming_chen" label="排班名称" width="120" />
-                    <el-table-column key="ban_ci_ming_" prop="ban_ci_ming_" label="班次名" width="80" />
-                    <el-table-column key="ban_ci_bie_ming_" prop="ban_ci_bie_ming_" label="班次别名" width="80" />
+                <!-- 考勤情况 -->
+                <el-table-column label="考勤情况">
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="应出勤天数" width="80" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="实际出勤天数" width="90" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="休息出勤天数" width="90" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="正常天数" width="70" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="异常天数" width="70" />
+                    <el-table-column key="gong_zuo_shi_chan" prop="gong_zuo_shi_chan" label="标准工作时长" width="100" />
+                    <el-table-column key="gong_zuo_shi_chan" prop="gong_zuo_shi_chan" label="实际工作时长" width="100" />
                 </el-table-column>
-                <el-table-column key="ri_qi_" prop="ri_qi_" label="日期" width="100" />
-                <!-- 上班分组 -->
-                <el-table-column label="上班">
-                    <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="打卡时间" width="120" />
-                    <el-table-column key="zhuang_tai_1_" prop="zhuang_tai_1_" label="打卡状态" width="80">
-                        <template #default="{ row }">
-                            <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : 'inherit' }">
-                                {{ row.zhuang_tai_2_ }}
-                            </span>
-                        </template>
-                    </el-table-column>
-                </el-table-column>
-                <!-- 下班分组 -->
-                <el-table-column label="下班">
-                    <el-table-column key="da_ka_shi_jian_2_" prop="da_ka_shi_jian_2_" label="打卡时间" width="120" />
-                    <el-table-column key="zhuang_tai_2_" prop="zhuang_tai_2_" label="打卡状态" width="80">
-                        <template #default="{ row }">
-                            <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : 'inherit' }">
-                                {{ row.zhuang_tai_2_ }}
-                            </span>
-                        </template>
-                    </el-table-column>
-                </el-table-column>
-                <el-table-column key="chi_dao_shi_chang" prop="chi_dao_shi_chang" label="迟到时长(分钟)" width="100" />
-                <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="打卡次数" width="70" />
-                <el-table-column key="kao_qin_zhuang_ta" prop="kao_qin_zhuang_ta" label="考勤状态" width="80">
-                    <template #default="{ row }">
-                        <span :style="{ color: row.kao_qin_zhuang_ta=='异常' ? 'red' : 'inherit' }">
-                            {{ row.kao_qin_zhuang_ta }}
-                        </span>
-                    </template>
+                <!-- 异常统计 -->
+                <el-table-column label="异常统计" :style="{ color: 'red' }">
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="异常合计" width="70" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="迟到次数" width="70" />
+                    <el-table-column key="chi_dao_shi_chang" prop="chi_dao_shi_chang" label="迟到时长(分钟)" width="100" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="早退次数" width="70" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="早退时长" width="70" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="旷工次数" width="70" />
                 </el-table-column>
             </template>
         </ibps-crud>
@@ -86,6 +80,7 @@ import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import IbpsExport from '@/plugins/export'
 import color from '@/store/modules/ibps/modules/color'
+import { mount } from 'sortablejs'
 
 export default {
     mixins: [FixHeight],
@@ -96,7 +91,7 @@ export default {
         return {
             userOption,
             deptOption,
-            title: '考勤明细统计',
+            title: '考勤统计',
             pkKey: 'id_', // 主键对应数据库字段
             loading: true,
             height: document.clientHeight,
@@ -106,6 +101,7 @@ export default {
                 limit: 20
             },
             sorts: {},
+            daterRange: [],
             listConfig: {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary' },
@@ -114,11 +110,7 @@ export default {
                 searchForm: {
                     labelWidth: 100,
                     forms: [
-                        { prop: 'Q^kao_qin_zhuang_ta^SL', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
-                        { prop: ['Q^ri_qi_^DL', 'Q^ri_qi_^DG'], label: '日期范围', fieldType: 'daterange' },
-                        { prop: 'Q^pai_ban_ming_chen^SL', label: '排班名称' },
-                        { prop: 'Q^ban_ci_ming_^SL', label: '班次名称' },
-                        { prop: 'Q^ban_ci_bie_ming_^SL', label: '班次别名' },
+                        { prop: '', label: '日期范围', fieldType: 'slot', slotName: 'time' },
                         { prop: 'Q^yong_hu_id_^S', label: '姓名', fieldType: 'select', options: userOption },
                         { prop: 'Q^gong_hao_^S', label: '工号' },
                         { prop: 'Q^bu_men_^SL', label: '部门', fieldType: 'select', options: deptOption }
@@ -131,6 +123,8 @@ export default {
     computed: {
     },
     created () {
+        const daterRange = this.getTodayDate()
+        this.daterRange = [daterRange.sDay, daterRange.eDay]
         this.loadData()
     },
     methods: {
@@ -165,6 +159,8 @@ export default {
             const { first, second } = this.$store.getters.level || {}
             const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             searchParam['Q^di_dian_^S'] = second || first
+            searchParam['Q^ri_qi_^DL'] = this.daterRange[0]
+            searchParam['Q^ri_qi_^DG'] = this.daterRange[1]
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {
@@ -206,6 +202,18 @@ export default {
             // 添加分页
             sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}`
             return sql
+        },
+        getTodayDate () { // 获取初始化查询截止日期
+            const yesterday = new Date()
+            yesterday.setDate(yesterday.getDate() - 1) // 减去1天
+            const year = yesterday.getFullYear()
+            const month = String(yesterday.getMonth() + 1).padStart(2, '0') // 月份从0开始，需要+1
+            const day = String(yesterday.getDate()).padStart(2, '0')
+            const daterRange = {
+                sDay: `${year}-${month}-01`,
+                eDay: `${year}-${month}-${day}`
+            }
+            return daterRange
         },
         // 分页/排序处理
         handlePaginationChange (page) {

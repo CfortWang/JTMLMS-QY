@@ -20,7 +20,7 @@
                         <el-table-column label="预扣量" prop="withhold" />
                         <el-table-column label="数量" prop="shuLiang">
                             <template slot-scope="{row}">
-                                <el-input v-model="row.shuLiang" type="number" size="mini" :max="10" placeholder="请输入" @input="handleInput(row)" />
+                                <el-input v-model="row.shuLiang" type="number" size="mini" :max="10" placeholder="请输入" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/^0+/, '')" @input="handleInput(row)" />
                             </template>
                         </el-table-column>
                         <el-table-column label="单位" prop="danWei" />
@@ -131,7 +131,7 @@ export default {
         handleInput (row) {
             if (Number(row.shuLiang || 0) > (Number(row.kuCunLiang) - Number(row.withhold || 0))) {
                 row.shuLiang = ''
-                this.$message.error('领用数量不可大于库存量减去预扣数量')
+                this.$message.warning('领用数量不可大于库存量减去预扣数量')
             }
         },
         // 当前页码改变

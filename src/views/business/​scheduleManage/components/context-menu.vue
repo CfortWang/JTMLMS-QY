@@ -87,6 +87,10 @@ export default {
     methods: {
         handleSubmit () {
             const selected = this.viewType === 'users' ? this.shiftList.filter(i => this.selectedShift.includes(i.alias)) : this.shiftList.filter(i => this.selectedShift.includes(i.userName))
+            if (selected.length > 3) {
+                this.$message.warning('不能超过三个班次！')
+                return
+            }
             this.$emit('select', { selected, params: this.params })
             this.$emit('close')
         }

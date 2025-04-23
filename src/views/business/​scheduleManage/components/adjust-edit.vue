@@ -577,6 +577,25 @@ export default {
                     this.$message.warning(row.afterDate + '您已有【' + val + '】班次，不能作为目标班次！')
                     return true
                 } else if (duplicateElements.length === 0 && type === 'after') {
+                    const targetData1 = this.afterDateList.filter(obj => obj.value == row.beforeDate) // 目标人在调班日期的班次
+                    const targetBanCiNum1 = targetData1[0].banci.split(',').length // 目标人在调班日期的班次数量
+                    // 判断班次不能大于3个
+                    if ((targetBanCiNum1 + row.beforeAdjust.length - row.afterAdjust.length) > 3) {
+                        const name = this.userList.filter(obj => obj.userId == row.party)[0].userName
+                        this.$message.warning('调班后【' + name + '】【 ' + row.afterDate + '】班次大于3个！')
+                        row.afterAdjust = []
+                        return true
+                    }
+                    const targetData2 = this.beforeDateList.filter(obj => obj.value == row.afterDate) // 调班人在目标日期的班次
+                    const targetBanCiNum2 = targetData2[0].banci.split(',').length // 调班人在目标日期的班次数量
+                    // 判断班次不能大于3个
+                    if ((targetBanCiNum2 + row.afterAdjust.length - row.beforeAdjust.length) > 3) {
+                        const name = this.userList.filter(obj => obj.userId == this.$store.getters.userId)[0].userName
+                        this.$message.warning('调班后【' + name + '】【 ' + row.beforeDate + '】班次大于3个！')
+                        row.beforeAdjust = []
+                        return true
+                    }
+
                     return false
                 }
                 const partyElements = []// 目标人员重复班次数组
@@ -597,9 +616,27 @@ export default {
                     this.$message.warning(row.beforeDate + '目标人员已有【' + val + '】班次，不能作为调班班次！')
                     return true
                 } else if (duplicateElements.length === 0 && type === 'before') {
+                    const targetData1 = this.afterDateList.filter(obj => obj.value == row.beforeDate) // 目标人在调班日期的班次
+                    const targetBanCiNum1 = targetData1[0].banci.split(',').length // 目标人在调班日期的班次数量
+                    // 判断班次不能大于3个
+                    if ((targetBanCiNum1 + row.beforeAdjust.length - row.afterAdjust.length) > 3) {
+                        const name = this.userList.filter(obj => obj.userId == row.party)[0].userName
+                        this.$message.warning('调班后【' + name + '】【 ' + row.afterDate + '】班次大于3个,请重新选择！')
+                        row.afterAdjust = []
+                        return true
+                    }
+                    const targetData2 = this.beforeDateList.filter(obj => obj.value == row.afterDate) // 调班人在目标日期的班次
+                    const targetBanCiNum2 = targetData2[0].banci.split(',').length // 调班人在目标日期的班次数量
+                    // 判断班次不能大于3个
+                    if ((targetBanCiNum2 + row.afterAdjust.length - row.beforeAdjust.length) > 3) {
+                        const name = this.userList.filter(obj => obj.userId == this.$store.getters.userId)[0].userName
+                        this.$message.warning('调班后【' + name + '】【 ' + row.beforeDate + '】班次大于3个,请重新选择！')
+                        row.beforeAdjust = []
+                        return true
+                    }
+
                     return false
                 }
-
             }
         },
         rowValidate (row, index) { // 行必填检验

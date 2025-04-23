@@ -82,7 +82,7 @@ export default {
                     const notChoice = this.statisItemData.filter(item => !item.da_an_).length // 未选项
                     const validCnt = this.statisItemData.length - notChoice
                     for (const key in t) {
-                        const cnt = this.statisItemData.filter(item => item.da_an_ === key).length
+                        const cnt = this.statisItemData.filter(item => item.da_an_.includes(key)).length
                         arr.push({
                             xx: `选项${ind}`,
                             xuan_xiang_: t[key],

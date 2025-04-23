@@ -856,18 +856,22 @@ export default {
                         // this.dataModel.push(data)
                     })
                     // 后置事件
+                    let importCallBack = null
                     if (this.actionCode === 'importData') {
                         this.afterScript(this.actionCode, this.actionPosition, {
                             button: this.actionButton,
                             importList: list,
-                            fullImportList: [...this.dataModel, ...list]
+                            fullImportList: [...this.dataModel, ...list],
+                            importFunction (a) {
+                                importCallBack = a
+                            }
                         })
                     }
 
                     this.importTableDialogVisible = false
                     this.importValue = null
                     this.importList = []
-                    ActionUtils.success('导入成功')
+                    importCallBack ? importCallBack() : ActionUtils.success('导入成功')
                 })
             } else {
                 const formData = FormUtils.getTableDefaultColumnData(this.field)

@@ -57,7 +57,7 @@ export default {
                     const t = Object.keys(JSON.parse(val[0].xuan_xiang_)).length
                     for (let i = 1; i <= 8; i++) {
                         if (i <= t) {
-                            obj[`xuan_xiang_${i}`] = (val.filter(item => item.da_an_ === String.fromCharCode('A'.charCodeAt() + i - 1)).length / val.length * 100).toFixed(2) + ' %'
+                            obj[`xuan_xiang_${i}`] = (val.filter(item => item.da_an_.includes(String.fromCharCode('A'.charCodeAt() + i - 1))).length / val.length * 100).toFixed(2) + ' %'
                         } else {
                             obj[`xuan_xiang_${i}`] = '/'
                         }

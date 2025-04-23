@@ -96,7 +96,7 @@ export default {
         return {
             userOption,
             deptOption,
-            title: '考勤明细统计',
+            title: '我的考勤明细统计',
             pkKey: 'id_', // 主键对应数据库字段
             loading: true,
             height: document.clientHeight,
@@ -116,12 +116,10 @@ export default {
                     forms: [
                         { prop: 'Q^kao_qin_zhuang_ta^SL', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
                         { prop: ['Q^ri_qi_^DL', 'Q^ri_qi_^DG'], label: '日期范围', fieldType: 'daterange' },
-                        { prop: 'Q^pai_ban_ming_chen^SL', label: '排班名称' },
                         { prop: 'Q^ban_ci_ming_^SL', label: '班次名称' },
                         { prop: 'Q^ban_ci_bie_ming_^SL', label: '班次别名' },
-                        { prop: 'Q^yong_hu_id_^S', label: '姓名', fieldType: 'select', options: userOption },
-                        { prop: 'Q^gong_hao_^S', label: '工号' },
-                        { prop: 'Q^bu_men_^SL', label: '部门', fieldType: 'select', options: deptOption }
+                        { prop: 'Q^pai_ban_ming_chen^SL', label: '排班名称' }
+
                     ]
                 },
                 columns: []
@@ -165,6 +163,8 @@ export default {
             const { first, second } = this.$store.getters.level || {}
             const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             searchParam['Q^di_dian_^S'] = second || first
+            // 筛选当前用户数据
+            searchParam['Q^yong_hu_id_^S'] = this.$store.getters.userId
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {

@@ -51,10 +51,10 @@
                     <el-form-item label="选择历史排班" prop="oldScheduleId" :show-message="false">
                         <el-select
                             v-model="formData.oldScheduleId"
-                            :disabled="readonly"
+                            :disabled="(readonly || ifFaBu)"
                             filterable
                             clearable
-                            :placeholder=" readonly ? '' : '请选择历史排班'"
+                            :placeholder=" (readonly || ifFaBu) ? '' : '请选择历史排班'"
                             @change="handleScheduleChange"
                         >
                             <el-option
@@ -91,7 +91,7 @@
                         </template>
                         <el-date-picker
                             v-model="formData.dateRange"
-                            :disabled="readonly"
+                            :disabled="(readonly || ifFaBu)"
                             type="daterange"
                             range-separator="至"
                             start-placeholder="开始日期"
@@ -107,7 +107,7 @@
                     <el-form-item label="排班配置" prop="config" required :show-message="false">
                         <el-select
                             v-model="formData.config"
-                            :disabled="readonly"
+                            :disabled="(readonly || ifFaBu)"
                             filterable
                             placeholder="请选择排班配置"
                             @change="handleConfigChange"
@@ -132,7 +132,7 @@
             <el-form-item label="排班人员" prop="scheduleStaff" required :show-message="false">
                 <el-select
                     v-model="formData.scheduleStaff"
-                    :disabled="readonly"
+                    :disabled="(readonly || ifFaBu)"
                     multiple
                     filterable
                     placeholder="请选择排班人员"
@@ -150,7 +150,7 @@
                     <el-form-item label="调班审批人" prop="approver" :show-message="false">
                         <el-select
                             v-model="formData.approver"
-                            :disabled="readonly"
+                            :disabled="(readonly || ifFaBu)"
                             multiple
                             filterable
                             placeholder="请选择"
@@ -344,7 +344,7 @@
                                 :style="{ display: viewType === 'users' ? 'grid' : 'flex'}"
                                 @mouseenter=" hoveredIndex = !readonly && `${row.value}-${cIndex}`"
                                 @mouseleave=" hoveredIndex = !readonly && null"
-                                @click.prevent="!readonly && handleShiftClick($event, {row, rIndex, column, cIndex})"
+                                @click.prevent="!readonly && ( !ifFaBu || getCompareTime(cIndex) ) && handleShiftClick($event, {row, rIndex, column, cIndex})"
                             >
                                 <div
                                     v-for="(shift, sIndex) in scheduleData[row.value][cIndex]"
@@ -442,6 +442,7 @@ export default {
             formLabelWidth: '120px',
             loading: false,
             activeStep: 1,
+            ifFaBu: false, // 是否发布，发布后的数据部分字段不可修改。
             formData: {
                 title: '',
                 id: '',
@@ -614,7 +615,7 @@ export default {
             //     scheduleContent.style.paddingLeft = '0px'
             // }
         },
-        getScheduleList (self) { // 获取选择排班下拉的选项
+        getScheduleList (self, flag) { // 获取选择排班下拉的选项
             const { first, second } = this.$store.getters.level || {}
             const params = {
                 parameters: [{
@@ -629,13 +630,16 @@ export default {
             }
             queryStaffSchedule(params).then((res) => {
                 const scheduleList = res.data.dataResult || []
-                self.scheduleOptions = scheduleList
+                if (flag) {
+                    self.scheduleOptions = scheduleList.filter(s => s.id !== self.formData.id) // 历史排班选项数据
+                } else {
+                    self.scheduleOptions = scheduleList// 历史排班选项数据
+                }
             })
         },
         loadData () {
             this.loading = true
             const self = this
-            this.getScheduleList(self)
             // 获取配置数据
             queryScheduleConfig({
                 parameters: [],
@@ -652,6 +656,7 @@ export default {
                 self.configOptions.forEach((el) => {
                     el.options = el.options.filter(obj => obj.diDian === (second || first))
                 })
+                self.getScheduleList(self, false)
                 // console.log(this.configOptions)
                 if (self.$utils.isEmpty(self.pageParams.id)) {
                     self.loading = false
@@ -684,10 +689,12 @@ export default {
                         return d.type === 'allday' ? '全天' : `当天 ${d.startTime}至${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`
                     })
                 }))
+                self.getScheduleList(self, true)
                 console.log('formData', self.formData)
                 self.scheduleData = self.transformScheduleData(records, overview, temp)
                 self.responseData = { ...self.responseData, records, overview, temp }
                 console.log('scheduleData', self.scheduleData)
+                self.ifFaBu = (status == '已发布' ? true : false)
                 self.loading = false
             }).catch(() => {
                 self.loading = false
@@ -700,6 +707,21 @@ export default {
                 text: `${days[dayIndex]}`, // 返回星期几的文字
                 isWeekend: dayIndex === 0 || dayIndex === 6 // 判断是否是周末
             }
+        },
+        getCompareTime (index) {
+            // 先把编辑菜单关闭
+            this.handleClose()
+            const date = new Date()
+            // 提取时间组件
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0') // 月份从0开始，需+1
+            const day = String(date.getDate()).padStart(2, '0')
+            const today = `${year}-${month}-${day} `
+            if (this.dateList[index] > today) {
+                return true
+            }
+            this.$message.warning('已发布的排班表，今日前的排班信息无法修改！')
+            return false
         },
         transformConfigData (data) {
             return data.reduce((acc, item) => {
@@ -1002,7 +1024,7 @@ export default {
             const self = this
             if (val) {
                 await getStaffSchedule({ id: val }).then((res) => {
-                    const { staffScheduleDetailPoList: records, title, endDate, startDate, overview, config,type } = res.data
+                    const { staffScheduleDetailPoList: records, title, endDate, startDate, overview, config, type } = res.data
                     const temp = config ? JSON.parse(config) : {}
                     self.responseData = res.data
                     self.formData = {
@@ -1024,6 +1046,11 @@ export default {
                             return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
                         })
                     }))
+                    // 把子表数据的id和parentid去除
+                    records.forEach((item) => {
+                        item.id = ''
+                        item.parentId = ''
+                    })
                     console.log('formData', self.formData)
                     self.scheduleData = self.transformScheduleData(records, overview, temp)
                     self.responseData = { ...self.responseData, records, overview, temp }
@@ -1147,7 +1174,7 @@ export default {
                 diDian: second || first,
                 title,
                 oldScheduleId,
-                status: type ? '已发布' : '未发布',
+                status: type ? '已发布' : (this.formData.status ? this.formData.status : '未发布'),
                 startDate: dateRange[0],
                 endDate: dateRange[1],
                 type: scheduleType,

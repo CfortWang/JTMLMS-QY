@@ -3,12 +3,12 @@
         <div style="  height:14%;line-height:30px;text-align: left;padding-left: 10px;color: white;">
             {{ info.config.title || "" }}
         </div>
-        <div v-show="showChart" style="width: 100%; height: 86%; display: inline-block; overflow: hidden">
+        <div style="width: 100%; height: 86%; display: inline-block; overflow: hidden">
             <div :id="info.config.idSelector" style="width: 100%; height: 95%; overflow: hidden" />
         </div>
-        <div v-if="!showChart" style="background: #061237;width: 100%;height: 70%;display: flex;justify-content: center;align-items: center;">
+        <!-- <div v-if="!showChart" style="background: #061237;width: 100%;height: 70%;display: flex;justify-content: center;align-items: center;">
             <div style="color: #c7c7c7">目前无数据</div>
-        </div>
+        </div> -->
     </div>
 </template>
 
