@@ -272,7 +272,7 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'deptName', label: '部门', width: 100 },
+                    { prop: 'deptName', label: '部门', width: 110 },
                     { prop: 'procDefName', label: '表单名称', formatter: this.replaceFormName, width: 220 },
                     { prop: 'desc', label: '事务说明', 'min-width': 280 },
                     { prop: 'endTime', label: '完成时间', sortable: 'custom', width: 135 },
