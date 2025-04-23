@@ -24,6 +24,7 @@
                     placeholder="选择签出时间"
                     value-format="yyyy-MM-dd HH:mm"
                     format="yyyy-MM-dd HH:mm"
+                    :picker-options="endPickerOptions"
                     style="width: 96%"
                 />
             </el-form-item>
@@ -50,13 +51,26 @@ export default {
         }
     },
     data () {
+        const that = this
         return {
             title: '签出',
             dialogVisible: this.visible,
             formList: {
                 dataTime: this.formatDate(new Date())
             },
-            toolbars: [{ key: 'confirm' }, { key: 'cancel' }]
+            toolbars: [{ key: 'confirm' }, { key: 'cancel' }],
+            endPickerOptions: {
+                disabledDate (time) {
+                    const t = new Date(time)
+                    const { jin_ru_shi_jian_: startTime } = that.dataList
+                    // 禁用当前时间之后和来访时间之前的时间
+                    if (startTime) {
+                        const start = new Date(startTime)
+                        return t.getTime() < start.getTime() || t.getTime() > Date.now()
+                    }
+                    return t.getTime() > Date.now()
+                }
+            }
         }
     },
     watch: {
