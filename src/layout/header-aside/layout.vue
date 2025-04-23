@@ -131,7 +131,8 @@
                             <ibps-icon :name="asideCollapse ? 'indent' : 'outdent'" />
                         </div>
                         <div style="width: 74%;" class="toggle-aside-btn layout-border-left-name">
-                            <span>{{ getSystemName[0].name }}</span>
+                            <ibps-icon v-if="asideCollapse" :name="getSystemName[0].icon || 'cog'" />
+                            <span v-else>{{ getSystemName[0].name }}</span>
                         </div>
                     </div>
                     <ibps-menu-side style="margin-top: 52px;" />
@@ -265,6 +266,7 @@ export default {
             themeActiveSetting: 'theme/activeSetting'
         }),
         getSystemName () {
+            console.log(this.header().filter(name => { return name.id === this.activeHeader() }))
             return this.header().filter(name => { return name.id === this.activeHeader() })
         },
         /**
