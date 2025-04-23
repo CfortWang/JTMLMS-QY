@@ -266,7 +266,6 @@ export default {
             themeActiveSetting: 'theme/activeSetting'
         }),
         getSystemName () {
-            console.log(this.header().filter(name => { return name.id === this.activeHeader() }))
             return this.header().filter(name => { return name.id === this.activeHeader() })
         },
         /**
