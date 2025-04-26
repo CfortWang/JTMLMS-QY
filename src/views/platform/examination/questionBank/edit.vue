@@ -444,7 +444,7 @@ export default {
                 xian_kao_ci_shu_: '不限',
                 shi_fou_gong_kai_: '是',
                 ping_fen_ren_: '',
-                da_biao_zhan_bi_: 60,
+                da_biao_zhan_bi_: 80,
                 miao_shu_: '',
                 ti_shu_: 0,
                 isLimit: '0',

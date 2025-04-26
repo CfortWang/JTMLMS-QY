@@ -95,6 +95,7 @@
             <el-table
                 ref="elTable"
                 v-loading="loading"
+                class="elTable"
                 v-bind="options"
                 :row-key="pkKey"
                 :data="ibpsData"
@@ -539,5 +540,20 @@ export default {
     .ibps-crud-search-form{
         display: flex;
         flex-wrap: wrap;
+    }
+    .elTable .el-table__body-wrapper{
+        height: v-bind(tableHeight);
+        overflow: scroll;
+
+    }
+    /* 根据高度添加滚动条 */
+    .elTable .el-table__body-wrapper {
+        height: v-bind(tableHeight);
+        overflow: scroll;
+
+    }
+    /* 隐藏滚动条 */
+    .elTable .el-table__body-wrapper::-webkit-scrollbar{
+        width: 0;
     }
 </style>

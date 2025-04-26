@@ -338,7 +338,14 @@ export default {
             // 2. 覆盖逻辑（与之前相同）
             return A.map(aItem => {
                 const key = `${aItem.bianMa}_${aItem.piHao}_${aItem.cunChuWeiZhi}`
-                return bMap.has(key) ? bMap.get(key) : aItem
+                if (bMap.has(key)) {
+                    // 合并 B 的记录，但保留 A 的 id
+                    return {
+                        ...bMap.get(key), // 先展开 B 的记录（覆盖其他字段）
+                        kuCunId: aItem.kuCunId // 显式保留 A 的 id
+                    }
+                }
+                return aItem // 无匹配则返回原记录
             })
         },
         // 删除

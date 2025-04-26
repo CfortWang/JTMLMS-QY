@@ -48,6 +48,18 @@
                 <div>
                     <strong class="label">说明：</strong>{{ banci.desc }}
                 </div>
+                <div>
+                    <strong class="label">出勤情况：</strong>
+                    <div class="dakaBox">
+                        <div>
+                            <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance.da_ka_shi_jian_1_, banci.attendance.zhuang_tai_1_, banci.attendance.chi_dao_shi_chang)"></span>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常'" class="clock-btn"> 补卡 </button>
+                        </div>
+                        <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance.da_ka_shi_jian_2_, banci.attendance.zhuang_tai_2_, 0)"></span> 
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常'" class="clock-btn"> 补卡 </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div slot="footer">
                 <el-button @click="closeDialog">关闭</el-button>
@@ -90,6 +102,16 @@ export default {
         openDialog () {
             this.dialogVisible = true
         },
+        getAttendanceInfo (shijian, zhuangTai, chiDaoShiChang) {
+            if (shijian) {
+                if (zhuangTai === '正常') {
+                    return shijian + ' 正常'
+                } else {
+                    return `${shijian} <span style="color: red;">${zhuangTai}${chiDaoShiChang}分钟</span>`
+                }
+            }
+            return '未打卡'
+        },
         closeDialog () {
             this.$emit('closeBanciDialog', 'banci')
         }
@@ -100,11 +122,31 @@ export default {
  .containerDiv {
       padding: 20px;
       div {
-          margin-bottom: 10px;
+          margin-bottom: 5px;
           display: flex;
           align-items: center;
           min-height: 30px;
       }
+      .dakaBox{
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: start;
+            .clock-btn {
+            border: none;
+            color: white;
+            background-color: #409EFF;
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            margin-left: 10px;
+            &:hover {
+                opacity: 0.8;
+            }
+            }
+
+    }
      .label {
           min-width: 80px;
           margin-right: 10px;
@@ -124,4 +166,5 @@ export default {
           }
       }
   }
+
 </style>

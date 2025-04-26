@@ -5,12 +5,13 @@ import { taskTypeOptions, dashboardStatus, genderOptions, favoritesOptions, noti
 import ActionUtils from '@/utils/action'
 import Utils from '@/utils/util'
 import { findAllByCurrUserId, saveCalendarInfos, removeCalendarInfos, delNavigation, addNavigation, getNavigation, sortNavigation } from '@/api/detection/newHomeApi'
-import { isEqual } from 'lodash'
+import { isEqual, now } from 'lodash'
 import Bus from '@/utils/EventBus'
 import newPng from '@/assets/images/homepage/new.png'
 import { BASE_URL } from '@/constant'
 import dayjs from 'dayjs'
 import { scheduleType } from '@/views/constants/schedule'
+import { lifeTimeData } from '@/views/business/deviceManagement/constants/simulated'
 
 /**
  * 创建组件
@@ -151,8 +152,11 @@ export function buildComponent (name, column, preview, vm) {
                     calendarToolbar: this.fullScreen ? [{ key: 'refresh' }] : [{ key: 'refresh' }, { key: 'fullscreen' }, { key: 'collapse' }],
                     isFirstAlert: true, // 是否首次日程提醒
                     scheduleData: [],
+                    hasMounted: false,
+                    attendanceData: [],
                     scheduleShift: [],
-                    todaySchedule: []
+                    todaySchedule: [],
+                    tempSelectedValue: ''
                 }
             },
             computed: {
@@ -164,6 +168,7 @@ export function buildComponent (name, column, preview, vm) {
                 this.defaultForm = JSON.parse(JSON.stringify(this.quickNavform))
                 this.$nextTick(async () => {
                     this.fetchData()
+                    this.attendanceData = await this.getAttendanceData()
                     this.scheduleData = await this.getScheduleData()
                 })
             },
@@ -587,11 +592,41 @@ export function buildComponent (name, column, preview, vm) {
                     }
                     return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24))
                 },
-                getScheduleData () {
+                getAttendanceData () {
                     const { first, second } = this.$store.getters.level || {}
-                    const sql = `select a.*, b.title_,b.type_, b.start_date_, b.end_date_, b.config_, b.overview_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
+                    const today = this.$common.getDateNow()
+                    const sql = `select a.id_, a.kao_qin_zhuang_ta,a.ri_qi_, a.pai_ban_id_, a.pai_ban_ji_lu_id_, a.ban_ci_bie_ming_, a.ban_ci_kai_shi_, a.ban_ci_jie_shu_, a.ban_ci_ming_, a.da_ka_shi_jian_1_, a.zhuang_tai_1_, a.da_ka_shi_jian_2_, a.zhuang_tai_2_, a.chi_dao_shi_chang FROM t_attendance_detail a JOIN t_schedule b ON a.pai_ban_id_ = b.id_ AND b.status_ = '已发布' WHERE a.di_dian_ = '${second || first}' AND a.ri_qi_ <= '${today}' AND a.yong_hu_id_ = '${this.userId}' `
                     return new Promise((resolve, reject) => {
                         this.$common.request('sql', sql).then(res => {
+                            const { data = [] } = res.variables || {}
+                            const resultMap = new Map()
+                            data.forEach(item => {
+                                const { ri_qi_, pai_ban_id_, ban_ci_bie_ming_, ...rest } = item
+                                // 第一级：按日期分组
+                                if (!resultMap.has(ri_qi_)) {
+                                    resultMap.set(ri_qi_, new Map())
+                                }
+                                const dateMap = resultMap.get(ri_qi_)
+                                // 第二级：按排班ID分组
+                                if (!dateMap.has(pai_ban_id_)) {
+                                    dateMap.set(pai_ban_id_, new Map())
+                                }
+                                const scheduleMap = dateMap.get(pai_ban_id_)
+                                // 第三级：按班次别名存储完整数据
+                                scheduleMap.set(ban_ci_bie_ming_, rest)
+                            })
+                            // return resultMap
+                            resolve(resultMap)
+                        }).catch(error => {
+                            reject(error)
+                        })
+                    })
+                },
+                getScheduleData () {
+                    const { first, second } = this.$store.getters.level || {}
+                    const sql = `select a.*, b.title_,b.type_, b.start_date_, b.end_date_, b.config_, b.overview_, b.id_ as pai_ban_id_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
+                    return new Promise((resolve, reject) => {
+                        this.$common.request('sql', sql).then((res) => {
                             const { data = [] } = res.variables || {}
                             const eventList = []
                             const self = this
@@ -609,6 +644,10 @@ export function buildComponent (name, column, preview, vm) {
                                         const shiftList = shift.split(',')
                                         shiftList.forEach(s => {
                                             const t = scheduleShift.find(i => i.alias === s)
+                                            const attendance = self.attendanceData
+                                                .get(date)
+                                                ?.get(item.pai_ban_id_)
+                                                ?.get(s)
                                             eventList.push({
                                                 scheduleName: item.title_ ? item.title_ : '', // 排班表名字
                                                 scheduleTypeLabel: scheduleTypeLabel || '', // 排班类型
@@ -623,6 +662,7 @@ export function buildComponent (name, column, preview, vm) {
                                                 zhuangTai: '',
                                                 id: i,
                                                 bcolor: t.color,
+                                                attendance: attendance || {}, // 考勤状态
                                                 ...t
                                             })
                                         })
@@ -647,6 +687,145 @@ export function buildComponent (name, column, preview, vm) {
                         param.event._def.title
                     )
                 },
+                showDaKaBtn (targetDay) { // 判断是否展示打卡按钮，当前日期则展示
+                    const today = this.$common.getDateNow()
+                    if (targetDay == today) {
+                        return true
+                    } else {
+                        return false
+                    }
+                },
+                // 打卡处理逻辑
+                handleClock (attendance) {
+                    if (Object.keys(attendance).length === 0) {
+                        this.$message.warning('考勤数据异常！')
+                        return
+                    }
+                    // 获取当前时间
+                    const currentDate = new Date()
+                    const hours = currentDate.getHours()
+                    const minutes = currentDate.getMinutes()
+                    const dakashijian = `${hours}:${minutes}`
+                    const time = this.$common.getDateNow() + ' ' + dakashijian
+                    let str = '打卡成功！'
+
+                    // 在班次结束时间前初次点击打卡按钮，视作上班打卡，自动判定状态为正常或迟到（迟到需记录迟到时长）；再次点击打卡按钮提示已打卡
+                    if (time < attendance.ban_ci_jie_shu_) { // 上班打卡
+                        if (!attendance.da_ka_shi_jian_1_) {
+                            attendance.da_ka_shi_jian_1_ = dakashijian
+                            attendance.zhuang_tai_1_ = time < attendance.ban_ci_kai_shi_ ? '正常' : '迟到'
+                            if (attendance.zhuang_tai_1_ == '迟到') {
+                                attendance.chi_dao_shi_chang = this.getTimeDifferenceInMinutes(attendance.ban_ci_kai_shi_, time)
+                                attendance.kao_qin_zhuang_ta = '异常' // 总考勤状态设置为异常
+                            }
+                        } else {
+                            this.$message.warning('该班次上班已打卡！')
+                            return
+                        }
+                    } else { // 下班打卡
+                        // 在班次结束时间后初始点击打卡按钮，视作下班打卡，再次点击打卡按钮则更新下班打卡时间并提示更新打卡时间成功
+                        if (attendance.da_ka_shi_jian_2_) {
+                            str = '已更新下班打卡！'
+                        }
+                        attendance.da_ka_shi_jian_2_ = dakashijian
+                        attendance.zhuang_tai_2_ = '正常'
+                    }
+
+                    // 更新打卡请求
+                    const tableName = ' t_attendance_detail'
+                    const updateParams = {
+                        tableName,
+                        updList: [
+                            {
+                                where: {
+                                    id_: attendance.id_
+                                },
+                                param: {
+                                    da_ka_shi_jian_1_: attendance.da_ka_shi_jian_1_,
+                                    zhuang_tai_1_: attendance.zhuang_tai_1_,
+                                    da_ka_shi_jian_2_: attendance.da_ka_shi_jian_2_,
+                                    zhuang_tai_2_: attendance.zhuang_tai_2_,
+                                    kao_qin_zhuang_ta: attendance.kao_qin_zhuang_ta,
+                                    chi_dao_shi_chang: attendance.chi_dao_shi_chang
+                                }
+                            }
+                        ]
+                    }
+                    this.$common.request('update', updateParams).then(() => {
+                        this.$message.success(str)
+                    })
+                },
+                getTimeDifferenceInMinutes (startTimeStr, endTimeStr) { // 时间相减分钟数
+                    const startTime = new Date(startTimeStr)
+                    const endTime = new Date(endTimeStr)
+                    const timeDifference = endTime - startTime
+                    return timeDifference / (1000 * 60)
+                },
+                // 打卡处理逻辑
+                handleClockFromTab (todaySchedule) {
+                    const today = this.$common.getDateNow()
+                    // 当天仅有一个班次
+                    if (todaySchedule.length == 1) {
+                        const scheduleObj = this.scheduleData.filter(item => item.start == today && item.alias == todaySchedule[0])
+                        const attendance = scheduleObj.attendance
+                        this.handleClock(attendance)
+                    } else {
+                        let scheduleArr = []
+                        for (let i = 0; i < todaySchedule.length; i++) {
+                            const currentSchedule = todaySchedule[i]
+                            const filtered = this.scheduleData.filter(item => item.start === today && item.alias === currentSchedule)
+                            scheduleArr = scheduleArr.concat(filtered)
+                        }
+                        debugger
+                        const h = this.$createElement
+                        const self = this
+                        this.$msgbox({
+                            title: '选择打卡班次',
+                            message: h('div', null, [
+                                h('p', { style: 'margin-bottom: 15px;' }, '请选择一个班次打卡'),
+                                h('el-radio-group', {
+                                    model: {
+                                        value: self.tempSelectedValue,
+                                        callback: (value) => {
+                                            self.tempSelectedValue = value;
+                                        }
+                                    }
+                                }, scheduleArr.map(schedule =>
+                                    h('el-radio', {
+                                        props: {
+                                            label: schedule.alias,
+                                            key: schedule.alias
+                                        },
+                                        style: 'display: block; margin: 10px 0;'
+                                    }, schedule.alias))
+                                )
+                            ]),
+                            showCancelButton: true,
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            beforeClose: (action, instance, done) => {
+                                if (action === 'confirm') {
+                                    if (!this.tempSelectedValue) {
+                                        this.$message.warning('请选择一个班次');
+                                        return false;
+                                    }
+                                    done();
+                                } else {
+                                    done();
+                                }
+                            }
+                        }).then(() => {
+                            const scheduleObj = this.scheduleData.find(item => 
+                                item.start === today && item.alias === this.tempSelectedValue
+                            );
+                            if (scheduleObj?.attendance) {
+                                this.handleClock(scheduleObj.attendance);
+                            }
+                        }).catch(() => {
+                            // 用户取消操作
+                        });
+                    }
+                },
                 showMySchedule () {
                     const scheduleConfig = {
                         height: '100%',
@@ -667,17 +846,66 @@ export function buildComponent (name, column, preview, vm) {
                             // left: 'prev,next today',
                             // start: '',
                             right: 'prev,next today',
+                            left: '',
                             center: 'title'
                             // right: 'dayGridMonth,timeGridWeek,timeGridDay'
                             // end: 'prev,next,today,month,agendaWeek,agendaDay,listWeek'
                         },
-                        events: this.scheduleData, // 排班数组
+                        // events: this.scheduleData, // 排班数组
                         eventClick: this.handleScheduleEventClick, // 排班点击信息展示
-                        scheduleShift: this.scheduleShift
+                        scheduleShift: this.scheduleShift,
+                        eventColor: '#ffffff',
+                        events: this.scheduleData,
+                        // 添加自定义事件渲染
+                        eventContent: (arg) => {
+                            const event = arg.event
+                            const now = new Date()
+                            const dayStart = new Date(event.start)
+                            dayStart.setHours(0, 0, 0, 0)
+                            // 组合DOM内容
+                            const fragment = document.createDocumentFragment()
+                            const content = document.createElement('div')
+                            const titleStr = event.extendedProps.name + '/' + event.extendedProps.alias
+                            const timeStr = event.extendedProps.dateRange[0].startTime + '至' + event.extendedProps.dateRange[0].endTime
+                            // 考勤是否正常
+                            const status = event.extendedProps.attendance.kao_qin_zhuang_ta || ''
+                            content.innerHTML = `
+                              <div class="event-header">
+                                    <div>
+                                        <div style="background:${event.extendedProps.bcolor};height:10px;width:10px;display:inline-block;">  </div>
+                                        ${titleStr} ${timeStr}
+                                    </div>
+                                    <div class="button-placeholder">
+                                        ${ event.extendedProps.jieShuShiJian <= this.$common.getDateNow() ?
+                                            (
+                                                (status === "正常")? '<i class="el-icon-check" style="color:#409EFF"></i>'
+                                                : '<i class="el-icon-warning-outline" style="color:#F5222D"></i>'
+                                            ) : ''
+                                        }
+                                    </div>
+                              </div>
+                             
+                            `
+                            // 打卡按钮显示
+                            if (this.showDaKaBtn(event.extendedProps.jieShuShiJian)) {
+                                const button = document.createElement('button')
+                                button.className = 'clock-btn'
+                                // 根据打卡状态显示不同文本
+                                button.innerHTML = '打卡'
+                                // 绑定点击事件（通过闭包传递当前事件）
+                                button.onclick = (e) => {
+                                    e.stopPropagation()
+                                    this.handleClock(event.extendedProps.attendance)
+                                }
+                                const placeholder = content.querySelector('.button-placeholder')
+                                placeholder.replaceWith(button)
+                            }
+                            fragment.appendChild(content)
+                            return { domNodes: [fragment] }
+                        }
                     }
                     this.$emit('action-event', 'mySchedule', scheduleConfig)
                 }
-
             },
             template: column.templateHtml !== '' ? `${column.templateHtml}` : `<div></div>`
         }

@@ -45,21 +45,70 @@ export default {
         },
         closeDialog () {
             this.scheduleDialogVisible = false
-        },
-        getScheduleData () {
-
         }
     }
 }
 </script>
-
 <style lang="scss" scoped>
-    .my-schedule {
-        ::v-deep {
-            .el-dialog__body {
-                padding: 20px 0 !important;
-                height: calc(100vh - 100px);
-            }
-        }
+.my-schedule {
+  ::v-deep {
+    .el-dialog__body {
+            padding: 20px 0 !important;
+            height: calc(100vh - 100px);
     }
+    // 事件容器样式
+    .fc-event {
+      padding: 8px;
+      border-radius: 4px;
+      background-color: #ffffff !important;
+      border-color: #e4e7ed !important;
+      margin: 5px 10px 5px 10px;
+      .event-header {
+        //font-weight: bold;
+        color: #606266;
+        font-size: 14px;
+        margin-bottom: 4px;
+        line-height: 24px;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+            > div {
+                vertical-align: middle;
+            }
+      }
+      .event-content{
+        color: #606266;
+        font-size: 14px;
+        margin-bottom: 4px;
+        line-height: 24px;
+      }
+      .event-button {
+       text-align: right;
+        margin-bottom: 4px;
+      }
+    }
+
+    // 打卡按钮
+    .clock-btn {
+      border: none;
+      color: white;
+      background-color: #409EFF;
+      border-radius: 4px;
+      padding: 2px 8px;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    // 异常标识
+    .abnormal-tag {
+      color: #F5222D;
+    }
+    .normal-tag {
+      color: #606266;
+    }
+  }
+}
 </style>
