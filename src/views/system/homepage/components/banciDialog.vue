@@ -30,7 +30,7 @@
                 </div>
                 <div>
                     <strong class="label">对应颜色：</strong>
-                    <div :style="{ background: banci.bcolor, height: '20px', width: '50px', display: 'inline-block' }"></div>
+                    <div :style="{ background: banci.bcolor, height: '20px', width: '50px', display: 'inline-block' }" />
                 </div>
                 <div>
                     <strong class="label">时间段：</strong>
@@ -42,7 +42,7 @@
                 <div class="position-row">
                     <strong class="label">岗位：</strong>
                     <ul class="position-list">
-                        <li class="el-tag el-tag--primary el-tag--small el-tag--light positionItem" v-for="(position, index) in banci.positions" :key="index">{{ position }}</li>
+                        <li v-for="(position, index) in banci.positions" :key="index" class="el-tag el-tag--primary el-tag--small el-tag--light positionItem">{{ position }}</li>
                     </ul>
                 </div>
                 <div>
@@ -52,10 +52,10 @@
                     <strong class="label">出勤情况：</strong>
                     <div class="dakaBox">
                         <div>
-                            <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance.da_ka_shi_jian_1_, banci.attendance.zhuang_tai_1_, banci.attendance.chi_dao_shi_chang)"></span>
+                            <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance.da_ka_shi_jian_1_, banci.attendance.zhuang_tai_1_, banci.attendance.chi_dao_shi_chang)" />
                             <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常'" class="clock-btn"> 补卡 </button>
                         </div>
-                        <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance.da_ka_shi_jian_2_, banci.attendance.zhuang_tai_2_, 0)"></span> 
+                        <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance.da_ka_shi_jian_2_, banci.attendance.zhuang_tai_2_, 0)" />
                             <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常'" class="clock-btn"> 补卡 </button>
                         </div>
                     </div>
@@ -69,12 +69,6 @@
 </template>
 <script>
 export default {
-    data () {
-        return {
-            dialogVisible: this.visible,
-            banci: this.banciInfo
-        }
-    },
     props: {
         visible: {
             type: Boolean,
@@ -84,6 +78,12 @@ export default {
         banciInfo: {
             type: Object,
             default: () => ({})
+        }
+    },
+    data () {
+        return {
+            dialogVisible: this.visible,
+            banci: this.banciInfo
         }
     },
     watch: {
@@ -119,20 +119,20 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
- .containerDiv {
-      padding: 20px;
-      div {
-          margin-bottom: 5px;
-          display: flex;
-          align-items: center;
-          min-height: 30px;
-      }
-      .dakaBox{
+.containerDiv {
+    padding: 20px;
+    div {
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        min-height: 30px;
+    }
+    .dakaBox{
         display: flex;
         flex-direction: column;
-        justify-content: start;
-        align-items: start;
-            .clock-btn {
+        justify-content: flex-start;
+        align-items: flex-start;
+        .clock-btn {
             border: none;
             color: white;
             background-color: #409EFF;
@@ -144,27 +144,26 @@ export default {
             &:hover {
                 opacity: 0.8;
             }
-            }
-
+        }
     }
-     .label {
-          min-width: 80px;
-          margin-right: 10px;
-      }
-     .position-row {
-          display: flex;
-          align-items: center;
-         .position-list {
-              display: flex;
-              flex-wrap: wrap;
-              list-style: none;
-              padding-left: 0;
-              li {
-                  margin-right: 10px;
-                  margin-top: 10px;
-              }
-          }
-      }
-  }
+    .label {
+        min-width: 80px;
+        margin-right: 10px;
+    }
+    .position-row {
+        display: flex;
+        align-items: center;
+        .position-list {
+            display: flex;
+            flex-wrap: wrap;
+            list-style: none;
+            padding-left: 0;
+            li {
+                margin-right: 10px;
+                margin-top: 10px;
+            }
+        }
+    }
+}
 
 </style>
