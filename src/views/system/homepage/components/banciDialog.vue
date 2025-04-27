@@ -52,10 +52,10 @@
                     <strong class="label">出勤情况：</strong>
                     <div class="dakaBox">
                         <div>
-                            <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance.da_ka_shi_jian_1_, banci.attendance.zhuang_tai_1_, banci.attendance.chi_dao_shi_chang)" />
+                            <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance, 1)" />
                             <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常'" class="clock-btn"> 补卡 </button>
                         </div>
-                        <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance.da_ka_shi_jian_2_, banci.attendance.zhuang_tai_2_, 0)" />
+                        <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance, 2)" />
                             <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常'" class="clock-btn"> 补卡 </button>
                         </div>
                     </div>
@@ -102,15 +102,16 @@ export default {
         openDialog () {
             this.dialogVisible = true
         },
-        getAttendanceInfo (shijian, zhuangTai, chiDaoShiChang) {
-            if (shijian) {
-                if (zhuangTai === '正常') {
-                    return shijian + ' 正常'
-                } else {
-                    return `${shijian} <span style="color: red;">${zhuangTai}${chiDaoShiChang}分钟</span>`
-                }
+        getAttendanceInfo (data = {}, type = 1) {
+            const time = ['', 'da_ka_shi_jian_1_', 'da_ka_shi_jian_2_']
+            const status = ['', 'zhuang_tai_1_', 'zhuang_tai_2_']
+            const duration = ['', 'chi_dao_shi_chang', 0]
+
+            if (!data?.[time[type]]) {
+                return '未打卡'
             }
-            return '未打卡'
+
+            return data[status[type]] === '正常' ? `${data[time[type]]} 正常` : `${data[time[type]]} <span style="color: red;">${data[status[type]]}${data[duration[type]]}分钟</span>`
         },
         closeDialog () {
             this.$emit('closeBanciDialog', 'banci')

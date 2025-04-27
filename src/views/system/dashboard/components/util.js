@@ -873,7 +873,7 @@ export function buildComponent (name, column, preview, vm) {
                               <div class="event-header">
                                     <div>
                                         <div style="background:${event.extendedProps.bcolor};height:10px;width:10px;display:inline-block;">  </div>
-                                        ${titleStr} ${timeStr}
+                                        ${titleStr}
                                     </div>
                                     <div class="button-placeholder">
                                         ${ event.extendedProps.jieShuShiJian <= this.$common.getDateNow() ?
