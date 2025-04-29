@@ -1051,9 +1051,9 @@ export default {
                         this.isFirstyiXiaoRiQi = false
                         return
                     }
-                    const zhouQi = this.form.xiaoZhunZQ || 0
-                    const result = this.$common.getFormatDate('string', 10, this.$common.getDate('month', Number(zhouQi), value))
-                    this.form.xiaoZhunYouXia = result
+                    const cycle = this.form.xiaoZhunZQ || 0
+                    const expiredDate = this.$common.getFormatDate('string', 10, this.$common.getDate('month', parseInt(cycle), value))
+                    this.form.xiaoZhunYouXia = this.$common.getFormatDate('string', 10, this.$common.getDate('day', -1, expiredDate))
                 }
             }
         }
