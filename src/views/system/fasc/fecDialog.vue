@@ -51,7 +51,10 @@
                     </el-row>
                     <el-row>
                         <el-col :span="12">
-                            <el-form-item v-if="lei_xing_!=='01-室内温湿度监控'" label="房间：">
+                            <el-form-item v-if="shouldRequired('fang_jian_')" label="房间：">
+                                <template slot="label">
+                                    <span class="required">房间：</span>
+                                </template>
                                 <ibps-link-data
                                     v-model="form.fang_jian_"
                                     style="width:80%"
@@ -67,9 +70,6 @@
                                 />
                             </el-form-item>
                             <el-form-item v-else label="房间：">
-                                <template slot="label">
-                                    <span class="required">房间：</span>
-                                </template>
                                 <ibps-link-data
                                     v-model="form.fang_jian_"
                                     style="width:80%"
@@ -645,8 +645,8 @@ export default {
             if (this.shouldRequired('deviceno1_') && this.form.deviceno1_ === '') {
                 throw new Error('请先选择设备！')
             }
-            if (this.lei_xing_ === '01-室内温湿度监控' && this.form.fang_jian_ === '') {
-                throw new Error('室内温湿度类型必须填写房间！')
+            if (this.shouldRequired('fang_jian_') && this.form.fang_jian_ === '') {
+                throw new Error('请先选择房间！')
             }
             if (this.form.lie_biao_shu_ju_) {
                 const lie_biao_shu_ju_ = JSON.parse(this.form.lie_biao_shu_ju_)

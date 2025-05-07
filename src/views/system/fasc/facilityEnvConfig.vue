@@ -505,7 +505,6 @@ export default {
     async mounted () {
         const config = await getSetting('facilityEnv', 'typeList')
         if (config) {
-            console.log(config)
             console.debug(config)
             this.config = config
         }
@@ -783,7 +782,7 @@ export default {
                 if (this.shouldRequired('deviceno1_') && item.deviceno1_ === '') {
                     return this.$message.warning(`子表第${i + 1}行设备信息缺失！`)
                 }
-                if (this.form.lei_xing_ === '01-室内温湿度监控' && item.fang_jian_ === '') {
+                if (this.shouldRequired('fang_jian_') && item.fang_jian_ === '') {
                     return this.$message.warning(`子表第${i + 1}行房间信息缺失！`)
                 }
                 if (item.lie_biao_shu_ju_) {

@@ -596,7 +596,7 @@ export function buildComponent (name, column, preview, vm) {
                 getTodaySchedule () { // 获取今日班次
                     const { first, second } = this.$store.getters.level || {}
                     const today = this.$common.getDateNow()
-                    const sql = `select a.*, b.start_date_, b.end_date_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
+                    const sql = `select a.*, b.start_date_, b.end_date_, b.config_, b.id_ as pai_ban_id_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
                     return new Promise((resolve, reject) => {
                         this.$common.request('sql', sql).then((res) => {
                             const { data = [] } = res.variables || {}
@@ -604,6 +604,9 @@ export function buildComponent (name, column, preview, vm) {
                             data.forEach(item => {
                                 const days = this.getDays(item.start_date_, today)
                                 const shift = item[`d${days}_`]
+                                const config = item.config_ ? JSON.parse(item.config_) : {}
+                                const { scheduleShift } = config
+                                this.scheduleShift = scheduleShift
                                 if (shift) {
                                     const shiftList = shift.split(',')
                                     todaySchedule = shiftList // 返回今日班次
@@ -713,7 +716,7 @@ export function buildComponent (name, column, preview, vm) {
                 },
                 showDaKaBtn (targetDay) { // 判断是否展示打卡按钮，当前日期则展示
                     const today = this.$common.getDateNow()
-                    if (targetDay == today) {
+                    if (targetDay === today) {
                         return true
                     } else {
                         return false
@@ -738,7 +741,7 @@ export function buildComponent (name, column, preview, vm) {
                         if (!attendance.da_ka_shi_jian_1_) {
                             attendance.da_ka_shi_jian_1_ = dakashijian
                             attendance.zhuang_tai_1_ = time < attendance.ban_ci_kai_shi_ ? '正常' : '迟到'
-                            if (attendance.zhuang_tai_1_ == '迟到') {
+                            if (attendance.zhuang_tai_1_ === '迟到') {
                                 attendance.chi_dao_shi_chang = this.getTimeDifferenceInMinutes(attendance.ban_ci_kai_shi_, time)
                                 attendance.kao_qin_zhuang_ta = '异常' // 总考勤状态设置为异常
                             }
@@ -789,64 +792,11 @@ export function buildComponent (name, column, preview, vm) {
                 handleClockFromTab (todaySchedule) {
                     const today = this.$common.getDateNow()
                     // 当天仅有一个班次
-                    if (todaySchedule.length == 1) {
-                        const scheduleObj = this.scheduleData.filter(item => item.start == today && item.alias == todaySchedule[0])
-                        const attendance = scheduleObj.attendance
-                        this.handleClock(attendance)
+                    if (todaySchedule.length === 1) {
+                        this.$emit('dakaSingle', todaySchedule[0])
+                        return
                     } else {
-                        let scheduleArr = []
-                        for (let i = 0; i < todaySchedule.length; i++) {
-                            const currentSchedule = todaySchedule[i]
-                            const filtered = this.scheduleData.filter(item => item.start === today && item.alias === currentSchedule)
-                            scheduleArr = scheduleArr.concat(filtered)
-                        }
-                        const h = this.$createElement
-                        const self = this
-                        this.$msgbox({
-                            title: '选择打卡班次',
-                            message: h('div', null, [
-                                h('p', { style: 'margin-bottom: 15px;' }, '请选择一个班次打卡'),
-                                h('el-radio-group', {
-                                    model: {
-                                        value: self.tempSelectedValue,
-                                        callback: (value) => {
-                                            self.tempSelectedValue = value
-                                        }
-                                    }
-                                }, scheduleArr.map(schedule =>
-                                    h('el-radio', {
-                                        props: {
-                                            label: schedule.alias,
-                                            key: schedule.alias
-                                        },
-                                        style: 'display: block; margin: 10px 0;'
-                                    }, schedule.alias))
-                                )
-                            ]),
-                            showCancelButton: true,
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消',
-                            beforeClose: (action, instance, done) => {
-                                if (action === 'confirm') {
-                                    if (!this.tempSelectedValue) {
-                                        this.$message.warning('请选择一个班次')
-                                        return false
-                                    }
-                                    done()
-                                } else {
-                                    done()
-                                }
-                            }
-                        }).then(() => {
-                            const scheduleObj = this.scheduleData.find(item => 
-                                item.start === today && item.alias === this.tempSelectedValue
-                            )
-                            if (scheduleObj?.attendance) {
-                                this.handleClock(scheduleObj.attendance)
-                            }
-                        }).catch(() => {
-                            // 用户取消操作
-                        })
+                        this.$emit('action-event', 'daka', todaySchedule)
                     }
                 },
                 async showMySchedule () {

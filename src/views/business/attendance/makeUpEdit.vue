@@ -24,11 +24,11 @@
         >
 
             <!-- 补卡日期 -->
-            <el-form-item label="补卡日期" prop="buKaRiQi">
+            <el-form-item label="补卡日期" prop="buKaRiQi" class="form-item-uniform">
                 <el-date-picker
                     v-model="formData.buKaRiQi"
                     type="date"
-                    placeholder="选择日期"
+                    :placeholder="readonly? '' : 选择日期"
                     value-format="yyyy-MM-dd"
                     :picker-options="buKaRiQiPickerOptions"
                     :disabled="readonly"
@@ -36,10 +36,10 @@
                 />
             </el-form-item>
             <!-- 补卡班次 -->
-            <el-form-item label="补卡班次" prop="buKaBanCi">
+            <el-form-item label="补卡班次" prop="buKaBanCi" class="form-item-uniform">
                 <el-select
                     v-model="formData.buKaBanCi"
-                    placeholder="请选择班次"
+                    :placeholder="readonly? '' : 请选择班次"
                     :disabled="readonly"
                     @focus="loadBuKaBanCiOptions"
                 >
@@ -52,11 +52,11 @@
                 </el-select>
             </el-form-item>
             <!-- 补卡时间 -->
-            <el-form-item label="补卡时间" prop="buKaShiJian">
+            <el-form-item label="补卡时间" prop="buKaShiJian" class="form-item-uniform">
                 <el-time-picker
                     v-model="formData.buKaShiJian"
                     value-format="HH:mm"
-                    placeholder="选择时间"
+                    :placeholder="readonly? '' : 请选择时间"
                     :disabled="readonly"
                 />
             </el-form-item>
@@ -66,7 +66,7 @@
                     v-model="formData.buKaShiYou"
                     type="textarea"
                     :rows="3"
-                    placeholder="请输入补卡原因"
+                    :placeholder="readonly? '' : 请输入补卡原因"
                     maxlength="200"
                     :disabled="readonly"
                     show-word-limit
@@ -79,6 +79,7 @@
                     :download="true"
                     multiple
                     accept="*"
+                    :placeholder="readonly? '' : 请上传附件"
                     :disabled="readonly"
                     style="width:100%"
                 />
@@ -94,7 +95,7 @@ import { queryAttendanceDetail, saveAttendanceReissue } from '@/api/business/att
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import ActionUtils from '@/utils/action'
 export default {
-    name: 'makeupedit',
+    // name: 'makeupedit',
     components: {
         IbpsAttachment
     },
@@ -323,5 +324,10 @@ export default {
                 margin-bottom: 5px;
             }
         }
+    }
+    .form-item-uniform .el-date-editor,
+    .form-item-uniform .el-select,
+    .form-item-uniform .el-time-picker {
+        width: 220px; /* 设置统一的宽度 */
     }
 </style>

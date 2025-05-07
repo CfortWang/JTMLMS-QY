@@ -144,6 +144,12 @@
             @closeBuKaDialog="handleClose"
             @open="handleOpen"
         />
+        <daka-dialog
+            :visible.sync="dakaDialogVisible"
+            :schedules="dakaArr"
+            @confirm="handleDakaConfirm"
+            @close="dakaDialogVisible = false"
+        />
     </ibps-container>
 </template>
 
@@ -172,6 +178,7 @@ import { markReadCalendar } from '@/api/detection/newHomeApi'
 import CalendarAlert from '@/views/system/dashboard/components/calendar-alert.vue'
 import mySchedule from './components/mySchedule.vue'
 import makeUpEdit from '@/views/business/attendance/makeUpEdit.vue'
+import dakaDialog from '@/views/business/attendance/dakaDialog.vue'
 
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
 export default {
@@ -187,7 +194,8 @@ export default {
         CalendarAlert,
         mySchedule,
         banciDialog,
-        makeUpEdit: makeUpEdit
+        makeUpEdit,
+        dakaDialog
     },
     data () {
         return {
@@ -247,7 +255,10 @@ export default {
             banciInfo: {},
             banciDialogVisible: false,
             bukaInfo: {},
-            makeUpEditVisible: false
+            makeUpEditVisible: false,
+            dakaDialogVisible: false,
+            dakaArr: [],
+            tempSelectedValue: ''
         }
     },
     computed: {
@@ -394,6 +405,9 @@ export default {
                     break
                 case 'mySchedule':
                     this.handleMySchedule(params)
+                    break
+                case 'daka':
+                    this.handleDakaDialog(params)
                     break
                 default:
                     break
@@ -734,6 +748,74 @@ export default {
         handleMySchedule (data) {
             this.scheduleConfig = data
             this.$refs.schedule.openDialog()
+        },
+        dakaSingle (selectedValue) {
+            const today = this.$common.getDateNow()
+            const { first, second } = this.$store.getters.level || {}
+            // 查询该班次对应的考勤数据
+            const sql = `select a.* FROM t_attendance_detail a JOIN t_schedule b ON a.pai_ban_id_ = b.id_ AND b.status_ = '已发布' WHERE a.di_dian_ = '${second || first}' AND a.ri_qi_ = '${today}' AND a.yong_hu_id_ = '${this.$store.getters.userId}' and a.ban_ci_bie_ming_ = '${selectedValue}' `
+            this.$common.request('sql', sql).then(res => {
+                const data = res.variables.data[0] || {}
+                // 获取当前时间
+                const currentDate = new Date()
+                const hours = currentDate.getHours()
+                const minutes = currentDate.getMinutes()
+                const dakashijian = `${hours}:${minutes}`
+                const time = this.$common.getDateNow() + ' ' + dakashijian
+                let str = '打卡成功！'
+                // 在班次结束时间前初次点击打卡按钮，视作上班打卡，自动判定状态为正常或迟到（迟到需记录迟到时长）；再次点击打卡按钮提示已打卡
+                if (time < data.ban_ci_jie_shu_) { // 上班打卡
+                    if (!data.da_ka_shi_jian_1_) {
+                        data.da_ka_shi_jian_1_ = dakashijian
+                        data.zhuang_tai_1_ = time < data.ban_ci_kai_shi_ ? '正常' : '迟到'
+                        if (data.zhuang_tai_1_ === '迟到') {
+                            data.chi_dao_shi_chang = this.getTimeDifferenceInMinutes(data.ban_ci_kai_shi_, time)
+                            data.kao_qin_zhuang_ta = '异常' // 总考勤状态设置为异常
+                        }
+                    } else {
+                        this.$message.warning('该班次上班已打卡！')
+                        return
+                    }
+                } else { // 下班打卡
+                    // 在班次结束时间后初始点击打卡按钮，视作下班打卡，再次点击打卡按钮则更新下班打卡时间并提示更新打卡时间成功
+                    if (data.da_ka_shi_jian_2_) {
+                        str = '已更新下班打卡！'
+                    }
+                    data.da_ka_shi_jian_2_ = dakashijian
+                    data.zhuang_tai_2_ = '正常'
+                }
+                // 更新打卡请求
+                const tableName = ' t_attendance_detail'
+                const updateParams = {
+                    tableName,
+                    updList: [
+                        {
+                            where: {
+                                id_: data.id_
+                            },
+                            param: {
+                                da_ka_shi_jian_1_: data.da_ka_shi_jian_1_,
+                                zhuang_tai_1_: data.zhuang_tai_1_,
+                                da_ka_shi_jian_2_: data.da_ka_shi_jian_2_,
+                                zhuang_tai_2_: data.zhuang_tai_2_,
+                                kao_qin_zhuang_ta: data.kao_qin_zhuang_ta,
+                                chi_dao_shi_chang: data.chi_dao_shi_chang
+                            }
+                        }
+                    ]
+                }
+                this.$common.request('update', updateParams).then(() => {
+                    this.$message.success(str)
+                })
+            }).catch(() => {
+            })
+        },
+        handleDakaConfirm (selectedValue) {
+            this.dakaSingle(selectedValue)
+        },
+        handleDakaDialog (data) {
+            this.dakaArr = data
+            this.dakaDialogVisible = true
         }
     }
 }

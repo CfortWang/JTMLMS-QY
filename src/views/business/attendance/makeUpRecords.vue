@@ -70,7 +70,7 @@ export default {
                     forms: [
                         { prop: 'Q^bian_zhi_ren_^S', label: '申请人', fieldType: 'select', options: userOption },
                         { prop: ['Q^bian_zhi_shi_jian^DL', 'Q^bian_zhi_shi_jian^DG'], label: '申请时间', fieldType: 'daterange' },
-                        { prop: 'Q^zhuang_tai_^SL', label: '状态', fieldType: 'select', options: [{ value: '待审核', label: '待审核' }, { value: '未通过', label: '未通过' }, { value: '已通过', label: '已通过' }] },
+                        { prop: 'Q^zhuang_tai_^SL', label: '状态', fieldType: 'select', options: [{ value: '待审核', label: '待审核' }, { value: '未通过', label: '未通过' }, { value: '已通过', label: '已通过' }, { value: '已撤销', label: '已撤销' }] },
                         { prop: ['Q^bu_ka_ri_qi_^DL', 'Q^bu_ka_ri_qi_^DG'], label: '补卡日期', fieldType: 'daterange' },
                         { prop: 'Q^bu_ka_ban_ci_^SL', label: '补卡班次' },
                         { prop: 'Q^bu_ka_shi_you_^SL', label: '补卡事由' }
@@ -92,6 +92,8 @@ export default {
                     effect: 'default',
                     // effect: 'display',
                     actions: [
+                        { key: 'cancel', label: '撤销', type: 'danger', icon: 'ibps-icon-cancel', hidden: function (row) { return (row.zhuang_tai_ !== '待审核') } },
+                        { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit', hidden: function (row) { return (row.zhuang_tai_ !== '已撤销') } },
                         { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt' }
                     ]
                 }
@@ -204,6 +206,9 @@ export default {
                 case 'detail':
                     this.handleEdit(command, data)
                     break
+                case 'cancel':
+                    this.handleCancel(data)
+                    break
             }
         },
         /**
@@ -221,6 +226,29 @@ export default {
         closeBuKaDialog () {
             this.showMakeUpEdit = false
             this.loadData()
+        },
+        /**
+         * 处理取消
+         */
+        async handleCancel (data) {
+            data.zhuang_tai_ = '已撤销'
+            // 改为通用接口
+            const tableName = 't_attendance_reissue'
+            const updateParams = {
+                tableName,
+                updList: [
+                    {
+                        where: {
+                            id_: data.id_
+                        },
+                        param: {
+                            zhuang_tai_: data.zhuang_tai_
+                        }
+                    }]
+            }
+            this.$common.request('update', updateParams).then(async () => {
+                this.$message.success('撤销成功')
+            }).catch((e) => { console.error(e) })
         }
     }
 }
