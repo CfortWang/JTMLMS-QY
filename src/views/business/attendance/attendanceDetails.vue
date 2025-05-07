@@ -40,14 +40,14 @@
                 </el-table-column>
                 <!-- 班次信息分组 -->
                 <el-table-column label="班次信息">
-                    <el-table-column key="pai_ban_ming_chen" prop="pai_ban_ming_chen" label="排班名称" width="120" />
+                    <el-table-column key="pai_ban_ming_chen" prop="pai_ban_ming_chen" label="排班名称" width="130" />
                     <el-table-column key="ban_ci_ming_" prop="ban_ci_ming_" label="班次名" width="80" />
                     <el-table-column key="ban_ci_bie_ming_" prop="ban_ci_bie_ming_" label="班次别名" width="80" />
                 </el-table-column>
                 <el-table-column key="ri_qi_" prop="ri_qi_" label="日期" width="100" />
                 <!-- 上班分组 -->
                 <el-table-column label="上班">
-                    <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="打卡时间" width="120" />
+                    <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="打卡时间" width="140" />
                     <el-table-column key="zhuang_tai_1_" prop="zhuang_tai_1_" label="打卡状态" width="80">
                         <template #default="{ row }">
                             <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : 'inherit' }">
@@ -58,7 +58,7 @@
                 </el-table-column>
                 <!-- 下班分组 -->
                 <el-table-column label="下班">
-                    <el-table-column key="da_ka_shi_jian_2_" prop="da_ka_shi_jian_2_" label="打卡时间" width="120" />
+                    <el-table-column key="da_ka_shi_jian_2_" prop="da_ka_shi_jian_2_" label="打卡时间" width="140" />
                     <el-table-column key="zhuang_tai_2_" prop="zhuang_tai_2_" label="打卡状态" width="80">
                         <template #default="{ row }">
                             <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : 'inherit' }">
@@ -102,8 +102,9 @@ export default {
             height: document.clientHeight,
             listData: [],
             pagination: {
-                currentPage: 1,
-                limit: 20
+                totalCount: 0,
+                page: 1,
+                limit: 15
             },
             sorts: {},
             listConfig: {
@@ -145,7 +146,7 @@ export default {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                // this.pagination.total = res.totalCount
+                this.pagination.totalCount = this.listData[0].total_count
             }).finally(() => {
                 this.loading = false
             })
@@ -168,8 +169,9 @@ export default {
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {
-            let sql = `select * FROM t_attendance_detail`
             const params = this.getSearchFormData()
+            const { first, second } = this.$store.getters.level || {}
+            let sql = `select t.*, (select COUNT(*) FROM t_attendance_detail WHERE di_dian_ = '${second || first}') AS total_count FROM t_attendance_detail t`
             // 定义操作符映射
             const operatorMap = {
                 'S': '=',
@@ -204,7 +206,7 @@ export default {
                 }
             }
             // 添加分页
-            sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}`
+            sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.page - 1) * this.pagination.limit}`
             return sql
         },
         // 分页/排序处理

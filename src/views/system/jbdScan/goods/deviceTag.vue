@@ -33,43 +33,9 @@
                                         </div>
                                     </div>
                                     <div class="tagBox">
-                                        <div class="lh">
-                                            <div class="qianZhi">设备名称：</div>
-                                            <div>{{ item.name }}</div>
-                                        </div>
-                                        <div class="lh">
-                                            <div>设备型号：</div>
-                                            <div>{{ item.model }}</div>
-                                        </div>
-                                        <div class="lh">
-                                            <div>设备编号：</div>
-                                            <div>{{ item.serial }}</div>
-                                        </div>
-                                        <div class="lh">
-                                            <div>固定资产号：</div>
-                                            <div>{{ item.assetNum }}</div>
-                                        </div>
-                                        <div class="lh">
-                                            <div>核查人：</div>
-                                            <div>{{ item.verifier }}</div>
-                                        </div>
-                                        <div class="lh" :style="item.range !== '' ? 'border-bottom: 1px solid #000000;' : 'border-bottom: 0px;'">
-                                            <div>核查日期：</div>
-                                            <div>{{ item.verificationDate }}</div>
-                                        </div>
-                                        <!-- <div class="lh">
-                                            <div class="la">
-                                                <div>核查人：</div>
-                                                <div>{{ item.verifier }}</div>
-                                            </div>
-                                            <div class="la" style="border-left: 1px solid #000000;">
-                                                <div>核查日期：</div>
-                                                <div>{{ item.verificationDate }}</div>
-                                            </div>
-                                        </div> -->
-                                        <div v-if="item.range !== ''" class="lh" style="border-bottom: 0px;">
-                                            <div class="qianZhi">限用范围：</div>
-                                            <div class="zuoJuZhong">{{ item.range }}</div>
+                                        <div v-for="(e,t) in midData.columns" v-if="(e.field=='range'&&item[e.field] !== '') || e.field!='range'" :key="'zi'+t" class="lh" :style=" e.field=='verificationDate' ? item['range'] !== '' ? 'border-bottom: 1px solid #000000;' : 'border-bottom: 0px;':''">
+                                            <div :class="e.field=='name'?'qianZhi':''">{{ e.label }}：</div>
+                                            <div>{{ item[e.field] }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -120,6 +86,10 @@ export default {
             default: function () {
                 return { '停用': '停用', '报废': '报废', '合格': '合格' }
             }
+        },
+        tagData: {
+            type: Object,
+            default: () => {}
         }
     },
     data () {
@@ -130,6 +100,7 @@ export default {
             list: [{
                 name: '设备名称',
                 serial: '设备编号',
+                original: '原设备编号',
                 model: '型号规格',
                 verifier: '核查人',
                 verificationDate: '核查日期',
@@ -140,7 +111,8 @@ export default {
                 range: '限用范围', // 限用范围
                 assetNum: '固定资产号'
             }],
-            visible: true
+            visible: true,
+            midData: {}
         }
     },
     watch: {
@@ -150,6 +122,16 @@ export default {
         scanVisible: {
             handler (val) {
                 this.dialogVisible = val
+            },
+            immediate: true
+        },
+        tagData: {
+            handler (val) {
+                if (this.tagData && this.tagData.hasOwnProperty('columns')) {
+                    this.midData = val
+                } else {
+                    this.midData = { 'columns': [{ 'label': '设备名称', 'field': 'name' }, { 'label': '设备型号', 'field': 'model' }, { 'label': '设备编号', 'field': 'serial' }, { 'label': '固定资产号', 'field': 'assetNum' }, { 'label': '核查人', 'field': 'verifier' }, { 'label': '核查日期', 'field': 'verificationDate' }, { 'label': '限用范围', 'field': 'range' }], 'width': 330 }
+                }
             },
             immediate: true
         }
@@ -182,7 +164,8 @@ export default {
                     dj.bi_xu_de_huan_jin,
                     dj.bi_xu_she_shi_,
                     dj.cai_gou_he_tong_,
-                    dj.zi_chan_bian_hao_
+                    dj.zi_chan_bian_hao_,
+                    dj.yuan_she_bei_bian
                 FROM
                     t_sbdj dj
                 WHERE
@@ -206,6 +189,7 @@ export default {
 
                         name: item.she_bei_ming_cheng_,
                         serial: item.she_bei_shi_bie_h,
+                        original: item.yuan_she_bei_bian,
                         model: item.gui_ge_xing_hao_,
                         verifier: this.findPersonName(item.bi_xu_de_huan_jin, personData),
                         verificationDate: verificationDateStr.substring(0, 10)

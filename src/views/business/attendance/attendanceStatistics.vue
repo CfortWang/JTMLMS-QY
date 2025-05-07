@@ -32,20 +32,20 @@
             </template>
             <!-- 自定义多级表头 -->
             <template #prepend-column>
-                <el-table-column key="userName" prop="userName" label="姓名" width="80">
+                <el-table-column key="user_name_" prop="user_name_" label="姓名" width="90">
                     <template #default="{ row }">
                         <el-tag style="margin: 2px;">
-                            {{ row.userName }}
+                            {{ row.user_name_ }}
                         </el-tag>
                     </template>
                 </el-table-column>
                 <!-- 基本信息分组 -->
                 <el-table-column label="基本信息">
                     <!--<el-table-column prop="yong_hu_id_" title="姓名" key="yong_hu_id_" width="80" />-->
-                    <el-table-column key="deptName" prop="deptName" label="部门" width="100">
+                    <el-table-column key="pos_name_" prop="pos_name_" label="部门" width="90">
                         <template #default="{ row }">
                             <el-tag style="margin: 2px;">
-                                {{ row.deptName }}
+                                {{ row.pos_name_ }}
                             </el-tag>
                         </template>
                     </el-table-column>
@@ -53,22 +53,46 @@
                 </el-table-column>
                 <!-- 考勤情况 -->
                 <el-table-column label="考勤情况">
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="应出勤天数" width="80" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="实际出勤天数" width="90" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="休息出勤天数" width="90" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="正常天数" width="70" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="异常天数" width="70" />
-                    <el-table-column key="gong_zuo_shi_chan" prop="gong_zuo_shi_chan" label="标准工作时长" width="100" />
-                    <el-table-column key="gong_zuo_shi_chan" prop="gong_zuo_shi_chan" label="实际工作时长" width="100" />
+                    <el-table-column key="ying_chu_qin_shu" prop="ying_chu_qin_shu" label="应出勤天数" width="80" />
+                    <el-table-column key="shi_ji_chu_qin_shu" prop="shi_ji_chu_qin_shu" label="实际出勤天数" width="85" />
+                    <el-table-column key="xiu_xi_shu" prop="xiu_xi_shu" label="休息天数" width="85" />
+                    <el-table-column key="zheng_chang_shu" prop="zheng_chang_shu" label="正常天数" width="65" />
+                    <el-table-column key="yi_chang_shu" prop="yi_chang_shu" label="异常天数" width="65" />
+                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长(分钟)" width="120" />
+                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长(分钟)" width="120" />
                 </el-table-column>
                 <!-- 异常统计 -->
-                <el-table-column label="异常统计" :style="{ color: 'red' }">
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="异常合计" width="70" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="迟到次数" width="70" />
-                    <el-table-column key="chi_dao_shi_chang" prop="chi_dao_shi_chang" label="迟到时长(分钟)" width="100" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="早退次数" width="70" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="早退时长" width="70" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="旷工次数" width="70" />
+                <el-table-column label="异常统计">
+                    <el-table-column key="yi_chang_he_ji" prop="yi_chang_he_ji" label="异常合计" width="70">
+                        <template #default="{ row }">
+                            <span :style="{ color: 'red' }">
+                                {{ row.yi_chang_he_ji }}次
+                            </span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column key="chi_dao_ci_shu" prop="chi_dao_ci_shu" label="迟到次数" width="70">
+                        <template #default="{ row }">
+                            <span :style="{ color: 'red' }">
+                                {{ row.chi_dao_ci_shu }}次
+                            </span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column key="total_chi_dao_shi_chang" prop="total_chi_dao_shi_chang" label="迟到时长(分钟)" width="100">
+                        <template #default="{ row }">
+                            <span :style="{ color: 'red' }">
+                                {{ row.total_chi_dao_shi_chang }}
+                            </span>
+                        </template>
+                    </el-table-column>
+                    <!--<el-table-column key="zao_tui_ci_shu" prop="zao_tui_ci_shu" label="早退次数" width="70" />
+                    <el-table-column key="zao_tui_shi_chang" prop="zao_tui_shi_chang" label="早退时长" width="70" />-->
+                    <el-table-column key="kuang_gong_ci_shu" prop="kuang_gong_ci_shu" label="旷工次数" width="80">
+                        <template #default="{ row }">
+                            <span :style="{ color: 'red' }">
+                                {{ row.kuang_gong_ci_shu }}次
+                            </span>
+                        </template>
+                    </el-table-column>
                 </el-table-column>
             </template>
         </ibps-crud>
@@ -97,8 +121,9 @@ export default {
             height: document.clientHeight,
             listData: [],
             pagination: {
+                totalCount: 0,
                 currentPage: 1,
-                limit: 20
+                limit: 15
             },
             sorts: {},
             daterRange: [],
@@ -139,7 +164,7 @@ export default {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                // this.pagination.total = res.totalCount
+                this.pagination.totalCount = this.listData[0].total_count
             }).finally(() => {
                 this.loading = false
             })
@@ -164,7 +189,40 @@ export default {
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {
-            let sql = `select * FROM t_attendance_detail`
+            let sql = `select 
+                        COUNT(*) AS total_count,
+                        USER_ID_,
+                        ri_qi_,
+                        user_name_,
+		                pos_name_,
+		                gong_hao_,
+                        COUNT(ri_qi_) AS ying_chu_qin_shu,
+                        SUM(CASE WHEN (da_ka_shi_jian_1_ IS NULL OR da_ka_shi_jian_1_ = '') 
+                                AND (da_ka_shi_jian_2_ IS NULL OR da_ka_shi_jian_2_ = '') 
+                                THEN 1 ELSE 0 END) AS xiu_xi_shu,
+                        COUNT(ri_qi_) - SUM(CASE WHEN (da_ka_shi_jian_1_ IS NULL OR da_ka_shi_jian_1_ = '') 
+                                                AND (da_ka_shi_jian_2_ IS NULL OR da_ka_shi_jian_2_ = '') 
+                                                THEN 1 ELSE 0 END) AS shi_ji_chu_qin_shu,
+                        SUM(CASE WHEN (zhuang_tai_1_ = '正常' OR zhuang_tai_1_ IS NULL) 
+                                AND (zhuang_tai_2_ = '正常' OR zhuang_tai_2_ IS NULL) 
+                                THEN 1 ELSE 0 END) AS zheng_chang_shu,
+                        COUNT(ri_qi_) - SUM(CASE WHEN (zhuang_tai_1_ = '正常' OR zhuang_tai_1_ IS NULL) 
+                                                AND (zhuang_tai_2_ = '正常' OR zhuang_tai_2_ IS NULL) 
+                                                THEN 1 ELSE 0 END) AS yi_chang_shu,
+                        SUM(ban_ci_shi_chang_) AS total_ban_ci_shi_chang,
+                        SUM(gong_zuo_shi_chan) AS total_gong_zuo_shi_chan,
+                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' OR zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
+                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN chi_dao_shi_chang ELSE 0 END) +
+                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN chi_dao_shi_chang ELSE 0 END) AS total_chi_dao_shi_chang,
+                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' OR 
+                                    zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' 
+                                THEN 1 ELSE 0 END) AS kuang_gong_ci_shu,
+                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' OR zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) +
+                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' OR 
+                                    zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' 
+                                THEN 1 ELSE 0 END) AS yi_chang_he_ji
+                    FROM 
+                        v_attendance_statistics `
             const params = this.getSearchFormData()
             // 定义操作符映射
             const operatorMap = {
@@ -197,10 +255,12 @@ export default {
 
                 if (conditions.length > 0) {
                     sql += ' WHERE ' + conditions.join(' AND ')
+                    sql += ' GROUP BY USER_ID_ ORDER BY USER_ID_'
                 }
             }
             // 添加分页
             sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}`
+
             return sql
         },
         getTodayDate () { // 获取初始化查询截止日期
@@ -241,14 +301,14 @@ export default {
         exportData () {
             const exportColumns = [
                 {
-                    field_name: 'userName',
+                    field_name: 'user_name_',
                     label: '姓名',
-                    name: 'userName'
+                    name: 'user_name_'
                 },
                 {
-                    field_name: 'deptName',
+                    field_name: 'pos_name_',
                     label: '部门',
-                    name: 'deptName'
+                    name: 'pos_name_'
                 },
                 {
                     field_name: 'gong_hao_',
@@ -256,62 +316,63 @@ export default {
                     name: 'gong_hao_'
                 },
                 {
-                    field_name: 'pai_ban_ming_chen',
-                    label: '排班名称',
-                    name: 'pai_ban_ming_chen'
+                    field_name: 'ying_chu_qin_shu',
+                    label: '应出勤天数',
+                    name: 'ying_chu_qin_shu'
                 },
                 {
-                    field_name: 'ban_ci_ming_',
-                    label: '班次名',
-                    name: 'ban_ci_ming_'
+                    field_name: 'shi_ji_chu_qin_shu',
+                    label: '实际出勤天数',
+                    name: 'shi_ji_chu_qin_shu'
                 },
                 {
-                    field_name: 'ban_ci_bie_ming_',
-                    label: '班次别名',
-                    name: 'ban_ci_bie_ming_'
+                    field_name: 'xiu_xi_shu',
+                    label: '休息天数',
+                    name: 'xiu_xi_shu'
                 },
                 {
-                    field_name: 'ri_qi_',
-                    label: '日期',
-                    name: 'ri_qi_'
+                    field_name: 'zheng_chang_shu',
+                    label: '正常天数',
+                    name: 'zheng_chang_shu'
                 },
                 {
-                    field_name: 'da_ka_shi_jian_1_',
-                    label: '上班打卡时间',
-                    name: 'da_ka_shi_jian_1_'
+                    field_name: 'yi_chang_shu',
+                    label: '异常天数',
+                    name: 'yi_chang_shu'
                 },
                 {
-                    field_name: 'zhuang_tai_1_',
-                    label: '上班打卡状态',
-                    name: 'zhuang_tai_1_'
+                    field_name: 'total_ban_ci_shi_chang',
+                    label: '标准工作时长(分钟)',
+                    name: 'total_ban_ci_shi_chang'
                 },
                 {
-                    field_name: 'da_ka_shi_jian_2_',
-                    label: '下班打卡时间',
-                    name: 'da_ka_shi_jian_2_'
+                    field_name: 'total_gong_zuo_shi_chan',
+                    label: '实际工作时长(分钟)',
+                    name: 'total_gong_zuo_shi_chan'
                 },
                 {
-                    field_name: 'zhuang_tai_2_',
-                    label: '下班打卡状态',
-                    name: 'zhuang_tai_2_'
+                    field_name: 'yi_chang_he_ji',
+                    label: '异常合计',
+                    name: 'yi_chang_he_ji'
+                },
+                {
+                    field_name: 'chi_dao_ci_shu',
+                    label: '迟到次数',
+                    name: 'chi_dao_ci_shu'
                 },
                 {
                     field_name: 'chi_dao_shi_chang',
                     label: '迟到时长(分钟)',
                     name: 'chi_dao_shi_chang'
                 },
+
                 {
-                    field_name: 'da_ka_ci_shu_',
-                    label: '打卡次数',
-                    name: 'da_ka_ci_shu_'
-                },
-                {
-                    field_name: 'kao_qin_zhuang_ta',
-                    label: '考勤状态',
-                    name: 'kao_qin_zhuang_ta'
+                    field_name: 'kuang_gong_ci_shu',
+                    label: '旷工次数',
+                    name: 'kuang_gong_ci_shu'
                 }
             ]
-            this.handleExport(exportColumns, this.listData, `考勤明细统计数据`)
+            this.handleExport(exportColumns, this.listData, `${this.daterRange[0] + '至' + this.daterRange[1]}考勤统计数据`)
         },
         handleExport (columns, data, title, message, nameKey = 'name') {
             IbpsExport.excel({

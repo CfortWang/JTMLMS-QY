@@ -88,11 +88,11 @@
                 :show-message="false"
             >
                 <template slot="label">
-                    <div class="custom-label">{{ `班次时间${index + 1}` }}</div>
+                    <div class="custom-label">{{ `班次时间` }}</div>
                 </template>
                 <el-radio-group v-model="item.type" class="date-type">
                     <el-radio-button label="range">时间段</el-radio-button>
-                    <el-radio-button label="allday" :disabled="formData.dateRange.length !== 1">全天</el-radio-button>
+                    <!--  <el-radio-button label="allday" :disabled="formData.dateRange.length !== 1">全天</el-radio-button>-->
                 </el-radio-group>
                 <div v-if="item.type === 'range'" class="range-item">
                     <div class="start">
@@ -122,7 +122,7 @@
                         />
                     </div>
                 </div>
-                <div v-if="!readonly" class="operate-btn">
+                <!--<div v-if="!readonly" class="operate-btn">
                     <el-button
                         v-if="index === 0 && formData.dateRange.length < 5 && item.type === 'range'"
                         type="primary"
@@ -139,7 +139,7 @@
                         circle
                         @click="subOption"
                     />
-                </div>
+                </div>-->
             </el-form-item>
             <el-form-item label="说明" prop="desc">
                 <el-input

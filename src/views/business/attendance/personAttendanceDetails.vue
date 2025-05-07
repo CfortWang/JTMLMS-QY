@@ -102,8 +102,9 @@ export default {
             height: document.clientHeight,
             listData: [],
             pagination: {
+                totalCount: 0,
                 currentPage: 1,
-                limit: 20
+                limit: 15
             },
             sorts: {},
             listConfig: {
@@ -143,7 +144,7 @@ export default {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                // this.pagination.total = res.totalCount
+                this.pagination.totalCount = this.listData[0].total_count
             }).finally(() => {
                 this.loading = false
             })
@@ -168,7 +169,8 @@ export default {
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {
-            let sql = `select * FROM t_attendance_detail`
+            const { first, second } = this.$store.getters.level || {}
+            let sql = `select t.*, (select COUNT(*) FROM t_attendance_detail WHERE di_dian_ = '${second || first}' AND yong_hu_id_ = '${this.$store.getters.userId}' ) AS total_count FROM t_attendance_detail t `
             const params = this.getSearchFormData()
             // 定义操作符映射
             const operatorMap = {

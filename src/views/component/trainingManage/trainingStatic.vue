@@ -290,11 +290,23 @@ export default {
                     }
                 }]
             }
-
+            // 更新人员培训记录的培训人
+            const params2 = {
+                tableName: 't_xygpx',
+                updList: [{
+                    where: {
+                        pei_xun_ming_chen: row.id_
+                    },
+                    param: {
+                        parent_id_: buQianRen === '' ? this.params.peixunrenyuan : buQianRen + ',' + this.params.peixunrenyuan
+                    }
+                }]
+            }
             // 合并请求
             Promise.all([
                 this.$common.request('add', addParams),
-                this.$common.request('update', params)
+                this.$common.request('update', params),
+                this.$common.request('update', params2)
             ]).then(async ([addRes, updateRes]) => {
                 console.log('补签签到数据成功', addRes)
                 console.log('更新补签考试人员', updateRes)

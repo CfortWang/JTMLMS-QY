@@ -117,9 +117,9 @@
                         </el-col>
 
                     </el-row>
-                    <el-row v-if="isShowDevice">
+                    <el-row v-if="shouldShowColumn('deviceno1_')">
                         <el-col :span="12">
-                            <el-form-item v-if="deviceIsRequired" label="被控设备/设施编号：" label-width="140">
+                            <el-form-item v-if="shouldRequired('deviceno1_')" label="被控设备/设施编号：" label-width="140">
                                 <template slot="label">
                                     <span class="required">被控设备/设施编号：</span>
                                 </template>
@@ -154,7 +154,7 @@
                             </el-form-item>
                         </el-col>
                         <el-col v-show="form.deviceno1_" :span="12">
-                            <el-form-item v-if="deviceIsRequired" label="被控设备/设施名称：" label-width="140">
+                            <el-form-item v-if="shouldRequired('devicename1_')" label="被控设备/设施名称：" label-width="140">
                                 <template slot="label">
                                     <span>被控设备/设施名称</span>
                                     <el-tooltip effect="dark" content="选择设备后自动带出名称" placement="top">
@@ -379,18 +379,23 @@ export default {
                 { label: '半年监测', value: '每半年' },
                 { label: '年监测', value: '每年' },
                 { label: '按时间间隔监测', value: '间隔' }
-            ]
+            ],
+            config: {}
         }
     },
     computed: {
         monitoringpPosition () {
             return this.jianCeGangWeiList.filter(i => i.suo_shu_bu_men_ === this.form.bu_men_)
         },
-        isShowDevice () {
-            return this.lei_xing_ !== '01-室内温湿度监控' && this.lei_xing_ !== '06-每日安全检查' && this.lei_xing_ !== '08-含氯有效性监测' && this.lei_xing_ !== '15-日常防护消毒'
+        shouldShowColumn () {
+            return (columnName) => {
+                return this.config[this.lei_xing_]?.displayField?.includes(columnName)
+            }
         },
-        deviceIsRequired () {
-            return this.lei_xing_ === '02-冰箱温度监控' || this.lei_xing_ === '05-纯水机水质监测' || this.lei_xing_ === '03-温浴箱温度监控' || this.lei_xing_ === '04-阴凉柜温度监控' || this.lei_xing_ === '16-设备排出废液'
+        shouldRequired () {
+            return (columnName) => {
+                return this.config[this.lei_xing_]?.requireField?.includes(columnName)
+            }
         },
         labelShow () {
             if (this.form.jian_ce_zhou_qi_) {
@@ -637,7 +642,7 @@ export default {
             if (this.form.jian_ce_gang_wei_ === '') {
                 throw new Error('监测岗位信息缺失！')
             }
-            if (this.deviceIsRequired && this.form.deviceno1_ === '') {
+            if (this.shouldRequired('deviceno1_') && this.form.deviceno1_ === '') {
                 throw new Error('请先选择设备！')
             }
             if (this.lei_xing_ === '01-室内温湿度监控' && this.form.fang_jian_ === '') {
@@ -701,10 +706,11 @@ export default {
                 })
             }
         },
-        open (row, jianCeGangWeiList, parentForm) {
+        open (row, jianCeGangWeiList, parentForm, config) {
             this.dialogVisible = true
             this.jianCeGangWeiList = jianCeGangWeiList
             this.lei_xing_ = parentForm.lei_xing_
+            this.config = config
             this.isEdit = !!(row && row.zi_wai_deng_wai_j)
             // 编辑
             if (this.isEdit) {

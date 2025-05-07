@@ -53,10 +53,10 @@
                     <div class="dakaBox">
                         <div>
                             <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance, 1)" />
-                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常'" class="clock-btn"> 补卡 </button>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常'" class="clock-btn" @click="bukaFun"> 补卡 </button>
                         </div>
                         <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance, 2)" />
-                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常'" class="clock-btn"> 补卡 </button>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常'" class="clock-btn" @click="bukaFun"> 补卡 </button>
                         </div>
                     </div>
                 </div>
@@ -115,6 +115,9 @@ export default {
         },
         closeDialog () {
             this.$emit('closeBanciDialog', 'banci')
+        },
+        bukaFun () {
+            this.$emit('open', 'buka')
         }
     }
 }

@@ -17,23 +17,36 @@
             @pagination-change="handlePaginationChange"
             @row-dblclick="handleRowDblclick"
         >
+            <template slot="time">
+                <el-date-picker
+                    v-model="daterRange"
+                    size="mini"
+                    type="daterange"
+                    :picker-options="pickerOptions"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    value-format="yyyy-MM-dd"
+                />
+            </template>
             <!-- 自定义多级表头 -->
             <template #prepend-column>
                 <el-table-column key="ri_qi_" prop="ri_qi_" label="日期" width="100" />
-                <el-table-column key="userName" prop="userName" label="姓名" width="80">
+                <el-table-column key="user_name_" prop="user_name_" label="姓名" width="80">
                     <template #default="{ row }">
                         <el-tag style="margin: 2px;">
-                            {{ row.userName }}
+                            {{ row.user_name_ }}
                         </el-tag>
                     </template>
                 </el-table-column>
                 <!-- 基本信息分组 -->
                 <el-table-column label="基本信息">
                     <!--<el-table-column prop="yong_hu_id_" title="姓名" key="yong_hu_id_" width="80" />-->
-                    <el-table-column key="deptName" prop="deptName" label="部门" width="100">
+                    <el-table-column key="pos_name_" prop="pos_name_" label="部门" width="100">
                         <template #default="{ row }">
                             <el-tag style="margin: 2px;">
-                                {{ row.deptName }}
+                                {{ row.pos_name_ }}
                             </el-tag>
                         </template>
                     </el-table-column>
@@ -41,15 +54,15 @@
                 </el-table-column>
                 <!-- 上班分组 -->
                 <el-table-column label="考勤概况">
-                    <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="最早" width="120" />
-                    <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="最晚" width="120" />
+                    <el-table-column key="zui_zao" prop="zui_zao" label="最早" width="120" />
+                    <el-table-column key="zui_wan" prop="zui_wan" label="最晚" width="120" />
                     <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="打卡次数" width="70" />
-                    <el-table-column key="gong_zuo_shi_chan" prop="gong_zuo_shi_chan" label="标准工作时长" width="100" />
-                    <el-table-column key="gong_zuo_shi_chan" prop="gong_zuo_shi_chan" label="实际工作时长" width="100" />
-                    <el-table-column key="kao_qin_zhuang_ta" prop="kao_qin_zhuang_ta" label="考勤结果" width="80">
+                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长（分钟）" width="100" />
+                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长（分钟）" width="100" />
+                    <el-table-column key="kao_qin_zhuang_tai" prop="kao_qin_zhuang_tai" label="考勤结果" width="80">
                         <template #default="{ row }">
-                            <span :style="{ color: row.kao_qin_zhuang_ta=='异常' ? 'red' : 'inherit' }">
-                                {{ row.kao_qin_zhuang_ta }}
+                            <span :style="{ color: row.kao_qin_zhuang_tai=='正常' ? 'inherit' : 'red' }">
+                                {{ row.kao_qin_zhuang_tai }}
                             </span>
                         </template>
                     </el-table-column>
@@ -80,10 +93,12 @@ export default {
             height: document.clientHeight,
             listData: [],
             pagination: {
+                totalCount: 0,
                 currentPage: 1,
-                limit: 20
+                limit: 15
             },
             sorts: {},
+            daterRange: [],
             listConfig: {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary' },
@@ -92,8 +107,8 @@ export default {
                 searchForm: {
                     labelWidth: 100,
                     forms: [
-                        { prop: ['Q^ri_qi_^DL', 'Q^ri_qi_^DG'], label: '日期范围', fieldType: 'daterange' },
-                        { prop: 'Q^kao_qin_zhuang_ta^SL', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
+                        { prop: '', label: '日期范围', fieldType: 'slot', slotName: 'time' },
+                        // { prop: 'Q^kao_qin_zhuang_ta^SL', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
                         { prop: 'Q^yong_hu_id_^S', label: '姓名', fieldType: 'select', options: userOption },
                         { prop: 'Q^bu_men_^SL', label: '部门', fieldType: 'select', options: deptOption }
                     ]
@@ -105,6 +120,8 @@ export default {
     computed: {
     },
     created () {
+        const daterRange = this.getTodayDate()
+        this.daterRange = [daterRange.sDay, daterRange.eDay]
         this.loadData()
     },
     methods: {
@@ -119,7 +136,7 @@ export default {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                // this.pagination.total = res.totalCount
+                this.pagination.totalCount = this.listData[0].total_count
             }).finally(() => {
                 this.loading = false
             })
@@ -139,10 +156,12 @@ export default {
             const { first, second } = this.$store.getters.level || {}
             const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             searchParam['Q^di_dian_^S'] = second || first
+            searchParam['Q^ri_qi_^DL'] = this.daterRange[0]
+            searchParam['Q^ri_qi_^DG'] = this.daterRange[1]
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {
-            let sql = `select * FROM t_attendance_detail`
+            let sql = ``
             const params = this.getSearchFormData()
             // 定义操作符映射
             const operatorMap = {
@@ -174,11 +193,63 @@ export default {
                 })
 
                 if (conditions.length > 0) {
-                    sql += ' WHERE ' + conditions.join(' AND ')
+                    const wherestr = ' WHERE ' + conditions.join(' AND ')
+                    sql = `select 
+                            t.*,
+                            (select COUNT(DISTINCT USER_ID_) 
+                            FROM v_attendance_statistics
+                            ${wherestr}
+                            ) AS total_count
+                        FROM (
+                            select 
+                                USER_ID_,
+                                ri_qi_,
+                                user_name_,
+                                pos_name_,
+                                gong_hao_,
+                                MIN(da_ka_shi_jian_1_) AS zui_zao,
+                                MAX(da_ka_shi_jian_2_) AS zui_wan,
+                                SUM(CASE WHEN da_ka_shi_jian_1_ IS NOT NULL AND da_ka_shi_jian_1_ != '' THEN 1 ELSE 0 END) +
+                                SUM(CASE WHEN da_ka_shi_jian_2_ IS NOT NULL AND da_ka_shi_jian_2_ != '' THEN 1 ELSE 0 END) AS da_ka_ci_shu_,
+                                SUM(ban_ci_shi_chang_) AS total_ban_ci_shi_chang,
+                                SUM(gong_zuo_shi_chan) AS total_gong_zuo_shi_chan,
+                                SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
+                                SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
+                                SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) AS que_qin_ci_shu,
+                                CASE 
+                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) > 0 
+                                        AND SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                            SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) > 0 
+                                    THEN CONCAT('迟到', 
+                                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END), '次，缺勤',
+                                        SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END), '次')
+                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) > 0 
+                                    THEN CONCAT('迟到', 
+                                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END), '次')
+                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) > 0 
+                                    THEN CONCAT('缺勤', 
+                                        SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END), '次')
+                                    ELSE '正常'
+                                END AS kao_qin_zhuang_tai
+                            FROM 
+                                v_attendance_statistics
+                            ${wherestr}
+                            GROUP BY 
+                                USER_ID_, ri_qi_
+                            ORDER BY 
+                                USER_ID_, ri_qi_
+                            LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}
+                        ) t `
                 }
             }
-            // 添加分页
-            sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}`
             return sql
         },
         // 分页/排序处理
@@ -190,7 +261,18 @@ export default {
             ActionUtils.setSorts(this.sorts, sort)
             this.loadData()
         },
-
+        getTodayDate () { // 获取初始化查询截止日期
+            const yesterday = new Date()
+            yesterday.setDate(yesterday.getDate() - 1) // 减去1天
+            const year = yesterday.getFullYear()
+            const month = String(yesterday.getMonth() + 1).padStart(2, '0') // 月份从0开始，需要+1
+            const day = String(yesterday.getDate()).padStart(2, '0')
+            const daterRange = {
+                sDay: `${year}-${month}-${day}`,
+                eDay: `${year}-${month}-${day}`
+            }
+            return daterRange
+        },
         // 操作处理
         handleAction (command, _, selection) {
             switch (command) {
@@ -207,14 +289,19 @@ export default {
         exportData () {
             const exportColumns = [
                 {
-                    field_name: 'userName',
-                    label: '姓名',
-                    name: 'userName'
+                    field_name: 'ri_qi_',
+                    label: '日期',
+                    name: 'ri_qi_'
                 },
                 {
-                    field_name: 'deptName',
+                    field_name: 'user_name_',
+                    label: '姓名',
+                    name: 'user_name_'
+                },
+                {
+                    field_name: 'pos_name_',
                     label: '部门',
-                    name: 'deptName'
+                    name: 'pos_name_'
                 },
                 {
                     field_name: 'gong_hao_',
@@ -222,57 +309,38 @@ export default {
                     name: 'gong_hao_'
                 },
                 {
-                    field_name: 'pai_ban_ming_chen',
-                    label: '排班名称',
-                    name: 'pai_ban_ming_chen'
+                    field_name: 'zui_zao',
+                    label: '最早',
+                    name: 'zui_zao'
                 },
                 {
-                    field_name: 'ban_ci_ming_',
-                    label: '班次名',
-                    name: 'ban_ci_ming_'
-                },
-                {
-                    field_name: 'ban_ci_bie_ming_',
-                    label: '班次别名',
-                    name: 'ban_ci_bie_ming_'
-                },
-                {
-                    field_name: 'ri_qi_',
-                    label: '日期',
-                    name: 'ri_qi_'
-                },
-                {
-                    field_name: 'da_ka_shi_jian_1_',
-                    label: '上班打卡时间',
-                    name: 'da_ka_shi_jian_1_'
-                },
-                {
-                    field_name: 'zhuang_tai_1_',
-                    label: '上班打卡状态',
-                    name: 'zhuang_tai_1_'
-                },
-                {
-                    field_name: 'da_ka_shi_jian_2_',
-                    label: '下班打卡时间',
-                    name: 'da_ka_shi_jian_2_'
-                },
-                {
-                    field_name: 'gong_zuo_shi_chan',
-                    label: '迟到时长(分钟)',
-                    name: 'gong_zuo_shi_chan'
+                    field_name: 'zui_wan',
+                    label: '最晚',
+                    name: 'zui_wan'
                 },
                 {
                     field_name: 'da_ka_ci_shu_',
                     label: '打卡次数',
                     name: 'da_ka_ci_shu_'
                 },
+
                 {
-                    field_name: 'kao_qin_zhuang_ta',
-                    label: '考勤状态',
-                    name: 'kao_qin_zhuang_ta'
+                    field_name: 'total_ban_ci_shi_chang',
+                    label: '标准工作时长（分钟）',
+                    name: 'total_ban_ci_shi_chang'
+                },
+                {
+                    field_name: 'total_gong_zuo_shi_chan',
+                    label: '实际工作时长（分钟）',
+                    name: 'total_gong_zuo_shi_chan'
+                },
+                {
+                    field_name: 'kao_qin_zhuang_tai',
+                    label: '考勤结果',
+                    name: 'kao_qin_zhuang_tai'
                 }
             ]
-            this.handleExport(exportColumns, this.listData, `考勤明细统计数据`)
+            this.handleExport(exportColumns, this.listData, `考勤概况统计数据`)
         },
         handleExport (columns, data, title, message, nameKey = 'name') {
             IbpsExport.excel({

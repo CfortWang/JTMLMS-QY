@@ -1,11 +1,17 @@
 <template>
     <div class="bg">
-        <el-dialog width="11cm" height="10cm" :modal-append-to-body='true' :append-to-body="true" title="设备检定校准标签"
-            :visible.sync="scanVisible">
+        <el-dialog
+            width="11cm"
+            height="10cm"
+            :modal-append-to-body="true"
+            :append-to-body="true"
+            title="设备检定校准标签"
+            :visible.sync="scanVisible"
+        >
             <!-- 表单是否显示 -->
             <div style="height:500px">
-                <div ref="qrcode" id="box">
-                    <vue-easy-print tableShow ref="easyPrint" :onePageRow="onePageRow">
+                <div id="box" ref="qrcode">
+                    <vue-easy-print ref="easyPrint" table-show :one-page-row="onePageRow">
                         <div v-for="(item, index1) in list" :key="index1">
                             <!-- style="page-break-after:always" -->
                             <div class="All">
@@ -13,12 +19,14 @@
                                     <div class="one">
                                         <div class="container">
                                             <div
-                                                :class="item.deviceStatus === '合格' ? 'triangle' : item.deviceStatus === '停用' ? 'triangleRed' : 'triangleYellow'">
+                                                :class="item.deviceStatus === '合格' ? 'triangle' : item.deviceStatus === '停用' ? 'triangleRed' : 'triangleYellow'"
+                                            >
                                                 <div class="label" style="border: 0;">{{ item.prove }}</div>
                                             </div>
                                             <div style="position: absolute;top: 25px;width: 100%;">
                                                 <div
-                                                    style="display: flex;justify-content: space-between;font-size: 14px;font-weight: 800;margin: 0 8px;">
+                                                    style="display: flex;justify-content: space-between;font-size: 14px;font-weight: 800;margin: 0 8px;"
+                                                >
                                                     <div>{{ item.slogan }}</div>
                                                 </div>
                                             </div>
@@ -29,14 +37,15 @@
                                             <div class="qianZhi">设备名称：</div>
                                             <div>{{ item.name }}</div>
                                         </div>
-                                        <div class="lh">
+                                        <div v-if="modelTF" class="lh">
                                             <div>设备型号：</div>
                                             <div>{{ item.model }}</div>
                                         </div>
                                         <div class="lh">
                                             <div>设备编号：</div>
-                                            <div>{{ item.serial }}</div>
+                                            <div>{{ orgTF?item.original:item.serial }}</div>
                                         </div>
+
                                         <div class="lh">
                                             <div class="la">
                                                 <div>校准日期：</div>
@@ -47,8 +56,10 @@
                                                 <div>{{ item.validTo }}</div>
                                             </div>
                                         </div>
-                                        <div class="lh"
-                                            :style="item.range !== '' ? 'border-bottom: 1px solid #000000;' : 'border-bottom: 0px;'">
+                                        <div
+                                            class="lh"
+                                            :style="item.range !== '' ? 'border-bottom: 1px solid #000000;' : 'border-bottom: 0px;'"
+                                        >
                                             <div class="qianZhi">校准单位：</div>
                                             <div class="zuoJuZhong">{{ item.unit }}</div>
                                         </div>
@@ -70,19 +81,19 @@
             </span>
         </el-dialog>
 
-
     </div>
 </template>
 
 <script>
-import VueBarcode from 'vue-barcode';
-import vueEasyPrint from "vue-easy-print";
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js';
+import VueBarcode from 'vue-barcode'
+import vueEasyPrint from 'vue-easy-print'
+import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
+import { getSetting } from '@/utils/query'
 
 export default {
     components: {
         VueBarcode,
-        vueEasyPrint,
+        vueEasyPrint
     },
     props: {
         obj: {
@@ -102,13 +113,14 @@ export default {
             default: false
         }
     },
-    data() {
+    data () {
         return {
             value: '',
             id: '',
             list: [{
                 name: 1,
                 serial: 1,
+                original: 1,
                 validTo: 1,
                 model: 1,
                 unit: 1,
@@ -120,36 +132,43 @@ export default {
                 range: 1 // 限用范围
             }],
             visible: true,
+            orgTF: false,
+            modelTF: true
+
         }
     },
     watch: {
-        obj() {
+        obj () {
             this.getInit()
             // console.log(this.obj)
         }
     },
-    created() {
+    created () {
         this.getInit()
     },
     methods: {
-        printDemo() {
+        printDemo () {
             this.$refs.easyPrint.print()
         },
-        getInit() {
-            var idStr = '';
+        async getInit () {
+            var idStr = ''
             this.obj.forEach(item => {
-                idStr += item.split(" ")[0] + ','
+                idStr += item.split(' ')[0] + ','
             })
-            idStr = idStr.substring(0, idStr.length - 1);
+            idStr = idStr.substring(0, idStr.length - 1)
             this.getLook(idStr)
+            const { tagData } = await getSetting('verificationTag') || {}
+            this.orgTF = tagData && tagData.hasOwnProperty('originalDevice') ? tagData.originalDevice : false
+            this.modelTF = tagData && tagData.hasOwnProperty('originalDevice') ? tagData.modelNumber : true
         },
-        getLook(id) {
-            let sql = `select
+        getLook (id) {
+            const sql = `select
                     dj.she_bei_ming_cheng_,
                     dj.she_bei_shi_bie_h,
                     dj.gui_ge_xing_hao_,
                     dj.she_bei_zhuang_ta,
                     dj.cai_gou_he_tong_, 
+                    dj.yuan_she_bei_bian,
                     zx.shi_shi_ri_qi_,
                     zx.chu_chang_bian_ha,
                     zx.jian_ding_dan_wei
@@ -159,23 +178,24 @@ export default {
                 WHERE
                     find_in_set( zx.id_, '${id}' )`
             // console.log(sql)
-            curdPost("sql", sql).then(res => {
+            curdPost('sql', sql).then(res => {
                 const { data } = res.variables || []
                 // console.log(data)
-                let list = []
+                const list = []
                 data.forEach(item => {
-                    let o = {
+                    const o = {
                         prove: this.switchProve(item.she_bei_zhuang_ta),
                         slogan: this.switchSlogan(item.she_bei_zhuang_ta),
                         deviceStatus: item.she_bei_zhuang_ta,
-                        range: this.judgementVal(item.cai_gou_he_tong_)?item.cai_gou_he_tong_:"",
+                        range: this.judgementVal(item.cai_gou_he_tong_) ? item.cai_gou_he_tong_ : '',
 
                         name: item.she_bei_ming_cheng_,
                         serial: item.she_bei_shi_bie_h,
+                        original: item.yuan_she_bei_bian,
                         validTo: item.chu_chang_bian_ha,
                         model: item.gui_ge_xing_hao_,
                         unit: item.jian_ding_dan_wei,
-                        jiaoZhunTime: item.shi_shi_ri_qi_,
+                        jiaoZhunTime: item.shi_shi_ri_qi_
                     }
                     list.push(o)
                 })
@@ -183,49 +203,49 @@ export default {
                 this.list = list
             })
         },
-        judgementVal(value){
+        judgementVal (value) {
             return value != null && value != undefined
         },
-        switchProve(status) {
+        switchProve (status) {
             switch (status) {
                 case '合格':
-                    return "合格证"
+                    return '合格证'
                 case '停用':
-                    return "停用证"
+                    return '停用证'
                 case '限用':
-                    return "限用证"
+                    return '限用证'
                 default:
-                    return "测试证"
+                    return '测试证'
             }
         },
-        switchSlogan(status) {
+        switchSlogan (status) {
             switch (status) {
                 case '合格':
-                    return "PASS"
+                    return 'PASS'
                 case '停用':
-                    return "STOP"
+                    return 'STOP'
                 case '限用':
-                    return "RESTRICT"
+                    return 'RESTRICT'
                 default:
-                    return "TEST"
+                    return 'TEST'
             }
         },
-        getTime(second) {
-            let date = new Date(second);
-            let year = date.getFullYear();
+        getTime (second) {
+            const date = new Date(second)
+            const year = date.getFullYear()
             let month = ''
             let day = ''
             if ((date.getMonth() + 1) <= 9) {
-                month = "0" + (date.getMonth() + 1)
+                month = '0' + (date.getMonth() + 1)
             } else {
                 month = date.getMonth() + 1
             }
             if (date.getDate() <= 9) {
-                day = "0" + date.getDate();
+                day = '0' + date.getDate()
             } else {
-                day = date.getDate();
+                day = date.getDate()
             }
-            return year + "-" + month + "-" + day;
+            return year + '-' + month + '-' + day
         }
     }
 }
@@ -301,8 +321,6 @@ export default {
     align-items: center;
     border-bottom: 1px solid #000000;
 }
-
-
 
 .container {
     width: 250px;

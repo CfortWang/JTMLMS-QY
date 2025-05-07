@@ -225,9 +225,6 @@
                                     </el-col>
                                     <el-col :span="8">
                                         <el-form-item label="出厂日期：" prop="chuChangRiQi">
-                                            <template slot="label">
-                                                <span class="required">出厂日期</span>
-                                            </template>
                                             <el-date-picker
                                                 v-if="!readonly"
                                                 v-model="form.chuChangRiQi"
@@ -983,11 +980,7 @@ export default {
                 ],
                 shiFouXiaoZhun: [
                     { required: true, message: '是否校准不能为空', trigger: 'blur' }
-                ],
-                chuChangRiQi: [
-                    { required: true, message: '出厂日期不能为空', trigger: 'blur' }
                 ]
-
             }
         }
     },

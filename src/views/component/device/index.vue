@@ -357,7 +357,7 @@
         />
         <!-- <DeviceTagWeiNing v-if="tagName==='deviceTagWeiNing'" :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" /> -->
         <DeviceTagTemplateTwo v-if="tagName==='deviceTagTemplateTwo'" :tag-data="tagData" :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" />
-        <DeviceTag v-else :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" />
+        <DeviceTag v-else :scan-visible="printVisible" :obj="printObj" :tag-data="tagData" :state-list="stateList" @scanOff="scanOff" />
         <el-dialog
             :close-on-click-modal="false"
             :close-on-press-escape="false"
@@ -666,12 +666,13 @@ export default {
             hasRole: true,
             typeList: { '检验系统': '检验系统', '通用设备': '通用设备', '软件': '软件', '信息系统': '信息系统' },
             tagName: '',
-            tagData: []
+            tagData: {}
         }
     },
     async mounted () {
         const { stateList, hideSysDeviceNo, tabList, hasDeviceRole, typeList } = await getSetting('device') || {}
-        const { tagName, tagData } = await getSetting('deviceTag') || {}
+        const { tagName } = await getSetting('deviceTag') || ''
+        const { tagData } = await getSetting('deviceTag') || {}
         if (tagName) {
             console.debug('tagName', tagName)
             this.tagName = tagName

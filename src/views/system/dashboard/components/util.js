@@ -168,8 +168,9 @@ export function buildComponent (name, column, preview, vm) {
                 this.defaultForm = JSON.parse(JSON.stringify(this.quickNavform))
                 this.$nextTick(async () => {
                     this.fetchData()
-                    this.attendanceData = await this.getAttendanceData()
-                    this.scheduleData = await this.getScheduleData()
+                    // this.attendanceData = await this.getAttendanceData()
+                    // this.scheduleData = await this.getScheduleData()
+                    this.todaySchedule = await this.getTodaySchedule()
                 })
             },
             methods: {
@@ -592,6 +593,29 @@ export function buildComponent (name, column, preview, vm) {
                     }
                     return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24))
                 },
+                getTodaySchedule () { // 获取今日班次
+                    const { first, second } = this.$store.getters.level || {}
+                    const today = this.$common.getDateNow()
+                    const sql = `select a.*, b.start_date_, b.end_date_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
+                    return new Promise((resolve, reject) => {
+                        this.$common.request('sql', sql).then((res) => {
+                            const { data = [] } = res.variables || {}
+                            let todaySchedule = []
+                            data.forEach(item => {
+                                const days = this.getDays(item.start_date_, today)
+                                const shift = item[`d${days}_`]
+                                if (shift) {
+                                    const shiftList = shift.split(',')
+                                    todaySchedule = shiftList // 返回今日班次
+                                }
+                            })
+                            console.log(todaySchedule)
+                            resolve(todaySchedule)
+                        }).catch(error => {
+                            reject(error)
+                        })
+                    })
+                },
                 getAttendanceData () {
                     const { first, second } = this.$store.getters.level || {}
                     const today = this.$common.getDateNow()
@@ -669,9 +693,9 @@ export function buildComponent (name, column, preview, vm) {
                                     }
                                 }
                             })
-                            const today = this.$common.getDateNow()
-                            this.todaySchedule = eventList.filter(i => i.start === today).map(i => i.title)
-                            console.log(this.todaySchedule)
+                            // const today = this.$common.getDateNow()
+                            // this.todaySchedule = eventList.filter(i => i.start === today).map(i => i.title)
+                            // console.log(this.todaySchedule)
                             resolve(eventList)
                         }).catch(error => {
                             reject(error)
@@ -761,7 +785,7 @@ export function buildComponent (name, column, preview, vm) {
                     const timeDifference = endTime - startTime
                     return timeDifference / (1000 * 60)
                 },
-                // 打卡处理逻辑
+                // 首页打卡处理逻辑
                 handleClockFromTab (todaySchedule) {
                     const today = this.$common.getDateNow()
                     // 当天仅有一个班次
@@ -776,7 +800,6 @@ export function buildComponent (name, column, preview, vm) {
                             const filtered = this.scheduleData.filter(item => item.start === today && item.alias === currentSchedule)
                             scheduleArr = scheduleArr.concat(filtered)
                         }
-                        debugger
                         const h = this.$createElement
                         const self = this
                         this.$msgbox({
@@ -787,7 +810,7 @@ export function buildComponent (name, column, preview, vm) {
                                     model: {
                                         value: self.tempSelectedValue,
                                         callback: (value) => {
-                                            self.tempSelectedValue = value;
+                                            self.tempSelectedValue = value
                                         }
                                     }
                                 }, scheduleArr.map(schedule =>
@@ -806,27 +829,29 @@ export function buildComponent (name, column, preview, vm) {
                             beforeClose: (action, instance, done) => {
                                 if (action === 'confirm') {
                                     if (!this.tempSelectedValue) {
-                                        this.$message.warning('请选择一个班次');
-                                        return false;
+                                        this.$message.warning('请选择一个班次')
+                                        return false
                                     }
-                                    done();
+                                    done()
                                 } else {
-                                    done();
+                                    done()
                                 }
                             }
                         }).then(() => {
                             const scheduleObj = this.scheduleData.find(item => 
                                 item.start === today && item.alias === this.tempSelectedValue
-                            );
+                            )
                             if (scheduleObj?.attendance) {
-                                this.handleClock(scheduleObj.attendance);
+                                this.handleClock(scheduleObj.attendance)
                             }
                         }).catch(() => {
                             // 用户取消操作
-                        });
+                        })
                     }
                 },
-                showMySchedule () {
+                async showMySchedule () {
+                    this.attendanceData = await this.getAttendanceData()
+                    this.scheduleData = await this.getScheduleData()
                     const scheduleConfig = {
                         height: '100%',
                         locale: 'zh-cn', // 语言
@@ -845,11 +870,23 @@ export function buildComponent (name, column, preview, vm) {
                         headerToolbar: { // 日历头部按钮位置
                             // left: 'prev,next today',
                             // start: '',
-                            right: 'prev,next today',
+                            right: 'customButton prev,next today',
                             left: '',
                             center: 'title'
                             // right: 'dayGridMonth,timeGridWeek,timeGridDay'
                             // end: 'prev,next,today,month,agendaWeek,agendaDay,listWeek'
+                        },
+                        customButtons: {
+                            customButton: { // 定义自定义按钮
+                                text: '补卡',
+                                click: (param) => {
+                                    // 打开补卡申请弹窗
+                                    this.$emit(
+                                        'open',
+                                        'buka'
+                                    )
+                                }
+                            }
                         },
                         // events: this.scheduleData, // 排班数组
                         eventClick: this.handleScheduleEventClick, // 排班点击信息展示
@@ -884,7 +921,6 @@ export function buildComponent (name, column, preview, vm) {
                                         }
                                     </div>
                               </div>
-                             
                             `
                             // 打卡按钮显示
                             if (this.showDaKaBtn(event.extendedProps.jieShuShiJian)) {

@@ -37,77 +37,107 @@
         "01-室内温湿度监控": {
           "label": "室内温湿度监控",
           "path": "/sshjgl/wdjc/snwsdjkcd",
-          "showDevice": false
+          "showDevice": false,
+          "displayField":[],
+          "requireField": ['fang_jian_']
         },
         "02-冰箱温度监控": {
           "label": "冰箱温度监控",
           "path": "/sshjgl/wdjc/bxwdjc",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": ['deviceno1_','devicename1_']
         },
         "03-温浴箱温度监控": {
           "label": "温浴箱温度监控",
           "path": "/sshjgl/wdjc/wyxwdjkywh",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": ['deviceno1_','devicename1_']
         },
         "04-阴凉柜温度监控": {
           "label": "阴凉柜温度监控",
           "path": "/sshjgl/wdjc/ylgwdjc",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": ['deviceno1_','devicename1_']
         },
         "05-纯水机水质监测": {
           "label": "纯水机水质监测",
           "path": "/sshjgl/csjszjcb",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": []
         },
         "06-每日安全检查": {
           "label": "每日安全检查",
           "path": "/sshjgl/aqgl/mraqjc",
-          "showDevice": false
+          "showDevice": false,
+          "displayField": [],
+          "requireField": []
         },
         "07-每月安全检查": {
           "label": "每月安全检查",
           "path": "/sshjgl/aqgl/myaqjc",
-          "showDevice": true
+          "showDevice": true,
+          displayField: ['deviceno1_','devicename1_'],
+          "requireField": []
         },
         "08-含氯有效性监测": {
           "label": "含氯有效性监测",
           "path": "/sshjgl/aqgl/hlyxxjc",
-          "showDevice": false
+          "showDevice": false,
+          "displayField": [],
+          "requireField": []
         },
         "10-洗眼器检查": {
           "label": "洗眼器检查",
           "path": "/sshjgl/aqgl/xyqjc",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": []
         },
         "11-紧急淋浴器检查": {
           "label": "紧急淋浴器检查",
           "path": "/sshjgl/aqgl/jjlyqjc",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": []
         },
         "12-紫外灯消毒": {
           "label": "紫外灯消毒",
           "path": "/sshjgl/aqgl/jykzwdxdjlb",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": []
         },
         "13-高压灭菌": {
           "label": "高压灭菌",
           "path": "/sshjgl/aqgl/gymjjlb",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": []
         },
         "14-空气消毒机": {
           "label": "空气消毒机",
           "path": "/sshjgl/aqgl/xdjsyjlb",
-          "showDevice": true
+          "showDevice": true,
+          "displayField": ['deviceno1_','devicename1_'],
+          "requireField": []
         },
         "15-日常防护消毒": {
           "label": "日常防护消毒",
           "path": "/sshjgl/aqgl/rcfhxd",
-          "showDevice": false
+          "showDevice": false,
+          "displayField": [],
+          "requireField": []
         },
         "16-设备排出废液": {
            "label": "设备排出废液",
            "path": "/sshjgl/aqgl/sbpcfyxd",
-           "showDevice": true
+           "showDevice": true,
+           "displayField": ['deviceno1_','devicename1_'],
+           "requireField": ['deviceno1_','devicename1_']
         }
       }
     },

@@ -141,12 +141,12 @@
                             label="房间"
                         />
                         <el-table-column
-                            v-if="isShowDevice"
+                            v-if="shouldShowColumn('deviceno1_')"
                             prop="deviceno1_"
                             label="被控设备编号"
                         />
                         <el-table-column
-                            v-if="isShowDevice"
+                            v-if="shouldShowColumn('devicename1_')"
                             prop="devicename1_"
                             label="被控设备名称"
                         />
@@ -322,42 +322,58 @@ export default {
                 '01-室内温湿度监控': {
                     label: '室内温湿度监控',
                     path: '/sshjgl/wdjc/snwsdjkcd',
-                    showDevice: false
+                    showDevice: false,
+                    displayField: [],
+                    requireField: ['fang_jian_']
                 },
                 '02-冰箱温度监控': {
                     label: '冰箱温度监控',
                     path: '/sshjgl/wdjc/bxwdjc',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: ['deviceno1_', 'devicename1_']
                 },
                 '03-温浴箱温度监控': {
                     label: '温浴箱温度监控',
                     path: '/sshjgl/wdjc/wyxwdjkywh',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: ['deviceno1_', 'devicename1_']
                 },
                 '04-阴凉柜温度监控': {
                     label: '阴凉柜温度监控',
                     path: '/sshjgl/wdjc/ylgwdjc',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: ['deviceno1_', 'devicename1_']
                 },
                 '05-纯水机水质监测': {
                     label: '纯水机水质监测',
                     path: '/sshjgl/csjszjcb',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: ['deviceno1_', 'devicename1_']
                 },
                 '06-每日安全检查': {
                     label: '每日安全检查',
                     path: '/sshjgl/aqgl/mraqjc',
-                    showDevice: false
+                    showDevice: false,
+                    displayField: [],
+                    requireField: []
                 },
                 '07-每月安全检查': {
                     label: '每月安全检查',
                     path: '/sshjgl/aqgl/myaqjc',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: []
                 },
                 '08-含氯有效性监测': {
                     label: '含氯有效性监测',
                     path: '/sshjgl/aqgl/hlyxxjc',
-                    showDevice: false
+                    showDevice: false,
+                    displayField: [],
+                    requireField: []
                 },
                 // '09-紫外灯辐照测定': {
                 //     path: '/sshjgl/aqgl/zwdfzd',
@@ -365,37 +381,51 @@ export default {
                 '10-洗眼器检查': {
                     label: '洗眼器检查',
                     path: '/sshjgl/aqgl/xyqjc',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: []
                 },
                 '11-紧急淋浴器检查': {
                     label: '紧急淋浴器检查',
                     path: '/sshjgl/aqgl/jjlyqjc',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: []
                 },
                 '12-紫外灯消毒': {
                     label: '紫外灯消毒',
                     path: '/sshjgl/aqgl/jykzwdxdjlb',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: []
                 },
                 '13-高压灭菌': {
                     label: '高压灭菌',
                     path: '/sshjgl/aqgl/gymjjlb',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: []
                 },
                 '14-空气消毒机': {
                     label: '空气消毒机',
                     path: '/sshjgl/aqgl/xdjsyjlb',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: []
                 },
                 '15-日常防护消毒': {
                     label: '日常防护消毒',
                     path: '/sshjgl/aqgl/rcfhxd',
-                    showDevice: false
+                    showDevice: false,
+                    displayField: [],
+                    requireField: []
                 },
                 '16-设备排出废液': {
                     label: '设备排出废液',
                     path: '/sshjgl/aqgl/sbpcfyxd',
-                    showDevice: true
+                    showDevice: true,
+                    displayField: ['deviceno1_', 'devicename1_'],
+                    requireField: ['deviceno1_', 'devicename1_']
                 }
             },
             subIdList: [],
@@ -413,11 +443,15 @@ export default {
         trueList () {
             return this.isSearch ? this.searchData : this.subForm
         },
-        isShowDevice () {
-            return this.config[this.form.lei_xing_]?.showDevice
+        shouldShowColumn () {
+            return (columnName) => {
+                return this.config[this.form.lei_xing_]?.displayField?.includes(columnName)
+            }
         },
-        deviceIsRequired () {
-            return this.form.lei_xing_ === '02-冰箱温度监控' || this.form.lei_xing_ === '05-纯水机水质监测' || this.form.lei_xing_ === '03-温浴箱温度监控' || this.form.lei_xing_ === '04-阴凉柜温度监控' || this.form.lei_xing_ === '16-设备排出废液'
+        shouldRequired () {
+            return (columnName) => {
+                return this.config[this.form.lei_xing_]?.requireField?.includes(columnName)
+            }
         },
         isEdit () {
             return !!(this.parentData instanceof Object && this.parentData.mainId)
@@ -471,6 +505,7 @@ export default {
     async mounted () {
         const config = await getSetting('facilityEnv', 'typeList')
         if (config) {
+            console.log(config)
             console.debug(config)
             this.config = config
         }
@@ -679,7 +714,7 @@ export default {
             }
             this.subDialogVisible = true
             this.$nextTick(() => {
-                this.$refs.FecDialogRef.open(row, this.jianCeGangWeiList, this.form)
+                this.$refs.FecDialogRef.open(row, this.jianCeGangWeiList, this.form, this.config)
             })
         },
         // 子表的提交事件
@@ -745,7 +780,7 @@ export default {
                 if (item.jian_ce_gang_wei_ === '') {
                     return this.$message.warning(`子表第${i + 1}行监测岗位信息缺失！`)
                 }
-                if (this.deviceIsRequired && item.deviceno1_ === '') {
+                if (this.shouldRequired('deviceno1_') && item.deviceno1_ === '') {
                     return this.$message.warning(`子表第${i + 1}行设备信息缺失！`)
                 }
                 if (this.form.lei_xing_ === '01-室内温湿度监控' && item.fang_jian_ === '') {

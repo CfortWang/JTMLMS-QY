@@ -138,6 +138,12 @@
             @closeBanciDialog="handleClose"
             @open="handleOpen"
         />
+        <makeUpEdit
+            :params="bukaInfo"
+            :visible="makeUpEditVisible"
+            @closeBuKaDialog="handleClose"
+            @open="handleOpen"
+        />
     </ibps-container>
 </template>
 
@@ -165,6 +171,7 @@ import { markReadCalendar } from '@/api/detection/newHomeApi'
 // 日程提醒弹窗组件
 import CalendarAlert from '@/views/system/dashboard/components/calendar-alert.vue'
 import mySchedule from './components/mySchedule.vue'
+import makeUpEdit from '@/views/business/attendance/makeUpEdit.vue'
 
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
 export default {
@@ -179,7 +186,8 @@ export default {
         ScheduleAdd,
         CalendarAlert,
         mySchedule,
-        banciDialog
+        banciDialog,
+        makeUpEdit: makeUpEdit
     },
     data () {
         return {
@@ -237,7 +245,9 @@ export default {
             calendarIds: [], // 日程 id 数组
             scheduleConfig: {},
             banciInfo: {},
-            banciDialogVisible: false
+            banciDialogVisible: false,
+            bukaInfo: {},
+            makeUpEditVisible: false
         }
     },
     computed: {
@@ -656,6 +666,9 @@ export default {
                 case 'banci':
                     this.banciDialogVisible = false
                     break
+                case 'buka':
+                    this.makeUpEditVisible = false
+                    break
                 default:
                     break
             }
@@ -684,6 +697,12 @@ export default {
                 {
                     this.banciInfo = dateArr
                     this.banciDialogVisible = true
+                    break
+                }
+                case 'buka':
+                {
+                    this.bukaInfo = dateArr
+                    this.makeUpEditVisible = true
                     break
                 }
                 default:
