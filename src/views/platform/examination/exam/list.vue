@@ -73,6 +73,7 @@ import { examTypeOptions, statusOption, basicColumn, infoColumn, resultColumn } 
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import { max, min, mean, sum, maxBy, minBy, meanBy, round, keyBy, mapValues } from 'lodash'
+import { removeFormData } from '@/api/platform/data/dataTemplate'
 
 const sortField = {
     CREATE_TIME_: 'ex.chuang_jian_shi_j',
@@ -624,7 +625,9 @@ export default {
                     end_time_: limitDate !== '不限' ? limitDate.slice(0, 10) : now,
                     emergency_state_: '2',
                     user_id_: i,
-                    user_name_: this.transformUser(i)
+                    user_name_: this.transformUser(i),
+                    data_source_id_: examId,
+                    data_info_: 't_exams'
                 }))
                 this.$common.request('add', {
                     tableName: 'ibps_party_user_calendar',
@@ -715,20 +718,29 @@ export default {
             if (!ids || !ids.length) {
                 return this.$message.warning('请选择要删除的考试！')
             }
-            this.$confirm('数据一旦删除无法恢复，确定要删除选中的考试吗？', '提示', {
+            this.$confirm('将删除所选考试及已产生的试卷数据，数据删除后无法恢复，确定要继续吗？', '提示', {
                 confirmButtonText: '确认',
                 cancelButtonText: '取消',
                 type: 'warning',
                 showClose: false,
                 closeOnClickModal: false
             }).then(() => {
-                this.$common.request('delete', {
-                    tableName: 't_exams',
-                    paramWhere: { id_: ids.join(',') }
+                removeFormData({
+                    formKey: 'examForDelete',
+                    ids: ids.join(',')
                 }).then(() => {
                     ActionUtils.removeSuccessMessage()
                     this.search()
-                })
+                }).catch(() => {})
+
+                // // 自定义删除方法，弃用，无法联动删除子表数据及考试对应日程数据
+                // this.$common.request('delete', {
+                //     tableName: 't_exams',
+                //     paramWhere: { id_: ids.join(',') }
+                // }).then(() => {
+                //     ActionUtils.removeSuccessMessage()
+                //     this.search()
+                // })
             })
         },
         transformUser (userId) {
