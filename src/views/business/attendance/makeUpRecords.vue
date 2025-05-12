@@ -12,12 +12,11 @@
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
+            :index-row="false"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
-            @row-dblclick="handleRowDblclick"
-        >
-        </ibps-crud>
+        />
         <makeUpEdit
             v-if="showMakeUpEdit"
             :visible.sync="showMakeUpEdit"
@@ -66,9 +65,10 @@ export default {
                     { key: 'add', icon: 'ibps-icon-plus', label: '申请', type: 'success' }
                 ],
                 searchForm: {
-                    labelWidth: 100,
+                    labelWidth: 90,
+                    itemWidth: 200,
                     forms: [
-                        { prop: 'Q^bian_zhi_ren_^S', label: '申请人', fieldType: 'select', options: userOption },
+                        // { prop: 'Q^bian_zhi_ren_^S', label: '申请人', fieldType: 'select', options: userOption },
                         { prop: ['Q^bian_zhi_shi_jian^DL', 'Q^bian_zhi_shi_jian^DG'], label: '申请时间', fieldType: 'daterange' },
                         { prop: 'Q^zhuang_tai_^SL', label: '状态', fieldType: 'select', options: [{ value: '待审核', label: '待审核' }, { value: '未通过', label: '未通过' }, { value: '已通过', label: '已通过' }, { value: '已撤销', label: '已撤销' }] },
                         { prop: ['Q^bu_ka_ri_qi_^DL', 'Q^bu_ka_ri_qi_^DG'], label: '补卡日期', fieldType: 'daterange' },
@@ -77,16 +77,18 @@ export default {
                     ]
                 },
                 columns: [
-                    { prop: 'bian_zhi_ren_', label: '申请人', tags: userOption, width: 80 },
+                    { prop: 'bian_zhi_ren_', label: '申请人', tags: userOption, width: 100 },
                     { prop: 'bian_zhi_shi_jian', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
-                    // { prop: 'shenHeRen', label: '审核人', tags: userOption, dataType: 'stringArray', separator: ',', minWidth: 100 },
-                    // { prop: 'shenHeShiJian', label: '审核时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
+                    { prop: 'shen_he_ren_', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', width: 200 },
+                    { prop: 'shen_he_shi_jian_', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
                     { prop: 'zhuang_tai_', label: '状态', width: 90 },
-                    { prop: 'bu_ka_ri_qi_', label: '补卡日期', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 80 },
-                    { prop: 'bu_ka_shi_jian_', label: '补卡时间', dateFormat: 'HH:mm', sortable: 'custom', width: 80 },
-                    { prop: 'bu_ka_ban_ci_', label: '补卡班次', width: 80 },
-                    { prop: 'bu_ka_shi_you_', label: '补卡事由', width: 300 },
-                    { prop: 'fu_jian_', label: '说明附件', width: 150 }
+                    { prop: 'bu_ka_ri_qi_', label: '补卡日期', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 100 },
+                    { prop: 'bu_ka_shi_jian_', label: '补卡时间', dateFormat: 'HH:mm', sortable: 'custom', width: 100 },
+                    { prop: 'bu_ka_ban_ci_', label: '补卡班次', width: 120 },
+                    { prop: 'bu_ka_shi_you_', label: '补卡事由', minWidth: 300 },
+                    { prop: 'fu_jian_', label: '说明附件', width: 0, hidden: true },
+                    { prop: 'pai_ban_id_', label: '关联排班', width: 0, hidden: true },
+                    { prop: 'pai_ban_ji_lu_id_', label: '关联排班详情', width: 0, hidden: true }
                 ],
                 rowHandle: {
                     effect: 'default',
@@ -137,6 +139,7 @@ export default {
             const { first, second } = this.$store.getters.level || {}
             const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             searchParam['Q^di_dian_^S'] = second || first
+            searchParam['Q^bian_zhi_ren_^S'] = this.$store.getters.userId
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {

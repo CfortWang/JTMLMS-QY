@@ -12,6 +12,7 @@
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
+            :index-row="false"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
@@ -150,6 +151,7 @@ export default {
             }
             const { first, second } = this.$store.getters.level || {}
             paramjson['Q^di_dian_^S'] = (second || first)
+            paramjson['Q^reason_^NE'] = '排班修改'
             return ActionUtils.formatParams(
                 // this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
                 paramjson,

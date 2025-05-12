@@ -105,7 +105,7 @@ export default {
                     { prop: 'name', label: '配置名称', width: 150 },
                     { prop: 'scheduleType', label: '排班类型', tags: scheduleType, width: 100, sortable: 'custom' },
                     { prop: 'isEffective', label: '是否生效', slotName: 'isEffective', width: 85, align: 'center' },
-                    { prop: 'approver', label: '调班审批人', tags: userOption, dataType: 'stringArray', minWidth: 140 },
+                    { prop: 'approver', label: '调班/补卡审批人', tags: userOption, dataType: 'stringArray', minWidth: 140 },
                     { prop: 'createBy', label: '创建人', tags: userOption, width: 90 },
                     { prop: 'createTime', label: '创建时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 120 }
                 ],

@@ -53,10 +53,10 @@
                     <div class="dakaBox">
                         <div>
                             <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance, 1)" />
-                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常'" class="clock-btn" @click="bukaFun"> 补卡 </button>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常' && compareTime() " class="clock-btn" @click="bukaFun"> 补卡 </button>
                         </div>
                         <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance, 2)" />
-                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常'" class="clock-btn" @click="bukaFun"> 补卡 </button>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常' && compareTime() " class="clock-btn" @click="bukaFun"> 补卡 </button>
                         </div>
                     </div>
                 </div>
@@ -112,6 +112,14 @@ export default {
             }
 
             return data[status[type]] === '正常' ? `${data[time[type]]} 正常` : `${data[time[type]]} <span style="color: red;">${data[status[type]]}${data[duration[type]]}分钟</span>`
+        },
+        compareTime () { // 比较班次时间和当前时间，过去日期的才显示。
+            const today = this.$common.getDateNow()
+            if (this.banciInfo.jieShuShiJian < today) {
+                return true
+            } else {
+                return false
+            }
         },
         closeDialog () {
             this.$emit('closeBanciDialog', 'banci')

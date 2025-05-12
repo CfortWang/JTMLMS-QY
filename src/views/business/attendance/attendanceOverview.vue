@@ -12,10 +12,10 @@
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
+            :index-row="false"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
-            @row-dblclick="handleRowDblclick"
         >
             <template slot="time">
                 <el-date-picker

@@ -12,10 +12,10 @@
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
+            :index-row="false"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
-            @row-dblclick="handleRowDblclick"
         >
             <template slot="time">
                 <el-date-picker
@@ -122,7 +122,7 @@ export default {
             listData: [],
             pagination: {
                 totalCount: 0,
-                currentPage: 1,
+                page: 1,
                 limit: 15
             },
             sorts: {},
@@ -189,40 +189,7 @@ export default {
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {
-            let sql = `select 
-                        COUNT(*) AS total_count,
-                        USER_ID_,
-                        ri_qi_,
-                        user_name_,
-		                pos_name_,
-		                gong_hao_,
-                        COUNT(ri_qi_) AS ying_chu_qin_shu,
-                        SUM(CASE WHEN (da_ka_shi_jian_1_ IS NULL OR da_ka_shi_jian_1_ = '') 
-                                AND (da_ka_shi_jian_2_ IS NULL OR da_ka_shi_jian_2_ = '') 
-                                THEN 1 ELSE 0 END) AS xiu_xi_shu,
-                        COUNT(ri_qi_) - SUM(CASE WHEN (da_ka_shi_jian_1_ IS NULL OR da_ka_shi_jian_1_ = '') 
-                                                AND (da_ka_shi_jian_2_ IS NULL OR da_ka_shi_jian_2_ = '') 
-                                                THEN 1 ELSE 0 END) AS shi_ji_chu_qin_shu,
-                        SUM(CASE WHEN (zhuang_tai_1_ = '正常' OR zhuang_tai_1_ IS NULL) 
-                                AND (zhuang_tai_2_ = '正常' OR zhuang_tai_2_ IS NULL) 
-                                THEN 1 ELSE 0 END) AS zheng_chang_shu,
-                        COUNT(ri_qi_) - SUM(CASE WHEN (zhuang_tai_1_ = '正常' OR zhuang_tai_1_ IS NULL) 
-                                                AND (zhuang_tai_2_ = '正常' OR zhuang_tai_2_ IS NULL) 
-                                                THEN 1 ELSE 0 END) AS yi_chang_shu,
-                        SUM(ban_ci_shi_chang_) AS total_ban_ci_shi_chang,
-                        SUM(gong_zuo_shi_chan) AS total_gong_zuo_shi_chan,
-                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' OR zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
-                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN chi_dao_shi_chang ELSE 0 END) +
-                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN chi_dao_shi_chang ELSE 0 END) AS total_chi_dao_shi_chang,
-                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' OR 
-                                    zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' 
-                                THEN 1 ELSE 0 END) AS kuang_gong_ci_shu,
-                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' OR zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) +
-                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' OR 
-                                    zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' 
-                                THEN 1 ELSE 0 END) AS yi_chang_he_ji
-                    FROM 
-                        v_attendance_statistics `
+            let sql = ``
             const params = this.getSearchFormData()
             // 定义操作符映射
             const operatorMap = {
@@ -254,13 +221,50 @@ export default {
                 })
 
                 if (conditions.length > 0) {
-                    sql += ' WHERE ' + conditions.join(' AND ')
-                    sql += ' GROUP BY USER_ID_ ORDER BY USER_ID_'
+                    const wherestr = ' WHERE ' + conditions.join(' AND ')
+                    sql = `select 
+                        (select COUNT(DISTINCT USER_ID_) 
+                            FROM v_attendance_statistics 
+                             ${wherestr}
+                        ) AS total_count,
+                        USER_ID_,
+                        ri_qi_,
+                        user_name_,
+		                pos_name_,
+		                gong_hao_,
+                        COUNT(ri_qi_) AS ying_chu_qin_shu,
+                        SUM(CASE WHEN (da_ka_shi_jian_1_ IS NULL OR da_ka_shi_jian_1_ = '') 
+                                AND (da_ka_shi_jian_2_ IS NULL OR da_ka_shi_jian_2_ = '') 
+                                THEN 1 ELSE 0 END) AS xiu_xi_shu,
+                        COUNT(ri_qi_) - SUM(CASE WHEN (da_ka_shi_jian_1_ IS NULL OR da_ka_shi_jian_1_ = '') 
+                                                AND (da_ka_shi_jian_2_ IS NULL OR da_ka_shi_jian_2_ = '') 
+                                                THEN 1 ELSE 0 END) AS shi_ji_chu_qin_shu,
+                        SUM(CASE WHEN (zhuang_tai_1_ = '正常' OR zhuang_tai_1_ IS NULL) 
+                                AND (zhuang_tai_2_ = '正常' OR zhuang_tai_2_ IS NULL) 
+                                THEN 1 ELSE 0 END) AS zheng_chang_shu,
+                        COUNT(ri_qi_) - SUM(CASE WHEN (zhuang_tai_1_ = '正常' OR zhuang_tai_1_ IS NULL) 
+                                                AND (zhuang_tai_2_ = '正常' OR zhuang_tai_2_ IS NULL) 
+                                                THEN 1 ELSE 0 END) AS yi_chang_shu,
+                        SUM(ban_ci_shi_chang_) AS total_ban_ci_shi_chang,
+                        SUM(gong_zuo_shi_chan) AS total_gong_zuo_shi_chan,
+                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' OR zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
+                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN chi_dao_shi_chang ELSE 0 END) +
+                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN chi_dao_shi_chang ELSE 0 END) AS total_chi_dao_shi_chang,
+                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' OR 
+                                    zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' 
+                                THEN 1 ELSE 0 END) AS kuang_gong_ci_shu,
+                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' OR zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) +
+                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' OR 
+                                    zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' 
+                                THEN 1 ELSE 0 END) AS yi_chang_he_ji
+                    FROM 
+                        v_attendance_statistics 
+                    ${wherestr}
+                    GROUP BY USER_ID_ ORDER BY USER_ID_
+                    LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.page - 1) * this.pagination.limit}
+                    `
                 }
             }
-            // 添加分页
-            sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}`
-
             return sql
         },
         getTodayDate () { // 获取初始化查询截止日期

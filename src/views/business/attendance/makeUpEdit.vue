@@ -117,11 +117,17 @@ export default {
             dialogVisible: this.visible,
             title: '补卡申请',
             formData: {
+                id: '',
                 buKaRiQi: '',
                 buKaBanCi: '',
                 buKaShiJian: '',
                 buKaShiYou: '',
-                fuJian: ''
+                shenHeRen: '',
+                shenHeShiJian: '',
+                kaoQinId: '',
+                fuJian: '',
+                paiBanId: '',
+                paiBanJiLuId: ''
             },
             buKaBanCiOptions: [],
             fileList: [],
@@ -161,11 +167,17 @@ export default {
             if (!isEmpty) {
                 this.buKaBanCiOptions = [{ label: this.params.bu_ka_ban_ci_, value: this.params.bu_ka_ban_ci_ }]
                 this.formData = {
+                    id: this.params.id_ || '',
                     buKaRiQi: this.params.bu_ka_ri_qi_ || '',
                     buKaBanCi: this.params.bu_ka_ban_ci_ || '',
                     buKaShiJian: this.params.bu_ka_shi_jian_ || '',
                     buKaShiYou: this.params.bu_ka_shi_you_ || '',
-                    fuJian: this.params.fu_jian_ || ''
+                    shenHeRen: this.params.shen_he_ren_ || '',
+                    shenHeShiJian: this.params.shen_he_shi_jian_ || '',
+                    kaoQinId: this.params.kao_qin_id_ || '',
+                    fuJian: this.params.fu_jian_ || '',
+                    paiBanId: this.params.pai_ban_id_ || '',
+                    paiBanJiLuId: this.params.pai_ban_ji_lu_id_ || ''
                 }
             }
         },
@@ -239,57 +251,104 @@ export default {
                     return self.$message.warning('请完善表单必填项信息！')
                 }
                 const { first, second } = self.$store.getters.level || {}
-                const { buKaRiQi, buKaBanCi, buKaShiJian, buKaShiYou, fuJian } = self.formData || {}
-
-                // 补卡关联的考勤数据
-                const updateObj = self.buKaBanCiOptions.filter(obj => obj.value === self.formData.buKaBanCi)
-                const updateId = updateObj[0].id
-                const updateData = self.yichangdata.filter(obj => obj.id === updateId)
-
-                // 获得补卡审批人
-                const sql = `select USER_ID_ FROM t_schedule_detail WHERE id_ = '${updateData[0].paiBanJiLuId}'`
-                self.$common.request('sql', sql).then((res) => {
+                const { id, buKaRiQi, buKaBanCi, buKaShiJian, buKaShiYou, shenHeRen, kaoQinId, fuJian, paiBanId, paiBanJiLuId } = self.formData || {}
+                const time = self.$common.getFormatDate()
+                if (!id) {
+                    // 补卡关联的考勤数据
+                    const updateObj = self.buKaBanCiOptions.filter(obj => obj.value === self.formData.buKaBanCi)
+                    const updateId = updateObj[0].id
+                    const updateData = self.yichangdata.filter(obj => obj.id === updateId)
+                    // 获得补卡审批人
+                    const sql = `select config_ FROM t_schedule WHERE id_ = '${updateData[0].paiBanId}'`
+                    self.$common.request('sql', sql).then((res) => {
+                        const str = res.variables.data[0].config_ || ''
+                        let shenHeRen = ''
+                        if (str) {
+                            const obj = JSON.parse(str)
+                            const shenHeRenArr = obj.approver
+                            shenHeRen = shenHeRenArr.join(',')
+                        }
+                        const submitData =
+                        {
+                            banCiZhuangTai: '',
+                            bianZhiRen: self.$store.getters.userId,
+                            bianZhiShiJian: time,
+                            buKaBanCi: buKaBanCi,
+                            buKaRiQi: buKaRiQi,
+                            buKaShiJian: buKaShiJian,
+                            buKaShiYou: buKaShiYou,
+                            createBy: '',
+                            createTime: '',
+                            dataStatus: '',
+                            dbType: '',
+                            diDian: second || first,
+                            dsAlias: '',
+                            fuJian: fuJian,
+                            id: self.params.id,
+                            ip: '',
+                            kaoQinId: updateId,
+                            kuaiZhao: '',
+                            name: '',
+                            paiBanId: updateData.paiBanId,
+                            paiBanJiLuId: updateData.paiBanJiLuId,
+                            pk: self.params.pk,
+                            shenHeRen: shenHeRen,
+                            shenHeShiJian: '',
+                            shenHeYiJian: '',
+                            tenantId: '',
+                            type: '',
+                            updateBy: '',
+                            updateTime: '',
+                            zhuangTai: '待审核'
+                        }
+                        // 提交数据
+                        saveAttendanceReissue(submitData).then((res) => {
+                            self.$message.success(`申请成功`)
+                            // 关闭弹窗，更新列表数据
+                            this.closeDialog()
+                        })
+                    })
+                } else { // 再次编辑
                     const submitData =
-                    {
-                        banCiZhuangTai: '',
-                        bianZhiRen: self.$store.getters.userId,
-                        bianZhiShiJian: self.$common.getDateNow(),
-                        buKaBanCi: buKaBanCi,
-                        buKaRiQi: buKaRiQi,
-                        buKaShiJian: buKaShiJian,
-                        buKaShiYou: buKaShiYou,
-                        createBy: '',
-                        createTime: '',
-                        dataStatus: '',
-                        dbType: '',
-                        diDian: second || first,
-                        dsAlias: '',
-                        fuJian: fuJian,
-                        id: self.params.id,
-                        ip: '',
-                        kaoQinId: updateId,
-                        kuaiZhao: '',
-                        name: '',
-                        paiBanId: updateData.paiBanId,
-                        paiBanJiLuId: updateData.paiBanJiLuId,
-                        pk: self.params.pk,
-                        shenHeRen: res.variables.data[0].USER_ID_ || '',
-                        shenHeShiJian: '',
-                        shenHeYiJian: '',
-                        tenantId: '',
-                        type: '',
-                        updateBy: '',
-                        updateTime: '',
-                        zhuangTai: '待审核'
-                    }
-
-                    // 提交数据
+                        {
+                            banCiZhuangTai: '',
+                            bianZhiRen: self.$store.getters.userId,
+                            bianZhiShiJian: time,
+                            buKaBanCi: buKaBanCi,
+                            buKaRiQi: buKaRiQi,
+                            buKaShiJian: buKaShiJian,
+                            buKaShiYou: buKaShiYou,
+                            createBy: '',
+                            createTime: '',
+                            dataStatus: '',
+                            dbType: '',
+                            diDian: second || first,
+                            dsAlias: '',
+                            fuJian: fuJian,
+                            id: id,
+                            ip: '',
+                            kaoQinId: kaoQinId,
+                            kuaiZhao: '',
+                            name: '',
+                            paiBanId: paiBanId,
+                            paiBanJiLuId: paiBanJiLuId,
+                            pk: self.params.pk,
+                            shenHeRen: shenHeRen,
+                            shenHeShiJian: '',
+                            shenHeYiJian: '',
+                            tenantId: '',
+                            type: '',
+                            updateBy: '',
+                            updateTime: '',
+                            zhuangTai: '待审核'
+                        }
+                        // 提交数据
                     saveAttendanceReissue(submitData).then((res) => {
                         self.$message.success(`申请成功`)
                         // 关闭弹窗，更新列表数据
                         this.closeDialog()
                     })
-                })
+                }
             })
         },
         handleCancel () {

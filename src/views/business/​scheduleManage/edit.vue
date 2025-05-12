@@ -147,7 +147,7 @@
             </el-form-item>
             <el-row :gutter="20" class="form-row">
                 <el-col :span="24">
-                    <el-form-item label="调班审批人" prop="approver" :show-message="false">
+                    <el-form-item label="调班/补卡审批人" prop="approver" :show-message="false">
                         <el-select
                             v-model="formData.approver"
                             :disabled="(readonly || ifFaBu)"
@@ -508,20 +508,37 @@ export default {
             pickerOptions: {
                 disabledDate: (time) => {
                     const { dateRange } = this.formData
+                    const today = new Date()
+                    today.setHours(0, 0, 0, 0) // 标准化今天的时间到00:00:00
+                    // 禁用所有今天之前的日期
+                    if (time < today) {
+                        return true
+                    }
                     if (!dateRange.length) {
                         return false
                     }
                     const startDate = dateRange[0]
                     const endDate = dateRange[1] || time
-                    // 日期差超过45天则禁用
-                    const diffDays = (endDate - startDate) / (1000 * 60 * 60 * 24)
-                    return diffDays > 45 || diffDays < -45
+                    const diffDays = Math.abs((endDate - startDate) / (86400000)) // 使用绝对值简化判断
+                    return diffDays > 45 // 超过45天禁用
                 },
                 onPick: ({ minDate, maxDate }) => {
                     if (minDate && !maxDate) {
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        // 如果选择的开始日期早于今天，自动修正为今天
+                        if (minDate < today) {
+                            minDate = new Date(today)
+                            this.formData.dateRange[0] = minDate // 同步更新表单数据
+                        }
                         this.pickerOptions.disabledDate = (time) => {
-                            const dayDifference = (time - minDate) / (1000 * 60 * 60 * 24)
-                            return dayDifference > 45 || dayDifference < -45
+                            // 保持今天之前的日期不可选
+                            if (time < today) {
+                                return true
+                            }
+                            // 计算与开始日期的绝对差值
+                            const dayDifference = Math.abs((time - minDate) / 86400000)
+                            return dayDifference > 45
                         }
                     }
                 }
@@ -694,7 +711,7 @@ export default {
                 self.scheduleData = self.transformScheduleData(records, overview, temp)
                 self.responseData = { ...self.responseData, records, overview, temp }
                 console.log('scheduleData', self.scheduleData)
-                self.ifFaBu = (status == '已发布' ? true : false)
+                self.ifFaBu = (status === '已发布' ? true : false)
                 self.loading = false
             }).catch(() => {
                 self.loading = false
@@ -839,7 +856,7 @@ export default {
             }
             this.shiftList = this.formData.scheduleShift.filter(s => s.isEnabled === 'Y').map(s => ({
                 ...s,
-                positions: s.positions.join('，'),
+                positions: (s.positions || []).join('，'),
                 dateRange: s.dateRange.map(d => {
                     return d.type === 'allday' ? '全天' : (`当天 ${d.startTime}` + ' 至 ' + `${d.isSecondDay === 'Y' ? '第二天' : '当天'} ${d.endTime}`)
                 })
@@ -1180,6 +1197,7 @@ export default {
                 type: scheduleType,
                 config: JSON.stringify(configData),
                 overview: JSON.stringify(overview),
+                updateType: '排班修改',
                 staffScheduleDetailPoList
             }
             console.log(submitData)

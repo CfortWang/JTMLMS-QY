@@ -11,6 +11,7 @@ import newPng from '@/assets/images/homepage/new.png'
 import { BASE_URL } from '@/constant'
 import dayjs from 'dayjs'
 import { scheduleType } from '@/views/constants/schedule'
+import { attendanceDetailClockIn } from '@/api/business/attendance'
 import { lifeTimeData } from '@/views/business/deviceManagement/constants/simulated'
 
 /**
@@ -591,7 +592,7 @@ export function buildComponent (name, column, preview, vm) {
                     if (!start || !end) {
                         return 0
                     }
-                    return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24))
+                    return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) + 1
                 },
                 getTodaySchedule () { // 获取今日班次
                     const { first, second } = this.$store.getters.level || {}
@@ -728,6 +729,13 @@ export function buildComponent (name, column, preview, vm) {
                         this.$message.warning('考勤数据异常！')
                         return
                     }
+                    // 更新打卡请求
+                    attendanceDetailClockIn(attendance.id_).then(() => {
+                        this.$message.success('打卡成功！')
+                    }).catch(() => {
+                        this.$message.warning('打卡失败')
+                    })
+                    /*
                     // 获取当前时间
                     const currentDate = new Date()
                     const hours = currentDate.getHours()
@@ -757,8 +765,6 @@ export function buildComponent (name, column, preview, vm) {
                         attendance.da_ka_shi_jian_2_ = dakashijian
                         attendance.zhuang_tai_2_ = '正常'
                     }
-
-                    // 更新打卡请求
                     const tableName = ' t_attendance_detail'
                     const updateParams = {
                         tableName,
@@ -781,6 +787,7 @@ export function buildComponent (name, column, preview, vm) {
                     this.$common.request('update', updateParams).then(() => {
                         this.$message.success(str)
                     })
+                */
                 },
                 getTimeDifferenceInMinutes (startTimeStr, endTimeStr) { // 时间相减分钟数
                     const startTime = new Date(startTimeStr)

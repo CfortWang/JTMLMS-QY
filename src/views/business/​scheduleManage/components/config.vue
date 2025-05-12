@@ -120,7 +120,7 @@
                             </el-form-item>
                         </el-col>
                         <el-col v-if="formData.isApproval === 'Y'" :span="12">
-                            <el-form-item label="调班审批人" prop="approver" required :show-message="false">
+                            <el-form-item label="调班/补卡审批人" prop="approver" required :show-message="false" label-width="120px">
                                 <el-select
                                     v-model="formData.approver"
                                     :disabled="readonly"

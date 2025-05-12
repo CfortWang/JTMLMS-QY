@@ -12,10 +12,10 @@
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
+            :index-row="false"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
-            @row-dblclick="handleRowDblclick"
         >
             <!-- 自定义多级表头 -->
             <template #prepend-column>
@@ -103,7 +103,7 @@ export default {
             listData: [],
             pagination: {
                 totalCount: 0,
-                currentPage: 1,
+                page: 1,
                 limit: 15
             },
             sorts: {},
@@ -113,7 +113,7 @@ export default {
                     { key: 'export', icon: 'ibps-icon-download', label: '导出', type: 'primary' }
                 ],
                 searchForm: {
-                    labelWidth: 100,
+                    labelWidth: 80,
                     forms: [
                         { prop: 'Q^kao_qin_zhuang_ta^SL', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
                         { prop: ['Q^ri_qi_^DL', 'Q^ri_qi_^DG'], label: '日期范围', fieldType: 'daterange' },
@@ -206,7 +206,7 @@ export default {
                 }
             }
             // 添加分页
-            sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}`
+            sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.page - 1) * this.pagination.limit}`
             return sql
         },
         // 分页/排序处理

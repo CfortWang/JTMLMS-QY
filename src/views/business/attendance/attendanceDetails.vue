@@ -12,10 +12,10 @@
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
+            :index-row="false"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
-            @row-dblclick="handleRowDblclick"
         >
             <!-- 自定义多级表头 -->
             <template #prepend-column>
@@ -113,16 +113,17 @@ export default {
                     { key: 'export', icon: 'ibps-icon-download', label: '导出', type: 'primary' }
                 ],
                 searchForm: {
-                    labelWidth: 100,
+                    labelWidth: 80,
+                    itemWidth: 200,
                     forms: [
                         { prop: 'Q^kao_qin_zhuang_ta^SL', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
-                        { prop: ['Q^ri_qi_^DL', 'Q^ri_qi_^DG'], label: '日期范围', fieldType: 'daterange' },
+                        { prop: 'Q^yong_hu_id_^S', label: '姓名', fieldType: 'select', options: userOption },
+                        { prop: 'Q^gong_hao_^S', label: '工号' },
+                        { prop: 'Q^bu_men_^SL', label: '部门', fieldType: 'select', options: deptOption },
                         { prop: 'Q^pai_ban_ming_chen^SL', label: '排班名称' },
                         { prop: 'Q^ban_ci_ming_^SL', label: '班次名称' },
                         { prop: 'Q^ban_ci_bie_ming_^SL', label: '班次别名' },
-                        { prop: 'Q^yong_hu_id_^S', label: '姓名', fieldType: 'select', options: userOption },
-                        { prop: 'Q^gong_hao_^S', label: '工号' },
-                        { prop: 'Q^bu_men_^SL', label: '部门', fieldType: 'select', options: deptOption }
+                        { prop: ['Q^ri_qi_^DL', 'Q^ri_qi_^DG'], label: '日期范围', fieldType: 'daterange' }
                     ]
                 },
                 columns: []

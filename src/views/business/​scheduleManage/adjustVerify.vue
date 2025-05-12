@@ -12,6 +12,7 @@
             :row-handle="listConfig.rowHandle"
             :pagination="pagination"
             :loading="loading"
+            :index-row="false"
             @action-event="handleAction"
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
@@ -219,7 +220,8 @@ export default {
                 }
             }
             const { first, second } = this.$store.getters.level || {}
-            parameters[0].parameters.push({'key': 'Q^di_dian_^S', 'value': (second || first) })
+            parameters[0].parameters.push({ 'key': 'Q^di_dian_^S', 'value': (second || first) })
+            parameters[0].parameters.push({ 'key': 'Q^reason_^NE', 'value': '排班修改' })
             const param = {
                 parameters: parameters,
                 ...ActionUtils.formatParams(null, this.pagination, this.sorts)
@@ -579,7 +581,7 @@ export default {
                 ActionUtils.warning('请选择数据！')
                 return
             }
-            let flag = []
+            const flag = []
             data = data.filter((row, index) => {
                 if (this.showAgreeBtn(row)) {
                     flag.push(index + 1)
@@ -588,7 +590,7 @@ export default {
                 return true
             })
             if (flag.length > 0) {
-                this.$message.warning('所选数据中【序号：' + flag.join(',') + '】您无权限处理或已结束审核审批!')
+                this.$message.warning('所选数据包含您无权限处理或已结束审核审批!')
                 return
             }
             if (key === 'massAgree') {

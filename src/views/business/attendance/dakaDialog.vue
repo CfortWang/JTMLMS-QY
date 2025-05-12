@@ -3,14 +3,16 @@
         :visible.sync="visible"
         title="选择打卡班次"
         width="400px"
-        @close="handleClose">
+        @close="handleClose"
+    >
         <div class="schedule-dialog">
             <el-radio-group v-model="selectedValue">
                 <el-radio
                     v-for="schedule in schedules"
                     :key="schedule"
                     :label="schedule"
-                    style="display: block; margin: 10px 0;">
+                    style="display: block; margin: 10px 0;"
+                >
                     {{ schedule }}
                 </el-radio>
             </el-radio-group>
