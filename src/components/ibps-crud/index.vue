@@ -543,17 +543,7 @@ export default {
     }
     .elTable .el-table__body-wrapper{
         height: v-bind(tableHeight);
-        overflow: scroll;
+        overflow-y: auto;
 
-    }
-    /* 根据高度添加滚动条 */
-    .elTable .el-table__body-wrapper {
-        height: v-bind(tableHeight);
-        overflow: scroll;
-
-    }
-    /* 隐藏滚动条 */
-    .elTable .el-table__body-wrapper::-webkit-scrollbar{
-        width: 0;
     }
 </style>
