@@ -10,7 +10,6 @@
         top="5vh"
         width="600px"
         :title="title"
-        @open="loadData"
         @close="closeDialog"
     >
         <el-form
@@ -28,7 +27,7 @@
                 <el-date-picker
                     v-model="formData.buKaRiQi"
                     type="date"
-                    :placeholder="readonly? '' : 选择日期"
+                    :placeholder="readonly? '' : '选择日期'"
                     value-format="yyyy-MM-dd"
                     :picker-options="buKaRiQiPickerOptions"
                     :disabled="readonly"
@@ -39,7 +38,7 @@
             <el-form-item label="补卡班次" prop="buKaBanCi" class="form-item-uniform">
                 <el-select
                     v-model="formData.buKaBanCi"
-                    :placeholder="readonly? '' : 请选择班次"
+                    :placeholder="readonly? '' : '请选择班次'"
                     :disabled="readonly"
                     @focus="loadBuKaBanCiOptions"
                 >
@@ -56,7 +55,7 @@
                 <el-time-picker
                     v-model="formData.buKaShiJian"
                     value-format="HH:mm"
-                    :placeholder="readonly? '' : 请选择时间"
+                    :placeholder="readonly? '' : '请选择时间'"
                     :disabled="readonly"
                 />
             </el-form-item>
@@ -66,7 +65,7 @@
                     v-model="formData.buKaShiYou"
                     type="textarea"
                     :rows="3"
-                    :placeholder="readonly? '' : 请输入补卡原因"
+                    :placeholder="readonly? '' : '请输入补卡原因'"
                     maxlength="200"
                     :disabled="readonly"
                     show-word-limit
@@ -79,7 +78,7 @@
                     :download="true"
                     multiple
                     accept="*"
-                    :placeholder="readonly? '' : 请上传附件"
+                    :placeholder="readonly? '' : '请上传附件'"
                     :disabled="readonly"
                     style="width:100%"
                 />

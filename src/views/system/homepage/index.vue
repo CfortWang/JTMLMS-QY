@@ -179,6 +179,7 @@ import CalendarAlert from '@/views/system/dashboard/components/calendar-alert.vu
 import mySchedule from './components/mySchedule.vue'
 import makeUpEdit from '@/views/business/attendance/makeUpEdit.vue'
 import dakaDialog from '@/views/business/attendance/dakaDialog.vue'
+import { attendanceDetailClockIn } from '@/api/business/attendance'
 
 const _import = require('@/utils/util.import.' + process.env.NODE_ENV)
 export default {
@@ -756,6 +757,20 @@ export default {
             const sql = `select a.* FROM t_attendance_detail a JOIN t_schedule b ON a.pai_ban_id_ = b.id_ AND b.status_ = '已发布' WHERE a.di_dian_ = '${second || first}' AND a.ri_qi_ = '${today}' AND a.yong_hu_id_ = '${this.$store.getters.userId}' and a.ban_ci_bie_ming_ = '${selectedValue}' `
             this.$common.request('sql', sql).then(res => {
                 const data = res.variables.data[0] || {}
+                // 更新打卡请求
+                attendanceDetailClockIn(data.id_).then(() => {
+                    this.$message.success('打卡成功！')
+                }).catch(() => {
+                    this.$message.warning('打卡失败')
+                })
+            })
+            /*
+            const today = this.$common.getDateNow()
+            const { first, second } = this.$store.getters.level || {}
+            // 查询该班次对应的考勤数据
+            const sql = `select a.* FROM t_attendance_detail a JOIN t_schedule b ON a.pai_ban_id_ = b.id_ AND b.status_ = '已发布' WHERE a.di_dian_ = '${second || first}' AND a.ri_qi_ = '${today}' AND a.yong_hu_id_ = '${this.$store.getters.userId}' and a.ban_ci_bie_ming_ = '${selectedValue}' `
+            this.$common.request('sql', sql).then(res => {
+                const data = res.variables.data[0] || {}
                 // 获取当前时间
                 const currentDate = new Date()
                 const hours = currentDate.getHours()
@@ -809,6 +824,7 @@ export default {
                 })
             }).catch(() => {
             })
+            */
         },
         handleDakaConfirm (selectedValue) {
             this.dakaSingle(selectedValue)
