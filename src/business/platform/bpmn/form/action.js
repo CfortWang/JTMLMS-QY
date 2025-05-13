@@ -751,60 +751,59 @@ export default {
         // 修改流程时间
 
         async handleTimeModification () {
-            // 表单参数
+            // 获取表单数据
             const { code = '', name = '' } = this.getFormEL().formDefData || {}
+            const currentFormData = this.$common.replaceNullWithEmpty(this.getFormData())
             const jsonData = {
                 boCode: code,
                 version: 0,
                 formKey: this.dataResultitem.formKey,
                 pk: this.dataResultitem.bizKey,
-                data: JSON.stringify(this.$common.replaceNullWithEmpty(this.getFormData()))
+                data: JSON.stringify(currentFormData),
+                // 接口新增参数，是否记录操作日志
+                addLog: true
             }
-            // 流程参数
-            const defData = this.formParams.formOpinionData.opinionList
-            // 快照参数
 
+            // 获取流程意见数据
+            const { opinionList, formOpinionNodeData } = this.formParams.formOpinionData || {}
             const snapshot = { id: this.instanceId_ }
 
-            // console.log(JSON.stringify(this.$common.replaceNullWithEmpty(this.formDataBF)), JSON.stringify(this.$common.replaceNullWithEmpty(this.getFormData())))
-            // console.log(this.formDataBF)
-            if (this.timeModification_) {
-                if (JSON.stringify(this.$common.replaceNullWithEmpty(this.formDataBF)) === JSON.stringify(this.$common.replaceNullWithEmpty(this.getFormData()))) {
-                    // console.log('aa')
-                    if (JSON.stringify(defData) === JSON.stringify(this.opinionListBF)) {
-                        // console.log('aa')
-                    } else {
-                        await this.timeModify(defData)
-                    }
-                } else {
-                    if (JSON.stringify(defData) === JSON.stringify(this.opinionListBF)) {
-                        await this.saveData(jsonData, false, defData, snapshot)
-                    } else {
-                        await this.saveData(jsonData, true, defData, snapshot)
-                    }
-                }
-                // this.timeModification_ = false
-            } else {
+            if (!this.timeModification_) {
                 this.timeModification_ = true
+                return
+            }
+
+            // 检查数据变更状态
+            const isFormDataChanged = JSON.stringify(this.$common.replaceNullWithEmpty(this.formDataBF)) !== JSON.stringify(currentFormData)
+            const isOpinionChanged = JSON.stringify(opinionList) !== JSON.stringify(this.opinionListBF)
+
+            // 根据变更状态执行相应操作
+            if (!isFormDataChanged && isOpinionChanged) {
+                const opinionNodeList = Object.values(formOpinionNodeData).filter(Array.isArray).flat()
+                await this.timeModify(opinionNodeList)
+            } else if (isFormDataChanged) {
+                await this.saveData(jsonData, isOpinionChanged, opinionList, snapshot)
             }
         },
         // 保存流程数据生成快照
         async timeModify (data) {
-            await changeCompleteTime(data).then(response => {
+            try {
+                const response = await changeCompleteTime(data)
                 if (response.state === 200) {
                     this.$message.success('修改成功！')
                     this.callbackPage()
                 } else {
                     this.$message.error(response.message)
                 }
-            }).catch(() => {
-            })
+            } catch (error) {
+                console.error('修改时间失败:', error)
+            }
         },
         // 保存表单数据生成快照
-        async saveData (data, sflc, defData, snapshot) {
+        async saveData (data, sflc, opinionList, snapshot) {
             await saveFormData(data).then(response => {
                 if (sflc) {
-                    this.timeModify(defData)
+                    this.timeModify(opinionList)
                 } else {
                     this.repleceSnapshot(snapshot)
                 }
