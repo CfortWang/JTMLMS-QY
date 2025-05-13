@@ -15,6 +15,7 @@
         <v-full-calendar
             ref="calendar"
             :options="scheduleConfig"
+            :hide-other-month-days="true"
             :style="{height: '100%', width: '100%'}"
         />
     </el-dialog>

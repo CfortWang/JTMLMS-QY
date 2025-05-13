@@ -27,14 +27,25 @@ export default {
     props: {
         options: {
             type: Object,
-            default: () => {}
+            default: () => ({})
+        },
+        // 新增配置项：是否隐藏其他月份日期
+        hideOtherMonthDays: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
         return {
             calendarOptions: {
                 plugins: [dayGridPlugin, timeGridPlugin, listPlugin, bootstrapPlugin, interactionPlugin],
-                initialView: 'dayGridMonth'
+                initialView: 'dayGridMonth',
+                fixedWeekCount: false,
+                views: {
+                    dayGridMonth: {
+                        showNonCurrentDates: !this.hideOtherMonthDays // 是否隐藏非当前月日期
+                    }
+                }
             }
         }
     },
@@ -48,6 +59,22 @@ export default {
         },
         locale () {
             return lang.localeMap[I18n.getLanguage()]
+        }
+    },
+    watch: {
+        hideOtherMonthDays: {
+            handler (newVal) {
+                const calendarApi = this.$refs.fullCalendar?.getApi()
+                if (calendarApi) {
+                    calendarApi.setOption('views', {
+                        dayGridMonth: {
+                            showNonCurrentDates: !this.hideOtherMonthDays // 根据 prop 反转逻辑
+                        }
+                    })
+                    calendarApi.render() // 强制重新渲染
+                }
+            },
+            immediate: true
         }
     }
 }
