@@ -127,6 +127,14 @@ export default {
             },
             sorts: {},
             daterRange: [],
+            pickerOptions: {
+                disabledDate (time) {
+                    const today = new Date()
+                    today.setHours(0, 0, 0, 0)
+                    // 禁用今天及未来的日期
+                    return time.getTime() >= today.getTime()
+                }
+            },
             listConfig: {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary' },
@@ -164,7 +172,7 @@ export default {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                this.pagination.totalCount = this.listData[0].total_count
+                this.pagination.totalCount = this.listData[0]?.total_count
             }).finally(() => {
                 this.loading = false
             })
@@ -239,28 +247,23 @@ export default {
                         COUNT(ri_qi_) - SUM(CASE WHEN (da_ka_shi_jian_1_ IS NULL OR da_ka_shi_jian_1_ = '') 
                                                 AND (da_ka_shi_jian_2_ IS NULL OR da_ka_shi_jian_2_ = '') 
                                                 THEN 1 ELSE 0 END) AS shi_ji_chu_qin_shu,
-                        SUM(CASE WHEN (zhuang_tai_1_ = '正常' OR zhuang_tai_1_ IS NULL) 
-                                AND (zhuang_tai_2_ = '正常' OR zhuang_tai_2_ IS NULL) 
-                                THEN 1 ELSE 0 END) AS zheng_chang_shu,
-                        COUNT(ri_qi_) - SUM(CASE WHEN (zhuang_tai_1_ = '正常' OR zhuang_tai_1_ IS NULL) 
-                                                AND (zhuang_tai_2_ = '正常' OR zhuang_tai_2_ IS NULL) 
-                                                THEN 1 ELSE 0 END) AS yi_chang_shu,
+                        SUM(kao_qin_zhuang_ta) AS zheng_chang_shu,
+                        SUM(CASE WHEN kao_qin_zhuang_ta = '异常' OR kao_qin_zhuang_ta IS NULL OR kao_qin_zhuang_ta = '' THEN 1 ELSE 0 END) AS yi_chang_shu,
                         SUM(ban_ci_shi_chang_) AS total_ban_ci_shi_chang,
                         SUM(gong_zuo_shi_chan) AS total_gong_zuo_shi_chan,
-                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' OR zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
-                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN chi_dao_shi_chang ELSE 0 END) +
-                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN chi_dao_shi_chang ELSE 0 END) AS total_chi_dao_shi_chang,
-                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' OR 
-                                    zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' 
-                                THEN 1 ELSE 0 END) AS kuang_gong_ci_shu,
-                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' OR zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) +
-                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' OR 
-                                    zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' 
-                                THEN 1 ELSE 0 END) AS yi_chang_he_ji
+                        SUM(CASE WHEN zhuang_tai_1_ = '异常' OR zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
+                        SUM(chi_dao_shi_chang) AS total_chi_dao_shi_chang,
+                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' THEN 1 ELSE 0 END) + 
+                        SUM(CASE WHEN zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' THEN 1 ELSE 0 END) AS kuang_gong_ci_shu,
+
+                        SUM(CASE WHEN zhuang_tai_1_ = '异常' THEN 1 ELSE 0 END) +
+                        SUM(CASE WHEN zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END) +
+                        SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' THEN 1 ELSE 0 END) + 
+                        SUM(CASE WHEN zhuang_tai_2_ IS NULL OR zhuang_tai_2_ = '' THEN 1 ELSE 0 END) AS yi_chang_he_ji
                     FROM 
                         v_attendance_statistics 
                     ${wherestr}
-                    GROUP BY USER_ID_ ORDER BY USER_ID_
+                    GROUP BY USER_ID_,ri_qi_ ORDER BY USER_ID_
                     LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.page - 1) * this.pagination.limit}
                     `
                 }

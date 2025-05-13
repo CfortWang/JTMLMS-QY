@@ -214,6 +214,8 @@ export default {
                     return '停用证'
                 case '限用':
                     return '限用证'
+                case '报废':
+                    return '报废证'
                 default:
                     return '测试证'
             }

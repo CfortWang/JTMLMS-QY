@@ -610,7 +610,7 @@ export function buildComponent (name, column, preview, vm) {
                                 this.scheduleShift = scheduleShift
                                 if (shift) {
                                     const shiftList = shift.split(',')
-                                    todaySchedule = shiftList // 返回今日班次
+                                    todaySchedule = todaySchedule.concat(shiftList) // 返回今日班次
                                 }
                             })
                             console.log(todaySchedule)
@@ -730,64 +730,11 @@ export function buildComponent (name, column, preview, vm) {
                         return
                     }
                     // 更新打卡请求
-                    attendanceDetailClockIn(attendance.id_).then(() => {
+                    attendanceDetailClockIn({ id: attendance.id_ }).then(() => {
                         this.$message.success('打卡成功！')
                     }).catch(() => {
-                        this.$message.warning('打卡失败')
+                        // this.$message.warning('打卡失败')
                     })
-                    /*
-                    // 获取当前时间
-                    const currentDate = new Date()
-                    const hours = currentDate.getHours()
-                    const minutes = currentDate.getMinutes()
-                    const dakashijian = `${hours}:${minutes}`
-                    const time = this.$common.getDateNow() + ' ' + dakashijian
-                    let str = '打卡成功！'
-
-                    // 在班次结束时间前初次点击打卡按钮，视作上班打卡，自动判定状态为正常或迟到（迟到需记录迟到时长）；再次点击打卡按钮提示已打卡
-                    if (time < attendance.ban_ci_jie_shu_) { // 上班打卡
-                        if (!attendance.da_ka_shi_jian_1_) {
-                            attendance.da_ka_shi_jian_1_ = dakashijian
-                            attendance.zhuang_tai_1_ = time < attendance.ban_ci_kai_shi_ ? '正常' : '迟到'
-                            if (attendance.zhuang_tai_1_ === '迟到') {
-                                attendance.chi_dao_shi_chang = this.getTimeDifferenceInMinutes(attendance.ban_ci_kai_shi_, time)
-                                attendance.kao_qin_zhuang_ta = '异常' // 总考勤状态设置为异常
-                            }
-                        } else {
-                            this.$message.warning('该班次上班已打卡！')
-                            return
-                        }
-                    } else { // 下班打卡
-                        // 在班次结束时间后初始点击打卡按钮，视作下班打卡，再次点击打卡按钮则更新下班打卡时间并提示更新打卡时间成功
-                        if (attendance.da_ka_shi_jian_2_) {
-                            str = '已更新下班打卡！'
-                        }
-                        attendance.da_ka_shi_jian_2_ = dakashijian
-                        attendance.zhuang_tai_2_ = '正常'
-                    }
-                    const tableName = ' t_attendance_detail'
-                    const updateParams = {
-                        tableName,
-                        updList: [
-                            {
-                                where: {
-                                    id_: attendance.id_
-                                },
-                                param: {
-                                    da_ka_shi_jian_1_: attendance.da_ka_shi_jian_1_,
-                                    zhuang_tai_1_: attendance.zhuang_tai_1_,
-                                    da_ka_shi_jian_2_: attendance.da_ka_shi_jian_2_,
-                                    zhuang_tai_2_: attendance.zhuang_tai_2_,
-                                    kao_qin_zhuang_ta: attendance.kao_qin_zhuang_ta,
-                                    chi_dao_shi_chang: attendance.chi_dao_shi_chang
-                                }
-                            }
-                        ]
-                    }
-                    this.$common.request('update', updateParams).then(() => {
-                        this.$message.success(str)
-                    })
-                */
                 },
                 getTimeDifferenceInMinutes (startTimeStr, endTimeStr) { // 时间相减分钟数
                     const startTime = new Date(startTimeStr)

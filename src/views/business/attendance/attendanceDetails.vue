@@ -17,6 +17,19 @@
             @sort-change="handleSortChange"
             @pagination-change="handlePaginationChange"
         >
+            <template slot="time">
+                <el-date-picker
+                    v-model="daterRange"
+                    size="mini"
+                    type="daterange"
+                    :picker-options="pickerOptions"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    value-format="yyyy-MM-dd"
+                />
+            </template>
             <!-- 自定义多级表头 -->
             <template #prepend-column>
                 <el-table-column key="userName" prop="userName" label="姓名" width="80">
@@ -50,8 +63,8 @@
                     <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="打卡时间" width="140" />
                     <el-table-column key="zhuang_tai_1_" prop="zhuang_tai_1_" label="打卡状态" width="80">
                         <template #default="{ row }">
-                            <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : 'inherit' }">
-                                {{ row.zhuang_tai_2_ }}
+                            <span :style="{ color: row.zhuang_tai_1_=='异常' ? 'red' : (!row.da_ka_shi_jian_1_ ? 'red' :'inherit') }">
+                                {{ !row.da_ka_shi_jian_1_ ? '缺勤' : (row.zhuang_tai_1_ === '异常' ? '迟到' : row.zhuang_tai_1_) }}
                             </span>
                         </template>
                     </el-table-column>
@@ -61,8 +74,8 @@
                     <el-table-column key="da_ka_shi_jian_2_" prop="da_ka_shi_jian_2_" label="打卡时间" width="140" />
                     <el-table-column key="zhuang_tai_2_" prop="zhuang_tai_2_" label="打卡状态" width="80">
                         <template #default="{ row }">
-                            <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : 'inherit' }">
-                                {{ row.zhuang_tai_2_ }}
+                            <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : (!row.da_ka_shi_jian_2_ ? 'red' :'inherit') }">
+                                {{ !row.da_ka_shi_jian_2_ ? '缺勤' : (row.zhuang_tai_2_ === '异常' ? '迟到' : row.zhuang_tai_2_) }}
                             </span>
                         </template>
                     </el-table-column>
@@ -96,7 +109,7 @@ export default {
         return {
             userOption,
             deptOption,
-            title: '考勤明细统计',
+            title: '考勤明细',
             pkKey: 'id_', // 主键对应数据库字段
             loading: true,
             height: document.clientHeight,
@@ -107,6 +120,15 @@ export default {
                 limit: 15
             },
             sorts: {},
+            daterRange: [],
+            pickerOptions: {
+                disabledDate (time) {
+                    const today = new Date()
+                    today.setHours(0, 0, 0, 0)
+                    // 禁用今天及未来的日期
+                    return time.getTime() >= today.getTime()
+                }
+            },
             listConfig: {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary' },
@@ -123,7 +145,7 @@ export default {
                         { prop: 'Q^pai_ban_ming_chen^SL', label: '排班名称' },
                         { prop: 'Q^ban_ci_ming_^SL', label: '班次名称' },
                         { prop: 'Q^ban_ci_bie_ming_^SL', label: '班次别名' },
-                        { prop: ['Q^ri_qi_^DL', 'Q^ri_qi_^DG'], label: '日期范围', fieldType: 'daterange' }
+                        { prop: '', label: '日期范围', fieldType: 'slot', slotName: 'time' }
                     ]
                 },
                 columns: []
@@ -147,7 +169,7 @@ export default {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                this.pagination.totalCount = this.listData[0].total_count
+                this.pagination.totalCount = this.listData[0]?.total_count
             }).finally(() => {
                 this.loading = false
             })
@@ -167,17 +189,19 @@ export default {
             const { first, second } = this.$store.getters.level || {}
             const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             searchParam['Q^di_dian_^S'] = second || first
+            searchParam['Q^ri_qi_^DG'] = this.$common.getDateNow()
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {
             const params = this.getSearchFormData()
             const { first, second } = this.$store.getters.level || {}
-            let sql = `select t.*, (select COUNT(*) FROM t_attendance_detail WHERE di_dian_ = '${second || first}') AS total_count FROM t_attendance_detail t`
+            let sql = `select t.*, (select COUNT(*) FROM t_attendance_detail WHERE di_dian_ = '${second || first}' and ri_qi_ < '${this.$common.getDateNow()}') AS total_count FROM t_attendance_detail t`
             // 定义操作符映射
             const operatorMap = {
                 'S': '=',
                 'SL': 'LIKE',
                 'DG': '<=',
+                'DGT': '<',
                 'DL': '>='
             }
             // 如果有查询条件，构建 WHERE 子句
@@ -203,7 +227,8 @@ export default {
                 })
 
                 if (conditions.length > 0) {
-                    sql += ' WHERE ' + conditions.join(' AND ')
+                    const wherestr = ' WHERE ' + conditions.join(' AND ')
+                    sql = `select t.*, (select COUNT(*) FROM t_attendance_detail ${wherestr} ) AS total_count FROM t_attendance_detail t ${wherestr} `
                 }
             }
             // 添加分页

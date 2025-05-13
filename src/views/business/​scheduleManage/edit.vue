@@ -771,6 +771,7 @@ export default {
         transformScheduleData (records, overview, { scheduleShift }) {
             const result = {}
             const temp = overview ? JSON.parse(overview) : {}
+            const self = this
             records.forEach(({ id, userId, ...days }) => {
                 result[userId] = []
                 for (let day = 1; day <= temp.dateCount; day++) {
@@ -781,7 +782,12 @@ export default {
                     })
                     result[userId].push(formattedShifts)
                 }
-                this.scheduleRecord.push({ userId, id })
+                const n = self.scheduleRecord.findIndex(i => i.userId === userId)
+                if (n !== -1) {
+                    self.scheduleRecord[n] = { userId, id }
+                } else {
+                    self.scheduleRecord.push({ userId, id })
+                }
             })
             return result
         },
@@ -1120,9 +1126,10 @@ export default {
                 data = this.reverseForScheduleData(this.scheduleData, this.userNameList, this.formData.scheduleShift, this.formData.overview)
             }
             var dateCount = 0
+            const self = this
             const result = Object.entries(data).map(([userId, days]) => {
                 const userObj = { userId, statistics: {}}
-                const temp = this.scheduleRecord.find(i => i.userId === userId)
+                const temp = self.scheduleRecord.find(i => i.userId === userId)
                 const recordId = temp ? temp.id : ''
                 dateCount = days.length
                 days.forEach((day, index) => {
@@ -1202,42 +1209,46 @@ export default {
             }
             console.log(submitData)
             this.loading = true
+            const self = this
             saveStaffSchedule(submitData).then(async (res) => {
                 if (res.variables.id) {
-                    this.formData.id = res.variables.id
-                    const response = await getStaffSchedule({ id: this.formData.id })
-                    this.responseData = response.data
+                    self.formData.id = res.variables.id
+                    const response = await getStaffSchedule({ id: self.formData.id })
+                    const { overview, config } = response.data
+                    const temp = config ? JSON.parse(config) : {}
+                    self.responseData = response.data
+                    self.scheduleData = self.transformScheduleData(response.data.staffScheduleDetailPoList, overview, temp)
+                }
+                if (type) { // 提交
+                    self.handleSaveNews().then(() => {
+                        self.loading = false
+                        self.activeStep = 3
+                        self.$message.success('提交成功')
+                        self.$confirm('退出当前页面？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            self.closeDialog()
+                            self.$emit('callback')
+                        }).catch(() => {
+                            self.$emit('callback')
+                        })
+                    }).catch(() => {
+                        self.$message.error('提交失败')
+                    })
+                } else { // 保存
+                    self.$message.success('保存成功')
+                    self.loading = false
+                    // this.closeDialog()
+                    self.$emit('callback')
                 }
                 // 增加一条调班申请记录，用于查看排班管理员修改历史。
-                this.submitAdjust(submitData).then(() => {
-                    if (type) { // 提交
-                        this.handleSaveNews().then(() => {
-                            this.loading = false
-                            this.activeStep = 3
-                            this.$message.success('提交成功')
-                            this.$confirm('退出当前页面？', '提示', {
-                                confirmButtonText: '确定',
-                                cancelButtonText: '取消',
-                                type: 'warning'
-                            }).then(() => {
-                                this.closeDialog()
-                                this.$emit('callback')
-                            }).catch(() => {
-                                this.$emit('callback')
-                            })
-                        }).catch(() => {
-                            this.$message.error('提交失败')
-                        })
-                    } else { // 保存
-                        this.$message.success('保存成功')
-                        this.loading = false
-                        // this.closeDialog()
-                        this.$emit('callback')
-                    }
-                })
+                // this.submitAdjust(submitData).then(() => {
+                // })
             }).catch(() => {
-                this.$message.error('保存失败')
-                this.loading = false
+                self.$message.error('保存失败')
+                self.loading = false
             })
         },
         async handleSaveNews () {
@@ -1474,67 +1485,6 @@ export default {
             this.scheduleData = history
             this.$message.success('撤销成功')
             this.$forceUpdate() // 强制更新视图
-        },
-        /** 获取排班变化描述 */
-        getOverViews (responseData, newData) {
-            const oldData = responseData.staffScheduleDetailPoList
-            const result = []
-            // 遍历newData
-            newData.forEach((newItem, i) => {
-                // 比较每个人班次的数量变化
-                if (newItem.statistics !== oldData[i].statistics) {
-                    const newStatistics = JSON.parse(newItem.statistics) || []
-                    const oldStatistics = JSON.parse(oldData[i].statistics) || []
-                    const changes = []
-                    // 比较每个人班次的数量变化
-                    for (const shift in newStatistics) {
-                        const newCount = newStatistics[shift] || 0
-                        const oldCount = oldStatistics[shift] || 0
-                        const shiftName = this.formData.scheduleShift.find(item => item.alias === shift)?.name
-                        if (newCount > oldCount) {
-                            changes.push(`${shiftName}增加了` + (newCount - oldCount) + '班次')
-                        } else if (newCount < oldCount) {
-                            changes.push(`${shiftName}减少了` + (oldCount - newCount) + '班次')
-                        }
-                    }
-                    // oldStatistics中有的项而newStatistics中没有的项
-                    for (const oldShift in oldStatistics) {
-                        if (!newStatistics.hasOwnProperty(oldShift)) {
-                            const shiftName = this.formData.scheduleShift.find(item => item.alias === oldShift)?.name
-                            const oldCount = oldStatistics[oldShift] || 0
-                            changes.push(`${shiftName}减少了` + oldCount + '班次')
-                        }
-                    }
-                    // 如果有班次变化，将其与userId记录到结果中
-                    if (changes.length > 0) {
-                        const userNameObj = this.userList.filter(item => item.userId === newItem.userId)
-                        const perOverView = userNameObj[0]?.userName + changes.join(',')
-                        result.push(perOverView)
-                    }
-                }
-            })
-            return result.join('。')
-        },
-        // 提交调班申请数据
-        async submitAdjust (submitData) {
-            let overView = ''
-            if (submitData.id) {
-                overView = this.getOverViews(this.responseData || null, submitData.staffScheduleDetailPoList)
-            }
-            if (overView === '') {
-                return
-            }
-            const { first, second } = this.$store.getters.level || {}
-            const adjustData = {
-                scheduleId: submitData.id,
-                reason: '排班管理员调整排班',
-                diDian: second || first,
-                overview: '排班管理员调整：' + overView,
-                status: '已通过',
-                updateTime: Date.now(),
-                adjustmentDetailPoList: []
-            }
-            await saveAdjustment(adjustData)
         },
         closeDialog () {
             this.$emit('close', false)

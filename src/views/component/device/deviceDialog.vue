@@ -569,7 +569,7 @@
                                             <el-col :span="8">
                                                 <el-row>
                                                     <el-col>
-                                                        <el-form-item label="是否校准：" prop="shiFouXiaoZhun">
+                                                        <el-form-item label="是否校准：" prop="shiFouXiaoZhun" label-width="140px">
                                                             <el-select v-if="!readonly" v-model="form.shiFouXiaoZhun" placeholder="请选择" size="mini" style="width:100%">
                                                                 <el-option
                                                                     v-for="item in ['是','否']"
@@ -585,7 +585,7 @@
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
-                                                        <el-form-item label="检定/校准周期(月)：" label-width="140">
+                                                        <el-form-item label="检定/校准周期(月)：" label-width="140px">
                                                             <el-input v-if="!readonly" v-model="form.xiaoZhunZQ" size="mini" type="number" style="width:100%" />
                                                             <span v-else>{{ form.xiaoZhunZQ ||'/' }}
                                                             </span>
@@ -594,7 +594,7 @@
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
-                                                        <el-form-item label="检定/校准单位：">
+                                                        <el-form-item label="检定/校准单位：" label-width="140px">
                                                             <ibps-custom-dialog
                                                                 v-model="form.shiYongKeShi"
                                                                 size="mini"
@@ -611,7 +611,7 @@
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
-                                                        <el-form-item label="最近校准时间：">
+                                                        <el-form-item label="最近校准时间：" label-width="140px">
                                                             <el-date-picker
                                                                 v-if="!readonly"
                                                                 v-model="form.yiXiaoRiQi"
@@ -629,7 +629,7 @@
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
-                                                        <el-form-item label="校准有效期至：">
+                                                        <el-form-item label="检定/校准有效期至：" label-width="140px">
                                                             <el-date-picker
                                                                 v-if="!readonly"
                                                                 v-model="form.xiaoZhunYouXia"
@@ -647,7 +647,7 @@
                                                 </el-row>
                                                 <el-row v-if="form.shiFouXiaoZhun==='是'">
                                                     <el-col>
-                                                        <el-form-item label="校准证书编号：">
+                                                        <el-form-item label="检定/校准证书编号：" label-width="140px">
                                                             <el-input v-if="!readonly" v-model="form.zhengShuBianHa" size="mini" />
                                                             <span v-else>{{ form.zhengShuBianHa ||'/' }}
                                                             </span>

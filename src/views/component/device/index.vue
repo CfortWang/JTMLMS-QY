@@ -299,8 +299,21 @@
                             />
                         </el-select>
                     </template>
-                    <template slot="place">
+                    <!-- <template slot="place">
                         <el-input v-model="search.place" size="mini" />
+                    </template> -->
+                    <template slot="place">
+                        <ibps-custom-dialog
+                            v-model="search.place"
+                            size="mini"
+                            template-key="fjxzkdd"
+                            multiple
+                            :disabled="false"
+                            type="dialog"
+                            class="custom-dialog"
+                            placeholder="请选择"
+                            icon="el-icon-search"
+                        />
                     </template>
                     <template slot="managePeople">
                         <ibps-user-selector
@@ -784,9 +797,16 @@ export default {
                 parameters.parameters.push(obj)
             }
             // 放置地点搜索
+            // if (this.search.place) {
+            //     const obj = { relation: 'AND', parameters: [] }
+            //     obj.parameters.push({ key: 'Q^cun_fang_di_dian_^SL', value: this.search.place, param: this.$utils.guid() })
+            //     parameters.parameters.push(obj)
+            // }
             if (this.search.place) {
-                const obj = { relation: 'AND', parameters: [] }
-                obj.parameters.push({ key: 'Q^cun_fang_di_dian_^SL', value: this.search.place, param: this.$utils.guid() })
+                const obj = { relation: 'OR', parameters: [] }
+                this.search.place.split(',').forEach(item => {
+                    obj.parameters.push({ key: 'Q^cun_fang_wei_zhi_^S', value: item, param: this.$utils.guid() })
+                })
                 parameters.parameters.push(obj)
             }
             // 保管人搜索(可多选)
@@ -801,7 +821,7 @@ export default {
             if (this.search.deviceClass) {
                 const obj = { relation: 'OR', parameters: [] }
                 this.search.deviceClass.split(',').forEach(item => {
-                    obj.parameters.push({ key: 'Q^wei_hu_fang_shi_^S', value: item, param: this.$utils.guid() })
+                    obj.parameters.push({ key: 'Q^wei_hu_fang_shi_^SL', value: item, param: this.$utils.guid() })
                 })
                 parameters.parameters.push(obj)
             }

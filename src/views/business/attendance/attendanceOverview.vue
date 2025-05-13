@@ -99,6 +99,14 @@ export default {
             },
             sorts: {},
             daterRange: [],
+            pickerOptions: {
+                disabledDate (time) {
+                    const today = new Date()
+                    today.setHours(0, 0, 0, 0)
+                    // 禁用今天及未来的日期
+                    return time.getTime() >= today.getTime()
+                }
+            },
             listConfig: {
                 toolbars: [
                     { key: 'search', icon: 'ibps-icon-search', label: '查询', type: 'primary' },
@@ -136,7 +144,7 @@ export default {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                this.pagination.totalCount = this.listData[0].total_count
+                this.pagination.totalCount = this.listData[0]?.total_count
             }).finally(() => {
                 this.loading = false
             })
@@ -209,34 +217,33 @@ export default {
                                 gong_hao_,
                                 MIN(da_ka_shi_jian_1_) AS zui_zao,
                                 MAX(da_ka_shi_jian_2_) AS zui_wan,
-                                SUM(CASE WHEN da_ka_shi_jian_1_ IS NOT NULL AND da_ka_shi_jian_1_ != '' THEN 1 ELSE 0 END) +
-                                SUM(CASE WHEN da_ka_shi_jian_2_ IS NOT NULL AND da_ka_shi_jian_2_ != '' THEN 1 ELSE 0 END) AS da_ka_ci_shu_,
+                                SUM(da_ka_ci_shu_) AS da_ka_ci_shu_,
                                 SUM(ban_ci_shi_chang_) AS total_ban_ci_shi_chang,
                                 SUM(gong_zuo_shi_chan) AS total_gong_zuo_shi_chan,
-                                SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
-                                SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
-                                SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
-                                SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) AS que_qin_ci_shu,
+                                SUM(CASE WHEN zhuang_tai_1_ = '异常' THEN 1 ELSE 0 END) + 
+                                SUM(CASE WHEN zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
+                                SUM(CASE WHEN zhuang_tai_1_ = '' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                SUM(CASE WHEN zhuang_tai_2_ = '' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) AS que_qin_ci_shu,
                                 CASE 
-                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
-                                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) > 0 
-                                        AND SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
-                                            SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) > 0 
+                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '异常' THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END) > 0 
+                                        AND SUM(CASE WHEN zhuang_tai_1_ = '' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                            SUM(CASE WHEN zhuang_tai_2_ = '' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) > 0 
                                     THEN CONCAT('迟到', 
-                                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
-                                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END), '次，缺勤',
-                                        SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
-                                        SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END), '次')
-                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
-                                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END) > 0 
+                                        SUM(CASE WHEN zhuang_tai_1_ = '异常' THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END), '次，缺勤',
+                                        SUM(CASE WHEN zhuang_tai_1_ = '' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END), '次')
+                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '异常' THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END) > 0 
                                     THEN CONCAT('迟到', 
-                                        SUM(CASE WHEN zhuang_tai_1_ = '迟到' THEN 1 ELSE 0 END) + 
-                                        SUM(CASE WHEN zhuang_tai_2_ = '迟到' THEN 1 ELSE 0 END), '次')
-                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
-                                        SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) > 0 
+                                        SUM(CASE WHEN zhuang_tai_1_ = '异常' THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END), '次')
+                                    WHEN SUM(CASE WHEN zhuang_tai_1_ = '' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END) > 0 
                                     THEN CONCAT('缺勤', 
-                                        SUM(CASE WHEN zhuang_tai_1_ = '缺勤' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
-                                        SUM(CASE WHEN zhuang_tai_2_ = '缺勤' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END), '次')
+                                        SUM(CASE WHEN zhuang_tai_1_ = '' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 
+                                        SUM(CASE WHEN zhuang_tai_2_ = '' OR zhuang_tai_2_ IS NULL THEN 1 ELSE 0 END), '次')
                                     ELSE '正常'
                                 END AS kao_qin_zhuang_tai
                             FROM 
