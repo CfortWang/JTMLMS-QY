@@ -959,18 +959,27 @@ export default {
                             a.ru_zhi_shi_jian_ 
                         FROM
                             t_ryjbqk AS a
-                            JOIN ibps_party_employee AS ee ON a.parent_id_ = ee.id_
-                            JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, ee.POSITIONS_ ) > 0 
+                            JOIN (
+                            SELECT
+                                e.* 
+                            FROM
+                                ibps_party_employee e
+                                JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, e.POSITIONS_ ) > 0 
+                            WHERE
+                                en.PATH_ LIKE '%${this.depth3}%' 
+                            GROUP BY
+                                e.id_ 
+                            ) AS ee ON a.parent_id_ = ee.id_ 
                         WHERE
                             a.id_ != '861622496187645952' 
-                            and ee.name_ not like '%系统%'
-                            and ee.name_ not like '%金通%'
-                            and ee.name_ not like '%管理%'
-                            and ee.id_ != '702117247933480960'
-                            AND en.PATH_ LIKE '%${this.depth3}%'`
+                            AND ee.name_ NOT LIKE '%系统%' 
+                            AND ee.name_ NOT LIKE '%金通%' 
+                            AND ee.name_ NOT LIKE '%管理%' 
+                            AND ee.id_ != '702117247933480960' `
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data
             })
+            console.log(data, 'aaaaaa')
             this.employeeNum = data.length
             if (this.initOnLoad === 0) {
                 this.initOnLoad = 1
@@ -1066,7 +1075,7 @@ export default {
                                     name_ 
                                 ) b 
                         WHERE
-                            b.positions_ IN ( SELECT id_ FROM ibps_party_entity WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position' ))`
+                            b.positions_ IN ( SELECT id_ FROM ibps_party_entity WHERE path_ LIKE '%${this.first}%' AND party_type_ = 'position' ))`
 
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data

@@ -908,11 +908,14 @@ export default {
                 }
                 await this.showAlert()
             } else {
+                const { positions } = this.$store.getters.userInfo
+                // 默认编制部门是主部门，没有主部门默认第一个部门
+                const mainPost = positions.find(item => item.isMainPost === 'Y')?.id || positions[0].id
                 this.readonly = false
                 this.infoFxssbData.di_dian_ = this.level
                 this.infoFxssbData.ji_hua_bian_hao_ = await this.getNextAlias('fxjhlsh')
                 this.infoFxssbData.nian_du_ = dayjs().format('YYYY')
-                this.infoFxssbData.bian_zhi_bu_men_ = this.position
+                this.infoFxssbData.bian_zhi_bu_men_ = mainPost
                 this.infoFxssbData.bian_zhi_ren_ = this.userId
                 this.infoFxssbData.bian_zhi_shi_jian = dayjs().format('YYYY-MM-DD HH:mm:ss')
                 this.infoFxssbData.zu_chang_id_ = this.userId

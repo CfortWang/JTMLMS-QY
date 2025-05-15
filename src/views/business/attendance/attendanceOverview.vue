@@ -57,8 +57,8 @@
                     <el-table-column key="zui_zao" prop="zui_zao" label="最早" width="120" />
                     <el-table-column key="zui_wan" prop="zui_wan" label="最晚" width="120" />
                     <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="打卡次数" width="70" />
-                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长（分钟）" width="100" />
-                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长（分钟）" width="100" />
+                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长（小时）" width="100" />
+                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长（小时）" width="100" />
                     <el-table-column key="kao_qin_zhuang_tai" prop="kao_qin_zhuang_tai" label="考勤结果" width="80">
                         <template #default="{ row }">
                             <span :style="{ color: row.kao_qin_zhuang_tai=='正常' ? 'inherit' : 'red' }">
@@ -218,8 +218,8 @@ export default {
                                 MIN(da_ka_shi_jian_1_) AS zui_zao,
                                 MAX(da_ka_shi_jian_2_) AS zui_wan,
                                 SUM(da_ka_ci_shu_) AS da_ka_ci_shu_,
-                                SUM(ban_ci_shi_chang_) AS total_ban_ci_shi_chang,
-                                SUM(gong_zuo_shi_chan) AS total_gong_zuo_shi_chan,
+                                ROUND(SUM(ban_ci_shi_chang_) / 60.0,2) AS total_ban_ci_shi_chang,
+                                ROUND(SUM(gong_zuo_shi_chan) / 60.0,2) AS total_gong_zuo_shi_chan,
                                 SUM(CASE WHEN zhuang_tai_1_ = '异常' THEN 1 ELSE 0 END) + 
                                 SUM(CASE WHEN zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
                                 SUM(CASE WHEN zhuang_tai_1_ = '' OR zhuang_tai_1_ IS NULL THEN 1 ELSE 0 END) + 

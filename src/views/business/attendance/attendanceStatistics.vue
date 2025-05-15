@@ -58,8 +58,8 @@
                     <el-table-column key="xiu_xi_shu" prop="xiu_xi_shu" label="休息天数" width="85" />
                     <el-table-column key="zheng_chang_shu" prop="zheng_chang_shu" label="正常天数" width="65" />
                     <el-table-column key="yi_chang_shu" prop="yi_chang_shu" label="异常天数" width="65" />
-                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长(分钟)" width="120" />
-                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长(分钟)" width="120" />
+                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长(小时)" width="120" />
+                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长(小时)" width="120" />
                 </el-table-column>
                 <!-- 异常统计 -->
                 <el-table-column label="异常统计">
@@ -249,8 +249,8 @@ export default {
                                                 THEN 1 ELSE 0 END) AS shi_ji_chu_qin_shu,
                         SUM(kao_qin_zhuang_ta) AS zheng_chang_shu,
                         SUM(CASE WHEN kao_qin_zhuang_ta = '异常' OR kao_qin_zhuang_ta IS NULL OR kao_qin_zhuang_ta = '' THEN 1 ELSE 0 END) AS yi_chang_shu,
-                        SUM(ban_ci_shi_chang_) AS total_ban_ci_shi_chang,
-                        SUM(gong_zuo_shi_chan) AS total_gong_zuo_shi_chan,
+                        ROUND(SUM(ban_ci_shi_chang_) / 60.0,2) AS total_ban_ci_shi_chang,
+                        ROUND(SUM(gong_zuo_shi_chan) / 60.0,2) AS total_gong_zuo_shi_chan,
                         SUM(CASE WHEN zhuang_tai_1_ = '异常' OR zhuang_tai_2_ = '异常' THEN 1 ELSE 0 END) AS chi_dao_ci_shu,
                         SUM(chi_dao_shi_chang) AS total_chi_dao_shi_chang,
                         SUM(CASE WHEN zhuang_tai_1_ IS NULL OR zhuang_tai_1_ = '' THEN 1 ELSE 0 END) + 

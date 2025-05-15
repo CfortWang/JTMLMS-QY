@@ -84,6 +84,7 @@
                             @open="handleOpen"
                             @close="handleClose"
                             @action-event="(command,data)=> handleActionEvent(command,data,index)"
+                            @dakaSingle="dakaSingle"
                         />
                     </ibps-grid-item>
                 </ibps-grid-layout>

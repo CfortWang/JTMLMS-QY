@@ -1021,7 +1021,8 @@ export default {
                 if (!val) return
                 const sql = `select fang_jian_ming_ha from t_jjqfjb where id_='${val}'`
                 const { variables: { data }} = await this.$common.request('sql', sql)
-                this.form.cunFangDiDian = data[0].fang_jian_ming_ha
+
+                this.form.cunFangDiDian = data && data[0] ? data[0].fang_jian_ming_ha : ''
             }
         },
         // 根据编制部门动态获取对应文件存放处数据

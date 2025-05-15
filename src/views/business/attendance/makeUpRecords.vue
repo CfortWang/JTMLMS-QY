@@ -83,7 +83,7 @@ export default {
                     { prop: 'shen_he_shi_jian_', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
                     { prop: 'zhuang_tai_', label: '状态', width: 90 },
                     { prop: 'bu_ka_ri_qi_', label: '补卡日期', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 100 },
-                    { prop: 'bu_ka_shi_jian_', label: '补卡时间', dateFormat: 'HH:mm', sortable: 'custom', width: 100 },
+                    { prop: 'bu_ka_shi_jian_', label: '补卡时间', dateFormat: 'HH:mm:ss', sortable: 'custom', width: 100 },
                     { prop: 'bu_ka_ban_ci_', label: '补卡班次', width: 120 },
                     { prop: 'bu_ka_shi_you_', label: '补卡事由', minWidth: 300 },
                     { prop: 'fu_jian_', label: '说明附件', width: 0, hidden: true },
@@ -119,7 +119,7 @@ export default {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                this.pagination.totalCount = this.listData[0].total_count
+                this.pagination.totalCount = this.listData[0]?.total_count
             }).finally(() => {
                 this.loading = false
             })

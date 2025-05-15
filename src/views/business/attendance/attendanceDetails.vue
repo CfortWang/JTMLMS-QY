@@ -189,7 +189,7 @@ export default {
             const { first, second } = this.$store.getters.level || {}
             const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             searchParam['Q^di_dian_^S'] = second || first
-            searchParam['Q^ri_qi_^DG'] = this.$common.getDateNow()
+            searchParam['Q^ri_qi_^DGT'] = this.$common.getDateNow()
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
         getSearchSql () {

@@ -354,7 +354,7 @@ export default {
             this.result2 = []
             this.result3 = []
             const yearStr = `('${this.yearArr.join("', '")}')`
-            const sql = `select 年度 as niandu,评价结果 as jieguo, COALESCE(COUNT(*), 0) AS count FROM v_sjzpjgpj WHERE 年度 IN ${yearStr} GROUP BY CONCAT(年度, ' ',评价结果)`
+            const sql = `select 年度 as niandu,评价结果 as jieguo, COALESCE(COUNT(*), 0) AS count FROM v_sjzpjgpj WHERE 年度 IN ${yearStr} and 状态 = '已完成' GROUP BY CONCAT(年度, ' ',评价结果)`
             this.$common.request('sql', sql).then((res) => {
                 const data = res.variables.data
                 for (var item of this.yearArr) {

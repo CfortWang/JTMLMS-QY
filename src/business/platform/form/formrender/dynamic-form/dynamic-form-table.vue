@@ -786,9 +786,12 @@ export default {
                 // 后置事件
                 this.afterScript(this.actionCode, this.actionPosition)
                 if (this.$refs.elTable) {
+                    this.$refs.elTable.clearSelection()
                     this.$refs.elTable.doLayout()
                 }
-            }).catch(() => {})
+            }).catch((e) => {
+            	this.$refs.elTable?.clearSelection()
+            })
         },
         /**
          * 获取选择的记录

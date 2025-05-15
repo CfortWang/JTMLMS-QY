@@ -81,7 +81,7 @@ export default {
                     { prop: 'shen_he_shi_jian_', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
                     { prop: 'zhuang_tai_', label: '状态', width: 90 },
                     { prop: 'bu_ka_ri_qi_', label: '补卡日期', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 100 },
-                    { prop: 'bu_ka_shi_jian_', label: '补卡时间', dateFormat: 'HH:mm', sortable: 'custom', width: 100 },
+                    { prop: 'bu_ka_shi_jian_', label: '补卡时间', dateFormat: 'HH:mm:ss', sortable: 'custom', width: 100 },
                     { prop: 'bu_ka_ban_ci_', label: '补卡班次', width: 100 },
                     { prop: 'bu_ka_shi_you_', label: '补卡事由', minWidth: 300 }
                     // { prop: 'fu_jian_', label: '说明附件', width: 150 }
@@ -90,8 +90,8 @@ export default {
                     effect: 'default',
                     // effect: 'display',
                     actions: [
-                        { key: 'agree', label: '同意', type: 'success', icon: 'ibps-icon-check' },
-                        { key: 'disagree', label: '不同意', type: 'danger', icon: 'ibps-icon-close' },
+                        { key: 'agree', label: '同意', type: 'success', icon: 'ibps-icon-check', hidden: function (row) { return (row.zhuang_tai_ === '已通过') } },
+                        { key: 'disagree', label: '不同意', type: 'danger', icon: 'ibps-icon-close', hidden: function (row) { return (row.zhuang_tai_ === '已通过') } },
                         { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt' }
                     ]
                 }
@@ -256,13 +256,18 @@ export default {
             const self = this
             getAttendanceDetail({ id: submitData.kaoQinId }).then((res) => { // 获取考勤明细
                 const updateData = res.data
+                debugger
                 if (submitData.buKaBanCi.includes('上班')) { // 更新上班数据
                     updateData.zhuangTai1 = '正常'
-                    updateData.daKaShiJian1 = submitData.buKaShiJian
+                    updateData.daKaShiJian1 = submitData.buKaRiQi + submitData.buKaShiJian
                 } else { // 更新下班数据
                     updateData.zhuangTai2 = '正常'
-                    updateData.daKaShiJian2 = submitData.buKaShiJian
+                    updateData.daKaShiJian2 = submitData.buKaRiQi + submitData.buKaShiJian
                 }
+                if (updateData.zhuangTai1 === '正常' && updateData.zhuangTai2 === '正常') {
+                    updateData.kaoQinZhuangTa = '正常'
+                }
+                updateData.chiDaoShiChang = null
                 saveAttendanceDetail(updateData)
             })
         },

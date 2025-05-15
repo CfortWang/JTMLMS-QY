@@ -344,7 +344,7 @@ export default {
             this.requestPage.pageNo = 1
         },
         showAndHide (data) {
-            if (data.includes('平行试验') || data.includes('留样再测') || data.includes('对比方案')) {
+            if (data.includes('平行试验') || data.includes('留样再测') || data.includes('比对方案')) {
                 this.show = true
             } else {
                 this.show = false

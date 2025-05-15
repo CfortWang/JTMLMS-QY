@@ -111,7 +111,7 @@ export default {
                 return '未打卡'
             }
 
-            return data[status[type]] === '正常' ? `${data[time[type]]} 正常` : `${data[time[type]]} <span style="color: red;">${data[status[type]]}${data[duration[type]]}分钟</span>`
+            return data[status[type]] === '正常' ? `${data[time[type]]} 正常` : `${data[time[type]]} <span style="color: red;">${data[status[type]] === '异常' ? '迟到' : data[status[type]]}${data[duration[type]]}分钟</span>`
         },
         compareTime () { // 比较班次时间和当前时间，过去日期的才显示。
             const today = this.$common.getDateNow()

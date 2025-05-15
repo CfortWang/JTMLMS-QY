@@ -54,7 +54,7 @@
             <el-form-item label="补卡时间" prop="buKaShiJian" class="form-item-uniform">
                 <el-time-picker
                     v-model="formData.buKaShiJian"
-                    value-format="HH:mm"
+                    value-format="HH:mm:ss"
                     :placeholder="readonly? '' : '请选择时间'"
                     :disabled="readonly"
                 />
@@ -78,6 +78,7 @@
                     :download="true"
                     multiple
                     accept="*"
+                    :limit="attachmentLimit"
                     :placeholder="readonly? '' : '请上传附件'"
                     :disabled="readonly"
                     style="width:100%"
@@ -131,6 +132,7 @@ export default {
             buKaBanCiOptions: [],
             fileList: [],
             yichangdata: [],
+            attachmentLimit: 5,
             rules: {
                 buKaRiQi: [{ required: true, message: '请选择补卡日期', trigger: 'change' }],
                 buKaBanCi: [{ required: true, message: '请选择补卡班次', trigger: 'change' }],
@@ -199,7 +201,7 @@ export default {
         handleBuKaRiQiChange (buKaRiQi) {
             queryAttendanceDetail(this.getSearchFormData()).then(res => {
                 // ActionUtils.handleListData(this, res.data)
-                this.yichangdata = res.data.dataResult.filter(item => item.kaoQinZhuangTa === '异常')
+                this.yichangdata = res.data.dataResult.filter(item => item.kaoQinZhuangTa === '异常' || item.kaoQinZhuangTa === '')
                 if (this.yichangdata.length === 0) {
                     this.$message.warning('该日期没有异常班次！')
                     return
