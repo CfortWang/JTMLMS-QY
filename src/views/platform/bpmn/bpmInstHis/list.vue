@@ -718,6 +718,7 @@ export default {
                             this.$common.request('delete', deleteParams2)
                         })
                         this.$message.success('删除成功！')
+                        this.$refs['crud']?.clearSelection()
                         this.search()
                     })
                 }).catch(() => {
@@ -728,6 +729,8 @@ export default {
         handleNodeClick (typeId, typeName) {
             this.tableTitle = typeName.name
             this.typeId = typeId
+            // 切换分类清除选中数据
+            this.$refs['crud']?.clearSelection()
             this.templateData = this.reportAll.template.find(i => i.fen_lei_id_ === typeId) || {}
             if (!this.templateData.templateid_) {
                 this.templateShow = false
