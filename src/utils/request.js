@@ -97,7 +97,7 @@ service.interceptors.request.use(async config => {
     if (config.method.toUpperCase() === 'GET') {
         if (ENCRYPT_GET_PARAMS) {
             config.params = {
-                _p: Utils.isNotEmpty(config.params) ? encryptByAes(JSON.stringify(config.params)) : undefined,
+                _p: Utils.isNotEmpty(config.params) ? encryptByAes(JSON.stringify(config.params), 'get') : undefined,
                 _t: new Ids([32, 36, 1]).next()
             }
         } else {

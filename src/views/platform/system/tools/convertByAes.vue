@@ -55,6 +55,17 @@
                         />
                     </div>
                 </div>
+                <div class="item">
+                    <div class="label">ivBase64</div>
+                    <div class="value">
+                        <el-input
+                            v-model="ivBase64"
+                            type="textarea"
+                            :rows="1"
+                            placeholder="请输入ivBase64"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     </el-dialog>
@@ -72,6 +83,7 @@ export default {
         return {
             dialogVisible: this.visible,
             plaintext: '',
+            ivBase64: '',
             ciphertext: ''
         }
     },
@@ -102,7 +114,10 @@ export default {
             if (!this.ciphertext) {
                 return this.$message.warning('请输入密文！')
             }
-            const temp = this.$common.decryptByAes(this.ciphertext)
+            if (!this.ivBase64) {
+                return this.$message.warning('请输入ivBase64！')
+            }
+            const temp = this.$common.decryptByAes(this.ciphertext, this.ivBase64)
             if (this.$utils.isEmpty(temp)) {
                 return this.$message.error('密文无效，无法解密！')
             }

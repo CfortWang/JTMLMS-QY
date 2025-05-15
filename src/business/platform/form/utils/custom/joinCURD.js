@@ -45,7 +45,7 @@ const dealData = (args, type) => {
     const data = typeof args === 'object' ? replaceNullWithEmpty(args) : args
     const plaintext = SHOW_PLAINTEXT ? { plaintext: data } : {}
     const res = {
-        ciphertext: encryptByAes(data),
+        ...encryptByAes(data),
         ...plaintext
     }
     return JSON.stringify(res)
