@@ -606,6 +606,10 @@ export default {
             if (this.nameColumns && this.nameColumns.length > 0) {
                 this.nameColumns.forEach((column) => {
                     columnsRights[column.name] = 'e'
+                    // 层级组件和子表隐藏字段修改时不显示
+                    if (column.field_type === 'currentPosition' || column.field_options.hide_rights === true) {
+                        columnsRights[column.name] = 'h'
+                    }
                 })
             }
             // console.log(columnsRights)
