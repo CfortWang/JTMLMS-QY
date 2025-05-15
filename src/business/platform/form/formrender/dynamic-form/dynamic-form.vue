@@ -142,7 +142,7 @@ export default {
         permissions: {
             type: Object
         },
-        BpmnForm: {
+        bpmnForm: {
             type: Boolean,
             default: false
         },
@@ -268,6 +268,9 @@ export default {
             },
             deep: true,
             immediate: true
+        },
+        timeModification () {
+            this.initResponseFields()
         }
         // models: {
         //     handler (val) {
@@ -304,8 +307,8 @@ export default {
     },
     methods: {
         /**
-             * 初始化字段
-             */
+         * 初始化字段
+         */
         async initResponseFields () {
             let fields
             if (this.formDef && this.formDef.fields) fields = this.formDef.fields
@@ -319,8 +322,8 @@ export default {
             await this.initResponseOpinionData()
         },
         /**
-             * 生成modles
-             */
+         * 生成modles
+         */
         async generateModles (fields) {
             for (let i = 0; i < fields.length; i++) {
                 const field = fields[i]
@@ -406,8 +409,8 @@ export default {
             return data
         },
         /**
-             *  初始化表单扩展参数
-             */
+         *  初始化表单扩展参数
+         */
         initFormFieldParameter (field) {
             // ====== 初始化表单权限
             this.initFormRights(field)
@@ -420,10 +423,18 @@ export default {
             this.rights[field.name] = FormUtils.getDefaultApprovalOpinionRigths(field, this.params) || this.getPermissions(this.permissions, field) || FormUtils.getDefaultRigths(field)
         },
         /**
-             *  初始化表单权限
-             */
+         *  初始化表单权限
+         */
         initFormRights (field) {
-            this.rights[field.name] = this.getPermissions(this.permissions, field) || FormUtils.getDefaultRigths(field)
+            let fieldRights = this.getPermissions(this.permissions, field) || FormUtils.getDefaultRigths(field)
+            const fieldType = field.field_type
+            const isNonInputField = FormOptions.t.NON_INPUT_FIELD_TYPES.includes(fieldType)
+            const specialFields = ['table', 'approval_opinion', 'currentPosition']
+            // 体系运行记录盒修改数据时，主表中，普通字段权限都设置为可编辑
+            if (!isNonInputField && !specialFields.includes(fieldType)) {
+                fieldRights = this.timeModification && fieldRights !== 'h' ? FormOptions.t.PERMISSIONS.EDIT : fieldRights
+            }
+            this.rights[field.name] = fieldRights
         },
         // 获取权限
         getPermissions (permissions, field) {
@@ -446,8 +457,8 @@ export default {
                 isSpecial = true
                 rightsValue = permissions.tables[name] ? permissions.tables[name] : null
             } else {
-                // 字段
-                rightsValue = permissions.fields[name] ? permissions.fields[name] : null
+                // 其他字段
+                rightsValue = permissions.fields[name] || null
             }
             if (this.$route.path === '/xxgl/jssllb') {
                 return rightsValue
@@ -513,8 +524,8 @@ export default {
             }
         },
         /**
-             * 表单提交校验
-             */
+         * 表单提交校验
+         */
         formSubmitVerify (callback) {
             let flag = true
             const verifys = this.formAttrs ? this.formAttrs.verifys : []
@@ -535,8 +546,8 @@ export default {
             callback(flag)
         },
         /**
-             * 获取表单数据
-             */
+         * 获取表单数据
+         */
         getFormData () {
             const data = {}
             // 去除文本字段,表单意见字段
@@ -548,32 +559,32 @@ export default {
             return data
         },
         /**
-             * 设置表单字段数据
-             */
+         * 设置表单字段数据
+         */
         setFieldData (name, value) {
             this.models[name] = value
         },
         /**
-             * 设置表单权限
-             */
+         * 设置表单权限
+         */
         getFormRights (name) {
             return this.rights[name]
         },
         /**
-             * 设置表单权限
-             */
+         * 设置表单权限
+         */
         setFormRights (name, value) {
             this.rights[name] = value
         },
         /**
-             *  是否有审批意见字段
-             */
+         *  是否有审批意见字段
+         */
         hasFormOpinion () {
             return this.$utils.isNotEmpty(this.responseOpinionFields)
         },
         /**
-             * 获取审批意见数据
-             */
+         * 获取审批意见数据
+         */
         getFormOpinionData () {
             const data = {}
             for (var key in this.models) {
@@ -584,8 +595,8 @@ export default {
             return data
         },
         /**
-             * 获取审批意见验证
-             */
+         * 获取审批意见验证
+         */
         formOpinionValidate (callback, flag = false) {
             if (this.$utils.isEmpty(this.responseOpinionFields)) {
                 callback(true)
@@ -613,8 +624,8 @@ export default {
             }
         },
         /**
-             * 表单验证
-             */
+         * 表单验证
+         */
         validate (callback) {
             // 先移除校验再进行校验
             this.$refs.form.clearValidate()
@@ -632,8 +643,8 @@ export default {
             this.record = type
         }
         /**
-             * 获取表单字段的具体控件组件实例
-             */
+         * 获取表单字段的具体控件组件实例
+         */
         // getRefsField (fieldName) {
         //     const refs = this.getRefs(fieldName)
         //     if (this.$utils.isEmpty(refs) || this.$utils.isEmpty(refs[0]) || this.$utils.isEmpty(refs[0].$refs) || this.$utils.isEmpty(refs[0].$refs['formField'])) {

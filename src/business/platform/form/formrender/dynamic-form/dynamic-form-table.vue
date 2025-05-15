@@ -607,7 +607,7 @@ export default {
                 this.nameColumns.forEach((column) => {
                     columnsRights[column.name] = 'e'
                     // 层级组件和子表隐藏字段修改时不显示
-                    if (column.field_type === 'currentPosition' || column.field_options.hide_rights === true) {
+                    if (column.field_type === 'currentPosition' || column.field_options.hide_rights === true || !column.field_options.display) {
                         columnsRights[column.name] = 'h'
                     }
                 })
