@@ -543,7 +543,6 @@ export default {
     }
     /* 表单组件渲染时计算表单高度受转换元素影响（附件、人员、部门等） */
     .elTable .el-table__body-wrapper{
-        height: v-bind(tableHeight);
         overflow-y: auto;
     }
 </style>
