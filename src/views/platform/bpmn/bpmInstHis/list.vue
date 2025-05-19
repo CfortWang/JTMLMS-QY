@@ -180,6 +180,7 @@ import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import { specialType, specialBtn, specialParams, specialTable, specialField } from './corresponding/index'
 import TemplateList from './templateList'
+import { getSetting } from '@/utils/query'
 
 export default {
     components: {
@@ -267,6 +268,7 @@ export default {
                         { prop: 'tableName', label: '表单名称', itemWidth: 150, placeholder: '请输入', labelWidth: 70 },
                         { prop: 'desc', label: '事务说明', itemWidth: 150, placeholder: '请输入', labelWidth: 70 },
                         { prop: 'createBy', label: '编制人', itemWidth: 150, placeholder: '请输入', labelWidth: 60 },
+                        { prop: ['Q^compile_time^DL', 'Q^compile_time^DG'], label: '编制时间', fieldType: 'daterange', labelWidth: 70, itemWidth: 220 },
                         { prop: ['Q^end_time_^DL', 'Q^end_time_^DG'], label: '完成时间', fieldType: 'daterange', labelWidth: 70, itemWidth: 220 }
                     ]
                 },
@@ -275,7 +277,8 @@ export default {
                     { prop: 'deptName', label: '部门', width: 110 },
                     { prop: 'procDefName', label: '表单名称', formatter: this.replaceFormName, width: 220 },
                     { prop: 'desc', label: '事务说明', 'min-width': 280 },
-                    { prop: 'endTime', label: '完成时间', sortable: 'custom', width: 135 },
+                    { prop: 'compileTime', label: '编制时间', sortable: 'custom', width: 135, dateFormat: 'yyyy-MM-dd HH:mm' },
+                    { prop: 'endTime', label: '完成时间', sortable: 'custom', width: 135, dateFormat: 'yyyy-MM-dd HH:mm' },
                     { prop: 'createBy', label: '编制人', width: 100, slotName: 'creator' }
                 ],
                 rowHandle: {
@@ -306,9 +309,23 @@ export default {
 
         }
     },
-    created () {
+    async created () {
         this.loadData()
         this.getConfig()
+        const { reocrdsBoxShowStartDate: showCompileTime = false, reocrdsBoxShowEndDate: showEndTime = true } = await getSetting('system')
+        this.sorts = showCompileTime ? { COMPILE_TIME: 'DESC' } : { END_TIME_: 'DESC' }
+        this.listConfig.searchForm.forms = this.listConfig.searchForm.forms.filter(item => {
+            if (item.label === '编制时间' && !showCompileTime) return false
+            if (item.label === '完成时间' && !showEndTime) return false
+            return true
+        })
+
+        this.listConfig.columns = this.listConfig.columns.filter(column => {
+            if (column.prop === 'completeTime' && !showCompileTime) return false
+            if (column.prop === 'endTime' && !showEndTime) return false
+            return true
+        })
+
         const { role = [] } = this.$store.getters.userInfo || {}
         const roleList = ['xtgljs', 'xxglxzfzr', 'wjglzzc', 'syszr']
         // 系统管理角色、信息管理负责人、检验科主任添加删除按钮
