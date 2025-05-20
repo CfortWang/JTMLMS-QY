@@ -1054,7 +1054,7 @@ export default {
                         ...self.formData,
                         title,
                         config: temp.id,
-                        dateRange: [startDate, endDate],
+                        // dateRange: [startDate, endDate],
                         approver: temp.approver || [],
                         overview: overview,
                         scheduleType: type,
