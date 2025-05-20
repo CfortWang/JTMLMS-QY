@@ -165,20 +165,25 @@ export const getSetting = async (module = '', key = '') => {
         const org = store.getters.level.first || ''
         const sql = `select setting from t_ipcc where org_ = '${org}' limit 1`
         const { variables: { data = [] } = {}} = await request('sql', sql)
-        if (data.length > 0 && data[0]?.setting) {
-            const setting = data[0].setting?.replace(/\n/g, '')
-            const res = JSON.parse(setting)
-            // 根据module和key的存在情况返回不同的结果
-            if (module !== '') {
-                if (key !== '') {
-                    return res?.[module]?.[key]
-                }
-                return res?.[module]
-            }
-            return res
+
+        // 如果数据为空或 setting 字段不存在，直接返回空对象
+        if (data.length === 0 || !data[0]?.setting) {
+            return {}
         }
-        return null
+
+        // 解析 JSON 并处理可能的格式错误
+        const setting = data[0].setting?.replace(/\n/g, '')
+        const res = JSON.parse(setting) || {}
+
+        // 根据 module 和 key 返回对应的值
+        if (module) {
+            const moduleSettings = res[module] || {}
+            return key ? moduleSettings[key] : moduleSettings
+        }
+
+        return res || {}
     } catch (error) {
+        console.error('获取配置失败:', error)
         return Message.warning('数据库字段配置错误！')
     }
 }

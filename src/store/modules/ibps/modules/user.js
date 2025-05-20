@@ -102,7 +102,7 @@ export default {
                         })
                         // 尝试从配置数据中获取 否则使用默认
                         const highRoles = await getSetting('system', 'highRoles')
-                        highRoles && (info.highRoles = highRoles)
+                        Utils.isNotEmpty(highRoles) && (info.highRoles = highRoles)
                         const { role = [] } = info || {}
                         const hasHighRole = role.some(item => info.highRoles.includes(item.alias))
                         // 用于文件预览页判定是否开启下载权限
