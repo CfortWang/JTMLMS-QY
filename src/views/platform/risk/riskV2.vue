@@ -432,8 +432,7 @@ export default {
 
     async mounted () {
         const culWays = await getSetting('risk', 'culWays')
-        if (culWays) {
-            console.debug(culWays)
+        if (this.$utils.isNotEmpty(culWays)) {
             this.culWays = culWays
         }
         this.init()

@@ -684,8 +684,7 @@ export default {
     },
     async mounted () {
         const { stateList, hideSysDeviceNo, tabList, hasDeviceRole, typeList } = await getSetting('device') || {}
-        const { tagName } = await getSetting('deviceTag') || ''
-        const { tagData } = await getSetting('deviceTag') || {}
+        const { tagData, tagName } = await getSetting('deviceTag') || {}
         if (tagName) {
             console.debug('tagName', tagName)
             this.tagName = tagName

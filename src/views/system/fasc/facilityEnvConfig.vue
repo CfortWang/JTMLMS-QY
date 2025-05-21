@@ -222,8 +222,6 @@
 <script>
 import { getSetting } from '@/utils/query'
 import ibpsUserSelector from '@/business/platform/org/selector'
-import xlsx from 'xlsx'
-import fs from 'file-saver'
 import FecDialog from './fecDialog.vue'
 import FacilityData from '@/views/component/facility/facilityData.vue'
 import DefaultSettingDialog from './defaultSettingDialog.vue'
@@ -504,8 +502,7 @@ export default {
     },
     async mounted () {
         const config = await getSetting('facilityEnv', 'typeList')
-        if (config) {
-            console.debug(config)
+        if (this.$utils.isNotEmpty(config)) {
             this.config = config
         }
         this.init()
