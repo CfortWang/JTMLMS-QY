@@ -18,6 +18,7 @@
                     <div class="value">
                         <el-input
                             v-model="result"
+                            v-loading="loading"
                             type="textarea"
                             :autosize="{ minRows: 10, maxRows: 24}"
                             placeholder=""
@@ -52,22 +53,41 @@ export default {
         return {
             title: 'JSON解析结果',
             dialogVisible: true,
+            loading: false,
             result: '',
             toolbars: [
-                { key: 'copy', icon: 'ibps-icon-copy', label: '复制', type: 'primary', hidden: () => !this.result },
+                { key: 'copy', icon: 'ibps-icon-copy', label: '复制', type: 'primary', hidden: () => !this.result || this.loading },
                 { key: 'cancel', icon: 'el-icon-close', label: '关闭', type: 'danger' }
             ]
         }
     },
-    computed: {
-
-    },
-    async mounted () {
-        const { logId } = this.params
-        const { data: { sql = '' } = {}} = await dataToSql({ logId })
-        this.result = sql
+    watch: {
+        visible: {
+            handler (newVal) {
+                console.log(newVal)
+                this.dialogVisible = newVal
+                if (newVal) {
+                    this.loadData()
+                }
+            },
+            immediate: true
+        }
     },
     methods: {
+        async loadData () {
+            try {
+                this.loading = true
+                const { logId } = this.params
+                const response = await dataToSql({ logId })
+                this.result = response?.data?.sql || ''
+            } catch (error) {
+                console.error('数据解析失败:', error)
+                this.$message.error('数据解析失败')
+                this.result = '数据解析失败，请重试'
+            } finally {
+                this.loading = false
+            }
+        },
         handleActionEvent ({ key }) {
             switch (key) {
                 case 'copy':
@@ -105,7 +125,6 @@ export default {
             }
         },
         closeDialog () {
-            // this.$emit('close', false)
             this.dialogVisible = false
         }
     }
