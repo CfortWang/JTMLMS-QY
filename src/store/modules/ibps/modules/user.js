@@ -92,6 +92,10 @@ export default {
                                 root: true
                             })
                         }
+                        // 获取所有配置信息
+                        await dispatch('ibps/param/setSetting', await getSetting(), {
+                            root: true
+                        })
                         // 获取所有用户信息
                         await dispatch('getUserList', level)
                         // 获取所有部门信息

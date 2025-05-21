@@ -41,5 +41,7 @@ export default {
     // 获取用户最高层级
     level: state => state.ibps.param && state.ibps.param.level ? state.ibps.param.level : [],
     // 获取认证信息
-    licence: state => state.ibps.licence ? state.ibps.licence.licJson : {}
+    licence: state => state.ibps.licence ? state.ibps.licence.licJson : {},
+    // 获取配置信息
+    setting: state => state.ibps.param && state.ibps.param.setting ? state.ibps.param.setting : {}
 }

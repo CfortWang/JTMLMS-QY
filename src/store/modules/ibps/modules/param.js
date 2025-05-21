@@ -11,7 +11,9 @@ export default {
         level: {
             first: '',
             second: ''
-        }
+        },
+        // 配置信息
+        setting: {}
     },
     mutations: {
         myformSet (state, myform) {
@@ -25,6 +27,9 @@ export default {
         },
         level (state, data) {
             state.level = data || { first: '', second: '' }
+        },
+        setting (state, data) {
+            state.setting = data || {}
         }
     },
     actions: {
@@ -33,6 +38,9 @@ export default {
         },
         setDeptList ({ commit }, data) {
             commit('deptList', data)
+        },
+        setSetting ({ commit }, data) {
+            commit('setting', data)
         },
         setLevel ({ commit }, data) {
             console.log(data)
