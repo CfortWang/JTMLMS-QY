@@ -948,18 +948,39 @@ export default {
                     : `ee.positions_ = '没有选择部门'`
             //         const sql = `select a.id_,a.parent_id_,ee.name_,a.zui_gao_xue_li_x_,a.zhi_cheng_deng_ji,ee.jian_ding_zi_ge_z,a.ren_zhi_shi_jian_,
             //   a.ru_zhi_shi_jian_ from  t_ryjbqk as a join  ibps_party_employee as ee on a.parent_id_= ee.id_ where a.id_ !='861622496187645952' and ee.positions_ like '%${first}%'`
+            // const sql = `select
+            //                 a.id_,
+            //                 a.parent_id_,
+            //                 ee.name_,
+            //                 a.zui_gao_xue_li_x_,
+            //                 a.zhi_cheng_deng_ji,
+            //                 ee.jian_ding_zi_ge_z,
+            //                 a.ren_zhi_shi_jian_,
+            //                 a.ru_zhi_shi_jian_
+            //             FROM
+            //                 t_ryjbqk AS a
+            //                 JOIN (
+            //                 SELECT
+            //                     e.*
+            //                 FROM
+            //                     ibps_party_employee e
+            //                     JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, e.POSITIONS_ ) > 0
+            //                 WHERE
+            //                     en.PATH_ LIKE '%${this.depth3}%'
+            //                 GROUP BY
+            //                     e.id_
+            //                 ) AS ee ON a.parent_id_ = ee.id_
+            //             WHERE
+            //                 a.id_ != '861622496187645952'
+            //                 AND ee.name_ NOT LIKE '%系统%'
+            //                 AND ee.name_ NOT LIKE '%金通%'
+            //                 AND ee.name_ NOT LIKE '%管理%'
+            //                 AND ee.id_ != '702117247933480960' `
             const sql = `select
-                            a.id_,
-                            a.parent_id_,
                             ee.name_,
-                            a.zui_gao_xue_li_x_,
-                            a.zhi_cheng_deng_ji,
-                            ee.jian_ding_zi_ge_z,
-                            a.ren_zhi_shi_jian_,
-                            a.ru_zhi_shi_jian_ 
+                            ee.jian_ding_zi_ge_z
                         FROM
-                            t_ryjbqk AS a
-                            JOIN (
+                        (
                             SELECT
                                 e.* 
                             FROM
@@ -969,13 +990,13 @@ export default {
                                 en.PATH_ LIKE '%${this.depth3}%' 
                             GROUP BY
                                 e.id_ 
-                            ) AS ee ON a.parent_id_ = ee.id_ 
+                            ) ee
                         WHERE
-                            a.id_ != '861622496187645952' 
-                            AND ee.name_ NOT LIKE '%系统%' 
+                        ee.name_ NOT LIKE '%系统%' 
+                            AND ee.STATUS_ = 'actived'
                             AND ee.name_ NOT LIKE '%金通%' 
                             AND ee.name_ NOT LIKE '%管理%' 
-                            AND ee.id_ != '702117247933480960' `
+                            AND ee.id_ != '702117247933480960'`
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data
             })
@@ -989,8 +1010,8 @@ export default {
                 personIdsArr.push(it.parent_id_)
                 this.optionPerson.yAxis.data.push(it.name_)
             }
-            this.personIds = personIdsArr.join(',')
-            this.getTtaskMattersData()
+            // this.personIds = personIdsArr.join(',')
+            // this.getTtaskMattersData()
         },
         // 饼图 环形图数据
         async degreeGradeInfoData () {

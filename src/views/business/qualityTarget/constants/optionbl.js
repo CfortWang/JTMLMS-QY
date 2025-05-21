@@ -119,7 +119,7 @@ export const monthChartOptionbl = {
         symbol: 'circle',
         name: '合格率',
         data: [],
-        symbolSize: 8,
+        symbolSize: 5,
         itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 { offset: 0, color: '#83bff6' },
@@ -138,12 +138,14 @@ export const monthChartOptionbl = {
         },
         label: {
             show: true,
-            position: 'top',
+            position: [4, -8],
             textStyle: {
                 color: '#fff',
-                fontSize: 14
+                fontSize: 10
             },
             formatter (params) {
+                console.log(params)
+
                 return params.value ? params.value : ''
             }
         }
@@ -152,7 +154,7 @@ export const monthChartOptionbl = {
         type: 'line',
         symbol: 'circle',
         name: '合格率',
-        symbolSize: 8,
+        symbolSize: 5,
         data: [],
         itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -180,10 +182,10 @@ export const monthChartOptionbl = {
         },
         label: {
             show: true,
-            position: 'bottom',
+            position: [-10, 8],
             textStyle: {
                 color: '#ff4949',
-                fontSize: 14
+                fontSize: 10
             },
             formatter (params) {
                 return params.value ? params.value : ''
@@ -213,7 +215,7 @@ export const quarterChartOptionbl = {
         symbol: 'circle',
         name: '',
         data: [],
-        symbolSize: 8,
+        symbolSize: 5,
 
         itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -249,7 +251,7 @@ export const quarterChartOptionbl = {
         symbol: 'circle',
         name: '',
         data: [],
-        symbolSize: 8,
+        symbolSize: 5,
 
         itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [

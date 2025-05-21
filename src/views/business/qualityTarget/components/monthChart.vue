@@ -79,7 +79,7 @@ export default {
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
             setTimeout(() => {
                 this.info.forEach((item, index) => {
-                    console.log(item)
+                    // console.log(item)
                     if (this.name !== '病理') {
                         const chart = echarts.init(document.getElementById(`card${index}`))
                         const option = JSON.parse(JSON.stringify(monthChartOption))
@@ -124,8 +124,8 @@ export default {
                         option.legend.data = [item.title, '达标标准率']
 
                         chart.setOption(option)
-                        console.log(option)
-                        chart.setOption(option)
+                        // console.log(option)
+                        // chart.setOption(option)
                     }
                 })
             }, 100)

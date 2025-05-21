@@ -174,7 +174,7 @@
                                 multiple
                                 filterable
                                 clearable
-                                multiple-limit="3"
+                                :multiple-limit=3
                                 :placeholder=" readonly ? '' : '请选择调班班次'"
                                 @change="vaildBanci($event, scope.row, 'before')"
                             >
@@ -265,7 +265,7 @@
                                 multiple
                                 clearable
                                 filterable
-                                multiple-limit="3"
+                                :multiple-limit=3
                                 :placeholder=" readonly ? '' : '请选择目标班次'"
                                 @change="vaildBanci($event, scope.row, 'after')"
                             >
@@ -580,7 +580,10 @@ export default {
                     return true
                 } else if (duplicateElements.length === 0 && type === 'after') {
                     const targetData1 = this.afterDateList.filter(obj => obj.value === row.beforeDate) // 目标人在调班日期的班次
-                    const targetBanCiNum1 = targetData1[0].banci.split(',').length // 目标人在调班日期的班次数量
+                    let targetBanCiNum1 = 0 // 目标人在调班日期的班次数量
+                    if (targetData1.length > 0) {
+                        targetBanCiNum1 = targetData1[0].banci.split(',').length// 目标人在调班日期的班次数量
+                    }
                     // 判断班次不能大于3个
                     if ((targetBanCiNum1 + row.beforeAdjust.length - row.afterAdjust.length) > 3) {
                         const name = this.userList.filter(obj => obj.userId === row.party)[0].userName
@@ -589,7 +592,10 @@ export default {
                         return true
                     }
                     const targetData2 = this.beforeDateList.filter(obj => obj.value === row.afterDate) // 调班人在目标日期的班次
-                    const targetBanCiNum2 = targetData2[0].banci.split(',').length // 调班人在目标日期的班次数量
+                    let targetBanCiNum2 = 0
+                    if (targetData2.length > 0) {
+                        targetBanCiNum2 = targetData2[0].banci.split(',').length // 调班人在目标日期的班次数量
+                    }
                     // 判断班次不能大于3个
                     if ((targetBanCiNum2 + row.afterAdjust.length - row.beforeAdjust.length) > 3) {
                         const name = this.userList.filter(obj => obj.userId === this.$store.getters.userId)[0].userName
@@ -603,7 +609,7 @@ export default {
                 const partyElements = []// 目标人员重复班次数组
                 const partyBeforeData = this.afterDateList.find(obj => obj.value === row.beforeDate)
                 row.beforeAdjust.some(element => {
-                    if (partyBeforeData.banci.includes(element)) {
+                    if (partyBeforeData && partyBeforeData.banci.includes(element)) {
                         partyElements.push(element)
                     }
                     return false
@@ -619,7 +625,10 @@ export default {
                     return true
                 } else if (duplicateElements.length === 0 && type === 'before') {
                     const targetData1 = this.afterDateList.filter(obj => obj.value === row.beforeDate) // 目标人在调班日期的班次
-                    const targetBanCiNum1 = targetData1[0].banci.split(',').length // 目标人在调班日期的班次数量
+                    let targetBanCiNum1 = 0 // 目标人在调班日期的班次数量
+                    if (targetData1.length > 0) {
+                        targetBanCiNum1 = targetData1[0].banci.split(',').length// 目标人在调班日期的班次数量
+                    }
                     // 判断班次不能大于3个
                     if ((targetBanCiNum1 + row.beforeAdjust.length - row.afterAdjust.length) > 3) {
                         const name = this.userList.filter(obj => obj.userId === row.party)[0].userName
@@ -628,7 +637,10 @@ export default {
                         return true
                     }
                     const targetData2 = this.beforeDateList.filter(obj => obj.value === row.afterDate) // 调班人在目标日期的班次
-                    const targetBanCiNum2 = targetData2[0].banci.split(',').length // 调班人在目标日期的班次数量
+                    let targetBanCiNum2 = 0
+                    if (targetData2.length > 0) {
+                        targetBanCiNum2 = targetData2[0].banci.split(',').length // 调班人在目标日期的班次数量
+                    }
                     // 判断班次不能大于3个
                     if ((targetBanCiNum2 + row.afterAdjust.length - row.beforeAdjust.length) > 3) {
                         const name = this.userList.filter(obj => obj.userId === this.$store.getters.userId)[0].userName
@@ -666,6 +678,9 @@ export default {
             }
         },
         initDateOptions (startDateStr, obj) { // 初始化日期下拉数据
+            if (!obj) {
+                return
+            }
             const result = []
             const startDate = new Date(startDateStr)
             // 筛选出以'd'开头且后面跟数字的键组成数组
@@ -869,6 +884,9 @@ export default {
             this.formData.adjustList[index][type] = temp
         },
         handlePartyChange (val, row, index, type) {
+            if (!val) {
+                return
+            }
             this.targetShift = this.scheduleInfo.shiftList.find(i => i.userId === val) // 获取目标人班次
             this.afterDateList = this.initDateOptions(this.scheduleInfo.startDate, this.targetShift) // 转换目标人能选择的日期
             this.formData.adjustList[index]['afterDate'] = '' // 更换目标人时刷新目标日期

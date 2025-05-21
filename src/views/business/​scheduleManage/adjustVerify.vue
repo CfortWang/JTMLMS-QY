@@ -221,7 +221,7 @@ export default {
             }
             const { first, second } = this.$store.getters.level || {}
             parameters[0].parameters.push({ 'key': 'Q^di_dian_^S', 'value': (second || first) })
-            parameters[0].parameters.push({ 'key': 'Q^reason_^NE', 'value': '排班修改' })
+            parameters[0].parameters.push({ 'key': 'Q^reason_^NE', 'value': '排班修改', 'param': 'reason1' })
             const param = {
                 parameters: parameters,
                 ...ActionUtils.formatParams(null, this.pagination, this.sorts)

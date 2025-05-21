@@ -141,23 +141,51 @@ export default {
          * 获取格式化参数
          */
         getSearchFormData () {
-            const paramjson = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            const parameters = [{
+                relation: 'AND',
+                parameters: [
+                    {
+                        'key': 'Q^reason_^NE',
+                        'value': '排班修改',
+                        'param': 'status1'
+                    }
+                ]
+            }]
+            // 加入搜索栏参数
+            const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+            if (Object.keys(searchParam).length) { // 查询条件不为空，则加入parameters
+                const reasonArr = Object.keys(searchParam).filter(key => key.includes('reason'))
+                const notreasonArr = Object.keys(searchParam).filter(key => key.includes('reason') === false)
+                if (reasonArr.length > 0) { // 加入状态查询
+                    parameters[0].parameters.push({
+                        'key': reasonArr[0],
+                        'value': searchParam[reasonArr[0]],
+                        'param': 'reason2'
+                    })
+                }
+                if (notreasonArr.length > 0) { // 加入其他查询
+                    notreasonArr.forEach((el) => {
+                        parameters[0].parameters.push({
+                            'key': el,
+                            'value': searchParam[el]
+                        })
+                    })
+                }
+            }
+            const { first, second } = this.$store.getters.level || {}
+            parameters[0].parameters.push({ 'key': 'Q^di_dian_^S', 'value': (second || first) })
             if (this.isRoleFilter()) { // 超级管理员和高权限角色不做申请人过滤
             } else {
                 const { userId } = this.$store.getters || ''
                 if (userId) {
-                    paramjson['Q^create_By_^S'] = userId
+                    parameters[0].parameters.push({ 'key': 'Q^create_By_^S', 'value': userId })
                 }
             }
-            const { first, second } = this.$store.getters.level || {}
-            paramjson['Q^di_dian_^S'] = (second || first)
-            paramjson['Q^reason_^NE'] = '排班修改'
-            return ActionUtils.formatParams(
-                // this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {},
-                paramjson,
-                this.pagination,
-                this.sorts
-            )
+            const param = {
+                parameters: parameters,
+                ...ActionUtils.formatParams(null, this.pagination, this.sorts)
+            }
+            return param
         },
         /**
          * 处理审核人数据

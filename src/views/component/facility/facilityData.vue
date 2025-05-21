@@ -91,6 +91,7 @@
     </div>
 </template>
 <script>
+import { getSetting } from '@/utils/query'
 import NumberRange from '@/views/component/xcomponent/numberRange.vue'
 import FacilityDataDialog from './facilityDataDialog.vue'
 export default {
@@ -117,7 +118,8 @@ export default {
             dialogShow: false,
             isFirst: true,
             forms: [],
-            multipleSelection: []
+            multipleSelection: [],
+            precision: 1
         }
     },
     computed: {
@@ -150,8 +152,10 @@ export default {
             deep: true
         }
     },
-    mounted () {
+    async mounted () {
         // console.log('mounted', this.formData)
+        const { precision = 1 } = await getSetting('facilityEnv')
+        this.precision = precision
     },
     methods: {
         // 弹窗的提交事件
@@ -302,9 +306,9 @@ export default {
             this.forms.forEach(item => {
                 if (item.value) {
                     if (item.fixValue) {
-                        item.result = (+item.fixValue + +item.value).toFixed(2)
+                        item.result = (+item.fixValue + +item.value).toFixed(this.precision)
                     } else {
-                        item.result = (+item.value).toFixed(2)
+                        item.result = (+item.value).toFixed(this.precision)
                     }
                     item.status = this.getStatus(item.range, item.result)
                 } else {
