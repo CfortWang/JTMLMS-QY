@@ -42,7 +42,7 @@
                         size="small"
                         icon="ibps-icon-copy"
                         @click="handleCopy"
-                    >复制明文SQL</el-button>
+                    >复制明文</el-button>
                 </div>
                 <div class="item">
                     <div class="label">密文</div>
@@ -55,7 +55,7 @@
                         />
                     </div>
                 </div>
-                <div class="item">
+                <!-- <div class="item">
                     <div class="label">ivBase64</div>
                     <div class="value">
                         <el-input
@@ -65,7 +65,7 @@
                             placeholder="请输入ivBase64"
                         />
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </el-dialog>
@@ -111,41 +111,41 @@ export default {
             this.ciphertext = this.$common.encryptByAes(this.plaintext)
         },
         handleDecrypt () {
-            if (!this.ciphertext) {
-                return this.$message.warning('请输入密文！')
+            if (!this.ciphertext || typeof this.ciphertext !== 'string') {
+                return this.$message.warning('无效的密文输入！')
             }
-            if (!this.ivBase64) {
-                return this.$message.warning('请输入ivBase64！')
-            }
-            const temp = this.$common.decryptByAes(this.ciphertext, this.ivBase64)
+            // if (!this.ivBase64) {
+            //     return this.$message.warning('请输入ivBase64！')
+            // }
+            const temp = this.$common.decryptByAes(this.ciphertext)
             if (this.$utils.isEmpty(temp)) {
                 return this.$message.error('密文无效，无法解密！')
             }
             this.plaintext = temp
         },
         handleCopy () {
-            if (!this.plaintext) {
-                return this.$message.warning('明文为空！')
+            const text = this.plaintext
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    this.$message.success('明文已复制到剪贴板！')
+                }).catch(() => this.fallbackCopy(text))
+            } else {
+                this.fallbackCopy(text)
             }
+        },
+        fallbackCopy (text) {
+            const textarea = document.createElement('textarea')
+            textarea.value = text
+            textarea.style.position = 'fixed'
+            document.body.appendChild(textarea)
+            textarea.select()
             try {
-                const temp = JSON.parse(this.plaintext)
-                const hasSql = temp.hasOwnProperty('sql')
-                // 明文是 JSON 格式
-                navigator.clipboard.writeText(temp.sql || this.plaintext).then(() => {
-                    const msg = hasSql ? '明文SQL已复制到剪贴板！' : '明文中不含SQL，已复制所有内容到剪贴板！'
-                    this.$message.success(msg)
-                }).catch(error => {
-                    this.$message.error('复制失败！')
-                    console.log(error)
-                })
-            } catch (e) {
-                // 明文不是 JSON 格式
-                navigator.clipboard.writeText(this.plaintext).then(() => {
-                    this.$message.success('明文内容已复制到剪贴板！')
-                }).catch(error => {
-                    this.$message.error('复制失败！')
-                    console.log(error)
-                })
+                document.execCommand('copy')
+                this.$message.success('明文已复制到剪贴板！')
+            } catch (err) {
+                this.$message.warning('复制失败，请手动选择内容复制！')
+            } finally {
+                document.body.removeChild(textarea)
             }
         },
         closeDialog () {
