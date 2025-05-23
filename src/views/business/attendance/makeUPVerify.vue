@@ -256,13 +256,12 @@ export default {
             const self = this
             getAttendanceDetail({ id: submitData.kaoQinId }).then((res) => { // 获取考勤明细
                 const updateData = res.data
-                debugger
                 if (submitData.buKaBanCi.includes('上班')) { // 更新上班数据
                     updateData.zhuangTai1 = '正常'
-                    updateData.daKaShiJian1 = submitData.buKaRiQi + submitData.buKaShiJian
+                    updateData.daKaShiJian1 = submitData.buKaRiQi + ' ' + submitData.buKaShiJian
                 } else { // 更新下班数据
                     updateData.zhuangTai2 = '正常'
-                    updateData.daKaShiJian2 = submitData.buKaRiQi + submitData.buKaShiJian
+                    updateData.daKaShiJian2 = submitData.buKaRiQi + ' ' + submitData.buKaShiJian
                 }
                 if (updateData.zhuangTai1 === '正常' && updateData.zhuangTai2 === '正常') {
                     updateData.kaoQinZhuangTa = '正常'

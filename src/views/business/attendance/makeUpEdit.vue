@@ -10,6 +10,7 @@
         top="5vh"
         width="600px"
         :title="title"
+        @opened="handleOpened"
         @close="closeDialog"
     >
         <el-form
@@ -41,6 +42,7 @@
                     :placeholder="readonly? '' : '请选择班次'"
                     :disabled="readonly"
                     @focus="loadBuKaBanCiOptions"
+                    @change="handleBanCiChange"
                 >
                     <el-option
                         v-for="buKaBanCi in buKaBanCiOptions"
@@ -182,6 +184,12 @@ export default {
                 }
             }
         },
+        handleOpened () {
+            this.init()
+            if (this.params.bu_ka_ri_qi_) {
+                this.handleBuKaRiQiChange(this.params.bu_ka_ri_qi_)
+            }
+        },
         /**
          * 异常考勤查询参数
          */
@@ -199,27 +207,38 @@ export default {
         },
         // 查询补卡日期下的异常数据
         handleBuKaRiQiChange (buKaRiQi) {
-            queryAttendanceDetail(this.getSearchFormData()).then(res => {
+            const self = this
+            queryAttendanceDetail(this.getSearchFormData()).then(async (res) => {
                 // ActionUtils.handleListData(this, res.data)
-                this.yichangdata = res.data.dataResult.filter(item => item.kaoQinZhuangTa === '异常' || item.kaoQinZhuangTa === '')
-                if (this.yichangdata.length === 0) {
-                    this.$message.warning('该日期没有异常班次！')
+                self.yichangdata = res.data.dataResult.filter(item => item.kaoQinZhuangTa === '异常' || item.kaoQinZhuangTa === '')
+                if (self.yichangdata.length === 0) {
+                    self.$message.warning('该日期没有异常班次！')
                     return
-                } else {
-                    const buKaBanCiArr = []
-                    this.yichangdata.forEach(element => {
-                        if (element.zhuangTai1 !== '正常') { // 上班异常
-                            buKaBanCiArr.push({ label: element.banCiBieMing + '-' + '上班', value: element.banCiBieMing + '-' + '上班', id: element.id })
-                        }
-                        if (element.zhuangTai2 !== '正常') {
-                            buKaBanCiArr.push({ label: element.banCiBieMing + '-' + '下班', value: element.banCiBieMing + '-' + '下班', id: element.id })
-                        }
-                    })
-                    this.buKaBanCiOptions = buKaBanCiArr
-                    if (this.buKaBanCiOptions.length === 1) { // 只有一个异常班次时自动带出
-                        this.formData.buKaBanCi = this.buKaBanCiOptions[0].value
-                        this.formData.buKaShiJian = this.buKaBanCiOptions[0].value.includes('上班') ? (this.yichangdata[0].banCiKaiShi.split(' ')[1]) : (this.yichangdata[0].banCiJieShu.split(' ')[1])
+                }
+                let buKaBanCiArr = []
+                self.yichangdata.forEach(element => {
+                    if (element.zhuangTai1 !== '正常') { // 上班异常
+                        buKaBanCiArr.push({ label: element.banCiBieMing + '-' + '上班', value: element.banCiBieMing + '-' + '上班', id: element.id })
                     }
+                    if (element.zhuangTai2 !== '正常') {
+                        buKaBanCiArr.push({ label: element.banCiBieMing + '-' + '下班', value: element.banCiBieMing + '-' + '下班', id: element.id })
+                    }
+                })
+                const { first, second } = self.$store.getters.level || {}
+                const sql = `select * from t_attendance_reissue where bu_ka_ri_qi_ = '${buKaRiQi}' and zhuang_tai_ = '待审核' and bian_zhi_ren_ = '${self.$store.getters.userId}' and di_dian_ = '${(second || first)}'`
+                const response = await self.$common.request('sql', sql)
+                // 过滤掉正在申请状态的班次
+                buKaBanCiArr = response.variables.data.filter(item => {
+                    return !buKaBanCiArr.some(banCi => banCi.value === item.bu_ka_ban_ci_)
+                })
+                if (buKaBanCiArr.length === 0) {
+                    self.$message.warning('该日期异常班次已申请！')
+                    return
+                }
+                self.buKaBanCiOptions = buKaBanCiArr
+                if (self.buKaBanCiOptions.length === 1) { // 只有一个异常班次时自动带出
+                    self.formData.buKaBanCi = self.buKaBanCiOptions[0].value
+                    self.formData.buKaShiJian = self.buKaBanCiOptions[0].value.includes('上班') ? (self.yichangdata[0].banCiKaiShi.split(' ')[1]) + ':00' : (self.yichangdata[0].banCiJieShu.split(' ')[1]) + ':00'
                 }
             }).catch(() => {
             })
@@ -228,6 +247,16 @@ export default {
             if (!this.formData.buKaRiQi) {
                 this.$message.warning('请先选择补卡日期')
                 return
+            }
+        },
+        handleBanCiChange (banci) {
+            const bieming = banci.split('-')[0]
+            const type = banci.split('-')[1]
+            const obj = this.yichangdata.filter(item => item.banCiBieMing === bieming)[0]
+            if (type === '上班') {
+                this.formData.buKaShiJian = obj.banCiKaiShi
+            } else {
+                this.formData.buKaShiJian = obj.banCiJieShu
             }
         },
         handleFormAction ({ key }) {

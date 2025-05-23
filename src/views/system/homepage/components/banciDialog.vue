@@ -53,10 +53,10 @@
                     <div class="dakaBox">
                         <div>
                             <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance, 1)" />
-                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常' && compareTime() " class="clock-btn" @click="bukaFun"> 补卡 </button>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常' && compareTime() " class="clock-btn" @click="bukaFun('in')"> 补卡 </button>
                         </div>
                         <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance, 2)" />
-                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常' && compareTime() " class="clock-btn" @click="bukaFun"> 补卡 </button>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常' && compareTime() " class="clock-btn" @click="bukaFun('out')"> 补卡 </button>
                         </div>
                     </div>
                 </div>
@@ -124,8 +124,43 @@ export default {
         closeDialog () {
             this.$emit('closeBanciDialog', 'banci')
         },
-        bukaFun () {
-            this.$emit('open', 'buka')
+        bukaFun (type) {
+            const attendanceInfo = this.banciInfo?.attendance || {}
+            let params = {}
+            if (attendanceInfo) {
+                const str = type === 'in' ? '上班' : '下班'
+                const buKaShiJian = type === 'in' ? attendanceInfo.ban_ci_kai_shi_.split(' ')[1] + ':00' : attendanceInfo.ban_ci_jie_shu_.split(' ')[1] + ':00'
+                params = {
+                    // "id_": "1375164563657326592",
+                    // "tenant_id_": "-999",
+                    // "ip_": "192.168.2.49",
+                    // "create_by_": "1169304256906264576",
+                    // "create_time_": 1747906381000,
+                    // "update_by_": "",
+                    // "di_dian_": "1166372664529387520",
+                    // "kuai_zhao_": "",
+                    // "bian_zhi_ren_": "1169304256906264576",
+                    // "bian_zhi_shi_jian": "2025-05-22 17:33:00",
+                    'bu_ka_ri_qi_': attendanceInfo.ri_qi_,
+                    'bu_ka_ban_ci_': attendanceInfo.ban_ci_bie_ming_ + '-' + str,
+                    // 'ban_ci_zhuang_tai': "",
+                    'bu_ka_shi_jian_': buKaShiJian,
+                    'pai_ban_id_': attendanceInfo.pai_ban_id_,
+                    'pai_ban_ji_lu_id_': attendanceInfo.pai_ban_ji_lu_id_
+                    //'bu_ka_shi_you_': "",
+                    //'fu_jian_': '',
+                    //"zhuang_tai_": "待审核",
+                    //"shen_he_ren_": "1116011959821533184",
+                    //"shen_he_shi_jian_": "",
+                    //"type_": "",
+                    //"kao_qin_id_": "1374051414149431297",
+                    //"shen_he_yi_jian_": "",
+                    //"total_count": 11,
+                    //"userName": "",
+                    //"deptName": ""
+                }
+            }
+            this.$emit('open', 'buka', params)
         }
     }
 }

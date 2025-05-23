@@ -32,8 +32,8 @@
             </template>
             <!-- 自定义多级表头 -->
             <template #prepend-column>
-                <el-table-column key="ri_qi_" prop="ri_qi_" label="日期" width="100" />
-                <el-table-column key="user_name_" prop="user_name_" label="姓名" width="80">
+                <el-table-column key="ri_qi_" prop="ri_qi_" label="日期" width="110" />
+                <el-table-column key="user_name_" prop="user_name_" label="姓名" width="120">
                     <template #default="{ row }">
                         <el-tag style="margin: 2px;">
                             {{ row.user_name_ }}
@@ -43,23 +43,23 @@
                 <!-- 基本信息分组 -->
                 <el-table-column label="基本信息">
                     <!--<el-table-column prop="yong_hu_id_" title="姓名" key="yong_hu_id_" width="80" />-->
-                    <el-table-column key="pos_name_" prop="pos_name_" label="部门" width="100">
+                    <el-table-column key="pos_name_" prop="pos_name_" label="部门" width="140">
                         <template #default="{ row }">
                             <el-tag style="margin: 2px;">
                                 {{ row.pos_name_ }}
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column key="gong_hao_" prop="gong_hao_" label="工号" width="80" />
+                    <el-table-column key="gong_hao_" prop="gong_hao_" label="工号" width="110" />
                 </el-table-column>
                 <!-- 上班分组 -->
                 <el-table-column label="考勤概况">
-                    <el-table-column key="zui_zao" prop="zui_zao" label="最早" width="120" />
-                    <el-table-column key="zui_wan" prop="zui_wan" label="最晚" width="120" />
-                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="打卡次数" width="70" />
-                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长（小时）" width="100" />
-                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长（小时）" width="100" />
-                    <el-table-column key="kao_qin_zhuang_tai" prop="kao_qin_zhuang_tai" label="考勤结果" width="80">
+                    <el-table-column key="zui_zao" prop="zui_zao" label="最早" min-width="160" />
+                    <el-table-column key="zui_wan" prop="zui_wan" label="最晚" min-width="160" />
+                    <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="打卡次数" min-width="100" />
+                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长（小时）" min-width="160" />
+                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长（小时）" min-width="160" />
+                    <el-table-column key="kao_qin_zhuang_tai" prop="kao_qin_zhuang_tai" label="考勤结果" min-width="100">
                         <template #default="{ row }">
                             <span :style="{ color: row.kao_qin_zhuang_tai=='正常' ? 'inherit' : 'red' }">
                                 {{ row.kao_qin_zhuang_tai }}
@@ -94,7 +94,7 @@ export default {
             listData: [],
             pagination: {
                 totalCount: 0,
-                currentPage: 1,
+                page: 1,
                 limit: 15
             },
             sorts: {},
@@ -252,8 +252,8 @@ export default {
                             GROUP BY 
                                 USER_ID_, ri_qi_
                             ORDER BY 
-                                USER_ID_, ri_qi_
-                            LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}
+                                ri_qi_ DESC
+                            LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.page - 1) * this.pagination.limit}
                         ) t `
                 }
             }

@@ -32,7 +32,7 @@
             </template>
             <!-- 自定义多级表头 -->
             <template #prepend-column>
-                <el-table-column key="userName" prop="userName" label="姓名" width="80">
+                <el-table-column key="userName" prop="userName" label="姓名" width="110">
                     <template #default="{ row }">
                         <el-tag style="margin: 2px;">
                             {{ row.userName }}
@@ -42,7 +42,7 @@
                 <!-- 基本信息分组 -->
                 <el-table-column label="基本信息">
                     <!--<el-table-column prop="yong_hu_id_" title="姓名" key="yong_hu_id_" width="80" />-->
-                    <el-table-column key="deptName" prop="deptName" label="部门" width="100">
+                    <el-table-column key="deptName" prop="deptName" label="部门" width="110">
                         <template #default="{ row }">
                             <el-tag style="margin: 2px;">
                                 {{ row.deptName }}
@@ -53,15 +53,15 @@
                 </el-table-column>
                 <!-- 班次信息分组 -->
                 <el-table-column label="班次信息">
-                    <el-table-column key="pai_ban_ming_chen" prop="pai_ban_ming_chen" label="排班名称" width="120" />
-                    <el-table-column key="ban_ci_ming_" prop="ban_ci_ming_" label="班次名" width="80" />
-                    <el-table-column key="ban_ci_bie_ming_" prop="ban_ci_bie_ming_" label="班次别名" width="80" />
+                    <el-table-column key="pai_ban_ming_chen" prop="pai_ban_ming_chen" label="排班名称" min-width="140" />
+                    <el-table-column key="ban_ci_ming_" prop="ban_ci_ming_" label="班次名" width="95" />
+                    <el-table-column key="ban_ci_bie_ming_" prop="ban_ci_bie_ming_" label="班次别名" width="95" />
                 </el-table-column>
                 <el-table-column key="ri_qi_" prop="ri_qi_" label="日期" width="100" />
                 <!-- 上班分组 -->
                 <el-table-column label="上班">
-                    <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="打卡时间" width="120" />
-                    <el-table-column key="zhuang_tai_1_" prop="zhuang_tai_1_" label="打卡状态" width="80">
+                    <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="打卡时间" width="160" />
+                    <el-table-column key="zhuang_tai_1_" prop="zhuang_tai_1_" label="打卡状态" width="90">
                         <template #default="{ row }">
                             <span :style="{ color: row.zhuang_tai_1_=='异常' ? 'red' : (!row.da_ka_shi_jian_1_ ? 'red' :'inherit') }">
                                 {{ !row.da_ka_shi_jian_1_ ? '缺勤' : (row.zhuang_tai_1_ === '异常' ? '迟到' : row.zhuang_tai_1_) }}
@@ -71,8 +71,8 @@
                 </el-table-column>
                 <!-- 下班分组 -->
                 <el-table-column label="下班">
-                    <el-table-column key="da_ka_shi_jian_2_" prop="da_ka_shi_jian_2_" label="打卡时间" width="120" />
-                    <el-table-column key="zhuang_tai_2_" prop="zhuang_tai_2_" label="打卡状态" width="80">
+                    <el-table-column key="da_ka_shi_jian_2_" prop="da_ka_shi_jian_2_" label="打卡时间" width="160" />
+                    <el-table-column key="zhuang_tai_2_" prop="zhuang_tai_2_" label="打卡状态" width="90">
                         <template #default="{ row }">
                             <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : (!row.da_ka_shi_jian_2_ ? 'red' :'inherit') }">
                                 {{ !row.da_ka_shi_jian_2_ ? '缺勤' : (row.zhuang_tai_2_ === '异常' ? '迟到' : row.zhuang_tai_2_) }}
@@ -80,9 +80,9 @@
                         </template>
                     </el-table-column>
                 </el-table-column>
-                <el-table-column key="chi_dao_shi_chang" prop="chi_dao_shi_chang" label="迟到时长(分钟)" width="100" />
-                <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="打卡次数" width="70" />
-                <el-table-column key="kao_qin_zhuang_ta" prop="kao_qin_zhuang_ta" label="考勤状态" width="80">
+                <el-table-column key="chi_dao_shi_chang" prop="chi_dao_shi_chang" label="迟到时长(分钟)" width="120" />
+                <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="打卡次数" width="90" />
+                <el-table-column key="kao_qin_zhuang_ta" prop="kao_qin_zhuang_ta" label="考勤状态" width="100">
                     <template #default="{ row }">
                         <span :style="{ color: row.kao_qin_zhuang_ta=='异常' ? 'red' : 'inherit' }">
                             {{ row.kao_qin_zhuang_ta }}
@@ -187,6 +187,10 @@ export default {
             const searchParam = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             searchParam['Q^di_dian_^S'] = second || first
             searchParam['Q^ri_qi_^DGT'] = this.$common.getDateNow()
+            if (this.daterRange.length > 0) {
+                searchParam['Q^ri_qi_^DL'] = this.daterRange[0]
+                searchParam['Q^ri_qi_^DG'] = this.daterRange[1]
+            }
             // 筛选当前用户数据
             searchParam['Q^yong_hu_id_^S'] = this.$store.getters.userId
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
@@ -200,6 +204,7 @@ export default {
                 'S': '=',
                 'SL': 'LIKE',
                 'DG': '<=',
+                'DLS': '>',
                 'DGT': '<',
                 'DL': '>='
             }
@@ -224,10 +229,9 @@ export default {
                         }
                     }
                 })
-                debugger
                 if (conditions.length > 0) {
                     const wherestr = ' WHERE ' + conditions.join(' AND ')
-                    sql = `select t.*, (select COUNT(*) FROM t_attendance_detail ${wherestr} ) AS total_count FROM t_attendance_detail t ${wherestr} `
+                    sql = `select t.*, (select COUNT(*) FROM t_attendance_detail ${wherestr} ) AS total_count FROM t_attendance_detail t ${wherestr} ORDER BY ri_qi_ DESC `
                 }
             }
             // 添加分页

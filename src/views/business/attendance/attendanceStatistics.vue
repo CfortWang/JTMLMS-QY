@@ -32,7 +32,7 @@
             </template>
             <!-- 自定义多级表头 -->
             <template #prepend-column>
-                <el-table-column key="user_name_" prop="user_name_" label="姓名" width="90">
+                <el-table-column key="user_name_" prop="user_name_" label="姓名" width="110">
                     <template #default="{ row }">
                         <el-tag style="margin: 2px;">
                             {{ row.user_name_ }}
@@ -42,42 +42,42 @@
                 <!-- 基本信息分组 -->
                 <el-table-column label="基本信息">
                     <!--<el-table-column prop="yong_hu_id_" title="姓名" key="yong_hu_id_" width="80" />-->
-                    <el-table-column key="pos_name_" prop="pos_name_" label="部门" width="90">
+                    <el-table-column key="pos_name_" prop="pos_name_" label="部门" width="110">
                         <template #default="{ row }">
                             <el-tag style="margin: 2px;">
                                 {{ row.pos_name_ }}
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column key="gong_hao_" prop="gong_hao_" label="工号" width="70" />
+                    <el-table-column key="gong_hao_" prop="gong_hao_" label="工号" width="90" />
                 </el-table-column>
                 <!-- 考勤情况 -->
                 <el-table-column label="考勤情况">
-                    <el-table-column key="ying_chu_qin_shu" prop="ying_chu_qin_shu" label="应出勤天数" width="80" />
-                    <el-table-column key="shi_ji_chu_qin_shu" prop="shi_ji_chu_qin_shu" label="实际出勤天数" width="85" />
-                    <el-table-column key="xiu_xi_shu" prop="xiu_xi_shu" label="休息天数" width="85" />
-                    <el-table-column key="zheng_chang_shu" prop="zheng_chang_shu" label="正常天数" width="65" />
-                    <el-table-column key="yi_chang_shu" prop="yi_chang_shu" label="异常天数" width="65" />
-                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长(小时)" width="120" />
-                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长(小时)" width="120" />
+                    <el-table-column key="ying_chu_qin_shu" prop="ying_chu_qin_shu" label="应出勤天数" width="110" />
+                    <el-table-column key="shi_ji_chu_qin_shu" prop="shi_ji_chu_qin_shu" label="实际出勤天数" width="110" />
+                    <el-table-column key="xiu_xi_shu" prop="xiu_xi_shu" label="休息天数" width="90" />
+                    <el-table-column key="zheng_chang_shu" prop="zheng_chang_shu" label="正常天数" width="90" />
+                    <el-table-column key="yi_chang_shu" prop="yi_chang_shu" label="异常天数" width="90" />
+                    <el-table-column key="total_ban_ci_shi_chang" prop="total_ban_ci_shi_chang" label="标准工作时长(小时)" min-width="140" />
+                    <el-table-column key="total_gong_zuo_shi_chan" prop="total_gong_zuo_shi_chan" label="实际工作时长(小时)" min-width="140" />
                 </el-table-column>
                 <!-- 异常统计 -->
                 <el-table-column label="异常统计">
-                    <el-table-column key="yi_chang_he_ji" prop="yi_chang_he_ji" label="异常合计" width="70">
+                    <el-table-column key="yi_chang_he_ji" prop="yi_chang_he_ji" label="异常合计" width="90">
                         <template #default="{ row }">
                             <span :style="{ color: 'red' }">
                                 {{ row.yi_chang_he_ji }}次
                             </span>
                         </template>
                     </el-table-column>
-                    <el-table-column key="chi_dao_ci_shu" prop="chi_dao_ci_shu" label="迟到次数" width="70">
+                    <el-table-column key="chi_dao_ci_shu" prop="chi_dao_ci_shu" label="迟到次数" width="90">
                         <template #default="{ row }">
                             <span :style="{ color: 'red' }">
                                 {{ row.chi_dao_ci_shu }}次
                             </span>
                         </template>
                     </el-table-column>
-                    <el-table-column key="total_chi_dao_shi_chang" prop="total_chi_dao_shi_chang" label="迟到时长(分钟)" width="100">
+                    <el-table-column key="total_chi_dao_shi_chang" prop="total_chi_dao_shi_chang" label="迟到时长(分钟)" min-width="120">
                         <template #default="{ row }">
                             <span :style="{ color: 'red' }">
                                 {{ row.total_chi_dao_shi_chang }}
@@ -86,7 +86,7 @@
                     </el-table-column>
                     <!--<el-table-column key="zao_tui_ci_shu" prop="zao_tui_ci_shu" label="早退次数" width="70" />
                     <el-table-column key="zao_tui_shi_chang" prop="zao_tui_shi_chang" label="早退时长" width="70" />-->
-                    <el-table-column key="kuang_gong_ci_shu" prop="kuang_gong_ci_shu" label="旷工次数" width="80">
+                    <el-table-column key="kuang_gong_ci_shu" prop="kuang_gong_ci_shu" label="旷工次数" width="90">
                         <template #default="{ row }">
                             <span :style="{ color: 'red' }">
                                 {{ row.kuang_gong_ci_shu }}次
@@ -263,7 +263,7 @@ export default {
                     FROM 
                         v_attendance_statistics 
                     ${wherestr}
-                    GROUP BY USER_ID_,ri_qi_ ORDER BY USER_ID_
+                    GROUP BY USER_ID_ ORDER BY USER_ID_
                     LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.page - 1) * this.pagination.limit}
                     `
                 }

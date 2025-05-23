@@ -844,8 +844,9 @@ export default {
         },
         // 查看表单
         goLookForm (row) {
-            const first = this.$store.getters.level.first
-            this.srcUrl = this.$reportPath.replace('show', 'pdf') + '设备/设备档案卡.rpx&id_=' + row.id + '&org_=' + first
+            const { first, second } = this.$store.getters.level || {}
+            const didian = second || first
+            this.srcUrl = this.$reportPath.replace('show', 'pdf') + '设备/设备档案卡.rpx&id_=' + row.id + '&org_=' + first + '&second_=' + didian
             this.iframeVisible = true
         },
         // 按钮事件处理

@@ -1182,6 +1182,11 @@ export default {
             return { staffScheduleDetailPoList: result, overview }
         },
         handleSave (type) {
+            const valid = this.validateForm()
+            if (!valid) {
+                this.$message.warning('请完善必填信息后再操作！')
+                return
+            }
             const { staffScheduleDetailPoList, overview } = this.dealData(this.scheduleData) || {}
             const { dateRange, title, config, approver, scheduleType, status, scheduleShift, scheduleStaff, scheduleRule, id, oldScheduleId } = this.formData
             const { first, second } = this.$store.getters.level || {}
@@ -1477,7 +1482,7 @@ export default {
             }
             if (this.historyStack.length === 0) {
                 this.$message.warning('已无更多可撤销操作')
-                // return
+                return
             }
             // 取出最近的历史记录
             const history = this.historyStack.pop()

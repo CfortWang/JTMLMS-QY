@@ -120,7 +120,7 @@ export default {
     watch: {
         'formData.dlxmsnzkyfxzb': {
             handler (val) {
-                if (val && val.length) {
+                if ((val && val.length) || (Array.prototype.isPrototypeOf(val) && val.length === 0)) {
                     // console.log(this.formData)
                     this.tableData = val
                 }

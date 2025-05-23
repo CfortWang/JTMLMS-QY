@@ -1283,66 +1283,66 @@ export default {
             })
         },
         // 个人任务统计
-        async getTtaskMattersData () {
-            const this_ = this
-            this_.optionPerson.series[0].data = []
-            this_.optionPerson.series[1].data = []
-            let data = [] // 待办数据
-            let yibanData = []
-            if (!this.personIds) {
-                return
-            }
-            // 待办数据
-            const sql = `select  executor_,count(executor_) as num ,ee.name_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b  
-                on a.task_id_ = b.task_id_ join ibps_party_employee as ee on b.executor_ = ee.id_ and
-                ee.STATUS_= 'actived' and ee.ID_ != '1' and ee.ID_ != '-1'  and b.executor_ in(${this.personIds}) 
-                and  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
-                  GROUP BY  executor_ order by FIELD(b.executor_,${this.personIds}) `
-            await curdPost('sql', sql).then((res) => {
-                data = res.variables.data
-            })
-            const yibansql = `select task.AUDITOR_,ee.name_,COUNT(ee.name_) AS num FROM 
-                            (SELECT DISTINCT inst.* FROM
-                                ( SELECT ap.AUDITOR_,rinst.* FROM
-                                ibps_bpm_inst rinst
-                                RIGHT JOIN ibps_bpm_approval ap ON ap.PROC_INST_ID_ = rinst.ID_
-                                WHERE
-                                ap.AUDITOR_ in(${this.personIds}) and 
-                                ap.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
-                                UNION ALL
-                                SELECT aphis.AUDITOR_,insthis.* FROM
-                                ibps_bpm_inst_his insthis
-                                RIGHT JOIN ibps_bpm_approval_his aphis ON aphis.PROC_INST_ID_ = insthis.ID_
-                                WHERE 
-                                aphis.AUDITOR_ in(${this.personIds})  AND insthis.id_ IS NOT NULL
-                                ) inst ) AS  task 
-                                LEFT JOIN ibps_party_employee ee ON task.AUDITOR_ = ee.id_ 
-                                where  task.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
-                                GROUP BY  task.AUDITOR_ order by FIELD(task.AUDITOR_,${this.personIds})`
-            await curdPost('sql', yibansql).then((res) => {
-                yibanData = res.variables.data
-            })
-            for (const i of this.personIds.split(',')) {
-                // 判断已读中是否存在该人员的待办
-                const daiBan = data.filter((fil) => {
-                    return fil.executor_ === i
-                })
-                if (daiBan.length === 0) {
-                    this_.optionPerson.series[0].data.push(0)
-                } else {
-                    this_.optionPerson.series[0].data.push(daiBan[0].num)
-                }
-                // 判断已读中是否存在该人员的已办
-                const yiBan = yibanData.filter((fil) => {
-                    return fil.AUDITOR_ === i
-                })
-                if (yiBan.length === 0) {
-                    this_.optionPerson.series[1].data.push(0)
-                } else {
-                    this_.optionPerson.series[1].data.push(yiBan[0].num)
-                }
-            }
-        },
+        // async getTtaskMattersData () {
+        //     const this_ = this
+        //     this_.optionPerson.series[0].data = []
+        //     this_.optionPerson.series[1].data = []
+        //     let data = [] // 待办数据
+        //     let yibanData = []
+        //     if (!this.personIds) {
+        //         return
+        //     }
+        //     // 待办数据
+        //     const sql = `select  executor_,count(executor_) as num ,ee.name_ FROM  IBPS_BPM_TASKS as a join IBPS_BPM_TASK_ASSIGN as b
+        //         on a.task_id_ = b.task_id_ join ibps_party_employee as ee on b.executor_ = ee.id_ and
+        //         ee.STATUS_= 'actived' and ee.ID_ != '1' and ee.ID_ != '-1'  and b.executor_ in(${this.personIds})
+        //         and  a.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
+        //           GROUP BY  executor_ order by FIELD(b.executor_,${this.personIds}) `
+        //     await curdPost('sql', sql).then((res) => {
+        //         data = res.variables.data
+        //     })
+        //     const yibansql = `select task.AUDITOR_,ee.name_,COUNT(ee.name_) AS num FROM
+        //                     (SELECT DISTINCT inst.* FROM
+        //                         ( SELECT ap.AUDITOR_,rinst.* FROM
+        //                         ibps_bpm_inst rinst
+        //                         RIGHT JOIN ibps_bpm_approval ap ON ap.PROC_INST_ID_ = rinst.ID_
+        //                         WHERE
+        //                         ap.AUDITOR_ in(${this.personIds}) and
+        //                         ap.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
+        //                         UNION ALL
+        //                         SELECT aphis.AUDITOR_,insthis.* FROM
+        //                         ibps_bpm_inst_his insthis
+        //                         RIGHT JOIN ibps_bpm_approval_his aphis ON aphis.PROC_INST_ID_ = insthis.ID_
+        //                         WHERE
+        //                         aphis.AUDITOR_ in(${this.personIds})  AND insthis.id_ IS NOT NULL
+        //                         ) inst ) AS  task
+        //                         LEFT JOIN ibps_party_employee ee ON task.AUDITOR_ = ee.id_
+        //                         where  task.CREATE_TIME_  between '${this.startDate}' and '${this.endDate}'
+        //                         GROUP BY  task.AUDITOR_ order by FIELD(task.AUDITOR_,${this.personIds})`
+        //     await curdPost('sql', yibansql).then((res) => {
+        //         yibanData = res.variables.data
+        //     })
+        //     for (const i of this.personIds.split(',')) {
+        //         // 判断已读中是否存在该人员的待办
+        //         const daiBan = data.filter((fil) => {
+        //             return fil.executor_ === i
+        //         })
+        //         if (daiBan.length === 0) {
+        //             this_.optionPerson.series[0].data.push(0)
+        //         } else {
+        //             this_.optionPerson.series[0].data.push(daiBan[0].num)
+        //         }
+        //         // 判断已读中是否存在该人员的已办
+        //         const yiBan = yibanData.filter((fil) => {
+        //             return fil.AUDITOR_ === i
+        //         })
+        //         if (yiBan.length === 0) {
+        //             this_.optionPerson.series[1].data.push(0)
+        //         } else {
+        //             this_.optionPerson.series[1].data.push(yiBan[0].num)
+        //         }
+        //     }
+        // },
         preDate (dateParameter, num) {
             // 往前推算日期
             var translateDate = ''

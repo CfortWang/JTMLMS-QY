@@ -109,7 +109,7 @@ export default {
                         { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit', hidden: (row) => {
                             return !this.isRoleFilter() && this.$store.getters.userId !== row.createBy
                         } },
-                        { key: 'preview', label: '查看', type: 'primary', icon: 'ibps-icon-eye', hidden: false }
+                        { key: 'preview', label: '查阅', type: 'primary', icon: 'ibps-icon-eye', hidden: false }
                         // { key: 'report', label: '实验报告', type: 'success', icon: 'ibps-icon-file-text-o' }
                     ]
                 }

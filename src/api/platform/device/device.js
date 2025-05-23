@@ -113,3 +113,15 @@ export function queryRepairRecord (data) {
         data: data
     })
 }
+/**
+ * 检验系统校准确认记录表列表(分页条件查询)数据
+ * @param {*} data
+ * @returns
+ */
+export function calibrateResultRecord (data) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/equipment/calibrateResultRecord/query',
+        method: 'post',
+        data: data
+    })
+}

@@ -767,6 +767,7 @@
 
                                 <el-tab-pane v-for="item in tabItems" :key="item.name" :label="item.label" :name="item.name" :disabled="item.isKeepAlive&&!isEdit">
                                     <template v-if="item.isKeepAlive">
+
                                         <!-- 使用 v-if 配合 keep-alive 实现按需加载 -->
                                         <keep-alive>
                                             <component :is="item.component" v-if="activeName===item.name" :params="form" />
@@ -795,12 +796,13 @@ import ScrappedRecord from './scrappedRecord.vue'
 import MaintenanceRecord from './maintenanceRecord.vue'
 import RepairRecord from './repairRecord.vue'
 import CalibrationCheckRecord from './calibrationCheckRecord.vue'
+import ConfirmationRecord from './ConfirmationRecord.vue'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
 import SelectType from '@/views/component/selectType.vue'
 import { getImage } from '@/api/platform/file/attachment'
 export default {
     components: {
-        ibpsUserSelector, Maintenance, MoreDevices, ScrappedRecord, MaintenanceRecord, RepairRecord, CalibrationCheckRecord, IbpsAttachment, SelectType,
+        ibpsUserSelector, Maintenance, MoreDevices, ScrappedRecord, MaintenanceRecord, RepairRecord, CalibrationCheckRecord, ConfirmationRecord, IbpsAttachment, SelectType,
         IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog'),
         IbpsImage: () => import('@/business/platform/file/image')
     },
@@ -847,7 +849,8 @@ export default {
                 { label: '使用与维护记录', name: 'four', component: 'MaintenanceRecord', isKeepAlive: true },
                 { label: '校准记录', name: 'five', component: 'CalibrationCheckRecord', isKeepAlive: true },
                 { label: '维修记录', name: 'six', component: 'RepairRecord', isKeepAlive: true },
-                { label: '停用、报废记录', name: 'seven', component: 'ScrappedRecord', isKeepAlive: true }
+                { label: '停用、报废记录', name: 'seven', component: 'ScrappedRecord', isKeepAlive: true },
+                { label: '检验系统校准确认记录', name: 'eight', component: 'ConfirmationRecord', isKeepAlive: true }
             ],
             filter: [{
                 descVal: '1',

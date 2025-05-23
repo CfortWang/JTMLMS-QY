@@ -562,6 +562,10 @@ export default {
                 }
                 await this.$common.request('update', sonUpdateParams) // 更新调班子表
                 ActionUtils.successMessage()
+                // 取消列表勾选
+                this.$nextTick(() => {
+                    this.$refs.crud.clearSelection()
+                })
                 data.forEach(async (el) => { // 给每个申请单发通知
                     if (el.status === '已通过') {
                         // 获取排班子表数据
