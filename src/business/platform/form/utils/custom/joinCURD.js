@@ -3,6 +3,7 @@ import { normal } from './requestType'
 import { encryptByAes } from '@/utils/encrypt'
 import { mapValues } from 'lodash'
 import { SHOW_PLAINTEXT } from '@/constant'
+import { getToken } from '@/utils/auth'
 // 请求方式默认POST
 const post = (type, data, method = 'post', loading = false) => {
     const requestUrl = `business/v3/sys/universal/${normal[type]}`
@@ -45,7 +46,7 @@ const dealData = (args, type) => {
     const data = typeof args === 'object' ? replaceNullWithEmpty(args) : args
     const plaintext = SHOW_PLAINTEXT ? { plaintext: data } : {}
     const res = {
-        ...encryptByAes(data),
+        ciphertext: encryptByAes(data, 'dynamic', getToken()),
         ...plaintext
     }
     return JSON.stringify(res)
