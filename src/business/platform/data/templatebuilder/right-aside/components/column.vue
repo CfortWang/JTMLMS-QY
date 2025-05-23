@@ -91,7 +91,7 @@
             >
                 <div v-for="(column,i) in columns" :key="column.name||column.key+''+i" class="list-group-item">
                     <div class="actions-left">
-                        {{ column.label }} <el-tag v-if="prop==='sort_columns'" type="">{{ column.direction ==='desc'?'降序':'升序' }}</el-tag>
+                        {{ column.label }} <el-tag v-if="prop==='sort_columns'" type="">{{ directionMap[column.direction] }}</el-tag>
                     </div>
                     <el-button-group class="actions" :class="{'sort-column-actions':prop==='sort_columns'}">
                         <template v-if="prop==='sort_columns' && datasetType !=='thirdparty'">
@@ -212,7 +212,12 @@ export default {
             toolbars: [
                 { key: 'confirm' },
                 { key: 'cancel' }
-            ]
+            ],
+            directionMap: {
+                'custom': '自定义',
+                'asc': '升序',
+                'desc': '降序'
+            }
         }
     },
     computed: {
@@ -358,6 +363,12 @@ export default {
                 if (!data) {
                     ActionUtils.saveErrorMessage()
                     return
+                }
+                if (data?.direction === 'custom' && data?.fieldValue?.length) {
+                    data = {
+                        ...data,
+                        fieldValue: data.fieldValue.sort((a, b) => a.val - b.val).map(item => item.label)
+                    }
                 }
                 if (this.editIndex > -1) {
                     this.columns.splice(this.editIndex, 1, data)
