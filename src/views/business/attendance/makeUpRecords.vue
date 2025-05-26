@@ -78,9 +78,9 @@ export default {
                 },
                 columns: [
                     { prop: 'bian_zhi_ren_', label: '申请人', tags: userOption, width: 100 },
-                    { prop: 'bian_zhi_shi_jian', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
+                    { prop: 'bian_zhi_shi_jian', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm:ss', sortable: 'custom', width: 140 },
                     { prop: 'shen_he_ren_', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', width: 200 },
-                    { prop: 'shen_he_shi_jian_', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm', sortable: 'custom', width: 140 },
+                    { prop: 'shen_he_shi_jian_', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm:ss', sortable: 'custom', width: 140 },
                     { prop: 'zhuang_tai_', label: '状态', width: 90 },
                     { prop: 'bu_ka_ri_qi_', label: '补卡日期', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 100 },
                     { prop: 'bu_ka_shi_jian_', label: '补卡时间', dateFormat: 'HH:mm:ss', sortable: 'custom', width: 100 },

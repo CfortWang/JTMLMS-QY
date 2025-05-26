@@ -228,8 +228,8 @@ export default {
                 const sql = `select * from t_attendance_reissue where bu_ka_ri_qi_ = '${buKaRiQi}' and zhuang_tai_ = '待审核' and bian_zhi_ren_ = '${self.$store.getters.userId}' and di_dian_ = '${(second || first)}'`
                 const response = await self.$common.request('sql', sql)
                 // 过滤掉正在申请状态的班次
-                buKaBanCiArr = response.variables.data.filter(item => {
-                    return !buKaBanCiArr.some(banCi => banCi.value === item.bu_ka_ban_ci_)
+                buKaBanCiArr = buKaBanCiArr.filter(banCi => {
+                    return !response.variables.data.some(item => item.bu_ka_ban_ci_ === banCi.value)
                 })
                 if (buKaBanCiArr.length === 0) {
                     self.$message.warning('该日期异常班次已申请！')
@@ -254,9 +254,9 @@ export default {
             const type = banci.split('-')[1]
             const obj = this.yichangdata.filter(item => item.banCiBieMing === bieming)[0]
             if (type === '上班') {
-                this.formData.buKaShiJian = obj.banCiKaiShi
+                this.formData.buKaShiJian = obj.banCiKaiShi.split(' ')[1] + ':00'
             } else {
-                this.formData.buKaShiJian = obj.banCiJieShu
+                this.formData.buKaShiJian = obj.banCiJieShu.split(' ')[1] + ':00'
             }
         },
         handleFormAction ({ key }) {

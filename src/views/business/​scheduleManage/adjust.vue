@@ -97,7 +97,7 @@ export default {
                     actions: [
                         { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit', hidden: function (row) { return row.status !== '已暂存' && row.status !== '已取消' } },
                         { key: 'cancel', label: '取消', type: 'danger', icon: 'ibps-icon-cancel', hidden: function (row) { return !(row.status === '待审核' && row.createBy === this.$store.getters.userId) } },
-                        { key: 'edit', label: '再次申请', type: 'primary', icon: 'ibps-icon-edit', hidden: function (row) { return row.status !== '已拒绝' } },
+                        { key: 'edit', label: '再次申请', type: 'primary', icon: 'ibps-icon-edit', hidden: function (row) { return !(row.status === '已拒绝' && row.createBy === this.$store.getters.userId) } },
                         { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt' }
                     ]
                 }

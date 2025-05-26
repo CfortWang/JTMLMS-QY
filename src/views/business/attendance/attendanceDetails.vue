@@ -30,6 +30,17 @@
                     value-format="yyyy-MM-dd"
                 />
             </template>
+            <template slot="userSlot">
+                <ibps-user-selector
+                    v-model="searchXinMing"
+                    type="user"
+                    readonly-text="text"
+                    :multiple="true"
+                    size="mini"
+                    :filter="filter"
+                    filtrate
+                />
+            </template>
             <!-- 自定义多级表头 -->
             <template #prepend-column>
                 <el-table-column key="userName" prop="userName" label="姓名" width="110">
@@ -98,9 +109,13 @@
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import IbpsExport from '@/plugins/export'
+import ibpsUserSelector from '@/business/platform/org/selector'
 import color from '@/store/modules/ibps/modules/color'
 
 export default {
+    components: {
+        ibpsUserSelector
+    },
     mixins: [FixHeight],
     data () {
         const { userList = [], deptList = [] } = this.$store.getters || {}
@@ -121,6 +136,7 @@ export default {
             },
             sorts: {},
             daterRange: [],
+            searchXinMing: '',
             pickerOptions: {
                 disabledDate (time) {
                     const today = new Date()
@@ -139,7 +155,8 @@ export default {
                     itemWidth: 200,
                     forms: [
                         { prop: 'Q^kao_qin_zhuang_ta^SL', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
-                        { prop: 'Q^yong_hu_id_^S', label: '姓名', fieldType: 'select', options: userOption },
+                        // { prop: 'Q^yong_hu_id_^S', label: '姓名', fieldType: 'select', options: userOption },
+                        { prop: '', label: '姓名', fieldType: 'slot', slotName: 'userSlot' },
                         { prop: 'Q^gong_hao_^S', label: '工号' },
                         { prop: 'Q^bu_men_^SL', label: '部门', fieldType: 'select', options: deptOption },
                         { prop: 'Q^pai_ban_ming_chen^SL', label: '排班名称' },
@@ -231,8 +248,11 @@ export default {
                     }
                 })
 
-                if (conditions.length > 0) {
-                    const wherestr = ' WHERE ' + conditions.join(' AND ')
+                if (conditions.length > 0) { // 正常查询条件一定会大于0，因为地点必查
+                    let wherestr = ' WHERE ' + conditions.join(' AND ')
+                    if (this.searchXinMing) {
+                        wherestr += `and yong_hu_id_ in ('` + this.searchXinMing.split(',').join("','") + `')`
+                    }
                     sql = `select t.*, (select COUNT(*) FROM t_attendance_detail ${wherestr} ) AS total_count FROM t_attendance_detail t ${wherestr}  ORDER BY ri_qi_ DESC `
                 }
             }

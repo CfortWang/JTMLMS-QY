@@ -53,10 +53,10 @@
                     <div class="dakaBox">
                         <div>
                             <span>上班:</span> <span v-html="getAttendanceInfo(banci.attendance, 1)" />
-                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常' && compareTime() " class="clock-btn" @click="bukaFun('in')"> 补卡 </button>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_1_!= '正常' && compareTime() && validExist(banci.attendance,'in') " class="clock-btn" @click="bukaFun('in')"> 补卡 </button>
                         </div>
                         <div><span>下班:</span> <span v-html="getAttendanceInfo(banci.attendance, 2)" />
-                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常' && compareTime() " class="clock-btn" @click="bukaFun('out')"> 补卡 </button>
+                            <button v-if="banci && banci.attendance && banci.attendance.zhuang_tai_2_!= '正常' && compareTime() && validExist(banci.attendance,'out') " class="clock-btn" @click="bukaFun('out')"> 补卡 </button>
                         </div>
                     </div>
                 </div>
@@ -113,13 +113,28 @@ export default {
 
             return data[status[type]] === '正常' ? `${data[time[type]]} 正常` : `${data[time[type]]} <span style="color: red;">${data[status[type]] === '异常' ? '迟到' : data[status[type]]}${data[duration[type]]}分钟</span>`
         },
-        compareTime () { // 比较班次时间和当前时间，过去日期的才显示。
+        compareTime () { // 比较班次时间和当前时间，过去日期的才显示，返回true。
             const today = this.$common.getDateNow()
             if (this.banciInfo.jieShuShiJian < today) {
                 return true
             } else {
                 return false
             }
+        },
+        validExist (attendance, type) { // 判断该班次是否已申请，已申请则不展示，返回false
+            const str = (type === 'in' ? '上班' : '下班')
+            const banci = attendance.ban_ci_bie_ming_ + '-' + str
+            const riqi = attendance.ri_qi_
+            const userId = this.$store.getters.userId
+            const { first, second } = this.$store.getters.level || {}
+            const sql = `select id_ from t_attendance_reissue where bu_ka_ban_ci_ = '${banci}' and bu_ka_ri_qi_ = '${riqi}' and bian_zhi_ren_ = '${userId}' and di_dian_ = '${second || first}'`
+            this.$common.request('sql', sql).then((res) => {
+                if (res.variables.data.length === 0) {
+                    return true
+                } else {
+                    return false
+                }
+            })
         },
         closeDialog () {
             this.$emit('closeBanciDialog', 'banci')
@@ -131,33 +146,11 @@ export default {
                 const str = type === 'in' ? '上班' : '下班'
                 const buKaShiJian = type === 'in' ? attendanceInfo.ban_ci_kai_shi_.split(' ')[1] + ':00' : attendanceInfo.ban_ci_jie_shu_.split(' ')[1] + ':00'
                 params = {
-                    // "id_": "1375164563657326592",
-                    // "tenant_id_": "-999",
-                    // "ip_": "192.168.2.49",
-                    // "create_by_": "1169304256906264576",
-                    // "create_time_": 1747906381000,
-                    // "update_by_": "",
-                    // "di_dian_": "1166372664529387520",
-                    // "kuai_zhao_": "",
-                    // "bian_zhi_ren_": "1169304256906264576",
-                    // "bian_zhi_shi_jian": "2025-05-22 17:33:00",
                     'bu_ka_ri_qi_': attendanceInfo.ri_qi_,
                     'bu_ka_ban_ci_': attendanceInfo.ban_ci_bie_ming_ + '-' + str,
-                    // 'ban_ci_zhuang_tai': "",
                     'bu_ka_shi_jian_': buKaShiJian,
                     'pai_ban_id_': attendanceInfo.pai_ban_id_,
                     'pai_ban_ji_lu_id_': attendanceInfo.pai_ban_ji_lu_id_
-                    //'bu_ka_shi_you_': "",
-                    //'fu_jian_': '',
-                    //"zhuang_tai_": "待审核",
-                    //"shen_he_ren_": "1116011959821533184",
-                    //"shen_he_shi_jian_": "",
-                    //"type_": "",
-                    //"kao_qin_id_": "1374051414149431297",
-                    //"shen_he_yi_jian_": "",
-                    //"total_count": 11,
-                    //"userName": "",
-                    //"deptName": ""
                 }
             }
             this.$emit('open', 'buka', params)
