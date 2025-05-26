@@ -777,12 +777,12 @@ export default {
             const isFormDataChanged = JSON.stringify(this.$common.replaceNullWithEmpty(this.formDataBF)) !== JSON.stringify(currentFormData)
             const isOpinionChanged = JSON.stringify(opinionList) !== JSON.stringify(this.opinionListBF)
 
+            const opinionNodeList = Object.values(formOpinionNodeData).filter(Array.isArray).flat()
             // 根据变更状态执行相应操作
             if (!isFormDataChanged && isOpinionChanged) {
-                const opinionNodeList = Object.values(formOpinionNodeData).filter(Array.isArray).flat()
                 await this.timeModify(opinionNodeList)
             } else if (isFormDataChanged) {
-                await this.saveData(jsonData, isOpinionChanged, opinionList, snapshot)
+                await this.saveData(jsonData, isOpinionChanged, opinionNodeList, snapshot)
             }
         },
         // 保存流程数据生成快照
