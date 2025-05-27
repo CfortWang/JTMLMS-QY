@@ -133,6 +133,27 @@
                                 />
                             </div>
                         </div>
+                        <dv-decoration-10
+                            style="height: 2%; width: 100%; margin: 0 auto"
+                        />
+                        <div class="middleView">
+                            <div class="midViewLeft">
+                                <PieView :info="zsPieData" />
+                            </div>
+                            <dv-decoration-2
+                                :reverse="true"
+                                style="width: 2%; height: 100%"
+                            />
+                            <div class="midViewRight">
+                                <BarChart
+                                    :info="zsOption"
+                                    :config="{
+                                        title: '部门证书信息统计',
+                                        id: 'positionsId3',
+                                    }"
+                                />
+                            </div>
+                        </div>
                     </div>
                     <dv-decoration-2
                         :reverse="true"
@@ -158,6 +179,7 @@ import CarouselTabl from '@/views/system/jbdHome/board/component/CarouselTabl'
 import SelectPositions from '@/views/component/selectPositions'
 import screenfull from 'screenfull'
 import { getUserStatisticList } from '@/api/platform/org/employee'
+import { getSetting } from '@/utils/query'
 export default {
     name: 'check-board1',
     components: {
@@ -410,6 +432,13 @@ export default {
                 color: colorGroup1,
                 config: { title: '学历学位统计', idSelector: 'degreeId' }
             },
+            // 学位统计图配置
+            zsPieData: {
+                // 学位学历
+                data: [],
+                color: colorGroup1,
+                config: { title: '证书统计', idSelector: 'zsId' }
+            },
             // 职称统计图配置
             ranksPieData: {
                 // 职称
@@ -434,6 +463,68 @@ export default {
                 ],
                 color: colorGroup1,
                 config: { title: '职称统计', idSelector: 'ranksid' }
+            },
+            // 部门学位学历信息统计配置表
+            zsOption: {
+                animation: true,
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+
+                legend: {
+                    textStyle: {
+                        color: '#fff'
+                    }
+                },
+                color: colorGroup1,
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: [],
+                        nameTextStyle: {
+                            color: '#fff'
+                        },
+                        axisLabel: {
+                            textStyle: {
+                                color: '#fff'
+                            },
+                            interval: 0,
+                            rotate: 50
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        name: '个数（人）',
+                        type: 'value',
+                        nameTextStyle: {
+                            color: '#fff'
+                        },
+                        axisLabel: {
+                            textStyle: {
+                                color: '#fff'
+                            }
+                        }
+                    }
+                ],
+                // " 大专", "本科", "硕士", "博士", "初级职称", "中级职称", "高级职称"
+                series: [
+
+                ],
+                dataZoom: [
+                    {
+                        type: 'inside'
+                    }
+                ]
             },
             // 部门学位学历信息统计配置表
             PositionsDegreeOption: {
@@ -846,7 +937,8 @@ export default {
                 title: '部门员工任务统计',
                 id: 'taskMatters',
                 state: '100'
-            }
+            },
+            optionZSB: []
         }
     },
     watch: {
@@ -855,6 +947,8 @@ export default {
                 this.positionsInfoData()
                 this.degreeGradeInfoData()
                 this.employeeInfoData()
+                this.zsInfoData()
+                this.zsInfoDataPos()
             },
             deep: true,
             immediate: true
@@ -889,7 +983,41 @@ export default {
             this.allView()
         }
     },
-    mounted () {},
+    async mounted () {
+        const { optionArr } = await getSetting('ryzsOption') || {}
+        this.optionZSB = optionArr
+        optionArr.forEach((item, i) => {
+            this.zsPieData.data.push({
+                name: item,
+                value: 0
+            })
+            this.zsOption.series.push(
+                {
+                    name: item,
+                    type: 'bar',
+                    stack: 'Search Engine',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [],
+                    label: {
+                        // 柱体上显示数值
+                        show: true, // 开启显示
+                        textStyle: {
+                            // 数值样式
+                            position: 'top',
+                            fontSize: '12px',
+                            color: '#fff'
+                        },
+                        formatter: function (name) {
+                            return name.value === 0
+                                ? ''
+                                : name + ':' + name.value
+                        }
+                    }
+                })
+        })
+    },
     beforeDestroy () {
         if (this.interval) {
             clearInterval(this.interval)
@@ -1280,6 +1408,170 @@ export default {
                 }
             })
         },
+        async zsInfoData () {
+            this.zsPieData.data.forEach((item, i) => {
+                item.value = 0
+            })
+            let data = []
+            const a = 'SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7'
+            let sqlparty = `SELECT 1 AS n`
+            this.$store.getters.deptList.forEach((it, i) => {
+                sqlparty += ` UNION ALL SELECT ${i + 2} `
+            })
+            let zsbParty = ``
+            if (this.optionZSB.length > 0) {
+                this.optionZSB.forEach((item, i) => {
+                    zsbParty += `,IFNULL( sum( zheng_shu_lei_xin like '%${item}%' ), 0 ) AS zsb${i}`
+                })
+            }
+            const sql = `select
+                            ( SELECT name_ FROM ibps_party_entity WHERE id_ = '${this.depth3}' ) AS enName
+                            ${zsbParty}
+                        FROM
+                            t_ryzsb 
+                        WHERE
+                            parent_id_ IN (
+                            SELECT
+                                b.id_ AS bid 
+                            FROM
+                                (
+                                SELECT
+                                    a.* 
+                                FROM
+                                    (
+                                    SELECT
+                                        id_,
+                                        name_,
+                                        TRIM(
+                                        SUBSTRING_INDEX( SUBSTRING_INDEX( positions_, ',', n ), ',', - 1 )) AS positions_ 
+                                    FROM
+                                        ibps_party_employee
+                                        JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers 
+                                    WHERE
+                                        LENGTH( positions_ ) - LENGTH(
+                                        REPLACE ( positions_, ',', '' )) >= n - 1 
+                                        and name_ not like '%系统%'
+                                        and name_ not like '%金通%'
+                                        and name_ not like '%管理%'
+                                        and id_ != '702117247933480960'
+                                    ) a 
+                                GROUP BY
+                                    name_ 
+                                ) b 
+                        WHERE
+                            b.positions_ IN ( SELECT id_ FROM ibps_party_entity WHERE path_ LIKE '%${this.first}%' AND party_type_ = 'position' ))`
+
+            await curdPost('sql', sql).then((res) => {
+                data = res.variables.data
+            })
+        },
+        async zsInfoDataPos () {
+            const a = 'SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7'
+            let sqlparty = `SELECT 1 AS n`
+            this.$store.getters.deptList.forEach((it, i) => {
+                sqlparty += ` UNION ALL SELECT ${i + 2} `
+            })
+            let zsbPartyAll = ``
+            let zsbParty = ``
+            let zsbName = ``
+            if (this.optionZSB.length > 0) {
+                this.optionZSB.forEach((item, i) => {
+                    zsbParty += `,sum( gy.zheng_shu_lei_xin like '%${item}%' ) AS zsb${i}`
+                    zsbPartyAll += `,IFNULL( sum( zheng_shu_lei_xin like '%${item}%' ), 0 ) AS zsb${i}`
+                    zsbName += `,IFNULL( jh.zsb${i}, 0 ) AS zsb${i}`
+                })
+            }
+            const sql = `select
+                            jh.enName
+                            ${zsbName}
+                        FROM
+                            (
+                            SELECT
+                                en.id_,
+                                en.name_ AS enName
+                                ${zsbParty}
+                            FROM
+                                (
+                                SELECT
+                                    ee.id_ AS eeID,
+                                    ee.name_ AS eeName,
+                                    ee.positions_,
+                                    ry.zheng_shu_lei_xin
+                                FROM
+                                    t_ryzsb AS ry
+                                    JOIN ibps_party_employee AS ee ON ry.parent_id_ = ee.id_ where ee.name_ not like '%系统%' and ee.name_ not like '%金通%' and ee.name_ not like '%管理%' and ee.id_ != '702117247933480960'
+                                ) gy
+                                RIGHT JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, gy.positions_ ) 
+                            WHERE
+                                en.DEPTH_ LIKE '%4%' 
+                                AND en.PARENT_ID_ LIKE '%${this.depth3}%' 
+                                AND en.id_ != '1166373874003083264' 
+                                AND en.name_ NOT LIKE '%综合%' 
+                            GROUP BY
+                                en.id_ 
+                            ) jh UNION
+                        SELECT
+                            ( SELECT name_ FROM ibps_party_entity WHERE id_ = '${this.depth3}' ) AS enName
+                            ${zsbPartyAll}
+                        FROM
+                            t_ryzsb
+                        WHERE
+                            parent_id_ IN (
+                            SELECT
+                                b.id_ AS bid 
+                            FROM
+                                (
+                                SELECT
+                                    a.* 
+                                FROM
+                                    (
+                                    SELECT
+                                        id_,
+                                        name_,
+                                        TRIM(
+                                        SUBSTRING_INDEX( SUBSTRING_INDEX( positions_, ',', n ), ',', - 1 )) AS positions_ 
+                                    FROM
+                                        ibps_party_employee
+                                        JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers 
+                                    WHERE
+                                        LENGTH( positions_ ) - LENGTH(
+                                        REPLACE ( positions_, ',', '' )) >= n - 1 
+                                        and name_ not like '%系统%'
+                                        and name_ not like '%金通%'
+                                        and name_ not like '%管理%'
+                                        and id_ != '702117247933480960'
+                                    ) a 
+                                GROUP BY
+                                    name_ 
+                                ) b 
+                        WHERE
+                            b.positions_ IN ( SELECT id_ FROM ibps_party_entity WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position' ))`
+
+            await curdPost('sql', sql).then((res) => {
+                const data = res.variables.data
+                // 组装数据集，以学历职称为列，以部门为行:{" 大专":['1','2','3']}
+                const degreeSeriesDatas = this.zsOption.series
+                this.zsOption.xAxis[0].data = []
+                const shuZuList = []
+                this.optionZSB.forEach((item, i) => {
+                    this.zsOption.series[i].data = []
+                    shuZuList.push('zsb' + i)
+                })
+                if (data.length !== 0) {
+                //     // 跟《部门信息统计配置表》排列顺序一致
+                    for (let t = 0; t < data.length; t++) {
+                        this.zsOption.xAxis[0].data.push(
+                            data[t].enName
+                        )
+                        for (let i = 0; i < degreeSeriesDatas.length; i++) {
+                            degreeSeriesDatas[i].data[t] =
+                                data[t][shuZuList[i]]
+                        }
+                    }
+                    this.zsOption.series = degreeSeriesDatas
+                }
+            })
+        },
         preDate (dateParameter, num) {
             // 往前推算日期
             var translateDate = ''
@@ -1325,6 +1617,7 @@ export default {
             if (this.initOnLoad === 0) {
                 this.positionsInfoData()
                 this.degreeGradeInfoData()
+                this.zsInfoDataPos()
             }
         },
         // 通过部门 id 获取部门人员
@@ -1560,7 +1853,7 @@ export default {
 .middleView {
     width: 100%;
     margin: 0 auto;
-    height: 50%;
+    height: 33%;
     overflow: hidden;
     box-sizing: border-box;
     display: flex;

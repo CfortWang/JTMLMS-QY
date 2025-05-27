@@ -105,7 +105,7 @@ export default {
                 rowHandle: {
                     effect: 'display',
                     actions: [
-                        { key: 'adjust', label: '申请调班', type: 'primary', icon: 'ibps-icon-exchange', hidden: false },
+                        // { key: 'adjust', label: '申请调班', type: 'primary', icon: 'ibps-icon-exchange', hidden: false },
                         { key: 'edit', label: '编辑', type: 'primary', icon: 'ibps-icon-edit', hidden: (row) => {
                             return !this.isRoleFilter() && this.$store.getters.userId !== row.createBy
                         } },
