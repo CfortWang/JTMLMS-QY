@@ -300,7 +300,6 @@
                     :readonly="fieldType === 'currentTime' || fieldType === 'currentDate' ? true : readonly"
                     :clearable="clearable"
                     unselectable="on"
-                    @change="selectTime"
                     v-on="$listeners"
                 />
                 <el-time-picker
@@ -1040,7 +1039,7 @@ export default {
                 this.$emit('change', this.dataModel)
             })
         },
-        // 日期格式调整
+        // 日期格式调整（无需拼接默认日或月日，弃用）
         selectTime (val) {
             if (!val) {
                 this.dataModel = ''
