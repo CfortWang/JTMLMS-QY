@@ -121,20 +121,20 @@ export default {
                 return false
             }
         },
-        validExist (attendance, type) { // 判断该班次是否已申请，已申请则不展示，返回false
+        async validExist (attendance, type) { // 判断该班次是否申请过
             const str = (type === 'in' ? '上班' : '下班')
             const banci = attendance.ban_ci_bie_ming_ + '-' + str
-            const riqi = attendance.ri_qi_
+            const riqi = attendance.ri_qi_ || this.banciInfo.jieShuShiJian || ''
             const userId = this.$store.getters.userId
             const { first, second } = this.$store.getters.level || {}
             const sql = `select id_ from t_attendance_reissue where bu_ka_ban_ci_ = '${banci}' and bu_ka_ri_qi_ = '${riqi}' and bian_zhi_ren_ = '${userId}' and di_dian_ = '${second || first}'`
-            this.$common.request('sql', sql).then((res) => {
-                if (res.variables.data.length === 0) {
-                    return true
-                } else {
-                    return false
-                }
-            })
+            try {
+                const res = await this.$common.request('sql', sql)
+                return res.variables.data.length === 0 // 直接返回结果
+            } catch (error) {
+                console.error('Error in validExist:', error)
+                return false
+            }
         },
         closeDialog () {
             this.$emit('closeBanciDialog', 'banci')

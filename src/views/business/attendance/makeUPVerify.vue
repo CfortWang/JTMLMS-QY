@@ -161,7 +161,9 @@ export default {
                         const operator = operatorMap[operatorKey]
                         if (operator) {
                             let condition
-                            if (operator === 'LIKE') {
+                            if (operatorKey === 'DG' || operatorKey === 'DL') {
+                                condition = `DATE(${field}) ${operator} '${value}'` // 添加 DATE 函数
+                            } else if (operator === 'LIKE') {
                                 condition = `${field} LIKE '%${value}%'` // LIKE 模糊查询
                             } else {
                                 condition = `${field} ${operator} '${value}'` // 其他操作符（=, <=, >=）
@@ -175,6 +177,12 @@ export default {
                     sql += ' WHERE ' + conditions.join(' AND ')
                 }
             }
+            // 添加排序
+            if (this.sorts.field) {
+                sql += ` ORDER BY ${this.sorts.field} ${this.sorts.order}`
+            } else {
+                sql += ` ORDER BY bian_zhi_shi_jian DESC` // 默认排序
+            }
             // 添加分页
             sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}`
             return sql
@@ -185,8 +193,16 @@ export default {
             this.loadData()
         },
         handleSortChange (sort) {
-            ActionUtils.setSorts(this.sorts, sort)
-            this.loadData()
+            // 解析排序参数
+            if (sort.sortBy && sort.order) {
+                this.sorts = {
+                    field: sort.sortBy,
+                    order: sort.order === 'ascending' ? 'ASC' : 'DESC' // 转换为 SQL 排序关键字
+                }
+            } else {
+                this.sorts = {} // 取消排序
+            }
+            this.loadData() // 重新加载数据
         },
 
         // 操作处理

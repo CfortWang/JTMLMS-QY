@@ -208,6 +208,9 @@ export default {
         // 查询补卡日期下的异常数据
         handleBuKaRiQiChange (buKaRiQi) {
             const self = this
+            // 清空补卡班次、补卡时间
+            self.formData.buKaBanCi = ''
+            self.formData.buKaShiJian = ''
             queryAttendanceDetail(this.getSearchFormData()).then(async (res) => {
                 // ActionUtils.handleListData(this, res.data)
                 self.yichangdata = res.data.dataResult.filter(item => item.kaoQinZhuangTa === '异常' || item.kaoQinZhuangTa === '')

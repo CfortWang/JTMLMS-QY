@@ -165,6 +165,10 @@ export default {
                 this.listData.forEach(item => {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
+                    // 考勤状态-缺勤
+                    if (item.kao_qin_zhuang_ta === '') {
+                        item.kao_qin_zhuang_ta = '异常'
+                    }
                 })
                 this.pagination.totalCount = this.listData[0]?.total_count || 0
             }).finally(() => {
@@ -230,6 +234,11 @@ export default {
                     }
                 })
                 if (conditions.length > 0) {
+                    conditions.forEach((condition, index) => {
+                        if (condition.includes('异常')) {
+                            conditions[index] = `(kao_qin_zhuang_ta = '异常' or kao_qin_zhuang_ta = '') `
+                        }
+                    })
                     const wherestr = ' WHERE ' + conditions.join(' AND ')
                     sql = `select t.*, (select COUNT(*) FROM t_attendance_detail ${wherestr} ) AS total_count FROM t_attendance_detail t ${wherestr} ORDER BY ri_qi_ DESC `
                 }

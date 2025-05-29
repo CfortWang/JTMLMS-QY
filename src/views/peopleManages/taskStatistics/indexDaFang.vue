@@ -193,7 +193,7 @@ export default {
     },
     data () {
         const { level } = this.$store.getters
-        const colorGroup1 = ['#d20962', '#f47721', '#00bce4', '#7552cc']
+        const colorGroup1 = ['#d20962', '#f47721', '#00bce4', '#7552cc', '#00a78e', '#AFEEEE', '#FFB6C1', '	#FFFFE0', '#6495ED']
         const colorGroup2 = ['#00a78e', '#7d3f98', '#f85a40']
         return {
             depth3: '',
@@ -437,7 +437,11 @@ export default {
                 // 学位学历
                 data: [],
                 color: colorGroup1,
-                config: { title: '证书统计', idSelector: 'zsId' }
+                legend: false,
+                config: {
+                    title: '证书统计',
+                    idSelector: 'zsId'
+                }
             },
             // 职称统计图配置
             ranksPieData: {
@@ -469,12 +473,15 @@ export default {
                 animation: true,
                 tooltip: {
                     trigger: 'axis',
+                    confine: true,
+                    // appendToBody: true,
                     axisPointer: {
                         type: 'shadow'
                     }
                 },
 
                 legend: {
+                    top: 0,
                     textStyle: {
                         color: '#fff'
                     }
@@ -483,7 +490,8 @@ export default {
                 grid: {
                     left: '3%',
                     right: '4%',
-                    bottom: '3%',
+                    top: '40%',
+                    bottom: '2%',
                     containLabel: true
                 },
                 xAxis: [
@@ -498,7 +506,26 @@ export default {
                                 color: '#fff'
                             },
                             interval: 0,
-                            rotate: 50
+                            rotate: 50,
+                            formatter: function (name) {
+                                const text = name
+                                let result = ''// 拼接加\n返回的类目项
+                                const maxLength = 5// 每项显示文字个数
+                                const valLength = text.length// X轴类目项的文字个数
+                                const rowNumber = Math.ceil(valLength / maxLength) // 类目项需要换行的行数
+                                if (rowNumber > 1) { // 如果文字大于3,
+                                    for (var i = 0; i < rowNumber; i++) {
+                                        let temp = ''// 每次截取的字符串
+                                        const start = i * maxLength// 开始截取的位置
+                                        const end = start + maxLength// 结束截取的位置
+                                        temp = text.substring(start, end) + '\n'
+                                        result += temp // 拼接生成最终的字符串
+                                    }
+                                    return result
+                                } else {
+                                    return text
+                                }
+                            }
                         }
                     }
                 ],
@@ -516,7 +543,6 @@ export default {
                         }
                     }
                 ],
-                // " 大专", "本科", "硕士", "博士", "初级职称", "中级职称", "高级职称"
                 series: [
 
                 ],
@@ -545,7 +571,7 @@ export default {
                 grid: {
                     left: '3%',
                     right: '4%',
-                    bottom: '3%',
+                    bottom: '0%',
                     containLabel: true
                 },
                 xAxis: [
@@ -560,7 +586,26 @@ export default {
                                 color: '#fff'
                             },
                             interval: 0,
-                            rotate: 50
+                            rotate: 50,
+                            formatter: function (name) {
+                                const text = name
+                                let result = ''// 拼接加\n返回的类目项
+                                const maxLength = 5// 每项显示文字个数
+                                const valLength = text.length// X轴类目项的文字个数
+                                const rowNumber = Math.ceil(valLength / maxLength) // 类目项需要换行的行数
+                                if (rowNumber > 1) { // 如果文字大于3,
+                                    for (var i = 0; i < rowNumber; i++) {
+                                        let temp = ''// 每次截取的字符串
+                                        const start = i * maxLength// 开始截取的位置
+                                        const end = start + maxLength// 结束截取的位置
+                                        temp = text.substring(start, end) + '\n'
+                                        result += temp // 拼接生成最终的字符串
+                                    }
+                                    return result
+                                } else {
+                                    return text
+                                }
+                            }
                         }
                     }
                 ],
@@ -698,7 +743,7 @@ export default {
                 grid: {
                     left: '3%',
                     right: '4%',
-                    bottom: '3%',
+                    bottom: '0%',
                     containLabel: true
                 },
                 xAxis: [
@@ -713,7 +758,26 @@ export default {
                                 color: '#fff'
                             },
                             interval: 0,
-                            rotate: 50
+                            rotate: 50,
+                            formatter: function (name) {
+                                const text = name
+                                let result = ''// 拼接加\n返回的类目项
+                                const maxLength = 5// 每项显示文字个数
+                                const valLength = text.length// X轴类目项的文字个数
+                                const rowNumber = Math.ceil(valLength / maxLength) // 类目项需要换行的行数
+                                if (rowNumber > 1) { // 如果文字大于3,
+                                    for (var i = 0; i < rowNumber; i++) {
+                                        let temp = ''// 每次截取的字符串
+                                        const start = i * maxLength// 开始截取的位置
+                                        const end = start + maxLength// 结束截取的位置
+                                        temp = text.substring(start, end) + '\n'
+                                        result += temp // 拼接生成最终的字符串
+                                    }
+                                    return result
+                                } else {
+                                    return text
+                                }
+                            }
                         }
                     }
                 ],
@@ -1002,7 +1066,7 @@ export default {
                     data: [],
                     label: {
                         // 柱体上显示数值
-                        show: true, // 开启显示
+                        show: false, // 开启显示
                         textStyle: {
                             // 数值样式
                             position: 'top',
@@ -1010,9 +1074,25 @@ export default {
                             color: '#fff'
                         },
                         formatter: function (name) {
-                            return name.value === 0
+                            const text = name.value === 0
                                 ? ''
-                                : name + ':' + name.value
+                                : name.seriesName + ':' + name.value
+                            let result = ''// 拼接加\n返回的类目项
+                            const maxLength = 5// 每项显示文字个数
+                            const valLength = text.length// X轴类目项的文字个数
+                            const rowNumber = Math.ceil(valLength / maxLength) // 类目项需要换行的行数
+                            if (rowNumber > 1) { // 如果文字大于3,
+                                for (var i = 0; i < rowNumber; i++) {
+                                    let temp = ''// 每次截取的字符串
+                                    const start = i * maxLength// 开始截取的位置
+                                    const end = start + maxLength// 结束截取的位置
+                                    temp = text.substring(start, end) + '\n'
+                                    result += temp // 拼接生成最终的字符串
+                                }
+                                return result
+                            } else {
+                                return text
+                            }
                         }
                     }
                 })
@@ -1127,7 +1207,6 @@ export default {
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data
             })
-            console.log(data, 'aaaaaa')
             this.employeeNum = data.length
             if (this.initOnLoad === 0) {
                 this.initOnLoad = 1
@@ -1464,6 +1543,14 @@ export default {
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data
             })
+            if (data.length > 0 && data[0]) {
+                console.log(data[0])
+                this.zsPieData.data.forEach((item, i) => {
+                    item.value = data[0]['zsb' + i]
+                        ? data[0]['zsb' + i]
+                        : 0
+                })
+            }
         },
         async zsInfoDataPos () {
             const a = 'SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7'
@@ -1559,15 +1646,20 @@ export default {
                 })
                 if (data.length !== 0) {
                 //     // 跟《部门信息统计配置表》排列顺序一致
-                    for (let t = 0; t < data.length; t++) {
-                        this.zsOption.xAxis[0].data.push(
-                            data[t].enName
-                        )
-                        for (let i = 0; i < degreeSeriesDatas.length; i++) {
-                            degreeSeriesDatas[i].data[t] =
-                                data[t][shuZuList[i]]
+                    // for (let t = 0; t < data.length; t++) {
+
+                    // }
+                    data.forEach((item, t) => {
+                        if (item) {
+                            this.zsOption.xAxis[0].data.push(
+                                item.enName
+                            )
+                            for (let i = 0; i < degreeSeriesDatas.length; i++) {
+                                degreeSeriesDatas[i].data[t] =
+                                item[shuZuList[i]]
+                            }
                         }
-                    }
+                    })
                     this.zsOption.series = degreeSeriesDatas
                 }
             })
@@ -1824,7 +1916,7 @@ export default {
     overflow: hidden;
     box-sizing: border-box;
     .viewLeft {
-        width: 58%;
+        width: 63%;
         height: 100%;
         overflow: hidden;
         box-sizing: border-box;
@@ -1839,7 +1931,7 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        width: 40%;
+        width: 35%;
         height: 100%;
         overflow: hidden;
         // padding-bottom: 10px;
@@ -1858,13 +1950,13 @@ export default {
     box-sizing: border-box;
     display: flex;
     .midViewLeft {
-        width: 40%;
+        width: 45%;
         height: 100%;
         overflow: hidden;
         box-sizing: border-box;
     }
     .midViewRight {
-        width: 60%;
+        width: 55%;
 
         height: 100%;
         overflow: hidden;

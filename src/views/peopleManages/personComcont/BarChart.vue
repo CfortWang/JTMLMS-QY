@@ -30,11 +30,11 @@
             v-else
             style="
         width: 100%;
-        height: 90%;
+        height: 95%;
         display: inline-block;
         overflow: hidden;
         box-sizing: border-box;
-        margin-top:5%;
+        margin-top:0%;
       "
         >
             <div

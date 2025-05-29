@@ -113,6 +113,16 @@ export default {
                 limit: 15
             },
             sorts: {},
+            filter: [{
+                descVal: '1',
+                includeSub: true,
+                old: 'position',
+                partyId: this.$store.getters.userInfo.employee.positions,
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             daterRange: [],
             searchXinMing: '',
             pickerOptions: {

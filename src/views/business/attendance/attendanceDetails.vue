@@ -134,6 +134,16 @@ export default {
                 page: 1,
                 limit: 15
             },
+            filter: [{
+                descVal: '1',
+                includeSub: true,
+                old: 'position',
+                partyId: this.$store.getters.userInfo.employee.positions,
+                partyName: '',
+                scriptContent: '',
+                type: 'user',
+                userType: 'position'
+            }],
             sorts: {},
             daterRange: [],
             searchXinMing: '',
@@ -154,7 +164,7 @@ export default {
                     labelWidth: 80,
                     itemWidth: 200,
                     forms: [
-                        { prop: 'Q^kao_qin_zhuang_ta^SL', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
+                        { prop: 'Q^kao_qin_zhuang_ta^S', label: '考勤状态', fieldType: 'select', options: [{ value: '正常', label: '正常' }, { value: '异常', label: '异常' }] },
                         // { prop: 'Q^yong_hu_id_^S', label: '姓名', fieldType: 'select', options: userOption },
                         { prop: '', label: '姓名', fieldType: 'slot', slotName: 'userSlot' },
                         { prop: 'Q^gong_hao_^S', label: '工号' },
@@ -185,7 +195,12 @@ export default {
                 this.listData.forEach(item => {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
+                    // 考勤状态-缺勤
+                    if (item.kao_qin_zhuang_ta === '') {
+                        item.kao_qin_zhuang_ta = '异常'
+                    }
                 })
+                debugger
                 this.pagination.totalCount = this.listData[0]?.total_count
             }).finally(() => {
                 this.loading = false
@@ -247,8 +262,13 @@ export default {
                         }
                     }
                 })
-
+                debugger
                 if (conditions.length > 0) { // 正常查询条件一定会大于0，因为地点必查
+                    conditions.forEach((condition, index) => {
+                        if (condition.includes('异常')) {
+                            conditions[index] = `(kao_qin_zhuang_ta = '异常' or kao_qin_zhuang_ta = '') `
+                        }
+                    })
                     let wherestr = ' WHERE ' + conditions.join(' AND ')
                     if (this.searchXinMing) {
                         wherestr += `and yong_hu_id_ in ('` + this.searchXinMing.split(',').join("','") + `')`
