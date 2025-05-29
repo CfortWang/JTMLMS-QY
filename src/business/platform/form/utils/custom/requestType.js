@@ -7,5 +7,6 @@ export const normal = {
     // 批量更新：不同结果
     update: 'updatesBatchContextTable',
     // 批量更新：统一结果
-    updates: 'updateDatasContextTable'
+    updates: 'updateDatasContextTable',
+    query: 'queryData'
 }

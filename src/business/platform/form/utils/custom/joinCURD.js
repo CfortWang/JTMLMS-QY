@@ -4,19 +4,6 @@ import { encryptByAes } from '@/utils/encrypt'
 import { mapValues } from 'lodash'
 import { SHOW_PLAINTEXT } from '@/constant'
 import { getToken } from '@/utils/auth'
-// 请求方式默认POST
-const post = (type, data, method = 'post', loading = false) => {
-    const requestUrl = `business/v3/sys/universal/${normal[type]}`
-    // 非sql类型要关闭loading动画需传参loading:true
-    const isLoading = type === 'sql' ? loading : !loading
-    return request({
-        url: requestUrl,
-        method,
-        data: dealData(data, type),
-        // 开启表单提交加载，查询接口除外
-        isLoading
-    })
-}
 
 const replaceNullWithEmpty = obj => {
     function replaceValue (value) {
@@ -37,6 +24,9 @@ const replaceNullWithEmpty = obj => {
 
 // 处理数据
 const dealData = (args, type) => {
+    if (type === 'query') {
+        return JSON.stringify(args)
+    }
     // sql方法特殊处理
     if (type === 'sql') {
         args = {
@@ -50,6 +40,26 @@ const dealData = (args, type) => {
         ...plaintext
     }
     return JSON.stringify(res)
+}
+
+const BASE_URL = 'business/v3/sys/universal/'
+const DEFAULT_METHOD = 'post'
+const DEFAULT_LOADING = false
+
+const post = (type, data, method = DEFAULT_METHOD, loading = DEFAULT_LOADING) => {
+    const requestUrl = `${BASE_URL}${normal[type]}`
+    const isQueryType = type === 'query'
+
+    // 查询类型默认无 loading 动画，非查询类型要关闭 loading 动画需传参 loading:true
+    const isLoading = ['sql', 'query'].includes(type) ? loading : !loading
+
+    return request({
+        url: requestUrl,
+        method,
+        isLoading,
+        data: dealData(data, type)
+        // ...(isQueryType ? { data: JSON } : { data: dealData(data, type) })
+    })
 }
 
 export default post
