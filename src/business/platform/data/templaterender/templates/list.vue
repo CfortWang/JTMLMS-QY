@@ -1028,6 +1028,8 @@ export default {
                 const [path, ...rest] = button.reportPath?.split('&') || []
                 switch (buttonType) {
                     case 'search': // 查询
+                        // 20250603新增逻辑，数据模板列表查询数据前先清除已选中数据
+                        this.clearSelection()
                         ActionUtils.setFirstPagination(this.pagination)
                         this.search()
                         break
