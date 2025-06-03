@@ -143,7 +143,9 @@ const action = {
                 selection = selection.join(separator)
             }
 
-            MessageBox.confirm(confirmMsg, I18n.t('common.dialog.title'), {
+            // 20250603 删除数据提示信息增加删除数据的数量提示
+            const newConfirmMsg = confirmMsg.replace('该数据', `已选中的${selection.split(',')?.length}条数据`)
+            MessageBox.confirm(newConfirmMsg, I18n.t('common.dialog.title'), {
                 type: 'warning'
             }).then(() => {
                 resolve(selection)
