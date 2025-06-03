@@ -474,12 +474,12 @@ export default {
                 // 流程实例当前审批节点
                 this.endProcessTaskId = data.endProcessTaskId
                 if (this.timeModificationbtn) {
-                // 备份对比
+                    // 备份对比
                     this.$nextTick(() => {
                         setTimeout(() => {
                             this.formDataBF = this.getFormData()
                         }, 500)
-                        this.opinionListBF = JSON.parse(JSON.stringify(this.formParams.formOpinionData.opinionList))
+                        this.opinionListBF = structuredClone(this.formParams.formOpinionData.opinionList)
                     })
                 }
                 //  ============内嵌表单[按钮这边提供] ================
