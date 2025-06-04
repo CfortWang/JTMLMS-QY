@@ -482,7 +482,7 @@ export default {
                 if (this.QrcodeedDialogShow) {
                     this.QrcodeedDialogShow = false
                 }
-                const sql = "select * FROM t_qrcodeb WHERE guan_lian_id_ = '" + this.params.id_ + "'"
+                const sql = `select * FROM t_qrcodeb WHERE guan_lian_id_ = '${this.params.id_}'`
                 this.$common.request('sql', sql).then(res => {
                     const cont = res.variables.data
                     if (cont.length === 0) {
@@ -520,42 +520,38 @@ export default {
             var jsonString = value
             var jsonObject = JSON.parse(jsonString)
             var idValue = jsonObject.id
+            const { userList = [] } = this.$store.getters || {}
             // 根据工号查人员姓名，查得到
             // 插入数据，签到成功   第一次插入，插入重复
             // 查不到，请扫描正确的二维码
-            const sql = `select ID_ as ryid,NAME_ as name FROM ibps_party_employee WHERE ID_ = '${idValue}'`
-            this.$common.request('sql', sql).then((response) => {
-                const cont = response.variables.data
-                console.log('cont.length', cont.length)
-                if (!cont.length) {
-                    this.$message.warning('当前二维码无效，请使用正确的二维码进行扫描!')
-                } else {
-                    const sql = `select  * FROM t_qdxxb WHERE  guan_lian_id_='${variable}' and ren_yuan_id_='${idValue}'`
-                    this.$common.request('sql', sql).then(response => {
-                        const { data = [] } = response.variables || {}
-                        console.log('data', data.length)
-                        if (data.length > 0) {
-                            this.$message.warning('该人员已签到，请勿重复扫码!')
-                        } else {
-                            const names = cont[0].name
-                            // 数据存在
-                            // 插入数据，签到成功   第一次插入，插入重复
-                            const addParams = {
-                                tableName: 't_qdxxb',
-                                paramWhere: [{
-                                    guan_lian_id_: variable,
-                                    ren_yuan_id_: cont[0].ryid,
-                                    qian_dao_shi_jian: this.$common.getDateNow(19),
-                                    ye_wu_biao_ming_: 't_jykzjbdjb'
-                                }]
-                            }
-                            this.$common.request('add', addParams).then(res => {
-                                console.log('添加签到数据成功')
-                                this.$message.success('亲爱的 [' + names + ']，签到成功！感谢您的参与，希望您今天充满活力，工作顺利，心情愉快！')
-                            })
-                        }
-                    })
+            const user = userList.find(i => i.userId === idValue)
+            if (!user) {
+                this.$message.warning('当前二维码无效，请使用正确的二维码进行扫描!')
+                return
+            }
+            const sql = `select * FROM t_qdxxb WHERE guan_lian_id_='${variable}'`
+            this.$common.request('sql', sql).then(response => {
+                const { data = [] } = response.variables || {}
+                const isExist = data.some(i => i.ren_yuan_id_ === idValue)
+                if (isExist) {
+                    this.$message.warning('该人员已签到，请勿重复扫码!')
+                    return
                 }
+                // 数据存在
+                // 插入数据，签到成功   第一次插入，插入重复
+                const addParams = {
+                    tableName: 't_qdxxb',
+                    paramWhere: [{
+                        guan_lian_id_: variable,
+                        ren_yuan_id_: idValue,
+                        qian_dao_shi_jian: this.$common.getDateNow(19),
+                        ye_wu_biao_ming_: 't_jykzjbdjb'
+                    }]
+                }
+                this.$common.request('add', addParams).then(() => {
+                    console.log('添加签到数据成功')
+                    this.$message.success('亲爱的 [' + user.userName + ']，签到成功！感谢您的参与，希望您今天充满活力，工作顺利，心情愉快！')
+                })
             })
         },
 
@@ -607,9 +603,9 @@ export default {
         },
         // 判断状态是否已结束
         async getIsFinish () {
-            const sql = `select * from t_jykzjbdjb where id_='${this.form.id_}'`
+            const sql = `select * from t_jykzjbdjb where id_ = '${this.form.id_}'`
             const { variables: { data }} = await this.$common.request('sql', sql)
-            if (data[0].shi_fou_guo_shen_ === '已完成') {
+            if (data[0]?.shi_fou_guo_shen_ === '已完成') {
                 throw new Error('已完成，无法操作！')
             }
         },
@@ -629,15 +625,10 @@ export default {
                             const sql3 = `select * from t_qdxxb where guan_lian_id_='${this.params.id_}'`
                             const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
                             const peopleList = [...new Set(data3.map(item => item.ren_yuan_id_))]
-                            let shi_ji_qian_dao_r = ''
-                            // 提交校验试剂签到人员不能为空
-                            if (peopleList.length > 0) {
-                                shi_ji_qian_dao_r = peopleList.join(',')
-                            } else {
+                            const shi_ji_qian_dao_r = peopleList.join(',') || ''
+                            if (!shi_ji_qian_dao_r) {
                                 return false
                             }
-                            console.log(shi_ji_qian_dao_r, 2)
-                            // 2.生成快照
                             const formName = '人员/检验科早交班登记表.rpx'
                             const res = await this.$common.snapshoot({
                                 url: this.$getReportFile(formName, this.getReportParams(formName, this.params.id_, {
@@ -648,12 +639,7 @@ export default {
                                 name: this.params.id_,
                                 type: 'pdf'
                             })
-                            console.log(res)
-                            if (!res.data || !res.data.id) {
-                                console.log('快照生成失败')
-                            } else {
-                                console.log('快照生成成功')
-                            }
+
                             // 3.更新
                             const updateParamsRecord = {
                                 tableName: 't_jykzjbdjb',
@@ -668,7 +654,6 @@ export default {
                                     }
                                 }]
                             }
-                            console.log(updateParamsRecord)
                             await this.$common.request('update', updateParamsRecord)
                             this.closeDialog(true)
                             this.$message.success('提交成功')
@@ -710,26 +695,12 @@ export default {
                 // 1.确定最终签到人员
                 const sql3 = `select * from t_qdxxb where guan_lian_id_='${this.params.id_}'`
                 const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
-                let tempPeople = []
-                if (this.form.shou_dong_qian_da) {
-                    tempPeople = this.form.shou_dong_qian_da.split(',')
-                }
-                if (data3.length > 0) {
-                    for (let index = 0; index < data3.length; index++) {
-                        const item = data3[index]
-                        if (item.qian_dao_lei_xing === '手动') continue
-                        tempPeople.push(item.ren_yuan_id_)
-                    }
-                }
-                const peopleList = [...new Set(tempPeople)]
-                let shi_ji_qian_dao_r = ''
-                // 提交校验试剂签到人员不能为空，保存可以为空
-                if (peopleList.length > 0) {
-                    shi_ji_qian_dao_r = peopleList.join(',')
-                } else if (!flag && peopleList.length == 0) {
-                    return this.$message.warning('实际签到人员不能为空,请完成签到')
-                }
-                console.log(shi_ji_qian_dao_r, 1)
+
+                const tempPeople = this.form.shou_dong_qian_da?.split(',') || []
+                const autoSigners = data3.filter(item => item.qian_dao_lei_xing !== '手动').map(item => item.ren_yuan_id_)
+
+                const peopleList = [...new Set([...tempPeople, ...autoSigners])]
+                const shi_ji_qian_dao_r = peopleList.length ? peopleList.join(',') : ''
                 // 2.更新主表展示内容
                 const updateParamsRecord = {
                     tableName: 't_jykzjbdjb',
@@ -743,15 +714,10 @@ export default {
                         }
                     }]
                 }
-                console.log(updateParamsRecord)
                 await this.$common.request('update', updateParamsRecord)
 
                 // 3.更新签到人员
-                let curIds = []
-                if (this.form.shou_dong_qian_da) {
-                    curIds = this.form.shou_dong_qian_da.split(',')
-                }
-                console.log(this.Ids, curIds)
+                const curIds = this.form.shou_dong_qian_da?.split(',') || [];
                 // 计算需要增加的id
                 const addedIds = curIds.filter(id => !this.Ids.includes(id))
                 // 计算需要更新的id
@@ -775,20 +741,19 @@ export default {
                     })
                 }
                 if (deletedIds.length > 0) {
-                    const sql = `select * from t_qdxxb where guan_lian_id_='${this.params.id_}' and qian_dao_lei_xing='手动' and ren_yuan_id_ in (${deletedIds.map(id => `'${id}'`).join(', ')})`
-                    await this.$common.request('sql', sql).then(async res => {
-                        const { data } = res.variables || []
-                        if (data.length > 0) {
-                            const params = {
-                                tableName: 't_qdxxb',
-                                paramWhere: {
-                                    id_: data.map(item => item.id_).join(',')
-                                }
-                            }
-                            await this.$common.request('delete', params).then(res => {
-                                console.log('签到数据删除成功')
-                            })
+                    const deleteItem = data3.filter(item => deletedIds.includes(item.ren_yuan_id_) && item.qian_dao_lei_xing === '手动').map(item => item.id_)
+
+                    if (!deleteItem || !deleteItem.length) {
+                        return
+                    }
+                    const params = {
+                        tableName: 't_qdxxb',
+                        paramWhere: {
+                            id_: deleteItem.join(',')
                         }
+                    }
+                    await this.$common.request('delete', params).then(res => {
+                        console.log('签到数据删除成功')
                     })
                 }
                 if (flag === 'close') {
