@@ -4,10 +4,12 @@ import { getRefreshToken } from '@/utils/auth'
 import { OAUTH2_URL } from '@/api/baseUrl'
 // 1、引入ibps-oauth包
 import IbpsOAuth from './oauth2'
-import { GRANT_TYPE, CLIENT_ID, CLIENT_SECRET } from '@/constant'
+// import { GRANT_TYPE, CLIENT_ID, CLIENT_SECRET } from '@/constant'
+import { GRANT_TYPE } from '@/constant'
 
 // 2、生成一个OAuth的实例，clientId和clientSecert作为构造参数
-const oauthApi = new IbpsOAuth(CLIENT_ID, CLIENT_SECRET)
+// const oauthApi = new IbpsOAuth(CLIENT_ID, CLIENT_SECRET)
+const oauthApi = new IbpsOAuth()
 
 /**
  * 用户登录
@@ -120,8 +122,8 @@ export function switchUser ({ username, token }) {
         url: OAUTH2_URL() + '/authentication/switch',
         method: 'post',
         data: {
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
+            // 'client_id': CLIENT_ID,
+            // 'client_secret': CLIENT_SECRET,
             'grant_type': 'authorization_code',
             'access_token': token,
             'username': username
@@ -134,8 +136,8 @@ export function exitSwitchUser ({ username, token }) {
         url: OAUTH2_URL() + '/authentication/switch/exit',
         method: 'post',
         data: {
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
+            // 'client_id': CLIENT_ID,
+            // 'client_secret': CLIENT_SECRET,
             'grant_type': 'authorization_code',
             'access_token': token,
             'username': username

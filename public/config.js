@@ -38,12 +38,6 @@
         HEADER_SYSTEM_ID: 'X-Authorization-systemid',
         //  租户ID
         HEADER_TENANT_ID: 'X-Authorization-tenantid',
-
-        //================认证中心=====================
-        //申请应用时分配的AppKey
-        CLIENT_ID: 'ibps',
-        //申请应用时分配的AppSecret
-        CLIENT_SECRET: '58b65297-3467-0859-8337-8cbaf81ef68a',
         //授权方式:authorization_code ：授权码方式，  password_credentials：密码模式
         GRANT_TYPE: 'authorization_code',
 

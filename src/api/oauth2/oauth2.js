@@ -220,8 +220,8 @@ OAuth.prototype.getAccessTokenByCode = function (code, callback) {
     const args = {
         url: OAUTH2_URL() + '/authentication/apply',
         data: {
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            // client_id: this.clientId,
+            // client_secret: this.clientSecret,
             authorize_code: code,
             username: this.username,
             grant_type: 'authorization_code'
@@ -264,8 +264,8 @@ OAuth.prototype.getAccessTokenByPassword = function ({ username, password }, cal
     const args = {
         url: OAUTH2_URL() + '/authentication/apply',
         data: {
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            // client_id: this.clientId,
+            // client_secret: this.clientSecret,
             username: username,
             password: password,
             grant_type: 'password_credentials'
@@ -306,8 +306,8 @@ OAuth.prototype.refreshAccessToken = function (refreshToken, callback) {
     const args = {
         url: OAUTH2_URL() + '/authentication/apply',
         data: {
-            client_id: this.clientId,
-            client_secret: this.clientSecret,
+            // client_id: this.clientId,
+            // client_secret: this.clientSecret,
             grant_type: 'refresh_token',
             username,
             refresh_token: refreshToken
@@ -474,7 +474,7 @@ OAuth.prototype.authorize = function (data, callback) {
             login_state: data
         }
     }
-    data.client_id = this.clientId
+    // data.client_id = this.clientId
 
     const args = {
         url,
