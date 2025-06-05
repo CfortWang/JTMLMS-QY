@@ -4,6 +4,7 @@ import { encryptByAes, decryptByAes } from '@/utils/encrypt'
 import { preview } from '@/business/platform/form/utils/custom/preview'
 import request from '@/business/platform/form/utils/custom/joinCURD'
 import pinyin4js from 'pinyin4js'
+import pinyin from '@/utils/pinyin'
 import { snapshoot } from '@/api/platform/file/attachment'
 import { getNextIdByAlias, reagentConsumablesInventory } from '@/api/platform/system/identity'
 import { save as sendMsg } from '@/api/platform/message/innerMessage'
@@ -159,6 +160,7 @@ export const replaceNullWithEmpty = obj => {
 export default {
     preview,
     request,
+    pinyin,
     pinyin4js,
     snapshoot,
     getNextIdByAlias,
