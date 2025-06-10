@@ -485,23 +485,7 @@ export default {
                     const { variables: { data }} = await this.$common.request('sql', sql)
                     const submitNum = new Set(data.map(item => item.bian_zhi_ren_)).size
                     if (submitNum === pinGuRenNum && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
-                        // 0.生成快照
-                        const formName = '风险管理/风险识别评估表V2.rpx'
-                        const res = await this.$common.snapshoot({
-                            url: this.$getReportFile(formName, this.getReportParams(formName, this.params.id_, {
-                                ...this.preParams,
-                                shi_fou_guo_shen_: '已完成'
-                            })),
-                            name: this.params.id_,
-                            type: 'pdf'
-                        })
-                        console.log(res)
-                        if (!res.data || !res.data.id) {
-                            console.log('快照生成失败')
-                        } else {
-                            console.log('快照生成成功')
-                        }
-                        // 1.修改状态为已完成 并保存快照
+                        // 1.修改状态为已完成
                         const updateParamsRecord = {
                             tableName: 't_fxpgjlb2',
                             updList: [{
@@ -509,8 +493,7 @@ export default {
                                     id_: this.params.id_
                                 },
                                 param: {
-                                    shi_fou_guo_shen_: '已完成',
-                                    kuai_zhao_: res.data.id
+                                    shi_fou_guo_shen_: '已完成'
                                 }
                             }]
                         }
@@ -552,13 +535,17 @@ export default {
                             formKey: 'fxcscsbV2',
                             defKey: 'Process_1li9h0n'
                         }
+
+                        this.loading = true
                         for (let i = 0; i < addParams.paramWhere.length; i++) {
                             const item = addParams.paramWhere[i]
                             item.gai_jin_bian_hao_ = await this.getNextAlias('gjjllsh')
                         }
-                        console.log(addParams)
                         if (addParams.paramWhere.length) {
-                            await this.$common.request('add', addParams)
+                            // 预防推送流程数据过多，做切片处理
+                            await this.processInBatches(addParams.paramWhere).then(() => {}).catch(() => {
+                                this.loading = false
+                            })
                             console.log('改进流程推送成功')
                         } else {
                             console.log('无需推送')
@@ -608,6 +595,25 @@ export default {
             } catch (error) {
                 this.$message.warning(error.message)
             }
+        },
+        async processInBatches (array, batchSize = 20) {
+            for (let i = 0; i < array.length; i += batchSize) {
+                const batch = array.slice(i, i + batchSize)
+
+                try {
+                    const addParams = {
+                        'tableName': 't_fxkzcsb2',
+                        'paramWhere': batch,
+                        'formKey': 'fxcscsbV2',
+                        'defKey': 'Process_1li9h0n'
+                    }
+                    await this.$common.request('add', addParams)
+                } catch (error) {
+                    console.error('处理批次时出错:', error)
+                    // 可以添加重试逻辑或错误处理
+                }
+            }
+            console.log('所有数据处理完成')
         },
         // id 转 姓名
         switchIdtoUserName (id) {

@@ -121,6 +121,8 @@
 </template>
 
 <script>
+import { getSetting } from '@/utils/query'
+
 export default {
     components: {
         IbpsImage: () => import('@/business/platform/file/image')
@@ -143,6 +145,7 @@ export default {
                 pageSize: 100
             },
             activeName: '1',
+            // activeName: '答卷1',
             title: '试题评阅',
             dialogVisible: this.visible,
             loading: false,
@@ -174,7 +177,10 @@ export default {
                 { key: 'cancel', label: '退出' }
             ],
             questionList: [],
+            groupedByPaperId: {}, // 根据答卷分类的题目列表
+            groupedArray: [], // 答卷id数组
             showIndex: 1,
+            groupByUser: false,
             userId
         }
     },
@@ -182,14 +188,36 @@ export default {
         formData () {
             return this.data
         },
+        /* -优化答卷
         pageTotal () {
             return Math.ceil(this.questionList.length / this.pagination.pageSize)
+        }*/
+        pageTotal () {
+            if (this.groupByUser) { // 按照答卷分类
+                return Array.from(
+                    { length: Object.keys(this.groupedByPaperId).length },
+                    (_, index) => `答卷${index + 1}`
+                )
+            } else {
+                return Math.ceil(this.questionList.length / this.pagination.pageSize)
+            }
         }
     },
     watch: {
+        /* -优化答卷
         activeName: {
             handler (val) {
                 this.pagination.currentPage = +val
+            }
+        },*/
+        activeName: {
+            handler (val) {
+                if (this.groupByUser) { // 按照答卷分类
+                    const num = val.split('答卷')[1]
+                    this.pagination.currentPage = +num
+                } else {
+                    this.pagination.currentPage = +val
+                }
             }
         },
         visible: {
@@ -198,15 +226,36 @@ export default {
             }
             // immediate: true
         },
+        /* -优化答卷
         showIndex: {
             handler (val, oldVal) {
                 this.pagination.currentPage = Math.ceil(val / this.pagination.pageSize)
                 this.activeName = this.pagination.currentPage + ''
                 const temp = this.questionList[oldVal - 1]
             }
+        }*/
+        showIndex: {
+            handler (val, oldVal) {
+                if (this.groupByUser) { // 按照答卷分类
+                    const paperId = this.questionList[val - 1].paperId
+                    const paperIds = Object.keys(this.groupedByPaperId)
+                    const num = paperIds.indexOf(paperId)
+                    this.pagination.currentPage = num + 1
+                    this.activeName = '答卷' + this.pagination.currentPage
+                } else {
+                    this.pagination.currentPage = Math.ceil(val / this.pagination.pageSize)
+                    this.activeName = this.pagination.currentPage + ''
+                }
+                const temp = this.questionList[oldVal - 1]
+            }
         }
     },
-    mounted () {
+    async mounted () {
+        const { tagData, tagName } = await getSetting('examTag') || {}
+        if (tagData) {
+            this.groupByUser = tagData.groupByUser
+            this.activeName = '答卷1'
+        }
         this.loadData()
         // 监听键盘事件
         window.addEventListener('keyup', this.handleKeyPress)
@@ -215,19 +264,69 @@ export default {
         window.removeEventListener('keyup', this.handleKeyPress)
     },
     methods: {
+        /* -优化答卷
         pageRange (pageNo) {
             return {
                 start: (pageNo - 1) * this.pagination.pageSize + 1,
                 end: pageNo * this.pagination.pageSize > this.questionList.length ? this.questionList.length : pageNo * this.pagination.pageSize
             }
+        },*/
+        pageRange (pageNo) {
+            if (this.groupByUser) { // 按照答卷分类
+                // 将分组对象转换为数组（例如：[[paperId1, questions1], [paperId2, questions2], ...]）
+                const groups = Object.values(this.groupedByPaperId)
+                // 计算累积题目数（例如：groups 是 [[题1~20], [题21~42]]，cumulativeLengths 是 [20, 42]）
+                const cumulativeLengths = groups.reduce((acc, group, index) => {
+                    const prevTotal = index === 0 ? 0 : acc[index - 1]
+                    acc.push(prevTotal + group.length)
+                    return acc
+                }, [])
+                // 根据页码找到对应的分组索引
+                const groupIndex = pageNo - 1 // 假设每页显示一个分组
+                if (groupIndex < 0 || groupIndex >= groups.length) {
+                    return { start: 0, end: 0 }
+                }
+                // 计算当前分组的 start 和 end
+                const start = groupIndex === 0 ? 1 : cumulativeLengths[groupIndex - 1] + 1
+                const end = cumulativeLengths[groupIndex]
+                return { start, end }
+            } else {
+                return {
+                    start: (pageNo - 1) * this.pagination.pageSize + 1,
+                    end: pageNo * this.pagination.pageSize > this.questionList.length ? this.questionList.length : pageNo * this.pagination.pageSize
+                }
+            }
         },
+        /* -优化答卷
         pageLabel (pageNo) {
             const { start, end } = this.pageRange(pageNo)
             return `${start}-${end}`
+        },*/
+        pageLabel (pageNo) {
+            if (this.groupByUser) { // 按照答卷分类
+                return `${pageNo}`
+            } else {
+                const { start, end } = this.pageRange(pageNo)
+                return `${start}-${end}`
+            }
         },
         // 获取题库数据
         async loadData () {
             this.questionList = await this.getQuestionData()
+            if (this.groupByUser) { // 按照答卷分类
+                this.groupedByPaperId = this.questionList.reduce((acc, current) => {
+                    const paperId = current.paperId
+                    if (!acc[paperId]) {
+                        acc[paperId] = []
+                    }
+                    acc[paperId].push(current)
+                    return acc
+                }, {})
+                // this.groupedArray = this.groupedByPaperId
+                this.questionList = Object.keys(this.groupedByPaperId).reduce((acc, paperId) => {
+                    return acc.concat(this.groupedByPaperId[paperId])
+                }, [])
+            }
             console.log(this.questionList)
         },
         handleActionEvent ({ key }) {

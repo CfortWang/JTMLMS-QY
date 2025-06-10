@@ -219,7 +219,7 @@
                             <template slot-scope="{row}">
                                 <el-select v-model="row.feng_xian_ying_du" placeholder="请选择" :disabled="readonly" size="mini">
                                     <el-option
-                                        v-for="item in ['风险降低','风险接受','风险回避']"
+                                        v-for="item in riskResponse"
                                         :key="item"
                                         :label="item"
                                         :value="item"
@@ -289,6 +289,7 @@
 </template>
 
 <script>
+import { getSetting } from '@/utils/query'
 import dayjs from 'dayjs'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import { getImage } from '@/api/platform/file/attachment'
@@ -361,7 +362,8 @@ export default {
             Ids: [],
             fengXianJiSuan: [],
             muban: '2',
-            leixing: '安全'
+            leixing: '安全',
+            riskResponse: ['风险降低', '风险接受', '风险回避']
         }
     },
     computed: {
@@ -456,6 +458,12 @@ export default {
                     this.loading = false
                 })
             }
+        }
+    },
+    async mounted () {
+        const riskResponse = await getSetting('risk', 'riskResponse')
+        if (this.$utils.isNotEmpty(riskResponse)) {
+            this.riskResponse = riskResponse
         }
     },
     methods: {

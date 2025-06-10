@@ -90,8 +90,8 @@ export default {
                     effect: 'default',
                     // effect: 'display',
                     actions: [
-                        { key: 'agree', label: '同意', type: 'success', icon: 'ibps-icon-check', hidden: function (row) { return (row.zhuang_tai_ === '已通过') } },
-                        { key: 'disagree', label: '不同意', type: 'danger', icon: 'ibps-icon-close', hidden: function (row) { return (row.zhuang_tai_ === '已通过') } },
+                        { key: 'agree', label: '同意', type: 'success', icon: 'ibps-icon-check', hidden: function (row) { return (row.zhuang_tai_ === '已通过' || row.zhuang_tai_ === '已撤销' || row.zhuang_tai_ === '未通过') } },
+                        { key: 'disagree', label: '不同意', type: 'danger', icon: 'ibps-icon-close', hidden: function (row) { return (row.zhuang_tai_ === '已通过' || row.zhuang_tai_ === '已撤销' || row.zhuang_tai_ === '未通过') } },
                         { key: 'detail', label: '详情', type: 'primary', icon: 'ibps-icon-list-alt' }
                     ]
                 }
