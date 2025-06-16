@@ -349,6 +349,8 @@
             :type-list="typeList"
             :tab-list="tabList"
             :hide-sys-device-no="hideSysDeviceNo"
+            :has-fu-ze-ren-dian-hua="hasFuZeRenDianHua"
+            :has-chang-jia-lian-xi-ren="hasChangJiaLianXiRen"
             :readonly="!hasRole"
             @close="close"
         />
@@ -370,6 +372,7 @@
         />
         <!-- <DeviceTagWeiNing v-if="tagName==='deviceTagWeiNing'" :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" /> -->
         <DeviceTagTemplateTwo v-if="tagName==='deviceTagTemplateTwo'" :tag-data="tagData" :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" />
+        <DeviceTagTemplateThree v-else-if="tagName==='deviceTagTemplateThree'" :tag-data="tagData" :scan-visible="printVisible" :obj="printObj" :state-list="stateList" @scanOff="scanOff" />
         <DeviceTag v-else :scan-visible="printVisible" :obj="printObj" :tag-data="tagData" :state-list="stateList" @scanOff="scanOff" />
         <el-dialog
             :close-on-click-modal="false"
@@ -408,11 +411,13 @@ import dayjs from 'dayjs'
 import DeviceTag from '@/views/system/jbdScan/goods/deviceTag.vue'
 // import DeviceTagWeiNing from '@/views/system/jbdScan/goods/deviceTagWeiNing.vue'
 import DeviceTagTemplateTwo from '@/views/system/jbdScan/goods/deviceTagTemplateTwo'
+import DeviceTagTemplateThree from '@/views/system/jbdScan/goods/deviceTagTemplateThree'
 export default {
     components: {
         DeviceTag,
         // DeviceTagWeiNing,
         DeviceTagTemplateTwo,
+        DeviceTagTemplateThree,
         DataTemplateFormrenderDialog,
         DeviceDialog,
         ibpsUserSelector,
@@ -675,6 +680,8 @@ export default {
             },
             stateList: { '停用': '停用', '报废': '报废', '合格': '合格' },
             hideSysDeviceNo: false,
+            hasFuZeRenDianHua: false,
+            hasChangJiaLianXiRen: false,
             tabList: {},
             hasRole: true,
             typeList: { '检验系统': '检验系统', '通用设备': '通用设备', '软件': '软件', '信息系统': '信息系统' },
@@ -683,7 +690,7 @@ export default {
         }
     },
     async mounted () {
-        const { stateList, hideSysDeviceNo, tabList, hasDeviceRole, typeList } = await getSetting('device') || {}
+        const { stateList, hideSysDeviceNo, tabList, hasDeviceRole, typeList, hasFuZeRenDianHua, hasChangJiaLianXiRen } = await getSetting('device') || {}
         const { tagData, tagName } = await getSetting('deviceTag') || {}
         if (tagName) {
             console.debug('tagName', tagName)
@@ -711,6 +718,12 @@ export default {
             // 查询条件隐藏设备编号 将原设备编号改为设备编号
             this.listConfig.searchForm.forms = this.listConfig.searchForm.forms.filter(i => i.slotName !== 'nowNumber')
             this.listConfig.searchForm.forms.find(i => i.slotName === 'preNumber').label = '设备编号'
+        }
+        if (hasFuZeRenDianHua) {
+            this.hasFuZeRenDianHua = hasFuZeRenDianHua
+        }
+        if (hasChangJiaLianXiRen) {
+            this.hasChangJiaLianXiRen = hasChangJiaLianXiRen
         }
         if (tabList) {
             console.debug('tabList', tabList)

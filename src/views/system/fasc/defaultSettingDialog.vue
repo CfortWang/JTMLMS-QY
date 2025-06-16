@@ -57,7 +57,7 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                    <el-row v-if="form.zhou_qi_!==''" :gutter="20">
+                    <el-row v-if="form.zhou_qi_!==''&& form.zhou_qi_ !== '按需'" :gutter="20">
                         <el-col :span="12">
                             <el-form-item :label="labelShow">
                                 <el-checkbox-group v-if="form.zhou_qi_==='每日'" v-model="dayCheck" style="width:100%">
@@ -243,7 +243,8 @@ export default {
                 { label: '季度监测', value: '每季度' },
                 { label: '半年监测', value: '每半年' },
                 { label: '年监测', value: '每年' },
-                { label: '按时间间隔监测', value: '间隔' }
+                { label: '按时间间隔监测', value: '间隔' },
+                { label: '按需监测', value: '按需' }
             ]
         }
     },

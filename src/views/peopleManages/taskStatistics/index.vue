@@ -1066,35 +1066,26 @@ export default {
                             t_ryjbqk 
                         WHERE
                             parent_id_ IN (
+                        select
+                            ee.id_ as bid
+                        FROM
+                        (
                             SELECT
-                                b.id_ AS bid 
+                                e.*
                             FROM
-                                (
-                                SELECT
-                                    a.* 
-                                FROM
-                                    (
-                                    SELECT
-                                        id_,
-                                        name_,
-                                        TRIM(
-                                        SUBSTRING_INDEX( SUBSTRING_INDEX( positions_, ',', n ), ',', - 1 )) AS positions_ 
-                                    FROM
-                                        ibps_party_employee
-                                        JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers 
-                                    WHERE
-                                        LENGTH( positions_ ) - LENGTH(
-                                        REPLACE ( positions_, ',', '' )) >= n - 1 
-                                        and name_ not like '%系统%'
-                                        and name_ not like '%金通%'
-                                        and name_ not like '%管理%'
-                                        and id_ != '702117247933480960'
-                                    ) a 
-                                GROUP BY
-                                    name_ 
-                                ) b 
+                                ibps_party_employee e
+                                JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, e.POSITIONS_ ) > 0 
+                            WHERE
+                                en.PATH_ LIKE '%${this.depth3}%' 
+                            GROUP BY
+                                e.id_ 
+                            ) ee
                         WHERE
-                            b.positions_ IN ( SELECT id_ FROM ibps_party_entity WHERE path_ LIKE '%${this.first}%' AND party_type_ = 'position' ))`
+                        ee.name_ NOT LIKE '%系统%' 
+                            AND ee.STATUS_ = 'actived'
+                            AND ee.name_ NOT LIKE '%金通%' 
+                            AND ee.name_ NOT LIKE '%管理%' 
+                            AND ee.id_ != '702117247933480960')`
 
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data
@@ -1178,7 +1169,7 @@ export default {
                                     ry.zhi_cheng_deng_ji 
                                 FROM
                                     t_ryjbqk AS ry
-                                    JOIN ibps_party_employee AS ee ON ry.parent_id_ = ee.id_ where ee.name_ not like '%系统%' and ee.name_ not like '%金通%' and ee.name_ not like '%管理%' and ee.id_ != '702117247933480960'
+                                    JOIN ibps_party_employee AS ee ON ry.parent_id_ = ee.id_ where ee.name_ not like '%系统%' AND ee.STATUS_ = 'actived' and ee.name_ not like '%金通%' and ee.name_ not like '%管理%' and ee.id_ != '702117247933480960'
                                 ) gy
                                 RIGHT JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, gy.positions_ ) 
                             WHERE
@@ -1203,35 +1194,27 @@ export default {
                             t_ryjbqk 
                         WHERE
                             parent_id_ IN (
+						select
+                            ee.id_ as bid
+                        FROM
+                        (
                             SELECT
-                                b.id_ AS bid 
+                                e.*
                             FROM
-                                (
-                                SELECT
-                                    a.* 
-                                FROM
-                                    (
-                                    SELECT
-                                        id_,
-                                        name_,
-                                        TRIM(
-                                        SUBSTRING_INDEX( SUBSTRING_INDEX( positions_, ',', n ), ',', - 1 )) AS positions_ 
-                                    FROM
-                                        ibps_party_employee
-                                        JOIN (${this.$store.getters.deptList.length > 2 ? sqlparty : a}) AS numbers 
-                                    WHERE
-                                        LENGTH( positions_ ) - LENGTH(
-                                        REPLACE ( positions_, ',', '' )) >= n - 1 
-                                        and name_ not like '%系统%'
-                                        and name_ not like '%金通%'
-                                        and name_ not like '%管理%'
-                                        and id_ != '702117247933480960'
-                                    ) a 
-                                GROUP BY
-                                    name_ 
-                                ) b 
+                                ibps_party_employee e
+                                JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, e.POSITIONS_ ) > 0 
+                            WHERE
+                                en.PATH_ LIKE '%${this.depth3}%' 
+                            GROUP BY
+                                e.id_ 
+                            ) ee
                         WHERE
-                            b.positions_ IN ( SELECT id_ FROM ibps_party_entity WHERE path_ LIKE '%${this.depth3}%' AND party_type_ = 'position' ))`
+                            ee.name_ NOT LIKE '%系统%' 
+                            AND ee.STATUS_ = 'actived'
+                            AND ee.name_ NOT LIKE '%金通%' 
+                            AND ee.name_ NOT LIKE '%管理%' 
+                            AND ee.id_ != '702117247933480960'
+														)`
 
             await curdPost('sql', sql).then((res) => {
                 const data = res.variables.data

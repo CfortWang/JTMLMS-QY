@@ -20,7 +20,7 @@
         <div class="container">
             <div class="left" :style="{width:initWidth}">
                 <div class="form">
-                    <el-form ref="form" label-width="100px" :model="form" :rules="rules" :hide-required-asterisk="true">
+                    <el-form ref="form" label-width="120px" :model="form" :rules="rules" :hide-required-asterisk="true">
                         <el-row type="flex" justify="center" :gutter="20">
                             <el-col :span="16">
                                 <el-row :gutter="20">
@@ -187,6 +187,7 @@
                                                 :filter="filter"
                                                 filtrate
                                                 style="width:100%"
+                                                @change-link-data="changeGuanLiRen"
                                             />
                                         </el-form-item>
                                     </el-col>
@@ -273,6 +274,20 @@
                                         <el-form-item label="注册证号：">
                                             <el-input v-if="!readonly" v-model="form.zhuCeZhengHao" size="mini" />
                                             <span v-else>{{ form.zhuCeZhengHao ||'/' }}</span>
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                                <el-row :gutter="20">
+                                    <el-col v-if="hasFuZeRenDianHua" :span="8">
+                                        <el-form-item label="负责人电话：">
+                                            <el-input v-if="!readonly" v-model="form.fuZeRenDianHua" size="mini" />
+                                            <span v-else>{{ form.fuZeRenDianHua ||'/' }}</span>
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col v-if="hasChangJiaLianXiRen" :span="10">
+                                        <el-form-item label="厂家联系人及电话：">
+                                            <el-input v-if="!readonly" v-model="form.changJiaLianXiRen" size="mini" />
+                                            <span v-else>{{ form.changJiaLianXiRen ||'/' }}</span>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -838,6 +853,14 @@ export default {
             default: function () {
                 return { '检验系统': '检验系统', '通用设备': '通用设备', '软件': '软件', '信息系统': '信息系统' }
             }
+        },
+        hasFuZeRenDianHua: {
+            type: Boolean,
+            default: false
+        },
+        hasChangJiaLianXiRen: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -944,8 +967,9 @@ export default {
                 jianDingXiao: '', // 检定/校准参数
                 xiuZhengZhiXiu: '', // 修正值
                 zuiDaYunCha: '', // U/精确度/最大允差
-                shiWuShuoMing: '' // 校准机构
-
+                shiWuShuoMing: '', // 校准机构
+                fuZeRenDianHua: '', // 负责人电话
+                changJiaLianXiRen: '' // 厂家联系人及电话
             },
             rules: {
                 sheBeiMingCheng: [
@@ -1060,6 +1084,9 @@ export default {
         this.init()
     },
     methods: {
+        changeGuanLiRen (key, data) {
+            this.form.fuZeRenDianHua = data?.mobile
+        },
         sheBeiMingChenChange (key, data) {
             this.form.sheBeiMingCheng = data.ming_cheng_str_
             this.form.guiGeXingHao = data.xing_hao_gui_ge_

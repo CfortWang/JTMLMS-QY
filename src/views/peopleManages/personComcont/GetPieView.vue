@@ -72,7 +72,7 @@ export default {
                 color: this.info.color,
                 tooltip: {
                     trigger: 'item',
-                    formatter: '{d}%'
+                    formatter: ''
                 },
                 label: {
                     formatter: function (name) {
@@ -89,9 +89,9 @@ export default {
                                 temp = text.substring(start, end) + (i === rowNumber - 1 ? '' : '\n')
                                 result += temp // 拼接生成最终的字符串
                             }
-                            return result + '(' + name.value + ')'
+                            return result + '(' + name.percent + '%)'
                         } else {
-                            return text + '(' + name.value + ')'
+                            return text + '(' + name.percent + '%)'
                         }
                     },
                     edgeDistance: '20%',

@@ -262,6 +262,13 @@ export default {
         position: absolute;
         color: #fff;
         z-index: 999;
+        font-size: 16px;
+        @media only screen and (max-width: 1680px) {
+            font-size: 14px;
+        }
+        @media only screen and (max-width: 1366px) {
+            font-size: 12px;
+        }
         :global {
             #dv-full-screen-container {
                 background-image: url('~@/assets/images/screen/bg.png');
@@ -341,10 +348,10 @@ export default {
             }
             .title {
                 position: absolute;
-                font-size: 30px;
+                font-size: 1.875em;
                 font-weight: bold;
                 left: 50%;
-                top: 15px;
+                top: 0.9375em;
                 transform: translateX(-50%);
             }
             .daterange, .cycle, .back, .parse {
@@ -371,7 +378,7 @@ export default {
                         background: rgba(255, 255, 255, 0);
                         border: none;
                         color: #fff;
-                        font-size: 16px;
+                        font-size: 1em;
                         cursor: pointer;
                         // padding-left: 0;
                         padding-right: 0;
@@ -381,7 +388,7 @@ export default {
                         background: rgba(255, 255, 255, 0);
                         border: none;
                         color: #fff;
-                        font-size: 12px;
+                        font-size: 0.75em;
                         cursor: pointer;
                         // padding-left: 0;
                         padding-right: 0;
@@ -390,7 +397,7 @@ export default {
                         width: 100% !important;
                         background: rgba(255, 255, 255, 0);
                         border: none;
-                        font-size: 16px;
+                        font-size: 1em;
                         cursor: pointer;
                         // padding-left: 0;
                         padding-right: 0;
@@ -406,20 +413,20 @@ export default {
                         }
                     }
                     .el-cascader .el-input--suffix .el-input__inner{
-                        font-size: 12px;
+                        font-size: 0.75em;
                         color: #fff;
                     }
                 }
             }
             .cycle {
                 display: flex;
-                min-width: 150px;
+                min-width: 9.375em;
                 justify-content: flex-end;
                 // width: 125px;
                 right: 75%;
-                padding-left: 10px;
+                padding-left: 0.625em;
                 color: #fff;
-                font-size: 22px;
+                font-size: 1.5em;
                 font-weight: 400;
                 :global {
                     .el-dropdown {
@@ -435,15 +442,15 @@ export default {
             }
             .back {
                 width: 5%;
-                left: calc(75% + 80px);
+                left: calc(75% + 5em);
             }
             .parse {
                 width: 2%;
                 left: 75%;
                 align-items: center;
-                padding: 5px;
+                padding: 0.3125em;
                 > img {
-                    height: calc(100% - 10px);
+                    height: calc(100% - 0.625em);
                 }
             }
             @media only screen and (max-width: 1680px) {

@@ -147,7 +147,7 @@ export default {
                     this.tableList = people.map(item => {
                         return {
                             bian_zhi_ren_: item,
-                            bian_zhi_bu_men_: this.getPersonPosition(item),
+                            bian_zhi_bu_men_: this.detail.find(i => i.bian_zhi_ren_ === item)?.bian_zhi_bu_men_ || this.getPersonPosition(item),
                             shi_fou_guo_shen_: this.getPersonStatus(item),
                             feng_xian_shu_: this.getRiskCount(item),
                             feng_xian_c_: this.getRiskCategory(item)

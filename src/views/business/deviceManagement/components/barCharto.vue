@@ -2,7 +2,7 @@
     <div :class="$style.statisticsPage" :style="{width:width,height:height}">
         <div v-show="show" :id="'staff'+id" :style="{height:'100%'}" />
         <div v-show="!show" :style="{height:'100%'}">
-            <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
+            <div style="height:8%;font-size:1.5em;font-weight: 600;"> {{ title }} </div>
             <div :class="$style.nullShow">暂无数据</div>
         </div>
     </div>
@@ -154,14 +154,15 @@ export default {
                 title: {
                     text: this.title,
                     left: 'left',
-                    textStyle: { fontSize: 24, color: this.colorw }
+                    textStyle: { fontSize: '1.5em', color: this.colorw }
                 },
                 legend: {
                     left: 'left',
                     top: '40',
                     show: this.legendVal,
                     textStyle: {
-                        color: '#fff'
+                        color: '#fff',
+                        fontSize: '0.8em'
                     },
                     formatter: function (name) {
                         return that.correspondence[name] || that.correspondenceUn[name] || that.dynamicMappingCondition[that.correspondenceCondition[name]]
@@ -202,6 +203,7 @@ export default {
                         interval: 0,
                         rotate: 20,
                         margin: 15,
+                        fontSize: '0.8em',
                         formatter: function (params) {
                             let str = ''
                             const paramsLen = params.length
@@ -230,6 +232,7 @@ export default {
                     axisLabel: {
                         color: '#fff',
                         min: 0,
+                        fontSize: '0.8em',
                         formatter: function (value) {
                             const mid = (value + '').indexOf('.') === -1 ? value + '' : ''
                             let str = ''
@@ -272,11 +275,18 @@ export default {
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       padding: 1%;
       /* background-color: rgba(6, 30, 93, 0.5); */
+    //   font-size: 16px;
+    //   @media only screen and (max-width: 1680px) {
+    //     font-size: 14px;
+    //   }
+    //   @media only screen and (max-width: 1366px) {
+    //     font-size: 12px;
+    //   }
       .nullShow{
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 1.125em;
         height: 92%;
       }
   }

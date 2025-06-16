@@ -14,8 +14,8 @@
                             </div>
                         </div>
                         <div>
-                            <div style="font-size:17px;font-weight:600;">{{ captionArr[n] }}</div>
-                            <div style="font-weight:600;font-size:28px;color: rgb(255,255,0);margin-top: 1vh;text-align: center;">{{ item }}</div>
+                            <div style="font-size:1.0625em;font-weight:600;">{{ captionArr[n] }}</div>
+                            <div style="font-weight:600;font-size:1.75em;color: rgb(255,255,0);margin-top: 1vh;text-align: center;">{{ item }}</div>
                         </div>
                     </div>
                     <div v-else-if="i!=='sum'&&n==='upKeep'" class="mySty">
@@ -144,7 +144,7 @@ export default {
       .titleSty{
         width: 100%;
         height: 15%;
-        font-size: 24px;
+        font-size: 1.5em;
         font-weight: 600;
       }
       .bodySty{
@@ -158,7 +158,7 @@ export default {
           padding: 1%;
           // border: solid 1px rgb(233, 233, 233);
           background-color: rgba(14, 34, 93, 0.9);
-          border-radius: 10px;
+          border-radius: 0.625em;
           display: flex;
           flex-flow: column;
           .itemSty{
@@ -182,8 +182,8 @@ export default {
               display: flex;
               align-items: center;
               justify-content: center;
-              border-radius: 200px;
-              padding: 15px;
+              border-radius: 12.5em;
+              padding: 0.975em;
               // background-color: rgb(16, 142, 255);
             }
           }
@@ -221,7 +221,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 1.125em;
         height: 92%;
       }
   }

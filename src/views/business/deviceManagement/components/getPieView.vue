@@ -1,8 +1,8 @@
 <template>
     <div class="statisticsPage" :style="{width:width,height:height}">
-        <div v-show="show" :id="'mid'+id" :style="{height:'100%'}"/>
-        <div v-show="!show"  :style="{height:'100%'}">
-            <div style="height:8%;font-size:24px;font-weight: 600;"> {{ title }} </div>
+        <div v-show="show" :id="'mid'+id" :style="{height:'100%'}" />
+        <div v-show="!show" :style="{height:'100%'}">
+            <div style="height:8%;font-size:1.5em;font-weight: 600;"> {{ title }} </div>
             <div class="nullShow">暂无数据</div>
         </div>
     </div>
@@ -16,25 +16,25 @@ export default {
             type: Array,
             default: []
         },
-        width:{
-            type:String,
-            default:"100%"
+        width: {
+            type: String,
+            default: '100%'
         },
-        height:{
-            type:String,
-            default: "100%"
+        height: {
+            type: String,
+            default: '100%'
         },
-        title:{
+        title: {
             type: String
         },
-        id:{
-            type:Number,
-            default:0
+        id: {
+            type: Number,
+            default: 0
         },
-        colorw:{
-            type:String,
-            default:'#fff'
-        },
+        colorw: {
+            type: String,
+            default: '#fff'
+        }
     },
     data () {
         return {
@@ -44,17 +44,16 @@ export default {
     watch: {
         value: {
             handler (newVal, oldVal) {
-                if(newVal.length>0){
+                if (newVal.length > 0) {
                     this.show = true
                     setTimeout(() => {
                         this.getMiddleLeft()
                     }, 100)
-                }else{
+                } else {
                     this.show = false
                 }
-                
             },
-            deep: true,
+            deep: true
             // immediate: true
         }
     },
@@ -66,15 +65,15 @@ export default {
     },
     methods: {
         getMiddleLeft () {
-            const chartDom = document.getElementById('mid'+this.id)
-            let myChart = echarts.init(chartDom)
+            const chartDom = document.getElementById('mid' + this.id)
+            const myChart = echarts.init(chartDom)
             const radius = window.innerWidth > 1600 ? '60%' : '45%'
             let option
             option = {
                 title: {
                     text: this.title,
                     left: 'left',
-                    textStyle:{ fontSize:24,color: this.colorw }
+                    textStyle: { fontSize: '1.5em', color: this.colorw }
                 },
                 color: ['#339933', '#3366CC', '#FF9933', '#FFFF00'],
                 tooltip: {
@@ -85,7 +84,7 @@ export default {
                     formatter: '{c}，{d}%\n{b}',
                     edgeDistance: '20%',
                     color: '#fff',
-                    fontSize: '12px'
+                    fontSize: '0.75em'
                 },
 
                 legend: {
@@ -96,7 +95,9 @@ export default {
                     left: 'left',
                     top: '45',
                     textStyle: {
-                        color: '#fff'
+                        color: '#fff',
+                        fontSize: '0.8em'
+
                     }
                 },
                 series: [
@@ -137,7 +138,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 1.12em;
         height: 92%;
     }
 }

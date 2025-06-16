@@ -69,7 +69,7 @@
                                 <span class="label">监测周期：</span>
                                 <el-select v-model="search.zhouQi" placeholder="请选择" size="mini" :clearable="true">
                                     <el-option
-                                        v-for="item in ['每日','每周','每月','每季度','每半年','每年']"
+                                        v-for="item in ['每日','每周','每月','每季度','每半年','每年','按需']"
                                         :key="item"
                                         :label="item"
                                         :value="item"
@@ -424,6 +424,13 @@ export default {
                     showDevice: true,
                     displayField: ['deviceno1_', 'devicename1_'],
                     requireField: ['deviceno1_', 'devicename1_']
+                },
+                '17-医疗废物收集交接': {
+                    label: '医疗废物收集交接',
+                    path: '/sshjgl/aqgl/ylfwjjdj',
+                    showDevice: false,
+                    displayField: [],
+                    requireField: []
                 }
             },
             subIdList: [],
@@ -770,7 +777,7 @@ export default {
                 if (item.bu_men_ === '') {
                     return this.$message.warning(`子表第${i + 1}行部门信息缺失！`)
                 }
-                if (item.jian_ce_ri_qi_ === '') {
+                if (item.jian_ce_ri_qi_ === '' && item.jian_ce_zhou_qi_ !== '按需') {
                     return this.$message.warning(`子表第${i + 1}行监测日期信息缺失！`)
                 }
                 if (item.jian_ce_gang_wei_ === '') {

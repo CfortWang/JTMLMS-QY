@@ -202,7 +202,7 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                    <el-row v-if="form.jian_ce_zhou_qi_!==''">
+                    <el-row v-if="form.jian_ce_zhou_qi_!==''&&form.jian_ce_zhou_qi_!=='按需'">
                         <el-col :span="12">
                             <el-form-item :label="labelShow">
                                 <template slot="label">
@@ -378,7 +378,8 @@ export default {
                 { label: '季度监测', value: '每季度' },
                 { label: '半年监测', value: '每半年' },
                 { label: '年监测', value: '每年' },
-                { label: '按时间间隔监测', value: '间隔' }
+                { label: '按时间间隔监测', value: '间隔' },
+                { label: '按需监测', value: '按需' }
             ],
             config: {}
         }
@@ -628,6 +629,11 @@ export default {
                         this.form.ri_qi_lie_biao_ = ''
                     }
                     break
+                case '按需':
+
+                    this.form.jian_ce_ri_qi_ = '按需'
+
+                    break
                 default:
                     break
             }
@@ -636,7 +642,7 @@ export default {
             if (this.form.bu_men_ === '') {
                 throw new Error('部门信息缺失！')
             }
-            if (this.form.jian_ce_ri_qi_ === '') {
+            if (this.form.jian_ce_ri_qi_ === '' && this.form.jian_ce_zhou_qi_ !== '按需') {
                 throw new Error('监测日期信息缺失！')
             }
             if (this.form.jian_ce_gang_wei_ === '') {

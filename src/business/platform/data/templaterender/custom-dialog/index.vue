@@ -10,8 +10,10 @@
             :size="size"
             :readonly-text="readonlyText"
             :temp-search="tempSearch"
+            :dialog-search="dialogSearch"
             @click="handleSelectorClick"
             @remove="handleSelectorRemove"
+            @removeAll="handleSelectorRemoveAll"
             v-on="$listeners"
         />
         <data-template-dialog
@@ -118,7 +120,8 @@ export default {
             selectorVisible: false,
             selectorValue: this.multiple ? [] : {},
             cacheData: {},
-            bindIdValue: ''
+            bindIdValue: '',
+            dialogSearch: true // 是否为自定义对话框
         }
     },
     computed: {
@@ -442,7 +445,16 @@ export default {
             this.handleInput(val)
             this.emitChange(val)
         },
-
+        handleSelectorRemoveAll (index) {
+            if (this.multiple) {
+                this.selectorValue = []
+            } else {
+                this.selectorValue = {}
+            }
+            const val = this.getValue()
+            this.handleInput(val)
+            this.emitChange(val)
+        },
         handleSelectorActionEvent (buttonKey, data) {
             let val
             switch (buttonKey) {

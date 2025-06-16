@@ -868,7 +868,9 @@ export default {
                             },
                             param: {
                                 ...item,
-                                xuan_ze_feng_xian: this.form.xuan_ze_feng_xian
+                                xuan_ze_feng_xian: this.form.xuan_ze_feng_xian,
+                                bian_zhi_bu_men_: this.position,
+                                bian_zhi_shi_jian: this.time
                             }
                         }))
                     }

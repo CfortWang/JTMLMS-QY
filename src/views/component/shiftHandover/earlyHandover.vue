@@ -701,6 +701,9 @@ export default {
 
                 const peopleList = [...new Set([...tempPeople, ...autoSigners])]
                 const shi_ji_qian_dao_r = peopleList.length ? peopleList.join(',') : ''
+                if (!flag && !shi_ji_qian_dao_r) {
+                    return this.$message.warning('实际签到人员不能为空,请完成签到')
+                }
                 // 2.更新主表展示内容
                 const updateParamsRecord = {
                     tableName: 't_jykzjbdjb',

@@ -1202,7 +1202,7 @@ export default {
                         ee.name_ NOT LIKE '%系统%' 
                             AND ee.STATUS_ = 'actived'
                             AND ee.name_ NOT LIKE '%金通%' 
-                            AND ee.name_ NOT LIKE '%管理%' 
+                            AND ee.name_ NOT LIKE '%管理%'
                             AND ee.id_ != '702117247933480960'`
             await curdPost('sql', sql).then((res) => {
                 data = res.variables.data
@@ -1295,6 +1295,7 @@ export default {
                                         and name_ not like '%系统%'
                                         and name_ not like '%金通%'
                                         and name_ not like '%管理%'
+                                        AND STATUS_ = 'actived'
                                         and id_ != '702117247933480960'
                                     ) a 
                                 GROUP BY
@@ -1385,7 +1386,7 @@ export default {
                                     ry.zhi_cheng_deng_ji 
                                 FROM
                                     t_ryjbqk AS ry
-                                    JOIN ibps_party_employee AS ee ON ry.parent_id_ = ee.id_ where ee.name_ not like '%系统%' and ee.name_ not like '%金通%' and ee.name_ not like '%管理%' and ee.id_ != '702117247933480960'
+                                    JOIN ibps_party_employee AS ee ON ry.parent_id_ = ee.id_ where ee.name_ not like '%系统%' AND ee.STATUS_ = 'actived' and ee.name_ not like '%金通%' and ee.name_ not like '%管理%' and ee.id_ != '702117247933480960'
                                 ) gy
                                 RIGHT JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, gy.positions_ ) 
                             WHERE
@@ -1432,6 +1433,7 @@ export default {
                                         and name_ not like '%系统%'
                                         and name_ not like '%金通%'
                                         and name_ not like '%管理%'
+                                        AND STATUS_ = 'actived'
                                         and id_ != '702117247933480960'
                                     ) a 
                                 GROUP BY
@@ -1532,6 +1534,7 @@ export default {
                                         and name_ not like '%系统%'
                                         and name_ not like '%金通%'
                                         and name_ not like '%管理%'
+                                        AND STATUS_ = 'actived'
                                         and id_ != '702117247933480960'
                                     ) a 
                                 GROUP BY
@@ -1586,7 +1589,7 @@ export default {
                                     ry.zheng_shu_lei_xin
                                 FROM
                                     t_ryzsb AS ry
-                                    JOIN ibps_party_employee AS ee ON ry.parent_id_ = ee.id_ where ee.name_ not like '%系统%' and ee.name_ not like '%金通%' and ee.name_ not like '%管理%' and ee.id_ != '702117247933480960'
+                                    JOIN ibps_party_employee AS ee ON ry.parent_id_ = ee.id_ where ee.name_ not like '%系统%' AND ee.STATUS_ = 'actived' and ee.name_ not like '%金通%' and ee.name_ not like '%管理%' and ee.id_ != '702117247933480960'
                                 ) gy
                                 RIGHT JOIN ibps_party_entity en ON FIND_IN_SET( en.id_, gy.positions_ ) 
                             WHERE
@@ -1626,6 +1629,7 @@ export default {
                                         and name_ not like '%系统%'
                                         and name_ not like '%金通%'
                                         and name_ not like '%管理%'
+                                        AND STATUS_ = 'actived'
                                         and id_ != '702117247933480960'
                                     ) a 
                                 GROUP BY

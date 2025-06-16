@@ -6,7 +6,7 @@
         <div
             v-if="selected && selected.length >0"
             ref="tags"
-            :style="{ 'max-width': inputWidth + 'px', width: '100%',overflow: 'hidden','white-space': 'ellipsis', 'word-break': 'break-all','text-overflow': 'ellipsis'}"
+            :style="{ 'max-width': inputWidth + 'px', width: '80%',overflow: 'hidden','white-space': 'ellipsis', 'word-break': 'break-all','text-overflow': 'ellipsis'}"
             class="el-selector__tags"
         >
             <transition-group @after-leave="resetInputHeight">
@@ -50,6 +50,8 @@
             @mouseleave.native="inputHovering = false"
         >
             <i v-if="prefixIconClass" slot="prefix" :class="prefixIconClass" />
+            <!-- 来自模板的查询，且为自定义对话框，且有值时显示全部清空图标 -->
+            <i v-if="selected.length > 0 && tempSearch && dialogSearch" slot="suffix" style="position: relative;;z-index: 100;" class="el-input__icon el-icon-circle-close" @click.stop="deleteAllTag()" />
         </el-input>
     </div>
 
@@ -115,7 +117,12 @@ export default {
         tempSearch: { // 是否是数据模板使用的筛选条件
             type: Boolean,
             default: false
+        },
+        dialogSearch: { // 是否是自定义对话框
+            type: Boolean,
+            default: false
         }
+
     },
     data () {
         return {
@@ -237,6 +244,9 @@ export default {
         },
         deleteTag (index) {
             this.$emit('remove', index)
+        },
+        deleteAllTag (index) {
+            this.$emit('removeAll')
         }
     }
 }
