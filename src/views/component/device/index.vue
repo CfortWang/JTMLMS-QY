@@ -1677,6 +1677,9 @@ export default {
                 if (item.weiHuLeiXing === '按需保养') {
                     item.weiHuRiQi = '/'
                 }
+                if (item.weiHuLeiXing === '日保养' && item.weiHuRiQi === '每周1,2,3,4,5,6,7') {
+                    item.weiHuRiQi = '每天'
+                }
             })
             const currentPosition = this.level
             const { userList = [], deptList = [] } = this.$store.getters || {}
