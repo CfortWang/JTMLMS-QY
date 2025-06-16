@@ -843,7 +843,7 @@ export default {
                 // 计算需要增加项
                 const addedIds = this.tableList.filter(item => !this.Ids.includes(item.shi_bie_xiang_))
                 // 计算需要更新项
-                const updatedIds = this.tableList.filter(item => this.Ids.includes(item.shi_bie_xiang_))
+                const updatedIds = this.tableList.filter(item => this.Ids.includes(item.shi_bie_xiang_) && item.id_)
                 // 计算需要删除项
                 const deletedIds = this.Ids.filter(id => !curIds.includes(id))
                 console.log(addedIds, updatedIds, deletedIds)
