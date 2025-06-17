@@ -140,7 +140,7 @@ export default {
         },
         async fetchData () {
             // 月度指标统计本年度，季度指标统计今年和去年，年度指标统计所有
-            const sql = `select a.id_ as aid, a.di_dian_ as place, a.bian_zhi_bu_men_ as dept, a.tong_ji_pin_lv_ as cycle, a.tong_ji_yue_fen_ as statisticalTime, a.create_time_ as createTime, b.id_ as bid, b.zhi_liang_mu_biao as goal, b.zhi_liang_zhi_bia as target, b.zhi_biao_xian_zhi as limitValue, b.shi_ji_shu_zhi_ as result, b.yuan_shi_shu_ju_ as originalData from t_zlzbpjb a inner join (select tong_ji_yue_fen_, max(create_time_) as max from t_zlzbpjb where di_dian_ = '${this.level}' group by tong_ji_yue_fen_) a_latest on a.tong_ji_yue_fen_ = a_latest.tong_ji_yue_fen_ and a.create_time_ = a_latest.max left join t_zlzbpjzb b on a.id_ = b.parent_id_ where a.shi_fou_guo_shen_ = '已完成' and a.di_dian_ = '${this.level}' and ((a.tong_ji_pin_lv_ = '每月' and a.tong_ji_yue_fen_ like '${this.year}%') or (a.tong_ji_pin_lv_ = '每季度' and (a.tong_ji_yue_fen_ like '${this.year}%' or a.tong_ji_yue_fen_ like '${this.year - 1}%')) or a.tong_ji_pin_lv_ = '每年')`
+            const sql = `select a.id_ as aid, a.di_dian_ as place, a.bian_zhi_bu_men_ as dept, a.tong_ji_pin_lv_ as cycle, a.tong_ji_yue_fen_ as statisticalTime, a.create_time_ as createTime, b.id_ as bid, b.zhi_liang_mu_biao as goal, b.zhi_liang_zhi_bia as target, b.zhi_biao_xian_zhi as limitValue, b.shi_ji_shu_zhi_ as result, b.yuan_shi_shu_ju_ as originalData from t_zlzbpjb a inner join (select tong_ji_yue_fen_, max(create_time_) as max from t_zlzbpjb where di_dian_ = '${this.level}' group by tong_ji_yue_fen_) a_latest on a.tong_ji_yue_fen_ = a_latest.tong_ji_yue_fen_ and a.create_time_ = a_latest.max left join t_zlzbpjzb b on a.id_ = b.parent_id_ where a.shi_fou_guo_shen_ = '已完成' and a.di_dian_ = '${this.level}' and ((a.tong_ji_pin_lv_ = '每月' and a.tong_ji_yue_fen_ like '${this.year}%') or (a.tong_ji_pin_lv_ = '每季度' and (a.tong_ji_yue_fen_ like '${this.year}%' or a.tong_ji_yue_fen_ like '${this.year - 1}%')) or (a.tong_ji_pin_lv_ = '每年' and a.tong_ji_yue_fen_ < '${this.year + 1}'))`
             return new Promise((resolve, reject) => {
                 this.$common.request('sql', sql).then(res => {
                     const { data = [] } = res.variables || {}
@@ -165,7 +165,9 @@ export default {
                             targetIndex = result[cycle].length - 1
                         }
                         const dataIndex = cycle === '每月' ? parseInt(statisticalTime.split('年')[1].split('月')[0]) - 1 : result[cycle][targetIndex].data.findIndex(i => i.statisticalTime === statisticalTime)
-                        result[cycle][targetIndex].data[dataIndex] = { ...item, result: parseFloat(targetValue), limitValue: parseFloat(limitValue) }
+                        if (dataIndex >= 0) {
+                            result[cycle][targetIndex].data[dataIndex] = { ...item, result: parseFloat(targetValue), limitValue: parseFloat(limitValue) }
+                        }
                     })
                     this.initData = result
                     this.cycleList = Object.keys(this.initData)
@@ -190,11 +192,14 @@ export default {
             return result
         },
         generateYear () {
-            const result = []
-            for (let year = this.year - 8; year < this.year; year++) {
-                result.push({ statisticalTime: `${year}年度` })
-            }
-            return result
+            const currentYear = new Date().getFullYear()
+            // 判断选择年份是否小于当前年，小于则返回包含选择年度的前八年，否则返回不包含选择年度的前八年
+            const includeCurrent = this.year < currentYear
+            const startYear = this.year - (includeCurrent ? 7 : 8)
+
+            return Array.from({ length: 8 }, (_, i) => ({
+                statisticalTime: `${startYear + i}年度`
+            }))
         },
         startAutoPlay () {
             this.autoPlay = true

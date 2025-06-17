@@ -138,7 +138,7 @@ const basicChart = {
     tooltip: {
         show: true,
         trigger: 'axis',
-        formatter: '指标详情<br/>{b}月：{c}'
+        formatter: '指标详情<br/>{b}：{c}'
     }
 }
 
@@ -318,17 +318,17 @@ export const barChartOption = {
             },
             itemStyle: {
                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: "#83bff6" },
-                    { offset: 0.5, color: "#188df0" },
-                    { offset: 1, color: "#188df0" },
+                    { offset: 0, color: '#83bff6' },
+                    { offset: 0.5, color: '#188df0' },
+                    { offset: 1, color: '#188df0' }
                 ])
             },
             emphasis: {
                 itemStyle: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: "#2378f7" },
-                        { offset: 0.7, color: "#2378f7" },
-                        { offset: 1, color: "#83bff6" },
+                        { offset: 0, color: '#2378f7' },
+                        { offset: 0.7, color: '#2378f7' },
+                        { offset: 1, color: '#83bff6' }
                     ])
                 }
             },
