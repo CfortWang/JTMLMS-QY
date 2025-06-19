@@ -1,6 +1,6 @@
 ### 版本信息
 
-- 版本：5.3.31
+- 版本：5.3.31-legacy
 - 来源：https://mozilla.github.io/pdf.js/getting_started/#download
 - 更新方法：
   1. 从官网下载指定版本
@@ -13,10 +13,10 @@
 | 版本       | 更新日期    | 变更说明                 |
 |:---------:|:----------:|--------------------------|
 | v2.4.456  | / | 初始引入                |
-| v5.3.31  | 2025-06-18 | 解决部分PDF文件预览内容缺失问题 |
+| v5.3.31-legacy  | 2025-06-18 | 解决部分PDF文件预览内容缺失问题 |
 
 ### 修改内容：
-- v2.4.456 → v5.3.31
+- v2.4.456 → v5.3.31-legacy
 ```deff
 // 找到defaultOptions对象的定义，增加属性hasRole，默认值为'0'
 const defaultOptions = {
@@ -59,10 +59,10 @@ async run(config) {
   + if (hasRole !== '1') {
   +   appConfig.toolbar?.download.setAttribute("hidden", "true");
   +   appConfig.toolbar?.print.setAttribute("hidden", "true");
-  +   appConfig.secondaryToolbar.downloadButton.setAttribute("hidden", "true");
-  +   appConfig.secondaryToolbar.printButton.setAttribute("hidden", "true");
-  +   appConfig.secondaryToolbar.openFileButton.setAttribute("hidden", "true");
-  +   appConfig.secondaryToolbar.viewBookmarkButton.setAttribute("hidden", "true");
+  +   appConfig.secondaryToolbar?.downloadButton.setAttribute("hidden", "true");
+  +   appConfig.secondaryToolbar?.printButton.setAttribute("hidden", "true");
+  +   appConfig.secondaryToolbar?.openFileButton.setAttribute("hidden", "true");
+  +   appConfig.secondaryToolbar?.viewBookmarkButton.setAttribute("hidden", "true");
   + }
 
   // 其他代码  

@@ -19594,7 +19594,6 @@ const PDFViewerApplication = {
     fileInput.type = "file";
     fileInput.value = null;
     document.body.append(fileInput);
-    console.log(appConfig)
     // 权限判定，无权限用户隐藏部分功能按钮
     if (hasRole !== '1') {
       appConfig.toolbar?.download.setAttribute("hidden", "true");
