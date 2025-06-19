@@ -600,6 +600,10 @@ const {
     UNDEFINED: 0x10
   };
   const defaultOptions = {
+    hasRole: {
+      value: '0',
+      kind: OptionKind.VIEWER
+    },
     allowedGlobalEvents: {
       value: null,
       kind: OptionKind.BROWSER
@@ -15178,16 +15182,28 @@ const {
         eventBus
       } = this;
       let file;
+      let hasRole;
       const queryString = document.location.search.substring(1);
       const params = parseQueryString(queryString);
       file = params.get("file") ?? AppOptions.get("defaultUrl");
-      validateFileURL(file);
+      hasRole = params.get("hasrole") ?? AppOptions.get("hasRole");
+      // validateFileURL(file);
       const fileInput = this._openFileInput = document.createElement("input");
       fileInput.id = "fileInput";
       fileInput.hidden = true;
       fileInput.type = "file";
       fileInput.value = null;
       document.body.append(fileInput);
+  
+      // 权限判定，无权限用户隐藏部分功能按钮
+      if (hasRole !== '1') {
+        appConfig.toolbar?.download.setAttribute("hidden", "true");
+        appConfig.toolbar?.print.setAttribute("hidden", "true");
+        appConfig.secondaryToolbar.downloadButton.setAttribute("hidden", "true");
+        appConfig.secondaryToolbar.printButton.setAttribute("hidden", "true");
+        appConfig.secondaryToolbar.openFileButton.setAttribute("hidden", "true");
+        appConfig.secondaryToolbar.viewBookmarkButton.setAttribute("hidden", "true");
+      }
       fileInput.addEventListener("change", function (evt) {
         const {
           files
