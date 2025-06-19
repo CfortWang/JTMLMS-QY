@@ -276,6 +276,7 @@ export default {
         handleRemove (ids) {
             remove({ datasetIds: ids }).then(response => {
                 ActionUtils.removeSuccessMessage()
+                this.$refs.crud.clearSelection()
                 this.search()
             }).catch(() => {})
         },

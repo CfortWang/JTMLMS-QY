@@ -141,7 +141,7 @@ export default {
                         { prop: 'examName', label: '考试名称', itemWidth: 150 },
                         { prop: 'examType', label: '考试类型', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: examTypeOptions },
                         { prop: 'examBank', label: '考试题库', fieldType: 'slot', slotName: 'examBankId', itemWidth: 150 },
-                        { prop: 'examState', label: '考试状态', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: statusOption },
+                        { prop: 'examState', label: '状态', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: statusOption },
                         { prop: ['createTime0', 'createTime1'], label: '创建时间', fieldType: 'daterange' },
                         { prop: ['publishDate0', 'publishDate1'], label: '发布时间', fieldType: 'daterange' }
                     ]

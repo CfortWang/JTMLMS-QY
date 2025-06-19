@@ -77,6 +77,7 @@ export default {
         handleRemove (ids) {
             remove({ defIds: ids }).then(response => {
                 ActionUtils.removeSuccessMessage()
+                this.$refs.crud.clearSelection()
                 this.search()
             }).catch(() => {
             })
