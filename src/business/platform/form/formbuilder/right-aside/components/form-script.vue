@@ -34,7 +34,7 @@
                                 <el-dropdown @command="handleScriptCommand">
                                     <span class="el-dropdown-link">
                                         <el-button type="text">
-                                            插入表单函数<i class="el-icon-arrow-down el-icon--right" />
+                                            插入表单函数<i class="el-icon-arrow-down el-icon--right"/>
                                         </el-button>
                                     </span>
                                     <el-dropdown-menu slot="dropdown">
@@ -71,164 +71,159 @@
     </el-dialog>
 </template>
 <script>
-import TreeUtils from '@/utils/tree'
-import { codemirror } from 'vue-codemirror'
-import { js_beautify } from 'js-beautify'
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/theme/idea.css'
-import 'codemirror/mode/javascript/javascript.js'
+    import TreeUtils from '@/utils/tree'
+    import { codemirror } from 'vue-codemirror'
+    import 'codemirror/lib/codemirror.css'
+    import 'codemirror/theme/idea.css'
+    import 'codemirror/mode/javascript/javascript.js'
 
-export default {
-    components: {
-        codemirror
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false
+    export default {
+        components: {
+            codemirror
         },
-        data: {
-            type: String
+        props: {
+            visible: {
+                type: Boolean,
+                default: false
+            },
+            data: {
+                type: String
+            },
+            boData: {
+                type: Array
+            },
+            title: {
+                type: String,
+                default: '表单脚本'
+            }
         },
-        boData: {
-            type: Array
-        },
-        title: {
-            type: String,
-            default: '表单脚本'
-        }
-    },
-    data () {
-        const _this = this
-        return {
-            dialogVisible: false,
-            formScript: '',
-            cmOption: {
-                indentUnit: 4,
-                tabSize: 4,
-                lineNumbers: true,
-                line: true,
-                autoCloseTags: true,
-                mode: 'text/javascript',
-                // idea, 3024-day, base-16-light, darcula, panda-syntax, paraiso-light
-                theme: 'idea',
-                extraKeys: {
-                    'Ctrl-S': function (e) {
-                        _this.handleConfirm(false)
+        data() {
+            const _this = this
+            return {
+                dialogVisible: false,
+                formScript: '',
+                cmOption: {
+                    indentUnit: 4,
+                    tabSize: 4,
+                    lineNumbers: true,
+                    line: true,
+                    autoCloseTags: true,
+                    mode: 'text/javascript',
+                    // idea, 3024-day, base-16-light, darcula, panda-syntax, paraiso-light
+                    theme: 'idea',
+                    extraKeys: {
+                        'Ctrl-S': function (e) {
+                            _this.handleConfirm(false)
+                        }
                     }
+                },
+                toolbars: [
+                    { key: 'confirm' },
+                    { key: 'cancel' }
+                ]
+            }
+        },
+        computed: {
+            boTreeData() {
+                return TreeUtils.transformToTreeFormat(this.boData, {
+                    idKey: 'id',
+                    pIdKey: 'parentId'
+                })
+            }
+        },
+        watch: {
+            visible: {
+                handler: function (val, oldVal) {
+                    this.dialogVisible = this.visible
+                },
+                immediate: true
+            }
+        },
+        methods: {
+            getFormData() {
+                this.$nextTick(() => {
+                    this.formScript = this.data || ''
+                })
+            },
+            getEditor() {
+                return this.$refs.formScript.cminstance
+            },
+            handleActionEvent({ key }) {
+                switch (key) {
+                    case 'confirm':
+                        this.handleConfirm()
+                        break
+                    case 'cancel':
+                        this.closeDialog()
+                        break
+                    default:
+                        break
                 }
             },
-            toolbars: [
-                { key: 'confirm' },
-                { key: 'cancel' }
-            ]
-        }
-    },
-    computed: {
-        boTreeData () {
-            return TreeUtils.transformToTreeFormat(this.boData, {
-                idKey: 'id',
-                pIdKey: 'parentId'
-            })
-        }
-    },
-    watch: {
-        visible: {
-            handler: function (val, oldVal) {
-                this.dialogVisible = this.visible
-            },
-            immediate: true
-        }
-    },
-    methods: {
-        getFormData () {
-            this.$nextTick(() => {
-                this.formScript = this.data || ''
-            })
-        },
-        getEditor () {
-            return this.$refs.formScript.cminstance
-        },
-        handleActionEvent ({ key }) {
-            switch (key) {
-                case 'confirm':
-                    this.handleConfirm()
-                    break
-                case 'cancel':
+            handleConfirm(isColse = true) {
+                const data = this.formScript
+                if (this.$utils.isEmpty(data)) {
+                    this.$message.closeAll()
+                    this.$message.warning('请设置表单脚本')
+                    this.getEditor().focus()
+                    return
+                }
+                this.$emit('callback', data)
+                if (isColse) {
                     this.closeDialog()
-                    break
-                default:
-                    break
-            }
-        },
-        handleConfirm (isColse = true) {
-            const data = this.formScript
-            if (this.$utils.isEmpty(data)) {
-                this.$message.closeAll()
-                this.$message.warning('请设置表单脚本')
+                } else {
+                    this.$message.closeAll()
+                    this.$message.success('设置表单脚本成功')
+                }
+            },
+            // 关闭当前窗口
+            closeDialog() {
+                this.$emit('close', false)
+            },
+            clickBoNode(data) {
+                this.insertField(data, false)
+            },
+            insertField: function (obj, b) {
+                this.getEditor().replaceSelection(obj.key)
                 this.getEditor().focus()
-                return
+            },
+            handleDefaultScript() {
+                const val = 'Object.assign(JForm, {\n\t// 加载事件\n\tonLoad (form) {\n\t\tconsole.log(form)\n\t}\n})'
+                this.formScript = val
+                this.getEditor().focus()
+            },
+            handleScriptCommand(command) {
+                let val = ''
+                switch (command) {
+                    case 'onLoad':
+                        val = '\n\t// 加载事件\n\tonLoad (form) {\n\t\t\n\t}'
+                        break
+                    case 'onLoadActions':
+                        val = '\n\t// 表单加载按钮事件\n\tonLoadActions (form, action, button, type) {\n\t\t\n\t}'
+                        break
+                    case 'onValidate':
+                        val = '\n\t// 表单提交校验\n\tonValidate (form, callback) {\n\t\tcallback(true)\n\t}'
+                        break
+                    case 'beforeSubmit':
+                        val = '\n\t// 表单按钮前置事件\n\tbeforeSubmit (form, action, postValue, callback) {\n\t\tcallback(true)\n\t}'
+                        break
+                    case 'afterSubmit':
+                        val = ' \n\t// 表单按钮后置事件\n\tafterSubmit (form, action, postValue, callback) {\n\t\tcallback(true)\n\t}'
+                        break
+                    case 'beforeSubButton':
+                        val = '\n\t// 表单子表按钮前置事件\n\tbeforeSubButton (tableForm, action, position, params, callback) {\n\t\tcallback(true)\n\t}'
+                        break
+                    case 'afterSubButton':
+                        val = ' \n\t// 表单子表按钮后置事件\n\tafterSubButton (tableForm, action, position, params, callback) {\n\t\tcallback(true)\n\t}'
+                        break
+                    default:
+                        break
+                }
+                this.getEditor().replaceSelection(val)
+                this.getEditor().focus()
             }
-            // const option = {
-
-            // }
-            // const formatData = js_beautify(this.formScript, { indent_size: 4 })
-            this.$emit('callback', data)
-            if (isColse) {
-                this.closeDialog()
-            } else {
-                this.$message.closeAll()
-                this.$message.success('设置表单脚本成功')
-            }
-        },
-        // 关闭当前窗口
-        closeDialog () {
-            this.$emit('close', false)
-        },
-        clickBoNode (data) {
-            this.insertField(data, false)
-        },
-        insertField: function (obj, b) {
-            this.getEditor().replaceSelection(obj.key)
-            this.getEditor().focus()
-        },
-        handleDefaultScript () {
-            const val = 'Object.assign(JForm, {\n\t// 加载事件\n\tonLoad (form) {\n\t\tconsole.log(form)\n\t}\n})'
-            this.formScript = val
-            this.getEditor().focus()
-        },
-        handleScriptCommand (command) {
-            let val = ''
-            switch (command) {
-                case 'onLoad':
-                    val = '\n\t// 加载事件\n\tonLoad (form) {\n\t\t\n\t}'
-                    break
-                case 'onLoadActions':
-                    val = '\n\t// 表单加载按钮事件\n\tonLoadActions (form, action, button, type) {\n\t\t\n\t}'
-                    break
-                case 'onValidate':
-                    val = '\n\t// 表单提交校验\n\tonValidate (form, callback) {\n\t\tcallback(true)\n\t}'
-                    break
-                case 'beforeSubmit':
-                    val = '\n\t// 表单按钮前置事件\n\tbeforeSubmit (form, action, postValue, callback) {\n\t\tcallback(true)\n\t}'
-                    break
-                case 'afterSubmit':
-                    val = ' \n\t// 表单按钮后置事件\n\tafterSubmit (form, action, postValue, callback) {\n\t\tcallback(true)\n\t}'
-                    break
-                case 'beforeSubButton':
-                    val = '\n\t// 表单子表按钮前置事件\n\tbeforeSubButton (tableForm, action, position, params, callback) {\n\t\tcallback(true)\n\t}'
-                    break
-                case 'afterSubButton':
-                    val = ' \n\t// 表单子表按钮后置事件\n\tafterSubButton (tableForm, action, position, params, callback) {\n\t\tcallback(true)\n\t}'
-                    break
-                default:
-                    break
-            }
-            this.getEditor().replaceSelection(val)
-            this.getEditor().focus()
         }
     }
-}
 </script>
 <style lang="scss">
     .form-script-dialog {

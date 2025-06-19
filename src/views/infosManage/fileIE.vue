@@ -13,14 +13,17 @@
                     @expand-collapse="handleExpandCollapse"
                 />
             </div>
-            <ibps-container :margin-left="width + 'px'" class="page">
+            <ibps-container
+                :margin-left="width + 'px'"
+                class="page"
+            >
                 <el-alert
                     v-if="!show"
                     :closable="false"
                     title="请选择点击记录分类菜单进行操作！"
                     type="warning"
                     show-icon
-                    style="height: 50px"
+                    style="height:50px;"
                 />
                 <!-- 选择文件，展示在右边 -->
                 <template v-else>
@@ -40,14 +43,6 @@
                         @action-event="handleAction"
                         @pagination-change="handlePaginationChange"
                     >
-                        <template slot="position">
-                            <ibps-user-selector
-                                v-model="pos"
-                                type="position"
-                                readonly-text="text"
-                                :multiple="true"
-                            />
-                        </template>
                         <template
                             v-if="scope.row.fu_jian_"
                             slot="file"
@@ -76,33 +71,16 @@
                                 <i class="el-icon-document" />
                                 <el-tag
                                     type="info"
-                                    style="cursor: pointer"
+                                    style="cursor: pointer;"
                                     @click="handleClickTag(scope.row)"
                                 >{{ scope.row.file_info_ }}</el-tag>
                             </div>
                         </template>
-                        <template
-                            v-if="showCaoZuoColumn"
-                            slot="caozuo"
-                            slot-scope="scope"
-                        >
-                            <div
-                                style="color: #1e90ff"
-                                class="hover-hand"
-                                @click="updateDate(scope)"
-                            >
-                                <i
-                                    class="el-icon-edit-outline"
-                                    style="cursor: pointer"
-                                />
-                                <span style="cursor: pointer"> 更新</span>
+                        <template v-if="showCaoZuoColumn" slot="caozuo" slot-scope="scope">
+                            <div style="color:#1E90FF; " class="hover-hand" @click="updateDate(scope)">
+                                <i class="el-icon-edit-outline" style="cursor: pointer;" />
+                                <span style="cursor: pointer;"> 更新</span>
                             </div>
-                        </template>
-                        <template
-                            slot="customButton"
-                            slot-scope="{row}"
-                        >
-                            <el-button type="text" icon="el-icon-edit-outline" @click="goEdit(row)">修改</el-button>
                         </template>
                     </ibps-crud>
                 </template>
@@ -139,6 +117,7 @@
                 :visible="dialogVisible"
                 :file-infos="fileInfos"
             /> -->
+            <!-- 本人修改 -->
             <file-lookup
                 v-if="dialogVisible"
                 :visible="dialogVisible"
@@ -151,15 +130,6 @@
             :visidial="dialogFormVisibles"
             :son-data="sonData"
             @getcolse="getcolse"
-        />
-        <data-template-formrender-dialog
-            :visible="editDialogVisible"
-            form-key="ywyxjlb"
-            :pk-value="editPkValue"
-            :toolbars="editToolbars"
-            :readonly="false"
-            :add-data-cont="addDataCont"
-            @close="editClose"
         />
     </div>
 </template>
@@ -175,27 +145,21 @@ import openFilePng from '@/assets/images/icons/openFile.png'
 import wordPng from '@/assets/images/icons/word.png'
 import fileTraining from '@/views/component/fileTraining'
 import UpdateFile from './updateFile'
-import DataTemplateFormrenderDialog from '@/business/platform/data/templaterender/form/dialog.vue'
-import ibpsUserSelector from '@/business/platform/org/selector'
+
 export default {
     components: {
         IbpsTypeTree,
         BpmnFormrender,
         UpdateFile,
         'ibps-attachment': IbpsAttachment,
-        'file-lookup': fileTraining,
-        DataTemplateFormrenderDialog,
-        ibpsUserSelector
+        'file-lookup': fileTraining
     },
     mixins: [FixHeight],
     data () {
-        const { isSuper, deptList = [], role } = this.$store.getters || {}
+        const { isSuper, role, deptList = [] } = this.$store.getters || {}
         const hasRole = localStorage.getItem('hasHighRole') === '1'
-        const depArrs = deptList.map(
-            (i) => `wj.bian_zhi_bu_men_ like '${i.positionId}'`
-        )
+        const depArrs = deptList.map(i => `wj.bian_zhi_bu_men_ like '${i.positionId}'`)
         return {
-            role,
             isSuper,
             hasRole,
             depArrs,
@@ -233,7 +197,9 @@ export default {
             //   listTreeData: [],
             listConfig: {
                 // 工具栏
-                toolbars: [{ key: 'search' }],
+                toolbars: [
+                    { key: 'search' }
+                ],
                 // 查询条件
                 searchForm: {
                     forms: []
@@ -246,13 +212,12 @@ export default {
             //     stripe: true
             //   },
             pagination: {
-                limit: 20,
-                page: 1
+                limit: 20, page: 1
             },
             sorts: {},
             sqlWhere: {},
             searchWhere: {},
-            pageKey: 'record', // file-受控文件查阅 recoed-纸质运行记录 recordUpload-纸质运行记录上传
+            pageKey: '',
             dialogFormVisible: false,
             defId: '',
             addDataCont: {},
@@ -268,20 +233,7 @@ export default {
             dialogVisible: false,
             fileInfos: {},
             // 本人修改
-            fileArray: [],
-            editDialogVisible: false,
-            editPkValue: '',
-            editToolbars: [{
-                button_type: 'close',
-                label: '关闭',
-                key: 'close'
-            },
-            {
-                button_type: 'save',
-                label: '保存',
-                key: 'save'
-            }],
-            pos: ''
+            fileArray: []
         }
     },
     watch: {
@@ -293,129 +245,58 @@ export default {
         }
     },
     created () {
-        const { defaultUrl } = this.$route.meta || {}
-        const { pageKey } = this.parseUrl(defaultUrl) || {}
-        this.pageKey = pageKey
-        console.log(pageKey)
-        this.categoryKey = this.pageKey === 'file' ? 'FILE_TYPE' : 'FLOW_TYPE'
+        this.pageKey = this.$route.name
+        this.categoryKey = this.pageKey === 'nbwj' ? 'FILE_TYPE' : 'FLOW_TYPE'
         this.userId = this.$store.getters.userInfo.employee.id
         const roleList = this.$store.getters.userInfo.role
         // 系统管理角色添加删除按钮
-        const hasRole = roleList.some((item) => item.name === '系统管理角色')
-        if (this.pageKey === 'recordUpload' || this.pageKey === 'record') {
+        const hasRole = roleList.some(item => item.name === '系统管理角色')
+        if (this.pageKey === 'wjkzgl-ywyxjlsc' || this.pageKey === 'ywtxyxjl') {
             // 系统管理角色不做分类过滤
             this.listConfig.toolbars.push({ key: 'remove' })
             this.selection = true
         }
-        if (this.pageKey === 'file') {
+        if (this.pageKey === 'nbwj') {
             this.listConfig.searchForm.forms = [
                 { prop: 'wen_jian_bian_hao', label: '文件编号' },
                 { prop: 'wen_jian_ming_che', label: '文件名称' }
             ]
             this.listConfig.columns = [
                 // { prop: 'wen_jian_xi_lei_', label: '文件细类', sortable: 'custom', minWidth: 100 },
-                {
-                    prop: 'wen_jian_bian_hao',
-                    label: '文件编号',
-                    sortable: 'custom',
-                    width: 150
-                },
+                { prop: 'wen_jian_bian_hao', label: '文件编号', sortable: 'custom', width: 150 },
                 { prop: 'wen_jian_ming_che', label: '文件名称', minWidth: 150 },
                 { prop: 'ban_ben_', label: '版本', width: 65 },
-                {
-                    prop: 'file_info_',
-                    label: '查阅',
-                    slotName: 'wenjinachayue',
-                    minWidth: 150
-                },
-                {
-                    prop: 'fa_fang_shi_jian_',
-                    label: '发布日期',
-                    sortable: 'custom',
-                    width: 150
-                },
-                {
-                    prop: 'cha_yue_jie_zhi_s',
-                    label: '查阅截止时间',
-                    sortable: 'custom',
-                    minWidth: 120
-                }
+                { prop: 'file_info_', label: '查阅', slotName: 'wenjinachayue', minWidth: 150 },
+                { prop: 'fa_fang_shi_jian_', label: '发布日期', sortable: 'custom', width: 150 },
+                { prop: 'cha_yue_jie_zhi_s', label: '查阅截止时间', sortable: 'custom', minWidth: 120 }
             ]
         }
-        if (this.pageKey === 'recordUpload' || this.pageKey === 'record') {
+        if (this.pageKey === 'wjkzgl-ywyxjlsc' || this.pageKey === 'ywtxyxjl') {
             this.listConfig.searchForm.forms = [
-                {
-                    prop: 'nian_du_',
-                    label: '记录月份',
-                    fieldType: 'date',
-                    dateType: 'year',
-                    width: 50
-                },
-                {
-                    prop: 'bian_zhi_shi_jian',
-                    label: '上传时间',
-                    fieldType: 'daterange',
-                    width: 200
-                },
-                { prop: 'org_name', label: '部门', fieldType: 'slot', slotName: 'position' },
-                { prop: 'biao_dan_ming_che', label: '表单名称', width: 150 },
-                { prop: 'shi_wu_shuo_ming_', label: '事务说明', width: 150 }
+                { prop: 'nian_du_', label: '记录月份', fieldType: 'date', dateType: 'year', width: 50 },
+                { prop: 'bian_zhi_shi_jian', label: '上传时间', fieldType: 'daterange', width: 200 }
             ]
             this.listConfig.columns = [
                 // { prop: 'fen_lei_', label: '表单分类', width: 120 },
-                {
-                    prop: 'nian_du_',
-                    label: '记录年份',
-                    dateFormat: 'yyyy-MM',
-                    width: 100
-                },
+                { prop: 'nian_du_', label: '记录月份', dateFormat: 'yyyy-MM', width: 100 },
                 { prop: 'org_name', label: '部门', width: 100 },
                 { prop: 'biao_dan_ming_che', label: '表单名称', width: 250 },
                 { prop: 'shi_wu_shuo_ming_', label: '事务说明', width: 250 },
-                {
-                    prop: 'fu_jian_',
-                    label: '附件',
-                    slotName: 'file',
-                    minWidth: 250
-                },
+                { prop: 'fu_jian_', label: '附件', slotName: 'file', minWidth: 250 },
                 { prop: 'bian_zhi_shi_jian', label: '上传时间', width: 140 },
                 { prop: 'ry_name', label: '上传人', width: 90 }
             ]
-            const roleList = ['xtgljs', 'wjglzzc', 'wjgly'] // 系统管理员 文件管理组组长 文件管理员可修改
-            const hasRole = this.role.some(r => roleList.includes(r.alias))
-            if (hasRole) this.listConfig.columns.push({ prop: '', label: '操作', width: 100, slotName: 'customButton' })
         }
     },
     methods: {
-        parseUrl (url) {
-            // 处理URL可能包含的前导/尾随斜杠和空格
-            url = (url || '').trim().replace(/^\/|\/$/g, '')
-            // 分割路径和查询部分
-            const [pathPart, queryPart] = url.split('?')
 
-            const queryParams = new URLSearchParams(queryPart || '')
-            const params = Object.fromEntries(queryParams)
-            return params
-        },
-        editClose (visible) {
-            this.editDialogVisible = visible
-            this.refreshData()
-        },
-        goEdit (row) {
-            this.editPkValue = row.id_
-            this.editDialogVisible = true
-        },
         unitConversions (str) {
             // 使用正则表达式匹配括号内的数字
             const match = str.match(/（(\d+)）/)
             // console.log('match', match)
             // 如果找到了匹配，则返回匹配到的数字；否则返回空字符串
-            if (!match) {
-                return
-            }
-            if (match[1] < 1024) {
-                return match[0] + match[1]
-            }
+            if (!match) { return }
+            if (match[1] < 1024) { return match[0] + match[1] }
             return match[0] + (match[1] / 1024).toFixed(2) + 'M'
         },
         colseVisible (val) {
@@ -431,10 +312,10 @@ export default {
         },
         handleClose (done) {
             this.$confirm('确认关闭？')
-                .then((_) => {
+                .then(_ => {
                     done()
                 })
-                .catch((_) => {})
+                .catch(_ => {})
         },
         handleExpandCollapse (isExpand, readonly = false) {
             this.width = isExpand ? 200 : 50
@@ -444,8 +325,7 @@ export default {
             this.loading = true
         },
         getDatas () {
-            const { comAuthority, buMenAuthority, authority } =
-                this.fileTypesDatas
+            const { comAuthority, buMenAuthority, authority } = this.fileTypesDatas
             // fileType存放点击文件id，如有孩子，则还有孩子id
             const { fileType, sorts } = this.sqlWhere
             this.listData = []
@@ -468,21 +348,12 @@ export default {
                     start = this.searchWhere[i]
                 }
                 if (i === 'i') {
-                    wheres1 =
-                        wheres1 +
-                        ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
-                    wheres2 =
-                        wheres2 +
-                        ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
-                    wheres3 =
-                        wheres3 +
-                        ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
+                    wheres1 = wheres1 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
+                    wheres2 = wheres2 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
+                    wheres3 = wheres3 + ` and bian_zhi_shi_jian between '${start} 00:00:00' and '${this.searchWhere[i]} 23:59:59'`
                 }
                 if (i !== 'i' && i !== 'b') {
-                    const likeWhere =
-                        i === 'nian_du_'
-                            ? this.searchWhere[i].getFullYear()
-                            : this.searchWhere[i]
+                    const likeWhere = i === 'nian_du_' ? this.searchWhere[i].getFullYear() : this.searchWhere[i]
                     wheres1 = wheres1 + ` and wj.${i} like '%${likeWhere}%'`
                     wheres2 = wheres2 + ` and wj.${i} like '%${likeWhere}%'`
                     wheres3 = wheres3 + ` and wj.${i} like '%${likeWhere}%'`
@@ -490,53 +361,35 @@ export default {
             }
             // fileType存放文件的id和有孩子的id
             if (fileType) {
-                if (this.pageKey === 'file') {
+                if (this.pageKey === 'nbwj') {
                     if (comAuthority.length !== 0) {
-                        wheres1 =
-                            wheres1 +
-                            ` and FIND_IN_SET (wj.xi_lei_id_,'${comAuthority}')`
+                        wheres1 = wheres1 + ` and FIND_IN_SET (wj.xi_lei_id_,'${comAuthority}')`
                     }
                     if (buMenAuthority.length !== 0) {
                         let orSql = ''
                         positionsDatas.forEach((item, index) => {
-                            orSql += `${
-                                index === 0 ? '' : 'OR'
-                            } wj.quan_xian_xin_xi_ LIKE '%${item.id}%'`
+                            orSql += `${index === 0 ? '' : 'OR'} wj.quan_xian_xin_xi_ LIKE '%${item.id}%'`
                         })
-                        wheres2 =
-                            wheres2 +
-                            ` and (${orSql}) and FIND_IN_SET (wj.xi_lei_id_,'${buMenAuthority}')`
+                        wheres2 = wheres2 + ` and (${orSql}) and FIND_IN_SET (wj.xi_lei_id_,'${buMenAuthority}')`
                     }
                     if (authority.length !== 0) {
-                        wheres3 =
-                            wheres3 +
-                            ` and FIND_IN_SET (wj.xi_lei_id_,'${authority}')`
+                        wheres3 = wheres3 + ` and FIND_IN_SET (wj.xi_lei_id_,'${authority}')`
                     }
                 } else {
-                    wheres1 =
-                        wheres1 +
-                        ` and FIND_IN_SET (wj.fen_lei_id_,'${fileType}')`
+                    wheres1 = wheres1 + ` and FIND_IN_SET (wj.fen_lei_id_,'${fileType}')`
                 }
             }
             let ascDesc = 'desc'
             if (sorts && JSON.stringify(sorts) !== '{}') {
-                wheres1 =
-                    wheres1 +
-                    ` order by  ${sorts.sortBy}  ${
-                        sorts.order === 'ascending' ? 'asc' : 'desc'
-                    }`
-                wheres2 =
-                    wheres2 +
-                    ` order by  ${sorts.sortBy}  ${
-                        sorts.order === 'ascending' ? 'asc' : 'desc'
-                    }`
+                wheres1 = wheres1 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
+                wheres2 = wheres2 + ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
                 ascDesc = sorts.order === 'ascending' ? 'asc' : 'desc'
             }
             const isSuper = this.$store.getters.isSuper
             const roleLists = this.$store.getters.userInfo.role
             const roleKey = ['wjgly']
-            const curRole = roleLists.map((i) => i.alias)
-            const isPower = curRole.some((i) => roleKey.includes(i))
+            const curRole = roleLists.map(i => i.alias)
+            const isPower = curRole.some(i => roleKey.includes(i))
             // 重复发放的文件，在权限表会存在重复的文件信息
             //   let fileSearchSql = `select  wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,qx.bian_zhi_shi_jian
             //    FROM (SELECT *FROM (SELECT * FROM t_wjcysqb  ORDER BY create_time_ DESC LIMIT 99999999) a GROUP BY a.yong_hu_id_,a.wen_jian_id_) qx LEFT JOIN t_wjxxb wj ON qx.wen_jian_id_=wj.wen_jian_fu_jian_ WHERE qx.yong_hu_id_='${this.userId}' AND qx.shou_quan_='1' ${wheres1} GROUP BY qx.yong_hu_id_,qx.wen_jian_id_`
@@ -559,9 +412,7 @@ export default {
             const allSql = ``
             // 共用文件
             const comSql = `${selectSql} t_wjxxb wj ${leftSql} 
-             where wj.shi_fou_guo_shen_ ='有效' and (${this.depArrs.join(
-        ' or '
-    )}) ${wheres1} `
+             where wj.shi_fou_guo_shen_ ='有效' and (${this.depArrs.join(' or ')}) ${wheres1} `
             // 部门权限文件
             const buMenSql = `${selectSql}  t_wjxxb wj ${leftSql}
             where wj.shi_fou_guo_shen_ in ('有效','使用') ${wheres2} `
@@ -578,15 +429,7 @@ export default {
                 ,'）') as file_info_,
                 wj.wen_jian_xi_lei_,wj.wen_jian_bian_hao,wj.wen_jian_ming_che,wj.ban_ben_,wj.wen_jian_fu_jian_ AS fu_jian_,wj.fa_bu_shi_jian_ as fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s  from
             t_wjxxb wj
-            left join (
-    select a.* 
-    FROM t_skwjcysqsqzb a
-    INNER JOIN (
-        select wen_jian_id_, MAX(cha_yue_jie_zhi_s) as max_time
-        FROM t_skwjcysqsqzb
-        GROUP BY wen_jian_id_
-    ) b ON a.wen_jian_id_ = b.wen_jian_id_ AND a.cha_yue_jie_zhi_s = b.max_time GROUP BY wen_jian_id_
-) sq ON wj.id_ = sq.wen_jian_id_
+            left join (select *from t_skwjcysqsqzb order by create_time_ desc limit 1) sq on wj.id_=sq.wen_jian_id_
             ${leftSql}
             WHERE wj.shi_fou_guo_shen_ ='有效'and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
             and wj.quan_xian_xin_xi_ like '%${this.userId}%'  ${wheres3} `
@@ -615,29 +458,16 @@ export default {
             const sqlArr = [comSql, buMenSql, authoritySql]
             let oldRecordSql = ''
             const buMenWhere = []
-            if (this.pageKey !== 'file') {
+            if (this.pageKey !== 'nbwj') {
                 if (this.$store.getters.deptList.length !== 0) {
-                    // eslint-disable-next-line no-redeclare
-                    if (this.pos) {
-                        for (var a of this.pos.split(',')) {
-                            buMenWhere.push(
-                                `bian_zhi_bu_men_ like '%${a}%'`
-                            )
-                        }
-                    } else {
-                        for (var b of this.$store.getters.deptList) {
-                            buMenWhere.push(
-                                `bian_zhi_bu_men_ like '%${b.positionId}%'`
-                            )
-                        }
+                // eslint-disable-next-line no-redeclare
+                    for (var i of this.$store.getters.deptList) {
+                        buMenWhere.push(`bian_zhi_bu_men_ like '%${i.positionId}%'`)
                     }
-
                     oldRecordSql = `select wj.*,en.name_ AS org_name,ee.name_ as ry_name FROM t_ywyxjlb wj 
                     left join ibps_party_employee ee on wj.bian_zhi_ren_ = ee.id_ 
                     LEFT JOIN ibps_party_entity en ON en.id_= bian_zhi_bu_men_ 
-                    where (${buMenWhere.join(
-        ' or '
-    )}) ${wheres1}  order by bian_zhi_shi_jian desc`
+                    where (${buMenWhere.join(' or ')}) ${wheres1}  order by bian_zhi_shi_jian desc`
                 } else {
                     console.log('没有部门组织')
                     return
@@ -653,36 +483,29 @@ export default {
             }
             const fileSearchSql = needSelType.join('union all')
             // ` order by  ${sorts.sortBy}  ${sorts.order === 'ascending' ? 'asc' : 'desc'}`
-            const sql =
-                this.pageKey === 'file'
-                    ? `select sq.id,sq.cy_id_,sq.sc_id_,sq.shu_ju_lai_yuan_,sq.file_info_,sq.wen_jian_xi_lei_,sq.wen_jian_bian_hao,sq.wen_jian_ming_che,sq.ban_ben_,sq.ext_,sq.file_path_,COALESCE(wjxz.gai_zhang_fu_jian,sq.fu_jian_) AS fu_jian_,sq.fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s from (${fileSearchSql}) sq LEFT JOIN t_wjxzxdjlb wjxz ON sq.shu_ju_lai_yuan_ = wjxz.id_ ORDER BY sq.wen_jian_bian_hao ${ascDesc},sq.wen_jian_ming_che DESC`
-                    : oldRecordSql
+            const sql = this.pageKey === 'nbwj' ? `select sq.id,sq.cy_id_,sq.sc_id_,sq.shu_ju_lai_yuan_,sq.file_info_,sq.wen_jian_xi_lei_,sq.wen_jian_bian_hao,sq.wen_jian_ming_che,sq.ban_ben_,sq.ext_,sq.file_path_,COALESCE(wjxz.gai_zhang_fu_jian,sq.fu_jian_) AS fu_jian_,sq.fa_fang_shi_jian_,sq.cha_yue_jie_zhi_s from (${fileSearchSql}) sq LEFT JOIN t_wjxzxdjlb wjxz ON sq.shu_ju_lai_yuan_ = wjxz.id_ ORDER BY sq.wen_jian_bian_hao ${ascDesc},sq.wen_jian_ming_che DESC` : oldRecordSql
             // console.log(sql, 'sssssssssssssssssss')
-            curdPost('sql', sql)
-                .then((res) => {
-                    const tableDatas = res.variables.data
-                    this.selectListData = JSON.parse(JSON.stringify(tableDatas))
-                    let filterDatas = []
-                    this.bianlistData.pageResult.totalCount = tableDatas.length
-                    this.bianlistData.pageResult.totalPages = Math.ceil(
-                        tableDatas.length / this.pagination.limit
-                    )
-                    this.bianlistData.pageResult.limit = this.pagination.limit
-                    this.bianlistData.pageResult.page = this.pagination.page
-                    if (this.pagination.limit > tableDatas.length) {
-                        filterDatas = JSON.parse(JSON.stringify(tableDatas))
-                    } else {
-                        for (let index = 0; index < 20; index++) {
-                            filterDatas.push(tableDatas[index])
-                        }
+            curdPost('sql', sql).then(res => {
+                const tableDatas = res.variables.data
+                this.selectListData = JSON.parse(JSON.stringify(tableDatas))
+                let filterDatas = []
+                this.bianlistData.pageResult.totalCount = tableDatas.length
+                this.bianlistData.pageResult.totalPages = Math.ceil(tableDatas.length / this.pagination.limit)
+                this.bianlistData.pageResult.limit = this.pagination.limit
+                this.bianlistData.pageResult.page = this.pagination.page
+                if (this.pagination.limit > tableDatas.length) {
+                    filterDatas = JSON.parse(JSON.stringify(tableDatas))
+                } else {
+                    for (let index = 0; index < 20; index++) {
+                        filterDatas.push(tableDatas[index])
                     }
-                    this.bianlistData.dataResult = filterDatas
-                    ActionUtils.handleListData(this, this.bianlistData)
-                })
-                .catch((res) => {
-                    this.loading = false
-                    this.listData = []
-                })
+                }
+                this.bianlistData.dataResult = filterDatas
+                ActionUtils.handleListData(this, this.bianlistData)
+            }).catch(res => {
+                this.loading = false
+                this.listData = []
+            })
         },
         //  and ((sq.cha_yue_jie_zhi_s >DATE_FORMAT(NOW(), '%Y-%m-%d')) OR (sq.cha_yue_jie_zhi_s =DATE_FORMAT(NOW(), '%Y-%m-%d')))
         refreshData () {
@@ -691,40 +514,27 @@ export default {
             this.getDatas()
         },
         hasColumnByProp (columns, prop) {
-            return columns.some((column) => column.prop === prop)
+            return columns.some(column => column.prop === prop)
         },
         removeColumnByProp (columns, prop) {
-            return columns.filter((column) => column.prop !== prop)
+            return columns.filter(column => column.prop !== prop)
         },
         handleNodeClick (nodeId, nodeData, treeDatas) {
             // 判断是否显示外部文件更新按钮
             if (nodeData.depth !== 0) {
                 const pathId = nodeData.path ? nodeData.path.split('.') : []
-                const pathNameList = pathId.map((id) => {
-                    const node = treeDatas.find((item) => item.id === id)
+                const pathNameList = pathId.map(id => {
+                    const node = treeDatas.find(item => item.id === id)
                     return node ? node.name : ''
                 })
                 if (pathNameList.includes('外部文件') && this.isSuper) {
                     this.showCaoZuoColumn = true
-                    if (
-                        !this.hasColumnByProp(
-                            this.listConfig.columns,
-                            'cao_zuo'
-                        )
-                    ) {
-                        this.listConfig.columns.push({
-                            prop: 'cao_zuo',
-                            label: '操作',
-                            slotName: 'caozuo',
-                            width: 100
-                        })
+                    if (!this.hasColumnByProp(this.listConfig.columns, 'cao_zuo')) {
+                        this.listConfig.columns.push({ prop: 'cao_zuo', label: '操作', slotName: 'caozuo', width: 100 })
                     }
                 } else {
                     this.showCaoZuoColumn = false
-                    this.listConfig.columns = this.removeColumnByProp(
-                        this.listConfig.columns,
-                        'cao_zuo'
-                    )
+                    this.listConfig.columns = this.removeColumnByProp(this.listConfig.columns, 'cao_zuo')
                 }
             }
             this.show = 'detail'
@@ -736,19 +546,17 @@ export default {
             }
             // 判断是否存在下级菜单
             const noHadNext = !nodeData.children || !nodeData.children.length
-            if (noHadNext && this.pageKey === 'recordUpload') {
-                const chongfu = this.listConfig.toolbars.filter((el) => {
+            if (noHadNext && this.pageKey === 'wjkzgl-ywyxjlsc') {
+                const chongfu = this.listConfig.toolbars.filter(el => {
                     return el.key === 'add'
                 })
                 if (chongfu.length === 0 && this.depth !== 0) {
                     this.listConfig.toolbars.splice(1, 0, { key: 'add' })
                 }
             } else {
-                this.listConfig.toolbars = this.listConfig.toolbars.filter(
-                    (el) => {
-                        return el.key !== 'add'
-                    }
-                )
+                this.listConfig.toolbars = this.listConfig.toolbars.filter(el => {
+                    return el.key !== 'add'
+                })
             }
             this.fileTypesDatas = {
                 comAuthority: [],
@@ -776,11 +584,11 @@ export default {
             }
             // 递归获取所有子节点
             // 存在子节点时，需获取当前节点及所有子节点信息 - task3329
-            const getTail = (item) => {
+            const getTail = item => {
                 const result = [item] // 将自身信息添加到结果中
                 if (item.children && item.children.length > 0) {
                     // 如果有子节点，则递归获取子节点的信息
-                    item.children.forEach((child) => {
+                    item.children.forEach(child => {
                         result.push(...getTail(child)) // 将子节点信息添加到结果中
                     })
                 }
@@ -812,9 +620,7 @@ export default {
          * 获取格式化参数
          */
         getSearcFormData () {
-            this.searchWhere = this.$refs['crud']
-                ? this.$refs['crud'].getSearcFormData()
-                : {}
+            this.searchWhere = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             //   this.getDatas()
         },
         /**
@@ -822,7 +628,7 @@ export default {
          */
         handleAction (command, position, selection, data, index, button) {
             switch (command) {
-                case 'search': // 查询
+                case 'search':// 查询
                     this.refreshData()
                     break
                 case 'remove':
@@ -868,8 +674,8 @@ export default {
             }
         },
         /**
-         * 处理排序
-         */
+        * 处理排序
+        */
         handleSortChange (sort) {
             this.sqlWhere.sorts = sort
             this.getDatas()
@@ -880,28 +686,16 @@ export default {
             this.bianlistData.pageResult.limit = page.limit
             this.bianlistData.pageResult.page = page.page
             const filterDatas = []
-            if (this.selectListData.length >= page.limit * page.page) {
-                for (
-                    let index = page.limit * page.page - page.limit;
-                    index < page.limit * page.page;
-                    index++
-                ) {
+            if (this.selectListData.length >= (page.limit * page.page)) {
+                for (let index = (page.limit * page.page) - page.limit; index < (page.limit * page.page); index++) {
                     filterDatas.push(this.selectListData[index])
                 }
-                this.bianlistData.dataResult = JSON.parse(
-                    JSON.stringify(filterDatas)
-                )
+                this.bianlistData.dataResult = JSON.parse(JSON.stringify(filterDatas))
             } else {
-                for (
-                    let index = page.limit * page.page - page.limit;
-                    index < this.selectListData.length;
-                    index++
-                ) {
+                for (let index = (page.limit * page.page) - page.limit; index < this.selectListData.length; index++) {
                     filterDatas.push(this.selectListData[index])
                 }
-                this.bianlistData.dataResult = JSON.parse(
-                    JSON.stringify(filterDatas)
-                )
+                this.bianlistData.dataResult = JSON.parse(JSON.stringify(filterDatas))
             }
             ActionUtils.handleListData(this, this.bianlistData)
         },
@@ -926,14 +720,16 @@ export default {
                     tableName: scTableName,
                     paramWhere: addScDatas
                 }
-                await curdPost('add', addParams).then((res) => {})
+                await curdPost('add', addParams).then(res => {
+                })
             }
             if (delIds.length) {
                 const deleteParams = {
                     tableName: scTableName,
                     paramWhere: { id_: delIds.join(',') }
                 }
-                await curdPost('delete', deleteParams).then(() => {})
+                await curdPost('delete', deleteParams).then(() => {
+                })
             }
             this.refreshData()
         },
@@ -956,38 +752,31 @@ export default {
             INNER JOIN t_wjxzxdjlb ON  t_wjxxb.shu_ju_lai_yuan_ = t_wjxzxdjlb.id_ WHERE  tou_ban_wen_jian_='${val.id}' AND t_wjxxb.shi_fou_guo_shen_='有效'`
             // 查看文件修订历史记录
             const sql = `select w.* FROM t_wjxzxdjlb w JOIN (select zuo_fei_cao_zuo_ FROM t_wjxzxdjlb WHERE id_ = (select shu_ju_lai_yuan_ FROM t_wjxxb WHERE id_ = '${val.id}') and zuo_fei_cao_zuo_ IS NOT NULL and zuo_fei_cao_zuo_!='' ) sub ON w.zuo_fei_cao_zuo_ = sub.zuo_fei_cao_zuo_ where w.zuo_fei_cao_zuo_ IS NOT NULL and w.zuo_fei_cao_zuo_!=''and w.shi_fou_guo_shen_='已完成' `
-            this.$common.request('sql', sql).then(async (res) => {
+            this.$common.request('sql', sql).then(res => {
                 const list = res.variables.data
-                for (let i = 0; i < list.length; i++) {
-                    const el = list[i]
+                list.forEach(el => {
                     const obj = {
                         zId: val.id,
                         id: el.id_,
                         wen_jian_ming_che: el.wen_jian_ming_che,
                         ban_ben_: el.ban_ben_,
                         // fu_jian_: el.wen_jian_fu_jian_,
-                        fu_jian_: el.gai_zhang_fu_jian
-                            ? el.gai_zhang_fu_jian
-                            : el.wen_jian_fu_jian_,
+                        fu_jian_: el.gai_zhang_fu_jian ? el.gai_zhang_fu_jian : el.wen_jian_fu_jian_,
                         xiu_ding_nei_rong: el.xiu_ding_nei_rong,
                         yuan_yin_: el.yuan_yin_,
                         fa_fang_shi_jian_: el.bian_zhi_shi_jian,
-                        fa_bu_shi_jian_: el.fa_bu_shi_jian_,
-                        xiu_ding_ban_ben_: el.xiu_ding_ban_ben_,
-                        xiu_ding_wen_jian_: el.xiu_ding_wen_jian_,
+                        xiu_ding_ban_ben_: el.xiu_ding_ban_ben_, xiu_ding_wen_jian_: el.xiu_ding_wen_jian_,
                         wen_jian_bian_hao: el.wen_jian_bian_hao,
                         bian_zhi_ren_: el.bian_zhi_ren_,
                         cao_zuo_lei_xing_: el.cao_zuo_lei_xing_,
-                        xiu_ding_fu_jian_: el.xiu_ding_fu_jian_,
-                        zhen_fu_jian_: el.fu_jian_
+                        xiu_ding_fu_jian_: el.xiu_ding_fu_jian_
                     }
-                    await this.handleFileInfo(obj)
-                }
-
+                    this.handleFileInfo(obj)
+                })
                 this.dialogVisible = true
             })
         },
-        async handleFileInfo (val) {
+        handleFileInfo (val) {
             // 修订附件作废附件不再使用，修订在文件附件上操作
             const sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
             //  let sql = ''
@@ -996,36 +785,16 @@ export default {
             // } else {
             //     sql = `select * from ibps_file_attachment where id_= '${val.fu_jian_}'`
             // }
-            const res = await this.$common.request('sql', sql)
-            this.fileInfos = {} // 本人添加
-            const { data = [] } = res.variables || {}
-            if (!data.length) {
-                this.$message.warning('没有可查阅的文件，请查明原因！')
-                return
-            }
-            this.fileInfos = {
-                id: val.id,
-                FILE_NAME_: val.wen_jian_ming_che,
-                fileInfos: data[0],
-                func: this.handleUpdate,
-                ban_ben_: val.ban_ben_,
-                xiu_ding_nei_rong: val.xiu_ding_nei_rong
-                    ? val.xiu_ding_nei_rong
-                    : '',
-                yuan_yin_: val.yuan_yin_ ? val.yuan_yin_ : '',
-                xiu_ding_ban_ben_: val.xiu_ding_ban_ben_
-                    ? val.xiu_ding_ban_ben_
-                    : '',
-                wen_jian_bian_hao: val.wen_jian_bian_hao,
-                fa_fang_shi_jian_: val.fa_fang_shi_jian_,
-                bian_zhi_ren_: val.bian_zhi_ren_,
-                cao_zuo_lei_xing_: val.cao_zuo_lei_xing_,
-                zId: val.zId,
-                xiu_ding_fu_jian_: val.xiu_ding_fu_jian_,
-                zhen_fu_jian_: val.zhen_fu_jian_,
-                fa_bu_shi_jian_: val.fa_bu_shi_jian_
-            }
-            this.fileArray.push(this.fileInfos)
+            this.$common.request('sql', sql).then(res => {
+                this.fileInfos = {}// 本人添加
+                const { data = [] } = res.variables || {}
+                if (!data.length) {
+                    this.$message.warning('没有可查阅的文件，请查明原因！')
+                    return
+                }
+                this.fileInfos = { id: val.id, FILE_NAME_: val.wen_jian_ming_che, fileInfos: data[0], func: this.handleUpdate, ban_ben_: val.ban_ben_, xiu_ding_nei_rong: val.xiu_ding_nei_rong ? val.xiu_ding_nei_rong : '', yuan_yin_: val.yuan_yin_ ? val.yuan_yin_ : '', xiu_ding_ban_ben_: val.xiu_ding_ban_ben_ ? val.xiu_ding_ban_ben_ : '', wen_jian_bian_hao: val.wen_jian_bian_hao, fa_fang_shi_jian_: val.fa_fang_shi_jian_, bian_zhi_ren_: val.bian_zhi_ren_, cao_zuo_lei_xing_: val.cao_zuo_lei_xing_, zId: val.zId, xiu_ding_fu_jian_: val.xiu_ding_fu_jian_ }
+                this.fileArray.push(this.fileInfos)
+            })
         },
         handleUpdate (fileId, time) {
             const addParams = {
@@ -1039,7 +808,7 @@ export default {
                     }
                 ]
             }
-            curdPost('add', addParams).then((res) => {
+            curdPost('add', addParams).then(res => {
                 this.refreshData()
             })
         }
@@ -1048,26 +817,27 @@ export default {
 </script>
 <style lang="less" scoped>
 .box {
-    width: 230px;
+  width: 230px;
 }
 
 .title {
-    font-size: 14px;
-    margin: 21px 5px 5px;
-    padding: 0;
+  font-size: 14px;
+  margin: 21px 5px 5px;
+  padding: 0;
 }
 
 /deep/ .el-tree-node__content {
-    display: block;
+  display: block;
 }
 
-/deep/ .el-form-item__label {
+/deep/ .el-form-item__label{
     text-align: left;
 }
 
-/deep/ .el-dialog__footer {
+/deep/ .el-dialog__footer{
     display: flex;
     justify-content: center;
 }
+
 </style>
 
