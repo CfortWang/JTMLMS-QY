@@ -12,22 +12,21 @@
                         <el-button type="text" size="mini">部门</el-button>
                     </el-row>
                     <dv-border-box-8>
-                        <el-select v-model="deptVal" @change="updateAll" :clearable="false" placeholder="请选择部门">
+                        <el-select v-model="deptVal" :clearable="false" placeholder="请选择部门" @change="updateAll">
                             <el-option
-                            v-for="item in chooseDept"
-                            :key="item.positionId"
-                            :label="item.positionName"
-                            :value="item.positionId"
-                            >
-                            </el-option>
+                                v-for="item in chooseDept"
+                                :key="item.positionId"
+                                :label="item.positionName"
+                                :value="item.positionId"
+                            />
                         </el-select>
                     </dv-border-box-8>
                 </div>
                 <div :class="$style.daterange" style="right:65%;">
                     <el-row style="display:flex">
                         <!-- <el-button :class="hoverClassAdd === 'w'? 'hoverClass' : ''" type="text" @click="changeDate('week')" size="mini">本周</el-button> -->
-                        <el-button :class="hoverClassAdd === 'm'? 'hoverClass' : ''" type="text" @click="changeDate('month')" size="mini">月</el-button>
-                        <el-button :class="hoverClassAdd === 'y'? 'hoverClass' : ''" type="text" @click="changeDate('year')" size="mini">年</el-button>
+                        <el-button :class="hoverClassAdd === 'm'? 'hoverClass' : ''" type="text" size="mini" @click="changeDate('month')">月</el-button>
+                        <el-button :class="hoverClassAdd === 'y'? 'hoverClass' : ''" type="text" size="mini" @click="changeDate('year')">年</el-button>
                     </el-row>
                     <!-- <el-row style="display:flex">
                         <el-button type="text" size="mini">日期</el-button>
@@ -51,8 +50,8 @@
                             format="yyyy-MM"
                             value-format="yyyy-MM"
                             placeholder="选择月"
-                            @change="updateAll"
                             :clearable="false"
+                            @change="updateAll"
                         />
                         <el-date-picker
                             v-show="hoverClassAdd === 'y'"
@@ -61,10 +60,10 @@
                             format="yyyy"
                             value-format="yyyy"
                             placeholder="选择年"
-                            @change="updateAll"
                             :clearable="false"
+                            @change="updateAll"
                         />
-                    </dv-border-box-8>  
+                    </dv-border-box-8>
                 </div>
                 <div :class="$style.back" @click.prevent="goBack()">
                     <dv-border-box-8>返回</dv-border-box-8>
@@ -100,25 +99,25 @@
                     <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :width="'32%'" :height="'29%'" :id="3"/>
                 </div> -->
                 <div class="vessel">
-                    <dv-border-box-12 class="areaTop" :color="dvColor" :backgroundColor="dvBackColor">
+                    <dv-border-box-12 class="areaTop" :color="dvColor" :background-color="dvBackColor">
                         <div class="area">
-                            <job-plan-chart class="merge" :title="mergeData[1].title" v-model="nowWeekData" :data="mergeData[1].numData" :width="'63%'" :height="'85%'" :id="1" />
-                            <dv-decoration-2  :color="dvLineColor" :key="`line1`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
-                            <pie-chart class="tabular" :title="mergeData[0].title" v-model="mergeData[0].numData" :total="mergeData[0].total" :width="'32%'" :height="'85%'" :id="1"/>
+                            <job-plan-chart :id="1" v-model="nowWeekData" class="merge" :title="mergeData[1].title" :data="mergeData[1].numData" :width="'63%'" :height="'85%'" />
+                            <dv-decoration-2 :key="`line1`" :color="dvLineColor" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
+                            <pie-chart :id="1" v-model="mergeData[0].numData" class="tabular" :title="mergeData[0].title" :total="mergeData[0].total" :width="'32%'" :height="'85%'" />
                         </div>
-                        <dv-decoration-2 :color="dvLineColor" :key="`line4`" :dur="6" style="width:98%;height:4%;margin: auto;" />
+                        <dv-decoration-2 :key="`line4`" :color="dvLineColor" :dur="6" style="width:98%;height:4%;margin: auto;" />
                         <div class="area">
-                            <training-staff-chart class="merge"  :title="mergeData[2].title" v-model="mergeData[2].numData" :data="mergeData[2].perList" :width="'63%'" :height="'85%'" :id="1" />
-                            <dv-decoration-2  :color="dvLineColor" :key="`line2`" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
-                            <pie-chart class="tabular" :title="mergeData[3].title" v-model="mergeData[3].numData" :total="mergeData[3].total" :width="'32%'" :height="'85%'" :id="2"/>
+                            <training-staff-chart :id="1" v-model="mergeData[2].numData" class="merge" :title="mergeData[2].title" :data="mergeData[2].perList" :width="'63%'" :height="'85%'" />
+                            <dv-decoration-2 :key="`line2`" :color="dvLineColor" :reverse="true" :dur="6" style="width:1%;height:85%;margin: auto;" />
+                            <pie-chart :id="2" v-model="mergeData[3].numData" class="tabular" :title="mergeData[3].title" :total="mergeData[3].total" :width="'32%'" :height="'85%'" />
                         </div>
                     </dv-border-box-12>
                     <div style="width:100%;height:2.64%" />
-                    <dv-border-box-12 class="areaBottom" :color="dvColor" :backgroundColor="dvBackColor">
+                    <dv-border-box-12 class="areaBottom" :color="dvColor" :background-color="dvBackColor">
                         <div class="area" style="height:100%">
-                            <pre-work-chart class="merge" :title="mergeData[5].title" v-model="mergeData[5].numData" :width="'63%'" :height="'87%'" :id="1" />
-                            <dv-decoration-2 :color="dvLineColor" :key="`line3`" :reverse="true" :dur="6" style="width:1%;height:87%;margin: auto;" />
-                            <pie-chart class="tabular" :title="mergeData[4].title" v-model="mergeData[4].numData" :total="mergeData[4].total" :width="'32%'" :height="'87%'" :id="3"/>
+                            <pre-work-chart :id="1" v-model="mergeData[5].numData" class="merge" :title="mergeData[5].title" :width="'63%'" :height="'87%'" />
+                            <dv-decoration-2 :key="`line3`" :color="dvLineColor" :reverse="true" :dur="6" style="width:1%;height:87%;margin: auto;" />
+                            <pie-chart :id="3" v-model="mergeData[4].numData" class="tabular" :title="mergeData[4].title" :total="mergeData[4].total" :width="'32%'" :height="'87%'" />
                         </div>
                     </dv-border-box-12>
                 </div>
@@ -131,6 +130,7 @@ import screenfull from 'screenfull'
 import data from './constants/simulated.js'
 import { getFormatDate } from './utils/config.js'
 import { trainingDashBoard } from '@/api/platform/spectaculars/lab'
+import { getSetting } from '@/utils/query'
 export default {
     components: {
         JobPlanChart: () => import('./components/jobPlanChart.vue'),
@@ -141,8 +141,8 @@ export default {
     data () {
         const d = new Date()
         const { deptList = [] } = this.$store.getters || {}
-        let chooseDept = deptList.filter(e => e.depth == 4&&e.positionName.indexOf('质量')==-1)
-        chooseDept.unshift({positionId: " ",positionName: "全科室"})
+        const chooseDept = deptList.filter(e => e.depth == 4 && e.positionName.indexOf('质量') == -1)
+        chooseDept.unshift({ positionId: ' ', positionName: '全科室' })
         return {
             deptList,
             chooseDept,
@@ -156,20 +156,21 @@ export default {
             itemIndex: 0,
             chartIndex: 0,
             autoPlay: true,
-            tabularArr1:[],
-            tabularArr2:[],
+            tabularArr1: [],
+            tabularArr2: [],
             daterange: [],
-            dateValM:'',
-            dateValY:'',
+            dateValM: '',
+            dateValY: '',
             nowWeekData: [],
             dvColor: ['rgb(22,47,98)', 'rgba(116, 142, 194, 1)'],
             dvLineColor: ['rgba(255, 255, 255, 0.5)'],
             dvBackColor: 'rgba(6, 30, 93, 0)',
-            dateVal: ["week","nowWeek"],
+            dateVal: ['week', 'nowWeek'],
             show: true,
             options: data.options,
-            hoverClassAdd:'m',
-            mergeData:[
+            hoverClassAdd: 'm',
+            version: '',
+            mergeData: [
                 {
                     title: '在岗培训类别占比',
                     numData: [],
@@ -209,7 +210,9 @@ export default {
             return this.sizeMap[this.selectedCycle]
         }
     },
-    created () {
+    async created () {
+        const res = await getSetting('pxSpectacularsOption')
+        this.version = res.version || ''
         // 默认全屏展示
         if (screenfull.isEnabled && !screenfull.isFullscreen) {
             screenfull.request()
@@ -228,16 +231,16 @@ export default {
         initializeData () {
             const w = window.innerWidth
             const { first = '', second = '' } = this.$store.getters.level || {}
-            let annual = this.hoverClassAdd === 'm' ? this.dateValM.substring(0,4) :this.dateValY 
+            const annual = this.hoverClassAdd === 'm' ? this.dateValM.substring(0, 4) : this.dateValY
             this.nowWeekData = []
             this.initData = {}
             this.itemIndex = 0
             this.chartIndex = 0
             this.level = second || first
             this.fontSize = w >= 1600 ? 20 : w > 1366 && w < 1600 ? 18 : 16
-            this.tabularArr1=[]
-            this.tabularArr2=[]
-            this.mergeData=[
+            this.tabularArr1 = []
+            this.tabularArr2 = []
+            this.mergeData = [
                 {
                     title: '在岗培训类别占比',
                     numData: [],
@@ -258,7 +261,7 @@ export default {
                     total: 0
                 },
                 {
-                    title: annual+ '年度岗前培训类别占比',
+                    title: annual + '年度岗前培训类别占比',
                     numData: [],
                     total: 0
                 },
@@ -279,10 +282,11 @@ export default {
             trainingDashBoard(
                 {
                     dept: this.deptVal,
-                    date: this.hoverClassAdd === 'm' ? this.dateValM :this.dateValY
+                    date: this.hoverClassAdd === 'm' ? this.dateValM : this.dateValY,
+                    version: this.version
                 }
-            ).then(res=>{
-                let data = res.data[0] || {}
+            ).then(res => {
+                const data = res.data[0] || {}
                 this.nowWeekData = data.weekDtoList
                 this.mergeData[1].numData = data.planDto
                 this.mergeData[0].numData = data.typeDto.typeDtoList
@@ -297,7 +301,7 @@ export default {
                 this.mergeData[2].numData = data.pxrytjqkDtoList
                 this.mergeData[2].perList = data.userRankList
                 this.mergeData[5].numData = data.ndgqpxList
-                loading.close();
+                loading.close()
             })
         },
         async fetchData () {
@@ -309,7 +313,7 @@ export default {
             switch (val) {
                 case 'week':
                     this.hoverClassAdd = 'w'
-                    let w = this.getCurrentWeek()
+                    const w = this.getCurrentWeek()
                     this.daterange = w
                     this.updateAll()
                     break
@@ -358,31 +362,31 @@ export default {
             const endDate = new Date(currentYear, 11, 31)
             return [getFormatDate('string', 0, 10, startDate), getFormatDate('string', 0, 10, endDate)]
         },
-        getAllDatesBetween(d) {
-            let startDate = new Date(d[0])
-            let endDate = new Date(d[1])
-            let dates = []
-            let currentDate = new Date(startDate)
+        getAllDatesBetween (d) {
+            const startDate = new Date(d[0])
+            const endDate = new Date(d[1])
+            const dates = []
+            const currentDate = new Date(startDate)
             while (currentDate <= endDate) {
-                let obj = {week: this.getWeekOfDay(currentDate), date: getFormatDate('string', 0, 10, new Date(currentDate))}
+                const obj = { week: this.getWeekOfDay(currentDate), date: getFormatDate('string', 0, 10, new Date(currentDate)) }
                 dates.push(obj)
                 currentDate.setDate(currentDate.getDate() + 1)
             }
-            return dates;
+            return dates
         },
-        getWeekOfDay(d){
+        getWeekOfDay (d) {
             const date = new Date(d)
             const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
             const dayOfWeek = weekDays[date.getDay()]
             return dayOfWeek
         },
-        getYearMonth(val){
-            let currentDate = new Date()
-            let currentYear = currentDate.getFullYear()
-            let currentMonth = currentDate.getMonth() + 1
-            let mon = currentMonth > 9 ? currentMonth : '0' + currentMonth
-            let currentYearMonth = currentYear + '-' + mon
-            return val === 'm' ? currentYearMonth : currentYear+''
+        getYearMonth (val) {
+            const currentDate = new Date()
+            const currentYear = currentDate.getFullYear()
+            const currentMonth = currentDate.getMonth() + 1
+            const mon = currentMonth > 9 ? currentMonth : '0' + currentMonth
+            const currentYearMonth = currentYear + '-' + mon
+            return val === 'm' ? currentYearMonth : currentYear + ''
         },
         toggleAutoPlay () {
             this.autoPlay ? this.stopAutoPlay() : this.startAutoPlay()
@@ -414,14 +418,14 @@ export default {
 //         border-color: #1892ea;
 //         color: #FFFFFF;
 //     }
-    
+
 //     ::v-deep .el-button--text:focus,
 //     .el-button--text:hover {
 //         background: #1892ea;
 //         border-color: #1892ea;
 //         color: #FFFFFF;
 //     }
-    
+
     ::v-deep .el-button--text {
         color: #FFFFFF;
         padding: 5px 5px;

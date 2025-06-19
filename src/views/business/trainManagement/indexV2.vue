@@ -97,6 +97,7 @@ import screenfull from 'screenfull'
 import data from './constants/simulated.js'
 import { getFormatDate } from './utils/config.js'
 import { trainingDashBoard } from '@/api/platform/spectaculars/lab'
+import { getSetting } from '@/utils/query'
 export default {
     components: {
         JobPlanChart: () => import('./components/jobPlanChart.vue'),
@@ -135,6 +136,7 @@ export default {
             show: true,
             options: data.options,
             hoverClassAdd: 'm',
+            version: '',
             mergeData: [
                 {
                     title: '培训类别占比',
@@ -175,7 +177,9 @@ export default {
             return this.sizeMap[this.selectedCycle]
         }
     },
-    created () {
+    async created () {
+        const res = await getSetting('pxSpectacularsOption')
+        this.version = res.version || ''
         // 默认全屏展示
         if (screenfull.isEnabled && !screenfull.isFullscreen) {
             screenfull.request()
@@ -245,7 +249,8 @@ export default {
             trainingDashBoard(
                 {
                     dept: this.deptVal,
-                    date: this.hoverClassAdd === 'm' ? this.dateValM : this.dateValY
+                    date: this.hoverClassAdd === 'm' ? this.dateValM : this.dateValY,
+                    version: this.version
                 }
             ).then(res => {
                 const data = res.data[0] || {}
