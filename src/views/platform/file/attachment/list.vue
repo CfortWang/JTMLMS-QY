@@ -286,6 +286,7 @@ export default {
                             newTab.document.write(`<title>文件预览页-${data.fileName}</title>`)
                             newTab.document.write('<style>body { margin: 0px; }</style>')
                             newTab.document.head.appendChild(link)
+                            console.log(`${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(url)}&hasRole=${hasRole}`)
                             newTab.document.write(`<iframe src="${this.$baseUrl}lib/pdfjs-dist/web/viewer.html?file=${encodeURIComponent(url)}&hasRole=${hasRole}" style="width:100%; height:100%;" frameborder="0";>`)
                         })
                     } else {
