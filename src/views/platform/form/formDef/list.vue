@@ -1,6 +1,8 @@
 <template>
     <div class="form-def">
+        <!-- card 展示 -->
         <ibps-card-list
+            v-if="showType === 'card'"
             ref="crud"
             :title="title"
             :height="height"
@@ -57,6 +59,26 @@
             </template>
         </ibps-card-list>
 
+        <!-- list 展示 -->
+        <ibps-crud
+            v-else
+            ref="crud"
+            :title="title"
+            :height="height"
+            :data="listData"
+            :pagination="pagination"
+            :pk-key="pkKey"
+            :toolbars="listConfig.toolbars"
+            :search-form="listConfig.searchForm"
+            :columns="listConfig.columns"
+            :row-handle="listConfig.rowHandle"
+            :loading="loading"
+            :create-text="createText"
+            @action-event="handleAction"
+            @sort-change="handleSortChange"
+            @pagination-change="handlePaginationChange"
+        >
+        </ibps-crud>
         <!-- 导入表单定义 -->
         <import-form
             :id="editId"
@@ -119,6 +141,7 @@ export default {
     components: {
         'ibps-type-tree': () => import('@/business/platform/cat/type/tree'),
         'ibps-card-list': () => import('@/components/ibps-card-list'),
+        'ibps-crud': () => import('@/components/ibps-crud'),
         'create-form': () => import('./create'),
         'copy-form': () => import('./copy'),
         'import-form': () => import('./import'),
@@ -150,6 +173,7 @@ export default {
             formKey: '',
             searchField: '',
             searchName: 'Q^name_^SL',
+            showType: 'card',
 
             listData: [],
             listConfig: {
@@ -358,6 +382,7 @@ export default {
         handleRemove (ids) {
             remove({ formDefIds: ids }).then(response => {
                 ActionUtils.removeSuccessMessage()
+                this.$refs.crud.clearSelection()
                 this.search()
             }).catch(() => {})
         },
