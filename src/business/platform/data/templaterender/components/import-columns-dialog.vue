@@ -181,7 +181,6 @@
 <script>
 import { saveUpload } from '@/api/platform/data/dataTemplate'
 import IbpsImport from '@/plugins/import'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
 export default {
     props: {

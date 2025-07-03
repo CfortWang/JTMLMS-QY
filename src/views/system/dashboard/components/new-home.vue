@@ -204,7 +204,6 @@
 </template>
 
 <script>
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import homeCalendar from './home-calendar'
 import { pending, handledTask } from '@/api/platform/office/bpmReceived'
 import { myDraft, removeDraft } from '@/api/platform/office/bpmInitiated'
@@ -394,10 +393,6 @@ export default {
                 this.userList = userList
                 return
             }
-            const sql = `select id_ as userId, name_ as userName, mobile_ as phone from ibps_party_employee where status_ = 'actived'`
-            curdPost('sql', sql).then(res => {
-                this.userList = res.variables && res.variables.data
-            })
         },
         // 获取用户部门信息
         getOrgInfo () {
@@ -442,38 +437,38 @@ export default {
         // 获取表格数据
         getData (type) {
             this.loading = true
-            operate[this.activeTab](this.getFormatParams(null, this.defaultPagination)).then(response => {
-                const { dataResult, pageResult } = response.data
-                if (dataResult && dataResult.length) {
-                    // 待办事宜对任务发起人做额外处理
-                    if (type === 'wait') {
-                        const instList = []
-                        dataResult.forEach(item => {
-                            instList.push(item.bpmnInstId)
-                        })
-                        const sql = `select b.bpmn_inst_id_, b.create_by_, a.name_ from ibps_bpm_inst b left join ibps_party_employee a on a.id_ = b.create_by_ where b.bpmn_inst_id_ in (${instList.join(',')}) order by find_in_set(b.bpmn_inst_id_,'${instList.join(',')}')`
-                        const currentTime = Date.now()
-                        curdPost('sql', sql).then(res => {
-                            const data = res.variables && res.variables.data
-                            data.forEach((item, index) => {
-                                dataResult[index].submitBy = item.name_
-                                dataResult[index].workName = dataResult[index].subject.includes('#') ? dataResult[index].subject.split('#')[0] : dataResult[index].subject.split('(')[0]
-                                dataResult[index].workType = this.plan.includes(dataResult[index].procDefKey) ? 'plan' : 'normal'
-                                dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, '1')
-                            })
-                            this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
-                            this.paginate = pageResult
-                        })
-                        this.urgeToManager()
-                    } else {
-                        this.dataList = dataResult
-                        this.paginate = pageResult
-                    }
-                }
-                this.loading = false
-            }).catch(() => {
-                this.loading = false
-            })
+            // operate[this.activeTab](this.getFormatParams(null, this.defaultPagination)).then(response => {
+            //     const { dataResult, pageResult } = response.data
+            //     if (dataResult && dataResult.length) {
+            //         // 待办事宜对任务发起人做额外处理
+            //         if (type === 'wait') {
+            //             const instList = []
+            //             dataResult.forEach(item => {
+            //                 instList.push(item.bpmnInstId)
+            //             })
+            //             const sql = `select b.bpmn_inst_id_, b.create_by_, a.name_ from ibps_bpm_inst b left join ibps_party_employee a on a.id_ = b.create_by_ where b.bpmn_inst_id_ in (${instList.join(',')}) order by find_in_set(b.bpmn_inst_id_,'${instList.join(',')}')`
+            //             const currentTime = Date.now()
+            //             curdPost('sql', sql).then(res => {
+            //                 const data = res.variables && res.variables.data
+            //                 data.forEach((item, index) => {
+            //                     dataResult[index].submitBy = item.name_
+            //                     dataResult[index].workName = dataResult[index].subject.includes('#') ? dataResult[index].subject.split('#')[0] : dataResult[index].subject.split('(')[0]
+            //                     dataResult[index].workType = this.plan.includes(dataResult[index].procDefKey) ? 'plan' : 'normal'
+            //                     dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, '1')
+            //                 })
+            //                 this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
+            //                 this.paginate = pageResult
+            //             })
+            //             this.urgeToManager()
+            //         } else {
+            //             this.dataList = dataResult
+            //             this.paginate = pageResult
+            //         }
+            //     }
+            //     this.loading = false
+            // }).catch(() => {
+            //     this.loading = false
+            // })
         },
         // 查询
         search () {
@@ -591,25 +586,25 @@ export default {
                 parameters: [],
                 sorts: []
             }
-            const sql = `select id_, shi_wu_id_ as taskId from t_gqswb where position('${userId}' in chu_li_ren_id_) FOR UPDATE`
-            // Promise.all([pending(params), curdPost('sql', sql)]).then(([res1, res2]) => {
-            //     let workData = res1.data && res1.data.dataResult
-            //     let noticeData = res2.variables && res2.variables.data
-            //     if (!workData || !workData.length) {
-            //         return
-            //     }
-            //     this.dealData(workData, noticeData)
+            // const sql = `select id_, shi_wu_id_ as taskId from t_gqswb where position('${userId}' in chu_li_ren_id_) FOR UPDATE`
+            // // Promise.all([pending(params), curdPost('sql', sql)]).then(([res1, res2]) => {
+            // //     let workData = res1.data && res1.data.dataResult
+            // //     let noticeData = res2.variables && res2.variables.data
+            // //     if (!workData || !workData.length) {
+            // //         return
+            // //     }
+            // //     this.dealData(workData, noticeData)
+            // // })
+            // pending(params).then(res1 => {
+            //     const workData = res1.data && res1.data.dataResult
+            //     curdPost('sql', sql).then(res2 => {
+            //         const noticeData = res2.variables && res2.variables.data
+            //         if (!workData || !workData.length) {
+            //             return
+            //         }
+            //         this.dealData(workData, noticeData)
+            //     })
             // })
-            pending(params).then(res1 => {
-                const workData = res1.data && res1.data.dataResult
-                curdPost('sql', sql).then(res2 => {
-                    const noticeData = res2.variables && res2.variables.data
-                    if (!workData || !workData.length) {
-                        return
-                    }
-                    this.dealData(workData, noticeData)
-                })
-            })
         },
         // 处理数据
         dealData (workList, noticeList) {
@@ -732,7 +727,7 @@ export default {
             }
             // console.log('新增过期事务表数据：', addList, '发送消息数据', sendList)
             if (addList.length) {
-                curdPost('add', addParams)
+                this.$common.request('add', addParams)
             }
             if (sendList.length) {
                 this.sendMsg(sendList)
@@ -758,7 +753,7 @@ export default {
                     id_: deleteList.join(',')
                 }
             }
-            curdPost('delete', params).then(() => {}).catch(err => {
+            this.$common.request('delete', params).then(() => {}).catch(err => {
                 console.log(err)
             })
         },

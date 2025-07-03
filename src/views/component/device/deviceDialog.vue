@@ -488,7 +488,7 @@
                                                             <ibps-custom-dialog
                                                                 v-model="form.weiHuFangShi"
                                                                 size="mini"
-                                                                template-key="sbbqdhk"
+                                                                :template-key="config?'gwzzdhkrcwh':'sbbqdhk'"
                                                                 multiple
                                                                 :disabled="readonly"
                                                                 type="dialog"
@@ -782,7 +782,6 @@
 
                                 <el-tab-pane v-for="item in tabItems" :key="item.name" :label="item.label" :name="item.name" :disabled="item.isKeepAlive&&!isEdit">
                                     <template v-if="item.isKeepAlive">
-
                                         <!-- 使用 v-if 配合 keep-alive 实现按需加载 -->
                                         <keep-alive>
                                             <component :is="item.component" v-if="activeName===item.name" :params="form" />
@@ -803,21 +802,21 @@
 
 <script>
 import dayjs from 'dayjs'
-import ibpsUserSelector from '@/business/platform/org/selector'
 import { getequipmentCard, saveEquipmentCard } from '@/api/platform/device/device'
-import Maintenance from './maintenance.vue'
-import MoreDevices from './moreDevices.vue'
-import ScrappedRecord from './scrappedRecord.vue'
-import MaintenanceRecord from './maintenanceRecord.vue'
-import RepairRecord from './repairRecord.vue'
-import CalibrationCheckRecord from './calibrationCheckRecord.vue'
-import ConfirmationRecord from './ConfirmationRecord.vue'
-import IbpsAttachment from '@/business/platform/file/attachment/selector'
-import SelectType from '@/views/component/selectType.vue'
 import { getImage } from '@/api/platform/file/attachment'
 export default {
     components: {
-        ibpsUserSelector, Maintenance, MoreDevices, ScrappedRecord, MaintenanceRecord, RepairRecord, CalibrationCheckRecord, ConfirmationRecord, IbpsAttachment, SelectType,
+        IbpsUserSelector: () => import('@/business/platform/org/selector'),
+        Maintenance: () => import('./maintenance.vue'),
+        MoreDevices: () => import('./moreDevices.vue'),
+        ScrappedRecord: () => import('./scrappedRecord.vue'),
+        MaintenanceRecord: () => import('./maintenanceRecord.vue'),
+        RepairRecord: () => import('./repairRecord.vue'),
+        CalibrationCheckRecord: () => import('./calibrationCheckRecord.vue'),
+        ConfirmationRecord: () => import('./ConfirmationRecord.vue'),
+        PvRecord: () => import('./pvRecord.vue'),
+        IbpsAttachment: () => import('@/business/platform/file/attachment/selector'),
+        SelectType: () => import('@/views/component/selectType.vue'),
         IbpsCustomDialog: () => import('@/business/platform/data/templaterender/custom-dialog'),
         IbpsImage: () => import('@/business/platform/file/image')
     },
@@ -864,8 +863,9 @@ export default {
         }
     },
     data () {
-        const { userId, position, level, deptList } = this.$store.getters
+        const { userId, position, level, deptList, setting } = this.$store.getters
         return {
+            config: setting?.postJob?.allocation || false,
             tabItems: [
                 { label: '维护项目', name: 'two', ref: 'MaintenanceRef', data: 'maintenanceItemPoList', component: 'Maintenance', isKeepAlive: false },
                 { label: '附属设备及配件', name: 'three', ref: 'MoreDevicesRef', data: 'accessoriesDevicePoList', component: 'MoreDevices', isKeepAlive: false },
@@ -874,6 +874,8 @@ export default {
                 { label: '维修记录', name: 'six', component: 'RepairRecord', isKeepAlive: true },
                 { label: '停用、报废记录', name: 'seven', component: 'ScrappedRecord', isKeepAlive: true },
                 { label: '检验系统校准确认记录', name: 'eight', component: 'ConfirmationRecord', isKeepAlive: true }
+                // 同步与深圳三院分支，后端暂未同步对应接口，不开放
+                // { label: '性能验证记录', name: 'nine', component: 'PvRecord', isKeepAlive: true }
             ],
             filter: [{
                 descVal: '1',
@@ -1046,24 +1048,15 @@ export default {
         'form.cunFangWeiZhi': {
             async handler (val) {
                 if (!val) return
-                const sql = `select fang_jian_ming_ha from t_jjqfjb where id_='${val}'`
-                const { variables: { data }} = await this.$common.request('sql', sql)
+                // const sql = `select fang_jian_ming_ha from t_jjqfjb where id_='${val}'`
+                const { variables: { data }} = await this.$common.request('query', {
+                    key: 'getRoomDataById',
+                    params: [val]
+                })
 
                 this.form.cunFangDiDian = data && data[0] ? data[0].fang_jian_ming_ha : ''
             }
         },
-        // 根据编制部门动态获取对应文件存放处数据
-        // 'form.bianZhiBuMen': {
-        //     handler (value) {
-        //         if (value) {
-        //             if (this.isFirstbianZhiBuMen) {
-        //                 this.isFirstbianZhiBuMen = false
-        //                 return
-        //             }
-        //             this.handleData(value)
-        //         }
-        //     }
-        // },
         // 根据最近检定时间动态计算对应有效期至
         'form.yiXiaoRiQi': {
             handler (value) {
@@ -1101,32 +1094,6 @@ export default {
         },
         changeData (...args) {
             this.form[args[0]] = args[1]
-        },
-        handleData (departmentId) {
-        // JSON_UNQUOTE( JSON_EXTRACT( AUTHORITY_NAME, '$.chaYue' ) )
-            const sql = `select
-                        id_ AS leiXingId,
-                        AUTHORITY_NAME AS chaYueValue 
-                    FROM
-                        ibps_cat_type 
-                    WHERE
-                        category_key_ = 'FILE_TYPE' 
-                        AND AUTHORITY_NAME LIKE '%"${departmentId}"%' 
-                        AND name_ = '设备使用说明书'`
-            // console.log(sql)
-            const { deptList = [] } = this.$store.getters || {}
-            const dept = deptList.find((i) => i.positionId === departmentId)
-            this.$common.request('sql', sql).then((res) => {
-                const { data = [] } = res.variables || {}
-                this.form.wenJianXiLei = `外部文件 / ${dept?.positionName} / 设备使用说明书`
-                if (!data.length) {
-                    return
-                }
-                const { leiXingId, chaYueValue } = data[0] || {}
-                this.form.xiLeiId = leiXingId
-                this.form.quanXianLeiXing = JSON.parse(chaYueValue).chaYue
-                this.form.zhuanYeBuMen = departmentId
-            })
         },
         handleClick () {
 
@@ -1183,8 +1150,11 @@ export default {
             const sysDeviceNo = this.form.sheBeiShiBieH
             const originalDeviceNo = this.form.yuanSheBeiBian
             const position = this.form.diDian
-            const sql = `select count(1) as num from t_sbdj where yuan_she_bei_bian = '${originalDeviceNo}' and di_dian_ = '${position}' and she_bei_shi_bie_h <> '${sysDeviceNo}' limit 1`
-            const result = await this.$common.request('sql', sql)
+            // const sql = `select count(1) as num from t_sbdj where yuan_she_bei_bian = '${originalDeviceNo}' and di_dian_ = '${position}' and she_bei_shi_bie_h <> '${sysDeviceNo}' limit 1`
+            const result = await this.$common.request('query', {
+                key: 'getExistDeviceNo',
+                params: [originalDeviceNo, position, sysDeviceNo]
+            })
             const { data = [] } = result.variables || {}
             if (data[0].num > 0) {
                 throw new Error(`系统当前已经存在此原设备编号,请更换另一个编号!`)
@@ -1223,26 +1193,6 @@ export default {
                 console.log(error)
                 this.$message.warning('添加失败')
                 this.loading = false
-            }
-        },
-        async subForm (id, table, parentData) {
-            const sql1 = `select id_ from ${table} where parent_id_='${id}'`
-            const { variables: { data }} = await this.$common.request('sql', sql1)
-            const pre_list = data.length > 0 ? data.map(item => item.id_) : []
-            const update_list = []
-            const add_list = []
-            parentData.forEach(item => {
-                if (item.id) {
-                    update_list.push(item)
-                } else {
-                    add_list.push(item)
-                }
-            })
-            const delete_list = pre_list.filter(id => !update_list.map(item => item.id).includes(id))
-            return {
-                add_list,
-                update_list,
-                delete_list
             }
         },
         async goEdit (flag) {
@@ -1290,12 +1240,6 @@ export default {
                 this.$emit('close')
             }
         },
-        // 检查设备编号是否重复
-        async checkIsRepeat (id) {
-            const sql = `select id_ from t_sbdj where she_bei_shi_bie_h='${id}' limit 1`
-            const { variables: { data }} = await this.$common.request('sql', sql)
-            return data.length > 0
-        },
         generateRandomString () {
             return `JYK-${Math.floor(Math.random() * 88888) + 10000}`
         },
@@ -1340,11 +1284,6 @@ export default {
             } else {
                 this.isFirstbianZhiBuMen = false
                 this.isFirstyiXiaoRiQi = false
-                // 随机生成一个不重复的设备编号
-                // this.form.sheBeiShiBieH = this.generateRandomString()
-                // for (; await this.checkIsRepeat(this.form.sheBeiShiBieH);) {
-                //     this.form.sheBeiShiBieH = this.generateRandomString()
-                // }
                 this.form.jieShouRiQi = dayjs().format('YYYY-MM-DD')
                 this.form.qiYongRiQi = dayjs().format('YYYY-MM-DD')
                 this.form.xiaoZhunWuCha = '否'

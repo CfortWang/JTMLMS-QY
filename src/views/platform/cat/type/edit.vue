@@ -191,7 +191,6 @@ import { save, get } from '@/api/platform/cat/type'
 import ActionUtils from '@/utils/action'
 import { srtuOptions } from './constants'
 import { validateKey } from '@/utils/validate'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
 export default {
     props: {
@@ -436,8 +435,11 @@ export default {
         },
         getRadioOptions () {
             this.type.authorityObject.buMen = ''
-            const sql = `select * FROM  ibps_party_entity WHERE party_type_='position' and (path_ like '%${this.second}%' or path_ = '${this.first}.')`
-            curdPost('sql', sql).then(res => {
+            // const sql = `select * FROM ibps_party_entity WHERE party_type_='position' and (path_ like concat('%', ${this.second}, '%') or path_ = '${this.first}.')`
+            this.$common.request('query', {
+                key: 'getPositionTreeData',
+                params: [this.second, this.first + '.']
+            }).then(res => {
                 const datas = res.variables.data
                 const treeDatas = this.buildTree(datas, 'ID_', 'PARENT_ID_')
                 const tree = []

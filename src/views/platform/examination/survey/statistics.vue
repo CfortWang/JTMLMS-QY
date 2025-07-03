@@ -182,8 +182,11 @@ export default {
         async init () {
             this.initWidth = window.innerWidth > 1600 ? '60%' : '80%'
             console.log('id_', this.id_)
-            const sql = `select a.*,b.diao_cha_dui_xian,b.diao_cha_ming_che FROM t_myddcjlxq a LEFT JOIN t_myddcjl b on a.parent_id_=b.id_ where b.diao_cha_id_='${this.id_}' and b.shi_fou_guo_shen_='已完成' ORDER BY b.create_time_ desc`
-            const { variables: { data = [] } = {}} = await this.$common.request('sql', sql)
+            // const sql = `select a.*, b.diao_cha_dui_xian, b.diao_cha_ming_che FROM t_myddcjlxq a LEFT JOIN t_myddcjl b on a.parent_id_ = b.id_ where b.diao_cha_id_ = '${this.id_}' and b.shi_fou_guo_shen_='已完成' ORDER BY b.create_time_ desc`
+            const { variables: { data = [] } = {}} = await this.$common.request('query', {
+                key: 'getUserSatSurveyStats',
+                params: [this.id_]
+            })
             const res = _.groupBy(data, 'diao_cha_dui_xian')
             for (const key in res) {
                 const val = res[key]

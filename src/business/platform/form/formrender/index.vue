@@ -104,26 +104,26 @@ export default {
             type: Object
         },
         /**
-             * @description 工具栏
-             */
+         * @description 工具栏
+         */
         buttons: {
             type: Array
         },
         /**
-             * 是否只读 (流程实例时候控制)
-             */
+         * 是否只读 (流程实例时候控制)
+         */
         readonly: {
             type: Boolean,
             default: false
         },
         /**
-             *  @description 扩展参数 比如流程id等
-             * 流程相关信息:
-             * taskId:任务id
-             * instanceId：流程实例
-             * defId：定义Id
-             * formOpinionData： 流程意见配置及已经审批的意见数据
-             */
+         *  @description 扩展参数 比如流程id等
+         * 流程相关信息:
+         * taskId:任务id
+         * instanceId：流程实例
+         * defId：定义Id
+         * formOpinionData： 流程意见配置及已经审批的意见数据
+         */
         params: {
             type: Object
         },
@@ -215,7 +215,9 @@ export default {
                     const data = JSON.parse(JSON.stringify(val))
                     // 表单数据
                     this.formData = data.responses || {}
-                    if (this.addDataCont) this.formData['addDataCont'] = this.addDataCont
+                    if (this.addDataCont) {
+                        this.formData['addDataCont'] = this.addDataCont
+                    }
                     // 表单权限
                     this.permissions = data.permissions || null
                 }
@@ -414,8 +416,8 @@ export default {
             return this.$refs.dynamicForm
         },
         /**
-             * 获取表单验证
-             */
+         * 获取表单验证
+         */
         validate (callback) {
             this.getForm().validate((valid, invalidFields) => {
                 callback(valid, invalidFields)
@@ -441,33 +443,33 @@ export default {
             })
         },
         /**
-             * 获取表单数据
-             */
+         * 获取表单数据
+         */
         getFormData () {
             return this.getForm().getFormData()
         },
         /**
-             * 获取字段数据
-             */
+         * 获取字段数据
+         */
         getData (name) {
             const data = this.getFormData()
             return data[name]
         },
         /**
-             * 设置字段数据
-             */
+         * 设置字段数据
+         */
         setData (name, value) {
             return this.getForm().setFieldData(name, value)
         },
         /**
-             * 设置表单权限
-             */
+         * 设置表单权限
+         */
         getFormRights (name) {
             return this.getForm().getFormRights(name)
         },
         /**
-             * 设置表单权限
-             */
+         * 设置表单权限
+         */
         setFormRights (name, value) {
             return this.getForm().setFormRights(name, value)
         },
@@ -475,26 +477,26 @@ export default {
             return this.getForm().hasFormOpinion()
         },
         /**
-             * 表单意见数据
-             */
+         * 表单意见数据
+         */
         getFormOpinionData () {
             return this.getForm().getFormOpinionData()
         },
         /**
-             * 获取审批意见验证
-             */
+         * 获取审批意见验证
+         */
         formOpinionValidate (calback, flag) {
             this.getForm().formOpinionValidate(calback, flag)
         },
         /**
-             * 获取表单字段组件实例
-             */
+         * 获取表单字段组件实例
+         */
         getRefs (fieldName) {
             return this.getForm().getRefs(fieldName)
         },
         /**
-             * 获取表单字段的具体控件组件实例
-             */
+         * 获取表单字段的具体控件组件实例
+         */
         getRefsField (fieldName) {
             return this.getForm().getRefsField(fieldName)
         },
@@ -511,8 +513,8 @@ export default {
             return this.getForm().clickTableHeand(a)
         },
         /**
-             * 初始化脚本
-             */
+         * 初始化脚本
+         */
         initJForm () {
             let script = document.getElementById(JFormId)
             if (script) {

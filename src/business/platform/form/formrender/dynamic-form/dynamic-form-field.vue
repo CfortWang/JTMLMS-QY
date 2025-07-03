@@ -205,8 +205,7 @@
                 :clearable="clearable"
                 :filterable="allowCreate"
                 :allow-create="allowCreate"
-                v-on="$listeners"
-                @change="selectLinkageChange"
+                v-on="{...$listeners, change: selectLinkageChange}"
             >
                 <el-option v-for="o in dataOptions" :key="o.val" :label="o.label" :value="o.val" />
             </el-select>

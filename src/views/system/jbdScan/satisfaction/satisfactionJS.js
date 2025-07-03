@@ -16,10 +16,13 @@ export default {
     },
     methods: {
         getManYIDuPeiZhi () {
-            const second = this.$store.getters.level.second
+            const { first, second } = this.$store.getters.level || {}
             return new Promise((resolve, reject) => {
-                const sql = `select * from t_myddcpzb where di_dian_ = '${second}' order by create_time_ desc LIMIT 1`
-                this.$common.request('sql', sql).then(res => {
+                // const sql = `select * from t_myddcpzb where di_dian_ = '${second || first}' order by create_time_ desc LIMIT 1`
+                this.$common.request('query', {
+                    key: 'getMyddcpzb',
+                    params: [second || first]
+                }).then(res => {
                     const { data = [] } = res.variables || {}
                     if (data.length > 0) {
                         const list = []
@@ -45,8 +48,11 @@ export default {
                     }
                     legendData.push(obj)
                 })
-                const sql = `select * from t_yhmyddctjzb where parent_id_ = '${id}' order by xu_hao_`
-                this.$common.request('sql', sql).then((res) => {
+                // const sql = `select * from t_yhmyddctjzb where parent_id_ = '${id}' order by xu_hao_`
+                this.$common.request('query', {
+                    key: 'getYhmyddctjzb',
+                    params: [id]
+                }).then((res) => {
                     const { data = [] } = res.variables || {}
                     if (data.length > 0) {
                         const list = []

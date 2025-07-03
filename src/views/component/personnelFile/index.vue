@@ -112,7 +112,8 @@ export default {
             infoNumArr: [],
             seal,
             stauts: '',
-            tipsControls: false
+            tipsControls: false,
+            processKey: 'Process_08xwabfNEW'
         }
     },
     watch: {
@@ -139,10 +140,17 @@ export default {
     created () {
         this.$parent.$parent.showClose = false
         if (this.$attrs.params) {
-            const sql1 = `select a.CREATE_BY_ from ibps_bpm_inst a join ibps_bpm_task_pendding b on b.proc_inst_id_=a.id_ where b.PROC_DEF_KEY_ = 'Process_08xwabfNEW' and b.task_id_ ='${this.$attrs.params.taskId}'`
-            // const sql1 = `select CREATE_BY_ FROM ibps_bpm_oper_log WHERE PROC_INST_ID_ = (SELECT PROC_INST_ID_ FROM ibps_bpm_bus_rel WHERE BUSINESSKEY_ = "${this.$attrs.params.attrs.id}" LIMIT 1 )AND OPER_TYPE_ IN('start')`
-            const sql2 = `select CREATE_BY_ FROM ibps_bpm_oper_log WHERE PROC_INST_ID_ = '${this.$attrs.params.instanceId}' AND OPER_TYPE_ IN('start') ORDER BY CREATE_TIME_ asc limit 1`
-            this.$common.request('sql', this.$attrs.params.hasOwnProperty('taskId') ? sql1 : this.$attrs.params.hasOwnProperty('instanceId') ? sql2 : '').then((r) => {
+            const { taskId, instanceId } = this.$attrs.params || {}
+            if (!taskId && !instanceId) {
+                return
+            }
+            const key = taskId ? 'getBpmTask' : 'getBpmInst'
+            const params = taskId ? [this.processKey, taskId] : [instanceId]
+
+            // const sql1 = `select a.CREATE_BY_ from ibps_bpm_inst a join ibps_bpm_task_pendding b on b.proc_inst_id_=a.id_ where b.PROC_DEF_KEY_ = '${processKey}' and b.task_id_ ='${taskId}'`
+            // // const sql1 = `select CREATE_BY_ FROM ibps_bpm_oper_log WHERE PROC_INST_ID_ = (SELECT PROC_INST_ID_ FROM ibps_bpm_bus_rel WHERE BUSINESSKEY_ = "${this.$attrs.params.attrs.id}" LIMIT 1 )AND OPER_TYPE_ IN('start')`
+            // const sql2 = `select CREATE_BY_ FROM ibps_bpm_oper_log WHERE PROC_INST_ID_ = '${instanceId}' AND OPER_TYPE_ IN('start') ORDER BY CREATE_TIME_ asc limit 1`
+            this.$common.request('query', { key, params }).then((r) => {
                 const datas = r.variables.data.length > 0 ? r.variables.data[0].CREATE_BY_ : ''
                 this.userId = datas
                 this.init(this.userId)
@@ -171,8 +179,11 @@ export default {
                 simulated.baseDataObj.zsb.data = res.data.certificateInfoPoList
                 this.$set(this.baseData, 'zsb', simulated.baseDataObj.zsb)
             })
-            const sql1 = `select * from t_rydatablpzb where xian_shi_yin_cang = 'Y'`
-            this.$common.request('sql', sql1).then((r) => {
+            // const sql1 = `select * from t_rydatablpzb where xian_shi_yin_cang = 'Y'`
+            this.$common.request('query', {
+                key: 'getStaffRecordTab',
+                params: [null]
+            }).then((r) => {
                 const { data = [] } = r.variables || []
                 data.forEach(e => {
                     this.$set(this.tagData, e.dui_ying_biao_min, { display: e.xian_shi_yin_cang, title: e.tab_zhong_wen_min })
@@ -306,7 +317,7 @@ export default {
                         this.personInfoData.updateTime = this.$common.getDateNow(19)
                         this.saveOperate()
                         // const sql = `select b.id_,b.name_ from ibps_bpm_inst a join ibps_bpm_tasks b on b.PROC_DEF_KEY_=a.PROC_DEF_KEY_ where b.PROC_DEF_KEY_ = 'Process_08xwabfNEW' and a.CREATE_BY_ ='${this.personID}'`
-                        // this.$common.request('sql', sql).then(res => {
+                        // this.$common.request('', sql).then(res => {
                         //     const datas = res.variables.data.length > 0 ? res.variables.data[0] : ''
                         //     if (datas.id_ !== '') {
                         //         agree(
@@ -404,8 +415,11 @@ export default {
             })
         },
         saveOperate () {
-            const sql = `select b.id_,b.name_ from ibps_bpm_inst a join ibps_bpm_tasks b on b.PROC_DEF_KEY_=a.PROC_DEF_KEY_ where b.PROC_DEF_KEY_ = 'Process_08xwabfNEW' and a.CREATE_BY_ ='${this.personID}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select b.id_,b.name_ from ibps_bpm_inst a join ibps_bpm_tasks b on b.PROC_DEF_KEY_ = a.PROC_DEF_KEY_ where b.PROC_DEF_KEY_ = '${this.processKey}' and a.CREATE_BY_ = '${this.personID}'`
+            this.$common.request('query', {
+                key: 'getBpmInstByUid',
+                params: [this.processKey, this.personID]
+            }).then(res => {
                 const datas = res.variables.data.length > 0 ? res.variables.data[0] : ''
                 if (res.variables.data.length > 0 && datas.id_ !== '') {
                     agree(

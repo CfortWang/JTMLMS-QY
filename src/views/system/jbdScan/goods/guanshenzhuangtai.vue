@@ -43,14 +43,14 @@
                                 管审改进项汇总表
                             </div>
                             <el-table :data="gaijinxianglie" :border="true" style="width: 90%;margin: 0 auto;">
-                                <el-table-column type="index" width="40" >            
+                                <el-table-column type="index" width="40">
                                     <template slot-scope="scope">
-                                        <span>{{scope.$index+1}} </span>
+                                        <span>{{ scope.$index+1 }} </span>
                                     </template>
-                                </el-table-column> 
-                                <el-table-column prop="gai_jin_yi_jian_" label="改进意见" width="250"  :key="Math.random()">
+                                </el-table-column>
+                                <el-table-column :key="Math.random()" prop="gai_jin_yi_jian_" label="改进意见" width="250">
                                     <template slot-scope="scope">
-                                        {{ scope.row.gai_jin_yi_jian_}}
+                                        {{ scope.row.gai_jin_yi_jian_ }}
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="fu_ze_bu_men_" label="责任部门" width="90">
@@ -63,107 +63,25 @@
                                         {{ scope.row.fu_ze_ren_ | emfiltes(employeeList) }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="gai_jin_que_ren_" label="改进有效性评审" width="100" > 
+                                <el-table-column prop="gai_jin_que_ren_" label="改进有效性评审" width="100">
                                     <template slot-scope="scope">
-                                        {{ scope.row.gai_jin_que_ren_}}
+                                        {{ scope.row.gai_jin_que_ren_ }}
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="shi_fou_guo_shen_" label="状态" width="65" > 
+                                <el-table-column prop="shi_fou_guo_shen_" label="状态" width="65">
                                     <template slot-scope="scope">
-                                        {{ scope.row.shi_fou_guo_shen_}}
+                                        {{ scope.row.shi_fou_guo_shen_ }}
                                     </template>
                                 </el-table-column>
                             </el-table>
                         </div>
                         <div class="table-echarts">
-                            <!-- <div class="in-echarts">
-                                <div>不符合项条款统计</div>
-                                <div id="in-echarts" />
-                            </div> -->
                             <div class="department">
                                 <div>改进项部门统计</div>
                                 <div id="department" />
                             </div>
                         </div>
                     </div>
-                    <!-- <div v-if="false">
-                        <div class="cma">
-                            <div style="width: 90%; margin: 0 auto; line-height: 35px">
-                                内审不符合项汇总表(CMA)
-                            </div>
-                            <el-table :data="CMAtable" :border="true" style="width: 90%; margin: 0 auto">
-                                <el-table-column prop="miao_shu_" label="不符合项描述" width="300" />
-                                <el-table-column prop="ping_shen_yi_ju_" label="评审依据" width="200" />
-                                <el-table-column prop="tiao_kuan_bian_ha" label="条款编号" width="70" />
-                                <el-table-column prop="nei_shen_yuan_" label="内审员" width="60">
-                                    <template slot-scope="scope">
-                                        {{ scope.row.nei_shen_yuan_ | emfiltes(employeeList) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="ze_ren_shi_" label="责任部门" width="100">
-                                    <template slot-scope="scope">
-                                        {{ scope.row.ze_ren_shi_ | partFilter(partList) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="fu_ze_ren_" label="部门负责人" width="60">
-                                    <template slot-scope="scope">
-                                        {{ scope.row.fu_ze_ren_ | emfiltes(employeeList) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="bu_fu_he_cheng_du" label="不符合程度" width="80" />
-                            </el-table>
-                        </div>
-                        <div class="table-echarts">
-                            <div class="in-echarts">
-                                <div>CMA不符合项条款统计</div>
-                                <div id="in-CMAecharts" />
-                            </div>
-                            <div class="department">
-                                <div>CMA不符合项部门统计</div>
-                                <div id="cma-department" />
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- 检查表编制数据检查完成 -->
-                    <!-- <div v-if="!CNASTableData.length > 0">
-                        <div class="cma">
-                            <div style="width: 90%; margin: 0 auto; line-height: 35px;display: flex;justify-content: space-between;">
-                                <div>内审检查表编制进度查阅</div>
-                                <div @click="urgingEvent" >
-                                    <button class="urgingBtn"><i class="el-icon-position"></i> 发送催办</button>
-                                </div>
-                            </div>
-                            <el-table :data="allCheckData" :border="true" @selection-change="handleSelectionChange" style="width: 90%; margin: 0 auto">
-                                <el-table-column type="selection"  width="40" align="center">
-                                </el-table-column>
-                                <el-table-column prop="nei_shen_yuan_" label="内审员" width="100">
-                                    <template slot-scope="scope">
-                                        {{ scope.row.nei_shen_yuan_ | emfiltes(employeeList) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="bei_nei_shen_bu_m" label="被审核部门" width="200" >
-                                    <template slot-scope="scope">
-                                        {{ scope.row.bei_nei_shen_bu_m | partFilter(partList) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="kai_shi_shi_jian_" label="开始时间" width="200">
-                                    <template slot-scope="scope">
-                                        {{ scope.row.kai_shi_shi_jian_.slice(0,scope.row.kai_shi_shi_jian_.length - 3) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="jie_shu_shi_jian_" label="结束时间" width="200">
-                                    <template slot-scope="scope">
-                                        {{ scope.row.jie_shu_shi_jian_.slice(0,scope.row.jie_shu_shi_jian_.length - 3) }}
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="shi_fou_guo_shen_" label="完成状态" width="70">
-                                    <template slot-scope="scope">
-                                        {{ scope.row.shi_fou_guo_shen_}}
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </div>
-                    </div> -->
                 </div>
                 <div v-if="gaijinxiangbing.length == 0" class="nodata">
                     暂无改进项统计
@@ -174,54 +92,29 @@
 </template>
 <script>
 import * as echarts from 'echarts'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import height from '@/mixins/height'
 export default {
     components: {},
     filters: {
         emfiltes: function (value, arr) {
-            for (let i = 0; i < arr.length; i++) {
-                if (value.includes(',')) {
-                    let part = ''
-                    let parts = []
-                    parts = value.split(',')
-                    for (const item of arr) {
-                        for (let j = 0; j < parts.length; j++) {
-                            if (item.ID_ == parts[j]) {
-                                part = part + ',' + item.NAME_
-                            }
-                        }
-                    }
-                    return part.slice(1, part.length)
-                } else if (arr[i].ID_ == value) {
-                    return arr[i].NAME_
-                }
-            }
+            const ids = value.split(',')
+            const matchedItems = arr.filter(item => ids.includes(item.ID_))
+
+            if (matchedItems.length === 0) return value
+
+            return matchedItems
+                .map(item => item.NAME_)
+                .join(',')
         },
         partFilter: function (value, arr) {
-            if (value.includes('1')) {
-                if (value.includes(',')) {
-                    let part = ''
-                    let parts = []
-                    parts = value.split(',')
-                    for (const item of arr) {
-                        for (let j = 0; j < parts.length; j++) {
-                            if (item.ID_ == parts[j]) {
-                                part = part + ',' + item.NAME_
-                            }
-                        }
-                    }
-                    return part.slice(1, part.length)
-                } else {
-                    for (let i = 0; i < arr.length; i++) {
-                        if (arr[i].ID_ == value) {
-                            return arr[i].NAME_
-                        }
-                    }
-                }
-            } else {
-                return value
-            }
+            if (!value.includes('1')) return value
+
+            const ids = value.split(',')
+            const result = arr
+                .filter(item => ids.includes(item.positionId))
+                .map(item => item.positionName)
+                .join(',')
+
+            return result || value
         }
     },
     props: {
@@ -234,10 +127,11 @@ export default {
         }
     },
     data () {
+        const { deptList } = this.$store.getters || {}
         return {
-            gaijinxiangbing:[],
-            gaijinxianglie:[],
-            jiescanVisible:this.scanVisible,
+            gaijinxiangbing: [],
+            gaijinxianglie: [],
+            jiescanVisible: this.scanVisible,
             value: '',
             id: '',
             visible: true,
@@ -279,13 +173,13 @@ export default {
             cnasPieData: [], // cnas饼图
             cmaPieData: [], // cma饼图
             employeeList: [],
-            partList: [],
+            partList: deptList,
             loading: true,
             settime: '',
             setCheckTime: '',
             checkValue: 0,
             allCheckData: [],
-            selectCheckData:[]
+            selectCheckData: []
         }
     },
     watch: {
@@ -298,7 +192,6 @@ export default {
     created () {
         this.getInit()
         this.getEmployee()
-        this.getPart()
         this.getCheckData()
     },
     mounted () {
@@ -313,52 +206,8 @@ export default {
         clearInterval(this.setCheckTime)
     },
     methods: {
-        handleSelectionChange(val) {
-          this.selectCheckData = val;
-        },
-        // 催办信息点击
-        urgingEvent () {
-            let this_ = this;
-            let receiverId = "";
-            console.log(this.selectCheckData,"选中的数据");
-            if(this.selectCheckData.length == 0){
-                this.$message({
-                    showClose: true,
-                    message: '您还未选中人员进行发送催办信息，请在列表中选择！',
-                    type: 'error'
-                });
-              return
-            }
-            for(let item of this.selectCheckData){
-                if(item.shi_fou_guo_shen_ !="已完成"){
-                    receiverId += item.nei_shen_yuan_ + ",";
-                }
-            }
-            receiverId = receiverId.slice(0,receiverId.length - 1);
-            let msage = {
-                  canreply: "0",
-                  content: "内审检查表还未完成，请及时完成",
-                  editorValue: "",
-                  fileMsg: "",
-                  groupId: "",
-                  groupName:  "",
-                  id: "",
-                  messageType :  "normal",
-                  ownerId : this.$store.getters.userId,
-                  ownerName: this.$store.getters.name, //发送人 
-                  positionId :  "",
-                  positionName:  "",
-                  receiver: "",
-                  receiverId: receiverId, //接收人
-                  subject: "请在规定时间内完成" + "内审检查表编制内容，以免影响后续进度"
-              }
-            this_.$common.sendMsg(msage).then(res =>{
-                this_.$message({
-                    duration:3000,
-                    message: '已成功向未完成编制内审检查表的内审员发送催办信息',
-                    type: 'success'
-                }); 
-            })
+        handleSelectionChange (val) {
+            this.selectCheckData = val
         },
         // 管审核查完成率仪表盘
         getLoadEcharts () {
@@ -513,154 +362,22 @@ export default {
             }, 2000)
             option && checkChart.setOption(option)
         },
-        // cnas指定数据到坐标轴的映射
-        getLoadEchartsTwo () {
-            var chartDom = document.getElementById('in-echarts')
-            let width,height;
-            if(window.innerWidth > 1600){
-                width = 590;
-                height = 450;
-            }else{
-                width = 480;
-                height = 400;
-            }
-            const setEchartWH = {
-                // 设置控制图表大小变量
-                width: width,
-                height: this.source.length < 7 ? 350 : (this.source.length - 1) * 30 + 100
-            }
-            var myChart = echarts.init(chartDom, null, setEchartWH)
-            var option
-
-            option = {
-                dataset: {
-                    source: this.source
-                },
-                grid: {
-                // 让图表占满容器
-                    top:"50px",
-                    left:"45px",
-                    right:"80px",
-                    bottom:"40px"
-                },
-                xAxis: {
-                    name: '  条数',
-                    interval: 1,
-                    nameGap: 0,
-                    nameRotate: 0,
-                    nameTextStyle: {
-                        fontSize: 10
-                    }
-                },
-                yAxis: { name: '条款编号', type: 'category' },
-                visualMap: {
-                    orient: 'horizontal',
-                    left: 'center',
-                    show: false,
-                    min: 10,
-                    max: 100,
-                    // text: ["High Score", "Low Score"],
-                    // Map the score column to color
-                    dimension: 0,
-                    inRange: {
-                        color: ['#65B581', '#FFCE34', '#FD665F']
-                    }
-                },
-
-                series: [
-                    {
-                        type: 'bar',
-                        encode: {
-                            // Map the "amount" column to X axis.
-                            x: 'amount',
-                            // Map the "product" column to Y axis
-                            y: 'product'
-                        },
-                        barWidth: 15
-                    }
-                ]
-            }
-
-            option && myChart.setOption(option)
-        },
-        // cma指定数据到坐标轴的映射
-        getLoadCmaEchartsX () {
-            var chartDom = document.getElementById('in-CMAecharts')
-            const setEchartWH = {
-                // 设置控制图表大小变量
-                width: 400,
-                height: 300
-            }
-
-            var myChart = echarts.init(chartDom, null, setEchartWH)
-            var option
-
-            option = {
-                dataset: {
-                    source: this.cmaSuorce
-                },
-                grid: {
-                    // 让图表占满容器
-                    top:"40px",
-                    left:"0px",
-                    right:"40px",
-                    bottom:"40px"
-                },
-                xAxis: {
-                    name: '不符合项',
-                    interval: 1,
-                    nameGap: 0,
-                    nameRotate: 0,
-                    nameTextStyle: {
-                        fontSize: 10
-                    }
-                },
-                yAxis: { type: 'category' },
-                visualMap: {
-                    orient: 'horizontal',
-                    left: 'left',
-                    show: false,
-                    min: 10,
-                    max: 100,
-                    // text: ["High Score", "Low Score"],
-                    // Map the score column to color
-                    dimension: 0,
-                    inRange: {
-                        color: ['#65B581', '#FFCE34', '#FD665F']
-                    }
-                },
-                series: [
-                    {
-                        type: 'bar',
-                        encode: {
-                            // Map the "amount" column to X axis.
-                            x: 'amount',
-                            // Map the "product" column to Y axis
-                            y: 'product'
-                        },
-                        barWidth: 30
-                    }
-                ]
-            }
-
-            option && myChart.setOption(option)
-        },
         // cnas部门饼图
         getLoadEchartsthree () {
-            let chartDom = document.getElementById('department')
-            if(chartDom!=null){
-                let radius,width,height,padding,center;
-                if(window.innerWidth > 1600){
-                    center = ["60%", "50%"];
-                    radius = "55%";
-                    width = 590;
-                    height = 450;
+            const chartDom = document.getElementById('department')
+            if (chartDom != null) {
+                let radius, width, height, padding, center
+                if (window.innerWidth > 1600) {
+                    center = ['60%', '50%']
+                    radius = '55%'
+                    width = 590
+                    height = 450
                     padding = [16, 0, 0, 0]
-                }else{
-                    center = ["53%", "50%"];
-                    radius = "42%";
-                    width = 500;
-                    height = 400;
+                } else {
+                    center = ['53%', '50%']
+                    radius = '42%'
+                    width = 500
+                    height = 400
                     padding = [16, 0, 0, 0]
                 }
                 // const center = window.innerWidth > 1600 ? "55%" : "42%";
@@ -669,14 +386,14 @@ export default {
                     width: width,
                     height: height
                 }
-                console.log(this.gaijinxiangbing,'setEchartWHsetEchartWH')
-                let myChart = echarts.init(chartDom, null, setEchartWH)
+                console.log(this.gaijinxiangbing, 'setEchartWHsetEchartWH')
+                const myChart = echarts.init(chartDom, null, setEchartWH)
                 let option
                 option = {
                     tooltip: {
                         trigger: 'item'
                     },
-                    
+
                     label: {
                         formatter: '{b}\n({c}项)',
                         edgeDistance: '20%'
@@ -691,7 +408,7 @@ export default {
                         bottom: '50%',
                         left: '10%',
                         right: '10%'
-                        },
+                    },
                     series: [
                         {
                             type: 'pie',
@@ -712,56 +429,13 @@ export default {
                 option && myChart.setOption(option)
             }
         },
-        // cma部门饼图
-        getLoadCmaEcharts () {
-            var chartDom = document.getElementById('cma-department')
-            const setEchartWH = {
-                // 设置控制图表大小变量
-                width: 400,
-                height: 300
-            }
-
-            var myChart = echarts.init(chartDom, null, setEchartWH)
-            var option
-            option = {
-                tooltip: {
-                    trigger: 'item'
-                },
-                legend: {
-                    orient: 'vertical',
-                    left: 'left'
-                },
-                series: [
-                    {
-                        type: 'pie',
-                        radius: '50%',
-                        data: this.cmaPieData, // [{1:2,3:4}]
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }
-                ]
-            }
-
-            option && myChart.setOption(option)
-        },
         // 人员
         async getEmployee () {
-            const this_ = this
-            const sql = 'select ID_,NAME_,CREATE_TIME_ FROM ibps_party_employee '
-            await curdPost('sql', sql).then((res) => {
-                this_.employeeList = res.variables.data
-            })
-        },
-        async getPart () {
-            const this_ = this
-            const sql = 'select * FROM ibps_party_position'
-            await curdPost('sql', sql).then((res) => {
-                this_.partList = res.variables.data
+            await this.$common.request('query', {
+                key: 'getAllUser',
+                params: [null]
+            }).then((res) => {
+                this.employeeList = res.variables.data
             })
         },
         jieduan (value) {
@@ -777,109 +451,62 @@ export default {
                 return 100
             } else if (value.includes('6')) {
                 return 100
-            } 
-        },
-        // 不符合项条款统计数据
-        getNoData (arr, type, callBlack) {
-            const firstArr = []
-            let secondArr = []
-            arr.forEach((it) => {
-                if (firstArr.length == 0) {
-                    secondArr.push('score')
-                    secondArr.push('不符合项')
-                    secondArr.push('product')
-                    firstArr.push(secondArr)
-                    secondArr = []
-                    secondArr.push(1)
-                    secondArr.push(1)
-                    secondArr.push(it.tiao_kuan_bian_ha)
-                    firstArr.push(secondArr)
-                    secondArr = []
-                } else {
-                    for (var i in firstArr) {
-                        const a = firstArr[i][2]
-                        const b = it.tiao_kuan_bian_ha
-                        if (firstArr[i][2] == it.tiao_kuan_bian_ha) {
-                            firstArr[i][0] = firstArr[i][0] + 1
-                            firstArr[i][1] = firstArr[i][1] + 1
-                            break
-                        } else if (i == firstArr.length - 1) {
-                            secondArr.push(1)
-                            secondArr.push(1)
-                            secondArr.push(it.tiao_kuan_bian_ha)
-                            firstArr.push(secondArr)
-                            secondArr = []
-                            break
-                        }
-                    }
-                }
-            })
-            type == 'CMA' ? (this.cmaSuorce = firstArr) : (this.source = firstArr)
-            callBlack()
+            }
         },
         // 饼图数据
         async getPieData (arr, type, callBlack) {
-            
             callBlack()
         },
         // 检查表编制完成数据
         async getCheckData () {
             const ids = this.obj[0]
             let data = []
-            const sql = `select COUNT(*) AS num FROM t_dsrw WHERE guan_lian_fu_biao = '${ids.id_}' UNION ALL SELECT COUNT(*) AS num FROM t_nsjcbxe WHERE ji_hua_zong_wai_j =  '${ids.ji_hua_zong_wai_j}' AND shi_fou_guo_shen_ = '已完成'`
-            await curdPost('sql', sql).then((res) => {
+            // const sql = `select COUNT(*) AS num FROM t_dsrw WHERE guan_lian_fu_biao = '${ids.id_}' UNION ALL SELECT COUNT(*) AS num FROM t_nsjcbxe WHERE ji_hua_zong_wai_j = '${ids.ji_hua_zong_wai_j}' AND shi_fou_guo_shen_ = '已完成'`
+            await this.$common.request('query', {
+                key: 'mgmtRevProgStat1',
+                params: [ids.id_, ids.ji_hua_zong_wai_j]
+            }).then((res) => {
                 data = res.variables.data
             })
             this.checkValue = parseInt(data[1].num / data[0].num * 100)
-            let finish = []
-            let noFinish = []
-            const sqsl1 = `select a.id_,a.nei_shen_yuan_,a.bei_nei_shen_bu_m,a.kai_shi_shi_jian_,a.jie_shu_shi_jian_,b.shi_fou_guo_shen_ FROM t_nsjcx AS a  LEFT JOIN  t_nsjcbxe AS b ON a.bei_nei_shen_bu_m = b.bei_nei_shen_bu_m WHERE a.parent_id_ = '${ids.id_}' AND b.ji_hua_zong_wai_j = '${ids.ji_hua_zong_wai_j}'  ORDER BY a.create_time_,a.id_ DESC`
-            await curdPost('sql', sqsl1).then((res) => {
-                finish = res.variables.data
-            })
-            let id = ''
-            finish.forEach(item => {
-                id += item.id_ + ','
-            })
-            id = id.slice(0, id.length - 1)
-            id = id.replace(/\,/g, '","')
-            const sql3 = `select id_,nei_shen_yuan_,bei_nei_shen_bu_m,kai_shi_shi_jian_,jie_shu_shi_jian_,shi_shi_ji_hua_wa as shi_fou_guo_shen_ FROM t_nsjcx  WHERE  id_ NOT IN ("${id}") AND parent_id_ = "${ids.id_}" `
-            await curdPost('sql', sql3).then((res) => {
-                noFinish = res.variables.data
-            })
-            this.allCheckData = finish.concat(noFinish)
         },
         // 核查数据
         async getInit () {
             const data = this.obj[0]
-            let that = this
+            const that = this
             let jieduanvalue
-            let sql = `select COUNT(*) as num from t_gsfzrbgtxb where zong_wai_jian_ = '${data.id_}' union all
-                        select COUNT(*) as num from t_gshyjyb where ji_hua_zhu_jian_ = '${data.id_}' union all
-                        select COUNT(*) as num from t_gsbgb where guan_lian_ji_hua_ = '${data.id_}' union all
-                        select COUNT(*) as num from t_glpsjhb where zong_wai_jian_ = '${data.id_}'`
-            let sql1 = `select COUNT(*) as num from t_glpsjhb where zong_wai_jian_ = '${data.id_}' and shi_fou_guo_shen_ ='已完成' `
-            console.log('64552464256')
-            await Promise.all([curdPost('sql', sql),curdPost('sql', sql1)]).then(([res,res1]) => {
-                let panduan = res.variables.data
-                let panduan1 = res1.variables.data
+            // const sql = `select COUNT(*) as num from t_gsfzrbgtxb where zong_wai_jian_ = '${data.id_}' union all
+            //             select COUNT(*) as num from t_gshyjyb where ji_hua_zhu_jian_ = '${data.id_}' union all
+            //             select COUNT(*) as num from t_gsbgb where guan_lian_ji_hua_ = '${data.id_}' union all
+            //             select COUNT(*) as num from t_glpsjhb where zong_wai_jian_ = '${data.id_}'`
+            // const sql1 = `select COUNT(*) as num from t_glpsjhb where zong_wai_jian_ = '${data.id_}' and shi_fou_guo_shen_ ='已完成'`
+            await Promise.all([
+                this.$common.request('query', {
+                    key: 'mgmtRevProgStat2',
+                    params: [data.id_, data.id_, data.id_, data.id_]
+                }), this.$common.request('query', {
+                    key: 'mgmtRevProgStat3',
+                    params: [data.id_]
+                })
+            ]).then(([res, res1]) => {
+                const panduan = res.variables.data
+                const panduan1 = res1.variables.data
                 let jishu = 1
                 aa: for (let i = 0; i < panduan.length; i++) {
-                    if(panduan[i].num!=0){
-                        jishu +=1
-                    }else{
-                        break aa;
+                    if (panduan[i].num != 0) {
+                        jishu += 1
+                    } else {
+                        break aa
                     }
                 }
                 // if(panduan1[0].num!=0){
                 //     jishu +=1
                 // }
-                jieduanvalue =  jishu+''
+                jieduanvalue = jishu + ''
                 that.activeIndex = that.jieduan(jieduanvalue)
                 that.jieduanValue = that.activeIndex
                 that.gettable(data.ji_hua_zong_wai_j)
             })
-            
         },
         async gettable (id) {
             const this_ = this
@@ -888,15 +515,25 @@ export default {
             // const sql = "select * FROM t_nsbfhxjlhzzb WHERE parent_id_ =(SELECT id_  FROM t_nsbfhxjlhzbzc WHERE ji_hua_zong_wai_j ='" + id + "' ORDER BY create_time_ DESC LIMIT 1)"
             this_.gaijinxianglie.length = 0
             this_.gaijinxiangbing.length = 0
-            const sql = `select * from t_glpsjhb where zong_wai_jian_ = '${this.obj[0].id_}'`
-            const sql1 = `select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select b.fu_ze_bu_men_,IFNULL(a.num,0) as num,IFNULL(b.numA,0) as numA from (select t_glpsjhb.fu_ze_bu_men_,COUNT(t_glpsjhb.id_) as num from t_glpsjhb where t_glpsjhb.zong_wai_jian_ = '${this.obj[0].id_}' and t_glpsjhb.shi_fou_guo_shen_ = '已完成' GROUP BY t_glpsjhb.fu_ze_bu_men_) as a right JOIN (select t_glpsjhb.fu_ze_bu_men_,COUNT(t_glpsjhb.id_) as numA from t_glpsjhb where t_glpsjhb.zong_wai_jian_ = '${this.obj[0].id_}' GROUP BY t_glpsjhb.fu_ze_bu_men_) as b on a.fu_ze_bu_men_ = b.fu_ze_bu_men_) c LEFT JOIN ibps_party_entity on c.fu_ze_bu_men_ = ibps_party_entity.id_`
-            await Promise.all([curdPost('sql', sql),curdPost('sql', sql1)]).then(([res,res1]) => {
+            const dataId = this.obj[0].id_
+            // const sql = `select * from t_glpsjhb where zong_wai_jian_ = '${dataId}'`
+            // const sql1 = `select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select b.fu_ze_bu_men_,IFNULL(a.num,0) as num,IFNULL(b.numA,0) as numA from (select t_glpsjhb.fu_ze_bu_men_,COUNT(t_glpsjhb.id_) as num from t_glpsjhb where t_glpsjhb.zong_wai_jian_ = '${dataId}' and t_glpsjhb.shi_fou_guo_shen_ = '已完成' GROUP BY t_glpsjhb.fu_ze_bu_men_) as a right JOIN (select t_glpsjhb.fu_ze_bu_men_,COUNT(t_glpsjhb.id_) as numA from t_glpsjhb where t_glpsjhb.zong_wai_jian_ = '${dataId}' GROUP BY t_glpsjhb.fu_ze_bu_men_) as b on a.fu_ze_bu_men_ = b.fu_ze_bu_men_) c LEFT JOIN ibps_party_entity on c.fu_ze_bu_men_ = ibps_party_entity.id_`
+            await Promise.all([
+                this.$common.request('query', {
+                    key: 'mgmtRevProgStat4',
+                    params: [dataId]
+                }),
+                this.$common.request('query', {
+                    key: 'mgmtRevProgStat5',
+                    params: [dataId, dataId]
+                })
+            ]).then(([res, res1]) => {
                 const data = res1.variables.data
                 this_.gaijinxianglie = res.variables.data
                 data.forEach(e => {
-                    this_.gaijinxiangbing.push({'name':e.NAME_,'value':e.numA})
-                    console.log(e,this_.gaijinxiangbing)
-                });
+                    this_.gaijinxiangbing.push({ 'name': e.NAME_, 'value': e.numA })
+                    console.log(e, this_.gaijinxiangbing)
+                })
                 this_.$nextTick(() => {
                     this_.getPieData(this_.gaijinxiangbing, 'CNAS', this_.getLoadEchartsthree)
                 })
@@ -942,7 +579,7 @@ export default {
   }
   .urgingBtn{
     background-color: #e6a23d;
-    color: white; 
+    color: white;
     border: none;
     padding: 4px;
     border-radius: 6%;
@@ -1113,7 +750,7 @@ export default {
     }
     ::deep .el-checkbox__inner{
         opacity: 0;
-    } 
+    }
   }
 }
 </style>

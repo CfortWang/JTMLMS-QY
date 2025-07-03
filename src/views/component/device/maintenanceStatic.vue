@@ -397,8 +397,11 @@ export default {
             this.title = `[${this.params.original_device_n}/${this.params.she_bei_ming_chen}]月度设备维护统计`
             const y = +this.month.split('-')[0]
             const m = +this.month.split('-')[1]
-            const sql = `select a.id_ AS mainId,a.shi_fou_guo_shen_,a.bian_zhi_bu_men_,c.wei_hu_xiang_mu_c,a.bian_zhi_ren_,a.she_bei_ming_chen,a.she_bei_bian_hao_,a.ri_qi_,a.original_device_n,a.zhu_zhou_qi_,a.nei_rong_qing_kua,a.ji_hua_shi_jian_,c.she_bei_lei_xing_,c.wei_hu_ri_qi_,c.wei_hu_lei_xing_,c.ri_qi_shu_zi_,d.bei_zhu_,d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.ri_qi_='${this.params.ri_qi_}' and a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m}`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select a.id_ AS mainId, a.shi_fou_guo_shen_, a.bian_zhi_bu_men_, c.wei_hu_xiang_mu_c, a.bian_zhi_ren_, a.she_bei_ming_chen, a.she_bei_bian_hao_, a.ri_qi_, a.original_device_n, a.zhu_zhou_qi_, a.nei_rong_qing_kua, a.ji_hua_shi_jian_, c.she_bei_lei_xing_, c.wei_hu_ri_qi_, c.wei_hu_lei_xing_, c.ri_qi_shu_zi_, d.bei_zhu_, d.wei_hu_zhuang_tai from t_mjsbwhbyjlby a left join t_mjsbwhjhzb b on a.ji_hua_wai_jian_ = b.id_ left join v_device_devicemaintenance c on b.she_bei_bian_hao_ = c.id_ left join t_mjsbwhbyjlzby d on a.id_ = d.parent_id_ where a.ri_qi_ = '${this.params.ri_qi_}' and a.shi_fou_guo_shen_!='已删除' and YEAR(a.ji_hua_shi_jian_) = ${y} and MONTH(a.ji_hua_shi_jian_) = ${m}`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getOneDeviceMaintenance',
+                params: [this.params.ri_qi_, y, m]
+            })
             this.dataList = data
             this.dataList.forEach(item => {
                 if (!Object.hasOwn(item, 'wei_hu_lei_xing_') || !item.wei_hu_lei_xing_) {

@@ -87,7 +87,6 @@
 <script>
 import VueBarcode from 'vue-barcode'
 import vueEasyPrint from 'vue-easy-print'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import { getSetting } from '@/utils/query'
 
 export default {
@@ -97,7 +96,7 @@ export default {
     },
     props: {
         obj: {
-            default: [],
+            default: () => [],
             type: Array
         },
         onePageRow: {
@@ -162,23 +161,11 @@ export default {
             this.modelTF = tagData && tagData.hasOwnProperty('originalDevice') ? tagData.modelNumber : true
         },
         getLook (id) {
-            const sql = `select
-                    dj.she_bei_ming_cheng_,
-                    dj.she_bei_shi_bie_h,
-                    dj.gui_ge_xing_hao_,
-                    dj.she_bei_zhuang_ta,
-                    dj.cai_gou_he_tong_, 
-                    dj.yuan_she_bei_bian,
-                    zx.shi_shi_ri_qi_,
-                    zx.chu_chang_bian_ha,
-                    zx.jian_ding_dan_wei
-                FROM
-                    t_sbdj dj
-                    RIGHT JOIN t_mjsbjdxzjhzb zx ON zx.bian_hao_zhong_we = dj.she_bei_shi_bie_h 
-                WHERE
-                    find_in_set( zx.id_, '${id}' )`
-            // console.log(sql)
-            curdPost('sql', sql).then(res => {
+            // const sql = `select dj.she_bei_ming_cheng_, dj.she_bei_shi_bie_h, dj.gui_ge_xing_hao_, dj.she_bei_zhuang_ta, dj.cai_gou_he_tong_, dj.yuan_she_bei_bian, zx.shi_shi_ri_qi_, zx.chu_chang_bian_ha, zx.jian_ding_dan_wei FROM t_sbdj dj RIGHT JOIN t_mjsbjdxzjhzb zx ON zx.bian_hao_zhong_we = dj.she_bei_shi_bie_h WHERE find_in_set(zx.id_, '${id}')`
+            this.$common.request('query', {
+                key: 'deviceVerificationTag',
+                params: [id]
+            }).then(res => {
                 const { data } = res.variables || []
                 // console.log(data)
                 const list = []

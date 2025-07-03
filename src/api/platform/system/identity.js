@@ -78,7 +78,7 @@ export function test (params) {
  */
 export function getNextIdByAlias (params) {
     return request({
-        url: SYSTEM_URL() + `/identity/getNextIdByAlias`,
+        url: SYSTEM_URL() + '/identity/getNextIdByAlias',
         method: 'get',
         params: params
     })

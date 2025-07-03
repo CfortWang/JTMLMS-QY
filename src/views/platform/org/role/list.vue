@@ -195,8 +195,11 @@ export default {
         // 获取组织的数据
         getPosition () {
             return new Promise((resolve, reject) => {
-                const sql = `select a.ID_ as ID_, a.NAME_ as NAME_, b.path_ as PATH_ FROM ibps_party_position a, ibps_party_entity b where a.id_ = b.id_`
-                this.$common.request('sql', sql).then((res) => {
+                // const sql = `select a.ID_ as ID_, a.NAME_ as NAME_, b.path_ as PATH_ FROM ibps_party_position a, ibps_party_entity b where a.id_ = b.id_`
+                this.$common.request('query', {
+                    key: 'getPartyPosition',
+                    params: [null]
+                }).then((res) => {
                     this.positionList = res.variables.data || []
                     resolve()
                 })

@@ -116,7 +116,6 @@
 
 <script>
 import { get } from '@/api/platform/message/innerMessage'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import { typeOptions, publicOrCanreplyOptions } from '../constants'
 import IbpsAttachmentSelector from '@/business/platform/file/attachment/selector'
 import ReadedList from './readed-list'
@@ -192,20 +191,20 @@ export default {
             return this.id
         }
     },
-    watch:{
+    watch: {
         showDialog: {
-            handler(val, oldVal) {
+            handler (val, oldVal) {
                 this.$emit('judgeIndex', val)
-            },
+            }
             // immediate: true
         },
         form: {
-            handler(val, oldVal) {
+            handler (val, oldVal) {
                 this.judgeTF(val)
             },
             immediate: true,
             deep: true
-        },
+        }
     },
     methods: {
         handleClick (tab, event) {
@@ -230,9 +229,9 @@ export default {
         //     this.dialogformrenderVisible = true
         // },
         handleDifferentTab () {
-            let objNum = this.form
+            const objNum = this.form
             const stm = JSON.parse(objNum.skipTypeMsg)
-            const tid = stm.pathInfo ? stm.pathInfo :objNum.taskId
+            const tid = stm.pathInfo ? stm.pathInfo : objNum.taskId
             switch (stm.skipType) {
                 case 1:// 明细
                     this.handleLinkClick(stm.pathInfo)
@@ -286,10 +285,13 @@ export default {
                         if (obj.skipType > 0) {
                             if (obj.skipType === 1) {
                                 this.showDialog = true
-                            } else if (obj.skipType === 2 ) {
-                                let canshu = form.taskId ? form.taskId : JSON.parse(form.skipTypeMsg).pathInfo
-                                const sql = "select count(id_) as num from ibps_bpm_task_pendding where task_id_='" + canshu + "'"
-                                curdPost('sql', sql).then(res => {
+                            } else if (obj.skipType === 2) {
+                                const canshu = form.taskId ? form.taskId : JSON.parse(form.skipTypeMsg).pathInfo
+                                // const sql = `select count(id_) as num from ibps_bpm_task_pendding where task_id_='${canshu}'`
+                                this.$common.request('query', {
+                                    key: 'getBpmnFromMsg',
+                                    params: [canshu]
+                                }).then(res => {
                                     if (res.variables.data[0].num > 0) {
                                         this.showDialog = true
                                     } else {

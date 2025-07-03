@@ -153,9 +153,12 @@ export default {
                     delList[procDefKey].push(bizKey)
                 })
                 console.log(idList, delList, defKeyArr)
-                const sql = `select bo_code_, def_key_ from ibps_bpm_def where find_in_set(def_key_, '${defKeyArr.join(',')}')`
+                // const sql = `select bo_code_, def_key_ from ibps_bpm_def where find_in_set(def_key_, '${defKeyArr.join(',')}')`
                 // const sql = `select a.bo_code_, b.key_ from ibps_form_bo a, ibps_form_def b where a.form_id_ = b.id_ and find_in_set(b.key_, '${formKeyArr.join(',')}')`
-                this.$common.request('sql', sql).then(res => {
+                this.$common.request('query', {
+                    key: 'getDraftBoData',
+                    params: [defKeyArr.join(',')]
+                }).then(res => {
                     const { data = [] } = res.variables || {}
                     if (!data.length) {
                         return

@@ -277,12 +277,6 @@
             @action-event="handleUploadFileActionEvent"
         />
 
-        <xlsxFile
-            v-if="xlsxFileVisible"
-            :visible="xlsxFileVisible"
-            @xlsxFileClose="xlsxFileClose"
-        />
-
         <ibps-attachment
             ref="snapshot"
             v-model="snapshotFile"
@@ -290,13 +284,10 @@
             :download="false"
             :readonly="true"
         />
-        <on-line-index :groove-data="grooveData" :groove-list="grooveList" :dialog-visible.sync="grooveDialogVisible" style="z-index: 9999;" />
 
     </div>
 </template>
 <script>
-import onLineIndex from '@/views/onLineEditing/onLineIndex'
-
 import { queryDataTable, removeFormData, exportData, checkExportData } from '@/api/platform/data/dataTemplate'
 import { startFlowFromList } from '@/api/platform/bpmn/bpmInst'
 import { getDatabaseType } from '@/api/platform/form/formDef'
@@ -341,7 +332,6 @@ import IbpsExport from '@/plugins/export'
 import IbpsImport from '@/plugins/import'
 import Vue from 'vue'
 Vue.component('ibps-data-template-render-dialog', () => import('@/business/platform/data/templaterender/preview/dialog.vue'))
-import xlsxFile from '@/business/platform/data/templaterender/templates/compenent/xlsxFile.vue'
 import generalModules from '@/views/system/jbdScan/generalModules.vue'
 import { upload } from '@/api/upload/zip'
 export default {
@@ -365,10 +355,7 @@ export default {
         uploadFile,
         Print: () => import('../components/print'),
         LabelPrint: () => import('../components/labelPrint'),
-        xlsxFile,
-        generalModules,
-        onLineIndex
-
+        generalModules
         // BpmnFormrender
         // DataTemplateFormat
     },
@@ -391,10 +378,6 @@ export default {
         relatedListFields: String,
         defaultData: [Array, Object],
         preview: {
-            type: Boolean,
-            default: false
-        },
-        xlsxFileVisible: {
             type: Boolean,
             default: false
         },
@@ -977,9 +960,12 @@ export default {
          * @param {String} defId 流程ID
          */
         getMainDefId (defId) {
-            const sql = `select def_id_, def_key_ from ibps_bpm_def where def_key_ in (select def_key_ from ibps_bpm_def where def_id_ = '${defId}') and is_main_ = 'Y'`
+            // const sql = `select def_id_, def_key_ from ibps_bpm_def where def_key_ in (select def_key_ from ibps_bpm_def where def_id_ = '${defId}') and is_main_ = 'Y'`
             return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then(res => {
+                this.$common.request('query', {
+                    key: 'getMainIdByDefId',
+                    params: [defId]
+                }).then(res => {
                     const { data = [] } = res.variables || {}
                     if (data.length) {
                         resolve(data[0].def_id_)
@@ -1000,9 +986,12 @@ export default {
             if (!isOpen) {
                 return null
             }
-            const sql = `select id_, biz_key_ from ibps_bpm_inst where proc_def_id_ = '${defId}' and create_by_ = '${userId}' and status_ = 'draft' order by create_time_ desc limit 1`
+            // const sql = `select id_, biz_key_ from ibps_bpm_inst where proc_def_id_ = '${defId}' and create_by_ = '${userId}' and status_ = 'draft' order by create_time_ desc limit 1`
             return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then(res => {
+                this.$common.request('query', {
+                    key: 'getDraftByDefId',
+                    params: [defId, userId]
+                }).then(res => {
                     const { data = [] } = res.variables || {}
                     if (data.length) {
                         resolve(data[0].id_)
@@ -1885,12 +1874,6 @@ export default {
                 obj[item.label] = item.name
                 return obj
             }, {})
-        },
-        xlsxFileClick () {
-            this.xlsxFileVisible = true
-        },
-        xlsxFileClose () {
-            this.xlsxFileVisible = false
         },
         getGroo (data, list) {
             this.grooveData = data

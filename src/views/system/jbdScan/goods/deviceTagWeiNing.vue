@@ -136,7 +136,6 @@
 <script>
 import VueBarcode from 'vue-barcode'
 import vueEasyPrint from 'vue-easy-print'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
 export default {
     components: {
@@ -227,26 +226,30 @@ export default {
             this.getLook(idStr)
         },
         getLook (id) {
-            const sql = `select
-                    dj.*
-                FROM
-                    t_sbdj dj
-                WHERE
-                    find_in_set( dj.id_, '${id}' )`
-            // console.log(sql)
-            const posSql = `select * from t_sbwhgwpzb`
-            const roomSql = `select * from t_jjqfjb`
-            const personSql = `select id_,NAME_ from ibps_party_employee`
-            Promise.all([curdPost('sql', sql), curdPost('sql', personSql), curdPost('sql', posSql), curdPost('sql', roomSql)]).then(([res1, res2, res3, res4]) => {
+            // const sql = `select * FROM t_sbdj WHERE find_in_set(id_, '${id}' )`
+            // const posSql = `select * from t_sbwhgwpzb`
+            // const roomSql = `select * from t_jjqfjb`
+            const { first, second } = this.$store.getters.level || {}
+            Promise.all([
+                this.$common.request('query', {
+                    key: 'rygwsqbb',
+                    params: [id]
+                }),
+                this.$common.request('query', {
+                    key: 'getPositionList',
+                    params: [second || first]
+                }),
+                this.$common.request('query', {
+                    key: 'getRoomData',
+                    params: [second || first]
+                })
+            ]).then(([res1, res2, res3]) => {
                 const { data } = res1.variables || []
-                const personData = res2.variables.data || []
-                const posData = res3.variables.data || []
-                const roomData = res4.variables.data || []
-                console.log(data)
-                console.log(this.userList, 'dddddddd')
+                const posData = res2.variables.data || []
+                const roomData = res3.variables.data || []
                 const list = []
                 data.forEach(item => {
-                    const midPos = item.wei_hu_fang_shi_ ? posData.find(t => t.id_ === item.wei_hu_fang_shi_).wei_hu_gang_wei_ : ''
+                    const midPos = item.wei_hu_fang_shi_ ? posData.find(t => t.positionId === item.wei_hu_fang_shi_).positionName : ''
                     const midRoom = item.cun_fang_wei_zhi_ ? roomData.find(t => t.id_ === item.cun_fang_wei_zhi_).fang_jian_ming_ha : ''
                     const midPer = item.guan_li_ren_ ? this.userList.find(t => t.userId === item.guan_li_ren_).userName : ''
 
@@ -261,7 +264,7 @@ export default {
                         name: item.she_bei_ming_cheng_,
                         serial: item.she_bei_shi_bie_h,
                         model: item.gui_ge_xing_hao_,
-                        verifier: this.findPersonName(item.bi_xu_de_huan_jin, personData),
+                        verifier: this.findPersonName(item.bi_xu_de_huan_jin),
                         verificationDate: verificationDateStr.substring(0, 10),
                         deviceGrouping: midPos,
                         placeOfPlacement: midRoom,
@@ -296,10 +299,9 @@ export default {
                     return 'TEST'
             }
         },
-        findPersonName (id, personData) {
-            if (!personData) { return '核查人列表为空' }
-            if (!id) { return '' }
-            return personData.find(i => i.id_ === id).NAME_
+        findPersonName (id) {
+            if (!id || !this.userList) { return '' }
+            return this.userList.find(i => i.userId === id).userName
         }
     }
 }

@@ -166,8 +166,11 @@ export default {
     methods: {
         getStoreHouse () {
             const { first, second } = this.$store.getters.level || {}
-            const sql = `select cang_ku_ming_chen mingChen, id_ from t_ckglpzb where di_dian_ = '${second || first}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select cang_ku_ming_chen mingChen, id_ from t_ckglpzb where di_dian_ = '${second || first}'`
+            this.$common.request('query', {
+                key: 'getStockConfig1',
+                params: [second || first]
+            }).then(res => {
                 this.storeHouseList = res?.variables?.data || []
             })
         },

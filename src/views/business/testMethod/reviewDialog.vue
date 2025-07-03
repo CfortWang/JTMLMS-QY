@@ -285,16 +285,18 @@ export default {
         },
         // 选择检验与方法带出数据
         breakData (newValeu) {
-            const sql = `select * from neng_li_fan_wei_ where id_='${newValeu}'`
-            this.$common.request('sql', sql).then(res => {
-                console.log('res', res)
+            // const sql = `select * from neng_li_fan_wei_ where id_='${newValeu}'`
+            this.$common.request('query', {
+                key: 'getNlfwbById',
+                params: [newValeu]
+            }).then(res => {
                 this.ruleForm.xiangMuMingCheng = res.variables.data[0].jian_yan_xiang_mu
                 this.ruleForm.sheBeiMingCheng = res.variables.data[0].she_bei_
                 this.ruleForm.sheBeiBianHao = res.variables.data[0].she_bei_bian_hao_
                 this.ruleForm.shiJi = res.variables.data[0].shi_ji_
                 this.ruleForm.jiaozhuiPin = res.variables.data[0].yang_pin_lei_xing
-                this.ruleForm.xiaoZhunPinJiPiHa = res.variables.data[0].xiao_zhun_wu_
                 this.ruleForm.jianYanXiangMu = res.variables.data[0].parent_id_
+                this.ruleForm.xiaoZhunPinJiPiHa = res.variables.data[0].xiao_zhun_wu_
             })
         },
 

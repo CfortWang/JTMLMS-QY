@@ -15,8 +15,6 @@
     </el-cascader>
 </template>
 <script>
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import Json from '@/business/platform/serv/components/json.vue'
 import TreeUtils from '@/utils/tree'
 
 export default {
@@ -117,8 +115,11 @@ export default {
         },
         // 获取文件分类信息
         async getCascaderOptions () {
-            const sql = `select *FROM ibps_cat_type WHERE  authority_name like '%${this.levelInfos}%' and CATEGORY_KEY_='FILE_TYPE' ORDER BY sn_ ASC`
-            curdPost('sql', sql).then((res) => {
+            // const sql = `select *FROM ibps_cat_type WHERE  authority_name like concat('%', ${this.levelInfos},'%') and CATEGORY_KEY_='FILE_TYPE' ORDER BY sn_ ASC`
+            this.$common.request('query', {
+                key: 'getFileType',
+                params: [this.levelInfos]
+            }).then((res) => {
                 if (res.state === 200) {
                     const datas = res.variables.data
                     this.sqlDatas = datas

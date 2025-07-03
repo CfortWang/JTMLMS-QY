@@ -417,10 +417,12 @@ export default {
         'form.xuan_ze_feng_xian': {
             handler (data) {
                 this.loading = true
-                data = data.split(',')
-                data = "'" + data.join("','") + "'"
-                const sql = `select * from t_fxkzb where  id_ in (${data}) ORDER BY FIELD(id_, ${data})`
-                this.$common.request('sql', sql).then(response => {
+                const order = data.replace(/,/g, "','")
+                // const sql = `select * from t_fxkzb where find_in_set(id_ , '${data}') ORDER BY FIELD(id_, '${order}')`
+                this.$common.request('query', {
+                    key: 'getRiskLibraryData',
+                    params: [data, order]
+                }).then(response => {
                     let data1 = []
                     if (response.variables != null && response.variables.data != null && response.variables.data.length > 0) {
                         data1 = response.variables.data
@@ -471,13 +473,12 @@ export default {
             this.loading = true
             // console.log(this.params)
             if (!this.params.id_) return
-            let sql = ''
-            if (this.readonly) {
-                sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.rowParams.bian_zhi_ren_}'`
-            } else {
-                sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.userId}'`
-            }
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select * from t_fxsbpgb2 where parent_id_ = '${this.params.id_}' and find_in_set(bian_zhi_ren_, '${this.readonly ? this.rowParams.bian_zhi_ren_ : this.userId}')`
+            const params = [this.params.id_, this.readonly ? this.rowParams.bian_zhi_ren_ : this.userId]
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getFxsbpgb2ByUid',
+                params
+            })
             if (data.length > 0) {
                 // console.log('data', data)
                 this.position = data[0].bian_zhi_bu_men_
@@ -507,15 +508,27 @@ export default {
                 this.content[3] = this.fengXianDengJi3
             }
             // 获取风险等级相关
-            const degreeSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='严重程度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
-            const gailvSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='发生概率' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
-            const dengjiSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='风险等级' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}'`
-            const jianCeSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='可检测度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
+            // const degreeSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='严重程度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
+            // const gailvSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='发生概率' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
+            // const dengjiSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='风险等级' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}'`
+            // const jianCeSql = `select feng_xian_lei_xin,yan_zhong_cheng_d, fen_ji_, miao_shu_ FROM t_yzcdfjbzb WHERE zi_fen_lei_ ='可检测度' and di_dian_ = '${this.level}' and mo_ban_fen_lei_='${this.muban}' and feng_xian_lei_xin='${this.leixing}' ORDER BY fen_ji_ ASC`
             Promise.all([
-                this.$common.request('sql', degreeSql),
-                this.$common.request('sql', gailvSql),
-                this.$common.request('sql', dengjiSql),
-                this.$common.request('sql', jianCeSql)
+                this.$common.request('query', {
+                    key: 'getRiskConfigWithOrder',
+                    params: ['严重程度', this.level, this.muban, this.leixing]
+                }),
+                this.$common.request('query', {
+                    key: 'getRiskConfigWithOrder',
+                    params: ['发生概率', this.level, this.muban, this.leixing]
+                }),
+                this.$common.request('query', {
+                    key: 'getRiskConfig',
+                    params: ['风险等级', this.level, this.muban, this.leixing]
+                }),
+                this.$common.request('query', {
+                    key: 'getRiskConfigWithOrder',
+                    params: ['可检测度', this.level, this.muban, this.leixing]
+                })
             ]).then(responses => {
                 let degreeData = []
                 let gailvData = []
@@ -789,8 +802,11 @@ export default {
                 await this.$common.request('update', params)
                 // 判断是否是最后一个提交的评估人
                 const pinGuRenNum = this.params.ping_gu_ren_yuan_.split(',').length
-                const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
-                const { variables: { data }} = await this.$common.request('sql', sql)
+                // const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
+                const { variables: { data }} = await this.$common.request('query', {
+                    key: 'getFxsbpgb2ByPid',
+                    params: [this.params.id_]
+                })
                 const submitNum = new Set(data.map(item => item.bian_zhi_ren_)).size
                 if (submitNum === pinGuRenNum && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
                     // 提醒组长
@@ -818,18 +834,20 @@ export default {
         },
         // 判断状态是否已完成
         async getIsFinish () {
-            let sql = ''
-            if (this.readonly) {
-                sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.rowParams.bian_zhi_ren_}'`
-            } else {
-                sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.userId}'`
-            }
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select * from t_fxsbpgb2 where parent_id_ = '${this.params.id_}' and find_in_set(bian_zhi_ren_, '${this.readonly ? this.rowParams.bian_zhi_ren_ : this.userId}')`
+            const params = [this.params.id_, this.readonly ? this.rowParams.bian_zhi_ren_ : this.userId]
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getFxsbpgb2ByUid',
+                params
+            })
             if (data.length > 0 && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
                 throw new Error('已提交，不可再次提交！')
             }
-            const sql2 = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
-            const { variables: { data: data2 }} = await this.$common.request('sql', sql2)
+            // const sql2 = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
+            const { variables: { data: data2 }} = await this.$common.request('query', {
+                key: 'getFxpgjlb2ById',
+                params: [this.params.id_]
+            })
             if (data2.length > 0 && data2[0].shi_fou_guo_shen_ === '已完成') {
                 throw new Error('已结束，不可再次提交！')
             }
@@ -880,8 +898,12 @@ export default {
                 }
                 // 删除
                 if (deletedIds.length > 0) {
-                    const sql3 = `select * from t_fxsbpgb2 where bian_zhi_ren_='${this.userId}' and parent_id_='${this.params.id_}' and shi_bie_xiang_ in (${deletedIds.map(id => `'${id}'`).join(', ')})`
-                    const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
+                    const ids = deletedIds.map(id => id).join(',')
+                    // const sql3 = `select * from t_fxsbpgb2 where parent_id_ = '${this.params.id_}' and bian_zhi_ren_='${this.userId}' and  find_in_set(shi_bie_xiang_, '${ids}')`
+                    const { variables: { data: data3 }} = await this.$common.request('query', {
+                        key: 'getFxsbpgb2BySbx',
+                        params: [this.params.id_, this.userId, ids]
+                    })
                     if (data3.length > 0) {
                     // console.log('data3', data3)
                         const params = {

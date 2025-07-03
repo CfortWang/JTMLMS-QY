@@ -125,3 +125,16 @@ export function calibrateResultRecord (data) {
         data: data
     })
 }
+
+/**
+ *  设备性能验证记录子表列表(分页条件查询)数据
+ * @param {*} data
+ * @returns
+ */
+export function queryEquipmentPvRecord (data) {
+    return request({
+        url: BUSINESS_BASE_URL() + '/equipment/pVRecord/query',
+        method: 'post',
+        data: data
+    })
+}

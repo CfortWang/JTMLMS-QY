@@ -347,9 +347,12 @@ export default {
         },
         async changeFrom (value) {
             // 新建数据集时，不可与已有数据集共用数据表，编辑数据集时，不可自身之外的数据集共用数据表
-            const params = this.$utils.isNotEmpty(this.form.id) ? ` and id_ != '${this.form.id}'` : ''
-            const sql = `select * from ibps_data_dataset where from_ = '${value}'${params}`
-            const res = await this.$common.request('sql', sql)
+            const p2 = this.$utils.isNotEmpty(this.form.id) ? this.form.id : null
+            const key = p2 ? 'getUniqueFromOnEdit' : 'getUniqueFromOnCreate'
+            const res = await this.$common.request('query', {
+                key,
+                params: [value, p2]
+            })
             const { data = [] } = res.variables || {}
             if (data.length) {
                 this.form.from = ''

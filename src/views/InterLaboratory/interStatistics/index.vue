@@ -129,6 +129,7 @@ export default {
     data () {
         return {
             yearArr: [],
+            yearStr: '',
             numArr: [],
             result: [],
             result1: [],
@@ -214,8 +215,11 @@ export default {
         getNumArr  (min, max) { return Array.from(Array(max - min + 1), (v, k) => k + min) },
         // 所有活动
         async getactivityList () {
-            const sql = `select huo_dong_ming_che as value from	t_sjzphdjhylxqb GROUP BY huo_dong_ming_che`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select huo_dong_ming_che as value from	t_sjzphdjhylxqb GROUP BY huo_dong_ming_che`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'interlabQualityBoard1',
+                params: [null]
+            })
             this.activityList = data
         },
         getData () {
@@ -240,6 +244,7 @@ export default {
                 title: '实验室间比对率'
             }
             this.yearArr = this.getNumArr(Number(this.yearValues[0]), Number(this.yearValues[1]))
+            this.yearStr = this.yearArr.join(',')
 
             this.getList1()
             this.topLeftData.yearArr = this.yearArr
@@ -267,14 +272,15 @@ export default {
 
         async getList1 () {
             this.numArr = []
-            const yearStr = `('${this.yearArr.join("', '")}')`
-            const activityStr = this.activityValue ? `= '${this.activityValue}'` : `is not null`
+            // const activityStr = this.activityValue ? `= '${this.activityValue}'` : `is not null`
             // const sql = `select left(zhu_biao_shi_jian, 4) as niandu, coalesce(count(*), 0) as count
             // from t_sjzphdjhylxqb
             // where left(zhu_biao_shi_jian, 4) in ${yearStr}
             // group by left(zhu_biao_shi_jian, 4)`
-            const sql = `select e.ji_hua_nian_fen_ as niandu,COALESCE(COUNT(*), 0) AS count from (select a.huo_dong_ming_che,a.zu_zhi_dan_wei_,a.xu_hao_,a.shi_yan_shi_jian_,a.bi_dui_lei_xing_,b.ji_hua_nian_fen_ from t_sjzphdjhylxqb a join (select c.*, d.ji_hua_nian_fen_ from t_cjwbzlpjhdjhxqb c join  t_cjwbzlpjhdjhb d on c.parent_id_ =  d.id_ WHERE d.shi_fou_guo_shen_='已完成' and huo_dong_ming_che ${activityStr}) b on a.huo_dong_ming_che=b.huo_dong_ming_che and a.zu_zhi_dan_wei_ = b.zu_zhi_dan_wei_ and a.xu_hao_ = b.xu_hao_ and a.shi_yan_shi_jian_ = b.shi_yan_shi_jian_) e WHERE ji_hua_nian_fen_ in ${yearStr}  GROUP BY e.ji_hua_nian_fen_`
-            await this.$common.request('sql', sql).then((res) => {
+            const key = this.activityValue ? 'interlabQualityBoard3' : 'interlabQualityBoard2'
+            const params = this.activityValue ? [this.activityValue, this.yearStr] : [this.yearStr]
+            // const sql = `select e.ji_hua_nian_fen_ as niandu,COALESCE(COUNT(*), 0) AS count from (select a.huo_dong_ming_che,a.zu_zhi_dan_wei_,a.xu_hao_,a.shi_yan_shi_jian_,a.bi_dui_lei_xing_,b.ji_hua_nian_fen_ from t_sjzphdjhylxqb a join (select c.*, d.ji_hua_nian_fen_ from t_cjwbzlpjhdjhxqb c join  t_cjwbzlpjhdjhb d on c.parent_id_ =  d.id_ WHERE d.shi_fou_guo_shen_='已完成' and huo_dong_ming_che ${activityStr}) b on a.huo_dong_ming_che=b.huo_dong_ming_che and a.zu_zhi_dan_wei_ = b.zu_zhi_dan_wei_ and a.xu_hao_ = b.xu_hao_ and a.shi_yan_shi_jian_ = b.shi_yan_shi_jian_) e WHERE find_in_set(ji_hua_nian_fen_, '${this.yearStr}') GROUP BY e.ji_hua_nian_fen_`
+            await this.$common.request('query', { key, params }).then((res) => {
                 const data = res.variables.data
                 for (var item of this.yearArr) {
                     const m = data.find((v) => { return v.niandu === item + '' })
@@ -289,9 +295,8 @@ export default {
         },
         async getList2 () {
             this.result = []
-            const yearStr = `('${this.yearArr.join("', '")}')`
-            // const sql = `select LEFT(bi_dui_lei_xing_, 2) as leixing,LEFT(zhu_biao_shi_jian, 4) as niandu, COALESCE(COUNT(*), 0) as count FROM t_sjzphdjhylxqb where left(zhu_biao_shi_jian, 4) in ${yearStr} GROUP BY CONCAT(LEFT(zhu_biao_shi_jian, 4), ' ', LEFT(bi_dui_lei_xing_, 2))`
-            // this.$common.request('sql', sql).then((res) => {
+            // const sql = `select LEFT(bi_dui_lei_xing_, 2) as leixing,LEFT(zhu_biao_shi_jian, 4) as niandu, COALESCE(COUNT(*), 0) as count FROM t_sjzphdjhylxqb where left(zhu_biao_shi_jian, 4) in ${this.yearStr} GROUP BY CONCAT(LEFT(zhu_biao_shi_jian, 4), ' ', LEFT(bi_dui_lei_xing_, 2))`
+            // this.$common.request('', sql).then((res) => {
             //     const data = res.variables.data
             //     // console.log(data)
 
@@ -322,13 +327,13 @@ export default {
             // })
             let data1 = []
             let data2 = []
-            const sql1 = `select 年度 as niandu,LEFT(能力验证类型, 2) as leixing,COUNT(*) AS count FROM v_sjzpjgpj WHERE 状态 ='已完成' and 年度 in ${yearStr} GROUP BY LEFT(能力验证类型, 2)`
-            const sql2 = `select LEFT(bian_zhi_shi_jian, 4) as niandu,'实验室' as leixing, COALESCE(COUNT(*), 0) AS count from t_sysbdjlb bian_zhi_shi_jian where shi_fou_guo_shen_ = '已完成' and LEFT(bian_zhi_shi_jian, 4) IN ${yearStr}`
+            // const sql1 = `select 年度 as niandu,LEFT(能力验证类型, 2) as leixing,COUNT(*) AS count FROM v_sjzpjgpj WHERE 状态 ='已完成' and find_in_set('年度', '${this.yearStr}') GROUP BY LEFT(能力验证类型, 2)`
+            // const sql2 = `select LEFT(bian_zhi_shi_jian, 4) as niandu,'实验室' as leixing, COALESCE(COUNT(*), 0) AS count from t_sysbdjlb bian_zhi_shi_jian where shi_fou_guo_shen_ = '已完成' and find_in_set(LEFT(bian_zhi_shi_jian, 4), '${this.yearStr}')`
 
-            await this.$common.request('sql', sql1).then((res) => {
+            await this.$common.request('query', { key: 'interlabQualityBoard4', params: [this.yearStr] }).then((res) => {
                 data1 = res.variables.data
             })
-            await this.$common.request('sql', sql2).then((res) => {
+            await this.$common.request('query', { key: 'interlabQualityBoard5', params: [this.yearStr] }).then((res) => {
                 data2 = res.variables.data
             })
             this.result.push(['product', '能力验证', '室间质评', '实验室', '其它'])
@@ -353,9 +358,8 @@ export default {
             this.result1 = []
             this.result2 = []
             this.result3 = []
-            const yearStr = `('${this.yearArr.join("', '")}')`
-            const sql = `select 年度 as niandu,评价结果 as jieguo, COALESCE(COUNT(*), 0) AS count FROM v_sjzpjgpj WHERE 年度 IN ${yearStr} and 状态 = '已完成' GROUP BY CONCAT(年度, ' ',评价结果)`
-            this.$common.request('sql', sql).then((res) => {
+            // const sql = `select 年度 as niandu,评价结果 as jieguo, COALESCE(COUNT(*), 0) AS count FROM v_sjzpjgpj WHERE find_in_set('年度', '${this.yearStr}') and 状态 = '已完成' GROUP BY CONCAT(年度, ' ',评价结果)`
+            this.$common.request('query', { key: 'interlabQualityBoard6', params: [this.yearStr] }).then((res) => {
                 const data = res.variables.data
                 for (var item of this.yearArr) {
                     const m = data.find((v) => { return v.niandu === item + '' && v.jieguo === '通过' })
@@ -379,12 +383,12 @@ export default {
             const yearStr = `('${this.yearArr.join("', '")}')`
             let data1 = []
             let data2 = []
-            const sql1 = `select LEFT(zhu_biao_shi_jian, 4) as niandu, COUNT(*) AS count FROM t_sjzphdjhylxqb WHERE LEFT(zhu_biao_shi_jian, 4) IN ${yearStr} GROUP BY LEFT(zhu_biao_shi_jian, 4)`
-            const sql2 = `select e.ji_hua_nian_fen_ as niandu,COALESCE(COUNT(*), 0) AS count from (select a.huo_dong_ming_che,a.zu_zhi_dan_wei_,a.xu_hao_,a.shi_yan_shi_jian_,a.bi_dui_lei_xing_,b.ji_hua_nian_fen_ from t_sjzphdjhylxqb a join (select c.*, d.ji_hua_nian_fen_ from t_cjwbzlpjhdjhxqb c join  t_cjwbzlpjhdjhb d on c.parent_id_ =  d.id_ WHERE d.shi_fou_guo_shen_='已完成') b on a.huo_dong_ming_che=b.huo_dong_ming_che and a.zu_zhi_dan_wei_ = b.zu_zhi_dan_wei_ and a.xu_hao_ = b.xu_hao_ and a.shi_yan_shi_jian_ = b.shi_yan_shi_jian_) e WHERE ji_hua_nian_fen_ in ${yearStr}  GROUP BY e.ji_hua_nian_fen_`
-            await this.$common.request('sql', sql1).then((res) => {
+            // const sql1 = `select LEFT(zhu_biao_shi_jian, 4) as niandu, COUNT(*) AS count FROM t_sjzphdjhylxqb WHERE find_in_set(LEFT(zhu_biao_shi_jian, 4), '${this.yearStr}') GROUP BY LEFT(zhu_biao_shi_jian, 4)`
+            // const sql2 = `select e.ji_hua_nian_fen_ as niandu,COALESCE(COUNT(*), 0) AS count from (select a.huo_dong_ming_che,a.zu_zhi_dan_wei_,a.xu_hao_,a.shi_yan_shi_jian_,a.bi_dui_lei_xing_,b.ji_hua_nian_fen_ from t_sjzphdjhylxqb a join (select c.*, d.ji_hua_nian_fen_ from t_cjwbzlpjhdjhxqb c join  t_cjwbzlpjhdjhb d on c.parent_id_ =  d.id_ WHERE d.shi_fou_guo_shen_='已完成') b on a.huo_dong_ming_che=b.huo_dong_ming_che and a.zu_zhi_dan_wei_ = b.zu_zhi_dan_wei_ and a.xu_hao_ = b.xu_hao_ and a.shi_yan_shi_jian_ = b.shi_yan_shi_jian_) e WHERE find_in_set(ji_hua_nian_fen_, '${this.yearStr}') GROUP BY e.ji_hua_nian_fen_`
+            await this.$common.request('query', { key: 'interlabQualityBoard7', params: [this.yearStr] }).then((res) => {
                 data1 = res.variables.data
             })
-            await this.$common.request('sql', sql2).then((res) => {
+            await this.$common.request('query', { key: 'interlabQualityBoard8', params: [this.yearStr] }).then((res) => {
                 data2 = res.variables.data
             })
 
@@ -405,21 +409,20 @@ export default {
             this.data1 = []
             this.data2 = []
             this.data3 = []
-            const yearStr = `('${this.yearArr.join("', '")}')`
             let data1 = []
             let data2 = []
             let data3 = []
-            const sql1 = `select LEFT(zhu_biao_shi_jian, 4) as niandu, COUNT(*) AS count FROM t_sjzphdjhylxqb WHERE LEFT(zhu_biao_shi_jian, 4) IN ${yearStr} GROUP BY LEFT(zhu_biao_shi_jian, 4)`
-            const sql2 = `select e.ji_hua_nian_fen_ as niandu,COALESCE(COUNT(*), 0) AS count from (select a.huo_dong_ming_che,a.zu_zhi_dan_wei_,a.xu_hao_,a.shi_yan_shi_jian_,a.bi_dui_lei_xing_,b.ji_hua_nian_fen_ from t_sjzphdjhylxqb a join (select c.*, d.ji_hua_nian_fen_ from t_cjwbzlpjhdjhxqb c join  t_cjwbzlpjhdjhb d on c.parent_id_ =  d.id_ WHERE d.shi_fou_guo_shen_='已完成') b on a.huo_dong_ming_che=b.huo_dong_ming_che and a.zu_zhi_dan_wei_ = b.zu_zhi_dan_wei_ and a.xu_hao_ = b.xu_hao_ and a.shi_yan_shi_jian_ = b.shi_yan_shi_jian_) e WHERE ji_hua_nian_fen_ in ${yearStr}  GROUP BY e.ji_hua_nian_fen_`
-            const sql3 = `select LEFT(bian_zhi_shi_jian, 4) as niandu, COALESCE(COUNT(*), 0) AS count from t_sysbdjlb bian_zhi_shi_jian where shi_fou_guo_shen_ = '已完成' and LEFT(bian_zhi_shi_jian, 4) IN ${yearStr}`
+            // const sql1 = `select LEFT(zhu_biao_shi_jian, 4) as niandu, COUNT(*) AS count FROM t_sjzphdjhylxqb WHERE find_in_set(LEFT(zhu_biao_shi_jian, 4), '${this.yearStr}') GROUP BY LEFT(zhu_biao_shi_jian, 4)`
+            // const sql2 = `select e.ji_hua_nian_fen_ as niandu,COALESCE(COUNT(*), 0) AS count from (select a.huo_dong_ming_che,a.zu_zhi_dan_wei_,a.xu_hao_,a.shi_yan_shi_jian_,a.bi_dui_lei_xing_,b.ji_hua_nian_fen_ from t_sjzphdjhylxqb a join (select c.*, d.ji_hua_nian_fen_ from t_cjwbzlpjhdjhxqb c join  t_cjwbzlpjhdjhb d on c.parent_id_ =  d.id_ WHERE d.shi_fou_guo_shen_='已完成') b on a.huo_dong_ming_che=b.huo_dong_ming_che and a.zu_zhi_dan_wei_ = b.zu_zhi_dan_wei_ and a.xu_hao_ = b.xu_hao_ and a.shi_yan_shi_jian_ = b.shi_yan_shi_jian_) e WHERE find_in_set(ji_hua_nian_fen_, '${this.yearStr}') GROUP BY e.ji_hua_nian_fen_`
+            // const sql3 = `select LEFT(bian_zhi_shi_jian, 4) as niandu,'实验室' as leixing, COALESCE(COUNT(*), 0) AS count from t_sysbdjlb bian_zhi_shi_jian where shi_fou_guo_shen_ = '已完成' and find_in_set(LEFT(bian_zhi_shi_jian, 4), '${this.yearStr}')`
 
-            await this.$common.request('sql', sql1).then((res) => {
+            await this.$common.request('query', { key: 'interlabQualityBoard7', params: [this.yearStr] }).then((res) => {
                 data1 = res.variables.data
             })
-            await this.$common.request('sql', sql2).then((res) => {
+            await this.$common.request('query', { key: 'interlabQualityBoard8', params: [this.yearStr] }).then((res) => {
                 data2 = res.variables.data
             })
-            await this.$common.request('sql', sql3).then((res) => {
+            await this.$common.request('query', { key: 'interlabQualityBoard5', params: [this.yearStr] }).then((res) => {
                 data3 = res.variables.data
             })
 

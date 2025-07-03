@@ -1,197 +1,204 @@
 <template>
-  <div class="bg">
-    <el-dialog 
-      width="11cm"
-      height="10cm" 
-       :modal-append-to-body='true' :append-to-body="true" title="设备故障标签" :visible.sync="scanVisible">
-      <!-- 表单是否显示 -->
-      <div style="height:500px">
-          <div ref="qrcode" id="box">
-          <vue-easy-print tableShow ref="easyPrint"
-            :onePageRow="onePageRow"
-          >
-            <div v-for="(item1, index1) in list" :key="index1"  >
-              <div v-for="(item2, index2) in parseInt(item1.num)" :key="index2" 
-              
-              ><!-- style="page-break-after:always" -->
-               <div class="All">
-                <div class="tagBox">
-                  <div class="lh">
-                    <div class="qianZhi zuoJuZhong">设备名称：</div>
-                    <div class="zuoJuZhong">{{ item1.name }}</div>
-                  </div>
-                  <div class="la">
-                    <div class="lh">
-                      <div>设备编号：</div>
-                      <div>{{ item1.serial }}</div>
-                    </div>
-                  </div>
-                  <div class="lh">
-                    <div class="qianZhi zuoJuZhong">存放地点：</div>
-                    <div class="zuoJuZhong">{{ item1.local }}</div>
-                  </div>
-                  <div class="lh">
-                    <div>启用日期：</div>
-                    <div>{{ item1.time }}</div>
-                  </div>
+    <div class="bg">
+        <el-dialog
+            width="11cm"
+            height="10cm"
+            :modal-append-to-body="true"
+            :append-to-body="true"
+            title="设备故障标签"
+            :visible.sync="scanVisible"
+        >
+            <!-- 表单是否显示 -->
+            <div style="height:500px">
+                <div id="box" ref="qrcode">
+                    <vue-easy-print
+                        ref="easyPrint"
+                        table-show
+                        :one-page-row="onePageRow"
+                    >
+                        <div v-for="(item1, index1) in list" :key="index1">
+                            <div
+                                v-for="(item2, index2) in parseInt(item1.num)"
+                                :key="index2"
+                            ><!-- style="page-break-after:always" -->
+                                <div class="All">
+                                    <div class="tagBox">
+                                        <div class="lh">
+                                            <div class="qianZhi zuoJuZhong">设备名称：</div>
+                                            <div class="zuoJuZhong">{{ item1.name }}</div>
+                                        </div>
+                                        <div class="la">
+                                            <div class="lh">
+                                                <div>设备编号：</div>
+                                                <div>{{ item1.serial }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="lh">
+                                            <div class="qianZhi zuoJuZhong">存放地点：</div>
+                                            <div class="zuoJuZhong">{{ item1.local }}</div>
+                                        </div>
+                                        <div class="lh">
+                                            <div>启用日期：</div>
+                                            <div>{{ item1.time }}</div>
+                                        </div>
 
-                  <div class="lh">
-                    <div>资产原值：</div>
-                    <div>{{ item1.money }}</div>
-                  </div>
-                  <div class="lh">
-                    <div>使用科室：</div>
-                    <div>细胞质量检测实验室</div>
-                    <!-- <div>{{ item1.condition }}</div> -->
-                  </div>
+                                        <div class="lh">
+                                            <div>资产原值：</div>
+                                            <div>{{ item1.money }}</div>
+                                        </div>
+                                        <div class="lh">
+                                            <div>使用科室：</div>
+                                            <div>细胞质量检测实验室</div>
+                                            <!-- <div>{{ item1.condition }}</div> -->
+                                        </div>
 
-                  <div class="lh">
-                    <div  class="qianZhi zuoJuZhong">固定资产编号：</div>
-                    <div class="zuoJuZhong">{{ item1.assets }}</div>
-                  </div>
-                  <div class="lh">
-                    <div>设备状态：</div>
-                    <div>{{ item1.status }}</div>
-                  </div>
-                 
-                  <div class="ewm">
-                    <vue-barcode :value="item1.serial" :width=1.5 :height=15 :fontSize=15 :margin="0" :displayValue="false"></vue-barcode>
-                  </div>
+                                        <div class="lh">
+                                            <div class="qianZhi zuoJuZhong">固定资产编号：</div>
+                                            <div class="zuoJuZhong">{{ item1.assets }}</div>
+                                        </div>
+                                        <div class="lh">
+                                            <div>设备状态：</div>
+                                            <div>{{ item1.status }}</div>
+                                        </div>
 
-                  <!-- <div
+                                        <div class="ewm">
+                                            <vue-barcode :value="item1.serial" :width="1.5" :height="15" :font-size="15" :margin="0" :display-value="false" />
+                                        </div>
+
+                                        <!-- <div
                     style="page-break-after: always; display: block !important;height: 40px"
                   ></div> -->
 
-
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </vue-easy-print>
                 </div>
-               </div>
-              </div>
             </div>
-          </vue-easy-print>
-        </div>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <!-- <el-button @click="dialogVisible = false">取 消</el-button> -->
-        <el-button type="primary" @click="printDemo">打印标签</el-button>
-      </span>
-    </el-dialog>
+            <span slot="footer" class="dialog-footer">
+                <!-- <el-button @click="dialogVisible = false">取 消</el-button> -->
+                <el-button type="primary" @click="printDemo">打印标签</el-button>
+            </span>
+        </el-dialog>
 
-
-  </div>
+    </div>
 </template>
 
 <script>
-import VueBarcode from 'vue-barcode';
-import vueEasyPrint from "vue-easy-print";
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js';
+import VueBarcode from 'vue-barcode'
+import vueEasyPrint from 'vue-easy-print'
 
 export default {
-  components: {
-    VueBarcode,
-    vueEasyPrint,
-  },
-  props: {
-    obj: {
-      default: [],
-      type: Array
+    components: {
+        VueBarcode,
+        vueEasyPrint
     },
-    onePageRow:{
-      type:Number,
-      default:3
+    props: {
+        obj: {
+            default: () => [],
+            type: Array
+        },
+        onePageRow: {
+            type: Number,
+            default: 3
+        },
+        blankLines: {
+            type: Boolean,
+            default: true
+        },
+        scanVisible: {
+            type: Boolean,
+            default: false
+        }
     },
-    blankLines:{
-      type:Boolean,
-      default:true
+    data () {
+        return {
+            value: '',
+            id: '',
+            list: [{
+                name: 1,
+                serial: 1,
+                assets: 1,
+                num: 1,
+                local: 1,
+                condition: 1,
+                money: 1,
+                time: 1,
+                yinZi: 1,
+                status: 1
+            }],
+            visible: true
+        }
     },
-    scanVisible:{
-      type:Boolean,
-      default: false
-    }
-  },
-  data() {
-    return {
-      value: '',
-      id: '',
-      list: [{
-        name: 1,
-        serial: 1,
-        assets: 1,
-        num: 1,
-        local:1,
-        condition: 1,
-        money:1,
-        time:1,
-        yinZi:1,
-        status: 1
-      }],
-      visible: true,
-    }
-  },
-  watch: {
-    obj() {
-      this.getInit()
-      // console.log(this.obj)
-    }
-  },
-  created() {
-    this.getInit()
-  },
-  methods: {
-    printDemo() {
-      this.$refs.easyPrint.print()
+    watch: {
+        obj () {
+            this.getInit()
+            // console.log(this.obj)
+        }
     },
-    getInit() {
-      var idStr = '';
-      this.obj.forEach(item=>{
-        idStr += item.split(" ")[0] + ','
-      })
-      idStr = idStr.substring(0,idStr.length-1);
-      this.getLook(idStr)
+    created () {
+        this.getInit()
     },
-    getLook(id) {
-      let sql =`select * from t_sbdj where she_bei_shi_bie_h = any(SELECT she_bei_bian_h_id FROM t_sbwxsq where FIND_IN_SET(id_,'${id}')) `
-      // console.log(sql)
-      curdPost("sql", sql).then(res => {
-          const data = res.variables.data
-          // console.log(data)
-          let list = []
-          data.forEach(item => {
-            let num = 1
-            let o = {
-              name: item.she_bei_ming_cheng_,
-              serial: item.she_bei_shi_bie_h,
-              assets: item.zi_chan_bian_hao_,
-              num: num,
-              local:item.cun_fang_di_dian_,
-              condition: item.shi_yong_ke_shi_,
-              money:item.zi_chan_yuan_zhi_,
-              time:item.qi_yong_ri_qi_!=null?this.getTime(item.qi_yong_ri_qi_):'',
-              status:item.she_bei_zhuang_ta,
+    methods: {
+        printDemo () {
+            this.$refs.easyPrint.print()
+        },
+        getInit () {
+            var idStr = ''
+            this.obj.forEach(item => {
+                idStr += item.split(' ')[0] + ','
+            })
+            idStr = idStr.substring(0, idStr.length - 1)
+            this.getLook(idStr)
+        },
+        getLook (id) {
+            // const sql = `select * from t_sbdj where she_bei_shi_bie_h = any(SELECT she_bei_bian_h_id FROM t_sbwxsq where FIND_IN_SET(id_,'${id}'))`
+            // console.log(sql)
+            this.$common.request('query', {
+                key: 'deviceFailureTag',
+                params: [id]
+            }).then(res => {
+                const data = res.variables.data
+                // console.log(data)
+                const list = []
+                data.forEach(item => {
+                    const num = 1
+                    const o = {
+                        name: item.she_bei_ming_cheng_,
+                        serial: item.she_bei_shi_bie_h,
+                        assets: item.zi_chan_bian_hao_,
+                        num: num,
+                        local: item.cun_fang_di_dian_,
+                        condition: item.shi_yong_ke_shi_,
+                        money: item.zi_chan_yuan_zhi_,
+                        time: item.qi_yong_ri_qi_ != null ? this.getTime(item.qi_yong_ri_qi_) : '',
+                        status: item.she_bei_zhuang_ta
+                    }
+                    list.push(o)
+                })
+
+                this.list = list
+            })
+        },
+        getTime (second) {
+            const date = new Date(second)
+            const year = date.getFullYear()
+            let month = ''
+            let day = ''
+            if ((date.getMonth() + 1) <= 9) {
+                month = '0' + (date.getMonth() + 1)
+            } else {
+                month = date.getMonth() + 1
             }
-            list.push(o)
-          })
-          
-          this.list = list
-      })
-    },
-    getTime(second) {
-      let date =new Date(second);
-      let year = date.getFullYear();
-      let month = ''
-      let day = ''
-      if((date.getMonth()+1)<=9){
-        month = "0"+ (date.getMonth()+1)
-      }else{
-        month = date.getMonth()+1
-      }
-      if(date.getDate()<=9){
-        day =  "0"+date.getDate();
-      }else {
-        day =  date.getDate();
-      }
-        return year + "-"+month+"-"+day;
+            if (date.getDate() <= 9) {
+                day = '0' + date.getDate()
+            } else {
+                day = date.getDate()
+            }
+            return year + '-' + month + '-' + day
+        }
     }
-  }
 }
 </script>
 

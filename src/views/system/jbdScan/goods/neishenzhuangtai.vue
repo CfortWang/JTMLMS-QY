@@ -184,54 +184,29 @@
 </template>
 <script>
 import * as echarts from 'echarts'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import height from '@/mixins/height'
 export default {
     components: {},
     filters: {
         emfiltes: function (value, arr) {
-            for (let i = 0; i < arr.length; i++) {
-                if (value.includes(',')) {
-                    let part = ''
-                    let parts = []
-                    parts = value.split(',')
-                    for (const item of arr) {
-                        for (let j = 0; j < parts.length; j++) {
-                            if (item.ID_ === parts[j]) {
-                                part = part + ',' + item.NAME_
-                            }
-                        }
-                    }
-                    return part.slice(1, part.length)
-                } else if (arr[i].ID_ === value) {
-                    return arr[i].NAME_
-                }
-            }
+            const ids = value.split(',')
+            const matchedItems = arr.filter(item => ids.includes(item.ID_))
+
+            if (matchedItems.length === 0) return value
+
+            return matchedItems
+                .map(item => item.NAME_)
+                .join(',')
         },
         partFilter: function (value, arr) {
-            if (value.includes('1')) {
-                if (value.includes(',')) {
-                    let part = ''
-                    let parts = []
-                    parts = value.split(',')
-                    for (const item of arr) {
-                        for (let j = 0; j < parts.length; j++) {
-                            if (item.ID_ === parts[j]) {
-                                part = part + ',' + item.NAME_
-                            }
-                        }
-                    }
-                    return part.slice(1, part.length)
-                } else {
-                    for (let i = 0; i < arr.length; i++) {
-                        if (arr[i].ID_ === value) {
-                            return arr[i].NAME_
-                        }
-                    }
-                }
-            } else {
-                return value
-            }
+            if (!value.includes('1')) return value
+
+            const ids = value.split(',')
+            const result = arr
+                .filter(item => ids.includes(item.positionId))
+                .map(item => item.positionName)
+                .join(',')
+
+            return result || value
         }
     },
     props: {
@@ -244,6 +219,7 @@ export default {
         }
     },
     data () {
+        const { deptList } = this.$store.getters || {}
         return {
             value: '',
             id: '',
@@ -306,7 +282,7 @@ export default {
             cnasPieData: [], // cnas饼图
             cmaPieData: [], // cma饼图
             employeeList: [],
-            partList: [],
+            partList: deptList,
             loading: true,
             settime: '',
             setCheckTime: '',
@@ -326,7 +302,6 @@ export default {
     created () {
         this.getInit()
         this.getEmployee()
-        this.getPart()
         this.getCheckData()
     },
     mounted () {
@@ -812,16 +787,11 @@ export default {
         // 人员
         async getEmployee () {
             const this_ = this
-            const sql = 'select ID_,NAME_,CREATE_TIME_ FROM ibps_party_employee '
-            await curdPost('sql', sql).then((res) => {
+            await this.$common.request('query', {
+                key: 'getAllUser',
+                params: [null]
+            }).then((res) => {
                 this_.employeeList = res.variables.data
-            })
-        },
-        async getPart () {
-            const this_ = this
-            const sql = 'select * FROM ibps_party_position'
-            await curdPost('sql', sql).then((res) => {
-                this_.partList = res.variables.data
             })
         },
         jieduan (value) {
@@ -850,6 +820,12 @@ export default {
             const firstArr = []
             let secondArr = []
             arr.forEach((it) => {
+                if(it.tiao_kuan_bian_ha.includes("CL02-A001")){
+                    it.tiao_kuan_bian_ha = it.tiao_kuan_bian_ha.split('\n')[1]
+                    console.log('it.tiao_kuan_bian_ha',it.tiao_kuan_bian_ha)
+                } 
+ 
+                const newBianhao = it.tiao_kuan_bian_ha.split('.')[0]
                 if (firstArr.length == 0) {
                     secondArr.push('score')
                     secondArr.push('不符合项')
@@ -858,21 +834,19 @@ export default {
                     secondArr = []
                     secondArr.push(1)
                     secondArr.push(1)
-                    secondArr.push(it.tiao_kuan_bian_ha)
+                    secondArr.push(newBianhao)
                     firstArr.push(secondArr)
                     secondArr = []
                 } else {
                     for (var i in firstArr) {
-                        const a = firstArr[i][2]
-                        const b = it.tiao_kuan_bian_ha
-                        if (firstArr[i][2] == it.tiao_kuan_bian_ha) {
+                        if (firstArr[i][2] == newBianhao) {
                             firstArr[i][0] = firstArr[i][0] + 1
                             firstArr[i][1] = firstArr[i][1] + 1
                             break
                         } else if (i == firstArr.length - 1) {
                             secondArr.push(1)
                             secondArr.push(1)
-                            secondArr.push(it.tiao_kuan_bian_ha)
+                            secondArr.push(newBianhao)
                             firstArr.push(secondArr)
                             secondArr = []
                             break
@@ -880,79 +854,82 @@ export default {
                     }
                 }
             })
+
+            firstArr.sort((a, b) => {
+                // 将字符串转换为数字后比较
+                return Number(a[2]) - Number(b[2]);
+            });
+           
             type === 'CMA' ? (this.cmaSuorce = firstArr) : (this.source = firstArr)
             callBlack()
         },
         // 饼图数据
         async getPieData (arr, type, callBlack) {
-            const arrr = arr
-            const newarr = []
-            let obj = {}
-            let str = ''
-            const sql = 'select * FROM  ibps_party_position'
-            await curdPost('sql', sql).then((res) => {
-                const arr1 = res.variables.data
-                arr.forEach((item, index) => {
-                    str = ''
-                    arr1.forEach((it) => {
-                        if (item.ze_ren_shi_ === it.ID_ && !item.ze_ren_shi_.includes(',')) {
-                            arr[index].ze_ren_shi_ = it.NAME_
-                        }
-                        if (item.ze_ren_shi_.includes(',') && item.ze_ren_shi_.includes(it.ID_)) {
-                            str += ',' + it.NAME_
-                        }
-                    })
-                    if (str) {
-                        arr[index].ze_ren_shi_ = str.slice(1, str.length)
-                    }
-                })
-            })
-            const map = new Map()
-            for (const item of arr) {
-                if (!map.has(item.ze_ren_shi_)) {
-                    map.set(item.ze_ren_shi_, item)
+            // 1. 处理责任人名称映射
+            const processedArr = arr.map(item => {
+                const responsibleIds = item.ze_ren_shi_.split(',')
+                const responsibleNames = this.partList
+                    .filter(it => responsibleIds.includes(it.positionId))
+                    .map(it => it.positionName)
+                    .join(',')
+
+                return {
+                    ...item,
+                    ze_ren_shi_: responsibleNames || item.ze_ren_shi_
                 }
+            })
+
+            // 2. 去重并统计
+            const uniqueItems = [...new Map(processedArr.map(item =>
+                [item.ze_ren_shi_, item])).values()]
+
+            const result = uniqueItems.map(item => {
+                const count = processedArr.filter(x =>
+                    x.ze_ren_shi_ === item.ze_ren_shi_).length
+
+                return {
+                    value: count,
+                    name: item.ze_ren_shi_
+                }
+            })
+
+            // 3. 存储结果并回调
+            if (type === 'CMA') {
+                this.cmaPieData = result
+            } else {
+                this.cnasPieData = result
             }
-            arr = [...map.values()]
-            arr.forEach((item, index) => {
-                let add = 0
-                for (var i = 0; i < arrr.length; i++) {
-                    if (item.ze_ren_shi_ == arrr[i].ze_ren_shi_) {
-                        add++
-                    }
-                }
-                obj.value = add
-                obj.name = item.ze_ren_shi_
-                newarr.push(obj)
-                obj = {}
-                this.loading = false
-            })
-            type == 'CMA' ? (this.cmaPieData = newarr) : (this.cnasPieData = newarr)
+
+            this.loading = false
             callBlack()
         },
         // 检查表编制完成数据
         async getCheckData () {
             const ids = this.obj[0]
             let data = []
-            const sql = `select COUNT(*) AS num FROM t_dsrw WHERE guan_lian_fu_biao = '${ids.id_}' UNION ALL SELECT COUNT(*) AS num FROM t_nsjcbxe WHERE ji_hua_zong_wai_j =  '${ids.ji_hua_zong_wai_j}' AND shi_fou_guo_shen_ = '已完成'`
-            await curdPost('sql', sql).then((res) => {
+            // const sql = `select COUNT(*) AS num FROM t_dsrw WHERE guan_lian_fu_biao = '${ids.id_}' UNION ALL SELECT COUNT(*) AS num FROM t_nsjcbxe WHERE ji_hua_zong_wai_j =  '${ids.ji_hua_zong_wai_j}' AND shi_fou_guo_shen_ = '已完成'`
+            await this.$common.request('query', {
+                key: 'getInnerAuditCheckRecord',
+                params: [ids.id_, ids.ji_hua_zong_wai_j]
+            }).then((res) => {
                 data = res.variables.data
             })
             this.checkValue = parseInt(data[1].num / data[0].num * 100)
             let finish = []
             let noFinish = []
-            const sqsl1 = `select a.id_,a.nei_shen_yuan_,a.bei_nei_shen_bu_m,a.kai_shi_shi_jian_,a.jie_shu_shi_jian_,b.shi_fou_guo_shen_ FROM t_nsjcx AS a  LEFT JOIN  t_nsjcbxe AS b ON a.bei_nei_shen_bu_m = b.bei_nei_shen_bu_m WHERE a.parent_id_ = '${ids.id_}' AND b.ji_hua_zong_wai_j = '${ids.ji_hua_zong_wai_j}' GROUP BY a.id_ ORDER BY a.create_time_,a.id_ DESC`
-            await curdPost('sql', sqsl1).then((res) => {
+            // const sqsl1 = `select a.id_,a.nei_shen_yuan_,a.bei_nei_shen_bu_m,a.kai_shi_shi_jian_,a.jie_shu_shi_jian_,b.shi_fou_guo_shen_ FROM t_nsjcx AS a  LEFT JOIN  t_nsjcbxe AS b ON a.bei_nei_shen_bu_m = b.bei_nei_shen_bu_m WHERE a.parent_id_ = '${ids.id_}' AND b.ji_hua_zong_wai_j = '${ids.ji_hua_zong_wai_j}' GROUP BY a.id_ ORDER BY a.create_time_,a.id_ DESC`
+            await this.$common.request('query', {
+                key: 'getInnerAuditCheckRecord2',
+                params: [ids.id_, ids.ji_hua_zong_wai_j]
+            }).then((res) => {
                 finish = res.variables.data
             })
-            let id = ''
-            finish.forEach(item => {
-                id += item.id_ + ','
-            })
-            id = id.slice(0, id.length - 1)
-            id = id.replace(/\,/g, '","')
-            const sql3 = `select id_,nei_shen_yuan_,bei_nei_shen_bu_m,kai_shi_shi_jian_,jie_shu_shi_jian_,shi_shi_ji_hua_wa as shi_fou_guo_shen_ FROM t_nsjcx  WHERE  id_ NOT IN ("${id}") AND parent_id_ = "${ids.id_}" `
-            await curdPost('sql', sql3).then((res) => {
+            const id = finish.map(item => item.id_).join(',')
+            // const sql3 = `select id_,nei_shen_yuan_,bei_nei_shen_bu_m,kai_shi_shi_jian_,jie_shu_shi_jian_,shi_shi_ji_hua_wa as shi_fou_guo_shen_ FROM t_nsjcx  WHERE find_in_set(id_, '${id}') = 0 AND parent_id_ = "${ids.id_}" `
+            await this.$common.request('query', {
+                key: 'getInnerAuditCheckItem',
+                params: [id, ids.id_]
+            }).then((res) => {
                 noFinish = res.variables.data
             })
             this.allCheckData = finish.concat(noFinish)
@@ -978,10 +955,13 @@ export default {
             const this_ = this
             this_.CNASTableData = []
             this_.CMAtable = []
-            // const sql = "select * FROM t_nsbfhxjlhzzb WHERE parent_id_ =(SELECT id_  FROM t_nsbfhxjlhzbzc WHERE ji_hua_zong_wai_j ='" + id + "' ORDER BY create_time_ DESC LIMIT 1)"
-            const sql = `select DISTINCT a.id_,a.shen_he_lei_xing_,a.miao_shu_,a.tiao_kuan_bian_ha,a.nei_shen_yuan_,a.ze_ren_shi_,a.fu_ze_ren_,a.bu_fu_he_cheng_du,c.shi_fou_guo_shen_ FROM t_nsbfhxjlhzzb AS a  JOIN  (select b.bei_shen_bu_men_,b.ji_hua_zong_wai_j,b.shi_fou_guo_shen_, b.lai_zi_he_chu_    FROM t_bfhhjzcsjlb AS b WHERE b.ji_hua_zong_wai_j ='${id}') AS c ON a.id_ = c.lai_zi_he_chu_   WHERE a.parent_id_ =(select d.id_  FROM t_nsbfhxjlhzbzc AS d WHERE d.ji_hua_zong_wai_j ='${id}' ORDER BY d.create_time_ DESC LIMIT 1) ORDER BY a.create_time_,a.id_ DESC `
-            const sql2 = `select distinct a.id_, a.shen_he_lei_xing_, a.miao_shu_, a.tiao_kuan_bian_ha, a.nei_shen_yuan_, a.ze_ren_shi_, a.fu_ze_ren_, a.bu_fu_he_cheng_du, c.shi_fou_guo_shen_ from t_nsbfhxjlhzzb as a join (select b.bei_shen_bu_men_, b.ji_hua_zong_wai_j, b.shi_fou_guo_shen_, b.lai_zi_he_chu_ from t_bfhhjzcsjlb as b where b.ji_hua_zong_wai_j ='${id}') as c on a.id_ = c.lai_zi_he_chu_ where a.parent_id_ = (select d.id_ from t_nsbfhxjlhzbzc as d where d.ji_hua_zong_wai_j = '${id}' order by d.create_time_ desc limit 1) order by a.create_time_ desc, a.id_ desc`
-            await curdPost('sql', sql2).then((res) => {
+            // // const sql = "select * FROM t_nsbfhxjlhzzb WHERE parent_id_ =(SELECT id_  FROM t_nsbfhxjlhzbzc WHERE ji_hua_zong_wai_j ='" + id + "' ORDER BY create_time_ DESC LIMIT 1)"
+            // // const sql = `select DISTINCT a.id_,a.shen_he_lei_xing_,a.miao_shu_,a.tiao_kuan_bian_ha,a.nei_shen_yuan_,a.ze_ren_shi_,a.fu_ze_ren_,a.bu_fu_he_cheng_du,c.shi_fou_guo_shen_ FROM t_nsbfhxjlhzzb AS a  JOIN  (select b.bei_shen_bu_men_,b.ji_hua_zong_wai_j,b.shi_fou_guo_shen_, b.lai_zi_he_chu_    FROM t_bfhhjzcsjlb AS b WHERE b.ji_hua_zong_wai_j ='${id}') AS c ON a.id_ = c.lai_zi_he_chu_   WHERE a.parent_id_ =(select d.id_  FROM t_nsbfhxjlhzbzc AS d WHERE d.ji_hua_zong_wai_j ='${id}' ORDER BY d.create_time_ DESC LIMIT 1) ORDER BY a.create_time_,a.id_ DESC `
+            // const sql2 = `select distinct a.id_, a.shen_he_lei_xing_, a.miao_shu_, a.tiao_kuan_bian_ha, a.nei_shen_yuan_, a.ze_ren_shi_, a.fu_ze_ren_, a.bu_fu_he_cheng_du, c.shi_fou_guo_shen_ from t_nsbfhxjlhzzb as a join (select b.bei_shen_bu_men_, b.ji_hua_zong_wai_j, b.shi_fou_guo_shen_, b.lai_zi_he_chu_ from t_bfhhjzcsjlb as b where b.ji_hua_zong_wai_j ='${id}') as c on a.id_ = c.lai_zi_he_chu_ where a.parent_id_ = (select d.id_ from t_nsbfhxjlhzbzc as d where d.ji_hua_zong_wai_j = '${id}' order by d.create_time_ desc limit 1) order by a.create_time_ desc, a.id_ desc`
+            await this.$common.request('query', {
+                key: 'innerAuditPrgs',
+                params: [id]
+            }).then((res) => {
                 const data = res.variables.data
                 data.forEach((item) => {
                     if (item.shen_he_lei_xing_.includes('CMA')) {

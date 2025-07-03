@@ -247,8 +247,19 @@ export default {
         },
         // 获取全部培训人员  7.15通用性调整
         async getAllPeople () {
-            const sql = `select * from ${this.params.tableName} where id_='${this.params.guan_lian_id_}'`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select * from ${this.params.tableName} where id_='${this.params.guan_lian_id_}'`
+            const { tableName, guan_lian_id_ } = this.params || {}
+            const keyMap = {
+                t_rypxcjb: 'getSignInBizInfo1',
+                t_fwxyhyqdb: 'getSignInBizInfo2',
+                t_nshyjyb: 'getSignInBizInfo3',
+                t_gshyjyb: 'getSignInBizInfo4',
+                t_jykzjbdjb: 'getSignInBizInfo5'
+            }
+            const { variables: { data }} = await this.$common.request('query', {
+                key: keyMap[tableName],
+                params: [guan_lian_id_]
+            })
             if (data.length <= 0) {
                 return this.$message.warning('数据异常！')
             }
@@ -302,8 +313,11 @@ export default {
 
         // 获取已签到人员
         async getRegisterPeople () {
-            const sql = `select * from t_qdxxb where guan_lian_id_='${this.params.guan_lian_id_}'`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select * from t_qdxxb where guan_lian_id_='${this.params.guan_lian_id_}'`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getSignInfoByBizKey',
+                params: [this.params.guan_lian_id_]
+            })
             // console.log('已签到', data)
             data.forEach(person => {
                 const p = this.tableList.find(item => item.ren_yuan_id_ === person.ren_yuan_id_)
@@ -311,11 +325,11 @@ export default {
                     this.tableList.push({
                         ren_yuan_id_: person.ren_yuan_id_,
                         status: '已签到',
-                        qian_dao_shi_jian: person.qian_dao_shi_jian
+                        qian_dao_shi_jian: person.qian_dao_lei_xing === '手动' ? '' : person.qian_dao_shi_jian
                     })
                 } else {
                     p.status = '已签到'
-                    p.qian_dao_shi_jian = person.qian_dao_shi_jian
+                    p.qian_dao_shi_jian = person.qian_dao_lei_xing === '手动' ? '' : person.qian_dao_shi_jian
                 }
             })
         },

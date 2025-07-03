@@ -14,6 +14,7 @@ import { onlyOfficeToPdf } from '@/api/platform/form/seal'
 import { downloadFile as download } from '@/business/platform/file/utils'
 import { removeFormData } from '@/api/platform/data/dataTemplate'
 import { queryPageList as queryRole } from '@/api/platform/org/employee'
+import exportExcel from '@/plugins/exportWithExcelJS'
 // 引入工具类
 import Utils from '@/utils/util'
 import ActionUtils from '@/utils/action'
@@ -157,6 +158,13 @@ export const replaceNullWithEmpty = obj => {
     return replaceValue(obj)
 }
 
+export const export2Excel = options => {
+    // options 参数属性值参考：src\plugins\exportWithExcelJS\readme.md
+    exportExcel(options).then(() => {
+        ActionUtils.success(options.message || '导出成功')
+    })
+}
+
 export default {
     preview,
     request,
@@ -183,6 +191,7 @@ export default {
     removeFormData,
     replaceNullWithEmpty,
     queryRole,
+    export2Excel,
     Utils,
     ActionUtils
 }

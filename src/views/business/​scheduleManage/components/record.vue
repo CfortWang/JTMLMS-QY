@@ -22,19 +22,19 @@
                 <el-card class="card">
                     <div class="applicant">
                         <span class="leftText">申请人:</span>
-                        <span class="rightText">{{item.creator }}</span>
+                        <span class="rightText">{{ item.creator }}</span>
                     </div>
                     <div class="reason">
                         <span class="leftText">原因:</span>
-                        <span class="rightText">{{item.reason }}</span>
+                        <span class="rightText">{{ item.reason }}</span>
                     </div>
                     <div class="detail">
                         <span class="leftText">详情:</span>
-                        <span class="rightText">{{item.overview }}</span>
+                        <span class="rightText">{{ item.overview }}</span>
                     </div>
                     <div class="approve">
                         <span class="leftText">通过时间:</span>
-                        <span class="rightText">{{item.updateTime }}</span>
+                        <span class="rightText">{{ item.updateTime }}</span>
                     </div>
                 </el-card>
             </el-timeline-item>
@@ -78,8 +78,11 @@ export default {
                 return
             }
             // const sql = `select a.id_ as dataId, a.parent_id_ as parentId, a.record_id_ as recordId, a.before_adjust_ as beforeAdjust, a.before_date_ as beforeDate, a.after_adjust_ as afterAdjust, a.after_date_ as afterDate, a.party_ as party, b.create_by_ as createBy, date_format(b.create_time_,'%Y-%m-%d %H:%i') AS createTime, b.di_dian_ as location, b.reason_ as reason, b.executor_ as executor, b.execute_date_ as executeDate, b.overview_ as overview, b.schedule_id_ as scheduleId from t_adjustment_detail a left join t_adjustment b on a.parent_id_ = b.id_ and b.schedule_id_ = '${this.scheduleId}'`
-            const sql = 'select * from t_adjustment where status in ( "已通过") and schedule_id_ = ' + this.scheduleId + ' order by update_time_ DESC'
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from t_adjustment where status in ("已通过") and schedule_id_ = '${this.scheduleId}' order by update_time_ desc`
+            this.$common.request('query', {
+                key: 'getAdjustmentByScheduleId',
+                params: [this.scheduleId]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     return

@@ -330,7 +330,6 @@ import ActionUtils from '@/utils/action'
 import IbpsEmployeeSelector from '@/business/platform/org/employee/selector'
 import BpmDefinitionSelector from '@/business/platform/bpmn/definition/selector'
 import ibpsUserSelector from '@/business/platform/org/selector'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import helpTip from '@/business/platform/form/formbuilder/right-aside/components/help-tip.vue'
 import Condition from './condition'
 import { load } from '@/api/platform/org/employee'
@@ -698,8 +697,11 @@ export default {
         },
 
         getImage () {
-            const sql = `select * from t_dlpz where di_dian_ = '${this.level}' order by create_time_ desc LIMIT 1`
-            curdPost('sql', sql).then((res) => {
+            // const sql = `select * from t_dlpz where di_dian_ = '${this.level}' order by create_time_ desc LIMIT 1`
+            this.$common.request('query', {
+                key: 'getAgentImgConfig',
+                params: [this.level]
+            }).then((res) => {
                 if (res.state === 200) {
                     const datas = res.variables.data
                     if (datas.length > 0) {
@@ -714,9 +716,18 @@ export default {
             })
         },
         getUrl (id) {
-            const sql1 = `select nei_rong_ from t_ipcc where id_ = '1'`
-            const sql2 = `select * from ibps_file_attachment where find_in_set(ID_,'${id}')`
-            Promise.all([curdPost('sql', sql1), curdPost('sql', sql2)]).then(
+            // const sql1 = `select nei_rong_ from t_ipcc where id_ = '1'`
+            // const sql2 = `select * from ibps_file_attachment where find_in_set(ID_,'${id}')`
+            Promise.all([
+                this.$common.request('query', {
+                    key: 'getIpConfig',
+                    params: [null]
+                }),
+                this.$common.request('query', {
+                    key: 'getFileAttachmentByIds',
+                    params: [id]
+                })
+            ]).then(
                 ([res1, res2]) => {
                     if (res1.state === 200 && res2.state === 200) {
                         const datas1 = res1.variables.data

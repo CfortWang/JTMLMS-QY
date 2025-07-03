@@ -581,18 +581,23 @@ export default {
                 const allRequests = []
                 const { tiKu, handQuestions } = val
                 if (tiKu) {
-                    const sql = `select * from t_questions where parent_id_ in (${tiKu.split(',').map(i => `'${i}'`)}) and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
-                    allRequests.push(this.$common.request('sql', sql))
+                    // const sql = `select * from t_questions where find_in_set(parent_id_, '${tiKu}') and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+                    allRequests.push(this.$common.request('query', {
+                        key: 'getExamQuestionByBid',
+                        params: [tiKu]
+                    }))
                 }
                 if (handQuestions) {
-                    let sql = ''
-                    if (tiKu) {
-                        sql = `select * from t_questions where id_ in (${handQuestions.split(',').map(i => `'${i}'`)}) and parent_id_ not in (${tiKu.split(',').map(i => `'${i}'`)}) and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
-                    } else {
-                        sql = `select * from t_questions where id_ in (${handQuestions.split(',').map(i => `'${i}'`)}) and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
-                    }
+                    // let sql = ''
+                    // if (tiKu) {
+                    //     sql = `select * from t_questions where find_in_set(id_, '${handQuestions}') and find_in_set(parent_id_, '${tiKu}') = 0 and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+                    // } else {
+                    //     sql = `select * from t_questions where find_in_set(id_, '${handQuestions}') and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+                    // }
+                    const key = tiKu ? 'getExamQuestionByQidBid' : 'getExamQuestionByQid'
+                    const params = tiKu ? [handQuestions, tiKu] : [handQuestions]
 
-                    allRequests.push(this.$common.request('sql', sql))
+                    allRequests.push(this.$common.request('query', { key, params }))
                 }
                 if (allRequests.length) {
                     Promise.all(allRequests).then(res => {
@@ -709,8 +714,11 @@ export default {
                 this.randButtonDisabled = true
                 this.$message.info('非未发布状态的考试仅可修改限考时间！')
             }
-            const sql = `select id_, create_by_, ti_ku_id_, guan_lian_id_, kao_shi_ming_chen, kao_shi_lei_xing_, chuang_jian_shi_j, fa_bu_shi_jian_, fa_bu_ren_, xian_kao_shi_jian, xian_kao_ci_shu_, kao_shi_shi_chang, can_kao_ren_yuan_, zhuang_tai_, da_biao_zhan_bi_, ji_fen_fang_shi_, kao_shi_miao_shu_, yun_xu_bao_ming_, sui_ji_chou_ti_, sui_ji_ti_shu_,chou_ti_zong_fen_,ti_mu_zong_shu_,chou_ti_fang_shi_,ping_fen_ren_ from t_exams where id_ = '${this.id}'`
-            this.$common.request('sql', sql).then((res) => {
+            // const sql = `select id_, create_by_, ti_ku_id_, guan_lian_id_, kao_shi_ming_chen, kao_shi_lei_xing_, chuang_jian_shi_j, fa_bu_shi_jian_, fa_bu_ren_, xian_kao_shi_jian, xian_kao_ci_shu_, kao_shi_shi_chang, can_kao_ren_yuan_, zhuang_tai_, da_biao_zhan_bi_, ji_fen_fang_shi_, kao_shi_miao_shu_, yun_xu_bao_ming_, sui_ji_chou_ti_, sui_ji_ti_shu_,chou_ti_zong_fen_,ti_mu_zong_shu_,chou_ti_fang_shi_,ping_fen_ren_ from t_exams where id_ = '${this.id}'`
+            this.$common.request('query', {
+                key: 'getExamDataById',
+                params: [this.id]
+            }).then((res) => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     this.$message.error('数据不存在')
@@ -744,17 +752,6 @@ export default {
                     }
                 }
                 this.allQuestions.tiKu = this.form.ti_ku_id_
-            })
-        },
-        // 随机题库 弃用
-        randTiku () {
-            this.randButtonDisabled = true
-            const sql = `select id_ from t_question_bank where ti_ku_zhuang_tai_='可用'`
-            this.$common.request('sql', sql).then((res) => {
-                const { data = [] } = res.variables || {}
-                const randNumber = Math.floor(Math.random() * data.length)
-                this.form.ti_ku_id_ = data[randNumber].id_
-                this.randButtonDisabled = false
             })
         },
         handleSubmit () {

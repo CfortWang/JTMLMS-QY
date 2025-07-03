@@ -1,9 +1,10 @@
 import * as echarts from 'echarts'
 export default {
     data () {
+        const { first, second } = this.$store.getters.level || {}
         return {
+            level: second || first,
             typeList: ['待分配', '待核查', '待审核', '待确认', '已结束'],
-            posiList: [],
             positionList: [],
             barLable: {
                 show: true,
@@ -23,21 +24,8 @@ export default {
 
     methods: {
         getPosition () {
-            const second = this.$store.getters.level.second
-            const sql = `select * from ibps_party_entity where party_type_ = 'position' and PATH_ like '%${second}%' and DEPTH_ = '4' order by ID_ desc`
-            this.$common.request('sql', sql).then(res => {
-                const { data = [] } = res.variables || {}
-                if (data.length > 0) {
-                    const list = []
-                    const list2 = []
-                    data.forEach(item => {
-                        list.push(item.NAME_)
-                        list2.push(item.NAME_)
-                    })
-                    this.posiList = list
-                    this.positionList = list2
-                }
-            })
+            const { deptList = [] } = this.$store.getters || {}
+            this.positionList = deptList.filter(i => i.depth === '4').map(i => i.positionName)
         },
         getColorRe (list) {
             const colors = [
@@ -77,8 +65,11 @@ export default {
             return dt
         },
         getJiHuaZhuangTai (id) {
-            const sql = `select * from t_rkzztkhcjh where id_ = '${id}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from t_rkzztkhcjh where id_ = '${id}'`
+            this.$common.request('query', {
+                key: 'checkProgressStat1',
+                params: [id]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length > 0) {
                     const index = this.typeList.findIndex(item => item === data[0].shi_fou_guo_shen_)
@@ -98,8 +89,11 @@ export default {
             })
         },
         getJiHuaZiBiaoJiSuan (id) {
-            const sql = `select * from t_rkzztkhcjhzb where ji_hua_de_id_ = '${id}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from t_rkzztkhcjhzb where ji_hua_de_id_ = '${id}'`
+            this.$common.request('query', {
+                key: 'checkProgressStat2',
+                params: [id]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length > 0) {
                     const list = []
@@ -115,14 +109,17 @@ export default {
             })
         },
         getShiShiData (id, activeIndex) {
-            const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen,h.NAME_ as yuanZuZhangBuMen,i.NAME_ as yuanZuZhangName from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_position h on a.bu_men_ = h.ID_ left join ibps_party_employee i on a.zu_chang_ = i.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.ji_hua_de_id_ = '${id}' order by a.tiao_kuan_hao_`
+            // const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen,h.NAME_ as yuanZuZhangBuMen,i.NAME_ as yuanZuZhangName from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_position h on a.bu_men_ = h.ID_ left join ibps_party_employee i on a.zu_chang_ = i.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.ji_hua_de_id_ = '${id}' order by a.tiao_kuan_hao_`
 
             // if (activeIndex === 1) {
             //     sql = `select * from t_rkzztkhcjhzb where parent_id_ = '${id}' order by tiao_kuan_hao_`
             // }
             // if (activeIndex === 2 || activeIndex === 3 || activeIndex === 4) {
             // }
-            this.$common.request('sql', sql).then(res => {
+            this.$common.request('query', {
+                key: 'checkProgressStat3',
+                params: [id]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length > 0) {
                     this.tableData = data
@@ -130,9 +127,12 @@ export default {
             })
         },
         getBuFuHeXiangMu (id) {
-            const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.ji_hua_de_id_ = '${id}' and a.he_cha_jie_guo_ = 'N' order by a.tiao_kuan_hao_`
+            // const sql = `select a.*,c.NAME_ as zuYuanPosiName,d.NAME_ as zuYuanName,e.NAME_ as zuZhangName,g.NAME_ as zuZhangBnMen from t_rkzztkhcjhzb a left join t_rkzztkhcjhzb b on a.id_ = b.ji_hua_zi_biao_id left join ibps_party_position c on a.bian_zhi_bu_men_ = c.ID_ left join ibps_party_employee d on a.zu_yuan_ = d.ID_ left join t_hcssjhb f on b.parent_id_ = f.id_ left join ibps_party_position g on f.bian_zhi_bu_men_ = g.ID_ left join ibps_party_employee e on f.bian_zhi_ren_ = e.ID_ where a.ji_hua_de_id_ = '${id}' and a.he_cha_jie_guo_ = 'N' order by a.tiao_kuan_hao_`
 
-            this.$common.request('sql', sql).then(res => {
+            this.$common.request('query', {
+                key: 'checkProgressStat4',
+                params: [id]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length > 0) {
                     this.buTableData = data
@@ -140,13 +140,29 @@ export default {
             })
         },
         getBuFuHeTuBiao (id) {
-            const second = this.$store.getters.level.second
-            const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'N' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'Y' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'N/A' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql4 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            // const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'N' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE concat('%', '${this.level}', '%') AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            // const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'Y' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE concat('%', '${this.level}', '%') AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            // const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' AND b.he_cha_jie_guo_ = 'N/A' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE concat('%', '${this.level}', '%') AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            // const sql4 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE concat('%', '${this.level}', '%') AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
 
-            Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2), this.$common.request('sql', sql3), this.$common.request('sql', sql4)]).then(res => {
+            Promise.all([
+                this.$common.request('query', {
+                    key: 'checkProgressStat5',
+                    params: [id, this.level]
+                }),
+                this.$common.request('query', {
+                    key: 'checkProgressStat6',
+                    params: [id, this.level]
+                }),
+                this.$common.request('query', {
+                    key: 'checkProgressStat7',
+                    params: [id, this.level]
+                }),
+                this.$common.request('query', {
+                    key: 'checkProgressStat8',
+                    params: [id, this.level]
+                })
+            ]).then(res => {
                 if (res.length > 0) {
                     const data1 = res[0].variables.data
                     const data2 = res[1].variables.data
@@ -165,17 +181,29 @@ export default {
                         return item.value === 0 ? '' : item.value
                     })
                     const accept = echarts.init(this.$refs.Echart2)
-                    accept.setOption({...this.barData(list1, list2, list3, list4)})
+                    accept.setOption({ ...this.barData(list1, list2, list3, list4) })
                 }
             })
         },
         getHeChaList (id) {
-            const second = this.$store.getters.level.second
-            const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待审核' or b.shi_fou_guo_shen_ = '待确认' or b.shi_fou_guo_shen_ = '已结束') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
-            const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待分配' or b.shi_fou_guo_shen_ = '待核查') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE '%${second}%' AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            // const sql1 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' WHERE a.party_type_ = 'position' AND a.PATH_ LIKE concat('%', '${this.level}', '%') AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            // const sql2 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待审核' or b.shi_fou_guo_shen_ = '待确认' or b.shi_fou_guo_shen_ = '已结束') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE concat('%', '${this.level}', '%') AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
+            // const sql3 = `select a.NAME_ as name,COALESCE(COUNT(b.id_), 0) AS value FROM ibps_party_entity a LEFT JOIN t_rkzztkhcjhzb b ON a.ID_ = b.bu_men_ AND b.ji_hua_de_id_ = '${id}' and (b.shi_fou_guo_shen_ = '待分配' or b.shi_fou_guo_shen_ = '待核查') WHERE a.party_type_ = 'position' AND a.PATH_ LIKE concat('%', '${this.level}', '%') AND a.DEPTH_ = '4' GROUP BY a.NAME_ order by a.ID_ desc`
 
-            Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2), this.$common.request('sql', sql3)]).then(res => {
+            Promise.all([
+                this.$common.request('query', {
+                    key: 'checkProgressStat9',
+                    params: [id, this.level]
+                }),
+                this.$common.request('query', {
+                    key: 'checkProgressStat10',
+                    params: [id, this.level]
+                }),
+                this.$common.request('query', {
+                    key: 'checkProgressStat11',
+                    params: [id, this.level]
+                })
+            ]).then(res => {
                 if (res.length > 0) {
                     const data1 = res[0].variables.data
                     const data2 = res[1].variables.data
@@ -190,7 +218,7 @@ export default {
                         return item.value === 0 ? '' : item.value
                     })
                     const accept = echarts.init(this.$refs.Echart2)
-                    accept.setOption({...this.barDataPlan(list1, list2, list3)})
+                    accept.setOption({ ...this.barDataPlan(list1, list2, list3) })
                 }
             })
         },
@@ -357,12 +385,12 @@ export default {
                 tooltip: {
                     show: true,
                     trigger: 'axis',
-                    formatter:function(params){
-                        let val0 = params[0].value==''? 0:params[0].value
-                        let val1 = params[1].value==''? 0:params[1].value
-                        let val2 = params[2].value==''? 0:params[2].value
-                        let val3 = params[3].value==''? 0:params[3].value
-                        let str = `${params[0].name}<br>${params[0].seriesName}：${val0}
+                    formatter: function (params) {
+                        const val0 = params[0].value == '' ? 0 : params[0].value
+                        const val1 = params[1].value == '' ? 0 : params[1].value
+                        const val2 = params[2].value == '' ? 0 : params[2].value
+                        const val3 = params[3].value == '' ? 0 : params[3].value
+                        const str = `${params[0].name}<br>${params[0].seriesName}：${val0}
                                                     <br>${params[1].seriesName}：${val1}
                                                     <br>${params[2].seriesName}：${val2}
                                                     <br>${params[3].seriesName}：${val3}`
@@ -450,11 +478,11 @@ export default {
                 tooltip: {
                     show: true,
                     trigger: 'axis',
-                    formatter:function(params){
-                        let val0 = params[0].value==''? 0:params[0].value
-                        let val1 = params[1].value==''? 0:params[1].value
-                        let val2 = params[2].value==''? 0:params[2].value
-                        let str = `${params[0].name}<br>${params[0].seriesName}：${val0}
+                    formatter: function (params) {
+                        const val0 = params[0].value == '' ? 0 : params[0].value
+                        const val1 = params[1].value == '' ? 0 : params[1].value
+                        const val2 = params[2].value == '' ? 0 : params[2].value
+                        const str = `${params[0].name}<br>${params[0].seriesName}：${val0}
                                                     <br>${params[1].seriesName}：${val1}
                                                     <br>${params[2].seriesName}：${val2}`
                         return str

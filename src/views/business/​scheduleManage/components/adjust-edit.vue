@@ -174,7 +174,7 @@
                                 multiple
                                 filterable
                                 clearable
-                                :multiple-limit=3
+                                :multiple-limit="3"
                                 :placeholder=" readonly ? '' : '请选择调班班次'"
                                 @change="vaildBanci($event, scope.row, 'before')"
                             >
@@ -265,7 +265,7 @@
                                 multiple
                                 clearable
                                 filterable
-                                :multiple-limit=3
+                                :multiple-limit="3"
                                 :placeholder=" readonly ? '' : '请选择目标班次'"
                                 @change="vaildBanci($event, scope.row, 'after')"
                             >
@@ -457,8 +457,11 @@ export default {
         },
         async getBlockAdjustRequest (self) { // 获取锁定班次
             const scheduleId = self.scheduleInfo.id
-            const sql = 'select * from t_adjustment_detail where status_ in ( "待审核", "审核中", "待审批") and parent_id_ in (select id_ from t_adjustment where schedule_id_ = ' + scheduleId + ' )'
-            const res = await self.$common.request('sql', sql) // 获取当前审核状态中的申请单数据
+            // const sql = `select * from t_adjustment_detail where status_ in ( "待审核", "审核中", "待审批") and parent_id_ in (select id_ from t_adjustment where schedule_id_ = '${scheduleId}')`
+            const res = await self.$common.request('query', {
+                key: 'getLockedAdjustmentData',
+                params: [scheduleId]
+            }) // 获取当前审核状态中的申请单数据
             self.blockList = self.getBlockResult(res.variables.data || [], 'default')
             // 清除列表中被申请数据
             this.vaildExpireData(self.blockList)

@@ -37,14 +37,10 @@
                                             <div
                                                 v-for="(e,t) in midData.columns"
                                                 :key="'zi'+t"
-                                                :class="{
-                                                    'single-row': t== midData.columns.length-1||t== midData.columns.length-2||t== midData.columns.length-5||t== midData.columns.length-6,
-                                                    'double-row': !(t== midData.columns.length-1||t== midData.columns.length-2||t== midData.columns.length-5||t== midData.columns.length-6)
-                                                }"
                                                 class="lh"
                                             >
                                                 <div class="qianZhi">{{ e.label }}：</div>
-                                                <div class="qianZhi">{{ item[e.field] }}</div>
+                                                <div>{{ item[e.field] }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -67,7 +63,6 @@
 <script>
 import VueBarcode from 'vue-barcode'
 import vueEasyPrint from 'vue-easy-print'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
 export default {
     components: {
@@ -175,41 +170,22 @@ export default {
             this.getLook(idStr)
         },
         async getLook (id) {
-            const sql = `select
-                    dj.she_bei_ming_cheng_,
-                    dj.she_bei_shi_bie_h,
-                    dj.gui_ge_xing_hao_,
-                    dj.she_bei_zhuang_ta,
-                    dj.bi_xu_de_huan_jin,
-                    dj.bi_xu_she_shi_,
-                    dj.cai_gou_he_tong_,
-                    dj.zi_chan_bian_hao_,
-                    dj.yuan_she_bei_bian,
-                    dj.chang_shang_,
-                    ifnull(dj.chang_jia_lian_xi, '') as chang_jia_lian_xi,
-                    dj.ji_shen_xu_hao_,
-                    dj.cun_fang_di_dian_,
-                    dj.guan_li_ren_,
-                    ifnull(dj.fu_ze_ren_dian_hu, '') as fu_ze_ren_dian_hu,
-                    dj.yi_xiao_ri_qi_
-                FROM
-                    t_sbdj dj
-                WHERE
-                    find_in_set( dj.id_, '${id}' )`
-            // console.log(sql)
-            const personSql = `select id_,NAME_ from ibps_party_employee`
-            const res1 = await curdPost('sql', sql)
-            const res2 = await curdPost('sql', personSql)
+            // const sql = `select she_bei_ming_cheng_, she_bei_shi_bie_h, gui_ge_xing_hao_, she_bei_zhuang_ta, bi_xu_de_huan_jin, bi_xu_she_shi_, cai_gou_he_tong_, zi_chan_bian_hao_, yuan_she_bei_bian, chang_shang_, ifnull(chang_jia_lian_xi, '') as chang_jia_lian_xi, ji_shen_xu_hao_, cun_fang_di_dian_, guan_li_ren_, ifnull(fu_ze_ren_dian_hu, '') as fu_ze_ren_dian_hu, yi_xiao_ri_qi_ FROM t_sbdj WHERE find_in_set(id_, '${id}' )`
+            // const personSql = `select id_,NAME_ from ibps_party_employee`
+            const res1 = await this.$common.request('query', { key: 'rygwsqbb', params: [id] })
+            const res2 = await this.$common.request('query', { key: 'getAllUser', params: [null] })
             const { data } = res1.variables || []
             const personData = res2.variables.data || []
             let sbjdData = []
             // 获取原设备编号后再去查他对应的检定校准记录
             if (data?.length) {
                 const yuanSheBei = data.map(item => item.yuan_she_bei_bian).join(',')
-                const sbjdsql = `select * FROM t_mjsbjdxzjhzb WHERE  marks_ = 'record' AND jing_ban_ren_ IS NOT NULL AND jing_ban_ren_ <> '' AND FIND_IN_SET(yuan_she_bei_bian,'${yuanSheBei}') ORDER BY ji_hua_ri_qi_ desc,bian_zhi_shi_jian desc`
-                const res3 = await curdPost('sql', sbjdsql)
+                // const sbjdsql = `select * FROM t_mjsbjdxzjhzb WHERE  marks_ = 'record' AND jing_ban_ren_ IS NOT NULL AND jing_ban_ren_ <> '' AND FIND_IN_SET(yuan_she_bei_bian,'${yuanSheBei}') ORDER BY ji_hua_ri_qi_ desc,bian_zhi_shi_jian desc`
+                const res3 = await this.$common.request('query', {
+                    key: 'getDeviceCalibrationRecords',
+                    params: [yuanSheBei]
+                })
                 sbjdData = res3.variables.data || []
-                console.log(sbjdData, '2222')
                 const list = []
                 data.forEach(item => {
                     const verificationDateStr = item.bi_xu_she_shi_ ? item.bi_xu_she_shi_ : ''
@@ -220,10 +196,10 @@ export default {
                         range: this.judgementVal(item.cai_gou_he_tong_) ? item.cai_gou_he_tong_ : '',
                         assetNum: item?.zi_chan_bian_hao_,
                         changJia: item?.chang_shang_,
-                        changJiaLianXiRen: item?.chang_jia_lian_xi,
+                        changJiaLianXiRen: item?.chang_jia_lian_xi || '',
                         jiShenXuHao: item?.ji_shen_xu_hao_,
                         cunFangDiDian: item?.cun_fang_di_dian_,
-                        fuZeRen: this.findPersonName(item.guan_li_ren_, personData) + item.fu_ze_ren_dian_hu,
+                        fuZeRen: this.findPersonName(item.guan_li_ren_, personData) + (item?.fu_ze_ren_dian_hu || ''),
                         jiaoZhunRiQi: this.findData('shi_shi_ri_qi_', item.yuan_she_bei_bian, sbjdData),
                         chuChangBianHao: this.findData('chu_chang_bian_ha', item.yuan_she_bei_bian, sbjdData),
                         jianDingDanWei: this.findData('jian_ding_dan_wei', item.yuan_she_bei_bian, sbjdData),
@@ -293,25 +269,44 @@ export default {
 }
 
 .tagBox {
-    width: 360px; // 300  240 231
-    position: relative;
-    border: 1px solid #000000;
-    border-top: 0px;
-    display: inline-block;
-    background-color: #fff;
-    line-height: 1.5;
+  width: 360px;
+  border: 1px solid #000;
+  border-top: 0;
+  background-color: #fff;
+  line-height: 1.5;
+  margin: 0 auto
 }
-.midSty{
-    display: flex;
-    justify-items: center;
-    align-items: center;
-    flex-wrap: wrap;
+
+.midSty {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 每行两列 */
+  gap: 0px; /* 元素间距 */
+}
+
+/* 特殊位置的元素占满整行 */
+.midSty > div:nth-last-child(1),
+.midSty > div:nth-last-child(2),
+.midSty > div:nth-last-child(5),
+.midSty > div:nth-last-child(6) {
+  grid-column: span 2; /* 跨两列 */
+}
+
+.lh {
+  display: flex; /* 内部使用 flex 排列标签和内容 */
+}
+
+.qianZhi {
+  white-space: nowrap;
+  // margin-right: 5px;
+}
+.single-row{
+    width: 100%;
+}
+.double-row {
+    width: 50%
 }
 .ewm {
     margin-left: 10px;
-}
-.qianZhi {
-    white-space: nowrap;
 }
 
 .la {
@@ -338,12 +333,7 @@ export default {
 .lh:nth-last-child(-n+1) {
     border-bottom: none;
 }
-.single-row{
-    width: 100%;
-}
-.double-row {
-    width: 50%
-}
+
 .container {
     width: 360px;
     height: 50px;

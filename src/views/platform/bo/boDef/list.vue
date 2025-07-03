@@ -441,7 +441,6 @@ export default {
                         type: 'warning'
                     })
                 }
-                this.$refs.crud.clearSelection()
                 this.loadData()
             })
         },

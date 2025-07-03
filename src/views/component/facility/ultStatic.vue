@@ -290,8 +290,11 @@ export default {
     },
     async mounted () {
         this.init()
-        const sql = `select she_shi_id_,zi_wai_deng_ming_,deng_guan_hao_,bian_zhi_bu_men_,gang_wei_ from t_jykzwdxdjlbsc where di_dian_='${this.level}' and shi_fou_ting_yong='1'`
-        const { variables: { data }} = await this.$common.request('sql', sql)
+        // const sql = `select she_shi_id_, zi_wai_deng_ming_, deng_guan_hao_, bian_zhi_bu_men_, gang_wei_ from t_jykzwdxdjlbsc where di_dian_='${this.level}' and shi_fou_ting_yong='1'`
+        const { variables: { data }} = await this.$common.request('query', {
+            key: 'getZwdConfig',
+            params: [this.level]
+        })
         this.totalList = data
     },
     methods: {
@@ -352,8 +355,11 @@ export default {
             this.title = `紫外灯消毒月度统计`
             const y = +this.month.split('-')[0]
             const m = +this.month.split('-')[1]
-            const sql = `select a.id_,a.parent_id_,a.she_bei_hao_,a.ri_qi_,a.bu_men_,a.wan_cheng_qing_ku,a.pi_ci_,a.shi_yong_shi_chan,a.zong_shi_chang_ as zsc1,a.qian_ming_,a.fang_jian_di_zhi_,a.e_ding_shi_chang_,a.zi_wai_deng_id_,a.gang_wei_,a.pan_ding_ri_qi_ as pdrq1,b.zi_wai_deng_ming_,b.zong_shi_chang_ as zsc2,b.deng_guan_hao_,b.ri_chang_zhao_she,b.shang_ci_xiao_du_,b.she_shi_id_,b.fang_jian_,b.shi_fou_gen_huan_,b.shi_fou_ting_yong,b.pan_ding_ri_qi_ as pdrq2 FROM t_jykzwdxdjlbzb a LEFT JOIN t_jykzwdxdjlbsc b ON a.zi_wai_deng_id_=b.id_ where b.di_dian_='${this.level}' and b.shi_fou_ting_yong='1' and YEAR(a.ri_qi_) = ${y} and MONTH(a.ri_qi_) = ${m}`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select a.id_, a.parent_id_, a.she_bei_hao_, a.ri_qi_, a.bu_men_, a.wan_cheng_qing_ku, a.pi_ci_, a.shi_yong_shi_chan, a.zong_shi_chang_ as zsc1, a.qian_ming_, a.fang_jian_di_zhi_, a.e_ding_shi_chang_, a.zi_wai_deng_id_, a.gang_wei_, a.pan_ding_ri_qi_ as pdrq1, b.zi_wai_deng_ming_, b.zong_shi_chang_ as zsc2, b.deng_guan_hao_, b.ri_chang_zhao_she, b.shang_ci_xiao_du_, b.she_shi_id_, b.fang_jian_, b.shi_fou_gen_huan_, b.shi_fou_ting_yong, b.pan_ding_ri_qi_ as pdrq2 FROM t_jykzwdxdjlbzb a LEFT JOIN t_jykzwdxdjlbsc b ON a.zi_wai_deng_id_ = b.id_ where b.di_dian_ = '${this.level}' and b.shi_fou_ting_yong = '1' and YEAR(a.ri_qi_) = ${y} and MONTH(a.ri_qi_) = ${m}`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getZwdDisinfectionRecord',
+                params: [this.level, y, m]
+            })
             // console.log('data', data)
             this.dataList = data
             // this.dataList.forEach(item => {

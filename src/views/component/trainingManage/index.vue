@@ -175,12 +175,12 @@ export default {
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'id_', label: '姓名', width: 100, slotName: 'userIdSlot' },
-                    { prop: 'positions_', label: '部门', width: 120, slotName: 'positionIdSlot' },
-                    { prop: 'jian_ding_zi_ge_z', label: '工号', width: 140 },
-                    { prop: 'planedjoin', label: '应参训次数', width: 120 },
-                    { prop: 'truejoin', label: '实参训次数', width: 120 },
-                    { prop: 'participationRate', label: '参训率', width: 120 },
+                    { prop: 'id_', label: '姓名', width: 150, slotName: 'userIdSlot' },
+                    { prop: 'positions_', label: '部门', width: 400, slotName: 'positionIdSlot' },
+                    { prop: 'jian_ding_zi_ge_z', label: '工号', width: 150 },
+                    { prop: 'planedjoin', label: '应参训次数' },
+                    { prop: 'truejoin', label: '实参训次数' },
+                    { prop: 'participationRate', label: '参训率', width: 150 },
                     { label: '操作', width: 120, slotName: 'customButton' }
                 ]
             },
@@ -307,4 +307,12 @@ export default {
     }
 }
 </script>
+<style lang="scss" scoped>
 
+/* 可选：调整表单标签宽度 */
+::v-deep .el-form-item__label {
+  width: auto !important;
+ // min-width: 40px !important; /* 固定标签宽度使内容对齐 */
+  text-align: left;
+}
+</style>

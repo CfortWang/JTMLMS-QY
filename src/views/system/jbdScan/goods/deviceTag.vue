@@ -57,7 +57,6 @@
 <script>
 import VueBarcode from 'vue-barcode'
 import vueEasyPrint from 'vue-easy-print'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 
 export default {
     components: {
@@ -156,23 +155,18 @@ export default {
             this.getLook(idStr)
         },
         getLook (id) {
-            const sql = `select
-                    dj.she_bei_ming_cheng_,
-                    dj.she_bei_shi_bie_h,
-                    dj.gui_ge_xing_hao_,
-                    dj.she_bei_zhuang_ta,
-                    dj.bi_xu_de_huan_jin,
-                    dj.bi_xu_she_shi_,
-                    dj.cai_gou_he_tong_,
-                    dj.zi_chan_bian_hao_,
-                    dj.yuan_she_bei_bian
-                FROM
-                    t_sbdj dj
-                WHERE
-                    find_in_set( dj.id_, '${id}' )`
-            // console.log(sql)
-            const personSql = `select id_,NAME_ from ibps_party_employee`
-            Promise.all([curdPost('sql', sql), curdPost('sql', personSql)]).then(([res1, res2]) => {
+            // const sql = `select she_bei_ming_cheng_, she_bei_shi_bie_h, gui_ge_xing_hao_, she_bei_zhuang_ta, bi_xu_de_huan_jin, bi_xu_she_shi_, cai_gou_he_tong_, zi_chan_bian_hao_, yuan_she_bei_bian FROM t_sbdj WHERE find_in_set(id_, ${id})`
+            // const personSql = `select * from ibps_party_employee`
+            Promise.all([
+                this.$common.request('query', {
+                    key: 'getDeviceInfoByIds',
+                    params: [id]
+                }),
+                this.$common.request('query', {
+                    key: 'getAllUser',
+                    params: [null]
+                })
+            ]).then(([res1, res2]) => {
                 const { data } = res1.variables || []
                 const personData = res2.variables.data || []
                 console.log(data)

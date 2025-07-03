@@ -13,7 +13,7 @@
             </el-table-column>
             <el-table-column label="质控结果" width="200" prop="zkjg">
                 <template slot-scope="{row}">
-                    <el-radio-group v-model="row.zkjg" v-removeAriaHidden :disabled="readonly">
+                    <el-radio-group v-model="row.zkjg" :disabled="readonly">
                         <el-radio label="1">在控</el-radio>
                         <el-radio label="2">失控</el-radio>
                     </el-radio-group>

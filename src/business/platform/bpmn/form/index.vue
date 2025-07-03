@@ -477,7 +477,7 @@ export default {
                     // 备份对比
                     this.$nextTick(() => {
                         setTimeout(() => {
-                            this.formDataBF = this.getFormData()
+                            this.formDataBF = structuredClone(this.getFormData())
                         }, 500)
                         this.opinionListBF = structuredClone(this.formParams.formOpinionData.opinionList)
                     })
@@ -498,7 +498,6 @@ export default {
                 this.buttons = this.buildButtons(data.buttons, this.attributes) || []
                 // 初始化url表单
                 this.initUrlForm(urlForm)
-                console.log(urlForm, this.attributes, data, this.formParams)
                 //  ============外部表单【iframe】 ================
             } else if (formModel.type === 'FRAME') {
                 const urlForm = formModel.formValue

@@ -36,8 +36,6 @@ import FixHeight from '@/mixins/height'
 import { typeOptions, statusOptions } from './constants'
 import Edit from '@/business/platform/bpmn/task-change/edit'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -152,15 +150,15 @@ export default {
             })
         },
         // 反查代理数据
-        getDaiLi (val1, val2, createTime, callback) {
-            const sql = `select DATE_FORMAT(EXPIRY_TIME_,'%Y-%m-%d') AS EXPIRY_TIME_, DATE_FORMAT(EFFECTIVE_TIME_,'%Y-%m-%d') AS EFFECTIVE_TIME_ from ibps_bpm_agent where DELEGATOR_ID_ = '${val1}' and AGENTER_ID_ = '${val2}' and DATE_FORMAT('${createTime}','%Y-%m-%d') BETWEEN EFFECTIVE_TIME_ and EXPIRY_TIME_`
-            curdPost('sql', sql).then((res) => {
-                if (res.state === 200) {
-                    const datas = res.variables.data
-                    callback(datas)
-                }
-            })
-        },
+        // getDaiLi (val1, val2, createTime, callback) {
+        //     const sql = `select DATE_FORMAT(EXPIRY_TIME_,'%Y-%m-%d') AS EXPIRY_TIME_, DATE_FORMAT(EFFECTIVE_TIME_,'%Y-%m-%d') AS EFFECTIVE_TIME_ from ibps_bpm_agent where DELEGATOR_ID_ = '${val1}' and AGENTER_ID_ = '${val2}' and DATE_FORMAT('${createTime}','%Y-%m-%d') BETWEEN EFFECTIVE_TIME_ and EXPIRY_TIME_`
+        //     this.$common.request('sql', sql).then((res) => {
+        //         if (res.state === 200) {
+        //             const datas = res.variables.data
+        //             callback(datas)
+        //         }
+        //     })
+        // },
         /**
          * 获取格式化参数
          */

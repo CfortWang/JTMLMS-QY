@@ -1,2 +1,2 @@
-import page from './board/checkBoard.vue'
+import page from './board/equipmentBoard.vue'
 export default page

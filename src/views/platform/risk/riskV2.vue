@@ -389,8 +389,11 @@ export default {
     watch: {
         'infoFxssbData.yi_ju_wen_jian_id': {
             handler (val) {
-                const sql = `select * from yijuwenjianxuanze where id_ in ('${val.replace(/,/g, "','")}') order by id_`
-                this.$common.request('sql', sql).then(response => {
+                // const sql = `select * from yijuwenjianxuanze where find_in_set(id_, '${val}') order by id_`
+                this.$common.request('query', {
+                    key: 'getRiskFileInfo',
+                    params: [val]
+                }).then(response => {
                     const conts = response.variables.data
                     let fileName = ''
                     let num = 1
@@ -445,8 +448,11 @@ export default {
     methods: {
         // 获取最新数据
         async getNewData () {
-            const sql = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getFxpgjlb2ById',
+                params: [this.params.id_]
+            })
             return data
         },
         // 判断是否已完成
@@ -481,8 +487,11 @@ export default {
                     await this.goSave()
                     // 判断每个评估人是否已完成识别项
                     const pinGuRenNum = this.Ids.length
-                    const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
-                    const { variables: { data }} = await this.$common.request('sql', sql)
+                    // const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
+                    const { variables: { data }} = await this.$common.request('query', {
+                        key: 'getFxsbpgb2ByPid',
+                        params: [this.params.id_]
+                    })
                     const submitNum = new Set(data.map(item => item.bian_zhi_ren_)).size
                     if (submitNum === pinGuRenNum && data.every(item => item.shi_fou_guo_shen_ === '已完成')) {
                         // 1.修改状态为已完成
@@ -663,8 +672,11 @@ export default {
         },
         // 推送消息给评估人
         async goSendMsg () {
-            const sql2 = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
-            const { variables: { data: data2 }} = await this.$common.request('sql', sql2)
+            // const sql2 = `select * from t_fxpgjlb2 where id_='${this.params.id_}'`
+            const { variables: { data: data2 }} = await this.$common.request('query', {
+                key: 'getFxpgjlb2ById',
+                params: [this.params.id_]
+            })
             if (data2.length > 0 && data2[0].shi_fou_guo_shen_ === '已完成') {
                 return this.$message('已结束，不可推送消息！')
             }
@@ -790,8 +802,12 @@ export default {
                 console.log(addedIds, updatedIds, deletedIds)
                 // 删除
                 if (deletedIds.length > 0) {
-                    const sql3 = `select *from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_ in (${deletedIds.map(id => `'${id}'`).join(', ')})`
-                    const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
+                    const ids = deletedIds.map(id => id).join(',')
+                    // const sql3 = `select *from t_fxsbpgb2 where parent_id_='${this.params.id_}' and find_in_set(bian_zhi_ren_, '${ids}')`
+                    const { variables: { data: data3 }} = await this.$common.request('query', {
+                        key: 'getFxsbpgb2ByUid',
+                        params: [this.params.id_, ids]
+                    })
                     // console.log(data3)
                     if (data3.length > 0) {
                         const params = {
@@ -862,8 +878,11 @@ export default {
         async showAlert () {
             if (!this.isPingGuRen || this.isFinished) return
             // 判断是否已经填写风险识别项
-            const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and bian_zhi_ren_='${this.userId}'`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}' and find_in_set(bian_zhi_ren_, '${this.userId}')`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getFxsbpgb2ByUid',
+                params: [this.params.id_, this.userId]
+            })
             let status = '填写'
             let type = 'warning'
             if (data.length > 0) {

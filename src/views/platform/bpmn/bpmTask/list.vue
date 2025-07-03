@@ -63,7 +63,6 @@
 import { queryPageList, remove, batchSuspendProcess, batchRecoverProcess, assignee } from '@/api/platform/bpmn/bpmTask'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 // import getFormDataFlag from '@/api/platform/form/common.js'
 import request from '@/utils/request'
 import { BUSINESS_BASE_URL } from '@/api/baseUrl'
@@ -312,7 +311,6 @@ export default {
         handleRemove (ids) {
             remove({ levelIds: ids }).then(response => {
                 ActionUtils.removeSuccessMessage()
-                this.$refs.crud.clearSelection()
                 this.search()
             }).catch(() => {})
         },
@@ -403,22 +401,6 @@ export default {
                     this.search()
                 }
             })
-
-            // let sql = "select ID_,HOT_READ_ from ibps_bpm_tasks where TASK_ID_='"+id+"'"
-            // curdPost('sql',sql).then(response => {
-            //     if( response.variables.data.length>0){
-            //         if( response.variables.data[0].HOT_READ_=='1'){
-            //             this_.editId = id
-            //             this_.bpmnFormrenderDialogVisible = true
-            //         } else {
-            //             ActionUtils.success('任务生成中、请稍后重试...!')
-            //             this_.search()
-            //         }
-            //     } else {
-            //         ActionUtils.success('任务状态已过期、请刷新页面...!')
-            //         this_.search()
-            //     }
-            // })
         },
         handleLinkClick (data, columns) {
             this.flowName = data.name

@@ -252,8 +252,11 @@ export default {
         handleUpemployee (type, ids) {
             const tableName = 'ibps_party_employee'
             // 更新ibps_party_employee里job_信息
-            const sql = `select ID_,JOB_ from ${tableName} where find_in_set(id_,'${ids}')`
-            this.$common.request('sql', sql).then((res) => {
+            // const sql = `select ID_,JOB_ from ${tableName} where find_in_set(id_,'${ids}')`
+            this.$common.request('query', {
+                key: 'getPartyEmployeeByUids',
+                params: [ids]
+            }).then((res) => {
                 const resDatas = res.variables.data
                 const updListDatas = []
                 for (const i of resDatas) {

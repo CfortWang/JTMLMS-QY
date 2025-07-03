@@ -1,6 +1,6 @@
 <template>
     <el-dialog
-        :visible.sync="visivle"
+        :visible.sync="dialogVisible"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="true"
@@ -85,18 +85,18 @@ export default {
         'ibps-attachment': IbpsAttachment
     },
     props: {
-        visidial: {
+        visible: {
             type: Boolean,
             default: false
         },
-        sonData: {
+        fileData: {
             type: Object,
             default: () => {}
         }
     },
     data () {
         return {
-            visivle: this.visidial,
+            dialogVisible: this.visible,
             toolbars: [
                 {
                     key: 'confirm'
@@ -111,11 +111,11 @@ export default {
                 wen_jian_fu_jian_: [{ required: true, message: this.$t('validate.required') }]
             },
             dialogForm: {
-                yuan_wen_jian_id_: this.sonData.row.id,
-                wen_jian_lei_xing: this.sonData.row.wen_jian_xi_lei_,
-                wen_jian_bian_hao: this.sonData.row.wen_jian_bian_hao,
-                yuan_wen_jian_min: this.sonData.row.wen_jian_ming_che,
-                ji_lu_id_: this.sonData.row.id,
+                yuan_wen_jian_id_: this.fileData.id,
+                wen_jian_lei_xing: this.fileData.wen_jian_xi_lei_,
+                wen_jian_bian_hao: this.fileData.wen_jian_bian_hao,
+                yuan_wen_jian_min: this.fileData.wen_jian_ming_che,
+                ji_lu_id_: this.fileData.id,
                 xin_wen_jian_ming: '',
                 fa_bu_shi_jian_: '',
                 sheng_xiao_shi_: '',
@@ -126,15 +126,15 @@ export default {
         }
     },
     watch: {
-        visidial (val) {
-            this.visivle = val
+        visible (val) {
+            this.dialogVisible = val
         },
-        sonData (val) {
-            this.dialogForm.wen_jian_lei_xing = val.row.wen_jian_xi_lei_
-            this.dialogForm.wen_jian_bian_hao = val.row.wen_jian_bian_hao
-            this.dialogForm.yuan_wen_jian_min = val.row.wen_jian_ming_che
-            this.dialogForm.yuan_wen_jian_id_ = val.row.id
-            this.dialogForm.ji_lu_id_ = val.row.id
+        fileData (val) {
+            this.dialogForm.wen_jian_lei_xing = val.wen_jian_xi_lei_
+            this.dialogForm.wen_jian_bian_hao = val.wen_jian_bian_hao
+            this.dialogForm.yuan_wen_jian_min = val.wen_jian_ming_che
+            this.dialogForm.yuan_wen_jian_id_ = val.id
+            this.dialogForm.ji_lu_id_ = val.id
         }
     },
     methods: {
@@ -151,7 +151,7 @@ export default {
             }
         },
         closeDialog () {
-            this.$emit('getcolse')
+            this.$emit('close')
         },
         dialogVisibleClick (dialogForm) {
             this.$refs[dialogForm]?.validate((valid) => {

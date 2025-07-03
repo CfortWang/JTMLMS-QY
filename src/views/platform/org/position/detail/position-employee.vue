@@ -260,8 +260,11 @@ export default {
         // 获取组织的数据
         getOrg () {
             return new Promise((resolve, reject) => {
-                const sql = `select a.ID_ as ID_, a.NAME_ as NAME_, b.path_ as PATH_ FROM ibps_party_position a, ibps_party_entity b where a.id_ = b.id_`
-                this.$common.request('sql', sql).then((res) => {
+                // const sql = `select a.ID_ as ID_, a.NAME_ as NAME_, b.path_ as PATH_ FROM ibps_party_position a, ibps_party_entity b where a.id_ = b.id_`
+                this.$common.request('query', {
+                    key: 'getPartyPosition',
+                    params: [null]
+                }).then((res) => {
                     const datas = res.variables.data
                     datas.forEach((item, index) => {
                         this.$set(item, 'value', item.ID_)
@@ -278,8 +281,11 @@ export default {
         handleUpemployee (type, ids) {
             const tableName = 'ibps_party_employee'
             // 更新ibps_party_employee里job_信息
-            const sql = `select ID_, POSITIONS_ from ${tableName} where find_in_set(id_,'${ids}')`
-            this.$common.request('sql', sql).then((res) => {
+            // const sql = `select ID_, POSITIONS_ from ibps_party_employee where find_in_set(id_,'${ids}')`
+            this.$common.request('query', {
+                key: 'getPartyEmployeeByUids',
+                params: [ids]
+            }).then((res) => {
                 const resDatas = res.variables.data
                 const updListDatas = []
                 for (const i of resDatas) {

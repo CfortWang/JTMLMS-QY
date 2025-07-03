@@ -237,7 +237,7 @@
                         {{ btn.label }}
                     </el-button>
                 </div>
-               
+
             <el-table
                 ref="ruleTable"
                 :data="formData.scheduleRule"
@@ -311,8 +311,9 @@ export default {
         }
     },
     data () {
-        const { isSuper, userList = [], deptList = [] } = this.$store.getters || {}
+        const { isSuper, userList = [], deptList = [], setting } = this.$store.getters || {}
         return {
+            config: setting?.postJob?.allocation || false,
             isSuper,
             userList,
             deptList,
@@ -398,8 +399,12 @@ export default {
         },
         getPositionLis () {
             const { first, second } = this.$store.getters.level || {}
-            const sql = `select suo_shu_bu_men_ as dept, wei_hu_gang_wei_ as positionName, id_ as positionId from t_sbwhgwpzb where di_dian_ = '${second || first}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select suo_shu_bu_men_ as dept, wei_hu_gang_wei_ as positionName, id_ as positionId from t_sbwhgwpzb where di_dian_ = '${second || first}'`
+            // const sql = `select bian_zhi_bu_men_ as dept, gang_wei_ming_che as positionName, id_ as positionId from t_dyzzb where gang_wei_lei_xing = '日常维护' and di_dian_ = '${second || first}'`
+            this.$common.request('query', {
+                key: this.config ? 'gwzzzha' : 'getPositionList',
+                params: [second || first]
+            }).then(res => {
                 this.positionList = res.variables.data || []
             })
         },

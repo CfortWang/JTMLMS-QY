@@ -366,7 +366,6 @@ export default {
         handleRemove (ids) {
             remove({ dataTemplateIds: ids }).then(response => {
                 ActionUtils.removeSuccessMessage()
-                this.$refs.crud.clearSelection()
                 this.search()
             }).catch(() => {})
         },

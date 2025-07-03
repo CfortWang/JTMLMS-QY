@@ -160,8 +160,14 @@ export default {
             if (this.categoryKey === 'FILE_TYPE') {
                 params.diDian = second || first
             }
-            const sql = `select id_ as id, id_ as templateId, bian_zhi_bu_men_ as submitDept, bu_men_fen_zu_ as deptGroup, bian_zhi_ren_ as submitBy, bian_zhi_shi_jian as submitTime, biao_dan_ming_che as name, biao_dan_mo_ban_ as templateFile, di_dian_ as location, gui_dang_lu_jing_ as parentId, cun_fang_lu_jing_ as filePath, liu_cheng_shu_ju_ as configData, bei_zhu_ as remark, wen_jian_xin_xi_ as fileOption from t_bdmbpzb where di_dian_ = '${second || first}' and (shi_fou_guo_shen_ != '已废除' or shi_fou_guo_shen_ is null)`
-            Promise.all([findTreeData(params), this.$common.request('sql', sql)]).then(([res1, res2]) => {
+            // const sql = `select id_ as id, id_ as templateId, bian_zhi_bu_men_ as submitDept, bu_men_fen_zu_ as deptGroup, bian_zhi_ren_ as submitBy, bian_zhi_shi_jian as submitTime, biao_dan_ming_che as name, biao_dan_mo_ban_ as templateFile, di_dian_ as location, gui_dang_lu_jing_ as parentId, cun_fang_lu_jing_ as filePath, liu_cheng_shu_ju_ as configData, bei_zhu_ as remark, wen_jian_xin_xi_ as fileOption from t_bdmbpzb where di_dian_ = '${second || first}' and (shi_fou_guo_shen_ != '已废除' or shi_fou_guo_shen_ is null)`
+            Promise.all([
+                findTreeData(params),
+                this.$common.request('query', {
+                    key: 'getFormTemplateConfig',
+                    params: [second || first]
+                })
+            ]).then(([res1, res2]) => {
                 this.treeData = res1.data || []
                 const templateData = res2.variables.data || []
                 if (this.hasPermission) {

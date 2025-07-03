@@ -515,8 +515,11 @@ export default {
             if (this.$utils.isEmpty(this.id)) {
                 return
             }
-            const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, biao_qian_, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_,nan_du_,da_an_jie_xi_ from t_questions where id_ = '${this.id}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select id_, chu_ti_ren_, bu_men_, chu_ti_shi_jian_, ti_gan_, ti_xing_, xuan_xiang_lei_xi, biao_qian_, da_an_, zheng_que_da_an_, ping_fen_fang_shi, ping_fen_ren_, fen_zhi_, zhuang_tai_, xuan_xiang_shu_, fu_tu_, bei_zhu_,nan_du_,da_an_jie_xi_ from t_questions where id_ = '${this.id}'`
+            this.$common.request('query', {
+                key: 'getQuestionDetail',
+                params: [this.id]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     return this.$message.error('获取题目数据失败！')
@@ -717,8 +720,11 @@ export default {
             this.changeQuestionType(quesType)
         },
         updatePaper () {
-            const sql = `select fen_zhi_ from t_questions where parent_id_ = '${this.bankId}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select fen_zhi_ from t_questions where parent_id_ = '${this.bankId}'`
+            this.$common.request('query', {
+                key: 'getQuestionBankScore',
+                params: [this.bankId]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 const params = {
                     tableName: 't_question_bank',

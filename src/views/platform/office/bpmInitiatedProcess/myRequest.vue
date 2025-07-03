@@ -10,8 +10,6 @@
                 @expand-collapse="handleExpandCollapse"
             />
         </div>
-        <!-- :row-handle="listConfig.rowHandle" -->
-        <!-- 隐藏操作列 -->
         <ibps-crud
             ref="crud"
             :height="height"
@@ -21,6 +19,7 @@
             :search-form="listConfig.searchForm"
             :pk-key="pkKey"
             :columns="listConfig.columns"
+            :row-handle="isSuper ? listConfig.rowHandle : false"
             :pagination="pagination"
             :loading="loading"
             :selection-row="false"
@@ -131,7 +130,9 @@ import CommonData from '../mixin/utils'
 export default {
     mixins: [FixHeight, CommonData],
     data () {
+        const { isSuper } = this.$store.getters || {}
         return {
+            isSuper,
             title: '我的发起',
             statusOptions: [],
             copyFlow: false,
@@ -172,8 +173,8 @@ export default {
                     actions: [
                         {
                             key: 'copy',
-                            label: '编制查看',
-                            icon: 'el-icon-setting'
+                            label: '再次发起',
+                            icon: 'el-icon-document-add'
                         }
                     ]
                 }

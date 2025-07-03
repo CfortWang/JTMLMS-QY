@@ -276,8 +276,11 @@ import { Message } from 'element-ui'
 export const getSetting = async (module = '', key = '') => {
     try {
         const org = store.getters.level.first || ''
-        const sql = `select setting from t_ipcc where org_ = '${org}' limit 1`
-        const { variables: { data = [] } = {}} = await request('sql', sql)
+        // const sql = `select setting from t_ipcc where org_ = '${org}' limit 1`
+        const { variables: { data = [] } = {}} = await request('query', {
+            key: 'getGlobalSetting',
+            params: [org]
+        })
 
         // 如果数据为空或 setting 字段不存在，直接返回空对象
         if (data.length === 0 || !data[0]?.setting) {

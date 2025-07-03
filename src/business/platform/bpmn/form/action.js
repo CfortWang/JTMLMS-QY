@@ -674,9 +674,12 @@ export default {
             if (!code) {
                 return
             }
-            const sql = `select * from t_lcidglbdbb where tablekey_ = '${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process' and (liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst where id_ = '${instId}' limit 1) or liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst_his where id_ = '${instId}' limit 1))`
+            // const sql = `select * from t_lcidglbdbb where tablekey_ = '${code}' and ti_jiao_kuai_zhao = '是' and gui_dang_lei_xing = 'process' and (liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst where id_ = '${instId}' limit 1) or liu_cheng_xuan_ze = (select PROC_DEF_KEY_ from ibps_bpm_inst_his where id_ = '${instId}' limit 1))`
             const { first = '' } = this.$store.getters.level
-            this.$common.request('sql', sql).then(async res => {
+            this.$common.request('query', {
+                key: 'getReportByInstId',
+                params: [code, instId, instId]
+            }).then(async res => {
                 const { data = [] } = res.variables || {}
                 // 轮询流程是否结束，流程未结束不生成快照，每2秒查询一次，最多等待10秒钟
                 let timeout = 10000
@@ -727,8 +730,11 @@ export default {
         },
         // 判断流程是否结束
         async isFinish (id) {
-            const sql = `select * from ibps_bpm_inst_his where id_ = '${id}'`
-            const res = await this.$common.request('sql', sql)
+            // const sql = `select * from ibps_bpm_inst_his where id_ = '${id}'`
+            const res = await this.$common.request('query', {
+                key: 'getBpmInstHis',
+                params: [id]
+            })
             const { data = [] } = res.variables || {}
             return data.length > 0
         },

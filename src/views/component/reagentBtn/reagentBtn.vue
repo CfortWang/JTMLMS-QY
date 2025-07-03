@@ -99,8 +99,11 @@ export default {
     },
     methods: {
         getPositionData () {
-            const sql = `select cang_ku_ming_chen AS positionName,qu_yu_ming_cheng_ AS quYu,id_ from t_ckglpzb`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select cang_ku_ming_chen AS positionName,qu_yu_ming_cheng_ AS quYu,id_ from t_ckglpzb`
+            this.$common.request('query', {
+                key: 'getStockConfig2',
+                params: [null]
+            }).then(res => {
                 const resData = res?.variables?.data || []
                 this.positionData = resData
             })
@@ -113,8 +116,11 @@ export default {
             }
         },
         async setTotal () {
-            const sql = `select * from v_inventory where batch_num='${this.formData.piHao}' and bian_ma ='${this.formData.bianMa}'`
-            await this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from v_inventory where batch_num='${this.formData.piHao}' and bian_ma ='${this.formData.bianMa}'`
+            await this.$common.request('query', {
+                key: 'getReagentStockByNo2',
+                params: [this.formData.piHao, this.formData.bianMa]
+            }).then(res => {
                 const resData = res.variables.data
                 if (resData?.length > 0) {
                     this.$emit('change-data', 'kuCunLiang', resData[0].total)
@@ -148,8 +154,11 @@ export default {
             }
         },
         onChange () {
-            const sql = `select position,quantity,enable_,withhold,min_stock,id_ from t_Reagent_Inventory  where batch_num='${this.formData.piHao}' and reagent_code='${this.formData.bianMa}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select position ,quantity, enable_, withhold, min_stock, id_ from t_Reagent_Inventory  where batch_num='${this.formData.piHao}' and reagent_code='${this.formData.bianMa}'`
+            this.$common.request('query', {
+                key: 'getReagentStockByNo1',
+                params: [this.formData.piHao, this.formData.bianMa]
+            }).then(res => {
                 const resData = res.variables.data
                 if (resData?.length > 0) {
                     resData.forEach(item => {

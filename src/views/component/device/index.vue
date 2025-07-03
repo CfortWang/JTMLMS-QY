@@ -54,7 +54,7 @@
                         <ibps-custom-dialog
                             v-model="row.weiHuFangShi"
                             size="mini"
-                            template-key="sbbqdhk"
+                            :template-key="config?'gwzzdhkrcwh':'sbbqdhk'"
                             multiple
                             :disabled="true"
                             type="dialog"
@@ -330,7 +330,7 @@
                         <ibps-custom-dialog
                             v-model="search.deviceClass"
                             size="mini"
-                            template-key="sbbqdhk"
+                            :template-key="config?'gwzzdhkrcwh':'sbbqdhk'"
                             multiple
                             :disabled="false"
                             type="dialog"
@@ -426,8 +426,10 @@ export default {
     },
     mixins: [FixHeight],
     data () {
-        const { userId, level = {}, position } = this.$store.getters || {}
+        const { userId, level = {}, position, setting } = this.$store.getters || {}
+
         return {
+            config: setting?.postJob?.allocation || false,
             filter: [{
                 descVal: '1',
                 includeSub: true,
@@ -519,7 +521,7 @@ export default {
                     { key: 'customPrint', label: '打印标签', icon: 'ibps-icon-cog', type: 'warning' },
                     { key: 'customExport', label: '导出数据', icon: 'ibps-icon-sign-in', type: 'primary' },
                     { key: 'customImport', label: '导入数据', icon: 'ibps-icon-sign-in', type: 'primary' },
-                    { key: 'customSetting', label: '岗位/分组配置', icon: 'ibps-icon-cogs', type: 'info' },
+                    // { key: 'customSetting', label: '岗位/分组配置', icon: 'ibps-icon-cogs', type: 'info' },
                     { key: 'customRemove', label: '删除', icon: 'ibps-icon-close', type: 'danger', hidden: () => { return !this.hasRole } }
                 ],
                 // 查询条件
@@ -1073,10 +1075,17 @@ export default {
             }
         },
         async switchExportData (data) {
-            const deviceGroupSql = `select id_,wei_hu_gang_wei_ from t_sbwhgwpzb` // 岗位/分组信息
-            const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb` // 供应商信息
-            const { variables: { data: deviceGroupData }} = await this.$common.request('sql', deviceGroupSql)
-            const { variables: { data: gysData }} = await this.$common.request('sql', supplierSql)
+            // const deviceGroupSql = `select id_, wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ = '${second || first}'` // 岗位/分组信息
+            // const supplierSql = `select id_, gong_ying_shang_m from t_gysxxb where di_dian_ = '${second || first}'` // 供应商信息
+            const { first, second } = this.$store.getters.level || {}
+            const { variables: { data: deviceGroupData }} = await this.$common.request('query', {
+                key: this.config ? 'gwzzzha' : 'getPositionList',
+                params: [second || first]
+            })
+            const { variables: { data: gysData }} = await this.$common.request('query', {
+                key: 'getSupplierList',
+                params: [second || first]
+            })
             const exportData = JSON.parse(JSON.stringify(data))
             for (let i = 0; i < exportData.length; i++) {
                 const item = exportData[i]
@@ -1098,7 +1107,7 @@ export default {
         switchDeviceIdToName (val, deviceGroupList) {
             const result = []
             const valList = val?.split(',') || []
-            valList.forEach(item => result.push((deviceGroupList?.find(i => i.id_ === item)?.wei_hu_gang_wei_) || ''))
+            valList.forEach(item => result.push((deviceGroupList?.find(i => i.positionId === item)?.positionName) || ''))
             return result.join(',')
         },
         // 供应商id 转 供应商名称 检定/校准单位
@@ -1141,8 +1150,11 @@ export default {
             let exportData = []
             console.log('导出维护项目')
             if (selection.length > 0) {
-                const sql = `select b.yuan_she_bei_bian as yuanSheBeiBian,b.she_bei_ming_cheng_ as sheBeiMingCheng,a.parent_id_,a.wei_hu_xiang_mu_c as weiHuXiangMuC,a.wei_hu_ri_qi_ as weiHuRiQi,a.wei_hu_lei_xing_ as weiHuLeiXing,a.ri_qi_shu_zi_ as riQiShuZi from t_whzqjxm a,t_sbdj b where a.parent_id_=b.id_ and a.parent_id_ in (${selection.map(i => `'${i}'`).join(',')})`
-                const { variables: { data }} = await this.$common.request('sql', sql)
+                // const sql = `select b.yuan_she_bei_bian as yuanSheBeiBian,b.she_bei_ming_cheng_ as sheBeiMingCheng,a.parent_id_,a.wei_hu_xiang_mu_c as weiHuXiangMuC,a.wei_hu_ri_qi_ as weiHuRiQi,a.wei_hu_lei_xing_ as weiHuLeiXing,a.ri_qi_shu_zi_ as riQiShuZi from t_whzqjxm a,t_sbdj b where a.parent_id_=b.id_ and find_in_set(a.parent_id_, '${selection.join(',')}')`
+                const { variables: { data }} = await this.$common.request('query', {
+                    key: 'getDeviceProject',
+                    params: [selection.join(',')]
+                })
                 exportData = data
                 this.xlsx(exportData, this.projectColums, '设备维护项目数据' + this.getTimeStamp())
             } else {
@@ -1367,8 +1379,11 @@ export default {
      */
         async filterOriginalDeviceNo (list, currentPosition) {
             const uniqueArr = Array.from(new Set(list.map(i => i.yuanSheBeiBian.trim())))
-            const sql = `select id_,yuan_she_bei_bian from t_sbdj where find_in_set(yuan_she_bei_bian,'${uniqueArr.join(',')}')and di_dian_ = '${currentPosition}'`
-            const res = await this.$common.request('sql', sql)
+            // const sql = `select id_,yuan_she_bei_bian from t_sbdj where find_in_set(yuan_she_bei_bian,'${uniqueArr.join(',')}')and di_dian_ = '${currentPosition}'`
+            const res = await this.$common.request('query', {
+                key: 'getExistDeviceWithImport',
+                params: [uniqueArr.join(','), currentPosition]
+            })
             const { data = [] } = res.variables || {}
             const originalDeviceNoList = data.map(i => i.yuan_she_bei_bian.trim())
             // 给要更新的数据加上id (接口需要!!!)
@@ -1507,7 +1522,7 @@ export default {
                 const result = []
                 const { weiHuFangShi } = element
                 const valList = weiHuFangShi.trim()?.split(',')
-                valList.forEach(item => result.push((deviceGroupList?.find(i => i.wei_hu_gang_wei_ === item)?.id_) || ''))
+                valList.forEach(item => result.push((deviceGroupList?.find(i => i.positionName === item)?.positionId) || ''))
                 element.weiHuFangShi = result.join(',')
             })
         },
@@ -1543,9 +1558,9 @@ export default {
             }
             const currentPosition = this.level
             const { userList = [], deptList = [] } = this.$store.getters || {}
-            const positionSql = `select id_,fang_jian_ming_ha from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息
-            const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb where di_dian_ = ${currentPosition}` // 供应商信息
-            const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 岗位/分组信息
+            // const positionSql = `select id_,fang_jian_ming_ha from t_jjqfjb where di_dian_ = ${currentPosition}` // 房间信息
+            // const supplierSql = `select id_,gong_ying_shang_m from t_gysxxb where di_dian_ = ${currentPosition}` // 供应商信息
+            // const deviceGroupSql = `select id_,suo_shu_bu_men_,wei_hu_gang_wei_ from t_sbwhgwpzb where di_dian_ =  ${currentPosition}` // 岗位/分组信息
             const currentTime = dayjs().format('YYYY-MM-DD HH:mm')
             const currentApartment = this.$store.getters.userInfo.employee.positions.split(',').at(-1) || ''
             const currentUser = this.userId
@@ -1556,7 +1571,10 @@ export default {
             importData = this.formatDateFieldsToReal(importData)
             console.log('%c partOne doCheck is completed! %c the result is %c', 'background:#35495E; padding: 1px; border-radius: 3px 0 0 3px; color: #fff;', 'background:#FF5733; padding: 1px; border-radius: 0 3px 3px 0; color: #fff;', 'background:transparent', importData)
             this.loading = true
-            Promise.all([this.$common.request('sql', positionSql), this.$common.request('sql', supplierSql), this.$common.request('sql', deviceGroupSql)]).then(async ([res1, res2, res3]) => {
+            Promise.all([
+                this.$common.request('query', { key: 'getRoomData', params: [currentPosition] }),
+                this.$common.request('query', { key: 'getSupplierList', params: [currentPosition] }),
+                this.$common.request('query', { key: this.config ? 'gwzzzha' : 'getPositionList', params: [currentPosition] })]).then(async ([res1, res2, res3]) => {
                 const { data: positionList = [] } = res1.variables || {}
                 const { data: supplierList = [] } = res2.variables || {}
                 const { data: deviceGroupList = [] } = res3.variables || {}
@@ -1709,8 +1727,11 @@ export default {
             // 2、根据原设备编号去重，检验原设备编号是否在数据库中存在，如有不存在的数据，不进行导入，并提示用户
             const uniqueArr = Array.from(new Set(importData.map(i => i.yuanSheBeiBian.trim())))
             /* 3、根据去重的设备编号去查对应的设备ID，然后拼接data数据，赋值设备ID*/
-            const sql = `select id_,yuan_she_bei_bian from t_sbdj where find_in_set(yuan_she_bei_bian,'${uniqueArr.join(',')}')and di_dian_ = ${currentPosition}`
-            this.$common.request('sql', sql).then(async res => {
+            // const sql = `select id_,yuan_she_bei_bian from t_sbdj where find_in_set(yuan_she_bei_bian,'${uniqueArr.join(',')}')and di_dian_ = ${currentPosition}`
+            this.$common.request('query', {
+                key: 'getExistDeviceWithImport',
+                params: [uniqueArr.join(','), currentPosition]
+            }).then(async res => {
                 const deviceNoWithIdlist = res.variables.data
                 console.log(deviceNoWithIdlist, ' <=> ', uniqueArr)
                 const deviceNoSet = new Set(deviceNoWithIdlist.map(i => i.yuan_she_bei_bian))

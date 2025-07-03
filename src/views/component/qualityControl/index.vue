@@ -210,8 +210,11 @@ export default {
             return result
         },
         async switchXmToId (list) {
-            const sql = `select id_,jian_yan_xiang_mu from t_nlfwb`
-            const { variables: { data = {}} = {}} = await this.$common.request('sql', sql)
+            // const sql = `select id_, jian_yan_xiang_mu from t_nlfwb`
+            const { variables: { data = {}} = {}} = await this.$common.request('query', {
+                key: 'getNlfwbProject',
+                params: [null]
+            })
             for (let i = 0; i < list.length; i++) {
                 const row = list[i]
                 const t = data.find(item => item.jian_yan_xiang_mu.trim() === row.xiangMu.trim())

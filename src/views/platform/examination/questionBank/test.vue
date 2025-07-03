@@ -360,9 +360,12 @@ export default {
         },
         getQuestionData () {
             this.loading = true
-            const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey,nan_du_ as questionLevel,da_an_jie_xi_ as resolution from t_questions where parent_id_ = '${this.bankId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
+            // const sql = `select id_ as questionId, ti_gan_ as stem, ti_xing_ as questionType, fu_tu_ as img, xuan_xiang_lei_xi as optionType, da_an_ as options, xuan_xiang_shu_ as optionsLength, fen_zhi_ as score, ping_fen_fang_shi as rateType, ping_fen_ren_ as rater, zheng_que_da_an_ as rightKey,nan_du_ as questionLevel,da_an_jie_xi_ as resolution from t_questions where parent_id_ = '${this.bankId}' and zhuang_tai_ = '启用' order by field(ti_xing_, '单选题', '多选题', '判断题', '填空题', '简答题')`
             return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then(res => {
+                this.$common.request('query', {
+                    key: 'getBankQuestion',
+                    params: [this.bankId]
+                }).then(res => {
                     let { data = [] } = res.variables || {}
                     if (!data.length) {
                         this.$message.error('获取题目信息失败！')

@@ -339,9 +339,12 @@ export default {
         }
     },
     created () {
-        const sql1 = 'select a.id_ as id_, a.name_ as name_, b.path_ as path_ from ibps_party_position a, ibps_party_entity b where a.id_ = b.id_ order by depth_ asc, sn_ asc'
-        const sql2 = 'select id_, name_ from ibps_party_role order by role_note_ asc'
-        Promise.all([this.getData(sql1, 'positionsList', 4), this.getData(sql2, 'roleList', 3)]).then(() => {
+        // const sql1 = 'select a.id_ as id_, a.name_ as name_, b.path_ as path_ from ibps_party_position a, ibps_party_entity b where a.id_ = b.id_ order by depth_ asc, sn_ asc'
+        // const sql2 = 'select id_, name_ from ibps_party_role order by role_note_ asc'
+        Promise.all([
+            this.getData('getPartyPosition', 'positionsList', 4),
+            this.getData('getPartyRole', 'roleList', 3)
+        ]).then(() => {
             this.loadData()
             this.loadDisplayField()
         })
@@ -599,9 +602,12 @@ export default {
             })
         },
         // 获取组织/角色数据
-        getData (sql, type, index) {
+        getData (key, type, index) {
             return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then(res => {
+                this.$common.request('query', {
+                    key,
+                    params: [null]
+                }).then(res => {
                     const { data = [] } = res.variables || {}
                     if (!data.length) {
                         ActionUtils.errorMessage('获取数据失败！')

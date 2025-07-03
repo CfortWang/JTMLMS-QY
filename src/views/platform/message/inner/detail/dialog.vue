@@ -150,11 +150,17 @@ export default {
                 if (!position) {
                     return this.$message.warning('系统所登录的账户并没有所属部门，请先在系统设置完再进行确认！')
                 }
-                // 判断签字图文是否存在
-                const sql1 = `select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '${userId}'`
-                // 判断是否已经点击过确认
-                const sql2 = `select id_ FROM ibps_msg_read WHERE msg_id_ = '${this.id}' and receiver_id_='${userId}'`
-                Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then((res) => {
+                // // 判断签字图文是否存在
+                // const sql1 = `select qian_zi_tu_wen_ FROM t_ryjbqk WHERE parent_id_ = '${userId}'`
+                // // 判断是否已经点击过确认
+                // const sql2 = `select id_ FROM ibps_msg_read WHERE msg_id_ = '${this.id}' and receiver_id_='${userId}'`
+                Promise.all([this.$common.request('query', {
+                    key: 'getSigImgByUid',
+                    params: [userId]
+                }), this.$common.request('query', {
+                    key: 'getMsgReadStatusByUid',
+                    params: [this.id, userId]
+                })]).then((res) => {
                     const ryjbqkDatas = res[0].variables.data
                     const cont2 = res[1].variables.data
                     if (!ryjbqkDatas.length) {

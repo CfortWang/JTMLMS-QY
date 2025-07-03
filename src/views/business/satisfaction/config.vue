@@ -112,8 +112,11 @@ export default {
     methods: {
         initData () {
             const { first, second } = this.$store.getters.level || {}
-            const sql = `select id_ as configId, pei_zhi_xiang_ as configData,lie_biao_shu_ju_ as jsonData from t_mydpz where di_dian_ = '${second || first}' order by create_time_ desc`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select id_ as configId, pei_zhi_xiang_ as configData,lie_biao_shu_ju_ as jsonData from t_mydpz where di_dian_ = '${second || first}' order by create_time_ desc`
+            this.$common.request('query', {
+                key: 'getSatisfactionConfig',
+                params: [second || first]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     this.jsonData = this.userTypes.map(item => {

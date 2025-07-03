@@ -1,102 +1,218 @@
-import en from "@/locales/bpmn-js/en"
-
 /* 统计的合格率配置信息，  如公正性，  一年需要完成4次， 当前完成2次的话，则为50%完成率。 */
-export const getConfig = (begin,end)=>{
-  return "select * FROM t_glps"
-
+export const getConfig = (begin, end) => {
+    return {
+        key: 'sysOpDataStats1',
+        params: [null]
+    }
+    // return 'select * FROM t_glps'
 }
-export const getJiaoYanObj = (end,info)=>{
-  return "select COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'"+info+"') and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' union all select COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'"+info+"') and t_mjsbjdxzjh.shi_fou_guo_shen_ = '已完成' and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' "
+export const getJiaoYanObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats2',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'" + info + "') and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' union all select COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'" + info + "') and t_mjsbjdxzjh.shi_fou_guo_shen_ = '已完成' and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' "
 }
-export const getJiaoYanObjFB = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from(select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_mjsbjdxzjh.bian_zhi_bu_men_,COUNT(t_mjsbjdxzjhzb.id_) as numA from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'"+info+"') and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsbjdxzjh.bian_zhi_bu_men_) a LEFT JOIN (select t_mjsbjdxzjh.bian_zhi_bu_men_,COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'"+info+"') and t_mjsbjdxzjh.shi_fou_guo_shen_ = '已完成' and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsbjdxzjh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+export const getJiaoYanObjFB = (end, info) => {
+    return {
+        key: 'sysOpDataStats3',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from(select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_mjsbjdxzjh.bian_zhi_bu_men_,COUNT(t_mjsbjdxzjhzb.id_) as numA from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'" + info + "') and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsbjdxzjh.bian_zhi_bu_men_) a LEFT JOIN (select t_mjsbjdxzjh.bian_zhi_bu_men_,COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'" + info + "') and t_mjsbjdxzjh.shi_fou_guo_shen_ = '已完成' and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsbjdxzjh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
-export const getJiaoYanMGObj = (end,info)=>{
-  return "select a.mz,IFNULL(a.num,0) as num ,IFNULL(b.num,0) as wnum from (select t_mjsbjdxzjhzb.bian_hao_zhong_we,concat(t_mjsbjdxzjhzb.bian_hao_zhong_we,t_mjsbjdxzjhzb.she_bei_ming_chen) as mz,COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'"+info+"') and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsbjdxzjhzb.bian_hao_zhong_we) as a LEFT JOIN (select t_mjsbjdxzjhzb.bian_hao_zhong_we, COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'"+info+"') and t_mjsbjdxzjh.shi_fou_guo_shen_ = '已完成' and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsbjdxzjhzb.bian_hao_zhong_we) as b on a.bian_hao_zhong_we=b.bian_hao_zhong_we"
+export const getJiaoYanMGObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats4',
+        params: [info, end[0], end[1]]
+    }
+    // return "select a.mz,IFNULL(a.num,0) as num ,IFNULL(b.num,0) as wnum from (select t_mjsbjdxzjhzb.bian_hao_zhong_we,concat(t_mjsbjdxzjhzb.bian_hao_zhong_we,t_mjsbjdxzjhzb.she_bei_ming_chen) as mz,COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'" + info + "') and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsbjdxzjhzb.bian_hao_zhong_we) as a LEFT JOIN (select t_mjsbjdxzjhzb.bian_hao_zhong_we, COUNT(t_mjsbjdxzjhzb.id_) as num from t_mjsbjdxzjhzb JOIN t_mjsbjdxzjh on t_mjsbjdxzjhzb.parent_id_ = t_mjsbjdxzjh.id_ where FIND_IN_SET(t_mjsbjdxzjh.bian_zhi_bu_men_,'" + info + "') and t_mjsbjdxzjh.shi_fou_guo_shen_ = '已完成' and t_mjsbjdxzjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsbjdxzjhzb.bian_hao_zhong_we) as b on a.bian_hao_zhong_we=b.bian_hao_zhong_we"
 }
-export const gethechaObj = (end,info)=>{
-  return "select COUNT(t_mjsbwhbyjlby.id_) as num from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION All select COUNT(t_mjsbwhbyjlby.id_) as num from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsbwhbyjlby.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'"
+export const gethechaObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats5',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_mjsbwhbyjlby.id_) as num from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION All select COUNT(t_mjsbwhbyjlby.id_) as num from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsbwhbyjlby.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'"
 }
-export const gethechaObjFB = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_mjsbwhjhb.bian_zhi_bu_men_,COUNT(t_mjsbwhbyjlby.id_) as numA from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsbwhjhb.bian_zhi_bu_men_) a LEFT JOIN (select t_mjsbwhjhb.bian_zhi_bu_men_,COUNT(t_mjsbwhbyjlby.id_) as num from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsbwhbyjlby.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsbwhjhb.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+export const gethechaObjFB = (end, info) => {
+    return {
+        key: 'sysOpDataStats6',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_mjsbwhjhb.bian_zhi_bu_men_,COUNT(t_mjsbwhbyjlby.id_) as numA from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsbwhjhb.bian_zhi_bu_men_) a LEFT JOIN (select t_mjsbwhjhb.bian_zhi_bu_men_,COUNT(t_mjsbwhbyjlby.id_) as num from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsbwhbyjlby.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsbwhjhb.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
-export const gethechaMGObj = (end,info)=>{
-  return "select a.mz,IFNULL(a.num,0) as num,IFNULL(b.wnum,0) as wnum from (select t_mjsbwhjhzb.bian_hao_zhong_we,concat(t_mjsbwhjhzb.bian_hao_zhong_we,t_mjsbwhjhzb.she_bei_ming_chen) as mz,COUNT(t_mjsbwhjhzb.id_) as num from t_mjsbwhjhzb JOIN t_mjsbwhjhb on t_mjsbwhjhzb.parent_id_ = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsbwhjhzb.bian_hao_zhong_we) as a LEFT JOIN (select t_mjsbwhbyjlby.ri_qi_,COUNT(t_mjsbwhbyjlby.id_) as wnum from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsbwhbyjlby.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'GROUP BY t_mjsbwhbyjlby.ri_qi_) as b on a.bian_hao_zhong_we= b.ri_qi_"
+export const gethechaMGObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats7',
+        params: [info, end[0], end[1]]
+    }
+    // return "select a.mz,IFNULL(a.num,0) as num,IFNULL(b.wnum,0) as wnum from (select t_mjsbwhjhzb.bian_hao_zhong_we,concat(t_mjsbwhjhzb.bian_hao_zhong_we,t_mjsbwhjhzb.she_bei_ming_chen) as mz,COUNT(t_mjsbwhjhzb.id_) as num from t_mjsbwhjhzb JOIN t_mjsbwhjhb on t_mjsbwhjhzb.parent_id_ = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsbwhjhzb.bian_hao_zhong_we) as a LEFT JOIN (select t_mjsbwhbyjlby.ri_qi_,COUNT(t_mjsbwhbyjlby.id_) as wnum from t_mjsbwhbyjlby JOIN t_mjsbwhjhb on t_mjsbwhbyjlby.ji_hua_zong_wai_j = t_mjsbwhjhb.id_ where FIND_IN_SET(t_mjsbwhjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsbwhbyjlby.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.shi_fou_guo_shen_ = '已完成' and t_mjsbwhjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'GROUP BY t_mjsbwhbyjlby.ri_qi_) as b on a.bian_hao_zhong_we= b.ri_qi_"
 }
 // export const getnengliObj = (end)=>{
 //   return "select COUNT(t_ndnlyzsysjbdjhzb.id_) as num from t_ndnlyzsysjbdjhzb LEFT JOIN t_nlyzsysjbdhdsyxhcb on t_ndnlyzsysjbdjhzb.id_=t_nlyzsysjbdhdsyxhcb.xiang_mu_ming_che WHERE t_nlyzsysjbdhdsyxhcb.shi_fou_guo_shen_ = '1' and  YEAR(t_ndnlyzsysjbdjhzb.create_time_)= "+end+" UNION all select COUNT(id_) as snum from t_ndnlyzsysjbdjhzb where  YEAR(create_time_)="+end
 // }
-export const getyangPinCaiJiObj = (end,info)=>{
-  return "select t_zlzbpjzb.*,ROUND(IF(FIND_IN_SET( '项', t_zlzbpjzb.zhi_biao_xian_zhi ) > 0 	AND FIND_IN_SET( '次', t_zlzbpjzb.zhi_biao_xian_zhi ) > 0,SUM( t_zlzbpjzb.shi_ji_shu_zhi_ ),AVG( t_zlzbpjzb.shi_ji_shu_zhi_ )),2) AS location,t_zlzbpjb.bian_zhi_bu_men_ AS bzbm,DATE_FORMAT( t_zlzbpjb.bian_zhi_shi_jian, '%Y-%m' ) AS bzsj FROM	t_zlzbpjzb	LEFT JOIN t_zlzbpjb ON t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ WHERE	FIND_IN_SET( t_zlzbpjb.bian_zhi_bu_men_, '"+info+"' ) 	AND t_zlzbpjb.shi_fou_guo_shen_ = '已完成' 	AND t_zlzbpjb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' 	AND '"+end[1]+"' GROUP BY	t_zlzbpjb.bian_zhi_bu_men_,	t_zlzbpjzb.zhi_liang_mu_biao ORDER BY	t_zlzbpjb.bian_zhi_bu_men_,	t_zlzbpjzb.zhi_liang_mu_biao"
+export const getyangPinCaiJiObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats8',
+        params: [info, end[0], end[1]]
+    }
+    // return "select t_zlzbpjzb.*,ROUND(IF(FIND_IN_SET( '项', t_zlzbpjzb.zhi_biao_xian_zhi ) > 0 	AND FIND_IN_SET( '次', t_zlzbpjzb.zhi_biao_xian_zhi ) > 0,SUM( t_zlzbpjzb.shi_ji_shu_zhi_ ),AVG( t_zlzbpjzb.shi_ji_shu_zhi_ )),2) AS location,t_zlzbpjb.bian_zhi_bu_men_ AS bzbm,DATE_FORMAT( t_zlzbpjb.bian_zhi_shi_jian, '%Y-%m' ) AS bzsj FROM	t_zlzbpjzb	LEFT JOIN t_zlzbpjb ON t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ WHERE	FIND_IN_SET( t_zlzbpjb.bian_zhi_bu_men_, '" + info + "' ) 	AND t_zlzbpjb.shi_fou_guo_shen_ = '已完成' 	AND t_zlzbpjb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' 	AND '" + end[1] + "' GROUP BY	t_zlzbpjb.bian_zhi_bu_men_,	t_zlzbpjzb.zhi_liang_mu_biao ORDER BY	t_zlzbpjb.bian_zhi_bu_men_,	t_zlzbpjzb.zhi_liang_mu_biao"
 }
-export const getzongZLMBObj = (end,info)=>{
-  return "select t_zlzbpjzb.*,IF(FIND_IN_SET('项', t_zlzbpjzb.zhi_biao_xian_zhi) > 0 AND FIND_IN_SET('次', t_zlzbpjzb.zhi_biao_xian_zhi) > 0,  SUM(t_zlzbpjzb.shi_ji_shu_zhi_),AVG(t_zlzbpjzb.shi_ji_shu_zhi_)) AS location,t_zlzbpjb.bian_zhi_bu_men_ as bzbm,DATE_FORMAT(t_zlzbpjb.bian_zhi_shi_jian, '%Y-%m')as bzsj from t_zlzbpjzb LEFT JOIN t_zlzbpjb on t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ where FIND_IN_SET(t_zlzbpjb.bian_zhi_bu_men_,'"+info+"') and t_zlzbpjb.shi_fou_guo_shen_ = '已完成' and t_zlzbpjb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_zlzbpjzb.zhi_liang_mu_biao"
+export const getzongZLMBObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats9',
+        params: [info, end[0], end[1]]
+    }
+    // return "select t_zlzbpjzb.*,IF(FIND_IN_SET('项', t_zlzbpjzb.zhi_biao_xian_zhi) > 0 AND FIND_IN_SET('次', t_zlzbpjzb.zhi_biao_xian_zhi) > 0,  SUM(t_zlzbpjzb.shi_ji_shu_zhi_),AVG(t_zlzbpjzb.shi_ji_shu_zhi_)) AS location,t_zlzbpjb.bian_zhi_bu_men_ as bzbm,DATE_FORMAT(t_zlzbpjb.bian_zhi_shi_jian, '%Y-%m')as bzsj from t_zlzbpjzb LEFT JOIN t_zlzbpjb on t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ where FIND_IN_SET(t_zlzbpjb.bian_zhi_bu_men_,'" + info + "') and t_zlzbpjb.shi_fou_guo_shen_ = '已完成' and t_zlzbpjb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_zlzbpjzb.zhi_liang_mu_biao"
 }
-export const getzhiliangmubiaotitleObj = (end,info)=>{
-  return "select distinct t_zlzbpjzb.zhi_liang_mu_biao,t_zlzbpjzb.zhi_biao_xian_zhi from t_zlzbpjzb LEFT JOIN t_zlzbpjb on t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ where FIND_IN_SET(t_zlzbpjb.bian_zhi_bu_men_,'"+info+"') and t_zlzbpjb.shi_fou_guo_shen_ = '已完成' and t_zlzbpjb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_zlzbpjb.bian_zhi_bu_men_,t_zlzbpjzb.zhi_liang_mu_biao ORDER BY t_zlzbpjzb.zhi_liang_mu_biao"
+export const getzhiliangmubiaotitleObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats10',
+        params: [info, end[0], end[1]]
+    }
+    // return "select distinct t_zlzbpjzb.zhi_liang_mu_biao,t_zlzbpjzb.zhi_biao_xian_zhi from t_zlzbpjzb LEFT JOIN t_zlzbpjb on t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ where FIND_IN_SET(t_zlzbpjb.bian_zhi_bu_men_,'" + info + "') and t_zlzbpjb.shi_fou_guo_shen_ = '已完成' and t_zlzbpjb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_zlzbpjb.bian_zhi_bu_men_,t_zlzbpjzb.zhi_liang_mu_biao ORDER BY t_zlzbpjzb.zhi_liang_mu_biao"
 }
-export const getzhiliangzhibiaotitleObj = (end,info)=>{
-  return "select distinct t_zlzbpjzb.zhi_liang_zhi_bia,t_zlzbpjzb.zhi_biao_xian_zhi,CONCAT(t_zlzbpjzb.zhi_liang_zhi_bia,t_zlzbpjzb.zhi_biao_xian_zhi,'') as allt from t_zlzbpjzb LEFT JOIN t_zlzbpjb on t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ where FIND_IN_SET(t_zlzbpjb.bian_zhi_bu_men_,'"+info+"') and t_zlzbpjb.shi_fou_guo_shen_ = '已完成' and t_zlzbpjb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_zlzbpjb.bian_zhi_bu_men_,t_zlzbpjzb.zhi_liang_zhi_bia ORDER BY t_zlzbpjzb.zhi_liang_zhi_bia"
+export const getzhiliangzhibiaotitleObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats11',
+        params: [info, end[0], end[1]]
+    }
+    // return "select distinct t_zlzbpjzb.zhi_liang_zhi_bia,t_zlzbpjzb.zhi_biao_xian_zhi,CONCAT(t_zlzbpjzb.zhi_liang_zhi_bia,t_zlzbpjzb.zhi_biao_xian_zhi,'') as allt from t_zlzbpjzb LEFT JOIN t_zlzbpjb on t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ where FIND_IN_SET(t_zlzbpjb.bian_zhi_bu_men_,'" + info + "') and t_zlzbpjb.shi_fou_guo_shen_ = '已完成' and t_zlzbpjb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_zlzbpjb.bian_zhi_bu_men_,t_zlzbpjzb.zhi_liang_zhi_bia ORDER BY t_zlzbpjzb.zhi_liang_zhi_bia"
 }
-export const getfenzuZLZBObj = (end,info)=>{
-  return "select t_zlzbpjzb.*,ROUND(IF(FIND_IN_SET('项', t_zlzbpjzb.zhi_biao_xian_zhi) > 0 AND FIND_IN_SET('次', t_zlzbpjzb.zhi_biao_xian_zhi) > 0,  SUM(t_zlzbpjzb.shi_ji_shu_zhi_),AVG(t_zlzbpjzb.shi_ji_shu_zhi_)),2) AS location,t_zlzbpjb.bian_zhi_bu_men_ as bzbm,DATE_FORMAT(t_zlzbpjb.bian_zhi_shi_jian, '%Y-%m')as bzsj from t_zlzbpjzb LEFT JOIN t_zlzbpjb on t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ where FIND_IN_SET(t_zlzbpjb.bian_zhi_bu_men_,'"+info+"') and t_zlzbpjb.shi_fou_guo_shen_ = '已完成' and t_zlzbpjb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY bzsj,bzbm, t_zlzbpjzb.zhi_liang_zhi_bia ORDER BY t_zlzbpjzb.zhi_liang_zhi_bia"
+export const getfenzuZLZBObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats12',
+        params: [info, end[0], end[1]]
+    }
+    // return "select t_zlzbpjzb.*,ROUND(IF(FIND_IN_SET('项', t_zlzbpjzb.zhi_biao_xian_zhi) > 0 AND FIND_IN_SET('次', t_zlzbpjzb.zhi_biao_xian_zhi) > 0,  SUM(t_zlzbpjzb.shi_ji_shu_zhi_),AVG(t_zlzbpjzb.shi_ji_shu_zhi_)),2) AS location,t_zlzbpjb.bian_zhi_bu_men_ as bzbm,DATE_FORMAT(t_zlzbpjb.bian_zhi_shi_jian, '%Y-%m')as bzsj from t_zlzbpjzb LEFT JOIN t_zlzbpjb on t_zlzbpjzb.parent_id_ = t_zlzbpjb.id_ where FIND_IN_SET(t_zlzbpjb.bian_zhi_bu_men_,'" + info + "') and t_zlzbpjb.shi_fou_guo_shen_ = '已完成' and t_zlzbpjb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY bzsj,bzbm, t_zlzbpjzb.zhi_liang_zhi_bia ORDER BY t_zlzbpjzb.zhi_liang_zhi_bia"
 }
 
+export const getzaigangrenyuanObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats13',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_ndrypxjhzb.id_) as num from t_ndrypxjhzb JOIN t_lhndrypxjh on t_ndrypxjhzb.parent_id_ = t_lhndrypxjh.id_ where FIND_IN_SET(t_lhndrypxjh.bian_zhi_bu_men_,'" + info + "') and t_lhndrypxjh.shi_fou_guo_shen_ = '已完成' and t_lhndrypxjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION ALL select COUNT(t_rypxcjb.id_) as num from t_rypxcjb JOIN t_lhndrypxjh on t_rypxcjb.ji_hua_zong_wai_j = t_lhndrypxjh.id_ where FIND_IN_SET(t_lhndrypxjh.bian_zhi_bu_men_,'" + info + "') and t_rypxcjb.shi_fou_guo_shen_ = '已结束' and t_lhndrypxjh.shi_fou_guo_shen_ = '已完成' and t_lhndrypxjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'"
+}
+export const getzaigangrenyuanFBObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats14',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.num as numA,IFNULL(b.num,0) as num  from (select t_lhndrypxjh.bian_zhi_bu_men_,COUNT(t_ndrypxjhzb.id_) as num from t_ndrypxjhzb JOIN t_lhndrypxjh on t_ndrypxjhzb.parent_id_ = t_lhndrypxjh.id_ where FIND_IN_SET(t_lhndrypxjh.bian_zhi_bu_men_,'" + info + "') and t_lhndrypxjh.shi_fou_guo_shen_ = '已完成' and t_lhndrypxjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'  GROUP BY t_lhndrypxjh.bian_zhi_bu_men_) a LEFT JOIN (select t_lhndrypxjh.bian_zhi_bu_men_, COUNT(t_rypxcjb.id_) as num from t_rypxcjb JOIN t_lhndrypxjh on t_rypxcjb.ji_hua_zong_wai_j = t_lhndrypxjh.id_ where FIND_IN_SET(t_lhndrypxjh.bian_zhi_bu_men_,'" + info + "') and t_rypxcjb.shi_fou_guo_shen_ = '已结束' and t_lhndrypxjh.shi_fou_guo_shen_ = '已完成' and t_lhndrypxjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_lhndrypxjh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_ = b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+}
+export const getgangqianpeixunObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats15',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_lhgqpxjhzb.id_) as num from t_lhgqpxjhzb JOIN t_lhgqpxjh on t_lhgqpxjhzb.parent_id_ = t_lhgqpxjh.id_ where FIND_IN_SET(t_lhgqpxjh.bian_zhi_bu_men_,'" + info + "') and t_lhgqpxjh.shi_fou_guo_shen_ = '已完成' and t_lhgqpxjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION ALL select COUNT(t_rypxcjb.id_) as num from t_rypxcjb JOIN t_lhgqpxjh on t_rypxcjb.ji_hua_zong_wai_j = t_lhgqpxjh.id_ where FIND_IN_SET(t_lhgqpxjh.bian_zhi_bu_men_,'" + info + "') and t_rypxcjb.shi_fou_guo_shen_ = '已结束' and t_lhgqpxjh.shi_fou_guo_shen_ = '已完成' and t_lhgqpxjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'"
+}
+export const getgangqianpeixunFBObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats16',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_lhgqpxjh.bian_zhi_bu_men_,COUNT(t_lhgqpxjhzb.id_) as numA from t_lhgqpxjhzb JOIN t_lhgqpxjh on t_lhgqpxjhzb.parent_id_ = t_lhgqpxjh.id_ where FIND_IN_SET(t_lhgqpxjh.bian_zhi_bu_men_,'" + info + "') and t_lhgqpxjh.shi_fou_guo_shen_ = '已完成' and t_lhgqpxjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'  GROUP BY t_lhgqpxjh.bian_zhi_bu_men_) a LEFT JOIN (select t_lhgqpxjh.bian_zhi_bu_men_,COUNT(t_rypxcjb.id_) as num from t_rypxcjb JOIN t_lhgqpxjh on t_rypxcjb.ji_hua_zong_wai_j = t_lhgqpxjh.id_ where FIND_IN_SET(t_lhgqpxjh.bian_zhi_bu_men_,'" + info + "') and t_rypxcjb.shi_fou_guo_shen_ = '已结束' and t_lhgqpxjh.shi_fou_guo_shen_ = '已完成' and t_lhgqpxjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'  GROUP BY t_lhgqpxjh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_ = b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+}
 
-export const getzaigangrenyuanObj = (end,info)=>{
-  return "select COUNT(t_ndrypxjhzb.id_) as num from t_ndrypxjhzb JOIN t_lhndrypxjh on t_ndrypxjhzb.parent_id_ = t_lhndrypxjh.id_ where FIND_IN_SET(t_lhndrypxjh.bian_zhi_bu_men_,'"+info+"') and t_lhndrypxjh.shi_fou_guo_shen_ = '已完成' and t_lhndrypxjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION ALL select COUNT(t_rypxcjb.id_) as num from t_rypxcjb JOIN t_lhndrypxjh on t_rypxcjb.ji_hua_zong_wai_j = t_lhndrypxjh.id_ where FIND_IN_SET(t_lhndrypxjh.bian_zhi_bu_men_,'"+info+"') and t_rypxcjb.shi_fou_guo_shen_ = '已结束' and t_lhndrypxjh.shi_fou_guo_shen_ = '已完成' and t_lhndrypxjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'"
+export const getwaibuObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats17',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_cjwbzlpjhdjhxqb.id_) as num from t_cjwbzlpjhdjhxqb JOIN t_cjwbzlpjhdjhb on t_cjwbzlpjhdjhxqb.parent_id_ = t_cjwbzlpjhdjhb.id_ where FIND_IN_SET(t_cjwbzlpjhdjhb.bu_men_,'" + info + "') and t_cjwbzlpjhdjhb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION All select COUNT(t_sjzpjgpjb.id_) as num from t_sjzpjgpjb JOIN t_cjwbzlpjhdjhb on t_sjzpjgpjb.shi_jian_zhi_ping = t_cjwbzlpjhdjhb.id_ where FIND_IN_SET(t_cjwbzlpjhdjhb.bu_men_,'" + info + "') and t_sjzpjgpjb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'"
 }
-export const getzaigangrenyuanFBObj = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.num as numA,IFNULL(b.num,0) as num  from (select t_lhndrypxjh.bian_zhi_bu_men_,COUNT(t_ndrypxjhzb.id_) as num from t_ndrypxjhzb JOIN t_lhndrypxjh on t_ndrypxjhzb.parent_id_ = t_lhndrypxjh.id_ where FIND_IN_SET(t_lhndrypxjh.bian_zhi_bu_men_,'"+info+"') and t_lhndrypxjh.shi_fou_guo_shen_ = '已完成' and t_lhndrypxjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'  GROUP BY t_lhndrypxjh.bian_zhi_bu_men_) a LEFT JOIN (select t_lhndrypxjh.bian_zhi_bu_men_, COUNT(t_rypxcjb.id_) as num from t_rypxcjb JOIN t_lhndrypxjh on t_rypxcjb.ji_hua_zong_wai_j = t_lhndrypxjh.id_ where FIND_IN_SET(t_lhndrypxjh.bian_zhi_bu_men_,'"+info+"') and t_rypxcjb.shi_fou_guo_shen_ = '已结束' and t_lhndrypxjh.shi_fou_guo_shen_ = '已完成' and t_lhndrypxjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_lhndrypxjh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_ = b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+export const getwaibuObjFB = (end, info) => {
+    return {
+        key: 'sysOpDataStats18',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from(select a.bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_cjwbzlpjhdjhb.bu_men_,COUNT(t_cjwbzlpjhdjhxqb.id_) as numA from t_cjwbzlpjhdjhxqb JOIN t_cjwbzlpjhdjhb on t_cjwbzlpjhdjhxqb.parent_id_ = t_cjwbzlpjhdjhb.id_ where FIND_IN_SET(t_cjwbzlpjhdjhb.bu_men_,'" + info + "') and t_cjwbzlpjhdjhb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_cjwbzlpjhdjhb.bu_men_) a LEFT JOIN (select t_cjwbzlpjhdjhb.bu_men_,COUNT(t_sjzpjgpjb.id_) as num from t_sjzpjgpjb JOIN t_cjwbzlpjhdjhb on t_sjzpjgpjb.shi_jian_zhi_ping = t_cjwbzlpjhdjhb.id_ where FIND_IN_SET(t_cjwbzlpjhdjhb.bu_men_,'" + info + "') and t_sjzpjgpjb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_cjwbzlpjhdjhb.bu_men_) b on a.bu_men_=b.bu_men_) c LEFT JOIN ibps_party_entity on c.bu_men_ = ibps_party_entity.id_"
 }
-export const getgangqianpeixunObj = (end,info)=>{
-  return "select COUNT(t_lhgqpxjhzb.id_) as num from t_lhgqpxjhzb JOIN t_lhgqpxjh on t_lhgqpxjhzb.parent_id_ = t_lhgqpxjh.id_ where FIND_IN_SET(t_lhgqpxjh.bian_zhi_bu_men_,'"+info+"') and t_lhgqpxjh.shi_fou_guo_shen_ = '已完成' and t_lhgqpxjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION ALL select COUNT(t_rypxcjb.id_) as num from t_rypxcjb JOIN t_lhgqpxjh on t_rypxcjb.ji_hua_zong_wai_j = t_lhgqpxjh.id_ where FIND_IN_SET(t_lhgqpxjh.bian_zhi_bu_men_,'"+info+"') and t_rypxcjb.shi_fou_guo_shen_ = '已结束' and t_lhgqpxjh.shi_fou_guo_shen_ = '已完成' and t_lhgqpxjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'"
+export const getneibuObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats19',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_nbbdsyjhzb.id_) as num from t_nbbdsyjhzb JOIN t_nbbdsyjh on t_nbbdsyjhzb.parent_id_ = t_nbbdsyjh.id_ where FIND_IN_SET(t_nbbdsyjh.bian_zhi_bu_men_,'" + info + "') and t_nbbdsyjh.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION All select COUNT(t_nbbdsy.id_) as num from t_nbbdsy JOIN t_nbbdsyjh on t_nbbdsy.ji_hua_id_ = t_nbbdsyjh.id_ where FIND_IN_SET(t_nbbdsyjh.bian_zhi_bu_men_,'" + info + "') and t_nbbdsy.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'"
 }
-export const getgangqianpeixunFBObj = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_lhgqpxjh.bian_zhi_bu_men_,COUNT(t_lhgqpxjhzb.id_) as numA from t_lhgqpxjhzb JOIN t_lhgqpxjh on t_lhgqpxjhzb.parent_id_ = t_lhgqpxjh.id_ where FIND_IN_SET(t_lhgqpxjh.bian_zhi_bu_men_,'"+info+"') and t_lhgqpxjh.shi_fou_guo_shen_ = '已完成' and t_lhgqpxjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'  GROUP BY t_lhgqpxjh.bian_zhi_bu_men_) a LEFT JOIN (select t_lhgqpxjh.bian_zhi_bu_men_,COUNT(t_rypxcjb.id_) as num from t_rypxcjb JOIN t_lhgqpxjh on t_rypxcjb.ji_hua_zong_wai_j = t_lhgqpxjh.id_ where FIND_IN_SET(t_lhgqpxjh.bian_zhi_bu_men_,'"+info+"') and t_rypxcjb.shi_fou_guo_shen_ = '已结束' and t_lhgqpxjh.shi_fou_guo_shen_ = '已完成' and t_lhgqpxjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'  GROUP BY t_lhgqpxjh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_ = b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+export const getneibuObjFB = (end, info) => {
+    return {
+        key: 'sysOpDataStats20',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from(select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_nbbdsyjh.bian_zhi_bu_men_,COUNT(t_nbbdsyjhzb.id_) as numA from t_nbbdsyjhzb JOIN t_nbbdsyjh on t_nbbdsyjhzb.parent_id_ = t_nbbdsyjh.id_ where FIND_IN_SET(t_nbbdsyjh.bian_zhi_bu_men_,'" + info + "') and t_nbbdsyjh.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_nbbdsyjh.bian_zhi_bu_men_) a LEFT JOIN (select t_nbbdsyjh.bian_zhi_bu_men_,COUNT(t_nbbdsy.id_) as num from t_nbbdsy JOIN t_nbbdsyjh on t_nbbdsy.ji_hua_id_ = t_nbbdsyjh.id_ where FIND_IN_SET(t_nbbdsyjh.bian_zhi_bu_men_,'" + info + "') and t_nbbdsy.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'  GROUP BY t_nbbdsyjh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
-
-export const getwaibuObj = (end,info)=>{
-  return "select COUNT(t_cjwbzlpjhdjhxqb.id_) as num from t_cjwbzlpjhdjhxqb JOIN t_cjwbzlpjhdjhb on t_cjwbzlpjhdjhxqb.parent_id_ = t_cjwbzlpjhdjhb.id_ where FIND_IN_SET(t_cjwbzlpjhdjhb.bu_men_,'"+info+"') and t_cjwbzlpjhdjhb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION All select COUNT(t_sjzpjgpjb.id_) as num from t_sjzpjgpjb JOIN t_cjwbzlpjhdjhb on t_sjzpjgpjb.shi_jian_zhi_ping = t_cjwbzlpjhdjhb.id_ where FIND_IN_SET(t_cjwbzlpjhdjhb.bu_men_,'"+info+"') and t_sjzpjgpjb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'"
+export const getyingjiObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats21',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_lisxttjyjyayljhzb.id_) as num from t_lisxttjyjyayljhzb JOIN t_lisxttjyjyayljh on t_lisxttjyjyayljhzb.parent_id_ = t_lisxttjyjyayljh.id_ where FIND_IN_SET(t_lisxttjyjyayljh.bian_zhi_bu_men_,'" + info + "') and t_lisxttjyjyayljh.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION ALL	select COUNT(t_lisxtgzyjylssjlb.id_) as num from t_lisxtgzyjylssjlb JOIN t_lisxttjyjyayljh on t_lisxtgzyjylssjlb.xuan_ze_ji_hua_= t_lisxttjyjyayljh.id_ where FIND_IN_SET(t_lisxttjyjyayljh.bian_zhi_bu_men_,'" + info + "') and t_lisxtgzyjylssjlb.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'"
 }
-export const getwaibuObjFB = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from(select a.bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_cjwbzlpjhdjhb.bu_men_,COUNT(t_cjwbzlpjhdjhxqb.id_) as numA from t_cjwbzlpjhdjhxqb JOIN t_cjwbzlpjhdjhb on t_cjwbzlpjhdjhxqb.parent_id_ = t_cjwbzlpjhdjhb.id_ where FIND_IN_SET(t_cjwbzlpjhdjhb.bu_men_,'"+info+"') and t_cjwbzlpjhdjhb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_cjwbzlpjhdjhb.bu_men_) a LEFT JOIN (select t_cjwbzlpjhdjhb.bu_men_,COUNT(t_sjzpjgpjb.id_) as num from t_sjzpjgpjb JOIN t_cjwbzlpjhdjhb on t_sjzpjgpjb.shi_jian_zhi_ping = t_cjwbzlpjhdjhb.id_ where FIND_IN_SET(t_cjwbzlpjhdjhb.bu_men_,'"+info+"') and t_sjzpjgpjb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.shi_fou_guo_shen_ = '已完成' and t_cjwbzlpjhdjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_cjwbzlpjhdjhb.bu_men_) b on a.bu_men_=b.bu_men_) c LEFT JOIN ibps_party_entity on c.bu_men_ = ibps_party_entity.id_"
+export const getyingjiObjFB = (end, info) => {
+    return {
+        key: 'sysOpDataStats22',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_lisxttjyjyayljh.bian_zhi_bu_men_,COUNT(t_lisxttjyjyayljhzb.id_) as numA from t_lisxttjyjyayljhzb JOIN t_lisxttjyjyayljh on t_lisxttjyjyayljhzb.parent_id_ = t_lisxttjyjyayljh.id_ where FIND_IN_SET(t_lisxttjyjyayljh.bian_zhi_bu_men_,'" + info + "') and t_lisxttjyjyayljh.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_lisxttjyjyayljh.bian_zhi_bu_men_) a LEFT JOIN	(select t_lisxttjyjyayljh.bian_zhi_bu_men_,COUNT(t_lisxtgzyjylssjlb.id_) as num from t_lisxtgzyjylssjlb JOIN t_lisxttjyjyayljh on t_lisxtgzyjylssjlb.xuan_ze_ji_hua_= t_lisxttjyjyayljh.id_ where FIND_IN_SET(t_lisxttjyjyayljh.bian_zhi_bu_men_,'" + info + "') and t_lisxtgzyjylssjlb.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_lisxttjyjyayljh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
-export const getneibuObj = (end,info)=>{
-  return "select COUNT(t_nbbdsyjhzb.id_) as num from t_nbbdsyjhzb JOIN t_nbbdsyjh on t_nbbdsyjhzb.parent_id_ = t_nbbdsyjh.id_ where FIND_IN_SET(t_nbbdsyjh.bian_zhi_bu_men_,'"+info+"') and t_nbbdsyjh.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION All select COUNT(t_nbbdsy.id_) as num from t_nbbdsy JOIN t_nbbdsyjh on t_nbbdsy.ji_hua_id_ = t_nbbdsyjh.id_ where FIND_IN_SET(t_nbbdsyjh.bian_zhi_bu_men_,'"+info+"') and t_nbbdsy.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'"
+export const getfengxianObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats23',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_mjsyshdfxsbykzjhxb.id_) as num from t_mjsyshdfxsbykzjhxb JOIN t_mjsyshdfxsbykzjhb on t_mjsyshdfxsbykzjhxb.parent_id_ = t_mjsyshdfxsbykzjhb.id_ where FIND_IN_SET(t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsyshdfxsbykzjhb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION ALL select COUNT(t_mjsyshdfxkzypjjlb.id_) as num from t_mjsyshdfxkzypjjlb JOIN t_mjsyshdfxsbykzjhb on t_mjsyshdfxkzypjjlb.ji_hua_zong_wai_j = t_mjsyshdfxsbykzjhb.id_ where FIND_IN_SET(t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsyshdfxkzypjjlb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'"
 }
-export const getneibuObjFB = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from(select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_nbbdsyjh.bian_zhi_bu_men_,COUNT(t_nbbdsyjhzb.id_) as numA from t_nbbdsyjhzb JOIN t_nbbdsyjh on t_nbbdsyjhzb.parent_id_ = t_nbbdsyjh.id_ where FIND_IN_SET(t_nbbdsyjh.bian_zhi_bu_men_,'"+info+"') and t_nbbdsyjh.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_nbbdsyjh.bian_zhi_bu_men_) a LEFT JOIN (select t_nbbdsyjh.bian_zhi_bu_men_,COUNT(t_nbbdsy.id_) as num from t_nbbdsy JOIN t_nbbdsyjh on t_nbbdsy.ji_hua_id_ = t_nbbdsyjh.id_ where FIND_IN_SET(t_nbbdsyjh.bian_zhi_bu_men_,'"+info+"') and t_nbbdsy.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.shi_fou_guo_shen_ = '已完成' and t_nbbdsyjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'  GROUP BY t_nbbdsyjh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+export const getfengxianObjFB = (end, info) => {
+    return {
+        key: 'sysOpDataStats24',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,COUNT(t_mjsyshdfxsbykzjhxb.id_) as numA from t_mjsyshdfxsbykzjhxb JOIN t_mjsyshdfxsbykzjhb on t_mjsyshdfxsbykzjhxb.parent_id_ = t_mjsyshdfxsbykzjhb.id_ where FIND_IN_SET(t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsyshdfxsbykzjhb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_) a LEFT JOIN	(select t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,COUNT(t_mjsyshdfxkzypjjlb.id_) as num from t_mjsyshdfxkzypjjlb JOIN t_mjsyshdfxsbykzjhb on t_mjsyshdfxkzypjjlb.ji_hua_zong_wai_j = t_mjsyshdfxsbykzjhb.id_ where FIND_IN_SET(t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,'" + info + "') and t_mjsyshdfxkzypjjlb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
-export const getyingjiObj = (end,info)=>{
-  return "select COUNT(t_lisxttjyjyayljhzb.id_) as num from t_lisxttjyjyayljhzb JOIN t_lisxttjyjyayljh on t_lisxttjyjyayljhzb.parent_id_ = t_lisxttjyjyayljh.id_ where FIND_IN_SET(t_lisxttjyjyayljh.bian_zhi_bu_men_,'"+info+"') and t_lisxttjyjyayljh.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION ALL	select COUNT(t_lisxtgzyjylssjlb.id_) as num from t_lisxtgzyjylssjlb JOIN t_lisxttjyjyayljh on t_lisxtgzyjylssjlb.xuan_ze_ji_hua_= t_lisxttjyjyayljh.id_ where FIND_IN_SET(t_lisxttjyjyayljh.bian_zhi_bu_men_,'"+info+"') and t_lisxtgzyjylssjlb.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'"
+export const getneishenObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats25',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_nsjh.id_) as num from t_nsjh where FIND_IN_SET(t_nsjh.bian_zhi_bu_men_,'" + info + "') and t_nsjh.shi_fou_guo_shen_ = '已完成' and t_nsjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION ALL select COUNT(t_nbshbgb.id_) as num from t_nbshbgb JOIN (select t_nbss.id_,t_nbss.shi_fou_guo_shen_ from t_nsjh join t_nbss on t_nbss.ji_hua_zong_wai_j = t_nsjh.id_ where FIND_IN_SET(t_nsjh.bian_zhi_bu_men_,'" + info + "') and t_nsjh.shi_fou_guo_shen_ = '已完成' and t_nsjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' ) as a on t_nbshbgb.ji_hua_zong_wai_j = a.id_ where t_nbshbgb.shi_fou_guo_shen_ = '已完成' and a.shi_fou_guo_shen_ = '已完成' "
 }
-export const getyingjiObjFB = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_lisxttjyjyayljh.bian_zhi_bu_men_,COUNT(t_lisxttjyjyayljhzb.id_) as numA from t_lisxttjyjyayljhzb JOIN t_lisxttjyjyayljh on t_lisxttjyjyayljhzb.parent_id_ = t_lisxttjyjyayljh.id_ where FIND_IN_SET(t_lisxttjyjyayljh.bian_zhi_bu_men_,'"+info+"') and t_lisxttjyjyayljh.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_lisxttjyjyayljh.bian_zhi_bu_men_) a LEFT JOIN	(select t_lisxttjyjyayljh.bian_zhi_bu_men_,COUNT(t_lisxtgzyjylssjlb.id_) as num from t_lisxtgzyjylssjlb JOIN t_lisxttjyjyayljh on t_lisxtgzyjylssjlb.xuan_ze_ji_hua_= t_lisxttjyjyayljh.id_ where FIND_IN_SET(t_lisxttjyjyayljh.bian_zhi_bu_men_,'"+info+"') and t_lisxtgzyjylssjlb.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.shi_fou_guo_shen_ = '已完成' and t_lisxttjyjyayljh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_lisxttjyjyayljh.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+export const getneishenObjFB = (end, info) => {
+    return {
+        key: 'sysOpDataStats26',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select d.bian_zhi_bu_men_,d.numA as numA,IFNULL(b.num,0) as num from (select t_nsjh.bian_zhi_bu_men_,COUNT(t_nsjh.id_) as numA from t_nsjh where FIND_IN_SET(t_nsjh.bian_zhi_bu_men_,'" + info + "') and t_nsjh.shi_fou_guo_shen_ = '已完成' and t_nsjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_nsjh.bian_zhi_bu_men_) d LEFT JOIN (select a.bian_zhi_bu_men_,COUNT(t_nbshbgb.id_) as num from t_nbshbgb JOIN (select t_nbss.id_,t_nbss.shi_fou_guo_shen_,t_nsjh.bian_zhi_bu_men_ from t_nsjh join t_nbss on t_nbss.ji_hua_zong_wai_j = t_nsjh.id_ where FIND_IN_SET(t_nsjh.bian_zhi_bu_men_,'" + info + "') and t_nsjh.shi_fou_guo_shen_ = '已完成' and t_nsjh.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' ) as a on t_nbshbgb.ji_hua_zong_wai_j = a.id_ where t_nbshbgb.shi_fou_guo_shen_ = '已完成' and a.shi_fou_guo_shen_ = '已完成' GROUP BY a.bian_zhi_bu_men_) b on d.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
-export const getfengxianObj = (end,info)=>{
-  return "select COUNT(t_mjsyshdfxsbykzjhxb.id_) as num from t_mjsyshdfxsbykzjhxb JOIN t_mjsyshdfxsbykzjhb on t_mjsyshdfxsbykzjhxb.parent_id_ = t_mjsyshdfxsbykzjhb.id_ where FIND_IN_SET(t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsyshdfxsbykzjhb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION ALL select COUNT(t_mjsyshdfxkzypjjlb.id_) as num from t_mjsyshdfxkzypjjlb JOIN t_mjsyshdfxsbykzjhb on t_mjsyshdfxkzypjjlb.ji_hua_zong_wai_j = t_mjsyshdfxsbykzjhb.id_ where FIND_IN_SET(t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsyshdfxkzypjjlb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'"
+export const getguanshenObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats27',
+        params: [info, end[0], end[1]]
+    }
+    // return "select COUNT(t_gglpsjhx.id_) as num from t_gglpsjhx where FIND_IN_SET(t_gglpsjhx.bian_zhi_bu_men_,'" + info + "') and t_gglpsjhx.shi_fou_guo_shen_ = '已完成' and t_gglpsjhx.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' UNION ALL select COUNT(t_gsbgb.id_) as num from t_gsbgb JOIN t_gglpsjhx on t_gsbgb.zong_wai_jian_ = t_gglpsjhx.id_ where t_gsbgb.shi_fou_guo_shen_ = '已完成' and t_gglpsjhx.shi_fou_guo_shen_ = '已完成' and FIND_IN_SET(t_gglpsjhx.bian_zhi_bu_men_,'" + info + "')  and t_gglpsjhx.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "'"
 }
-export const getfengxianObjFB = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,COUNT(t_mjsyshdfxsbykzjhxb.id_) as numA from t_mjsyshdfxsbykzjhxb JOIN t_mjsyshdfxsbykzjhb on t_mjsyshdfxsbykzjhxb.parent_id_ = t_mjsyshdfxsbykzjhb.id_ where FIND_IN_SET(t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsyshdfxsbykzjhb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_) a LEFT JOIN	(select t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,COUNT(t_mjsyshdfxkzypjjlb.id_) as num from t_mjsyshdfxkzypjjlb JOIN t_mjsyshdfxsbykzjhb on t_mjsyshdfxkzypjjlb.ji_hua_zong_wai_j = t_mjsyshdfxsbykzjhb.id_ where FIND_IN_SET(t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_,'"+info+"') and t_mjsyshdfxkzypjjlb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.shi_fou_guo_shen_ = '已完成' and t_mjsyshdfxsbykzjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_mjsyshdfxsbykzjhb.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+export const getguanshenObjFB = (end, info) => {
+    return {
+        key: 'sysOpDataStats28',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_gglpsjhx.bian_zhi_bu_men_,COUNT(t_gglpsjhx.id_) as numA from t_gglpsjhx where FIND_IN_SET(t_gglpsjhx.bian_zhi_bu_men_,'" + info + "') and t_gglpsjhx.shi_fou_guo_shen_ = '已完成' and t_gglpsjhx.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_gglpsjhx.bian_zhi_bu_men_) a LEFT JOIN (select t_gglpsjhx.bian_zhi_bu_men_,COUNT(t_gsbgb.id_) as num from t_gsbgb JOIN t_gglpsjhx on t_gsbgb.zong_wai_jian_ = t_gglpsjhx.id_ where t_gsbgb.shi_fou_guo_shen_ = '已完成' and t_gglpsjhx.shi_fou_guo_shen_ = '已完成' and FIND_IN_SET(t_gglpsjhx.bian_zhi_bu_men_,'" + info + "')  and t_gglpsjhx.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_gglpsjhx.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
-export const getneishenObj = (end,info)=>{
-  return "select COUNT(t_nsjh.id_) as num from t_nsjh where FIND_IN_SET(t_nsjh.bian_zhi_bu_men_,'"+info+"') and t_nsjh.shi_fou_guo_shen_ = '已完成' and t_nsjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION ALL select COUNT(t_nbshbgb.id_) as num from t_nbshbgb JOIN (select t_nbss.id_,t_nbss.shi_fou_guo_shen_ from t_nsjh join t_nbss on t_nbss.ji_hua_zong_wai_j = t_nsjh.id_ where FIND_IN_SET(t_nsjh.bian_zhi_bu_men_,'"+info+"') and t_nsjh.shi_fou_guo_shen_ = '已完成' and t_nsjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' ) as a on t_nbshbgb.ji_hua_zong_wai_j = a.id_ where t_nbshbgb.shi_fou_guo_shen_ = '已完成' and a.shi_fou_guo_shen_ = '已完成' "
+export const getbufuheObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats29',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,IFNULL(a.num,0) as num,IFNULL(b.numA,0) as numA from (select t_bfhhjzcsjlb.bian_zhi_bu_men_,COUNT(t_bfhhjzcsjlb.id_) as num from t_bfhhjzcsjlb where FIND_IN_SET(t_bfhhjzcsjlb.bian_zhi_bu_men_,'" + info + "') and t_bfhhjzcsjlb.shi_fou_guo_shen_ = '已完成' and t_bfhhjzcsjlb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_bfhhjzcsjlb.bian_zhi_bu_men_) as a LEFT JOIN (select t_bfhhjzcsjlb.bian_zhi_bu_men_,COUNT(t_bfhhjzcsjlb.id_) as numA from t_bfhhjzcsjlb where FIND_IN_SET(t_bfhhjzcsjlb.bian_zhi_bu_men_,'" + info + "') and t_bfhhjzcsjlb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_bfhhjzcsjlb.bian_zhi_bu_men_) as b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
-export const getneishenObjFB = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select d.bian_zhi_bu_men_,d.numA as numA,IFNULL(b.num,0) as num from (select t_nsjh.bian_zhi_bu_men_,COUNT(t_nsjh.id_) as numA from t_nsjh where FIND_IN_SET(t_nsjh.bian_zhi_bu_men_,'"+info+"') and t_nsjh.shi_fou_guo_shen_ = '已完成' and t_nsjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_nsjh.bian_zhi_bu_men_) d LEFT JOIN (select a.bian_zhi_bu_men_,COUNT(t_nbshbgb.id_) as num from t_nbshbgb JOIN (select t_nbss.id_,t_nbss.shi_fou_guo_shen_,t_nsjh.bian_zhi_bu_men_ from t_nsjh join t_nbss on t_nbss.ji_hua_zong_wai_j = t_nsjh.id_ where FIND_IN_SET(t_nsjh.bian_zhi_bu_men_,'"+info+"') and t_nsjh.shi_fou_guo_shen_ = '已完成' and t_nsjh.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' ) as a on t_nbshbgb.ji_hua_zong_wai_j = a.id_ where t_nbshbgb.shi_fou_guo_shen_ = '已完成' and a.shi_fou_guo_shen_ = '已完成' GROUP BY a.bian_zhi_bu_men_) b on d.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
-}
-export const getguanshenObj = (end,info)=>{
-  return "select COUNT(t_gglpsjhx.id_) as num from t_gglpsjhx where FIND_IN_SET(t_gglpsjhx.bian_zhi_bu_men_,'"+info+"') and t_gglpsjhx.shi_fou_guo_shen_ = '已完成' and t_gglpsjhx.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' UNION ALL select COUNT(t_gsbgb.id_) as num from t_gsbgb JOIN t_gglpsjhx on t_gsbgb.zong_wai_jian_ = t_gglpsjhx.id_ where t_gsbgb.shi_fou_guo_shen_ = '已完成' and t_gglpsjhx.shi_fou_guo_shen_ = '已完成' and FIND_IN_SET(t_gglpsjhx.bian_zhi_bu_men_,'"+info+"')  and t_gglpsjhx.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"'"
-}
-export const getguanshenObjFB = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,a.numA as numA,IFNULL(b.num,0) as num from (select t_gglpsjhx.bian_zhi_bu_men_,COUNT(t_gglpsjhx.id_) as numA from t_gglpsjhx where FIND_IN_SET(t_gglpsjhx.bian_zhi_bu_men_,'"+info+"') and t_gglpsjhx.shi_fou_guo_shen_ = '已完成' and t_gglpsjhx.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_gglpsjhx.bian_zhi_bu_men_) a LEFT JOIN (select t_gglpsjhx.bian_zhi_bu_men_,COUNT(t_gsbgb.id_) as num from t_gsbgb JOIN t_gglpsjhx on t_gsbgb.zong_wai_jian_ = t_gglpsjhx.id_ where t_gsbgb.shi_fou_guo_shen_ = '已完成' and t_gglpsjhx.shi_fou_guo_shen_ = '已完成' and FIND_IN_SET(t_gglpsjhx.bian_zhi_bu_men_,'"+info+"')  and t_gglpsjhx.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_gglpsjhx.bian_zhi_bu_men_) b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
-}
-export const getbufuheObj = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,IFNULL(a.num,0) as num,IFNULL(b.numA,0) as numA from (select t_bfhhjzcsjlb.bian_zhi_bu_men_,COUNT(t_bfhhjzcsjlb.id_) as num from t_bfhhjzcsjlb where FIND_IN_SET(t_bfhhjzcsjlb.bian_zhi_bu_men_,'"+info+"') and t_bfhhjzcsjlb.shi_fou_guo_shen_ = '已完成' and t_bfhhjzcsjlb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_bfhhjzcsjlb.bian_zhi_bu_men_) as a LEFT JOIN (select t_bfhhjzcsjlb.bian_zhi_bu_men_,COUNT(t_bfhhjzcsjlb.id_) as numA from t_bfhhjzcsjlb where FIND_IN_SET(t_bfhhjzcsjlb.bian_zhi_bu_men_,'"+info+"') and t_bfhhjzcsjlb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_bfhhjzcsjlb.bian_zhi_bu_men_) as b on a.bian_zhi_bu_men_=b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
-}
-export const getgaijinxiangObj = (end,info)=>{
-  return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,IFNULL(a.num,0) as num,IFNULL(b.numA,0) as numA from (select t_glpsjhb.bian_zhi_bu_men_,COUNT(t_glpsjhb.id_) as num from t_glpsjhb where FIND_IN_SET(t_glpsjhb.bian_zhi_bu_men_,'"+info+"') and t_glpsjhb.shi_fou_guo_shen_ = '已完成' and t_glpsjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_glpsjhb.bian_zhi_bu_men_) as a LEFT JOIN (select t_glpsjhb.bian_zhi_bu_men_,COUNT(t_glpsjhb.id_) as numA from t_glpsjhb where FIND_IN_SET(t_glpsjhb.bian_zhi_bu_men_,'"+info+"') and t_glpsjhb.bian_zhi_shi_jian BETWEEN '"+end[0]+"' and '"+end[1]+"' GROUP BY t_glpsjhb.bian_zhi_bu_men_) as b on a.bian_zhi_bu_men_ = b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
+export const getgaijinxiangObj = (end, info) => {
+    return {
+        key: 'sysOpDataStats30',
+        params: [info, end[0], end[1]]
+    }
+    // return "select ibps_party_entity.NAME_,c.numA,c.num,if(c.numA=0,0,ROUND((c.num/c.numA)*100,2)) as chu from (select a.bian_zhi_bu_men_,IFNULL(a.num,0) as num,IFNULL(b.numA,0) as numA from (select t_glpsjhb.bian_zhi_bu_men_,COUNT(t_glpsjhb.id_) as num from t_glpsjhb where FIND_IN_SET(t_glpsjhb.bian_zhi_bu_men_,'" + info + "') and t_glpsjhb.shi_fou_guo_shen_ = '已完成' and t_glpsjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_glpsjhb.bian_zhi_bu_men_) as a LEFT JOIN (select t_glpsjhb.bian_zhi_bu_men_,COUNT(t_glpsjhb.id_) as numA from t_glpsjhb where FIND_IN_SET(t_glpsjhb.bian_zhi_bu_men_,'" + info + "') and t_glpsjhb.bian_zhi_shi_jian BETWEEN '" + end[0] + "' and '" + end[1] + "' GROUP BY t_glpsjhb.bian_zhi_bu_men_) as b on a.bian_zhi_bu_men_ = b.bian_zhi_bu_men_) c LEFT JOIN ibps_party_entity on c.bian_zhi_bu_men_ = ibps_party_entity.id_"
 }
 // export const getbiaozhunTObj = (end)=>{
 //   return "select MONTH(shi_shi_shi_jian_) as time from t_bzwzqjhcjhzb where YEAR(shi_shi_shi_jian_) ="+end+" ORDER BY shi_shi_shi_jian_ ASC LIMIT 1"
@@ -114,7 +230,7 @@ export const getgaijinxiangObj = (end,info)=>{
 //  return "select MONTH(shi_shi_shi_jian_) as time from t_bzxbqjhcjhzbn where YEAR(shi_shi_shi_jian_) ="+end+" ORDER BY shi_shi_shi_jian_ ASC LIMIT 1"
 // }
 // export const DBData = (begin,end,scope)=>{
- 
+
 //   return "select tt.* "+
 //   " FROM("+s1jianCe(begin,end)+
 //   " join "+s1renwu(begin,end,scope)+
@@ -142,7 +258,7 @@ export const getgaijinxiangObj = (end,info)=>{
 //   return " YEAR ( create_time_ ) = '" + val+"'"
 // }
 // function PAT_TASK(val,choose){
-  
+
 //   return choose?"shi_fou_guo_shen_ = '1' AND YEAR( create_time_ ) = '"+val+"' AND DATE(update_time_) BETWEEN DATE( create_time_ ) and DATE( qi_wang_wan_cheng ) ":"shi_fou_guo_shen_ = '1' AND YEAR( create_time_ ) = '"+val+"'"
 // }
 // function PAT_CHOOSE(val,choose){
@@ -199,7 +315,7 @@ export const getgaijinxiangObj = (end,info)=>{
 //   "( SELECT COUNT( id_ ) AS t_lhjcz"+end+" FROM t_lhjczb "+ "WHERE zhuang_tai_ = '已完成' and shi_fou_ji_shi_ = '否' AND YEAR( create_time_ ) = "+end+") s1renwu2  JOIN"+
 //   "( SELECT COUNT( id_ ) AS t_lhjc"+end+" FROM t_lhjczb "+ "WHERE (zhuang_tai_ != '已完成' or shi_fou_ji_shi_ ='' or shi_fou_ji_shi_ is null)  AND YEAR( create_time_ ) = "+end+") s1renwu3  JOIN"+
 //   "( SELECT COUNT( id_ ) AS t_lhjczbS"+end+" FROM t_lhjczb WHERE YEAR ( create_time_ ) = "+end+" ) s1renwu4  "
- 
+
 //   }
 // /* 检测 */
 // function s1jianCe(begin,end){

@@ -402,8 +402,11 @@ export default {
                     }
                     // 防止主部门多条起
                     const obj = this.employee.posItemList.find(t => t.isMainPost === 'Y')
-                    const sql = `select * from ibps_party_rel where biz_ = 'mainPost' and SUB_PID_ = '${this.employee.id}'`
-                    this.$common.request('sql', sql).then((r) => {
+                    // const sql = `select * from ibps_party_rel where biz_ = 'mainPost' and SUB_PID_ = '${this.employee.id}'`
+                    this.$common.request('query', {
+                        key: 'getMainPostByUid',
+                        params: [this.employee.id]
+                    }).then((r) => {
                         const res = r.variables.data
                         let old = false
                         const oldArr = []
@@ -604,8 +607,11 @@ export default {
 
         // 更新扫码签到表的数据
         getWxyh (data) {
-            const sql = `select * from t_wxyh where xing_ming_ = '${data.name}' and shou_ji_ = '${data.mobile}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from t_wxyh where xing_ming_ = '${data.name}' and shou_ji_ = '${data.mobile}'`
+            this.$common.request('query', {
+                key: 'getUserWxConfig',
+                params: [data.name, data.mobile]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     return

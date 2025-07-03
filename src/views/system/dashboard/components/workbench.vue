@@ -143,67 +143,67 @@ export default {
         listSearchForm.guide.forms[0].value = isManager ? 'all' : 'aboutMe'
         listSearchForm.guide.forms[1].options = sysOption
         listSearchForm.guide.forms[3].options = roleOption
-        const getGuide = ({ parameters, requestPage, sorts }) => {
-            // 获取查询角色信息
-            let roleParams = ''
-            let aboutMeParams = ''
-            const range = {
-                aboutMe: [],
-                sponsor: [],
-                review: [],
-                approve: []
-            }
-            const sortField = {
-                TABLE_NO_: 'biao_dan_bian_hao'
-            }
-            let sortParams = 'sn_ + 0 asc'
-            if (sorts && sorts.length) {
-                sortParams = sorts.map(i => `${sortField[i.field]} ${i.order}`).join(',')
-            }
-            role.forEach(i => {
-                range.aboutMe.push(`bian_zhi_jiao_se_ like '%${i.id}%' or shen_he_jiao_se_ like '%${i.id}%' or shen_pi_jiao_se_ like '%${i.id}%'`)
-                range.sponsor.push(`bian_zhi_jiao_se_ like '%${i.id}%'`)
-                range.review.push(`shen_he_jiao_se_ like '%${i.id}%'`)
-                range.approve.push(`shen_pi_jiao_se_ like '%${i.id}%'`)
-            })
-            parameters.forEach(item => {
-                if (item.key === 'range' && item.value !== 'all') {
-                    aboutMeParams = ` and (${range[item.value].join(' or ')})`
-                }
-                if (item.key === 'role') {
-                    roleParams = ` and (bian_zhi_jiao_se_ like '%${item.value}%')`
-                }
-            })
-            // 获取查询字段
-            let params = parameters.filter(i => i.key !== 'role' && i.key !== 'range').reduce((acc, curr) => {
-                return `${acc} and ${curr.key} like '%${curr.value}%'`
-            }, '')
-            params = params + aboutMeParams + roleParams
-            // and di_dian_ = '${level}'
-            const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver, ye_mian_lu_jing_ as path, zi_yuan_lu_jing_ as res from t_bdbhpzb where sn_ + 0 > 0 ${params} order by ${sortParams}`
-            const { pageNo = 1, limit = 15 } = requestPage || {}
-            return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then(res => {
-                    const { data = [] } = res.variables || {}
-                    const page = {
-                        limit,
-                        page: pageNo,
-                        totalCount: data.length,
-                        totalPages: Math.ceil(data.length / limit)
-                    }
-                    const result = {
-                        data: {
-                            dataResult: data.slice((pageNo - 1) * limit, pageNo * limit),
-                            pageResult: page
-                        }
-                    }
-                    resolve(result)
-                }).catch(error => {
-                    reject(error)
-                })
-            })
-        }
-        operate.guide = getGuide
+        // const getGuide = ({ parameters, requestPage, sorts }) => {
+        //     // 获取查询角色信息
+        //     let roleParams = ''
+        //     let aboutMeParams = ''
+        //     const range = {
+        //         aboutMe: [],
+        //         sponsor: [],
+        //         review: [],
+        //         approve: []
+        //     }
+        //     const sortField = {
+        //         TABLE_NO_: 'biao_dan_bian_hao'
+        //     }
+        //     let sortParams = 'sn_ + 0 asc'
+        //     if (sorts && sorts.length) {
+        //         sortParams = sorts.map(i => `${sortField[i.field]} ${i.order}`).join(',')
+        //     }
+        //     role.forEach(i => {
+        //         range.aboutMe.push(`bian_zhi_jiao_se_ like '%${i.id}%' or shen_he_jiao_se_ like '%${i.id}%' or shen_pi_jiao_se_ like '%${i.id}%'`)
+        //         range.sponsor.push(`bian_zhi_jiao_se_ like '%${i.id}%'`)
+        //         range.review.push(`shen_he_jiao_se_ like '%${i.id}%'`)
+        //         range.approve.push(`shen_pi_jiao_se_ like '%${i.id}%'`)
+        //     })
+        //     parameters.forEach(item => {
+        //         if (item.key === 'range' && item.value !== 'all') {
+        //             aboutMeParams = ` and (${range[item.value].join(' or ')})`
+        //         }
+        //         if (item.key === 'role') {
+        //             roleParams = ` and (bian_zhi_jiao_se_ like '%${item.value}%')`
+        //         }
+        //     })
+        //     // 获取查询字段
+        //     let params = parameters.filter(i => i.key !== 'role' && i.key !== 'range').reduce((acc, curr) => {
+        //         return `${acc} and ${curr.key} like '%${curr.value}%'`
+        //     }, '')
+        //     params = params + aboutMeParams + roleParams
+        //     // and di_dian_ = '${level}'
+        //     const sql = `select sn_ as sn, suo_shu_xi_tong_ as sysName, gong_neng_mo_kuai as module, biao_dan_ming_che as tableName, biao_dan_bian_hao as tableNo, tian_xie_shi_ji_ as timing, shi_wu_lei_xing_ as taskType, cheng_xu_wen_jian as fileName, bian_zhi_ren_ as creator, shen_he_ren_ as reviewer, shen_pi_ren_ as approver, ye_mian_lu_jing_ as path, zi_yuan_lu_jing_ as res from t_bdbhpzb where sn_ + 0 > 0 ${params} order by ${sortParams}`
+        //     const { pageNo = 1, limit = 15 } = requestPage || {}
+        //     return new Promise((resolve, reject) => {
+        //         this.$common.request('sql', sql).then(res => {
+        //             const { data = [] } = res.variables || {}
+        //             const page = {
+        //                 limit,
+        //                 page: pageNo,
+        //                 totalCount: data.length,
+        //                 totalPages: Math.ceil(data.length / limit)
+        //             }
+        //             const result = {
+        //                 data: {
+        //                     dataResult: data.slice((pageNo - 1) * limit, pageNo * limit),
+        //                     pageResult: page
+        //                 }
+        //             }
+        //             resolve(result)
+        //         }).catch(error => {
+        //             reject(error)
+        //         })
+        //     })
+        // }
+        // operate.guide = getGuide
         return {
             level,
             tabList,
@@ -339,42 +339,42 @@ export default {
         getData (type) {
             this.loading = true
             const pageParams = this.pagination && this.pagination.page ? this.pagination : this.defaultPagination
-            operate[this.activeTab](this.getFormatParams(null, pageParams)).then(response => {
-                const { dataResult, pageResult } = response.data
-                // 待办事宜对任务发起人做额外处理
-                if (type === 'wait') {
-                    const instList = []
-                    dataResult.forEach(item => {
-                        instList.push(item.bpmnInstId)
-                    })
-                    const sql = `select b.bpmn_inst_id_, b.create_by_, a.name_ from ibps_bpm_inst b left join ibps_party_employee a on a.id_ = b.create_by_ where b.bpmn_inst_id_ in (${instList.length ? instList.join(',') : `''`}) order by find_in_set(b.bpmn_inst_id_,'${instList.join(',')}')`
-                    const currentTime = Date.now()
-                    this.$common.request('sql', sql).then(res => {
-                        const data = res.variables && res.variables.data
-                        data.forEach((item, index) => {
-                            dataResult[index].submitBy = item.name_
-                            dataResult[index].workName = this.getWorkInfo(dataResult[index].subject, 'name')
-                            dataResult[index].workDesc = this.getWorkInfo(dataResult[index].subject, 'desc')
-                            dataResult[index].workType = this.plan.includes(dataResult[index].procDefKey) ? 'plan' : 'normal'
-                            const limit = this.getAttr(dataResult[index].subject, 'loseDate') || this.getAttr(dataResult[index].subject, 'timeLimit') || 3
-                            dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, limit)
-                        })
-                        this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
-                        this.pagination = pageResult
-                    })
-                    this.urgeToManager()
-                } else {
-                    this.dataList = dataResult
-                    this.pagination = pageResult || {}
-                }
-                this.loading = false
-            }).catch(() => {
-                // 请求出错清除轮询
-                if (type === 'wait') {
-                    clearInterval(this.timer)
-                }
-                this.loading = false
-            })
+            // operate[this.activeTab](this.getFormatParams(null, pageParams)).then(response => {
+            //     const { dataResult, pageResult } = response.data
+            //     // 待办事宜对任务发起人做额外处理
+            //     if (type === 'wait') {
+            //         const instList = []
+            //         dataResult.forEach(item => {
+            //             instList.push(item.bpmnInstId)
+            //         })
+            //         const sql = `select b.bpmn_inst_id_, b.create_by_, a.name_ from ibps_bpm_inst b left join ibps_party_employee a on a.id_ = b.create_by_ where b.bpmn_inst_id_ in (${instList.length ? instList.join(',') : `''`}) order by find_in_set(b.bpmn_inst_id_,'${instList.join(',')}')`
+            //         const currentTime = Date.now()
+            //         this.$common.request('sql', sql).then(res => {
+            //             const data = res.variables && res.variables.data
+            //             data.forEach((item, index) => {
+            //                 dataResult[index].submitBy = item.name_
+            //                 dataResult[index].workName = this.getWorkInfo(dataResult[index].subject, 'name')
+            //                 dataResult[index].workDesc = this.getWorkInfo(dataResult[index].subject, 'desc')
+            //                 dataResult[index].workType = this.plan.includes(dataResult[index].procDefKey) ? 'plan' : 'normal'
+            //                 const limit = this.getAttr(dataResult[index].subject, 'loseDate') || this.getAttr(dataResult[index].subject, 'timeLimit') || 3
+            //                 dataResult[index].state = this.judgeExpire(dataResult[index].createTime, currentTime, dataResult[index].workType, limit)
+            //             })
+            //             this.dataList = dataResult.sort((a, b) => b.createTime.localeCompare(a.createTime))
+            //             this.pagination = pageResult
+            //         })
+            //         this.urgeToManager()
+            //     } else {
+            //         this.dataList = dataResult
+            //         this.pagination = pageResult || {}
+            //     }
+            //     this.loading = false
+            // }).catch(() => {
+            //     // 请求出错清除轮询
+            //     if (type === 'wait') {
+            //         clearInterval(this.timer)
+            //     }
+            //     this.loading = false
+            // })
         },
         // 延迟更新列表数据
         updateList () {
@@ -500,34 +500,34 @@ export default {
                 console.log(idList, delList, defKeyArr)
                 const sql = `select bo_code_, def_key_ from ibps_bpm_def where find_in_set(def_key_, '${defKeyArr.join(',')}')`
                 // const sql = `select a.bo_code_, b.key_ from ibps_form_bo a, ibps_form_def b where a.form_id_ = b.id_ and find_in_set(b.key_, '${formKeyArr.join(',')}')`
-                this.$common.request('sql', sql).then(res => {
-                    const { data = [] } = res.variables || {}
-                    if (!data.length) {
-                        return
-                    }
-                    const codes = {}
-                    data.forEach(item => {
-                        const { bo_code_, def_key_ } = item
-                        codes[def_key_] = bo_code_
-                    })
-                    // 删除选中记录
-                    removeDraft({ ids: idList.join(',') }).then(() => {
-                        ActionUtils.removeSuccessMessage()
-                        this.selection = []
-                        // 循环删除对应数据表数据
-                        defKeyArr.forEach(k => {
-                            const deleteParams = {
-                                tableName: `t_${codes[k]}`,
-                                paramWhere: { id_: delList[k].join(',') }
-                            }
-                            this.$common.request('delete', deleteParams, 'post', true)
-                        })
-                        this.$message.success('删除成功！')
-                        this.search()
-                    })
-                }).catch(() => {
-                    this.$message.error('获取数据表key值出错，请联系开发人员！')
-                })
+                // this.$common.request('sql', sql).then(res => {
+                //     const { data = [] } = res.variables || {}
+                //     if (!data.length) {
+                //         return
+                //     }
+                //     const codes = {}
+                //     data.forEach(item => {
+                //         const { bo_code_, def_key_ } = item
+                //         codes[def_key_] = bo_code_
+                //     })
+                //     // 删除选中记录
+                //     removeDraft({ ids: idList.join(',') }).then(() => {
+                //         ActionUtils.removeSuccessMessage()
+                //         this.selection = []
+                //         // 循环删除对应数据表数据
+                //         defKeyArr.forEach(k => {
+                //             const deleteParams = {
+                //                 tableName: `t_${codes[k]}`,
+                //                 paramWhere: { id_: delList[k].join(',') }
+                //             }
+                //             this.$common.request('delete', deleteParams, 'post', true)
+                //         })
+                //         this.$message.success('删除成功！')
+                //         this.search()
+                //     })
+                // }).catch(() => {
+                //     this.$message.error('获取数据表key值出错，请联系开发人员！')
+                // })
             })
         },
         // 数组去重
@@ -547,25 +547,25 @@ export default {
                 parameters: [],
                 sorts: []
             }
-            const sql = `select id_, shi_wu_id_ as taskId from t_gqswb where position('${userId}' in chu_li_ren_id_)`
-            // Promise.all([pending(params), this.$common.request('sql', sql)]).then(([res1, res2]) => {
-            //     let workData = res1.data && res1.data.dataResult
-            //     let noticeData = res2.variables && res2.variables.data
-            //     if (!workData || !workData.length) {
-            //         return
-            //     }
-            //     this.dealData(workData, noticeData)
+            // const sql = `select id_, shi_wu_id_ as taskId from t_gqswb where position('${userId}' in chu_li_ren_id_)`
+            // // Promise.all([pending(params), this.$common.request('sql', sql)]).then(([res1, res2]) => {
+            // //     let workData = res1.data && res1.data.dataResult
+            // //     let noticeData = res2.variables && res2.variables.data
+            // //     if (!workData || !workData.length) {
+            // //         return
+            // //     }
+            // //     this.dealData(workData, noticeData)
+            // // })
+            // pending(params).then(res1 => {
+            //     const workData = res1.data && res1.data.dataResult
+            //     this.$common.request('sql', sql).then(res2 => {
+            //         const noticeData = res2.variables && res2.variables.data
+            //         if (!workData || !workData.length) {
+            //             return
+            //         }
+            //         this.dealData(workData, noticeData)
+            //     })
             // })
-            pending(params).then(res1 => {
-                const workData = res1.data && res1.data.dataResult
-                this.$common.request('sql', sql).then(res2 => {
-                    const noticeData = res2.variables && res2.variables.data
-                    if (!workData || !workData.length) {
-                        return
-                    }
-                    this.dealData(workData, noticeData)
-                })
-            })
         },
         // 处理数据
         dealData (workList, noticeList) {

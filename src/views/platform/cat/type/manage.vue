@@ -181,7 +181,7 @@ export default {
             this.loading = true
             let whereParams = {}
             const allRequests = []
-            if (this.$router.currentRoute.fullPath === '/zlgl/wjkzgl/wjjflsz') {
+            if (this.$route?.meta?.name === 'wjjflsz') {
                 this.categoryKey = 'FILE_TYPE'
                 const keys = ['FILE_TYPE', 'FLOW_TYPE']
                 keys.forEach(item => {

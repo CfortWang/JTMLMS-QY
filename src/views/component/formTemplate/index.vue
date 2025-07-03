@@ -41,7 +41,7 @@
                                     <ibps-custom-dialog
                                         v-model="form.bu_men_fen_zu_"
                                         size="mini"
-                                        template-key="gwfzdhk"
+                                        :template-key="config?'gwzzdhkrcwh':'gwfzdhk'"
                                         store="id"
                                         :multiple="false"
                                         :dynamic-params="{
@@ -243,8 +243,9 @@ export default {
         }
     },
     data () {
-        const { userId, position, level, mainPosition } = this.$store.getters
+        const { userId, position, level, mainPosition, setting } = this.$store.getters
         return {
+            config: setting?.postJob?.allocation || false,
             filter: [{
                 descVal: '1',
                 includeSub: true,

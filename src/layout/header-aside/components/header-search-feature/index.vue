@@ -67,9 +67,12 @@ export default {
                 this.handleEsc()
                 return
             }
-            const sql1 = `select * FROM ibps_auth_res WHERE id_='${item.id}'`
-            const response = await this.$common.request('sql', sql1)
-            const id = response?.variables?.data[0]?.PATH_?.split('.')[0]
+            // const sql1 = `select * FROM ibps_auth_res WHERE id_='${item.id}'`
+            const { variables: { data = [] }} = await this.$common.request('query', {
+                key: 'getPathByResId',
+                params: [item.id]
+            })
+            const id = data[0]?.PATH_?.split('.')[0]
             await this.$store.dispatch('ibps/menu/activeHeaderSet', { activeHeader: id, vm: this })
             // 用户选择的是其它页面
             await this.$nextTick()
@@ -110,8 +113,8 @@ export default {
     .custom-autocomplete {
         width: 150px;
         ::v-deep .el-autocomplete-suggestion{
-        width: auto !important;
-    }
+            width: auto !important;
+        }
     }
 }
 

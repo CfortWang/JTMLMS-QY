@@ -362,8 +362,11 @@ export default {
         },
         // 获取部门数据
         async posData () {
-            const sql = `select p.*,r.SUB_PID_ as userId FROM IBPS_PARTY_POSITION p INNER JOIN ibps_party_rel r ON p.id_ = r.MAIN_PID_ WHERE r.BIZ_ = 'mainPost' ORDER BY p.CREATE_TIME_ DESC`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select p.*,r.SUB_PID_ as userId FROM IBPS_PARTY_POSITION p INNER JOIN ibps_party_rel r ON p.id_ = r.MAIN_PID_ WHERE r.BIZ_ = 'mainPost' ORDER BY p.CREATE_TIME_ DESC`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getMainPosition',
+                params: [null]
+            })
             this.paperList.forEach((item) => {
                 const mainUser = data.find(i => i.userId === item.examineeId)
                 // 如果有主部门  只统计主部门
@@ -412,9 +415,12 @@ export default {
             return (passList.length / list.length * 100).toFixed(2) + '%'
         },
         getQuestionData () {
-            const sql = `select qb.ti_ku_ming_cheng_ as bankName, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc,ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber,ex.chou_ti_zong_fen_ as randScore,ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex, t_question_bank qb, t_examination e where ex.ti_ku_id_ = qb.id_ and e.exam_id_ = ex.id_ and ex.id_ = '${this.examId}' order by e.kao_shi_ren_ desc, e.jie_shu_shi_jian_ desc`
+            // const sql = `select qb.ti_ku_ming_cheng_ as bankName, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc,ex.sui_ji_chou_ti_ as isRand, ex.sui_ji_ti_shu_ as randNumber,ex.chou_ti_zong_fen_ as randScore,ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex, t_question_bank qb, t_examination e where ex.ti_ku_id_ = qb.id_ and e.exam_id_ = ex.id_ and ex.id_ = '${this.examId}' order by e.kao_shi_ren_ desc, e.jie_shu_shi_jian_ desc`
             return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then(res => {
+                this.$common.request('query', {
+                    key: 'getExamQuestion',
+                    params: [this.examId]
+                }).then(res => {
                     const { data = [] } = res.variables || {}
                     if (!data.length) {
                         this.$message.warning('未查询到已提交的考试记录，请先完成考试！')

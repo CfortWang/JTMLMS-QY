@@ -483,6 +483,9 @@ export default {
                 let midI = mid.findIndex(
                     (v) => v.NAME_ == this.guanshenfbObj[i].NAME_
                 );
+                if (midI === -1) {
+                    continue
+                }
                 mid[midI].numA =
                     this.guanshenfbObj[i].numA < 0
                         ? 0

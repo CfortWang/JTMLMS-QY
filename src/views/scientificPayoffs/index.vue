@@ -27,14 +27,14 @@
                 </div>
             </div>
             <dv-border-box-1 class="contentBorder">
-                <!-- :style="indexData == 1 && kyxmListShow && kyxmDataShow ? 'display: block' : 'display: none'" -->
-                <scientificBoxVue v-if="indexData == 1 && kyxmListShow && kyxmDataShow" class="contentBorderBox" :list-show="kyxmListShow" :data-show="kyxmDataShow" :data-item="kyxmData" />
-                <scientificBoxVue v-if="indexData == 1 && SCIwztjbDataShow && SCIwztjbListShow" class="contentBorderBox" :bottom-border="false" :list-show="SCIwztjbListShow" :data-show="SCIwztjbDataShow" :data-item="SCIwztjbData" />
-                <scientificBoxVue v-if="indexData == 2 && zwlwListShow && zwlwDataShow" class="contentBorderBox" :list-show="zwlwListShow" :data-show="zwlwDataShow" :data-item="zwlwData" />
-                <scientificBoxVue v-if="indexData == 2 && zhuZuoListShow && zhuZuoDataShow" class="contentBorderBox" :bottom-border="false" :list-show="zhuZuoListShow" :data-show="zhuZuoDataShow" :data-item="zhuZuoData" />
-                <scientificBoxVue v-if="indexData == 3 && zhuanLiListShow && zhuanLiDataShow" class="contentBorderBox" :list-show="zhuanLiListShow" :data-show="zhuanLiDataShow" :data-item="zhuanLiData" />
-                <scientificBoxVue v-if="indexData == 3 && jxjyxmxshdListShow && jxjyxmxshdDataShow" class="contentBorderBox" :bottom-border="false" :list-show="jxjyxmxshdListShow" :data-show="jxjyxmxshdDataShow" :data-item="jxjyxmxshdData" />
-                <scientificBoxVue v-if="indexData == 4 && kjhjcgDataShow && kjhjcgListShow" class="contentBorderBox" :bottom-border="false" :list-show="kjhjcgListShow" :data-show="kjhjcgDataShow" :data-item="kjhjcgData" />
+                <!-- :style="indexData === 1 && kyxmListShow && kyxmDataShow ? 'display: block' : 'display: none'" -->
+                <scientificBoxVue v-if="indexData === 1 && kyxmListShow && kyxmDataShow" class="contentBorderBox" :list-show="kyxmListShow" :data-show="kyxmDataShow" :data-item="kyxmData" />
+                <scientificBoxVue v-if="indexData === 1 && SCIwztjbDataShow && SCIwztjbListShow" class="contentBorderBox" :bottom-border="false" :list-show="SCIwztjbListShow" :data-show="SCIwztjbDataShow" :data-item="SCIwztjbData" />
+                <scientificBoxVue v-if="indexData === 2 && zwlwListShow && zwlwDataShow" class="contentBorderBox" :list-show="zwlwListShow" :data-show="zwlwDataShow" :data-item="zwlwData" />
+                <scientificBoxVue v-if="indexData === 2 && zhuZuoListShow && zhuZuoDataShow" class="contentBorderBox" :bottom-border="false" :list-show="zhuZuoListShow" :data-show="zhuZuoDataShow" :data-item="zhuZuoData" />
+                <scientificBoxVue v-if="indexData === 3 && zhuanLiListShow && zhuanLiDataShow" class="contentBorderBox" :list-show="zhuanLiListShow" :data-show="zhuanLiDataShow" :data-item="zhuanLiData" />
+                <scientificBoxVue v-if="indexData === 3 && jxjyxmxshdListShow && jxjyxmxshdDataShow" class="contentBorderBox" :bottom-border="false" :list-show="jxjyxmxshdListShow" :data-show="jxjyxmxshdDataShow" :data-item="jxjyxmxshdData" />
+                <scientificBoxVue v-if="indexData === 4 && kjhjcgDataShow && kjhjcgListShow" class="contentBorderBox" :bottom-border="false" :list-show="kjhjcgListShow" :data-show="kjhjcgDataShow" :data-item="kjhjcgData" />
             </dv-border-box-1>
         </dv-full-screen-container>
     </div>
@@ -51,7 +51,10 @@ export default {
     name: 'index',
     components: { scientificBoxVue, ibpsTreeSelect },
     data () {
+        const { mainPosition, position } = this.$store.getters || {}
+        const mainPos = mainPosition ? mainPosition.id : position.split(',')[0]
         return {
+            position: mainPos,
             titleName: '科研成果看板',
             treeData: [],
             clearable: true,
@@ -151,26 +154,16 @@ export default {
                 }
             },
             // ie.STATUS_= 'actived' and ie.ID_ != '1' and ie.ID_ != '-1' and ie.ID_ != '702117247933480960' and ie.ID_ != '1115242459127873536' and ie.ID_ != '1115242765924433920' and ie.GROUP_ID_ not like '%1041786072788369408%' GROUP BY ie.id_
-            likeParams: "ie.STATUS_= 'actived' AND ie.jian_ding_zi_ge_z !='' AND ie.jian_ding_zi_ge_z IS NOT NULL GROUP BY ie.id_",
-
+            likeParams: "ie.STATUS_= 'actived' GROUP BY ie.id_",
             likeTongJi: `lei_xing_ = '统计'`
         }
     },
     watch: {
-        selectData () {
-            if (this.selectData) {
-                const sqlData = `ie.POSITIONS_ like '%${this.selectData}%'`
-                const sqlData2 = `bian_zhi_bu_men_ like '%${this.selectData}%'`
-                this.likeParams = `ie.STATUS_= 'actived' AND ie.jian_ding_zi_ge_z !='' AND ie.jian_ding_zi_ge_z IS NOT NULL and (${sqlData}) GROUP BY ie.id_`
-                this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
+        selectData (val) {
+            this.getPosition(val).then(() => {
                 this.getInit()
-                this.getKeYanChengGuoList()
-            } else {
-                this.getPosition().then((res) => {
-                    this.getInit()
-                    this.getKeYanChengGuoList()
-                })
-            }
+                this.getKeYanChengGuoList(val, this.position)
+            })
         }
     },
     created () {
@@ -181,7 +174,7 @@ export default {
         this.getPositionList()
         this.getPosition().then((res) => {
             this.getInit()
-            this.getKeYanChengGuoList()
+            this.getKeYanChengGuoList(this.selectData, this.position)
         })
 
         this.timer = setInterval(() => {
@@ -189,7 +182,7 @@ export default {
         }, 600000)
 
         this.timer3 = setInterval(() => {
-            this.getKeYanChengGuoList()
+            this.getKeYanChengGuoList(this.selectData, this.position)
         }, 1000 * 60 * 60)
         this.getCreate()
     },
@@ -203,31 +196,37 @@ export default {
         clearInterval(this.timer3)
     },
     methods: {
-        getPosition () {
+        getPosition (v) {
             return new Promise((resolve, reject) => {
-                let sqlData = ``
-                let sqlData2 = ``
-                const positions = this.$store.getters.userInfo.employee.positions
-                const positionsList = positions.split(',')
-                if (positionsList.length > 0) {
-                    // 默认所在部门
-                    // positionsList.forEach((item, index) => {
-                    //     if (index === 0) {
-                    //         sqlData += `ie.POSITIONS_ like '%${item}%'`
-                    //         sqlData2 += `bian_zhi_bu_men_ like '%${item}%'`
-                    //     } else {
-                    //         sqlData += ` or ie.POSITIONS_ like '%${item}%'`
-                    //         sqlData2 += ` or bian_zhi_bu_men_ like '%${item}%'`
-                    //     }
-                    // })
-                    // 默认最后一个数据
-                    sqlData = `ie.POSITIONS_ like '%${positionsList[positionsList.length - 1]}%'`
-                    sqlData2 = `bian_zhi_bu_men_ like '%${positionsList[positionsList.length - 1]}%'`
-                    this.selectData = positionsList[positionsList.length - 1]
+                // let sqlData = ``
+                // let sqlData2 = ``
+                // const positions = this.$store.getters.userInfo.employee.positions
+                // const positionsList = positions.split(',')
+                // if (positionsList.length > 0) {
+                // // 默认所在部门
+                // positionsList.forEach((item, index) => {
+                //     if (index === 0) {
+                //         sqlData += `ie.POSITIONS_ like '%${item}%'`
+                //         sqlData2 += `bian_zhi_bu_men_ like '%${item}%'`
+                //     } else {
+                //         sqlData += ` or ie.POSITIONS_ like '%${item}%'`
+                //         sqlData2 += ` or bian_zhi_bu_men_ like '%${item}%'`
+                //     }
+                // })
 
-                    this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
-                    this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
-                }
+                // // 默认最后一个数据
+                // sqlData = `ie.POSITIONS_ like '%${positionsList[positionsList.length - 1]}%'`
+                // sqlData2 = `bian_zhi_bu_men_ like '%${positionsList[positionsList.length - 1]}%'`
+                // this.selectData = positionsList[positionsList.length - 1]
+                // this.likeParams = `ie.STATUS_= 'actived' and (${sqlData}) GROUP BY ie.id_`
+                // this.likeTongJi = `lei_xing_ = '统计' and (${sqlData2})`
+
+                // }
+                // 逻辑更新，改用主部门查询数据，若未设置主部门，则使用第一个部门
+                const { mainPosition, position } = this.$store.getters || {}
+                const mainPos = mainPosition ? mainPosition.id : position.split(',')[0]
+                this.likeParams = `ie.STATUS_= 'actived' and ie.POSITIONS_ like concat('%', '${v || mainPos}', '%') GROUP BY ie.id_`
+                this.likeTongJi = `lei_xing_ = '统计' and bian_zhi_bu_men_ like concat('%', '${v || mainPos}', '%')`
                 resolve()
             })
         },
@@ -253,7 +252,7 @@ export default {
         },
         // 上一页
         previou () {
-            if (this.indexData == 1) {
+            if (this.indexData === 1) {
                 this.indexData = 4
             } else {
                 this.indexData--
@@ -262,7 +261,7 @@ export default {
         },
         // 下一页
         next () {
-            if (this.indexData == 4) {
+            if (this.indexData === 4) {
                 this.indexData = 1
             } else {
                 this.indexData++
@@ -271,31 +270,64 @@ export default {
         },
         // 时间
         updateAll (e) {
-            if (this.indexData == 1) {
-                this.getKyxmDataAndList(e)
-                this.getSCIwztjbDataAndList(e)
+            const v = {
+                month: e,
+                position: this.selectData || this.position
             }
-            if (this.indexData == 2) {
-                this.getZwlwDataAndList(e)
-                this.getZhuZuoDataAndList(e)
+            if (this.indexData === 1) {
+                this.getKyxmDataAndList(v)
+                this.getSCIwztjbDataAndList(v)
             }
-            if (this.indexData == 3) {
-                this.getZhuanLiDataAndList(e)
-                this.getJxjyxmxshdDataAndList(e)
+            if (this.indexData === 2) {
+                this.getZwlwDataAndList(v)
+                this.getZhuZuoDataAndList(v)
             }
-            if (this.indexData == 4) {
-                this.getKjhjcgDataAndList(e)
+            if (this.indexData === 3) {
+                this.getZhuanLiDataAndList(v)
+                this.getJxjyxmxshdDataAndList(v)
+            }
+            if (this.indexData === 4) {
+                this.getKjhjcgDataAndList(v)
             }
         },
-        getKeYanChengGuoList () {
-            const sql1 = `select * from t_kyxm where ${this.likeTongJi} order by create_time_ desc`
-            const sql2 = `select * from t_kjhjcg where ${this.likeTongJi} order by create_time_ desc`
-            const sql3 = `select * from t_SCIwztjb where ${this.likeTongJi} order by create_time_ desc`
-            const sql4 = `select * from t_zwlw where ${this.likeTongJi} order by create_time_ desc`
-            const sql5 = `select * from t_kyzz where ${this.likeTongJi} order by create_time_ desc`
-            const sql6 = `select * from t_kyzl where ${this.likeTongJi} order by create_time_ desc`
-            const sql7 = `select * from t_jxjyxmxshd where ${this.likeTongJi} order by create_time_ desc`
-            Promise.all([curdPost('sql', sql1), curdPost('sql', sql2), curdPost('sql', sql3), curdPost('sql', sql4), curdPost('sql', sql5), curdPost('sql', sql6), curdPost('sql', sql7)]).then(([res1, res2, res3, res4, res5, res6, res7]) => {
+        getKeYanChengGuoList (v1, v2) {
+            // const sql1 = `select * from t_kyxm where ${this.likeTongJi} order by create_time_ desc`
+            // const sql2 = `select * from t_kjhjcg where ${this.likeTongJi} order by create_time_ desc`
+            // const sql3 = `select * from t_SCIwztjb where ${this.likeTongJi} order by create_time_ desc`
+            // const sql4 = `select * from t_zwlw where ${this.likeTongJi} order by create_time_ desc`
+            // const sql5 = `select * from t_kyzz where ${this.likeTongJi} order by create_time_ desc`
+            // const sql6 = `select * from t_kyzl where ${this.likeTongJi} order by create_time_ desc`
+            // const sql7 = `select * from t_jxjyxmxshd where ${this.likeTongJi} order by create_time_ desc`
+            Promise.all([
+                curdPost('query', {
+                    key: 'rschMgtBoard1',
+                    params: [v1 || v2]
+                }),
+                curdPost('query', {
+                    key: 'rschMgtBoard2',
+                    params: [v1 || v2]
+                }),
+                curdPost('query', {
+                    key: 'rschMgtBoard3',
+                    params: [v1 || v2]
+                }),
+                curdPost('query', {
+                    key: 'rschMgtBoard4',
+                    params: [v1 || v2]
+                }),
+                curdPost('query', {
+                    key: 'rschMgtBoard5',
+                    params: [v1 || v2]
+                }),
+                curdPost('query', {
+                    key: 'rschMgtBoard6',
+                    params: [v1 || v2]
+                }),
+                curdPost('query', {
+                    key: 'rschMgtBoard7',
+                    params: [v1 || v2]
+                })
+            ]).then(([res1, res2, res3, res4, res5, res6, res7]) => {
                 if (res1.state === 200) {
                     const datas = res1.variables.data
                     const config = indexFile.getKyxmList(datas)
@@ -343,36 +375,41 @@ export default {
 
         // 接口
         // 科研项目
-        getKyxmDataAndList (month) {
-            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kyxm tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
-            curdPost('sql', sql2).then((res2) => {
-                if (res2.state == 200) {
-                    const datas = res2.variables.data
-                    const config = indexFile.getKyxmData(datas)
-                    this.kyxmData.dataCount = JSON.parse(JSON.stringify(config))
-                    this.kyxmDataShow = true
-                }
+        getKyxmDataAndList ({ month, position }) {
+            // const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kyxm tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like concat('%', '${month}', '%') where ${this.likeParams}`
+            curdPost('query', {
+                key: 'rschMgtBoard8',
+                params: [month, position]
+            }).then((res2) => {
+                const datas = res2.variables.data
+                const config = indexFile.getKyxmData(datas)
+                this.kyxmData.dataCount = JSON.parse(JSON.stringify(config))
+                this.kyxmDataShow = true
             })
         },
 
         // 科技获奖成果
-        getKjhjcgDataAndList (month) {
-            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kjhjcg tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
-            curdPost('sql', sql2).then((res2) => {
-                if (res2.state == 200) {
-                    const datas = res2.variables.data
-                    const config = indexFile.getKyxmData(datas)
-                    this.kjhjcgData.dataCount = JSON.parse(JSON.stringify(config))
-                    this.kjhjcgDataShow = true
-                }
+        getKjhjcgDataAndList ({ month, position }) {
+            // const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kjhjcg tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like concat('%', '${month}', '%') where ${this.likeParams}`
+            curdPost('query', {
+                key: 'rschMgtBoard9',
+                params: [month, position]
+            }).then((res2) => {
+                const datas = res2.variables.data
+                const config = indexFile.getKyxmData(datas)
+                this.kjhjcgData.dataCount = JSON.parse(JSON.stringify(config))
+                this.kjhjcgDataShow = true
             })
         },
 
         // SCI文章统计表
-        getSCIwztjbDataAndList (month) {
-            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_SCIwztjb tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
-            curdPost('sql', sql2).then((res2) => {
-                if (res2.state == 200) {
+        getSCIwztjbDataAndList ({ month, position }) {
+            // const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_SCIwztjb tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like concat('%', '${month}', '%') where ${this.likeParams}`
+            curdPost('query', {
+                key: 'rschMgtBoard10',
+                params: [month, position]
+            }).then((res2) => {
+                if (res2.state === 200) {
                     const datas = res2.variables.data
                     const config = indexFile.getKyxmData(datas)
                     this.SCIwztjbData.dataCount = JSON.parse(JSON.stringify(config))
@@ -382,10 +419,13 @@ export default {
         },
 
         // 中文论文
-        getZwlwDataAndList (month) {
-            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_zwlw tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
-            curdPost('sql', sql2).then((res2) => {
-                if (res2.state == 200) {
+        getZwlwDataAndList ({ month, position }) {
+            // const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_zwlw tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like concat('%', '${month}', '%') where ${this.likeParams}`
+            curdPost('query', {
+                key: 'rschMgtBoard11',
+                params: [month, position]
+            }).then((res2) => {
+                if (res2.state === 200) {
                     const datas = res2.variables.data
                     const config = indexFile.getKyxmData(datas)
                     this.zwlwData.dataCount = JSON.parse(JSON.stringify(config))
@@ -395,10 +435,13 @@ export default {
         },
 
         // 著作
-        getZhuZuoDataAndList (month) {
-            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kyzz tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
-            curdPost('sql', sql2).then((res2) => {
-                if (res2.state == 200) {
+        getZhuZuoDataAndList ({ month, position }) {
+            // const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kyzz tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like concat('%', '${month}', '%') where ${this.likeParams}`
+            curdPost('query', {
+                key: 'rschMgtBoard12',
+                params: [month, position]
+            }).then((res2) => {
+                if (res2.state === 200) {
                     const datas = res2.variables.data
                     const config = indexFile.getKyxmData(datas)
                     this.zhuZuoData.dataCount = JSON.parse(JSON.stringify(config))
@@ -408,10 +451,13 @@ export default {
         },
 
         // 专利
-        getZhuanLiDataAndList (month) {
-            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kyzl tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
-            curdPost('sql', sql2).then((res2) => {
-                if (res2.state == 200) {
+        getZhuanLiDataAndList ({ month, position }) {
+            // const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_kyzl tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like concat('%', '${month}', '%') where ${this.likeParams}`
+            curdPost('query', {
+                key: 'rschMgtBoard13',
+                params: [month, position]
+            }).then((res2) => {
+                if (res2.state === 200) {
                     const datas = res2.variables.data
                     const config = indexFile.getKyxmData(datas)
                     this.zhuanLiData.dataCount = JSON.parse(JSON.stringify(config))
@@ -421,10 +467,13 @@ export default {
         },
 
         // 继续教育项目/学术活动
-        getJxjyxmxshdDataAndList (month) {
-            const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_jxjyxmxshd tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like '%${month}%' where ${this.likeParams}`
-            curdPost('sql', sql2).then((res2) => {
-                if (res2.state == 200) {
+        getJxjyxmxshdDataAndList ({ month, position }) {
+            // const sql2 = `select ie.NAME_,count(tk.id_) as count from ibps_party_employee ie left join t_jxjyxmxshd tk on ie.ID_ = tk.parent_id_ and tk.lei_xing_ = '个人' and tk.create_time_ like concat('%', '${month}', '%') where ${this.likeParams}`
+            curdPost('query', {
+                key: 'rschMgtBoard14',
+                params: [month, position]
+            }).then((res2) => {
+                if (res2.state === 200) {
                     const datas = res2.variables.data
                     const config = indexFile.getKyxmData(datas)
                     this.jxjyxmxshdData.dataCount = JSON.parse(JSON.stringify(config))
@@ -435,13 +484,14 @@ export default {
 
         getPositionList () {
             const first = this.$store.getters.level.first
-            const sql2 = `select * from ibps_party_entity where id_!='1166373874003083264' and name_ not like '%综合%' and party_type_ = 'position' and PATH_ like '%${first}%' and DEPTH_ > 2`
-            curdPost('sql', sql2).then((res2) => {
-                if (res2.state === 200) {
-                    const datas = res2.variables.data
-                    if (datas.length > 0) {
-                        this.treeData = this.toTree(datas)
-                    }
+            // const sql2 = `select * from ibps_party_entity where id_!='1166373874003083264' and name_ not like '%综合%' and party_type_ = 'position' and PATH_ like concat('%', '${first}', '%') and DEPTH_ > 2`
+            curdPost('query', {
+                key: 'rschMgtBoard15',
+                params: [first]
+            }).then((res2) => {
+                const datas = res2.variables.data
+                if (datas.length > 0) {
+                    this.treeData = this.toTree(datas)
                 }
             })
         },

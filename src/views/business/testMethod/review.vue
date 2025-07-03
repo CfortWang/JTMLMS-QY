@@ -189,7 +189,6 @@ export default {
         },
         statData: {
             handler (val) {
-                console.log('点击子表确定val', val)
                 const t = val.map(item => ({
                     'id': '',
                     'parentId': '',
@@ -269,8 +268,11 @@ export default {
         },
         async jian (val) {
             try {
-                const sql1 = `select * FROM t_bzffglb WHERE id_='${val}'`
-                const response = await this.$common.request('sql', sql1)
+                // const sql1 = `select * FROM t_bzffglb WHERE id_='${val}'`
+                const response = await this.$common.request('query', {
+                    key: 'getBzffglbById',
+                    params: [val]
+                })
                 const a = response.variables.data[0] && response.variables.data[0].fang_fa_ming_chen
                 return a
             } catch (error) {
@@ -280,8 +282,11 @@ export default {
         },
         async xiang (val) {
             try {
-                const sql2 = `select * FROM neng_li_fan_wei_ WHERE id_='${val}'`
-                const response = await this.$common.request('sql', sql2)
+                // const sql2 = `select * FROM neng_li_fan_wei_ WHERE id_='${val}'`
+                const response = await this.$common.request('query', {
+                    key: 'getNlfwbById',
+                    params: [val]
+                })
                 const a = response.variables.data[0] && response.variables.data[0].jian_yan_xiang_mu
                 return a
             } catch (error) {
@@ -304,7 +309,6 @@ export default {
         },
         handleEdit (row, index) {
             // 编辑操作
-            console.log('点击编辑', row)
             this.selectEditchange = true
             this.selectEditData = row
             this.selectEditData.rowIndex = index
@@ -318,8 +322,11 @@ export default {
         },
         // 配置完成之后评审内容数据自动带出
         configData () {
-            const sql = `select * from  t_jyffxnpspzb`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from  t_jyffxnpspzb`
+            this.$common.request('query', {
+                key: 'getJyffxnpspzb',
+                params: [null]
+            }).then(res => {
                 const data = res.variables.data
 
                 data.forEach(item => {

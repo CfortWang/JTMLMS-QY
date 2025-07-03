@@ -38,14 +38,15 @@
 
 <script>
 import IbpsEmployeeSelector from '@/business/platform/org/employee/selector'
-import { queryPageList, remove, setEnable } from '@/api/platform/bpmn/bpmAgent'
+// import { queryPageList, remove, setEnable } from '@/api/platform/bpmn/bpmAgent'
+import { queryTaskAgemt } from '@api/business/general'
 import ibpsUserSelector from '@/business/platform/org/selector'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import { statusOptions, agentTypeOptions } from '../constants'
 import Edit from './edit'
-import { create, update, load, upEmployee } from '@/api/platform/org/employee'
 import agent from './agent'
+import { keyBy, mapValues } from 'lodash'
 
 export default {
     components: {
@@ -71,12 +72,7 @@ export default {
             height: document.clientHeight,
 
             listData: [],
-            pagination: {
-                limit: 10,
-                page: 1,
-                totalCount: 0,
-                totalPages: 0
-            },
+            pagination: {},
             sorts: {},
             listConfig: {
                 toolbars: [
@@ -93,11 +89,11 @@ export default {
                 searchForm: {
                     forms: [
                         {
-                            prop: 'dai_li_ren_xing_m',
+                            prop: 'daiLiRenXingM',
                             label: '代理人'
                         },
                         {
-                            prop: 'shi_fou_qi_yong_',
+                            prop: 'shiFouQiYong',
                             label: '是否启用',
                             fieldType: 'select',
                             options: statusOptions
@@ -171,30 +167,39 @@ export default {
             this.searchDelegatorId = value
         },
         // 加载数据
+        // loadData () {
+        //     this.loading = true
+        //     const start = (this.pagination.page - 1) * this.pagination.limit
+        //     const end = this.pagination.page * this.pagination.limit
+        //     const searcFormData = this.getSearcFormData()
+        //     const sql1 = `select a.*,b.name_ from t_swdl a left join ibps_party_employee b on a.create_by_ = b.ID_  where a.di_dian_ = '${this.level}' ${searcFormData} order by a.create_time_ desc limit ${start},${end}`
+        //     const sql2 = `select count(a.id_) as count from t_swdl a where a.di_dian_ = '${this.level}' ${searcFormData}`
+        //     Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then((res) => {
+        //         const list0 = res[0].variables.data
+        //         list0.forEach(item => {
+        //             item.id = item.id_
+        //         })
+        //         const list1 = res[1].variables.data
+        //         const page = {
+        //             limit: this.pagination.limit,
+        //             page: this.pagination.page,
+        //             totalCount: list1[0].count,
+        //             totalPages: Math.ceil(list1[0].count / this.pagination.limit)
+        //         }
+        //         const result = {
+        //             dataResult: list0,
+        //             pageResult: page
+        //         }
+        //         ActionUtils.handleListData(this, result)
+        //         this.loading = false
+        //     }).catch(() => {
+        //         this.loading = false
+        //     })
+        // },
         loadData () {
             this.loading = true
-            const start = (this.pagination.page - 1) * this.pagination.limit
-            const end = this.pagination.page * this.pagination.limit
-            const searcFormData = this.getSearcFormData()
-            const sql1 = `select a.*,b.name_ from t_swdl a left join ibps_party_employee b on a.create_by_ = b.ID_  where a.di_dian_ = '${this.level}' ${searcFormData} order by a.create_time_ desc limit ${start},${end}`
-            const sql2 = `select count(a.id_) as count from t_swdl a where a.di_dian_ = '${this.level}' ${searcFormData}`
-            Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then((res) => {
-                const list0 = res[0].variables.data
-                list0.forEach(item => {
-                    item.id = item.id_
-                })
-                const list1 = res[1].variables.data
-                const page = {
-                    limit: this.pagination.limit,
-                    page: this.pagination.page,
-                    totalCount: list1[0].count,
-                    totalPages: Math.ceil(list1[0].count / this.pagination.limit)
-                }
-                const result = {
-                    dataResult: list0,
-                    pageResult: page
-                }
-                ActionUtils.handleListData(this, result)
+            queryTaskAgemt(this.getSearchFormData()).then(res => {
+                ActionUtils.handleListData(this, res.data)
                 this.loading = false
             }).catch(() => {
                 this.loading = false
@@ -203,18 +208,21 @@ export default {
         /**
          * 获取格式化参数
          */
-        getSearcFormData () {
+        getSearchFormData () {
             const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-            let keyParams = ``
-            if (params) {
-                Object.keys(params).forEach(item => {
-                    if (params[item]) {
-                        keyParams = `and a.${item} like '%${params[item]}%'`
-                    }
-                })
+            const formatParams = ActionUtils.formatParams(
+                params,
+                this.pagination,
+                this.sorts
+            )
+            const { parameters, requestPage, sorts } = formatParams || {}
+            const p = mapValues(keyBy(parameters, 'key'), 'value')
+            const { pageNo, limit } = requestPage || {}
+            return {
+                ...p,
+                pageNo,
+                limit
             }
-            return keyParams
-            // return ActionUtils.formatParams(params, this.pagination, this.sorts)
         },
         /**
          * 处理分页事件

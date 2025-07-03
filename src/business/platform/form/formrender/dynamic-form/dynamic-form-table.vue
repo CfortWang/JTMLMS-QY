@@ -50,7 +50,6 @@
                             <el-table-column
                                 v-if="!columnHidden(column) && column.field_type != 'desc' && column.label != ''"
                                 :key="j"
-                                show-overflow-tooltip
                                 :prop="column.name"
                                 :width="column.field_options.custom_class || null"
                             >
@@ -813,8 +812,7 @@ export default {
         handleRemove (button, index) {
             const position = button.position
             const selection = this.getSelection(position, index)
-            const msg = position === 'toolbar' ? `确定删除当前已选中的 ${selection.length} 条数据？` : `确定删除当前数据？`
-            ActionUtils.removeRecord(selection, msg, true).then((ids) => {
+            ActionUtils.removeRecord(selection, '确定删除当前数据？', true).then((ids) => {
                 for (let i = this.dataModel.length - 1; i >= 0; i--) {
                     if (ids.indexOf(i) > -1) {
                         this.dataModel.splice(i, 1)

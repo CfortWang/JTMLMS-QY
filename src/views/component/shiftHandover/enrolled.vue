@@ -28,9 +28,9 @@
                     <el-select v-model="ruleForm.gang_wei_" placeholder="请选择" size="mini" style="width:100%" :disabled="!editPermissions">
                         <el-option
                             v-for="item in filterData"
-                            :key="item.id_"
-                            :label="item.wei_hu_gang_wei_"
-                            :value="item.wei_hu_gang_wei_"
+                            :key="item.positionId"
+                            :label="item.positionName"
+                            :value="item.positionName"
                         />
                     </el-select>
                 </el-form-item>
@@ -270,7 +270,7 @@ export default {
         'ruleForm.deng_ji_bu_men_': {
             handler (val) {
                 console.log(val)
-                this.filterData = this.jianCeGangWeiList.filter(i => i.suo_shu_bu_men_ === val)
+                this.filterData = this.jianCeGangWeiList.filter(i => i.dept === val)
             },
             deep: true
         }
@@ -300,10 +300,12 @@ export default {
     methods: {
         // 修改
         loadSelectorData () {
-            console.log('部门', this.ruleForm.deng_ji_bu_men_)
-            const pos = this.$store.getters.level.second ? this.$store.getters.level.second : this.$store.getters.level.first
-            const sql = `select * from t_sbwhgwpzb where di_dian_='${pos}'`
-            this.$common.request('sql', sql).then(res => {
+            const { first, second } = this.$store.getters.level || {}
+            // const sql = `select * from t_sbwhgwpzb where di_dian_='${second || first}'`
+            this.$common.request('query', {
+                key: 'getPositionList',
+                params: [second || first]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 this.jianCeGangWeiList = data
             })
@@ -358,9 +360,12 @@ export default {
                     if (this.editPermissions) {
                         // 主表和子表一起添加一条数据
                         this.addDatebase('t_jjbdjb', masterTableData).then(() => {
-                            const sql = 'select * from t_jjbdjb order by create_time_ desc limit 1'
+                            // const sql = 'select * from t_jjbdjb order by create_time_ desc limit 1'
                             subtablesData.parent_id_ = ''
-                            this.$common.request('sql', sql).then(res => {
+                            this.$common.request('query', {
+                                key: 'getJjbLatestRecord',
+                                params: [null]
+                            }).then(res => {
                                 subtablesData.parent_id_ = res.variables.data[0].id_
                                 subtablesData.ban_ci_ = this.subReport[0]
                                 if (subtablesData.parent_id_) {
@@ -375,8 +380,11 @@ export default {
                         })
                     } else {
                         // 子表添加一条数据
-                        const sql = 'select* from t_jjbjlb WHERE parent_id_=' + this.parentData.id_
-                        this.$common.request('sql', sql).then(res => {
+                        // const sql = 'select* from t_jjbjlb WHERE parent_id_=' + this.parentData.id_
+                        this.$common.request('query', {
+                            key: 'getJjbByParentId',
+                            params: [this.parentData.id_]
+                        }).then(res => {
                             const count = res.variables.data.length
                             subtablesData.parent_id_ = this.parentData.id_
                             switch (count) {

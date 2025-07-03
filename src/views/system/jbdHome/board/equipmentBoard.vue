@@ -91,7 +91,11 @@ export default {
     },
     data () {
         const d = new Date()
+        const { first, second } = this.$store.getters.level || {}
+        const { deptList } = this.$store.getters || {}
         return {
+            level: second || first,
+            deptList,
             titleName: '设备管理看板',
             year: d.toJSON().slice(0, 4),
             month: d.toJSON().slice(0, 7),
@@ -119,7 +123,7 @@ export default {
             // 新
             moreBarData: {
                 data: { dimensions: [], source: [] },
-                config: { idSelector: 'eqFinish', title: '各部门设备完好情况', colors: ['#3870e0', '#12bc79','#C1FFC1','#ff0066','#FFFF00'] }
+                config: { idSelector: 'eqFinish', title: '各部门设备完好情况', colors: ['#3870e0', '#12bc79', '#C1FFC1', '#ff0066', '#FFFF00'] }
             },
             zichangBarData: {
                 data: [],
@@ -142,7 +146,7 @@ export default {
             allSheBeiData: {
                 data: [{ name: '良好数', value: 0 }, { name: '限用数', value: 0 }, { name: '停用数', value: 0 }, { name: '报废数', value: 0 }],
                 config: { title: '检验科设备完好情况', idSelector: 'allShebei' },
-                color: ['#12bc79', '#C1FFC1', '#FF0033','#FFFF00']
+                color: ['#12bc79', '#C1FFC1', '#FF0033', '#FFFF00']
             },
             allWeihuSheBeiData: {
                 data: [{ name: '待处理', value: 0 }, { name: '已完成', value: 0 }],
@@ -191,12 +195,9 @@ export default {
             this.getZichanBarData()
         },
         async getTopBarData () {
-            const this_ = this
-            let didian = ''
-            this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
-            didian.includes(',') ? didian = didian.split(',')[0] : ''
+            const didian = this.level
             this.MiddleLeftPieViewList = { data: [], config: { idSelector: 'main' }, rowNum: 7, color: [] }
-            this_.sheBeiDataShow = false
+            this.sheBeiDataShow = false
             this.eBgRateData = { data: [], config: {}}
             this.sheBeiHeChaData = { data: [], config: {}}
             this.jianDingjiaoZhunSheBeiData = { data: [], config: {}}
@@ -205,208 +206,206 @@ export default {
             this.bottomData = { xData: [], data: [], config: { idSelector: '' }}
             this.zhuantaiEData = { xData: [], data: [], config: { idSelector: '' }}
             this.sheBeiweiHuData = { xData: [], data: [], config: { idSelector: '' }}
-            const sql =
-      `select a.Equipments,a1.mony,b.addEquipments,c.testEquipments,c1.testNoEquipments,e.goodEquipments,f.scrapEquipments,g.limitedEquipments,h.weiHuNoEquipments,h1.weiHuEquipments  FROM  
-      (select COUNT(*) AS Equipments FROM t_sbdj where di_dian_ = '${didian}') AS a, 
-      (select zi_chan_yuan_zhi_ AS mony FROM t_sbdj where  di_dian_ = '${didian}') AS a1, 
-      (select COUNT(*) AS addEquipments  FROM t_yqsbysb WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' AND shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS b,
-      (select COUNT(*) AS testNoEquipments FROM t_jyxtxzjgyzhqrjlb WHERE bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' or create_time_ LIKE '%${this_.month.slice(0, 4)}%' and  di_dian_ = '${didian}') AS c1,    
-      (select COUNT(*) AS testEquipments FROM t_jyxtxzjgyzhqrjlb WHERE bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' and  shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS c,  
-      (select COUNT(*) AS goodEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='合格' and  di_dian_ = '${didian}') AS e,    
-      (select COUNT(*) AS scrapEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='停用' OR she_bei_zhuang_ta ='暂停使用' and  di_dian_ = '${didian}') AS f,      
-      (select COUNT(*) AS limitedEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='报废' and  di_dian_ = '${didian}') AS g,    
-      (select  COUNT(*) AS weiHuNoEquipments FROM t_mjsbwhbyjlby WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' or create_time_ LIKE '%${this_.month}%' and  di_dian_ = '${didian}') AS h,  
-      (select COUNT(*) AS weiHuEquipments  FROM t_mjsbwhbyjlby WHERE bian_zhi_shi_jian LIKE '%${this_.month}%' AND shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS h1`
-            await curdPost('sql', sql)
-                .then((res) => {
-                    const data = res.variables.data
+            const year = this.month.slice(0, 4)
+            /* const sql =
+      `select a.Equipments,a1.mony,b.addEquipments,c.testEquipments,c1.testNoEquipments,e.goodEquipments,f.scrapEquipments,g.limitedEquipments,h.weiHuNoEquipments,h1.weiHuEquipments  FROM
+      (select COUNT(*) AS Equipments FROM t_sbdj where di_dian_ = '${didian}') AS a,
+      (select zi_chan_yuan_zhi_ AS mony FROM t_sbdj where  di_dian_ = '${didian}') AS a1,
+      (select COUNT(*) AS addEquipments  FROM t_yqsbysb WHERE bian_zhi_shi_jian LIKE concat('%', '${this.month}','%') AND shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS b,
+      (select COUNT(*) AS testNoEquipments FROM t_jyxtxzjgyzhqrjlb WHERE bian_zhi_shi_jian LIKE concat('%', '${year}','%') or create_time_ LIKE concat('%', '${year}','%') and  di_dian_ = '${didian}') AS c1,
+      (select COUNT(*) AS testEquipments FROM t_jyxtxzjgyzhqrjlb WHERE bian_zhi_shi_jian LIKE concat('%', '${year}','%') and  shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS c,
+      (select COUNT(*) AS goodEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='合格' and  di_dian_ = '${didian}') AS e,
+      (select COUNT(*) AS scrapEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='停用' OR she_bei_zhuang_ta ='暂停使用' and  di_dian_ = '${didian}') AS f,
+      (select COUNT(*) AS limitedEquipments  FROM t_sbdj WHERE she_bei_zhuang_ta ='报废' and  di_dian_ = '${didian}') AS g,
+      (select  COUNT(*) AS weiHuNoEquipments FROM t_mjsbwhbyjlby WHERE bian_zhi_shi_jian LIKE concat('%', '${this.month}','%') or create_time_ LIKE concat('%', '${this.month}','%') and  di_dian_ = '${didian}') AS h,
+      (select COUNT(*) AS weiHuEquipments  FROM t_mjsbwhbyjlby WHERE bian_zhi_shi_jian LIKE concat('%', '${this.month}','%') AND shi_fou_guo_shen_ ='已完成' and  di_dian_ = '${didian}') AS h1` */
+            await curdPost('query', {
+                key: 'devMgtBoard1',
+                params: [didian, this.month, year]
+            }).then((res) => {
+                const data = res.variables.data
 
-                    let zichan = this_.getAllMonyInt(data)
-                    zichan = zichan + ''
-                    if (zichan.length > 4) {
-                        zichan = zichan.substring(0, zichan.length - 4)
+                let zichan = this.getAllMonyInt(data)
+                zichan = zichan + ''
+                if (zichan.length > 4) {
+                    zichan = zichan.substring(0, zichan.length - 4)
+                }
+
+                const eIntactnessRate = Number(((data[0].goodEquipments / data[0].Equipments).toFixed(2) * 100 + '').slice(0, 5))
+                const eBadRate = Number(((100 - eIntactnessRate).toFixed(4) + '').slice(0, 4))
+                let obj = {}
+                obj.value = Number(((data[0].goodEquipments / data[0].Equipments).toFixed(4) * 100 + '').slice(0, 5))
+                obj.name = '正常设备数'
+                this.MiddleLeftPieViewList.data.push(obj)
+                obj = {}
+                obj.value = Number(((data[0].scrapEquipments / data[0].Equipments).toFixed(4) * 100 + '').slice(0, 5))
+                obj.name = '停用/报废'
+                this.MiddleLeftPieViewList.data.push(obj)
+                this.MiddleLeftPieViewList.color = ['#339933', '#FFFF66', '#FF0033']
+                this.MiddleLeftPieViewList.config.title = '设备各工作状态数量统计'
+                this.MiddleLeftPieViewList.config.idSelector = 'main2'
+                obj = {}
+                const result = [
+                    {
+                        title: '',
+                        children: [
+                            {
+                                label: '设备总数',
+                                value: data[0].Equipments,
+                                danwei: ''
+                            },
+                            {
+                                label: '新增数',
+                                value: data[0].addEquipments,
+                                danwei: ''
+                            },
+                            {
+                                label: '正常数',
+                                value: data[0].goodEquipments,
+                                danwei: ''
+                            },
+                            {
+                                label: '报废/停用数',
+                                value: data[0].scrapEquipments,
+                                danwei: ''
+                            }
+                        ]
+                    },
+                    {
+                        title: '',
+                        children: [
+                            {
+                                label: '计划维护数',
+                                value: data[0].weiHuNoEquipments,
+                                danwei: ''
+                            },
+                            {
+                                label: '已维护数',
+                                value: data[0].weiHuEquipments,
+                                danwei: ''
+                            }
+                        ]
+                    },
+                    {
+                        title: '',
+                        children: [
+                            {
+                                label: '计划检定/校准数',
+                                value: data[0].testNoEquipments,
+                                danwei: ''
+                            },
+                            {
+                                label: '已检定/校准数',
+                                value: data[0].testEquipments,
+                                danwei: ''
+                            }
+                        ]
+                    },
+                    {
+                        title: '',
+                        children: [
+                            {
+                                label: '完好率',
+                                value: eIntactnessRate,
+                                danwei: '%'
+                            },
+                            {
+                                label: '故障率',
+                                value: eBadRate,
+                                danwei: '%'
+                            },
+                            {
+                                label: zichan.length > 4 ? '总值(万元)' : '总值(元)',
+                                value: zichan,
+                                danwei: ''
+                            }
+                        ]
                     }
-
-                    const eIntactnessRate = Number(((data[0].goodEquipments / data[0].Equipments).toFixed(2) * 100 + '').slice(0, 5))
-                    const eBadRate = Number(((100 - eIntactnessRate).toFixed(4) + '').slice(0, 4))
-                    let obj = {}
-                    obj.value = Number(((data[0].goodEquipments / data[0].Equipments).toFixed(4) * 100 + '').slice(0, 5))
-                    obj.name = '正常设备数'
-                    this_.MiddleLeftPieViewList.data.push(obj)
-                    obj = {}
-                    obj.value = Number(((data[0].scrapEquipments / data[0].Equipments).toFixed(4) * 100 + '').slice(0, 5))
-                    obj.name = '停用/报废'
-                    this_.MiddleLeftPieViewList.data.push(obj)
-                    this_.MiddleLeftPieViewList.color = ['#339933', '#FFFF66', '#FF0033']
-                    this_.MiddleLeftPieViewList.config.title = '设备各工作状态数量统计'
-                    this_.MiddleLeftPieViewList.config.idSelector = 'main2'
-                    obj = {}
-                    const result = [
-                        {
-                            title: '',
-                            children: [
-                                {
-                                    label: '设备总数',
-                                    value: data[0].Equipments,
-                                    danwei: ''
-                                },
-                                {
-                                    label: '新增数',
-                                    value: data[0].addEquipments,
-                                    danwei: ''
-                                },
-                                {
-                                    label: '正常数',
-                                    value: data[0].goodEquipments,
-                                    danwei: ''
-                                },
-                                {
-                                    label: '报废/停用数',
-                                    value: data[0].scrapEquipments,
-                                    danwei: ''
-                                }
-                            ]
-                        },
-                        {
-                            title: '',
-                            children: [
-                                {
-                                    label: '计划维护数',
-                                    value: data[0].weiHuNoEquipments,
-                                    danwei: ''
-                                },
-                                {
-                                    label: '已维护数',
-                                    value: data[0].weiHuEquipments,
-                                    danwei: ''
-                                }
-                            ]
-                        },
-                        {
-                            title: '',
-                            children: [
-                                {
-                                    label: '计划检定/校准数',
-                                    value: data[0].testNoEquipments,
-                                    danwei: ''
-                                },
-                                {
-                                    label: '已检定/校准数',
-                                    value: data[0].testEquipments,
-                                    danwei: ''
-                                }
-                            ]
-                        },
-                        {
-                            title: '',
-                            children: [
-                                {
-                                    label: '完好率',
-                                    value: eIntactnessRate,
-                                    danwei: '%'
-                                },
-                                {
-                                    label: '故障率',
-                                    value: eBadRate,
-                                    danwei: '%'
-                                },
-                                {
-                                    label: zichan.length > 4 ? '总值(万元)' : '总值(元)',
-                                    value: zichan,
-                                    danwei: ''
-                                }
-                            ]
-                        }
-                    ]
-                    // 设备数量统计
-                    // this_.sheBeiData.xData = ["设备总数","新增数","良好数","报废停用数",];
-                    this_.sheBeiData.xData = ['设备总数', '良好数']
-                    this_.sheBeiData.data.push(data[0].Equipments)
-                    // this_.sheBeiData.data.push(data[0].addEquipments);
-                    this_.sheBeiData.data.push(data[0].goodEquipments)
-                    // this_.sheBeiData.data.push(data[0].limitedEquipments);
-                    // this_.sheBeiData.data.push(data[0].scrapEquipments);
-                    this_.sheBeiData.config.title = '设备完好情况'
-                    this_.sheBeiData.config.idSelector = 'main8'
-                    this_.sheBeiDataShow = true
-                    this_.zhuantaiEData.xData = ['计划检定/校准数', '已完成检定/校准数']
-                    this_.zhuantaiEData.data.push(data[0].testNoEquipments)
-                    this_.zhuantaiEData.data.push(data[0].testEquipments)
-                    this_.zhuantaiEData.config.title = '检定/校准设备完成图'
-                    this_.zhuantaiEData.config.idSelector = 'main3'
-                    // 维护设备数柱状图
-                    this_.sheBeiweiHuData.xData = ['计划维护数', '已完成数']
-                    this_.sheBeiweiHuData.data.push(data[0].weiHuNoEquipments)
-                    this_.sheBeiweiHuData.data.push(data[0].weiHuEquipments)
-                    this_.sheBeiweiHuData.config.title = '设备维护柱状图'
-                    this_.sheBeiweiHuData.config.idSelector = 'mainWeiHuZ'
-                    let objRate = {}
-                    objRate.name = '完好率'
-                    objRate.value = eIntactnessRate
-                    this_.eBgRateData.data.push(objRate)
-                    objRate = {}
-                    objRate.value = eBadRate
-                    objRate.name = '故障率'
-                    this_.eBgRateData.data.push(objRate)
-                    this_.eBgRateData.color = ['#339933', '#FF0033']
-                    this_.eBgRateData.config.title = '设备工作状态完成率'
-                    this_.eBgRateData.config.idSelector = 'main1'
-                    // 设备数维护
-                    let objweihu = {}
-                    objweihu.name = '计划维护数'
-                    objweihu.value = data[0].weiHuNoEquipments
-                    this_.weiHuSheBeiData.data.push(objweihu)
-                    objweihu = {}
-                    objweihu.value = data[0].weiHuEquipments
-                    objweihu.name = '已维护数'
-                    this_.weiHuSheBeiData.data.push(objweihu)
-                    this_.weiHuSheBeiData.color = ['#5470c6', '#38a838']
-                    this_.weiHuSheBeiData.config.title = '设备维护完成情况'
-                    this_.weiHuSheBeiData.config.idSelector = 'mainWeiHu'
-                    // 设备数检定校准
-                    let objJianding = {}
-                    objJianding.name = '计划检定/校准数'
-                    objJianding.value = data[0].testNoEquipments
-                    this_.jianDingjiaoZhunSheBeiData.data.push(objJianding)
-                    objJianding = {}
-                    objJianding.value = data[0].testEquipments
-                    objJianding.name = '已完成数'
-                    this_.jianDingjiaoZhunSheBeiData.data.push(objJianding)
-                    this_.jianDingjiaoZhunSheBeiData.color = ['#5470c6', '#38a838']
-                    this_.jianDingjiaoZhunSheBeiData.config.title = '设备检定/校准完成情况'
-                    this_.jianDingjiaoZhunSheBeiData.config.idSelector = 'mainJianDing'
-                    objRate = {}
-                    this_.topBarData = result
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
+                ]
+                // 设备数量统计
+                // this.sheBeiData.xData = ["设备总数","新增数","良好数","报废停用数",];
+                this.sheBeiData.xData = ['设备总数', '良好数']
+                this.sheBeiData.data.push(data[0].Equipments)
+                // this.sheBeiData.data.push(data[0].addEquipments);
+                this.sheBeiData.data.push(data[0].goodEquipments)
+                // this.sheBeiData.data.push(data[0].limitedEquipments);
+                // this.sheBeiData.data.push(data[0].scrapEquipments);
+                this.sheBeiData.config.title = '设备完好情况'
+                this.sheBeiData.config.idSelector = 'main8'
+                this.sheBeiDataShow = true
+                this.zhuantaiEData.xData = ['计划检定/校准数', '已完成检定/校准数']
+                this.zhuantaiEData.data.push(data[0].testNoEquipments)
+                this.zhuantaiEData.data.push(data[0].testEquipments)
+                this.zhuantaiEData.config.title = '检定/校准设备完成图'
+                this.zhuantaiEData.config.idSelector = 'main3'
+                // 维护设备数柱状图
+                this.sheBeiweiHuData.xData = ['计划维护数', '已完成数']
+                this.sheBeiweiHuData.data.push(data[0].weiHuNoEquipments)
+                this.sheBeiweiHuData.data.push(data[0].weiHuEquipments)
+                this.sheBeiweiHuData.config.title = '设备维护柱状图'
+                this.sheBeiweiHuData.config.idSelector = 'mainWeiHuZ'
+                let objRate = {}
+                objRate.name = '完好率'
+                objRate.value = eIntactnessRate
+                this.eBgRateData.data.push(objRate)
+                objRate = {}
+                objRate.value = eBadRate
+                objRate.name = '故障率'
+                this.eBgRateData.data.push(objRate)
+                this.eBgRateData.color = ['#339933', '#FF0033']
+                this.eBgRateData.config.title = '设备工作状态完成率'
+                this.eBgRateData.config.idSelector = 'main1'
+                // 设备数维护
+                let objweihu = {}
+                objweihu.name = '计划维护数'
+                objweihu.value = data[0].weiHuNoEquipments
+                this.weiHuSheBeiData.data.push(objweihu)
+                objweihu = {}
+                objweihu.value = data[0].weiHuEquipments
+                objweihu.name = '已维护数'
+                this.weiHuSheBeiData.data.push(objweihu)
+                this.weiHuSheBeiData.color = ['#5470c6', '#38a838']
+                this.weiHuSheBeiData.config.title = '设备维护完成情况'
+                this.weiHuSheBeiData.config.idSelector = 'mainWeiHu'
+                // 设备数检定校准
+                let objJianding = {}
+                objJianding.name = '计划检定/校准数'
+                objJianding.value = data[0].testNoEquipments
+                this.jianDingjiaoZhunSheBeiData.data.push(objJianding)
+                objJianding = {}
+                objJianding.value = data[0].testEquipments
+                objJianding.name = '已完成数'
+                this.jianDingjiaoZhunSheBeiData.data.push(objJianding)
+                this.jianDingjiaoZhunSheBeiData.color = ['#5470c6', '#38a838']
+                this.jianDingjiaoZhunSheBeiData.config.title = '设备检定/校准完成情况'
+                this.jianDingjiaoZhunSheBeiData.config.idSelector = 'mainJianDing'
+                objRate = {}
+                this.topBarData = result
+            }).catch((err) => {
+                console.log(err)
+            })
         },
         async getCarouselShiYonglvTable () { // 设备建档信息
-            const this_ = this
-            let didian = ''
-            this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
-            didian.includes(',') ? didian = didian.split(',')[0] : ''
-            const sql = `select a.she_bei_shi_bie_h,a.she_bei_ming_cheng_,a.cun_fang_di_dian_,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a JOIN ibps_party_employee AS b ON a.guan_li_ren_ = b.ID_ where a.di_dian_ = '${didian}'`
+            // const sql = `select a.she_bei_shi_bie_h,a.she_bei_ming_cheng_,a.cun_fang_di_dian_,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a JOIN ibps_party_employee AS b ON a.guan_li_ren_ = b.ID_ where a.di_dian_ = '${this.level}'`
             let data1 = []
-            const res1 = []
-            this_.shiyonglvConfig.data = []
-            await curdPost('sql', sql)
-                .then((res) => {
-                    const result = res.variables.data
-                    result.forEach((item) => {
-                        data1 = []
-                        data1.push(item.she_bei_shi_bie_h)
-                        data1.push(item.she_bei_ming_cheng_)
-                        data1.push(item.cun_fang_di_dian_)
-                        data1.push(item.she_bei_zhuang_ta)
-                        data1.push(item.name_)
-                        this_.shiyonglvConfig.data.push(data1)
-                    })
+            this.shiyonglvConfig.data = []
+            await curdPost('query', {
+                key: 'devMgtBoard2',
+                params: [this.level]
+            }).then((res) => {
+                const result = res.variables.data
+                result.forEach((item) => {
+                    data1 = []
+                    data1.push(item.she_bei_shi_bie_h)
+                    data1.push(item.she_bei_ming_cheng_)
+                    data1.push(item.cun_fang_di_dian_)
+                    data1.push(item.she_bei_zhuang_ta)
+                    data1.push(item.name_)
+                    this.shiyonglvConfig.data.push(data1)
                 })
-                .catch((err) => {
-                    console.log(err)
-                })
+            }).catch((err) => {
+                console.log(err)
+            })
             this.isup = true
         },
         timestampToTime (timestamp) {
@@ -420,19 +419,36 @@ export default {
             return Y + M + D
         },
         async getMoreBarData () {
-            const this_ = this
             this.moreBarData.data.source = []
-            let didian = ''
-            this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
-            didian.includes(',') ? didian = didian.split(',')[0] : ''
             this.moreBarData.data.dimensions = ['product', '设备总数', '良好数', '限用数', '停用数', '报废数']
-            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
-            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='合格'  GROUP BY a.bian_zhi_bu_men_`
-            const sql3 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='限用'  GROUP BY a.bian_zhi_bu_men_`
-            const sql4 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='停用'  GROUP BY a.bian_zhi_bu_men_`
-            const sql5 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total  FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${didian}' and a.she_bei_zhuang_ta ='报废'  GROUP BY a.bian_zhi_bu_men_`
+            // const sql1 = `select DISTINCT(a.bian_zhi_bu_men_), name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ where b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${this.level}' GROUP BY a.bian_zhi_bu_men_`
+            // const sql2 = `select DISTINCT(a.bian_zhi_bu_men_), name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${this.level}' and a.she_bei_zhuang_ta ='合格' GROUP BY a.bian_zhi_bu_men_`
+            // const sql3 = `select DISTINCT(a.bian_zhi_bu_men_), name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${this.level}' and a.she_bei_zhuang_ta ='限用' GROUP BY a.bian_zhi_bu_men_`
+            // const sql4 = `select DISTINCT(a.bian_zhi_bu_men_), name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${this.level}' and a.she_bei_zhuang_ta ='停用' GROUP BY a.bian_zhi_bu_men_`
+            // const sql5 = `select DISTINCT(a.bian_zhi_bu_men_), name_,COUNT(*) AS total FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%' and b.name_ not like '%综合%' and  a.di_dian_ = '${this.level}' and a.she_bei_zhuang_ta ='报废' GROUP BY a.bian_zhi_bu_men_`
             let data1, data2, data3, data4, data5
-            await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2), curdPost('sql', sql3), curdPost('sql', sql4), curdPost('sql', sql5)]).then(([res1, res2, res3, res4, res5]) => {
+            await Promise.all([
+                curdPost('query', {
+                    key: 'devMgtBoard3',
+                    params: [this.level]
+                }),
+                curdPost('query', {
+                    key: 'devMgtBoard4',
+                    params: [this.level]
+                }),
+                curdPost('query', {
+                    key: 'devMgtBoard5',
+                    params: [this.level]
+                }),
+                curdPost('query', {
+                    key: 'devMgtBoard6',
+                    params: [this.level]
+                }),
+                curdPost('query', {
+                    key: 'devMgtBoard7',
+                    params: [this.level]
+                })
+            ]).then(([res1, res2, res3, res4, res5]) => {
                 if (res1.state === 200) {
                     data1 = res1.variables.data
                 }
@@ -489,7 +505,7 @@ export default {
                     }
                 })
             })
-            
+
             if (source.length === 0) {
                 this.moreBarData.data.source = [999]
             } else {
@@ -497,7 +513,7 @@ export default {
             }
 
             // let allTotal = 0; let goods = 0; let deactivates = 0
-            let goods = 0; let restricts = 0; let deactivates = 0; let scraps = 0;
+            let goods = 0; let restricts = 0; let deactivates = 0; let scraps = 0
             source.forEach(item => {
                 // allTotal += item['设备总数']
                 goods += item['良好数']
@@ -514,21 +530,25 @@ export default {
             this.allSheBeiData.data[1].value = restricts
             this.allSheBeiData.data[2].value = deactivates
             this.allSheBeiData.data[3].value = scraps
-           
         },
         async getWeihuBarData () {
-            const this_ = this
             this.weihuBarData.data.source = []
-            let didian = ''
-            this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
-            didian.includes(',') ? didian = didian.split(',')[0] : ''
-            // 计划数，查询设备维护计划表完成数
-            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE '%${this_.today}%' and b.name_ not like '%综合%' and b.name_ not like '%综合%' AND a.shi_fou_guo_shen_ != '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
-            //   维护记录数
-            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE '%${this_.today}%' and b.name_ not like '%综合%' and b.name_ not like '%综合%' AND a.shi_fou_guo_shen_ = '已完成' AND a.di_dian_ = '${didian}' GROUP BY a.bian_zhi_bu_men_`
+            // // 计划数，查询设备维护计划表完成数
+            // const sql1 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE concat('%', '${this.today}', '%') and b.name_ not like '%综合%' and b.name_ not like '%综合%' AND a.shi_fou_guo_shen_ != '已完成' AND a.di_dian_ = '${this.level}' GROUP BY a.bian_zhi_bu_men_`
+            // //   维护记录数
+            // const sql2 = `select DISTINCT(a.bian_zhi_bu_men_) ,name_,COUNT(*) AS total FROM t_mjsbwhbyjlby AS a JOIN ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.ji_hua_shi_jian_ LIKE concat('%', '${this.today}', '%') and b.name_ not like '%综合%' and b.name_ not like '%综合%' AND a.shi_fou_guo_shen_ = '已完成' AND a.di_dian_ = '${this.level}' GROUP BY a.bian_zhi_bu_men_`
             this.weihuBarData.data.dimensions = ['product', '待处理', '已完成']
             let data1, data2
-            await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2)]).then(([res1, res2]) => {
+            await Promise.all([
+                curdPost('query', {
+                    key: 'devMgtBoard8',
+                    params: [this.today, this.level]
+                }),
+                curdPost('query', {
+                    key: 'devMgtBoard9',
+                    params: [this.today, this.level]
+                })
+            ]).then(([res1, res2]) => {
                 if (res1.state === 200) {
                     data1 = res1.variables.data
                 }
@@ -597,14 +617,15 @@ export default {
             }
         },
         async getZichanBarData () {
-            const this_ = this
-            let didian = ''
-            this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
-            didian.includes(',') ? didian = didian.split(',')[0] : ''
-            const sql1 = `select a.bian_zhi_bu_men_,name_,a.zi_chan_yuan_zhi_ FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%'  and b.name_ not like '%综合%' and a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ ASC`
+            // const sql1 = `select a.bian_zhi_bu_men_,name_,a.zi_chan_yuan_zhi_ FROM t_sbdj AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE b.name_ not like '%检验科%'  and b.name_ not like '%综合%' and a.di_dian_ = '${this.level}' ORDER BY a.bian_zhi_bu_men_ ASC`
             const source = []
             let data1
-            await Promise.all([curdPost('sql', sql1)]).then(([res1, res2]) => {
+            await Promise.all([
+                curdPost('query', {
+                    key: 'devMgtBoard10',
+                    params: [this.level]
+                })
+            ]).then(([res1, res2]) => {
                 if (res1.state === 200) {
                     data1 = res1.variables.data
                 }
@@ -660,16 +681,22 @@ export default {
             }
         },
         async getJiaozhunBarData () {
-            const this_ = this
             this.jiaozhunBarData.data.source = []
-            let didian = ''
-            this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
-            didian.includes(',') ? didian = didian.split(',')[0] : ''
-            const sql1 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND (shi_fou_guo_shen_ = '已审批' or shi_fou_guo_shen_ = '已完成')) AND a.di_dian_ = '${didian}'  and b.name_ not like '%综合%' GROUP BY a.bian_zhi_bu_men_`
-            const sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE '%${this_.month.slice(0, 4)}%' OR create_time_ LIKE '%${this_.month.slice(0, 4)}%') AND shi_fou_guo_shen_ = '已完成') AND a.di_dian_ = '${didian}' and b.name_ not like '%综合%' GROUP BY a.bian_zhi_bu_men_`
+            const year = this.month.slice(0, 4)
+            // const sql1 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE concat('%', '${year}', '%') OR create_time_ LIKE concat('%', '${year}', '%')) AND (shi_fou_guo_shen_ = '已审批' or shi_fou_guo_shen_ = '已完成')) AND a.di_dian_ = '${this.level}'  and b.name_ not like '%综合%' GROUP BY a.bian_zhi_bu_men_`
+            // const sql2 = `select DISTINCT(a.bian_zhi_bu_men_),name_,COUNT(*) AS total FROM t_mjsbjdxzjhzb AS a JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE a.parent_id_ IN ( SELECT id_ FROM t_mjsbjdxzjh WHERE (bian_zhi_shi_jian LIKE concat('%', '${year}', '%') OR create_time_ LIKE concat('%', '${year}', '%')) AND shi_fou_guo_shen_ = '已完成') AND a.di_dian_ = '${this.level}' and b.name_ not like '%综合%' GROUP BY a.bian_zhi_bu_men_`
             this.jiaozhunBarData.data.dimensions = ['product', '计划数', '完成数']
             let data1, data2
-            await Promise.all([curdPost('sql', sql1), curdPost('sql', sql2)]).then(([res1, res2]) => {
+            await Promise.all([
+                curdPost('query', {
+                    key: 'devMgtBoard11',
+                    params: [year, this.level]
+                }),
+                curdPost('query', {
+                    key: 'devMgtBoard12',
+                    params: [year, this.level]
+                })
+            ]).then(([res1, res2]) => {
                 if (res1.state === 200) {
                     data1 = res1.variables.data
                 }
@@ -736,30 +763,26 @@ export default {
                 rowNum: 6,
                 data: []
             }
-            const this_ = this
-            let didian = ''
-            this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
-            didian.includes(',') ? didian = didian.split(',')[0] : ''
-            // const sql =`select * from t_sbdj where (she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' or she_bei_zhuang_ta ='报废/停用') and  di_dian_ = '${didian}'`;
-            // const sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' and b.name_ not like '%综合%' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
-            const sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' and b.name_ not like '%综合%' AND a.di_dian_ = '${didian}' ORDER BY a.bian_zhi_bu_men_ DESC`
+            // const sql = `select a.she_bei_ming_cheng_, a.she_bei_shi_bie_h,a.she_bei_zhuang_ta,b.name_ FROM t_sbdj AS a  JOIN  ibps_party_position AS b ON a.bian_zhi_bu_men_ = b.id_ WHERE she_bei_zhuang_ta ='停用' or she_bei_zhuang_ta ='报废' and b.name_ not like '%综合%' AND a.di_dian_ = '${this.level}' ORDER BY a.bian_zhi_bu_men_ DESC`
             let data1 = []
-            await curdPost('sql', sql)
-                .then((res) => {
-                    this_.BaofeiBarData.data = []
-                    const result = res.variables.data
-                    if (result.length === 0) {
-                        this_.BaofeiBarData.data = [999]
-                    }
-                    result.forEach((item) => {
-                        data1 = []
-                        data1.push(item.name_)
-                        data1.push(item.she_bei_ming_cheng_)
-                        data1.push(item.she_bei_shi_bie_h)
-                        data1.push(item.she_bei_zhuang_ta)
-                        this_.BaofeiBarData.data.push(data1)
-                    })
+            await curdPost('query', {
+                key: 'devMgtBoard13',
+                params: [this.level]
+            }).then((res) => {
+                this.BaofeiBarData.data = []
+                const result = res.variables.data
+                if (result.length === 0) {
+                    this.BaofeiBarData.data = [999]
+                }
+                result.forEach((item) => {
+                    data1 = []
+                    data1.push(item.name_)
+                    data1.push(item.she_bei_ming_cheng_)
+                    data1.push(item.she_bei_shi_bie_h)
+                    data1.push(item.she_bei_zhuang_ta)
+                    this.BaofeiBarData.data.push(data1)
                 })
+            })
                 .catch((err) => {
                     console.log(err)
                 })
@@ -778,12 +801,11 @@ export default {
             return mony
         },
         async getEnTypeData () {
-            const this_ = this
-            let didian = ''
-            this_.$store.getters.level.second ? didian = this_.$store.getters.level.second : didian = this_.$store.getters.level.first
-            didian.includes(',') ? didian = didian.split(',')[0] : ''
-            const sql = `select DISTINCT(she_bei_lei_xing_),COUNT(*) AS total  FROM t_sbdj where di_dian_ = '${didian}' GROUP BY she_bei_lei_xing_`
-            let data = await curdPost('sql', sql)
+            // const sql = `select DISTINCT(she_bei_lei_xing_),COUNT(*) AS total  FROM t_sbdj where di_dian_ = '${this.level}' GROUP BY she_bei_lei_xing_`
+            let data = await curdPost('query', {
+                key: 'devMgtBoard14',
+                params: [this.level]
+            })
             data = data.variables.data
 
             const dataTypes = [
@@ -801,17 +823,17 @@ export default {
             })
 
             let objJianding = {}
-            this_.enTypeData.data = []
+            this.enTypeData.data = []
             // dataTypes.forEach(item=>{
             for (const item of dataTypes) {
                 objJianding = {}
                 objJianding.name = item.she_bei_lei_xing_
                 objJianding.value = item.total
-                this_.enTypeData.data.push(objJianding)
+                this.enTypeData.data.push(objJianding)
             }
-            this_.enTypeData.color = ['#339933', '#3366CC', '#FF9933', '#FFFF00']
-            this_.enTypeData.config.title = '检验科各型设备分布情况'
-            this_.enTypeData.config.idSelector = 'enTypeId'
+            this.enTypeData.color = ['#339933', '#3366CC', '#FF9933', '#FFFF00']
+            this.enTypeData.config.title = '检验科各型设备分布情况'
+            this.enTypeData.config.idSelector = 'enTypeId'
         }
     }
 }

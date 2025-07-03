@@ -34,9 +34,9 @@
                                 size="mini"
                             >{{ item.name }}</el-tag>
                         </div>
-                        <div style="display: flex; align-items: center;">
+                        <div style="display: flex; align-items: center;flex-wrap: wrap;">
                             <template v-if="todaySchedule.length">
-                                <span>今日班次：</span>
+                                <span style="flex-shrink:0;">今日班次：</span>
                                 <el-tag
                                     v-for="(item, index) in todaySchedule"
                                     :key="index"
@@ -45,15 +45,23 @@
                                     size="mini"
                                 >{{ item }}</el-tag>
                             </template>
-                            <span v-else>今日无排班，祝您休息愉快！</span>
+                            <span v-else style="text-overflow: ellipsis;width: 190px;">今日无排班，祝您休息愉快！</span>
                             <!--<a style="color: #409eff;" @click="showMySchedule">我的排班</a>-->
                             <el-button
                                 type="primary"
                                 size="mini"
                                 plain
                                 @click="showMySchedule"
-                                style="display: flex; align-items: center; padding: 4px 5px;"
+                                style="display: flex; align-items: center; height: 20px;padding: 0 5px;line-height: 19px;margin-left: 4px;"
                             ><i class="el-icon-date"  style="margin-right: 3px;" ></i>我的排班</el-button>
+                            <el-button
+                                type="primary"
+                                size="mini"
+                                plain
+                                v-if="todaySchedule.length > 0 "
+                                @click="handleClockFromTab(todaySchedule)"
+                                style="display: flex; align-items: center; height: 20px;padding: 0 5px;line-height: 19px;margin-left: 4px;"
+                            >打卡</el-button>
                         </div>
                     </div>
                 </div>

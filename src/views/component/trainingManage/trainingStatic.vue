@@ -258,9 +258,13 @@ export default {
         },
 
         async onRegister (row) {
-            const sql = `select * from t_qdxxb where ren_yuan_id_='${this.params.peixunrenyuan}' and guan_lian_id_='${row.id_}'`
-            const { variables: { data }} = await this.$common.request('sql', sql)
-            if (data.length > 0) {
+            // const sql = `select * from t_qdxxb where ren_yuan_id_='${this.params.peixunrenyuan}' and guan_lian_id_='${row.id_}'`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getSignInfoByBizKey',
+                params: [row.id_]
+            })
+            const isSign = data.some(item => item.ren_yuan_id_ === this.params.peixunrenyuan)
+            if (isSign) {
                 return this.$message.warning('已签到，请不要重复签到！')
             }
 
@@ -395,14 +399,20 @@ export default {
         },
         // 查询指定人员的培训记录
         async fetchPaperList () {
-            const sql = `select * from t_rypxcjb where FIND_IN_SET('${this.params.peixunrenyuan}', pei_xun_ren_yuan_) > 0 and shi_fou_guo_shen_='已结束'`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select * from t_rypxcjb where FIND_IN_SET('${this.params.peixunrenyuan}', pei_xun_ren_yuan_) > 0 and shi_fou_guo_shen_='已结束'`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getTrainRecordById',
+                params: [this.params.peixunrenyuan]
+            })
             this.tableList = data
         },
         // 获取签到状态
         async fetchRegisterList () {
-            const sql = `select guan_lian_id_,ren_yuan_id_ from t_qdxxb where ren_yuan_id_='${this.params.peixunrenyuan}'`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select guan_lian_id_,ren_yuan_id_ from t_qdxxb where ren_yuan_id_='${this.params.peixunrenyuan}'`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getTrainSignStatus',
+                params: [this.params.peixunrenyuan]
+            })
             this.tableList.forEach(item => {
                 const id_ = item.id_
                 const index = data.findIndex(i => i.guan_lian_id_ === id_)

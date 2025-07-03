@@ -116,7 +116,10 @@ export default {
             height: document.clientHeight,
             logHeight: 600,
             listData: [],
-            pagination: {},
+            pagination: {
+                limit: 20,
+                page: 1
+            },
             sorts: {},
             listConfig: {
                 toolbars: [
@@ -163,7 +166,7 @@ export default {
                 rowHandle: {
                     actions: [{
                         key: 'remove'
-                    },{
+                    }, {
                         key: 'addTrigger',
                         icon: 'ibps-icon-add',
                         label: '添加计划'
@@ -213,14 +216,22 @@ export default {
             const page = {
                 requestPage: {
                     limit: this.pagination.limit || 20,
-                    pageNo: this.pagination.pageNo || 1
+                    pageNo: this.pagination.page || 1
                 }
             }
             queryPageList({
                 jobName,
                 group
             }, page).then(response => {
-                ActionUtils.handleListData(this, response.data)
+                const data = response.data
+                data.pageResult = {
+                    'limit': this.pagination.limit || 20,
+                    'page': this.pagination.page || 1,
+                    'totalCount': data.dataResult.length || 0,
+                    'totalPages': Math.ceil(data.dataResult.length / (this.pagination.limit || 20))
+                }
+                data.dataResult = data.dataResult.slice((this.pagination.page - 1) * this.pagination.limit, this.pagination.page * this.pagination.limit)
+                ActionUtils.handleListData(this, data)
                 this.loading = false
             }).catch(() => {
                 this.loading = false

@@ -138,8 +138,11 @@ export default {
             // this.tableList = data
             this.isZuZhang = this.userId === this.params.zu_chang_id_
             if (this.peopleIds) {
-                const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
-                const { variables: { data }} = await this.$common.request('sql', sql)
+                // const sql = `select * from t_fxsbpgb2 where parent_id_='${this.params.id_}'`
+                const { variables: { data }} = await this.$common.request('query', {
+                    key: 'getFxsbpgb2ByPid',
+                    params: [this.params.id_]
+                })
                 this.detail = data
                 // console.log(data)
                 const people = this.peopleIds.split(',')

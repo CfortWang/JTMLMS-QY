@@ -104,7 +104,6 @@ import { save, get } from '@/api/platform/cat/type'
 import ActionUtils from '@/utils/action'
 import { srtuOptions } from './constants'
 import { validateKey } from '@/utils/validate'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js' // 增删改查规则
 export default {
     props: {
         className: String,
@@ -227,7 +226,7 @@ export default {
                     }
                 }]
             }
-            curdPost('update', params).then(() => {
+            this.$common.request('update', params).then(() => {
                 this.$emit('callback', true)
                 this.dialogVisible = false
                 this.$message({

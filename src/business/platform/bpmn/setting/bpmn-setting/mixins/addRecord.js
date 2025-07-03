@@ -1,7 +1,3 @@
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
-import request from '@/utils/request'
-import ActionUtils from '@/utils/action'
-
 export default {
     data () {
         return {
@@ -11,8 +7,11 @@ export default {
     },
     methods: {
         getRecord (id) {
-            const sql = `select * from t_lcidglbdbb where gui_dang_lei_xing = 'process' and liu_cheng_xuan_ze = '${id}'`
-            curdPost('sql', sql).then(res => {
+            // const sql = `select * from t_lcidglbdbb where gui_dang_lei_xing = 'process' and liu_cheng_xuan_ze = '${id}'`
+            this.$common.request('query', {
+                key: 'getReportByBpmKey',
+                params: [id]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (!data.length) {
                     return
@@ -54,7 +53,7 @@ export default {
                     gui_dang_lei_xing: 'process'
                 }]
             }
-            curdPost('add', params).then(() => {
+            this.$common.request('add', params).then(() => {
                 this.flag = true
                 this.$message.success('添加成功！')
             })
@@ -80,7 +79,7 @@ export default {
                     }
                 ]
             }
-            curdPost('update', params).then(() => {
+            this.$common.request('update', params).then(() => {
                 this.$message.info('修改成功')
             })
         }

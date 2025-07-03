@@ -136,12 +136,12 @@ export const listSearchForm = {
     guide: {
         forms: [
             { prop: 'range', label: '显示范围', labelWidth: 70, fieldType: 'select', options: rangeOption, value: 'aboutMe' },
-            { prop: 'suo_shu_xi_tong_', label: '所属子系统', labelWidth: 85, fieldType: 'select', options: [] },
-            { prop: 'gong_neng_mo_kuai', label: '所属功能模块', labelWidth: 100, fieldType: 'input' },
-            { prop: 'role', label: '编制角色', labelWidth: 70, fieldType: 'select', options: [] },
-            { prop: 'biao_dan_ming_che', label: '表单名称', labelWidth: 70, fieldType: 'input' },
-            { prop: 'biao_dan_bian_hao', label: '表单编号', labelWidth: 70, fieldType: 'input' },
-            { prop: 'shi_wu_lei_xing_', label: '事务类型', labelWidth: 70, fieldType: 'select', options: taskTypeOption }
+            { prop: 'Q^suo_shu_xi_tong_^S', label: '所属子系统', labelWidth: 85, fieldType: 'select', options: [], multiple: 'Y' },
+            { prop: 'Q^gong_neng_mo_kuai^SL', label: '所属功能模块', labelWidth: 100, fieldType: 'input' },
+            { prop: 'role', label: '编制角色', labelWidth: 70, fieldType: 'select', options: [], multiple: 'Y' },
+            { prop: 'Q^biao_dan_ming_che^SL', label: '表单名称', labelWidth: 70, fieldType: 'input' },
+            { prop: 'Q^biao_dan_bian_hao^SL', label: '表单编号', labelWidth: 70, fieldType: 'input' },
+            { prop: 'Q^shi_wu_lei_xing_^S', label: '事务类型', labelWidth: 70, fieldType: 'select', options: taskTypeOption, multiple: 'Y' }
         ]
     }
 }

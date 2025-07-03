@@ -482,8 +482,11 @@ export default {
                 if (this.QrcodeedDialogShow) {
                     this.QrcodeedDialogShow = false
                 }
-                const sql = `select * FROM t_qrcodeb WHERE guan_lian_id_ = '${this.params.id_}'`
-                this.$common.request('sql', sql).then(res => {
+                // const sql = `select * FROM t_qrcodeb WHERE guan_lian_id_ = '${this.params.id_}'`
+                this.$common.request('query', {
+                    key: 'getQrcodeByBizKey',
+                    params: [this.params.id_]
+                }).then(res => {
                     const cont = res.variables.data
                     if (cont.length === 0) {
                         const arr = []
@@ -529,8 +532,11 @@ export default {
                 this.$message.warning('当前二维码无效，请使用正确的二维码进行扫描!')
                 return
             }
-            const sql = `select * FROM t_qdxxb WHERE guan_lian_id_='${variable}'`
-            this.$common.request('sql', sql).then(response => {
+            // const sql = `select * FROM t_qdxxb WHERE guan_lian_id_='${variable}'`
+            this.$common.request('query', {
+                key: 'getSignInfoByBizKey',
+                params: [variable]
+            }).then(response => {
                 const { data = [] } = response.variables || {}
                 const isExist = data.some(i => i.ren_yuan_id_ === idValue)
                 if (isExist) {
@@ -603,8 +609,11 @@ export default {
         },
         // 判断状态是否已结束
         async getIsFinish () {
-            const sql = `select * from t_jykzjbdjb where id_ = '${this.form.id_}'`
-            const { variables: { data }} = await this.$common.request('sql', sql)
+            // const sql = `select * from t_jykzjbdjb where id_ = '${this.form.id_}'`
+            const { variables: { data }} = await this.$common.request('query', {
+                key: 'getEarlyHandoverState',
+                params: [this.form.id_]
+            })
             if (data[0]?.shi_fou_guo_shen_ === '已完成') {
                 throw new Error('已完成，无法操作！')
             }
@@ -622,8 +631,11 @@ export default {
                             // 提交自动保存
                             await this.goEdit()
                             // 1.确定最终签到人员
-                            const sql3 = `select * from t_qdxxb where guan_lian_id_='${this.params.id_}'`
-                            const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
+                            // const sql3 = `select * from t_qdxxb where guan_lian_id_='${this.params.id_}'`
+                            const { variables: { data: data3 }} = await this.$common.request('query', {
+                                key: 'getSignInfoByBizKey',
+                                params: [this.params.id_]
+                            })
                             const peopleList = [...new Set(data3.map(item => item.ren_yuan_id_))]
                             const shi_ji_qian_dao_r = peopleList.join(',') || ''
                             if (!shi_ji_qian_dao_r) {
@@ -693,8 +705,11 @@ export default {
                 await this.getIsFinish()
 
                 // 1.确定最终签到人员
-                const sql3 = `select * from t_qdxxb where guan_lian_id_='${this.params.id_}'`
-                const { variables: { data: data3 }} = await this.$common.request('sql', sql3)
+                // const sql3 = `select * from t_qdxxb where guan_lian_id_='${this.params.id_}'`
+                const { variables: { data: data3 }} = await this.$common.request('query', {
+                    key: 'getSignInfoByBizKey',
+                    params: [this.params.id_]
+                })
 
                 const tempPeople = this.form.shou_dong_qian_da?.split(',') || []
                 const autoSigners = data3.filter(item => item.qian_dao_lei_xing !== '手动').map(item => item.ren_yuan_id_)

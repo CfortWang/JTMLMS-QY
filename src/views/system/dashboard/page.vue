@@ -248,15 +248,15 @@ export default {
     },
     beforeRouteEnter (to, from, next) {
         const { first = '', second = '' } = param.state.level
-        const sql = `select * from t_jhswpzb where di_dian_ = '${second || first}'`
-        curdPost('sql', sql).then(res => {
-            const { data = [] } = res.variables || {}
-            cronTask = data.map(i => i.liu_cheng_key_)
-            next()
-        }).catch(error => {
-            alert('获取计划事务配置表信息失败，请刷新页面重试！')
-            console.log(error)
-        })
+        // const sql = `select * from t_jhswpzb where di_dian_ = '${second || first}'`
+        // curdPost('sql', sql).then(res => {
+        //     const { data = [] } = res.variables || {}
+        //     cronTask = data.map(i => i.liu_cheng_key_)
+        next()
+        // }).catch(error => {
+        //     alert('获取计划事务配置表信息失败，请刷新页面重试！')
+        //     console.log(error)
+        // })
     },
     mounted () {
         if (localStorage.getItem('statistic') === 'isNormal') {
@@ -529,18 +529,18 @@ export default {
             }
         },
         getPeriodTask () {
-            const { userId, role = [] } = this.$store.getters
-            const roles = role.map(i => i.id)
-            const sql = `select * from t_zqswtxb where shi_fou_ti_xing_ = '是' and (zhi_xing_ren_yuan like '%${userId}%' or find_in_set(zhi_xing_jiao_se_, '${roles.join(',')}')) order by field(zhi_xing_zhou_qi_, '1次/天', '1次/周', '1次/月', '1次/季度', '1次/半年', '1次/年')`
-            this.$common.request('sql', sql).then(res => {
-                const { data = [] } = res.variables || {}
-                if (data.length) {
-                    this.showMsg(data)
-                }
-            }).catch(error => {
-                this.$message.error('获取周期事务信息失败！')
-                console.log(error)
-            })
+            // const { userId, role = [] } = this.$store.getters
+            // const roles = role.map(i => i.id)
+            // const sql = `select * from t_zqswtxb where shi_fou_ti_xing_ = '是' and (zhi_xing_ren_yuan like '%${userId}%' or find_in_set(zhi_xing_jiao_se_, '${roles.join(',')}')) order by field(zhi_xing_zhou_qi_, '1次/天', '1次/周', '1次/月', '1次/季度', '1次/半年', '1次/年')`
+            // this.$common.request('sql', sql).then(res => {
+            //     const { data = [] } = res.variables || {}
+            //     if (data.length) {
+            //         this.showMsg(data)
+            //     }
+            // }).catch(error => {
+            //     this.$message.error('获取周期事务信息失败！')
+            //     console.log(error)
+            // })
         },
         showMsg (data) {
             const h = this.$createElement

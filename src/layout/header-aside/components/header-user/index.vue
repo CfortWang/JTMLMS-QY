@@ -289,8 +289,11 @@ export default {
             })
         },
         setMainPosition (mid) {
-            const sql = `select * from ibps_party_rel where biz_ = 'mainPost' and SUB_PID_ = '${this.userId}'`
-            this.$common.request('sql', sql).then((r) => {
+            // const sql = `select * from ibps_party_rel where biz_ = 'mainPost' and SUB_PID_ = '${this.userId}'`
+            this.$common.request('query', {
+                key: 'getMainPostByUid',
+                params: [this.userId]
+            }).then((r) => {
                 if (r.variables.data.length === 0) {
                     request({
                         url: '/platform/v3/rel/save',

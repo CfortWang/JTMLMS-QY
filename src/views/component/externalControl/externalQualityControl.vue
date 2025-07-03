@@ -503,9 +503,12 @@ export default {
             this.importTableDialogVisible = true
         },
         getShebList () {
-            const sbsql = `select id_, yuan_she_bei_bian from t_sbdj where yuan_she_bei_bian is not null and yuan_she_bei_bian != ''`
+            // const sbsql = `select id_, yuan_she_bei_bian from t_sbdj where yuan_she_bei_bian is not null and yuan_she_bei_bian != ''`
             return new Promise((resolve, reject) => {
-                this.$common.request('sql', sbsql).then(res => {
+                this.$common.request('query', {
+                    key: 'sjzphdjhylb2',
+                    params: [null]
+                }).then(res => {
                     const arr = res.variables.data
                     resolve(arr)
                 }).catch(error => {

@@ -597,9 +597,12 @@ export function buildComponent (name, column, preview, vm) {
                 getTodaySchedule () { // 获取今日班次
                     const { first, second } = this.$store.getters.level || {}
                     const today = this.$common.getDateNow()
-                    const sql = `select a.*, b.start_date_, b.end_date_, b.config_, b.id_ as pai_ban_id_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
+                    // const sql = `select a.*, b.title_,b.type_, b.start_date_, b.end_date_, b.config_, b.overview_, b.id_ as pai_ban_id_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
                     return new Promise((resolve, reject) => {
-                        this.$common.request('sql', sql).then((res) => {
+                        this.$common.request('query', {
+                            key: 'getScheduleDataByUid',
+                            params: [second || first, this.userId]
+                        }).then((res) => {
                             const { data = [] } = res.variables || {}
                             let todaySchedule = []
                             data.forEach(item => {
@@ -623,9 +626,12 @@ export function buildComponent (name, column, preview, vm) {
                 getAttendanceData () {
                     const { first, second } = this.$store.getters.level || {}
                     const today = this.$common.getDateNow()
-                    const sql = `select a.id_, a.kao_qin_zhuang_ta,a.ri_qi_, a.pai_ban_id_, a.pai_ban_ji_lu_id_, a.ban_ci_bie_ming_, a.ban_ci_kai_shi_, a.ban_ci_jie_shu_, a.ban_ci_ming_, a.da_ka_shi_jian_1_, a.zhuang_tai_1_, a.da_ka_shi_jian_2_, a.zhuang_tai_2_, a.chi_dao_shi_chang FROM t_attendance_detail a JOIN t_schedule b ON a.pai_ban_id_ = b.id_ AND b.status_ = '已发布' WHERE a.di_dian_ = '${second || first}' AND a.ri_qi_ <= '${today}' AND a.yong_hu_id_ = '${this.userId}' `
+                    // const sql = `select a.id_, a.kao_qin_zhuang_ta,a.ri_qi_, a.pai_ban_id_, a.pai_ban_ji_lu_id_, a.ban_ci_bie_ming_, a.ban_ci_kai_shi_, a.ban_ci_jie_shu_, a.ban_ci_ming_, a.da_ka_shi_jian_1_, a.zhuang_tai_1_, a.da_ka_shi_jian_2_, a.zhuang_tai_2_, a.chi_dao_shi_chang FROM t_attendance_detail a JOIN t_schedule b ON a.pai_ban_id_ = b.id_ AND b.status_ = '已发布' WHERE a.di_dian_ = '${second || first}' AND a.ri_qi_ <= '${today}' AND a.yong_hu_id_ = '${this.userId}'`
                     return new Promise((resolve, reject) => {
-                        this.$common.request('sql', sql).then(res => {
+                        this.$common.request('query', {
+                            key: 'getAttendanceDataByUid',
+                            params: [second || first, today, this.userId]
+                        }).then(res => {
                             const { data = [] } = res.variables || {}
                             const resultMap = new Map()
                             data.forEach(item => {
@@ -652,9 +658,12 @@ export function buildComponent (name, column, preview, vm) {
                 },
                 getScheduleData () {
                     const { first, second } = this.$store.getters.level || {}
-                    const sql = `select a.*, b.title_,b.type_, b.start_date_, b.end_date_, b.config_, b.overview_, b.id_ as pai_ban_id_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
+                    // const sql = `select a.*, b.title_,b.type_, b.start_date_, b.end_date_, b.config_, b.overview_, b.id_ as pai_ban_id_ from t_schedule_detail a, t_schedule b where a.parent_id_ = b.id_ and b.di_dian_ = '${second || first}' and a.user_id_ = '${this.userId}' and b.status_ = '已发布'`
                     return new Promise((resolve, reject) => {
-                        this.$common.request('sql', sql).then((res) => {
+                        this.$common.request('query', {
+                            key: 'getScheduleDataByUid',
+                            params: [second || first, this.userId]
+                        }).then((res) => {
                             const { data = [] } = res.variables || {}
                             const eventList = []
                             const self = this

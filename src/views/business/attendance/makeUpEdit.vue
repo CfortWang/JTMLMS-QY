@@ -228,8 +228,12 @@ export default {
                     }
                 })
                 const { first, second } = self.$store.getters.level || {}
-                const sql = `select * from t_attendance_reissue where bu_ka_ri_qi_ = '${buKaRiQi}' and zhuang_tai_ = '待审核' and bian_zhi_ren_ = '${self.$store.getters.userId}' and di_dian_ = '${(second || first)}'`
-                const response = await self.$common.request('sql', sql)
+                const { userId } = self.$store.getters || {}
+                // const sql = `select * from t_attendance_reissue where bu_ka_ri_qi_ = '${buKaRiQi}' and zhuang_tai_ = '待审核' and bian_zhi_ren_ = '${userId}' and di_dian_ = '${second || first}'`
+                const response = await self.$common.request('query', {
+                    key: 'getUserReissueInfo',
+                    params: [buKaRiQi, userId, second || first]
+                })
                 // 过滤掉正在申请状态的班次
                 buKaBanCiArr = buKaBanCiArr.filter(banCi => {
                     return !response.variables.data.some(item => item.bu_ka_ban_ci_ === banCi.value)
@@ -292,8 +296,11 @@ export default {
                     const updateId = updateObj[0].id
                     const updateData = self.yichangdata.filter(obj => obj.id === updateId)
                     // 获得补卡审批人
-                    const sql = `select config_ FROM t_schedule WHERE id_ = '${updateData[0].paiBanId}'`
-                    self.$common.request('sql', sql).then((res) => {
+                    // const sql = `select config_ FROM t_schedule WHERE id_ = '${updateData[0].paiBanId}'`
+                    self.$common.request('query', {
+                        key: 'getScheduleConfigById',
+                        params: [updateData[0].paiBanId]
+                    }).then((res) => {
                         const str = res.variables.data[0].config_ || ''
                         let shenHeRen = ''
                         if (str) {

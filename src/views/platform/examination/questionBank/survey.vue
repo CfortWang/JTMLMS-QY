@@ -458,12 +458,18 @@ export default {
             if (this.$utils.isEmpty(this.formId)) {
                 return
             }
-            const sql = `select * from t_myddcwjb where id_='${this.formId}'`
-            const { variables: { data = [] } = {}} = await this.$common.request('sql', sql)
+            // const sql = `select * from t_myddcwjb where id_ = '${this.formId}'`
+            const { variables: { data = [] } = {}} = await this.$common.request('query', {
+                key: 'getSatSurveyById',
+                params: [this.formId]
+            })
             data.length && (this.form = data[0])
 
-            const sql2 = `select * from t_myddcwjtmb where parent_id_='${this.formId}' order by pai_xu_+0 asc`
-            const { variables: { data: data2 = [] } = {}} = await this.$common.request('sql', sql2)
+            // const sql2 = `select * from t_myddcwjtmb where parent_id_ = '${this.formId}' order by pai_xu_+0 asc`
+            const { variables: { data: data2 = [] } = {}} = await this.$common.request('query', {
+                key: 'getSatSurveyQues',
+                params: [this.formId]
+            })
             data2.length && (this.questionData = data2) && (this.quesIdList = data2.map(i => i.id_))
         },
         handleSubmit () {

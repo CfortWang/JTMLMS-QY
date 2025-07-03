@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { saveAttendanceReissue, saveAttendanceDetail, getAttendanceDetail } from '@/api/business/attendance'
+import { queryAttendanceReissue, saveAttendanceReissue, saveAttendanceDetail, getAttendanceDetail } from '@/api/business/attendance'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 
@@ -75,16 +75,18 @@ export default {
                     ]
                 },
                 columns: [
-                    { prop: 'bian_zhi_ren_', label: '申请人', tags: userOption, width: 100 },
-                    { prop: 'bian_zhi_shi_jian', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm:ss', sortable: 'custom', width: 140 },
-                    { prop: 'shen_he_ren_', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', width: 200 },
-                    { prop: 'shen_he_shi_jian_', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm:ss', sortable: 'custom', width: 140 },
-                    { prop: 'zhuang_tai_', label: '状态', width: 90 },
-                    { prop: 'bu_ka_ri_qi_', label: '补卡日期', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 100 },
-                    { prop: 'bu_ka_shi_jian_', label: '补卡时间', dateFormat: 'HH:mm:ss', sortable: 'custom', width: 100 },
-                    { prop: 'bu_ka_ban_ci_', label: '补卡班次', width: 100 },
-                    { prop: 'bu_ka_shi_you_', label: '补卡事由', minWidth: 300 }
-                    // { prop: 'fu_jian_', label: '说明附件', width: 150 }
+                    { prop: 'bianZhiRen', label: '申请人', tags: userOption, width: 100 },
+                    { prop: 'bianZhiShiJian', label: '申请时间', dateFormat: 'yyyy-MM-dd HH:mm:ss', sortable: 'custom', width: 140 },
+                    { prop: 'shenHeRen', label: '审批人', tags: userOption, dataType: 'stringArray', separator: ',', width: 200 },
+                    { prop: 'shenHeShiJian', label: '审批时间', dateFormat: 'yyyy-MM-dd HH:mm:ss', sortable: 'custom', width: 140 },
+                    { prop: 'zhuangTai', label: '状态', width: 90 },
+                    { prop: 'buKaRiQi', label: '补卡日期', dateFormat: 'yyyy-MM-dd', sortable: 'custom', width: 100 },
+                    { prop: 'buKaShiJian', label: '补卡时间', dateFormat: 'HH:mm:ss', sortable: 'custom', width: 100 },
+                    { prop: 'buKaBanCi', label: '补卡班次', width: 120 },
+                    { prop: 'buKaShiYou', label: '补卡事由', minWidth: 300 },
+                    { prop: 'fuJian', label: '说明附件', width: 0, hidden: true },
+                    { prop: 'paiBanId', label: '关联排班', width: 0, hidden: true },
+                    { prop: 'paiBanJiLuId', label: '关联排班详情', width: 0, hidden: true }
                 ],
                 rowHandle: {
                     effect: 'default',
@@ -107,16 +109,15 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
-            const sql = this.getSearchSql()
-            this.$common.request('sql', sql).then(res => {
-                this.listData = res.variables.data
+            queryAttendanceReissue(this.getSearchFormData()).then(res => {
+                this.listData = res.data.dataResult
                 // 做部门和姓名处理
                 this.listData.forEach(item => {
                     item.userName = this.getUserLabel(item.yong_hu_id_)
                     item.deptName = this.getDeptLabel(item.bu_men_)
                 })
-                // this.pagination.total = res.totalCount
-            }).finally(() => {
+                this.loading = false
+            }).catch(() => {
                 this.loading = false
             })
         },
@@ -138,71 +139,19 @@ export default {
             searchParam['Q^shen_he_ren_^SL'] = this.$store.getters.userId
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
         },
-        getSearchSql () {
-            const { first, second } = this.$store.getters.level || {}
-            let sql = `select t.*, (select COUNT(*) FROM t_attendance_reissue WHERE di_dian_ = '${second || first}' and shen_he_ren_ = '${this.$store.getters.userId}' ) AS total_count FROM t_attendance_reissue t`
-            const params = this.getSearchFormData()
-            // 定义操作符映射
-            const operatorMap = {
-                'S': '=',
-                'SL': 'LIKE',
-                'DG': '<=',
-                'DL': '>='
-            }
-            // 如果有查询条件，构建 WHERE 子句
-            if (params.parameters && params.parameters.length > 0) {
-                const conditions = []
-                params.parameters.forEach(item => {
-                    const { key, value } = item
-                    const parts = key.split('^') // 格式: Q^field^operator
-                    if (parts.length === 3 && parts[0] === 'Q') {
-                        const field = parts[1] // 字段名
-                        const operatorKey = parts[2] // 操作符（S/SL/DG/DL）
-                        const operator = operatorMap[operatorKey]
-                        if (operator) {
-                            let condition
-                            if (operatorKey === 'DG' || operatorKey === 'DL') {
-                                condition = `DATE(${field}) ${operator} '${value}'` // 添加 DATE 函数
-                            } else if (operator === 'LIKE') {
-                                condition = `${field} LIKE '%${value}%'` // LIKE 模糊查询
-                            } else {
-                                condition = `${field} ${operator} '${value}'` // 其他操作符（=, <=, >=）
-                            }
-                            conditions.push(condition)
-                        }
-                    }
-                })
-
-                if (conditions.length > 0) {
-                    sql += ' WHERE ' + conditions.join(' AND ')
-                }
-            }
-            // 添加排序
-            if (this.sorts.field) {
-                sql += ` ORDER BY ${this.sorts.field} ${this.sorts.order}`
-            } else {
-                sql += ` ORDER BY bian_zhi_shi_jian DESC` // 默认排序
-            }
-            // 添加分页
-            sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.currentPage - 1) * this.pagination.limit}`
-            return sql
-        },
-        // 分页/排序处理
+        /**
+         * 处理分页事件
+         */
         handlePaginationChange (page) {
             ActionUtils.setPagination(this.pagination, page)
             this.loadData()
         },
+        /**
+         * 处理排序
+         */
         handleSortChange (sort) {
-            // 解析排序参数
-            if (sort.sortBy && sort.order) {
-                this.sorts = {
-                    field: sort.sortBy,
-                    order: sort.order === 'ascending' ? 'ASC' : 'DESC' // 转换为 SQL 排序关键字
-                }
-            } else {
-                this.sorts = {} // 取消排序
-            }
-            this.loadData() // 重新加载数据
+            ActionUtils.setSorts(this.sorts, sort)
+            this.loadData()
         },
 
         // 操作处理
@@ -232,6 +181,11 @@ export default {
                 status = '已通过'
             }
             const time = self.$common.getFormatDate()
+            data.shenHeShiJian = time || ''
+            data.zhuangTai = status
+            const submitData = data
+
+            /*
             const submitData = {
                 banCiZhuangTai: data.ban_ci_zhuang_tai || '',
                 bianZhiRen: data.bian_zhi_ren_ || '',
@@ -256,7 +210,7 @@ export default {
                 updateBy: data.update_by_ || '',
                 updateTime: data.update_time_ || '',
                 zhuangTai: status
-            }
+            }*/
             // 更新补卡数据
             saveAttendanceReissue(submitData).then((res) => {
                 self.$message.success(`操作成功`)

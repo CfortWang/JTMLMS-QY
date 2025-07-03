@@ -49,43 +49,43 @@
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column key="gong_hao_" prop="gong_hao_" label="工号" width="80" />
+                    <el-table-column key="gongHao" prop="gongHao" label="工号" width="80" />
                 </el-table-column>
                 <!-- 班次信息分组 -->
                 <el-table-column label="班次信息">
-                    <el-table-column key="pai_ban_ming_chen" prop="pai_ban_ming_chen" label="排班名称" min-width="140" />
-                    <el-table-column key="ban_ci_ming_" prop="ban_ci_ming_" label="班次名" width="95" />
-                    <el-table-column key="ban_ci_bie_ming_" prop="ban_ci_bie_ming_" label="班次别名" width="95" />
+                    <el-table-column key="paiBanMingChen" prop="paiBanMingChen" label="排班名称" min-width="140" />
+                    <el-table-column key="banCiMing" prop="banCiMing" label="班次名" width="95" />
+                    <el-table-column key="banCiBieMing" prop="banCiBieMing" label="班次别名" width="95" />
                 </el-table-column>
-                <el-table-column key="ri_qi_" prop="ri_qi_" label="日期" width="100" />
+                <el-table-column key="riQi" prop="riQi" label="日期" width="100" />
                 <!-- 上班分组 -->
                 <el-table-column label="上班">
-                    <el-table-column key="da_ka_shi_jian_1_" prop="da_ka_shi_jian_1_" label="打卡时间" width="160" />
-                    <el-table-column key="zhuang_tai_1_" prop="zhuang_tai_1_" label="打卡状态" width="90">
+                    <el-table-column key="daKaShiJian1" prop="daKaShiJian1" label="打卡时间" width="160" />
+                    <el-table-column key="zhuangTai1" prop="zhuangTai1" label="打卡状态" width="90">
                         <template #default="{ row }">
-                            <span :style="{ color: row.zhuang_tai_1_=='异常' ? 'red' : (!row.da_ka_shi_jian_1_ ? 'red' :'inherit') }">
-                                {{ !row.da_ka_shi_jian_1_ ? '缺勤' : (row.zhuang_tai_1_ === '异常' ? '迟到' : row.zhuang_tai_1_) }}
+                            <span :style="{ color: row.zhuangTai1=='异常' ? 'red' : (!row.daKaShiJian1 ? 'red' :'inherit') }">
+                                {{ !row.daKaShiJian1 ? '缺勤' : (row.zhuangTai1 === '异常' ? '迟到' : row.zhuangTai1) }}
                             </span>
                         </template>
                     </el-table-column>
                 </el-table-column>
                 <!-- 下班分组 -->
                 <el-table-column label="下班">
-                    <el-table-column key="da_ka_shi_jian_2_" prop="da_ka_shi_jian_2_" label="打卡时间" width="160" />
-                    <el-table-column key="zhuang_tai_2_" prop="zhuang_tai_2_" label="打卡状态" width="90">
+                    <el-table-column key="daKaShiJian2" prop="daKaShiJian2" label="打卡时间" width="160" />
+                    <el-table-column key="zhuangTai2" prop="zhuangTai2" label="打卡状态" width="90">
                         <template #default="{ row }">
-                            <span :style="{ color: row.zhuang_tai_2_=='异常' ? 'red' : (!row.da_ka_shi_jian_2_ ? 'red' :'inherit') }">
-                                {{ !row.da_ka_shi_jian_2_ ? '缺勤' : (row.zhuang_tai_2_ === '异常' ? '迟到' : row.zhuang_tai_2_) }}
+                            <span :style="{ color: row.zhuangTai2=='异常' ? 'red' : (!row.daKaShiJian2 ? 'red' :'inherit') }">
+                                {{ !row.daKaShiJian2 ? '缺勤' : (row.zhuangTai2 === '异常' ? '迟到' : row.zhuangTai2) }}
                             </span>
                         </template>
                     </el-table-column>
                 </el-table-column>
-                <el-table-column key="chi_dao_shi_chang" prop="chi_dao_shi_chang" label="迟到时长(分钟)" width="120" />
-                <el-table-column key="da_ka_ci_shu_" prop="da_ka_ci_shu_" label="打卡次数" width="90" />
-                <el-table-column key="kao_qin_zhuang_ta" prop="kao_qin_zhuang_ta" label="考勤状态" width="100">
+                <el-table-column key="chiDaoShiChang" prop="chiDaoShiChang" label="迟到时长(分钟)" width="120" />
+                <el-table-column key="daKaCiShu" prop="daKaCiShu" label="打卡次数" width="90" />
+                <el-table-column key="kaoQinZhuangTa" prop="kaoQinZhuangTa" label="考勤状态" width="100">
                     <template #default="{ row }">
-                        <span :style="{ color: row.kao_qin_zhuang_ta=='异常' ? 'red' : 'inherit' }">
-                            {{ row.kao_qin_zhuang_ta }}
+                        <span :style="{ color: row.kaoQinZhuangTa=='异常' ? 'red' : 'inherit' }">
+                            {{ row.kaoQinZhuangTa }}
                         </span>
                     </template>
                 </el-table-column>
@@ -98,7 +98,7 @@
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 import IbpsExport from '@/plugins/export'
-import color from '@/store/modules/ibps/modules/color'
+import { queryAttendanceDetail } from '@/api/business/attendance'
 
 export default {
     mixins: [FixHeight],
@@ -158,19 +158,19 @@ export default {
         // 加载数据
         loadData () {
             this.loading = true
-            const sql = this.getSearchSql()
-            this.$common.request('sql', sql).then(res => {
+            queryAttendanceDetail(this.getSearchFormData()).then(res => {
                 this.listData = res.variables.data
-                // 做部门和姓名处理
-                this.listData.forEach(item => {
-                    item.userName = this.getUserLabel(item.yong_hu_id_)
-                    item.deptName = this.getDeptLabel(item.bu_men_)
-                    // 考勤状态-缺勤
-                    if (item.kao_qin_zhuang_ta === '') {
-                        item.kao_qin_zhuang_ta = '异常'
-                    }
-                })
-                this.pagination.totalCount = this.listData[0]?.total_count || 0
+                if (this.listData.length > 0) {
+                    // 做部门和姓名处理
+                    this.listData.forEach(item => {
+                        item.userName = this.getUserLabel(item.yong_hu_id_)
+                        item.deptName = this.getDeptLabel(item.bu_men_)
+                        // 考勤状态-缺勤
+                        if (item.kaoQinZhuangTa === '') {
+                            item.kaoQinZhuangTa = '异常'
+                        }
+                    })
+                }
             }).finally(() => {
                 this.loading = false
             })
@@ -198,54 +198,6 @@ export default {
             // 筛选当前用户数据
             searchParam['Q^yong_hu_id_^S'] = this.$store.getters.userId
             return ActionUtils.formatParams(searchParam, this.pagination, this.sorts)
-        },
-        getSearchSql () {
-            const { first, second } = this.$store.getters.level || {}
-            let sql = `select t.*, (select COUNT(*) FROM t_attendance_detail WHERE di_dian_ = '${second || first}' AND yong_hu_id_ = '${this.$store.getters.userId}' and ri_qi_ < '${this.$common.getDateNow()}' ) AS total_count FROM t_attendance_detail t `
-            const params = this.getSearchFormData()
-            // 定义操作符映射
-            const operatorMap = {
-                'S': '=',
-                'SL': 'LIKE',
-                'DG': '<=',
-                'DLS': '>',
-                'DGT': '<',
-                'DL': '>='
-            }
-            // 如果有查询条件，构建 WHERE 子句
-            if (params.parameters && params.parameters.length > 0) {
-                const conditions = []
-                params.parameters.forEach(item => {
-                    const { key, value } = item
-                    const parts = key.split('^') // 格式: Q^field^operator
-                    if (parts.length === 3 && parts[0] === 'Q') {
-                        const field = parts[1] // 字段名
-                        const operatorKey = parts[2] // 操作符（S/SL/DG/DL）
-                        const operator = operatorMap[operatorKey]
-                        if (operator) {
-                            let condition
-                            if (operator === 'LIKE') {
-                                condition = `${field} LIKE '%${value}%'` // LIKE 模糊查询
-                            } else {
-                                condition = `${field} ${operator} '${value}'` // 其他操作符（=, <=, >=）
-                            }
-                            conditions.push(condition)
-                        }
-                    }
-                })
-                if (conditions.length > 0) {
-                    conditions.forEach((condition, index) => {
-                        if (condition.includes('异常')) {
-                            conditions[index] = `(kao_qin_zhuang_ta = '异常' or kao_qin_zhuang_ta = '') `
-                        }
-                    })
-                    const wherestr = ' WHERE ' + conditions.join(' AND ')
-                    sql = `select t.*, (select COUNT(*) FROM t_attendance_detail ${wherestr} ) AS total_count FROM t_attendance_detail t ${wherestr} ORDER BY ri_qi_ DESC `
-                }
-            }
-            // 添加分页
-            sql += ` LIMIT ${this.pagination.limit} OFFSET ${(this.pagination.page - 1) * this.pagination.limit}`
-            return sql
         },
         // 分页/排序处理
         handlePaginationChange (page) {
@@ -283,64 +235,64 @@ export default {
                     name: 'deptName'
                 },
                 {
-                    field_name: 'gong_hao_',
+                    field_name: 'gongHao',
                     label: '工号',
-                    name: 'gong_hao_'
+                    name: 'gongHao'
                 },
                 {
-                    field_name: 'pai_ban_ming_chen',
+                    field_name: 'paiBanMingChen',
                     label: '排班名称',
-                    name: 'pai_ban_ming_chen'
+                    name: 'paiBanMingChen'
                 },
                 {
-                    field_name: 'ban_ci_ming_',
+                    field_name: 'banCiMing',
                     label: '班次名',
-                    name: 'ban_ci_ming_'
+                    name: 'banCiMing'
                 },
                 {
-                    field_name: 'ban_ci_bie_ming_',
+                    field_name: 'banCiBieMing',
                     label: '班次别名',
-                    name: 'ban_ci_bie_ming_'
+                    name: 'banCiBieMing'
                 },
                 {
-                    field_name: 'ri_qi_',
+                    field_name: 'riQi',
                     label: '日期',
-                    name: 'ri_qi_'
+                    name: 'riQi'
                 },
                 {
-                    field_name: 'da_ka_shi_jian_1_',
+                    field_name: 'daKaShiJian1',
                     label: '上班打卡时间',
-                    name: 'da_ka_shi_jian_1_'
+                    name: 'daKaShiJian1'
                 },
                 {
-                    field_name: 'zhuang_tai_1_',
+                    field_name: 'zhuangTai1',
                     label: '上班打卡状态',
-                    name: 'zhuang_tai_1_'
+                    name: 'zhuangTai1'
                 },
                 {
-                    field_name: 'da_ka_shi_jian_2_',
+                    field_name: 'daKaShiJian2',
                     label: '下班打卡时间',
-                    name: 'da_ka_shi_jian_2_'
+                    name: 'daKaShiJian2'
                 },
                 {
-                    field_name: 'zhuang_tai_2_',
+                    field_name: 'zhuangTai2',
                     label: '下班打卡状态',
-                    name: 'zhuang_tai_2_'
+                    name: 'zhuangTai2'
                 },
                 {
-                    field_name: 'chi_dao_shi_chang',
+                    field_name: 'chiDaoShiChang',
                     label: '迟到时长(分钟)',
-                    name: 'chi_dao_shi_chang'
+                    name: 'chiDaoShiChang'
                 },
                 {
-                    field_name: 'da_ka_ci_shu_',
+                    field_name: 'daKaCiShu',
                     label: '打卡次数',
-                    name: 'da_ka_ci_shu_'
+                    name: 'daKaCiShu'
                 },
                 {
-                    field_name: 'kao_qin_zhuang_ta',
+                    field_name: 'kaoQinZhuangTa',
                     label: '考勤状态',
-                    name: 'kao_qin_zhuang_ta'
+                    name: 'kaoQinZhuangTa'
                 }
             ]
             this.handleExport(exportColumns, this.listData, `考勤明细统计数据`)

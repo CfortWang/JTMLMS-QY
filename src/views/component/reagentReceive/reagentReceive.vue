@@ -74,8 +74,11 @@ export default {
         'formData.weiZhiLingYong': {
             handler (value, old) {
                 if (value) {
-                    const sql = `select * from v_reagentinventory where find_in_set(id_,'${value}')`
-                    this.$common.request('sql', sql).then((res) => {
+                    // const sql = `select * from v_reagentinventory where find_in_set(id_, '${value}')`
+                    this.$common.request('query', {
+                        key: 'getInventoryById1',
+                        params: [value]
+                    }).then((res) => {
                         const { data = [] } = res.variables || {}
                         const arry = []
                         value.split(',').forEach(al => {
@@ -94,8 +97,11 @@ export default {
         'formData.lingYongShiJiHaoC': {
             handler (value, old) {
                 if (value) {
-                    const sql = `select * from v_inventory where find_in_set(inventory_id_,'${value}')`
-                    this.$common.request('sql', sql).then((res) => {
+                    // const sql = `select * from v_inventory where find_in_set(inventory_id_,'${value}')`
+                    this.$common.request('query', {
+                        key: 'getInventoryById2',
+                        params: [value]
+                    }).then((res) => {
                         const { data = [] } = res.variables || {}
                         const arry = []
                         value.split(',').forEach(al => {
@@ -122,8 +128,11 @@ export default {
     },
     methods: {
         getPositionData () {
-            const sql = `select cang_ku_ming_chen AS positionName,qu_yu_ming_cheng_ AS quYu,id_ from t_ckglpzb`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select cang_ku_ming_chen AS positionName,qu_yu_ming_cheng_ AS quYu,id_ from t_ckglpzb`
+            this.$common.request('query', {
+                key: 'getStockConfig2',
+                params: [null]
+            }).then(res => {
                 const resData = res?.variables?.data || []
                 this.positionData = resData
             })

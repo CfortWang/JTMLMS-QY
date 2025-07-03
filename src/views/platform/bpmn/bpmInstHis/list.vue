@@ -173,12 +173,13 @@
 
 <script>
 import { queryPageList, queryClassify } from '@/api/platform/bpmn/bpmInstHis'
+import { getProcSnap } from '@/api/business/general'
 import ActionUtils from '@/utils/action'
 import IbpsTypeTree from '@/business/platform/cat/type/tree'
 import FixHeight from '@/mixins/height'
 import BpmnFormrender from '@/business/platform/bpmn/form/dialog'
 import IbpsAttachment from '@/business/platform/file/attachment/selector'
-import { specialType, specialBtn, specialParams, specialTable, specialField } from './corresponding/index'
+import { specialType, specialBtn, specialParams, specialTable, specialField, queryKey } from './corresponding/index'
 import TemplateList from './templateList'
 import { getSetting } from '@/utils/query'
 
@@ -399,8 +400,11 @@ export default {
         },
         // 获取所有流程的报表配置数据
         getConfig () {
-            const sql = `select * from t_lcidglbdbb`
-            this.$common.request('sql', sql).then((res) => {
+            // const sql = `select * from t_lcidglbdbb`
+            this.$common.request('query', {
+                key: 'getProcessArchiveConfig',
+                params: [null]
+            }).then((res) => {
                 const { data = [] } = res.variables || {}
                 data.forEach(i => {
                     if (!i.gui_dang_lei_xing) {
@@ -460,9 +464,23 @@ export default {
             }
             // console.log(this.record)
             if (this.record.file.length && this.record.table.length) {
-                this.getAllFile(this.record)
+                // this.getAllFile(this.record)
+                this.getAllFileByApi(procDefKey, bizKey)
                 return
             }
+        },
+        getAllFileByApi (procDefKey, id) {
+            this.fileLoading = true
+            getProcSnap({ id, procDefKey }).then(res => {
+                const { kuaiZhao = [], fuJian = [] } = res.variables || {}
+                console.log(kuaiZhao, fuJian)
+                const allFileId = fuJian.map(i => {
+                    return this.getFileId(i)
+                })
+                this.fileId = [...new Set(allFileId)].join(',')
+                this.snapshotId = [...new Set(kuaiZhao)].join(',')
+                this.fileLoading = false
+            })
         },
         // 获取所有附件
         getAllFile ({ file, table, field, bizKey }) {
@@ -541,9 +559,12 @@ export default {
         },
         // 获取内审管审文件
         getSpecicalFile (id) {
-            const sql = `select ${specialParams[this.typeId]} from ${specialTable[this.typeId]} where ${specialField[this.typeId]} = '${id}'`
+            // const sql = `select ${specialParams[this.typeId]} from ${specialTable[this.typeId]} where ${specialField[this.typeId]} = '${id}'`
             // console.log(sql)
-            this.$common.request('sql', sql).then(res => {
+            this.$common.request('query', {
+                key: queryKey[this.typeId],
+                params: [id]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length) {
                     this.record.special = data.filter(i => i.beforeImprove || i.afterImprove)
@@ -712,9 +733,12 @@ export default {
                     }
                 })
                 // console.log(delList, formKeyArr)
-                const sql = `select a.bo_code_, b.key_ from ibps_form_bo a, ibps_form_def b where a.form_id_ = b.id_ and find_in_set(b.key_, '${formKeyArr.join(',')}')`
+                // const sql = `select a.bo_code_, b.key_ from ibps_form_bo a, ibps_form_def b where a.form_id_ = b.id_ and find_in_set(b.key_, '${formKeyArr.join(',')}')`
                 // 获取选中记录对应的数据表code
-                this.$common.request('sql', sql).then(res => {
+                this.$common.request('query', {
+                    key: 'getBoCodeByFormKey',
+                    params: [formKeyArr.join(',')]
+                }).then(res => {
                     const result = res.variables && res.variables.data
                     const codeList = {}
                     result.forEach(m => {
@@ -832,9 +856,9 @@ export default {
                 margin-top: 0px;
             }
         }
-        ::v-deep .el-upload-list__item {
-            line-height: 18px;
-        }
+        // ::v-deep .el-upload-list__item {
+        //     line-height: 18px;
+        // }
     }
     .popverClass_sub {
         .div_content {

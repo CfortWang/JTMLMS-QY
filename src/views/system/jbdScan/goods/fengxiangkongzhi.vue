@@ -98,7 +98,6 @@
 <script>
 import * as echarts from 'echarts'
 import request from '@/utils/request'
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import tableCom from '../../jbdHome/board/component/tableCom.vue'
 import PieView from '../../jbdHome/board/component/fengxianPie.vue'
 import js from '@/views/scientificPayoffs/js'
@@ -390,9 +389,12 @@ export default {
         },
         // 剩余风险统计表
         async remainingRisk () {
-            const sql = `select * FROM t_yzcdfjbzb where zi_fen_lei_ = '严重程度'`
+            // const sql = `select * FROM t_yzcdfjbzb where zi_fen_lei_ = '严重程度'`
             let riskCount = []
-            await curdPost('sql', sql).then((res) => {
+            await this.$common.request('query', {
+                key: 'riskAssessProgStat1',
+                params: [null]
+            }).then((res) => {
                 riskCount = res.variables.data
             })
             const riskCD = await this.countApi(this.zongid, 'SYFX_CD')
@@ -438,21 +440,28 @@ export default {
         },
         // 风险识别评估表
         async getRiskIdentification () {
-            const this_ = this
-            const riskCountSql = `select COUNT(*) as count from t_fxsbpgb where zong_id_ = '${this.zongid}'`
+            // const riskCountSql = `select COUNT(*) as count from t_fxsbpgb where zong_id_ = '${this.zongid}'`
             let riskCount = []
-            await curdPost('sql', riskCountSql).then((res) => {
+            await this.$common.request('query', {
+                key: 'riskAssessProgStat2',
+                params: [this.zongid]
+            }).then((res) => {
                 riskCount = res.variables.data
             })
 
-            // this_.$refs.RiskIdenList.curreFn(riskCount[0].count)
+            // this.$refs.RiskIdenList.curreFn(riskCount[0].count)
             this.pageTotal = Number(riskCount[0].count)
 
-            const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,shi_shi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
-            await curdPost('sql', sql).then((res) => {
-                this_.RiskIdenList = res.variables.data
+            // const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,shi_shi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
+            // 通用查询接口修改，SQL实现不支持分页
+            // const sql = `select bian_zhi_bu_men_,bian_zhi_shi_jian,shi_shi_ren_,shi_fou_guo_shen_ from t_fxsbpgb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc`
+            await this.$common.request('query', {
+                key: 'riskAssessProgStat3',
+                params: [this.zongid]
+            }).then((res) => {
+                this.RiskIdenList = res.variables.data
             })
-            for (const item of this_.RiskIdenList) {
+            for (const item of this.RiskIdenList) {
                 item.shi_shi_ren_ = item.shi_shi_ren_ ? this.findUser(item.shi_shi_ren_) : '/'
                 item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'
                 item.bian_zhi_shi_jian = item.bian_zhi_shi_jian.split(' ')[0] || '/'
@@ -467,19 +476,26 @@ export default {
         },
         // 降低风险等记表
         async getReduceChange () {
-            const this_ = this
-            const riskCountSql = `select COUNT(*) as count from t_djbzb where zong_id_ = '${this.zongid}'`
+            // const riskCountSql = `select COUNT(*) as count from t_djbzb where zong_id_ = '${this.zongid}'`
             let riskCount = []
-            await curdPost('sql', riskCountSql).then((res) => {
+            await this.$common.request('query', {
+                key: 'riskAssessProgStat4',
+                params: [this.zongid]
+            }).then((res) => {
                 riskCount = res.variables.data
             })
             this.pageTotal = Number(riskCount[0].count)
 
-            const sql = `select * from t_djbzb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
-            await curdPost('sql', sql).then((res) => {
-                this_.reduceList = res.variables.data
+            // const sql = `select * from t_djbzb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
+            // 通用查询接口修改，SQL实现不支持分页
+            // const sql = `select * from t_djbzb where zong_id_ = '${this.zongid}' order by shi_fou_guo_shen_ desc`
+            await this.$common.request('query', {
+                key: 'riskAssessProgStat5',
+                params: [this.zongid]
+            }).then((res) => {
+                this.reduceList = res.variables.data
             })
-            for (const item of this_.reduceList) {
+            for (const item of this.reduceList) {
                 item.bian_zhi_ren_ = item.bian_zhi_ren_ ? this.findUser(item.bian_zhi_ren_) : '/'
                 item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'
                 item.bian_zhi_shi_jian = item.bian_zhi_shi_jian.split(' ')[0] || '/'
@@ -501,21 +517,31 @@ export default {
         },
         // 风险改进记录
         async getImprovementRecords () {
-            const this_ = this
-            this_.pageTotal = 0
-            const sql1 = `select * from t_bmfxgjjl where zong_id_ = '${this.zongid}' limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
-            const sql2 = `select count(*) as count from t_bmfxgjjl where zong_id_ = '${this.zongid}'`
-            await Promise.all([this.$common.request('sql', sql1), this.$common.request('sql', sql2)]).then((res) => {
-                this_.ImproRecordsList = res[0].variables.data
-                if (this_.ImproRecordsList === 0) {
+            this.pageTotal = 0
+            // const sql1 = `select * from t_bmfxgjjl where zong_id_ = '${this.zongid}' limit ${(this.currentPage - 1) * this.pagesize},${this.pagesize}`
+            // 通用查询接口修改，SQL实现不支持分页
+            // const sql1 = `select * from t_bmfxgjjl where zong_id_ = '${this.zongid}'`
+            // const sql2 = `select count(*) as count from t_bmfxgjjl where zong_id_ = '${this.zongid}'`
+            await Promise.all([
+                this.$common.request('query', {
+                    key: 'riskAssessProgStat6',
+                    params: [this.zongid]
+                }),
+                this.$common.request('query', {
+                    key: 'riskAssessProgStat7',
+                    params: [this.zongid]
+                })
+            ]).then((res) => {
+                this.ImproRecordsList = res[0].variables.data
+                if (this.ImproRecordsList === 0) {
                     return
                 }
-                this_.pageTotal = res[1].variables.data[0].count
-                if (this_.pageTotal !== 0) {
-                    this_.$refs.ImproRecords.curreFn(res[1].variables.data[0].count)
+                this.pageTotal = res[1].variables.data[0].count
+                if (this.pageTotal !== 0) {
+                    this.$refs.ImproRecords.curreFn(res[1].variables.data[0].count)
                 }
             })
-            for (const item of this_.ImproRecordsList) {
+            for (const item of this.ImproRecordsList) {
                 item.bian_zhi_ren_ = item.bian_zhi_ren_ ? this.findUser(item.bian_zhi_ren_) : '/'
                 item.ping_gu_ren_ = item.ping_gu_ren_ ? this.findUser(item.ping_gu_ren_) : '/'
                 item.bian_zhi_bu_men_ = item.bian_zhi_bu_men_ ? this.findDept(item.bian_zhi_bu_men_) : '/'

@@ -32,6 +32,7 @@ const specialBtn = {}
 const specialParams = {}
 const specialTable = {}
 const specialField = {}
+const queryKey = {}
 
 specialType[neishen] = [
     '首次会议签到',
@@ -67,10 +68,14 @@ specialTable[guanshen] = 't_glpsjhb'
 specialField[neishen] = 'ji_hua_zong_wai_j'
 specialField[guanshen] = 'zong_wai_jian_'
 
+queryKey[neishen] = 'getAuditNC'
+queryKey[guanshen] = 'getMgmtReviewItem'
+
 export {
     specialType,
     specialBtn,
     specialParams,
     specialTable,
-    specialField
+    specialField,
+    queryKey
 }

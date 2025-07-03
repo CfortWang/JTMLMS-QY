@@ -561,8 +561,11 @@ export default {
         getPeriodTask () {
             const { userId, role = [] } = this.$store.getters
             const roles = role.map(i => i.id)
-            const sql = `select * from t_zqswtxb where shi_fou_ti_xing_ = '是' and (zhi_xing_ren_yuan like '%${userId}%' or find_in_set(zhi_xing_jiao_se_, '${roles.join(',')}')) order by field(zhi_xing_zhou_qi_, '1次/天', '1次/周', '1次/月', '1次/季度', '1次/半年', '1次/年')`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from t_zqswtxb where shi_fou_ti_xing_ = '是' and (zhi_xing_ren_yuan like concat('%', '${userId}', '%') or find_in_set(zhi_xing_jiao_se_, '${roles.join(',')}')) order by field(zhi_xing_zhou_qi_, '1次/天', '1次/周', '1次/月', '1次/季度', '1次/半年', '1次/年')`
+            this.$common.request('query', {
+                key: 'getCycleTaskRmdConfig',
+                params: [userId, roles.join(',')]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 if (data.length) {
                     this.showMsg(data)
@@ -714,8 +717,11 @@ export default {
                     this.banciInfo = dateArr
                     // 更新考勤数据
                     const self = this
-                    const sql = `select * from t_attendance_detail where id_ = '${dateArr.attendance?.id_}' `
-                    this.$common.request('sql', sql).then((res) => {
+                    const sql = `select * from t_attendance_detail where id_ = '${dateArr.attendance?.id_}'`
+                    this.$common.request('query', {
+                        key: 'getAttendanceDetailById',
+                        params: [dateArr.attendance?.id_]
+                    }).then((res) => {
                         const obj = res.variables.data[0] || dateArr.attendance
                         self.banciInfo = {
                             ...self.banciInfo, // 保留其他属性
@@ -764,9 +770,13 @@ export default {
         dakaSingle (selectedValue) {
             const today = this.$common.getDateNow()
             const { first, second } = this.$store.getters.level || {}
+            const { userId } = this.$store.getters || {}
             // 查询该班次对应的考勤数据
-            const sql = `select a.* FROM t_attendance_detail a JOIN t_schedule b ON a.pai_ban_id_ = b.id_ AND b.status_ = '已发布' WHERE a.di_dian_ = '${second || first}' AND a.ri_qi_ = '${today}' AND a.yong_hu_id_ = '${this.$store.getters.userId}' and a.ban_ci_bie_ming_ = '${selectedValue}' `
-            this.$common.request('sql', sql).then(res => {
+            const sql = `select a.* FROM t_attendance_detail a JOIN t_schedule b ON a.pai_ban_id_ = b.id_ AND b.status_ = '已发布' WHERE a.di_dian_ = '${second || first}' AND a.ri_qi_ = '${today}' AND a.yong_hu_id_ = '${userId}' and a.ban_ci_bie_ming_ = '${selectedValue}'`
+            this.$common.request('query', {
+                key: 'getShiftAttendanceData',
+                params: [second || first, today, userId, selectedValue]
+            }).then(res => {
                 const data = res.variables.data[0] || {}
                 // 更新打卡请求
                 attendanceDetailClockIn({ id: data.id_ }).then(() => {

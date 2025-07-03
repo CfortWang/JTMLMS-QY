@@ -5,39 +5,56 @@
         <div class="statistics">
             <div class="editDate" style="background-color: rgba(0,0,0,0);display: block;width: 100%;height: 10%;">
                 <!-- 标题装饰组件 -->
-                <!-- <header-decoration />  -->
-                <!-- <div class="stitle">实验室管理看板</div> -->
-                <!-- <div class="block" style="display:none">
-            <span class="demonstration">开始:</span>
-            <el-date-picker v-model="BeginDate" type="year" size="mini" value-format="yyyy" format="yyyy年"  style="width: 96px;"
-              :clearable="false" @change="checkYear(BeginDate,'begin')" placeholder="选择日期">
-            </el-date-picker>
-          </div> -->
+                <!-- <header-decoration />
+                <div class="stitle">实验室管理看板</div>
+                <div class="block" style="display:none">
+                    <span class="demonstration">开始:</span>
+                    <el-date-picker
+                        v-model="BeginDate"
+                        type="year"
+                        size="mini"
+                        value-format="yyyy"
+                        format="yyyy年"
+                        style="width: 96px;"
+                        :clearable="false"
+                        placeholder="选择日期"
+                        @change="checkYear(BeginDate,'begin')"
+                    />
+                </div>
 
-                <!-- <div class="block"> -->
-                <!-- <span class="demonstration">查询年度:</span> -->
-                <!-- <el-date-picker v-model="endDate" type="year" size="mini" value-format="yyyy" format="yyyy年"  :clearable="false" style="width: 96px;"
-              @change="checkYear(endDate,'end')" placeholder="选择日期"> -->
-                <!-- <el-date-picker
-                  v-model="endDate"
-                  type="year"
-                  value-format="yyyy"
-                  @change="checkYear(endDate,'end')"
-                  placeholder="选择年">
-                </el-date-picker> -->
-                <!-- </el-date-picker> -->
-                <!-- </div> -->
+                <div class="block">
+                    <span class="demonstration">查询年度:</span>
+                    <el-date-picker
+                        v-model="endDate"
+                        type="year"
+                        size="mini"
+                        value-format="yyyy"
+                        format="yyyy年"
+                        :clearable="false"
+                        style="width: 96px;"
+                        placeholder="选择日期"
+                        @change="checkYear(endDate,'end')"
+                    >
+                        <el-date-picker
+                            v-model="endDate"
+                            type="year"
+                            value-format="yyyy"
+                            placeholder="选择年"
+                            @change="checkYear(endDate,'end')"
+                        />
+                    </el-date-picker>
+                </div> -->
                 <div
                     style="width: 100%;
-            height:45%;
-            line-height: 45%;
-            text-align:center;
-            float: left;
-            margin: 2% 0 1% 1%;
-            font-size: 100%;
-            color: #fff !important;
-            align-items: center;
-            display:flex"
+                    height:45%;
+                    line-height: 45%;
+                    text-align:center;
+                    float: left;
+                    margin: 2% 0 1% 1%;
+                    font-size: 100%;
+                    color: #fff !important;
+                    align-items: center;
+                    display:flex"
                 >
                     <div style="color:#000;">
                         月份：
@@ -61,222 +78,273 @@
             <div v-if="relOf">
                 <s4renYuanPeiXun
                     v-if="showAll || showComponents[1]"
-                    :height="'200%'"
+                    height="200%"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getS4renYuanPeiXun()"
                 />
                 <s4renYuanPeiXunCol
-                    v-if="zaigangrenyuanfb.length>0&&(showAll || showComponents[2])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="zaigangrenyuanfb.length && (showAll || showComponents[2])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getS4renYuanPeiXunFB()"
                 />
-                <div v-if="zaigangrenyuanfb.length<=0&&(showAll || showComponents[2])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!zaigangrenyuanfb.length && (showAll || showComponents[2])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
 
                 <s5renYuanJianDu
                     v-if="showAll || showComponents[3]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getS5renYuanJianDu()"
                 />
                 <s5renYuanJianDuCol
-                    v-if="gangqianpeixunfb.length>0&&(showAll || showComponents[4])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="gangqianpeixunfb.length && (showAll || showComponents[4])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getS5renYuanJianDuFB()"
                 />
-                <div v-if="gangqianpeixunfb.length<=0&&(showAll || showComponents[4])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!gangqianpeixunfb.length && (showAll || showComponents[4])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
 
                 <s7sheBeiJiaoZhun
                     v-if="showAll || showComponents[5]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getJiaoYanObjNum()"
                 />
                 <s7sheBeiJiaoZhunCol
-                    v-if="jiaoyanMGObj.length>0&&(showAll || showComponents[6])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="jiaoyanMGObj.length && (showAll || showComponents[6])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getJiaoYanObjNumFB()"
                 />
-                <div v-if="jiaoyanMGObj.length<=0&&(showAll || showComponents[6])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!jiaoyanMGObj.length && (showAll || showComponents[6])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
 
                 <s8sheBeiHeCha
                     v-if="showAll || showComponents[7]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="gethechaObjNum()"
                 />
                 <s8sheBeiHeChaCol
-                    v-if="hechaMGObj.length>0&&(showAll || showComponents[8])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="hechaMGObj.length && (showAll || showComponents[8])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="gethechaObjNumFB()"
                 />
-                <div v-if="hechaMGObj.length<=0&&(showAll || showComponents[8])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!hechaMGObj.length && (showAll || showComponents[8])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
 
                 <s9neiBuZhiLiang
                     v-if="showAll || showComponents[9]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getS9neiBuZhiLiang()"
                 />
                 <s9neiBuZhiLiangCol
-                    v-if="neibuObjfb.length>0&&(showAll || showComponents[10])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="neibuObjfb.length && (showAll || showComponents[10])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getS9neiBuZhiLiangFB()"
                 />
-                <div v-if="neibuObjfb.length<=0&&(showAll || showComponents[10])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!neibuObjfb.length && (showAll || showComponents[10])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
 
                 <s10waiBuNengLi
                     v-if="showAll || showComponents[11]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getnengtliObjNum()"
                 />
                 <s10waiBuNengLiCol
-                    v-if="waibuObjfb.length>0&&(showAll || showComponents[12])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="waibuObjfb.length && (showAll || showComponents[12])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getnengtliObjNumFB()"
                 />
-                <div v-if="waibuObjfb.length<=0&&(showAll || showComponents[12])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!waibuObjfb.length && (showAll || showComponents[12])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
 
                 <s15tousu
                     v-if="showAll || showComponents[13]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getS3tousu()"
                 />
                 <s15tousuCol
-                    v-if="yingjifbObj.length>0&&(showAll || showComponents[14])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="yingjifbObj.length && (showAll || showComponents[14])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getS3tousuFB()"
                 />
-                <div v-if="yingjifbObj.length<=0&&(showAll || showComponents[14])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!yingjifbObj.length && (showAll || showComponents[14])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
 
                 <s12fengXian
                     v-if="showAll || showComponents[15]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getS12fengXian()"
                 />
                 <s12fengXianCol
-                    v-if="fengxianfbObj.length>0&&(showAll || showComponents[16])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="fengxianfbObj.length && (showAll || showComponents[16])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getS12fengXianFB()"
                 />
-                <div v-if="fengxianfbObj.length<=0&&(showAll || showComponents[16])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!fengxianfbObj.length && (showAll || showComponents[16])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
 
                 <s2manYiDu
                     v-if="showAll || showComponents[17]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getS2manYiDu()"
                 />
                 <s2manYiDuCol
-                    v-if="neishenfbObj.length>0&&(showAll || showComponents[18])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="neishenfbObj.length && (showAll || showComponents[18])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getS2manYiDuFB()"
                 />
-                <div v-if="neishenfbObj.length<=0&&(showAll || showComponents[18])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!neishenfbObj.length && (showAll || showComponents[18])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
                 <s14bufuhexiang
-                    v-if="bufuheObj.length>0&&(showAll || showComponents[19])"
-                    :height="'500%'"
-                    :width="static=='row' ? '100%': '100%'"
+                    v-if="bufuheObj.length && (showAll || showComponents[19])"
+                    height="500%"
+                    width="100%"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getS14bufuhexiang()"
                 />
-                <div v-if="bufuheObj.length<=0&&(showAll || showComponents[19])" class="nullDate1" style="height:50%;width:100%;">暂无数据</div>
+                <div
+                    v-if="!bufuheObj.length && (showAll || showComponents[19])"
+                    class="nullDate1"
+                    style="height:50%;width:100%;"
+                >暂无数据</div>
 
                 <s1zhiLiangMuBiao
                     v-if="showAll || showComponents[21]"
-                    :height="'200%'"
-                    :width="static=='row' ? '25%': '100%'"
+                    height="200%"
+                    :width="displayType === 'row' ? '25%' : '100%'"
                     :colorw="colorw"
                     style="box-shadow:none;width:100%;"
                     :data="getS1renwu()"
                 />
                 <s1zhiLiangMuBiaoCol
-                    v-if="guanshenfbObj.length>0&&(showAll || showComponents[22])"
-                    :height="'500%'"
-                    :width="static=='row' ? '75%': '100%'"
+                    v-if="guanshenfbObj.length && (showAll || showComponents[22])"
+                    height="500%"
+                    :width="displayType === 'row' ? '75%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getS1renwuFB()"
                 />
-                <div v-if="guanshenfbObj.length<=0&&(showAll || showComponents[22])" class="nullDate1" style="height:50%;width:75%;">暂无数据</div>
+                <div
+                    v-if="!guanshenfbObj.length && (showAll || showComponents[22])"
+                    class="nullDate1"
+                    style="height:50%;width:75%;"
+                >暂无数据</div>
                 <s16bzJunZhu
-                    v-if="gaijinxiangObj.length>0&&(showAll || showComponents[23])"
-                    :height="'500%'"
-                    :width="static=='row' ? '100%': '100%'"
+                    v-if="gaijinxiangObj.length && (showAll || showComponents[23])"
+                    height="500%"
+                    width="100%"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getbzJunZhujNum()"
                 />
-                <div v-if="gaijinxiangObj.length<=0&&(showAll || showComponents[23])" class="nullDate1" style="height:50%;width:100%;">暂无数据</div>
+                <div
+                    v-if="!gaijinxiangObj.length && (showAll || showComponents[23])"
+                    class="nullDate1"
+                    style="height:50%;width:100%;"
+                >暂无数据</div>
                 <s11biaoZhunWu
-                    v-if=" buhegelvObj.length>0 && (showAll || showComponents[24])"
-                    :height="'500%'"
-                    :width="static=='row' ? '100%': '100%'"
+                    v-if="buhegelvObj.length && (showAll || showComponents[24])"
+                    height="500%"
+                    :width="displayType === 'row' ? '100%' : '100%'"
                     :colorw="colorw"
                     :direction="direction"
                     style="box-shadow:none;width:100%;"
                     :data="getyangPinCaiJiObjNum()"
                 />
-                <div v-if="buhegelvObj.length<=0&&( showAll || showComponents[24])" class="nullDate">暂无数据</div>
+                <div
+                    v-if="!buhegelvObj.length && ( showAll || showComponents[24])"
+                    class="nullDate"
+                >暂无数据</div>
                 <div class="clear" />
             </div>
         </div>
@@ -329,7 +397,6 @@ import * as echarts from 'echarts'
 import { DBData, getConfig, getJiaoYanObj, gethechaObj, getgangqianpeixunFBObj, getguanshenObjFB, getzhiliangmubiaotitleObj, getneishenObjFB, getfengxianObjFB, getyingjiObjFB, getwaibuObjFB, getneibuObjFB, getJiaoYanObjFB, gethechaObjFB, getnengliObj, getkangningyangpinObj, getzaigangrenyuanFBObj, getgaijinxiangObj, getbufuheObj, getguanshenObj, getneishenObj, getfengxianObj, getyingjiObj, getneibuObj, getwaibuObj, gethechaMGObj, getJiaoYanMGObj, getgangqianpeixunObj, getzaigangrenyuanObj, getfenzuZLZBObj, getzongZLMBObj, getzhiliangzhibiaotitleObj, getyangPinCaiJiObj, getbiaozhunTObj, getbzJunZhuObj, getbzJunZhuTObj, getbzXiBaoObj, getbzXiBaoTObj } from './js/selectDB.js'
 import sendDatas from './sendDatas.js'
 import repostCurd from '@/business/platform/form/utils/custom/joinCURD.js'
-import * as forEach from 'lodash/forEach'
 export default {
     components: {
         headerDecoration,
@@ -373,7 +440,7 @@ export default {
             type: Array,
             default: () => []
         },
-        static: { // 显示类型，默认为横向   ,作为表单统计图的外部引用为 line
+        displayType: { // 显示类型，默认为横向   ,作为表单统计图的外部引用为 line
             type: String,
             default: 'row'
         }
@@ -470,15 +537,15 @@ export default {
         }
     },
     created () {
-        // 时间
         // this.currentTime()
-        this.getqualityData()
-        // if(screenfull.isEnabled && !screenfull.isFullscreen){
-        //   this.allView()
-
+        // this.getqualityData()
+        // if (screenfull.isEnabled && !screenfull.isFullscreen) {
+        //     this.allView()
         // }
     },
-    provide () { return { rollcontinue: this.rollcontinue, rollstop: this.rollstop } },
+    provide () {
+        return { rollcontinue: this.rollcontinue, rollstop: this.rollstop }
+    },
     mounted () {
         /* 以shows是否有参数来判断， 是否需要仅显示部分子组件*/
         if (this.shows.length > 0) {
@@ -493,20 +560,19 @@ export default {
             this.dataScope.push(this.BeginDate)
             this.dataScope.push(this.endDate)
         }
+        this.getqualityData()
         // 获取统计的配置
 
-        // if(this.buhegelvObj.length>0){
-        // console.log(this.pageAll,'76777index')
-        // this.timer1 = setInterval(()=>{
-        //   if(this.pageOT>=this.pageAll){
-        //     this.pageOT=1
-        //   }else{
-        //     this.pageOT = this.pageOT + 1
-        //   }
-        //   // console.log(this.pageOT)
-        // },8000)
+        // if (this.buhegelvObj.length > 0) {
+        //     this.timer1 = setInterval(() => {
+        //         if (this.pageOT >= this.pageAll) {
+        //             this.pageOT = 1
+        //         } else {
+        //             this.pageOT = this.pageOT + 1
+        //         }
+        //         // console.log(this.pageOT)
+        //     }, 8000)
         // }
-        // console.log('jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj')
         // this.drawLine()
     },
     updated () {
@@ -530,45 +596,18 @@ export default {
             }
         },
         getqualityData () {
-            const pos = this.$store.getters.level.second ? this.$store.getters.level.second : this.$store.getters.level.first
-            const sql = "select id_,name_ from ibps_party_entity where name_ like '%组' and name_ NOT LIKE '%综合%' and name_ NOT LIKE '%质量%' and name_ NOT LIKE '%科研%'  and name_ NOT LIKE '%教学%' and PATH_ like '%" + pos + "%'"
-            const sql1 = "select id_,name_ from ibps_party_entity where name_ like '%组' and PATH_ like '%" + pos + "%'"
+            const { deptList } = this.$store.getters || {}
+            const filterLetter = ['综合', '质量', '科研', '教学', '医疗', '样品', '助理', '急诊']
+            const AllDeptList = deptList.filter(d => d.depth === 4)
+            const deptEntity = deptList.filter(d => d.depth === 4 && !filterLetter.some(i => d.positionName.includes(i)))
 
-            Promise.all([repostCurd('sql', sql), repostCurd('sql', sql1)]).then(([response, response1]) => {
-                // console.log(sql)
-                const a = response.variables.data // 结果一定存在第0个，因为只有一条数据
-                const a1 = response1.variables.data // 结果一定存在第0个，因为只有一条数据
-                this.quality = a
-                this.quality1 = a1
-                // console.log(a,'335345345234543534')
-                // for (let i = 0; i < this.quality.length; i++) {
-                //   let a = {}
-                //   a.value = this.quality[i].id_
-                //   a.label = this.quality[i].name_
-                //   this.bumen.push(a)
-                // }
-                this.idsStr = this.quality.map(function (obj, index) {
-                    return obj.id_
-                }).join(',')
-                this.bumen = this.quality1.map(function (obj, index) {
-                    return obj.id_
-                }).join(',')
-                // console.log(this.quality1,'bumnebumen')
-                for (let i = 0; i < this.quality1.length; i++) {
-                    const mid = { 'NAME_': this.quality1[i].name_, 'numA': 0, 'num': 0, 'wnum': 0, 'chu': 0 }
-                    this.allBuMen.push(mid)
-                }
-                for (let i = 0; i < this.quality.length; i++) {
-                    const mid = { 'NAME_': this.quality[i].name_, 'numA': 0, 'num': 0, 'wnum': 0, 'chu': 0 }
-                    this.bfBuMen.push(mid)
-                }
-                // console.log(this.allBuMen,'2434465565665656rterterte')
-                // if(this.bumen != ''){
-                //   this.getConfigData(this.endDate,this.bumen)
-                // }else{
-                this.getConfigData(this.endDate, this.bumen, this.idsStr)
-                // }
-            })
+            this.idsStr = deptEntity.map(i => i.positionId).join(',')
+            this.bumen = AllDeptList.map(i => i.positionId).join(',')
+            this.allBuMen = AllDeptList.map(i => ({ 'NAME_': i.positionName, 'numA': 0, 'num': 0, 'wnum': 0, 'chu': 0 }))
+            this.bfBuMen = deptEntity.map(i => ({ 'NAME_': i.positionName, 'numA': 0, 'num': 0, 'wnum': 0, 'chu': 0 }))
+            console.log('aaaa', this.bfBuMen)
+
+            this.getConfigData(this.endDate, this.bumen, this.idsStr)
         },
         getNextMonth (date) {
             const arr = date.split('-')
@@ -585,23 +624,41 @@ export default {
             return t2
         },
         /* 查询统计配置中的完成率*/
-        getConfigData (end, info, info1) {
+        getConfigData (end, allDept, filterDept) {
+            console.log(end, allDept, filterDept)
             const that = this
             end[2] = end[1]
             end[1] = this.getNextMonth(end[1])
-            Promise.all([repostCurd('sql', getConfig()), repostCurd('sql', getyangPinCaiJiObj(end, info1)), repostCurd('sql', getzhiliangzhibiaotitleObj(end, info1)),
-                repostCurd('sql', getzongZLMBObj(end, info1)), repostCurd('sql', getfenzuZLZBObj(end, info1)), repostCurd('sql', getzaigangrenyuanObj(end, info)),
-                repostCurd('sql', getgangqianpeixunObj(end, info)), repostCurd('sql', getJiaoYanObj(end, info)), repostCurd('sql', getJiaoYanObjFB(end, info)),
-                repostCurd('sql', gethechaObj(end, info)), repostCurd('sql', gethechaObjFB(end, info)), repostCurd('sql', getwaibuObj(end, info)),
-                repostCurd('sql', getneibuObj(end, info)), repostCurd('sql', getyingjiObj(end, info)), repostCurd('sql', getfengxianObj(end, info)),
-                repostCurd('sql', getneishenObj(end, info)), repostCurd('sql', getguanshenObj(end, info)), repostCurd('sql', getbufuheObj(end, info)),
-                repostCurd('sql', getgaijinxiangObj(end, info)),
-                repostCurd('sql', getzaigangrenyuanFBObj(end, info)), repostCurd('sql', getgangqianpeixunFBObj(end, info)),
-                repostCurd('sql', getneibuObjFB(end, info)), repostCurd('sql', getwaibuObjFB(end, info)),
-                repostCurd('sql', getyingjiObjFB(end, info)), repostCurd('sql', getfengxianObjFB(end, info)),
-                repostCurd('sql', getneishenObjFB(end, info)), repostCurd('sql', getguanshenObjFB(end, info)),
-                repostCurd('sql', getzhiliangmubiaotitleObj(end, info1))]).then(([response, response1, response2, response3, response4, response5, response6, response7, response8, response9, response10, response11, response12, response13, response14, response15, response16, response17, response18,
-                fb, fb1, fb2, fb3, fb4, fb5, fb6, fb7, fb8]) => {
+            Promise.all([
+                repostCurd('query', getConfig()),
+                repostCurd('query', getyangPinCaiJiObj(end, filterDept)),
+                repostCurd('query', getzhiliangzhibiaotitleObj(end, filterDept)),
+                repostCurd('query', getzongZLMBObj(end, filterDept)),
+                repostCurd('query', getfenzuZLZBObj(end, filterDept)),
+                repostCurd('query', getzaigangrenyuanObj(end, allDept)),
+                repostCurd('query', getgangqianpeixunObj(end, allDept)),
+                repostCurd('query', getJiaoYanObj(end, allDept)),
+                repostCurd('query', getJiaoYanObjFB(end, allDept)),
+                repostCurd('query', gethechaObj(end, allDept)),
+                repostCurd('query', gethechaObjFB(end, allDept)),
+                repostCurd('query', getwaibuObj(end, allDept)),
+                repostCurd('query', getneibuObj(end, allDept)),
+                repostCurd('query', getyingjiObj(end, allDept)),
+                repostCurd('query', getfengxianObj(end, allDept)),
+                repostCurd('query', getneishenObj(end, allDept)),
+                repostCurd('query', getguanshenObj(end, allDept)),
+                repostCurd('query', getbufuheObj(end, allDept)),
+                repostCurd('query', getgaijinxiangObj(end, allDept)),
+                repostCurd('query', getzaigangrenyuanFBObj(end, allDept)),
+                repostCurd('query', getgangqianpeixunFBObj(end, allDept)),
+                repostCurd('query', getneibuObjFB(end, allDept)),
+                repostCurd('query', getwaibuObjFB(end, allDept)),
+                repostCurd('query', getyingjiObjFB(end, allDept)),
+                repostCurd('query', getfengxianObjFB(end, allDept)),
+                repostCurd('query', getneishenObjFB(end, allDept)),
+                repostCurd('query', getguanshenObjFB(end, allDept)),
+                repostCurd('query', getzhiliangmubiaotitleObj(end, filterDept))
+            ]).then(([response, response1, response2, response3, response4, response5, response6, response7, response8, response9, response10, response11, response12, response13, response14, response15, response16, response17, response18, fb, fb1, fb2, fb3, fb4, fb5, fb6, fb7, fb8]) => {
                 that.config = response.variables.data
                 that.buhegelvObj = response1.variables.data
                 that.zhiliangzhibiaotitle = response2.variables.data
@@ -645,15 +702,11 @@ export default {
                 that.relOf = true
             })
         },
-
-        async costPlannedAmountChange (record, value) {
-        // console.log(record,value,'34322222222222222222222222222222222222222222224')
-        },
         /* 查询全部*/
         selectAll () {
         /* 上次查询时间不等于当次查询时间，    开始时间不能等于结束时间， 则开始查询。*/
         // if (this.selectEnd != this.endDate) {
-            // this.getConfigData(this.endDate,this.idsStr)
+        // this.getConfigData(this.endDate,this.idsStr)
             this.getqualityData()
 
             this.relOf = true
@@ -665,7 +718,6 @@ export default {
         // }
         },
         checkYear (year, data) {
-        // console.log('222jinlailegengxinmeiyou')
             this.selectAll()
         },
         /* 获取当前年份*/
@@ -682,275 +734,74 @@ export default {
             return [nowDate.getFullYear() - year + '-01', nowDate.getFullYear() - year + '-' + month1]
         },
         sortArr (arr, str) {
-            const _arr = []
-            let _t = []
-            // 临时的变量
-            let _tmp
+            if (!arr?.length) return [] // 空数组直接返回
 
-            // 按照特定的参数将数组排序将具有相同值得排在一起
-            arr = arr.sort(function (a, b) {
-                const s = a[str]
-                const t = b[str]
+            // 1. 按属性排序
+            const sorted = [...arr].sort((a, b) => a[str].localeCompare(b[str]))
 
-                return s < t ? -1 : 1
-            })
+            // 2. 使用 Map 进行分组（更高效）
+            const grouped = sorted.reduce((map, item) => {
+                const key = item[str]
+                map.has(key) ? map.get(key).push(item) : map.set(key, [item])
+                return map
+            }, new Map())
 
-            if (arr.length) {
-                _tmp = arr[0][str]
-            }
-            // 将相同类别的对象添加到统一个数组
-            for (const i in arr) {
-                if (arr[i][str] === _tmp) {
-                    _t.push(arr[i])
-                } else {
-                    _arr.push({ 'id_': _tmp, 'data': _t })
-                    _tmp = arr[i][str]
-                    _t = [arr[i]]
-                }
-                // console.log( _tmp,_t,arr[i]);
-            }
-            // 将最后的内容推出新数组
-            _arr.push({ 'id_': _tmp, 'data': _t })
-            return _arr
+            // 3. 转换为目标格式 [{ id_: key, data: [...] }]
+            return [...grouped].map(([id_, data]) => ({ id_, data }))
         },
         getzzzbNum () {
-        // 生成月份
-            const that = this
-            const d1 = this.endDate[0]
-            const d2 = this.endDate[2]
-            const dateArry = new Array()
-            const s1 = d1.split('-')
-            const s2 = d2.split('-')
-            let mCount = 0
-            if (parseInt(s1[0]) < parseInt(s2[0])) {
-                mCount = (parseInt(s2[0]) - parseInt(s1[0])) * 12 + parseInt(s2[1]) - parseInt(s1[1]) + 1
-            } else {
-                mCount = parseInt(s2[1]) - parseInt(s1[1]) + 1
-            }
-            if (mCount > 0) {
-                let startM = parseInt(s1[1])
-                let startY = parseInt(s1[0])
-                for (let i = 0; i < mCount; i++) {
-                    if (startM < 12) {
-                        dateArry[i] = startY + '-' + (startM > 9 ? startM : '0' + startM)
-                        startM += 1
-                    } else {
-                        dateArry[i] = startY + '-' + (startM > 9 ? startM : '0' + startM)
-                        startM = 1
-                        startY += 1
-                    }
-                }
-            }
-            // 处理数据
-            const zjarr = []
-            let fenshuzu = []
-            const zongfz = []
-            fenshuzu = that.quality
-            for (let m = 0; m < that.quality.length; m++) {
-                for (let n = 0; n < that.fenzuzlmb.length; n++) {
-                    // console.log(that.quality.id_ == that.fenzuzlmb.id_,that.quality,that.fenzuzlmb)
-                    if (that.quality[m].id_ == that.fenzuzlmb[n].id_) {
-                        fenshuzu[m].data = that.fenzuzlmb[n].data ? that.fenzuzlmb[n].data : ''
-                        continue
-                    }
-                }
-            }
+            // 1. 生成月份数组
+            const [startDate, endDate] = [this.endDate[0], this.endDate[2]]
+            const [startYear, startMonth] = startDate.split('-').map(Number)
+            const [endYear, endMonth] = endDate.split('-').map(Number)
 
-            // console.log(fenshuzu,,fenshuzu[1].hasOwnProperty('data'),'55353453535345')
-            const title = ['name_']
-            for (let zn = 0; zn < fenshuzu.length; zn++) {
-                let zmIndex = 0
-                const zlzbfz = []
-                // zlzbfz = zjarr
-                for (let j = 0; j < dateArry.length; j++) {
-                    const rq = {}
-                    rq.name_ = dateArry[j]
-                    zlzbfz.push(rq)
-                    // console.log(zlzbfz,dateArry[j],'erw232222222222222222222222222224586')
-                }
-                for (let i = 0; i < zlzbfz.length; i++) {
-                    if (fenshuzu[zn].data && fenshuzu[zn].data.length > 0) {
-                        for (let j = 0; j < fenshuzu[zn].data.length; j++) {
-                            if (zlzbfz[i].name_ == fenshuzu[zn].data[j].bzsj) {
-                                const prop = fenshuzu[zn].data[j].zhi_liang_zhi_bia
-                                zlzbfz[i][prop] = fenshuzu[zn].data[j].location
-                                // console.log(zlzbfz,'zlzbfzzlzbfz')
-                                zmIndex = 1
-                            }
-                            continue
-                        }
-                    }
-                    continue
-                }
-                // console.log(zlzbfz,'ghshhhsuihihuisoio878788787878778')
-                if (zmIndex == 1) {
-                    zongfz.push({ 'id': fenshuzu[zn].id_, 'name': fenshuzu[zn].name_, 'data': zlzbfz })
-                } else {
-                    // zongfz.push({'id':fenshuzu[zn].id_,'name':fenshuzu[zn].name_,'data':[]})
+            const monthCount = endYear > startYear
+                ? (endYear - startYear) * 12 + endMonth - startMonth + 1
+                : endMonth - startMonth + 1
 
+            const dateArray = Array.from({ length: monthCount }, (_, i) => {
+                const month = startMonth + i
+                const year = startYear + Math.floor((month - 1) / 12)
+                const paddedMonth = String(month % 12 || 12).padStart(2, '0')
+                return `${year}-${paddedMonth}`
+            })
+
+            // 2. 合并 quality 和 fenzuzlmb 数据
+            const qualityMap = new Map(this.quality.map(item => [item.id_, item]))
+            this.fenzuzlmb.forEach(item => {
+                if (qualityMap.has(item.id_)) {
+                    qualityMap.get(item.id_).data = item.data || ''
                 }
-            }
-            for (let t = 0; t < this.zhiliangzhibiaotitle.length; t++) {
-                title.push(this.zhiliangzhibiaotitle[t].zhi_liang_zhi_bia)
-            }
-            const zbval = []
-            for (let t = 0; t < this.zhiliangzhibiaotitle.length; t++) {
-                zbval.push(parseFloat(this.zhiliangzhibiaotitle[t].zhi_biao_xian_zhi.match(/(\d+(\.\d+)?)/)))
-            }
-            this.zhiliangmuTitle = title
-            this.zhiliangmuNeirong = zongfz
-            // console.log(this.zhiliangmuNeirong.length,this.zhiliangmuNeirong,'fgdfgdafffffffffffff5426666')
-            this.zhiliangxianzhi = zbval
-            this.pageAll = this.zhiliangmuNeirong.length
-            // this.drawLine()
+            })
+
+            // 3. 按日期重组数据
+            const zongfz = [...qualityMap.values()].map(({ id_, name_, data = [] }) => {
+                const zlzbfz = dateArray.map(name_ => ({ name_ }))
+
+                data.forEach(({ bzsj, zhi_liang_zhi_bia, location }) => {
+                    const target = zlzbfz.find(item => item.name_ === bzsj)
+                    if (target) target[zhi_liang_zhi_bia] = location
+                })
+
+                return { id: id_, name: name_, data: zlzbfz }
+            }).filter(item => item.data.some(entry => Object.keys(entry).length > 1))
+
+            // 4. 提取标题和指标值
+            const title = ['name_', ...this.zhiliangzhibiaotitle.map(item => item.zhi_liang_zhi_bia)]
+            const zbval = this.zhiliangzhibiaotitle.map(item =>
+                parseFloat(item.zhi_biao_xian_zhi.match(/(\d+(\.\d+)?)/)[0])
+            )
+
+            // 5. 更新组件数据
+            Object.assign(this, {
+                zhiliangmuTitle: title,
+                zhiliangmuNeirong: zongfz,
+                zhiliangxianzhi: zbval,
+                pageAll: zongfz.length
+            })
+
             clearInterval(this.timer1)
-            // if(this.rollup == true){
-            //   this.fadeinout = false
-            //   this.timer1 = setInterval(()=>{
-            //     // console.log(Math.ceil(this.pageAll/2)+6,this.pageAll)
-            //     if(this.pageOT>=Math.ceil(this.pageAll/2)+7){
-            //       this.pageOT=1
-            //     }else{
-            //       this.pageOT = this.pageOT + 1
-            //     }
-            //   },4000)
-            // }
         },
-        // drawLine(){
-        //   setTimeout(() => {
-        //     this.zhiliangmuNeirong.forEach((item, index) => {
-        //       let xunhuanzzzb = echarts.init(document.getElementById(`card${index}`))
-        //       let barColor = ['#FF4433','#C9A9A6','#097969','#FF66CC','#EC5800','#AAFF00','#F8DE7E','#B87333',
-        //                       '#66FFCC','#A52A2A','#FFCCCC','#33FF00',,'#880808','#89CFF0','#5D3FD3','#9F2B68',
-        //                       '#FBCEB1','#E49B0F','#D27D2D','#FFBF00','#A0522D','#FF00FF','#D8BFD8',
-        //                       '#FFB6C1','#5D3FD3','#C3B1E1','#770737','#ECFFDC','#DA70D6','#F89880']
-        //       let barNum = []
-        //       for (let i = 0; i < this.zhiliangxianzhi.length-1; i++) {
-        //         barNum.push({
-        //           type: 'bar',
-        //           itemStyle: {color: barColor[i]},
-        //           label:{
-        //             normal:{
-        //               show:true,
-        //               position:'top',
-
-        //               textStyle:{
-        //                 fontSize:12,
-        //                 color:'#B0CEFC'
-        //               }
-        //             }
-        //           },
-        //           markLine: {
-        //             symbol: ['none', 'none'], // 去掉箭头
-        //             // label: {
-        //             //   show: false,
-        //             //   position: 'start',
-        //             //   formatter: '{b}'
-        //             // },
-        //             data: [
-        //               {
-        //                 name: '阈值',
-        //                 yAxis: this.zhiliangxianzhi[i]*1
-        //               }
-        //             ],
-        //             lineStyle: {
-        //               color: barColor[i]
-        //             }
-        //           }
-
-        //         })
-
-        //       }
-        //       let option = {
-        //         //v3
-        //         title: {
-        //           textStyle:{ fontSize:12,color: this.colorw }
-        //         },
-        //         legend: {
-        //           textStyle: {
-        //             fontSize: 12,
-        //             color: '#B0CEFC'  // 图例文字颜色
-        //           }
-
-        //         },
-        //         tooltip: {
-        //           // 当trigger : axis 鼠标移入标线不会有悬浮框出现 params的值为一个数组，只会悬浮series
-        //           // 当trigger : item 鼠标移入标线有悬浮框出现 params的值为一个对象，会区别鼠标移入的是series还是markLine
-        //           // 使用axis 注释掉formatter 自己写也行 ；使用item放开formatter
-        //           show: true,
-        //           trigger: "item",//axis item
-        //           axisPointer: {
-        //               type: "cross",
-        //               label: {
-        //                   backgroundColor: "#6a7985",
-        //               },
-        //           },
-        //           formatter: (params) => {
-        //             return this.zhiliangzhibiaotitle[params.seriesIndex].allt
-        //           }
-        //         },
-        //         grid: {
-        //               top: '20%',
-        //               left: '3%',
-        //               right: '4%',
-        //               bottom: '5%',
-        //               containLabel: true
-        //         },
-        //         xAxis: {
-        //           splitLine:{show: false},
-        //           type: 'category',
-        //           axisLabel: {
-        //             show: true,
-        //             textStyle: {
-        //               color: '#fff'   //这里用参数代替了
-        //             }
-        //           },
-        //           axisLine:{
-        //             lineStyle:{
-        //               color:'#fff',
-        //               width:1, //x轴线的宽度
-        //             }
-        //           }
-        //         },
-        //         yAxis: {
-        //           splitLine:{show: false},
-        //           axisLabel: {
-        //             show: true,
-        //             textStyle: {
-        //               color: '#fff'    //这里用参数代替了
-        //             }
-        //           },
-        //           axisLine:{
-        //             lineStyle:{
-        //               color:'#fff',
-        //               width:1, //x轴线的宽度
-        //             }
-        //           }
-        //         },
-        //         dataset: {
-        //           dimensions: this.zhiliangmuTitle,
-        //           source: this.zhiliangmuNeirong[index].data
-        //         },
-        //         series: barNum,
-        //         dataZoom: [
-        //           {
-        //               id: 'dataZoomY',
-        //               type: 'inside',
-        //               yAxisIndex: [0],
-        //               filterMode: 'empty'
-        //           }
-        //         ],
-
-        //       };
-
-        //       this.allEcharts.push(xunhuanzzzb)
-        //       option && xunhuanzzzb.setOption(option);
-        //     })
-        //   }, 0)
-        // },
-        // allView(){
-        //   screenfull.request() //默认显示全屏
-        // },
         goBack () {
             this.$router.back(-1)
             this.fadeinout = true

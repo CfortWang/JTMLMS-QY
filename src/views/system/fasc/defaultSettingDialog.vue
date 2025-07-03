@@ -35,9 +35,9 @@
                                 <el-select v-model="form.gang_wei_" placeholder="请选择" size="mini" style="width:100%">
                                     <el-option
                                         v-for="item in monitoringpPosition"
-                                        :key="item.id_"
-                                        :label="item.wei_hu_gang_wei_"
-                                        :value="item.wei_hu_gang_wei_"
+                                        :key="item.positionId"
+                                        :label="item.positionName"
+                                        :value="item.positionName"
                                     />
                                 </el-select>
                             </el-form-item>
@@ -250,7 +250,7 @@ export default {
     },
     computed: {
         monitoringpPosition () {
-            return this.jianCeGangWeiList.filter(i => i.suo_shu_bu_men_ === this.form.bian_zhi_bu_men_)
+            return this.jianCeGangWeiList.filter(i => i.dept === this.form.bian_zhi_bu_men_)
         },
         labelShow () {
             if (this.form.zhou_qi_) {

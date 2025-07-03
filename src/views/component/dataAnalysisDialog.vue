@@ -232,13 +232,6 @@ export default {
     },
     methods: {
         bringOutData(){
-            //sql版
-            // let bm = this.dynamicParams.formObj.getData("bianZhiBuMen")
-            // let sql = "select * from t_zbmbpzzb where parent_id_ = (select id_ from t_zbmbpz where bian_zhi_bu_men_ = '"+bm+"' ORDER BY create_time_ DESC limit 1)"
-            // this.$common.request('sql', sql).then(res => {
-            //     this.bringOut = res.variables.data.length>0?res.variables.data:[]
-            // })
-
             //值来源
             getBuildDataById({
                 dataTemplateId: "1214166960749674496"

@@ -145,7 +145,8 @@ export default {
             buttonShow: true,
             flowDiagramVisible: false,
             approvalHistoryVisible: false,
-            moreShow: false
+            moreShow: false,
+            processKey: 'Process_08xwabfNEW'
         }
     },
     watch: {
@@ -186,8 +187,11 @@ export default {
         },
         changeButtonShow (val, name) {
             if (this.$parent.userId !== '') {
-                const sql = `select count(*) as count from ibps_bpm_inst where PROC_DEF_KEY_ = 'Process_08xwabfNEW' and create_by_ = '${this.$parent.userId}'`
-                this.$common.request('sql', sql).then(res => {
+                // const sql = `select count(*) as count from ibps_bpm_inst where PROC_DEF_KEY_ = '${this.processKey}' and create_by_ = '${this.$parent.userId}'`
+                this.$common.request('query', {
+                    key: 'getBpmInstCountByUid',
+                    params: [this.processKey, this.$parent.userId]
+                }).then(res => {
                     const datas = res.variables.data
                     if (datas[0].count > 0) {
                         this.$alert(`你已经填写修改个人信息申请，但是还没有审核完毕，不能重复提交申请！`, '提示', {

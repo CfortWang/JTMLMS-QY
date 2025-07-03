@@ -72,12 +72,13 @@
 import { examTypeOptions, statusOption, basicColumn, infoColumn, resultColumn } from '../constants'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
-import { max, min, mean, sum, maxBy, minBy, meanBy, round, keyBy, mapValues } from 'lodash'
+import { max, min, mean, sum, maxBy, minBy, meanBy, round, keyBy, mapValues, fromPairs } from 'lodash'
 import { removeFormData } from '@/api/platform/data/dataTemplate'
+import { queryExams } from '@/api/business/general'
 
 const sortField = {
-    CREATE_TIME_: 'ex.chuang_jian_shi_j',
-    PUBLISH_DATE_: 'ex.fa_bu_shi_jian_'
+    CREATE_TIME_: 'chuangJianShiJ',
+    PUBLISH_DATE_: 'faBuShiJian'
 }
 
 export default {
@@ -110,11 +111,14 @@ export default {
             endColumn,
             level: second || first,
             title: '考试管理',
-            pkKey: 'id', // 主键  如果主键不是pk需要传主键
+            pkKey: 'examId', // 主键  如果主键不是pk需要传主键
             loading: true,
             height: document.clientHeight,
             listData: [],
-            pagination: {},
+            pagination: {
+                page: 1,
+                limit: 20
+            },
             sorts: {},
             showEditDialog: false,
             showDetailDialog: false,
@@ -138,12 +142,12 @@ export default {
                 ],
                 searchForm: {
                     forms: [
-                        { prop: 'examName', label: '考试名称', itemWidth: 150 },
-                        { prop: 'examType', label: '考试类型', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: examTypeOptions },
-                        { prop: 'examBank', label: '考试题库', fieldType: 'slot', slotName: 'examBankId', itemWidth: 150 },
-                        { prop: 'examState', label: '状态', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: statusOption },
-                        { prop: ['createTime0', 'createTime1'], label: '创建时间', fieldType: 'daterange' },
-                        { prop: ['publishDate0', 'publishDate1'], label: '发布时间', fieldType: 'daterange' }
+                        { prop: 'kaoShiMingChen', label: '考试名称', itemWidth: 150 },
+                        { prop: 'kaoShiLeiXing', label: '考试类型', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: examTypeOptions },
+                        { prop: 'tiKuId', label: '考试题库', fieldType: 'slot', slotName: 'examBankId', itemWidth: 150 },
+                        { prop: 'zhuangTai', label: '状态', itemWidth: 150, fieldType: 'select', multiple: 'Y', options: statusOption },
+                        { prop: ['chuangJianShiJ^S', 'chuangJianShiJ^E'], label: '创建时间', fieldType: 'daterange' },
+                        { prop: ['faBuShiJian^S', 'faBuShiJian^E'], label: '发布时间', fieldType: 'daterange' }
                     ]
                 },
                 // 表格字段配置
@@ -228,176 +232,236 @@ export default {
                 this.loadData()
             }
         },
-        // 加载数据
         loadData () {
             this.loading = true
-            this.getData(this.getSearchFormData()).then(res => {
+            queryExams(this.getSearchParams()).then(res => {
+                const { dataResult } = res.data
+                const { page, limit } = this.pagination
+                const archiveData = this.dealData(dataResult)
+                const { isNotEmpty } = this.$utils
+                // 数据处理后排序失效，前端重新排序
+                if (isNotEmpty(this.sorts)) {
+                    const sortFieldMap = {
+                        CREATE_TIME_: 'createTime',
+                        PUBLISH_DATE_: 'publishDate'
+                    }
+                    const [[key, direction]] = Object.entries(this.sorts)
+                    const field = sortFieldMap[key]
+                    archiveData.sort((a, b) => {
+                        const dateA = isNotEmpty(a[field]) ? new Date(a[field]).getTime() : 0
+                        const dateB = isNotEmpty(b[field]) ? new Date(b[field]).getTime() : 0
+                        return direction === 'ASC' ? dateA - dateB : dateB - dateA
+                    })
+                }
+                // 处理分页
+                const pageResult = {
+                    limit,
+                    page,
+                    totalCount: archiveData.length,
+                    totalPages: Math.ceil(archiveData.length / limit)
+                }
+                const result = {
+                    dataResult: archiveData.slice((page - 1) * limit, page * limit),
+                    pageResult
+                }
+                // console.log(result)
+                ActionUtils.handleListData(this, result)
+            }).finally(() => {
                 this.loading = false
-                ActionUtils.handleListData(this, res.data)
             })
         },
-        getData ({ parameters, requestPage, sorts }) {
+        getSearchParams () {
+            const { parameters, requestPage, sorts } = this.getSearchFormData() || {}
             const { pageNo = 1, limit = 20 } = requestPage || {}
-            let sortParams = ''
-            if (sorts && sorts.length) {
-                sortParams = sorts.map(i => `${sortField[i.field]} ${i.order}`).join(',')
-            } else {
-                sortParams = 'ex.chuang_jian_shi_j desc, ex.fa_bu_shi_jian_ desc'
-            }
-            const params = this.getParams(parameters)
-            const sql = `select qb.ti_ku_ming_cheng_ as bankName,f.pei_xun_nei_rong_ as trainId, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.kao_shi_lei_xing_ as examType, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.fa_bu_ren_ as publisher, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc, ex.shu_ju_yong_tu_ as dataType, ex.sui_ji_chou_ti_ as isRand,ex.chou_ti_fang_shi_ as randWay, ex.sui_ji_ti_shu_ as randNumber, ex.chou_ti_zong_fen_ as randScore, ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex left join t_question_bank qb on ex.ti_ku_id_ = qb.id_ left join t_examination e on e.exam_id_ = ex.id_ left join t_rypxcjb f on f.id_=ex.guan_lian_id_ where ex.di_dian_ = '${this.level}'${params} order by ${sortParams}`
-            return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then(res => {
-                    const { data = [] } = res.variables || {}
-                    if (!data.length) {
-                        resolve({
-                            dataResult: [],
-                            pageResult: {
-                                limit: 20,
-                                page: 1,
-                                totalCount: 0,
-                                totalPages: 0
-                            }
-                        })
-                        return
-                    }
-                    const archiveData = []
-                    const scorrType = {
-                        '最高分': 'max',
-                        '平均分': 'avg',
-                        '最近得分': 'latest'
-                    }
-                    data.forEach(item => {
-                        const examIndex = archiveData.findIndex(i => i.examId === item.examId)
-                        const temp = {
-                            paperId: item.paperId,
-                            paperState: item.paperState,
-                            examineeId: item.examineeId,
-                            score: item.score,
-                            applyTime: item.applyTime,
-                            startTime: item.startTime,
-                            endTime: item.endTime,
-                            qualifiedRadio: item.qualifiedRadio,
-                            totalScore: item.isRand === '1' ? parseFloat(item.randScore) : parseFloat(item.totalScore),
-                            scoringType: item.scoringType
-                        }
-                        if (examIndex === -1) {
-                            archiveData.push({
-                                trainId: item.trainId,
-                                examId: item.examId,
-                                examName: item.examName,
-                                examType: item.examType,
-                                examState: item.examState,
-                                bankId: item.bankId,
-                                bankName: item.bankName,
-                                examinee: item.examinee,
-                                questionCount: item.isRand === '1' ? parseFloat(item.randTotal) : parseFloat(item.questionCount),
-                                duration: item.duration,
-                                limitCount: item.limitCount,
-                                limitDate: item.limitDate,
-                                qualifiedRadio: item.qualifiedRadio,
-                                scoringType: item.scoringType,
-                                allowRegist: item.allowRegist,
-                                isRand: item.isRand,
-                                randWay: item.randWay,
-                                examDesc: item.examDesc,
-                                createTime: item.createTime,
-                                publishDate: item.publishDate,
-                                publisher: item.publisher,
-                                createBy: item.createBy,
-                                dataType: item.dataType,
-                                totalScore: item.isRand === '1' ? parseFloat(item.randScore) : parseFloat(item.totalScore),
-                                paperList: [temp],
-                                scoreList: [parseFloat(item.score || -1)],
-                                statusList: [item.paperState]
-                            })
-                        } else {
-                            archiveData[examIndex].scoreList.push(parseFloat(item.score || -1))
-                            archiveData[examIndex].statusList.push(item.paperState)
-                            archiveData[examIndex].paperList.push(temp)
-                        }
-                    })
-                    const nodatadesc = '/'
-                    archiveData.forEach((item, index) => {
-                        const finishScore = item.scoreList.filter(i => i !== -1)
-                        const examCount = item.scoreList.length
-                        item.paperList.forEach((paper, index) => {
-                            paper.cj = item.scoreList[index]
-                            paper.userName = this.transformUser(paper.examineeId)
-                            paper.max = finishScore.length ? round(max(finishScore), 2) : nodatadesc
-                            paper.min = finishScore.length ? round(min(finishScore), 2) : nodatadesc
-                            paper.avg = finishScore.length ? round(mean(finishScore), 2) : nodatadesc
-                            paper.sum = finishScore.length ? round(sum(finishScore), 2) : nodatadesc
-                            paper.latest = finishScore.length ? round(finishScore[0], 2) : nodatadesc
-                            paper.examCount = examCount
-                            paper.finishCount = finishScore.length
-                            paper.count = `${paper.examCount}/${paper.finishCount}`
-                            // 修改考试结束的判断逻辑：只要有一次交卷记录即为已完成
-                            paper.examStatus = paper.finishCount > 0 ? '已完成' : '未完成'
-                            paper.resultScore = paper[scorrType[paper.scoringType]]
-                            paper.isQualified = paper.examStatus === '已完成' ? paper.resultScore >= (parseFloat(paper.qualifiedRadio) / 100 * parseFloat(paper.totalScore)) ? '达标' : '未达标' : '考试未结束'
-                        })
-                        const finishList = item.paperList.filter(i => i.cj !== -1)
-                        item.maxScore = finishList.length ? maxBy(finishList, 'max').max : nodatadesc
-                        item.minScore = finishList.length ? minBy(finishList, 'min').min : nodatadesc
-                        item.avgScore = finishList.length ? meanBy(finishList, 'avg').toFixed(2) : nodatadesc
-                        item.passRate = finishList.length ? this.getPassRate(finishList) : nodatadesc
-                        item.examineeCount = item.examinee ? item.examinee.split(',').length : 0
-                        item.examFinishCount = [...new Set(finishList.map(ii => ii.examineeId))].length
-                    })
-                    const page = {
-                        limit,
-                        page: pageNo,
-                        totalCount: archiveData.length,
-                        totalPages: Math.ceil(archiveData.length / limit)
-                    }
-                    const result = {
-                        data: {
-                            dataResult: archiveData.slice((pageNo - 1) * limit, pageNo * limit),
-                            pageResult: page
-                        }
-                    }
-                    resolve(result)
-                }).catch(error => {
-                    reject(error)
-                })
-            })
-        },
-        // 组装SQL查询参数
-        getParams (parameters) {
-            const temp = mapValues(keyBy(parameters, 'key'), 'value')
-            let params = ''
-
-            const addCondition = (condition, value, isArray = false) => {
-                if (this.$utils.isNotEmpty(value)) {
-                    if (isArray) {
-                        const conditions = value.map(v => `${condition} = '${v}'`).join(' or ')
-                        params += ` and (${conditions})`
-                    } else {
-                        params += ` and ${condition} like '%${value}%'`
-                    }
-                }
-            }
-            addCondition('ex.kao_shi_ming_chen', temp.examName)
-            addCondition('ex.kao_shi_lei_xing_', temp.examType, true)
-            addCondition('ex.zhuang_tai_', temp.examState, true)
-
+            const param = mapValues(keyBy(parameters, 'key'), 'value')
+            const sort = fromPairs(sorts.map(({ field, order }) => [sortField[field], order]))
             if (this.examBankId) {
-                const conditions = this.examBankId.split(',').map(id => `ex.ti_ku_id_ = '${id}'`).join(' or ')
-                params += ` and (${conditions})`
+                param.tiKuId = this.examBankId.split(',')
             }
-
-            const addDateCondition = (key, field) => {
-                const dateParam = parameters.find(i => i.key.includes(key))
-                if (dateParam) {
-                    params += ` and (${field} >= '${temp[key + '0']}' and ${field} <= '${temp[key + '1']}' or ${field} is null)`
-                }
+            return {
+                pageNo,
+                // 获取全部数据处理后前端自行分页
+                limit: 99999,
+                ...(this.$utils.isNotEmpty(param) && { param }),
+                ...(this.$utils.isNotEmpty(sort) && { order: sort })
             }
-            addDateCondition('createTime', 'ex.chuang_jian_shi_j')
-            addDateCondition('publishDate', 'ex.fa_bu_shi_jian_')
-            console.log(params)
-            return params
         },
+        // 数据处理
+        dealData (data) {
+            const archiveData = []
+            const scorrType = {
+                '最高分': 'max',
+                '平均分': 'avg',
+                '最近得分': 'latest'
+            }
+            data.forEach(item => {
+                const examIndex = archiveData.findIndex(i => i.examId === item.examId)
+                const temp = {
+                    paperId: item.paperId,
+                    paperState: item.paperState,
+                    examineeId: item.examineeId,
+                    score: item.score,
+                    applyTime: item.applyTime,
+                    startTime: item.startTime,
+                    endTime: item.endTime,
+                    qualifiedRadio: item.qualifiedRadio,
+                    totalScore: item.isRand === '1' ? parseFloat(item.randScore) : parseFloat(item.totalScore),
+                    scoringType: item.scoringType
+                }
+                if (examIndex === -1) {
+                    archiveData.push({
+                        trainId: item.trainId,
+                        examId: item.examId,
+                        examName: item.examName,
+                        examType: item.examType,
+                        examState: item.examState,
+                        bankId: item.bankId,
+                        bankName: item.bankName,
+                        examinee: item.examinee,
+                        questionCount: item.isRand === '1' ? parseFloat(item.randTotal) : parseFloat(item.questionCount),
+                        duration: item.duration,
+                        limitCount: item.limitCount,
+                        limitDate: item.limitDate,
+                        qualifiedRadio: item.qualifiedRadio,
+                        scoringType: item.scoringType,
+                        allowRegist: item.allowRegist,
+                        isRand: item.isRand,
+                        randWay: item.randWay,
+                        examDesc: item.examDesc,
+                        createTime: item.createTime,
+                        publishDate: item.publishDate,
+                        publisher: item.publisher,
+                        createBy: item.createBy,
+                        dataType: item.dataType,
+                        totalScore: item.isRand === '1' ? parseFloat(item.randScore) : parseFloat(item.totalScore),
+                        paperList: [temp],
+                        scoreList: [parseFloat(item.score || -1)],
+                        statusList: [item.paperState]
+                    })
+                } else {
+                    archiveData[examIndex].scoreList.push(parseFloat(item.score || -1))
+                    archiveData[examIndex].statusList.push(item.paperState)
+                    archiveData[examIndex].paperList.push(temp)
+                }
+            })
+            const nodatadesc = '/'
+            archiveData.forEach((item, index) => {
+                const finishScore = item.scoreList.filter(i => i !== -1)
+                const examCount = item.scoreList.length
+                item.paperList.forEach((paper, index) => {
+                    paper.cj = item.scoreList[index]
+                    paper.userName = this.transformUser(paper.examineeId)
+                    paper.max = finishScore.length ? round(max(finishScore), 2) : nodatadesc
+                    paper.min = finishScore.length ? round(min(finishScore), 2) : nodatadesc
+                    paper.avg = finishScore.length ? round(mean(finishScore), 2) : nodatadesc
+                    paper.sum = finishScore.length ? round(sum(finishScore), 2) : nodatadesc
+                    paper.latest = finishScore.length ? round(finishScore[0], 2) : nodatadesc
+                    paper.examCount = examCount
+                    paper.finishCount = finishScore.length
+                    paper.count = `${paper.examCount}/${paper.finishCount}`
+                    // 修改考试结束的判断逻辑：只要有一次交卷记录即为已完成
+                    paper.examStatus = paper.finishCount > 0 ? '已完成' : '未完成'
+                    paper.resultScore = paper[scorrType[paper.scoringType]]
+                    paper.isQualified = paper.examStatus === '已完成' ? paper.resultScore >= (parseFloat(paper.qualifiedRadio) / 100 * parseFloat(paper.totalScore)) ? '达标' : '未达标' : '考试未结束'
+                })
+                const finishList = item.paperList.filter(i => i.cj !== -1)
+                item.maxScore = finishList.length ? maxBy(finishList, 'max').max : nodatadesc
+                item.minScore = finishList.length ? minBy(finishList, 'min').min : nodatadesc
+                item.avgScore = finishList.length ? meanBy(finishList, 'avg').toFixed(2) : nodatadesc
+                item.passRate = finishList.length ? this.getPassRate(finishList) : nodatadesc
+                item.examineeCount = item.examinee ? item.examinee.split(',').length : 0
+                item.examFinishCount = [...new Set(finishList.map(ii => ii.examineeId))].length
+            })
+            return archiveData
+        },
+        // 加载数据
+        // loadData () {
+        //     this.loading = true
+        //     console.log(this.getSearchFormData())
+        //     this.getData(this.getSearchFormData()).then(res => {
+        //         this.loading = false
+        //         ActionUtils.handleListData(this, res.data)
+        //     })
+        // },
+        // getData ({ parameters, requestPage, sorts }) {
+        //     const { pageNo = 1, limit = 20 } = requestPage || {}
+        //     let sortParams = ''
+        //     if (sorts && sorts.length) {
+        //         sortParams = sorts.map(i => `${sortField[i.field]} ${i.order}`).join(',')
+        //     } else {
+        //         sortParams = 'ex.chuang_jian_shi_j desc, ex.fa_bu_shi_jian_ desc'
+        //     }
+        //     const params = this.getParams(parameters)
+        //     const sql = `select qb.ti_ku_ming_cheng_ as bankName,f.pei_xun_nei_rong_ as trainId, ex.id_ as examId, ex.ti_ku_id_ as bankId, e.id_ as paperId, ex.zhuang_tai_ as examState, e.zhuang_tai_ as paperState, qb.ti_shu_ as questionCount, qb.zong_fen_ as totalScore, ex.kao_shi_ming_chen as examName, ex.kao_shi_lei_xing_ as examType, ex.can_kao_ren_yuan_ as examinee, e.kao_shi_ren_ as examineeId, ex.create_by_ as createBy, ex.chuang_jian_shi_j as createTime, ex.fa_bu_shi_jian_ as publishDate, ex.fa_bu_ren_ as publisher, ex.xian_kao_shi_jian as limitDate, ex.kao_shi_shi_chang as duration, ex.xian_kao_ci_shu_ as limitCount, ex.da_biao_zhan_bi_ as qualifiedRadio, ex.ji_fen_fang_shi_ as scoringType, ex.yun_xu_bao_ming_ as allowRegist, ex.kao_shi_miao_shu_ as examDesc, ex.shu_ju_yong_tu_ as dataType, ex.sui_ji_chou_ti_ as isRand,ex.chou_ti_fang_shi_ as randWay, ex.sui_ji_ti_shu_ as randNumber, ex.chou_ti_zong_fen_ as randScore, ex.ti_mu_zong_shu_ as randTotal, e.de_fen_ as score, e.bao_ming_shi_jian as applyTime, e.kai_shi_shi_jian_ as startTime, e.jie_shu_shi_jian_ as endTime from t_exams ex left join t_question_bank qb on ex.ti_ku_id_ = qb.id_ left join t_examination e on e.exam_id_ = ex.id_ left join t_rypxcjb f on f.id_=ex.guan_lian_id_ where ex.di_dian_ = '${this.level}'${params} order by ${sortParams}`
+        //     return new Promise((resolve, reject) => {
+        //         this.$common.request('sql', sql).then(res => {
+        //             const { data = [] } = res.variables || {}
+        //             if (!data.length) {
+        //                 resolve({
+        //                     dataResult: [],
+        //                     pageResult: {
+        //                         limit: 20,
+        //                         page: 1,
+        //                         totalCount: 0,
+        //                         totalPages: 0
+        //                     }
+        //                 })
+        //                 return
+        //             }
+        //             const archiveData = this.dealData(data)
+        //             const page = {
+        //                 limit,
+        //                 page: pageNo,
+        //                 totalCount: archiveData.length,
+        //                 totalPages: Math.ceil(archiveData.length / limit)
+        //             }
+        //             const result = {
+        //                 data: {
+        //                     dataResult: archiveData.slice((pageNo - 1) * limit, pageNo * limit),
+        //                     pageResult: page
+        //                 }
+        //             }
+        //             resolve(result)
+        //         }).catch(error => {
+        //             reject(error)
+        //         })
+        //     })
+        // },
+        // // 组装SQL查询参数
+        // getParams (parameters) {
+        //     const temp = mapValues(keyBy(parameters, 'key'), 'value')
+        //     let params = ''
+
+        //     const addCondition = (condition, value, isArray = false) => {
+        //         if (this.$utils.isNotEmpty(value)) {
+        //             if (isArray) {
+        //                 const conditions = value.map(v => `${condition} = '${v}'`).join(' or ')
+        //                 params += ` and (${conditions})`
+        //             } else {
+        //                 params += ` and ${condition} like '%${value}%'`
+        //             }
+        //         }
+        //     }
+        //     addCondition('ex.kao_shi_ming_chen', temp.examName)
+        //     addCondition('ex.kao_shi_lei_xing_', temp.examType, true)
+        //     addCondition('ex.zhuang_tai_', temp.examState, true)
+
+        //     if (this.examBankId) {
+        //         const conditions = this.examBankId.split(',').map(id => `ex.ti_ku_id_ = '${id}'`).join(' or ')
+        //         params += ` and (${conditions})`
+        //     }
+
+        //     const addDateCondition = (key, field) => {
+        //         const dateParam = parameters.find(i => i.key.includes(key))
+        //         if (dateParam) {
+        //             params += ` and (${field} >= '${temp[key + '0']}' and ${field} <= '${temp[key + '1']}' or ${field} is null)`
+        //         }
+        //     }
+        //     addDateCondition('createTime', 'ex.chuang_jian_shi_j')
+        //     addDateCondition('publishDate', 'ex.fa_bu_shi_jian_')
+        //     console.log(params)
+        //     return params
+        // },
         /**
          * 获取格式化参数
          */
@@ -426,6 +490,7 @@ export default {
          * 查询
          */
         search () {
+            this.$refs['crud'].clearSelection()
             this.loadData()
         },
         handleRowDblclick (row) {

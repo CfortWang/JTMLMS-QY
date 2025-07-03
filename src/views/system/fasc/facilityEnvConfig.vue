@@ -81,9 +81,9 @@
                                 <el-select v-model="search.gangWei" placeholder="请选择" size="mini" :clearable="true">
                                     <el-option
                                         v-for="item in jianCeGangWeiList"
-                                        :key="item.id_"
-                                        :label="item.wei_hu_gang_wei_"
-                                        :value="item.wei_hu_gang_wei_"
+                                        :key="item.positionId"
+                                        :label="item.positionName"
+                                        :value="item.positionName"
                                     />
                                 </el-select>
                             </div>
@@ -363,7 +363,7 @@ export default {
                     label: '每月安全检查',
                     path: '/sshjgl/aqgl/myaqjc',
                     showDevice: true,
-                    displayField: ['deviceno1_', 'devicename1_'],
+                    displayField: [],
                     requireField: []
                 },
                 '08-含氯有效性监测': {
@@ -434,7 +434,8 @@ export default {
                 }
             },
             subIdList: [],
-            isFirstLieBiao: true
+            isFirstLieBiao: true,
+            settig: false
         }
     },
     computed: {
@@ -509,8 +510,12 @@ export default {
     },
     async mounted () {
         const config = await getSetting('facilityEnv', 'typeList')
+        const settig = await getSetting('postJob', 'allocation')
         if (this.$utils.isNotEmpty(config)) {
             this.config = config
+        }
+        if (this.$utils.isNotEmpty(settig)) {
+            this.settig = settig
         }
         this.init()
         if (this.isEdit) {
@@ -525,16 +530,22 @@ export default {
             this.loadSelectorData()
         },
         loadSelectorData () {
-            const pos = this.$store.getters.level.second ? this.$store.getters.level.second : this.$store.getters.level.first
-            const sql = `select * from t_sbwhgwpzb where di_dian_='${pos}'`
-            this.$common.request('sql', sql).then(res => {
+            const { first, second } = this.$store.getters.level || {}
+            // const sql = `select * from t_sbwhgwpzb where di_dian_='${second || first}'`
+            this.$common.request('query', {
+                key: this.settig ? 'gwzzzha' : 'getPositionList',
+                params: [second || first]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 this.jianCeGangWeiList = data
             })
         },
         loadData () {
-            const sql = `select * from t_sshjpzb where id_='${this.parentData.mainId}'`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from t_sshjpzb where id_='${this.parentData.mainId}'`
+            this.$common.request('query', {
+                key: 'getFacsConfigById',
+                params: [this.parentData.mainId]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 // console.log('主表', data)
                 if (!data.length) {
@@ -583,8 +594,11 @@ export default {
             })
         },
         loadSubData () {
-            const sql = `select * from t_sshjpzxq where parent_id_='${this.parentData.mainId}' and (shi_fou_shan_chu_ !='1' OR shi_fou_shan_chu_ IS NULL OR shi_fou_shan_chu_='')`
-            this.$common.request('sql', sql).then(res => {
+            // const sql = `select * from t_sshjpzxq where parent_id_='${this.parentData.mainId}' and (shi_fou_shan_chu_ !='1' OR shi_fou_shan_chu_ IS NULL OR shi_fou_shan_chu_='')`
+            this.$common.request('query', {
+                key: 'getSubFacsConfig',
+                params: [this.parentData.mainId]
+            }).then(res => {
                 const { data = [] } = res.variables || {}
                 // console.log('子表', data)
                 if (!data.length) {

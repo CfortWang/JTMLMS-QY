@@ -40,7 +40,7 @@
                         <el-form-item label="部门分组：" prop="bu_men_fen_zu_">
                             <ibps-custom-dialog
                                 v-model="form.bu_men_fen_zu_"
-                                template-key="sbbqdhk"
+                                :template-key="config?'gwzzdhkrcwh':'sbbqdhk'"
                                 :multiple="false"
                                 :disabled="readonly"
                                 type="dialog"
@@ -251,8 +251,9 @@ export default {
         }
     },
     data () {
-        const { userId, position, level } = this.$store.getters
+        const { userId, position, level, setting } = this.$store.getters
         return {
+            config: setting?.postJob?.allocation || false,
             userId,
             position,
             level: level.second || level.first,

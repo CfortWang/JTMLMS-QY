@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import curdPost from '@/business/platform/form/utils/custom/joinCURD.js'
 import TreeUtils from '@/utils/tree'
 
 export default {
@@ -53,12 +52,14 @@ export default {
         this.getPositionList()
     },
     methods: {
-    // 获取本账户所在的部门
+        // 获取本账户所在的部门
         getPositionList () {
-            const sql = `select *FROM ibps_cat_type where category_key_ ='FILE_TYPE' 
-      and AUTHORITY_NAME LIKE '%${this.level.second ? this.level.second : this.level.first}%'
-      and AUTHORITY_NAME LIKE '%"需要"%' order by sn_ asc`
-            curdPost('sql', sql).then((res) => {
+            const { first, second } = this.$store.getters.level || {}
+            // const sql = `select *FROM ibps_cat_type where category_key_ ='FILE_TYPE' and AUTHORITY_NAME LIKE concat('%', ${second || first}, '%') and AUTHORITY_NAME LIKE '%"需要"%' order by sn_ asc`
+            this.$common.request('query', {
+                key: 'getFileTypeWithReview',
+                params: [second || first]
+            }).then((res) => {
                 if (res.state === 200) {
                     const datas = res.variables.data
                     this.sqlDatas = datas

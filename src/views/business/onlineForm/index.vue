@@ -79,6 +79,7 @@
 <script>
 
 import { createTemplateFile, editTemplateFile, deleteTemplateFile } from '@/api/platform/file/onlyoffice'
+import { queryOnlineForm } from '@/api/business/general'
 import ActionUtils from '@/utils/action'
 import FixHeight from '@/mixins/height'
 // import Handle from './mixin/handle'
@@ -185,27 +186,22 @@ export default {
                     labelWidth: 80,
                     itemWidth: 150,
                     forms: [
-                        { prop: 'dept', label: '部门', fieldType: 'slot', slotName: 'dept', itemWidth: 120 },
-                        { prop: 'formName', label: '表单名称' },
-                        { prop: 'state', label: '状态', fieldType: 'select', options: stateOption },
-                        { prop: 'submitBy', label: '填写人', fieldType: 'slot', slotName: 'user' },
-                        {
-                            prop: ['submitTime0', 'submitTime1'],
-                            label: '填写时间',
-                            fieldType: 'daterange',
-                            itemWidth: 240
-                        }
+                        { prop: 'bian_zhi_bu_men_', label: '部门', fieldType: 'slot', slotName: 'dept', itemWidth: 120 },
+                        { prop: 'Q^biao_dan_ming_che^SL', label: '表单名称' },
+                        { prop: 'Q^shi_fou_guo_shen_^S', label: '状态', fieldType: 'select', options: stateOption },
+                        { prop: 'bian_zhi_ren_', label: '填写人', fieldType: 'slot', slotName: 'user' },
+                        { prop: ['Q^bian_zhi_shi_jian^DL', 'Q^bian_zhi_shi_jian^DG'], label: '填写时间', fieldType: 'daterange', itemWidth: 240 }
                     ]
                 },
                 // 表格字段配置
                 columns: [
-                    { prop: 'dept', label: '部门', tags: deptOption, width: 100, sortable: true },
-                    { prop: 'formName', label: '表单名称', width: 200, sortable: true },
-                    { prop: 'state', label: '状态', width: 90 },
-                    { prop: 'submitBy', label: '填写人', tags: userOption, width: 100, sortable: true },
-                    { prop: 'submitTime', label: '填写时间', width: 140, sortable: true },
-                    { prop: 'version', label: '表单版本', width: 90 },
-                    { prop: 'attachment', label: '附件', slotName: 'attachment', minWidth: 110 }
+                    { prop: 'bianZhiBuMen', label: '部门', tags: deptOption, width: 100, sortable: true },
+                    { prop: 'biaoDanMingChe', label: '表单名称', width: 200, sortable: true },
+                    { prop: 'shiFouGuoShen', label: '状态', width: 90 },
+                    { prop: 'bianZhiRen', label: '填写人', tags: userOption, width: 100, sortable: true },
+                    { prop: 'bianZhiShiJian', label: '填写时间', width: 140, sortable: true },
+                    // { prop: 'version', label: '表单版本', width: 90 },
+                    { prop: 'fuJian', label: '附件', slotName: 'attachment', minWidth: 110 }
                 ],
                 rowHandle: {
                     effect: 'display',
@@ -246,111 +242,155 @@ export default {
         this.loadData()
     },
     methods: {
-        /**
-         * 加载数据
-         */
+        // /**
+        //  * 加载数据
+        //  */
+        // loadData () {
+        //     this.loading = true
+        //     this.getData(this.getSearchFormData()).then(res => {
+        //         this.loading = false
+        //         ActionUtils.handleListData(this, res.data)
+        //     })
+        // },
+        // /**
+        //  * 加载数据
+        //  */
+        // getData ({ parameters, requestPage, sorts }) {
+        //     const { pageNo = 1, limit = 20 } = requestPage || {}
+        //     let sortParams = ''
+        //     if (sorts && sorts.length) {
+        //         sortParams = sorts.map(i => `${sortField[i.field]} ${i.order}`).join(',')
+        //     } else {
+        //         sortParams = 'bian_zhi_shi_jian desc, bian_zhi_bu_men_ asc'
+        //     }
+        //     const params = this.getParams(parameters)
+        //     const sql = `select id_ as id, create_by_ as createBy, bian_zhi_ren_ as submitBy, create_time_ as createTime, bian_zhi_shi_jian as submitTime, bian_zhi_bu_men_ as dept, shi_fou_guo_shen_ as state, biao_dan_ming_che as formName, biao_dan_mo_ban_ as formTemplate, mo_ban_id_ as templateId, gui_dang_lu_jing_ as parentId, fu_jian_ as attachment, cun_fang_lu_jing_ as filePath, shuo_ming_ as detail, pei_zhi_ as config from t_bdmbtxjl where di_dian_ = '${this.level}'${params} order by ${sortParams}`
+        //     return new Promise((resolve, reject) => {
+        //         this.$common.request('sql', sql).then(res => {
+        //             const { data = [] } = res.variables || {}
+        //             if (!data.length) {
+        //                 resolve({
+        //                     dataResult: [],
+        //                     pageResult: {
+        //                         limit: 20,
+        //                         page: 1,
+        //                         totalCount: 0,
+        //                         totalPages: 0
+        //                     }
+        //                 })
+        //                 return
+        //             }
+        //             const page = {
+        //                 limit,
+        //                 page: pageNo,
+        //                 totalCount: data.length,
+        //                 totalPages: Math.ceil(data.length / limit)
+        //             }
+        //             const result = {
+        //                 data: {
+        //                     dataResult: data.slice((pageNo - 1) * limit, pageNo * limit),
+        //                     pageResult: page
+        //                 }
+        //             }
+        //             resolve(result)
+        //         }).catch(error => {
+        //             reject(error)
+        //         })
+        //     })
+        // },
+        // // 组装SQL查询参数
+        // getParams (parameters) {
+        //     const temp = mapValues(keyBy(parameters.filter(i => this.$utils.isNotEmpty(i.value)), 'key'), 'value')
+        //     let params = ''
+
+        //     const addCondition = (condition, value, isArray = false) => {
+        //         if (this.$utils.isNotEmpty(value)) {
+        //             if (isArray) {
+        //                 const conditions = value.map(v => `${condition} = '${v}'`).join(' or ')
+        //                 params += ` and (${conditions})`
+        //             } else {
+        //                 params += ` and ${condition} like '%${value}%'`
+        //             }
+        //         }
+        //     }
+        //     addCondition('biao_dan_ming_che', temp.formName)
+        //     addCondition('bian_zhi_bu_men_', temp.dept?.split(','), true)
+        //     addCondition('shi_fou_guo_shen_', temp.state)
+        //     addCondition('bian_zhi_ren_', temp.submitBy?.split(','), true)
+
+        //     const addDateCondition = (key, field) => {
+        //         const dateParam = parameters.find(i => i.key.includes(key))
+        //         if (dateParam) {
+        //             params += ` and (${field} >= '${temp[key + '0']}' and ${field} <= '${temp[key + '1']}' or ${field} is null)`
+        //         }
+        //     }
+        //     addDateCondition('submitTime', 'bian_zhi_shi_jian')
+        //     if (this.typeId) {
+        //         params += ` and mo_ban_id_ = '${this.typeId}'`
+        //     }
+        //     return params
+        // },
+        // /**
+        //  * 获取格式化参数
+        //  */
+        // getSearchFormData () {
+        //     let params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
+        //     params = {
+        //         ...params,
+        //         ...this.searchParams
+        //     }
+        //     if (this.$utils.isNotEmpty(this.typeId)) {
+        //         params['Q^TYPE_ID_^S'] = this.typeId
+        //     }
+        //     return ActionUtils.formatParams(
+        //         params,
+        //         this.pagination,
+        //         this.sorts
+        //     )
+        // },
         loadData () {
             this.loading = true
-            this.getData(this.getSearchFormData()).then(res => {
-                this.loading = false
+            console.log(this.getSearchFormData())
+            queryOnlineForm(this.getSearchFormData()).then(res => {
                 ActionUtils.handleListData(this, res.data)
+                this.loading = false
+            }).catch(() => {
+                this.loading = false
             })
-        },
-        /**
-         * 加载数据
-         */
-        getData ({ parameters, requestPage, sorts }) {
-            const { pageNo = 1, limit = 20 } = requestPage || {}
-            let sortParams = ''
-            if (sorts && sorts.length) {
-                sortParams = sorts.map(i => `${sortField[i.field]} ${i.order}`).join(',')
-            } else {
-                sortParams = 'bian_zhi_shi_jian desc, bian_zhi_bu_men_ asc'
-            }
-            const params = this.getParams(parameters)
-            const sql = `select id_ as id, create_by_ as createBy, bian_zhi_ren_ as submitBy, create_time_ as createTime, bian_zhi_shi_jian as submitTime, bian_zhi_bu_men_ as dept, shi_fou_guo_shen_ as state, biao_dan_ming_che as formName, biao_dan_mo_ban_ as formTemplate, mo_ban_id_ as templateId, gui_dang_lu_jing_ as parentId, fu_jian_ as attachment, cun_fang_lu_jing_ as filePath, shuo_ming_ as detail, pei_zhi_ as config from t_bdmbtxjl where di_dian_ = '${this.level}'${params} order by ${sortParams}`
-            return new Promise((resolve, reject) => {
-                this.$common.request('sql', sql).then(res => {
-                    const { data = [] } = res.variables || {}
-                    if (!data.length) {
-                        resolve({
-                            dataResult: [],
-                            pageResult: {
-                                limit: 20,
-                                page: 1,
-                                totalCount: 0,
-                                totalPages: 0
-                            }
-                        })
-                        return
-                    }
-                    const page = {
-                        limit,
-                        page: pageNo,
-                        totalCount: data.length,
-                        totalPages: Math.ceil(data.length / limit)
-                    }
-                    const result = {
-                        data: {
-                            dataResult: data.slice((pageNo - 1) * limit, pageNo * limit),
-                            pageResult: page
-                        }
-                    }
-                    resolve(result)
-                }).catch(error => {
-                    reject(error)
-                })
-            })
-        },
-        // 组装SQL查询参数
-        getParams (parameters) {
-            const temp = mapValues(keyBy(parameters.filter(i => this.$utils.isNotEmpty(i.value)), 'key'), 'value')
-            let params = ''
-
-            const addCondition = (condition, value, isArray = false) => {
-                if (this.$utils.isNotEmpty(value)) {
-                    if (isArray) {
-                        const conditions = value.map(v => `${condition} = '${v}'`).join(' or ')
-                        params += ` and (${conditions})`
-                    } else {
-                        params += ` and ${condition} like '%${value}%'`
-                    }
-                }
-            }
-            addCondition('biao_dan_ming_che', temp.formName)
-            addCondition('bian_zhi_bu_men_', temp.dept?.split(','), true)
-            addCondition('shi_fou_guo_shen_', temp.state)
-            addCondition('bian_zhi_ren_', temp.submitBy?.split(','), true)
-
-            const addDateCondition = (key, field) => {
-                const dateParam = parameters.find(i => i.key.includes(key))
-                if (dateParam) {
-                    params += ` and (${field} >= '${temp[key + '0']}' and ${field} <= '${temp[key + '1']}' or ${field} is null)`
-                }
-            }
-            addDateCondition('submitTime', 'bian_zhi_shi_jian')
-            if (this.typeId) {
-                params += ` and mo_ban_id_ = '${this.typeId}'`
-            }
-            return params
         },
         /**
          * 获取格式化参数
          */
         getSearchFormData () {
-            let params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
-            params = {
-                ...params,
-                ...this.searchParams
-            }
+            const params = this.$refs['crud'] ? this.$refs['crud'].getSearcFormData() : {}
             if (this.$utils.isNotEmpty(this.typeId)) {
-                params['Q^TYPE_ID_^S'] = this.typeId
+                params['Q^mo_ban_id_^S'] = this.typeId
             }
-            return ActionUtils.formatParams(
-                params,
-                this.pagination,
-                this.sorts
+            const { dept, submitBy } = this.searchParams
+            if (this.$utils.isNotEmpty(dept)) {
+                params[`Q^bian_zhi_bu_men_^S`] = dept.split(',')
+            }
+            if (this.$utils.isNotEmpty(submitBy)) {
+                params[`Q^bian_zhi_ren_^S`] = submitBy.split(',')
+            }
+            params['Q^di_dian_^S'] = this.level
+            // console.log(params)
+            const result = {
+                parameters: this.formatParameters(params),
+                ...ActionUtils.formatParams(null, this.pagination, this.sorts)
+            }
+            return result
+        },
+        formatParameters (data) {
+            if (this.$utils.isEmpty(data)) {
+                return []
+            }
+            const parameters = Object.entries(data).map(([key, value]) =>
+                Array.isArray(value)
+                    ? { relation: 'OR', parameters: value.map(v => ({ key, value: v, param: this.$utils.guid() })) }
+                    : { key, value }
             )
+            return parameters.length === 1 ? [parameters[0]] : [{ relation: 'AND', parameters }]
         },
         /**
          * 处理分页事件
@@ -363,6 +403,8 @@ export default {
          * 处理排序
          */
         handleSortChange (sort) {
+            // 处理字段长度，可能出现排序字段与数据库字段不一致情况
+            sort.sortBy = sort.sortBy.slice(0, 17)
             ActionUtils.setSorts(this.sorts, sort)
             this.loadData()
         },

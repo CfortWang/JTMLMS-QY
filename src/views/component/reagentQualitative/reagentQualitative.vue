@@ -43,7 +43,7 @@
                                 </el-radio-group>
                             </template>
                         </el-table-column>
-                        <el-table-column label="可接受范围（≥80%）" prop="biaoZhun">
+                        <el-table-column label="可接受范围" prop="biaoZhun">
                             <template slot-scope="{row}">
                                 <el-input v-if="!isRead" v-model="row.biaoZhun" size="mini" maxlength="32" placeholder="请输入" @input="handleInput" />
                                 <span v-else>{{ row.biaoZhun }}</span>
