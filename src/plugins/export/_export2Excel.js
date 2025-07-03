@@ -50,54 +50,119 @@ function datenum (v, date1904) {
     return (epoch - new Date(Date.UTC(1899, 11, 30))) / (24 * 60 * 60 * 1000)
 }
 
-function sheet_from_array_of_arrays (data, columnStyles = {}) {
-    var ws = {}
-    var range = { s: { c: 10000000, r: 10000000 }, e: { c: 0, r: 0 }}
-    for (var R = 0; R !== data.length; ++R) {
-        for (var C = 0; C !== data[R].length; ++C) {
+function normalizeColor (val) {
+    if (typeof val === 'string') return { rgb: val }
+    return val
+}
+
+function mergeStyles (base = {}, override = {}) {
+    const deepMerge = (a = {}, b = {}) => ({ ...a, ...b })
+    return {
+        font: deepMerge(base.font, override.font),
+        alignment: deepMerge(base.alignment, override.alignment),
+        border: deepMerge(base.border, override.border),
+        fill: deepMerge(base.fill, override.fill),
+        numFmt: override.numFmt || base.numFmt
+    }
+}
+
+function sheet_from_array_of_arrays (data, columnStyles = {}, cellStyles = {}) {
+    const ws = {}
+    const range = { s: { c: 10000000, r: 10000000 }, e: { c: 0, r: 0 }}
+
+    // 处理行高（全局设置）
+    ws['!rows'] = data.map((_, rowIndex) => ({
+        hpx: columnStyles.rows && columnStyles.rows[rowIndex] ? columnStyles.rows[rowIndex].height : 20 // 默认行高20px
+    }))
+
+    // 列宽设置
+    ws['!cols'] = data[0].map((_, colIndex) => {
+        const col = columnStyles[colIndex] || {}
+        return {
+            wpx: col.wpx,
+            width: col.width,
+            hidden: col.hidden
+        }
+    })
+
+    // 处理列样式
+    // ws['!cols'] = data[0].map((_, colIndex) => {
+    //     const style = columnStyles[colIndex] || {}
+    //     return {
+    //         width: style.width || 15, // 列宽（字符单位）
+    //         wpx: style.wpx, // 列宽（像素单位）
+    //         hidden: style.hidden, // 是否隐藏列
+    //         level: style.level, // 大纲级别
+    //         numFmt: style.numFmt || '@', // 数字格式
+    //         style: {
+    //             alignment: style.alignment || {
+    //                 wrapText: style.wrapText || false, // 自动换行
+    //                 vertical: style.vertical || 'top', // 垂直对齐(top/middle/bottom)
+    //                 horizontal: style.horizontal || 'left' // 水平对齐(left/center/right)
+    //             },
+    //             font: style.font || {
+    //                 name: '宋体',
+    //                 sz: 11,
+    //                 bold: false,
+    //                 color: { rgb: '000000' }
+    //             },
+    //             border: style.border || {
+    //                 top: { style: 'thin', color: { rgb: '000000' }},
+    //                 bottom: { style: 'thin', color: { rgb: '000000' }},
+    //                 left: { style: 'thin', color: { rgb: '000000' }},
+    //                 right: { style: 'thin', color: { rgb: '000000' }}
+    //             },
+    //             fill: style.fill // 背景色
+    //         }
+    //     }
+    // })
+
+    for (let R = 0; R < data.length; ++R) {
+        for (let C = 0; C < data[R].length; ++C) {
+            // 1. 计算单元格范围
             if (range.s.r > R) range.s.r = R
             if (range.s.c > C) range.s.c = C
             if (range.e.r < R) range.e.r = R
             if (range.e.c < C) range.e.c = C
-            var cell = { v: data[R][C] }
-            if (cell.v == null) continue
-            var cell_ref = XLSX.utils.encode_cell({ c: C, r: R })
-            var style = columnStyles[C] || {}
+
+            // 2. 初始化单元格
+            const cellValue = data[R][C]
+            if (cellValue == null) continue
+
+            // 3. 合并样式（优先级：单元格样式 > 列样式）
+            const colStyle = columnStyles[C] || {}
+            const cellStyle = cellStyles[R] && cellStyles[R][C] || {}
+            const style = mergeStyles(colStyle.style || colStyle, cellStyle)
+
+            if (style.font && style.font.color) style.font.color = normalizeColor(style.font.color)
+            if (style.fill && style.fill.fgColor) style.fill.fgColor = normalizeColor(style.fill.fgColor)
+            if (style.border) {
+                for (const key of ['top', 'bottom', 'left', 'right']) {
+                    if (style.border[key] && style.border[key].color) { style.border[key].color = normalizeColor(style.border[key].color) }
+                }
+            }
+            const cell = { v: cellValue, s: style }
+
+            // 4. 类型和格式处理（支持优先级）
             if (typeof cell.v === 'number') {
                 cell.t = 'n'
-                if (style.numFmt) cell.z = style.numFmt
+                cell.z = style.numFmt || '0.00'
             } else if (typeof cell.v === 'boolean') {
                 cell.t = 'b'
+                cell.z = style.numFmt || 'BOOLEAN'
             } else if (cell.v instanceof Date) {
                 cell.t = 'n'
-                cell.z = style.numFmt || XLSX.SSF._table[14]
+                cell.z = style.numFmt || 'yyyy-mm-dd'
                 cell.v = datenum(cell.v)
             } else {
                 cell.t = 's'
-                cell.z = '@'
+                cell.z = style.numFmt || '@'
             }
 
-            if (style.font) cell.s = { font: style.font }
-            if (style.alignment) cell.s = { ...(cell.s || {}), alignment: style.alignment }
-            if (style.border) cell.s = { ...(cell.s || {}), border: style.border }
-            if (style.fill) cell.s = { ...(cell.s || {}), fill: style.fill }
-
+            const cell_ref = XLSX.utils.encode_cell({ c: C, r: R })
             ws[cell_ref] = cell
         }
     }
-    // 设置整列样式
-    ws['!cols'] = data[0].map((_, index) => {
-        return {
-            width: 15, // 列宽，单位为字符
-            numFmt: '', // 数字格式
-            style: {
-                font: style.font, // 字体样式
-                alignment: style.alignment, // 对齐方式
-                border: style.border, // 边框样式
-                fill: style.fill // 填充样式
-            }
-        }
-    })
     if (range.s.c < 10000000) ws['!ref'] = XLSX.utils.encode_range(range)
     return ws
 }
@@ -144,7 +209,7 @@ export function export_table_to_excel (id) {
 // function formatJson(jsonData) {
 //     console.log(jsonData)
 // }
-export function export_json_to_excel (th, jsonData, defaultTitle, options = { merges: [], header: null, columnStyles: {}}) {
+export function export_json_to_excel (th, jsonData, defaultTitle, options = { merges: [], header: null, columnStyles: {}, cellStyles: {}}) {
     // original data
     var data = jsonData
     data.unshift(th)
@@ -152,7 +217,7 @@ export function export_json_to_excel (th, jsonData, defaultTitle, options = { me
     var ws_name = defaultTitle || 'SheetJS'
 
     var wb = new Workbook()
-    var ws = sheet_from_array_of_arrays(data, options.columnStyles)
+    var ws = sheet_from_array_of_arrays(data, options.columnStyles, options.cellStyles)
 
     // add merges area to worksheet
     let { merges } = options

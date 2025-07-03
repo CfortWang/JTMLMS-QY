@@ -36,12 +36,13 @@ const IbpsExport = {
                 labelKey: 'label',
                 header: null,
                 merges: [],
-                columnStyles: {}
+                columnStyles: {},
+                cellStyles: {}
             }
             // 合并参数
             const _params = Object.assign({}, paramsDefault, params)
             // 从参数中派生数据
-            const header = _params.columns.map(e => e[_params.labelKey])
+            const header = _params.columns.map(col => col[_params.labelKey])
             const data = _params.data.map(row => _params.columns.map(col => row[col[_params.nameKey]]))
             /**
              * 定义列格式。单元格格式可能值：
@@ -57,12 +58,31 @@ const IbpsExport = {
              * 'yyyy-mm-dd hh:mm:ss'：日期时间格式，例如 2023-05-15 15:30:00。
              * '@'：文本格式，单元格内容会被视为文本而不是数字。
              */
-            const columnStyles = _params.columns.reduce((acc, col) => {
-                acc[col[_params.nameKey]] = { numFmt: col.format || '@' }
-                return acc
-            }, {})
+            const columnStyles = {}
+            const colIndexMap = {} // prop -> column index
+            _params.columns.forEach((col, index) => {
+                colIndexMap[col[_params.nameKey]] = index
+                columnStyles[index] = {
+                    width: col.width,
+                    wpx: col.wpx,
+                    hidden: col.hidden,
+                    numFmt: col.format,
+                    alignment: col.alignment,
+                    font: col.font,
+                    border: col.border,
+                    fill: col.fill
+                }
+            })
             // 导出
-            Excel.export_json_to_excel(header, data, _params.title, { merges: _params.merges, header: _params.header, columnStyles })
+            Excel.export_json_to_excel(header, data, _params.title, {
+                merges: _params.merges,
+                header: _params.header,
+                columnStyles: {
+                    ...columnStyles,
+                    rows: _params.columnStyles.rows || {} // 保留行高配置
+                },
+                cellStyles: _params.cellStyles
+            })
             // 完成
             resolve()
         })
