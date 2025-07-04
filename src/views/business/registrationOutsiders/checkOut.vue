@@ -62,7 +62,8 @@ export default {
             endPickerOptions: {
                 disabledDate (time) {
                     const t = new Date(time)
-                    const { jin_ru_shi_jian_: startTime } = that.dataList
+                    let { jin_ru_shi_jian_: startTime } = that.dataList
+                    startTime = startTime.slice(0, 10) + ' 00:00'
                     // 禁用当前时间之后和来访时间之前的时间
                     if (startTime) {
                         const start = new Date(startTime)

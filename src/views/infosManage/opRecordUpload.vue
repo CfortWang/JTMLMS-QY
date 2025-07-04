@@ -254,7 +254,7 @@ export default {
             this.addDataCont = { fenLei: nodeData.name, fenLeiId: nodeId }
             // 文件控制-纸质运行记录上传页面，无下级菜单且无添加按钮时显示添加按钮（仅对纸质运行记录上传列表生效）
             if (this.pageKey === 'ywyxjlsc') {
-                const noChildren = nodeData.isLeaf === 'Y'
+                const noChildren = !nodeData.children?.length
                 const hasAddBtn = this.listConfig.toolbars.some(el => el.key === 'add')
 
                 if (!noChildren && hasAddBtn) {
